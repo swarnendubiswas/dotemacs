@@ -10,7 +10,7 @@
 ;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
 ;; expansions in the current buffer and presents suggestions for completion.
 (use-package hippie-exp
-  :straight (:type built-in)
+  ;; :straight (:type built-in)
   :custom
   (hippie-expand-try-functions-list '(try-expand-dabbrev
                                       try-expand-dabbrev-all-buffers
@@ -284,16 +284,16 @@
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes
-                     (vertico-buffer
-                      vertico-directory
-                      vertico-flat
-                      vertico-indexed
-                      vertico-mouse
-                      vertico-quick
-                      vertico-repeat
-                      vertico-reverse))
+  ;; :straight (vertico :files (:defaults "extensions/*")
+  ;;                    :includes
+  ;;                    (vertico-buffer
+  ;;                     vertico-directory
+  ;;                     vertico-flat
+  ;;                     vertico-indexed
+  ;;                     vertico-mouse
+  ;;                     vertico-quick
+  ;;                     vertico-repeat
+  ;;                     vertico-reverse))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands command-completion-default-include-p
@@ -438,10 +438,10 @@
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (use-package corfu
-  :straight (corfu :includes (corfu-indexed
-                              corfu-quick
-                              corfu-history)
-                   :files (:defaults "extensions/corfu-*.el"))
+  ;; :straight (corfu :includes (corfu-indexed
+  ;;                             corfu-quick
+  ;;                             corfu-history)
+                  ;;  :files (:defaults "extensions/corfu-*.el"))
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :preface
   (defun sb/corfu-move-to-minibuffer ()
@@ -528,7 +528,7 @@
 ;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
 ;; function company-capf"
 (use-package company-capf
-  :straight company
+  ;; :straight company
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands company-capf)
 
@@ -633,17 +633,17 @@
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
-  :straight flx
-  :straight t
+  :ensure flx
+  :ensure t
   :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :after company
   :diminish (company-fuzzy-mode global-company-fuzzy-mode)
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
   :custom
-  (company-fuzzy-sorting-backend 'flx)
-  (company-fuzzy-show-annotation nil "The right-hand side gets cut off")
-  ;; We should not need this because the `flx' sorting accounts for the prefix
+  (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+  (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+  ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix
   (company-fuzzy-prefix-on-top t))
 
 (use-package company-shell
@@ -760,26 +760,8 @@
   (dolist (hook '(latex-mode-hook))
     (add-hook hook (lambda ()
                      (when (or (not (display-graphic-p)) (eq sb/capf 'company))
-                       (sb/company-latex-mode))))))
-
-(progn
-  (defun sb/company-web-mode ()
-    "Add backends for web completion in company mode."
-
-    (make-local-variable 'company-backends)
-
-    (setq company-backends '(company-capf
-                             company-files
-                             company-yasnippet
-                             company-dabbrev
-                             company-ispell)))
-
-  (dolist (hook '(web-mode-hook))
-    (add-hook hook (lambda ()
-                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
-                       (sb/company-web-mode)
-                       (company-fuzzy-mode 1)
-                       (diminish 'company-fuzzy-mode))))))
+                       (sb/company-latex-mode)
+                       (company-fuzzy-mode 1))))))
 
 (progn
   (defun sb/company-text-mode ()
@@ -794,8 +776,8 @@
     (set (make-local-variable 'company-backends)
          '(company-files
            company-dabbrev
-           company-ispell
-           company-abbrev)))
+           ;; company-abbrev
+           company-ispell)))
 
   (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook hook (lambda ()
@@ -888,69 +870,92 @@
                                 (company-fuzzy-mode 1)
                                 (diminish 'company-fuzzy-mode)))))
 
-(progn
-  (defun sb/company-elisp-mode ()
-    "Set up company for elisp mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 2)
-    (make-local-variable 'company-backends)
-
-    (setq company-backends '(company-capf
-                             company-yasnippet
-                             company-files
-                             company-dabbrev-code
-                             company-dabbrev)))
-
-  (add-hook 'emacs-lisp-mode-hook (lambda ()
-                                    (when (or (not (display-graphic-p)) (eq sb/capf 'company))
-                                      (sb/company-elisp-mode)
-                                      (company-fuzzy-mode 1)
-                                      (diminish 'company-fuzzy-mode)))))
-
-(progn
-  (defun sb/company-python-mode ()
-    "Add backends for Python completion in company mode."
-    (defvar company-minimum-prefix-length)
-    (defvar company-backends)
-
-    (setq-local company-minimum-prefix-length 3)
-    (make-local-variable 'company-backends)
-
-    ;; `company-dabbrev-code' is useful for variable names
-    (setq company-backends '(company-capf
-                             company-yasnippet
-                             company-dabbrev-code
-                             company-files
-                             company-dabbrev)))
-
-  (add-hook 'python-mode-hook (lambda ()
-                                (when (or (not (display-graphic-p)) (eq sb/capf 'company))
-                                  (sb/company-python-mode)
-                                  (company-fuzzy-mode 1)
-                                  (diminish 'company-fuzzy-mode)))))
-
 ;; (progn
-;;   (defun sb/company-prog-mode ()
-;;     "Add backends for program completion in company mode."
+;;   (defun sb/company-elisp-mode ()
+;;     "Set up company for elisp mode."
 ;;     (defvar company-minimum-prefix-length)
 ;;     (defvar company-backends)
 
 ;;     (setq-local company-minimum-prefix-length 2)
 ;;     (make-local-variable 'company-backends)
 
-;;     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
 ;;     (setq company-backends '(company-capf
 ;;                              company-yasnippet
 ;;                              company-files
 ;;                              company-dabbrev-code
 ;;                              company-dabbrev)))
 
-;;   (add-hook 'prog-mode-hook (lambda ()
-;;                               (sb/company-prog-mode)
-;;                               (company-fuzzy-mode 1)
-;;                               (diminish 'company-fuzzy-mode))))
+;;   (add-hook 'emacs-lisp-mode-hook (lambda ()
+;;                                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+;;                                       (sb/company-elisp-mode)
+;;                                       (company-fuzzy-mode 1)
+;;                                       (diminish 'company-fuzzy-mode)))))
+
+;; (progn
+;;   (defun sb/company-python-mode ()
+;;     "Add backends for Python completion in company mode."
+;;     (defvar company-minimum-prefix-length)
+;;     (defvar company-backends)
+
+;;     (setq-local company-minimum-prefix-length 3)
+;;     (make-local-variable 'company-backends)
+
+;;     ;; `company-dabbrev-code' is useful for variable names
+;;     (setq company-backends '(company-capf
+;;                              company-yasnippet
+;;                              company-dabbrev-code
+;;                              company-files
+;;                              company-dabbrev)))
+
+;;   (add-hook 'python-mode-hook (lambda ()
+;;                                 (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+;;                                   (sb/company-python-mode)
+;;                                   (company-fuzzy-mode 1)
+;;                                   (diminish 'company-fuzzy-mode)))))
+
+;; (progn
+;;   ;; `web-mode' is derived from `prog-mode'
+;;   (defun sb/company-web-mode ()
+;;     "Add backends for web completion in company mode."
+
+;;     (make-local-variable 'company-backends)
+
+;;     (setq company-backends '(company-capf
+;;                              company-files
+;;                              company-yasnippet
+;;                              company-dabbrev
+;;                              company-ispell)))
+
+;;   (dolist (hook '(web-mode-hook))
+;;     (add-hook hook (lambda ()
+;;                      (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+;;                        (sb/company-web-mode)
+;;                        (company-fuzzy-mode 1)
+;;                        (diminish 'company-fuzzy-mode))))))
+
+(progn
+  (defun sb/company-prog-mode ()
+    "Add backends for program completion in company mode."
+    (defvar company-minimum-prefix-length)
+    (defvar company-backends)
+
+    (setq-local company-minimum-prefix-length 2)
+    (make-local-variable 'company-backends)
+
+    ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+    (setq company-backends '(company-capf
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-files
+                             company-dabbrev)))
+
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (when (or (not (display-graphic-p)) (eq sb/capf 'company))
+                (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
+                  (sb/company-prog-mode)
+                  (company-fuzzy-mode 1)
+                  (diminish 'company-fuzzy-mode))))))
 
 (use-package orderless
   :after (:any ivy vertico)

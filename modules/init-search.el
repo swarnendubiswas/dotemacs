@@ -10,7 +10,8 @@
 ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; `isearch' candidates.
 (use-package isearch
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
   :custom
   (search-highlight t "Highlight incremental search")
@@ -26,12 +27,12 @@
    ("C-f"     . isearch-repeat-forward)
    ("C-c C-o" . isearch-occur)))
 
-(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
-  :after isearch
-  :commands (isearch-forward-symbol ; "M-s _"
-             isearch-symbol-at-point
-             isearch-forward-symbol-at-point ; "M-s ."
-             isearch-backward-symbol-at-point))
+;; (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
+;;   :after isearch
+;;   :commands (isearch-forward-symbol ; "M-s _"
+;;              isearch-symbol-at-point
+;;              isearch-forward-symbol-at-point ; "M-s ."
+;;              isearch-backward-symbol-at-point))
 
 (use-package anzu
   :diminish anzu-mode

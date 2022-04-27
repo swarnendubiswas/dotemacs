@@ -20,12 +20,12 @@
               (display-fill-column-indicator-mode 1))))
 
 (use-package subword
-  :straight nil
+  ;; :straight nil
   :diminish
   :hook (prog-mode-hook . subword-mode))
 
 (use-package outline ; Edit outlines
-  :straight nil
+  ;; :straight nil
   :disabled t
   :hook (prog-mode-hook . outline-minor-mode)
   :diminish outline-minor-mode)
@@ -33,7 +33,7 @@
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 (use-package hideshow
-  :straight nil
+  ;; :straight nil
   :disabled t
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
@@ -136,11 +136,13 @@
   :hook (prog-mode-hook . hes-mode))
 
 (use-package ini-mode
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :commands ini-mode)
 
 (use-package elisp-mode
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :mode
   (("\\.el\\'"  . emacs-lisp-mode)
    ("\\.elc\\'" . elisp-byte-code-mode))
@@ -195,7 +197,8 @@
     :server-id 'cssls-r)))
 
 (use-package make-mode
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :mode
   (("\\Makefile\\'"       . makefile-mode)
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
@@ -219,14 +222,15 @@
   (csv-separators '("," ";" "|" " ")))
 
 (use-package antlr-mode
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :mode "\\.g4\\'")
 
 (use-package bison-mode
   :mode ("\\.bison\\'"))
 
 (use-package llvm-mode
-  :straight nil
+  ;; :straight nil
   ;; :straight (llvm-mode :type git :host github
   ;;                      :repo "llvm/llvm-project"
   ;;                      :files "llvm/utils/emacs/llvm-mode.el")
@@ -235,7 +239,7 @@
   :mode "\\.ll\\'")
 
 (use-package tablegen-mode
-  :straight nil
+  ;; :straight nil
   :load-path "extras"
   :commands tablegen-mode
   :mode "\\.td\\'")
@@ -312,7 +316,7 @@
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
-  :straight spinner
+  ;; :straight spinner
   :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -577,7 +581,8 @@
   :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
 (use-package cc-mode
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode
@@ -653,7 +658,7 @@
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 (use-package python
-  :straight nil
+  ;; :straight nil
   :hook (python-mode-hook . lsp-deferred)
   :mode ("SCon\(struct\|script\)$" . python-mode)
   :mode ("[./]flake8\\'" . conf-mode)
@@ -764,7 +769,7 @@
   :hook (python-mode-hook . yapf-mode))
 
 (use-package cperl-mode
-  :straight nil
+  ;; :straight nil
   :mode ("latexmkrc\\'")
   :hook (cperl-mode-hook . lsp-deferred)
   :config
@@ -837,7 +842,7 @@
   :mode "\\.gradle\\'")
 
 (use-package sh-script ; Shell script mode
-  :straight nil
+  ;; :straight nil
   :mode
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
@@ -870,7 +875,7 @@
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 (use-package bat-mode
-  :straight nil
+  ;; :straight nil
   :commands bat-mode
   :mode
   (("\\.bat\\'" . bat-mode)
@@ -909,7 +914,8 @@
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
-  :straight nil
+  ;; :straight nil
+  :ensure nil
   :commands nxml-mode
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
@@ -978,7 +984,7 @@
   :hook (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
-  :straight nil
+  ;; :straight nil
   :commands mlir-mode
   :load-path "extras"
   :mode "\\.mlir\\'")
@@ -996,7 +1002,7 @@
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
-  :straight tree-sitter-langs
+  ;; :straight tree-sitter-langs
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
   :diminish tree-sitter-mode
@@ -1021,7 +1027,7 @@
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (use-package ansi-color
-  :straight nil
+  ;; :straight nil
   :commands ansi-color-apply-on-region
   :preface
   (defun sb/colorize-compilation-buffer ()
@@ -1038,7 +1044,7 @@
   (add-hook 'compilation-filter-hook #'sanityinc/colourise-compilation-buffer))
 
 (use-package info-colors
-  :straight nil
+  ;; :straight nil
   :commands info-colors-fontify-node
   :hook (Info-selection-hook . info-colors-fontify-node))
 
@@ -1054,7 +1060,7 @@
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line
 (use-package executable
-  :straight nil
+  ;; :straight nil
   :commands (executable-make-buffer-file-executable-if-script-p)
   :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 

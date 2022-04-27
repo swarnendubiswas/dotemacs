@@ -7,8 +7,9 @@
 
 ;;; Code:
 
-(use-package help-fns+
-  :demand t)
+;; (use-package help-fns+
+;;   :ensure nil
+;;   :demand t)
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
@@ -189,7 +190,7 @@
   :commands (define-word define-word-at-point))
 
 (use-package number-separator
-  :straight (number-separator :type git :host github :repo "legalnonsense/number-separator.el")
+  ;; :straight (number-separator :type git :host github :repo "legalnonsense/number-separator.el")
   :commands number-separator-mode
   :disabled t
   :diminish
@@ -200,7 +201,7 @@
   (number-separator-decimal-char "."))
 
 (use-package eldoc
-  :straight nil
+  ;; :straight nil
   :if (symbol-value 'sb/IS-LINUX)
   :commands turn-on-eldoc-mode
   :diminish
@@ -213,7 +214,7 @@
   ;; (setq eldoc-echo-area-use-multiline-p nil)
 
   ;; Allow eldoc to trigger after completions
-  (when (sb/capf 'company)
+  (with-eval-after-load "company"
     (eldoc-add-command 'company-complete-selection
                        'company-complete-common
                        'company-capf
@@ -238,7 +239,7 @@
   :commands (bug-hunter-init-file bug-hunter-file))
 
 (use-package explain-pause-mode
-  :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
+  ;; :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
   :if (bound-and-true-p sb/debug-init-file)
   :disabled t
   :commands (explain-pause-mode explain-pause-top)
@@ -248,7 +249,7 @@
   :bind ([remap other-window] . ace-window))
 
 (use-package windmove ; "Shift + direction" arrows
-  :straight nil
+  ;; :straight nil
   :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
   :custom
@@ -308,7 +309,8 @@
         ("M-g l" . ivy-avy)))
 
 (use-package bookmark
-  :straight nil)
+  ;; :straight nil
+  )
 
 (use-package bm
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous

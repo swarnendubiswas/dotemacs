@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package dired
-  :straight (:type built-in)
+  ;; :straight (:type built-in)
   :commands (dired-next-line dired-jump)
   :defines dired-clean-confirm-killing-deleted-buffers
   :preface
@@ -51,7 +51,7 @@
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
-  :straight nil
+  ;; :straight nil
   :defines dired-cleanup-buffers-too
   :commands (dired-omit-mode)
   :hook (dired-mode-hook . dired-omit-mode)
@@ -90,7 +90,7 @@
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :straight  (dired+ :type git :host github :repo "emacsmirror/dired-plus")
+  ;; :straight  (dired+ :type git :host github :repo "emacsmirror/dired-plus")
   :commands diredp-toggle-find-file-reuse-dir
   :init (setq diredp-bind-problematic-terminal-keys nil)
   :custom
@@ -270,7 +270,7 @@
   :config (treemacs-load-theme "all-the-icons"))
 
 (use-package dired-async
-  :straight async
+  ;; :straight async
   :diminish
   :hook (dired-mode-hook . dired-async-mode))
 

@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package paren
-  :straight nil
+  ;; :straight nil
   ;; :init (run-with-idle-timer 2 nil #'show-paren-mode)
   :hook (after-init-hook . show-paren-mode)
   :config
@@ -18,7 +18,7 @@
 
 ;; Enable autopairing
 (use-package elec-pair
-  :straight nil
+  ;; :straight nil
   :commands (electric-pair-mode)
   :disabled t
   ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)

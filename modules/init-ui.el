@@ -205,7 +205,7 @@
   (spaceline-emacs-theme))
 
 (use-package awesome-tray ; Minimal modeline information
-  :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
+  ;; :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
   :commands awesome-tray-mode
   :if (eq sb/modeline-theme 'awesome-tray)
   :hook (after-init-hook . awesome-tray-mode)
@@ -372,7 +372,7 @@
 
 ;; Show dividers on the right of each window, more prominent than the default
 (use-package frame
-  :straight (:type built-in)
+  ;; :straight (:type built-in)
   :hook (after-init-hook . window-divider-mode))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
@@ -439,7 +439,7 @@
   :hook (after-init-hook . global-disable-mouse-mode))
 
 (use-package avoid ; Move the cursor from the line of view
-  :straight nil
+  ;; :straight nil
   :commands mouse-avoidance-mode
   :if (display-mouse-p)
   :init (mouse-avoidance-mode 'banish))

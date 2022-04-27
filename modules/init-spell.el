@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package ispell
-  :straight nil
+  ;; :straight nil
   :if (symbol-value 'sb/IS-LINUX)
   :custom
   (ispell-dictionary "en_US")
@@ -37,7 +37,7 @@
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}")))
 
 (use-package flyspell
-  :straight nil
+  ;; :straight nil
   :if (symbol-value 'sb/IS-LINUX)
   :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :diminish

@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package org
-  :straight nil
+  ;; :straight nil
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
@@ -62,7 +62,7 @@
   :hook (org-mode-hook . org-bullets-mode))
 
 (use-package org-appear ; Make invisible parts of Org elements appear visible
-  :straight (org-appear :type git :host github :repo "awth13/org-appear")
+  ;; :straight (org-appear :type git :host github :repo "awth13/org-appear")
   :commands org-appear-mode
   :hook (org-mode-hook . org-appear-mode)
   :custom

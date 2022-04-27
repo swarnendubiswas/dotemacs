@@ -43,7 +43,7 @@
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
 
   (use-package magit-diff
-    :straight nil
+    ;; :straight nil
     :demand t
     :custom
     (magit-diff-refine-hunk  t)
@@ -99,7 +99,7 @@
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
-  :straight (:type built-in)
+  ;; :straight (:type built-in)
   :after hydra
   :commands (smerge-next smerge-prev smerge-auto-leave
                          smerge-keep-base smerge-keep-upper
@@ -144,7 +144,7 @@
         ("M-g M"   . smerge-popup-context-menu)))
 
 (use-package ediff
-  :straight nil
+  ;; :straight nil
   :after magit
   :demand t
   :defines ediff-window-setup-function

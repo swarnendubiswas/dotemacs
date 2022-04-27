@@ -9,69 +9,96 @@
 
 ;; Bootstrap `straight.el'
 
-(setf straight-profiles `((nil . "straight.lockfile.el")))
+(when (bound-and-true-p sb/disable-package.el)
+  (setf straight-profiles `((nil . "straight.lockfile.el")))
 
-(defvar bootstrap-version)
-(setq straight-build-dir (format "build/%d%s%d"
-                                 emacs-major-version
-                                 version-separator
-                                 emacs-minor-version)
-      straight-check-for-modifications nil)
+  (defvar bootstrap-version)
+  (setq straight-build-dir (format "build/%d%s%d"
+                                   emacs-major-version
+                                   version-separator
+                                   emacs-minor-version)
+        straight-check-for-modifications nil)
 
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t
-      straight-disable-native-compile nil
-      ;; There is no need to download the whole Git history, and a single branch often suffices
-      straight-vc-git-default-clone-depth '(1 single-branch))
+  (straight-use-package 'use-package)
+  (setq straight-use-package-by-default t
+        straight-disable-native-compile nil
+        ;; There is no need to download the whole Git history, and a single branch often suffices
+        straight-vc-git-default-clone-depth '(1 single-branch))
 
-;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
-;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
-;; persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
-;; packages to their locked versions, making the config totally reproducible across environments.
+  ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
+  ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
+  ;; persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
+  ;; packages to their locked versions, making the config totally reproducible across environments.
 
-;; Freeze package versions with `straight-freeze-versions' which will write the versions in a
-;; lockfile. All package versions can be restored to the versions specified in the lockfile with
-;; `straight-thaw-versions'.
+  ;; Freeze package versions with `straight-freeze-versions' which will write the versions in a
+  ;; lockfile. All package versions can be restored to the versions specified in the lockfile with
+  ;; `straight-thaw-versions'.
 ;;;; Create a version file if it does not yet exist
-(when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
-                                            straight-base-dir)))
-  (straight-freeze-versions))
+  (when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
+                                              straight-base-dir)))
+    (straight-freeze-versions)))
 
-;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
-;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
-;; implies always load features lazily unless told otherwise. This implies we should use
-;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
-;; careful about using `:after' and always deferring loading, because then we will need to specifiy
-;; alternate ways of loading the package.
-;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
+(unless (bound-and-true-p sb/disable-package.el)
+  ;; Avoid loading packages twice, this is set during `(package-initialize)'
+  (setq package-enable-at-startup nil)
 
-;; Hooks in the `:hook' section run in reverse order. Example:
-;; (use-package package-name
-;;   :hook
-;;   ((x-mode-hook . last)
-;;    (x-mode-hook . second)
-;;    (x-mode-hook . first)))
+  (with-eval-after-load 'package
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+    (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+    (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
-(when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error                 t
-        debug-on-event                 'sigusr2
-        garbage-collection-messages    t
-        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-        use-package-verbose            t
-        use-package-expand-minimally   nil)
-  (debug-on-entry 'projectile-remove-known-project))
+  ;; Initialise the package management system. Another option is to construct the `load-path'
+  ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+  (package-initialize)
+
+  (defvar package-native-compile)
+  (defvar native-comp-always-compile)
+
+  ;; Enable ahead-of-time compilation when installing a package
+  (when sb/EMACS28+
+    (setq package-native-compile nil))
+
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (setq use-package-always-ensure t))
+
+  ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
+  ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
+  ;; implies always load features lazily unless told otherwise. This implies we should use
+  ;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
+  ;; careful about using `:after' and always deferring loading, because then we will need to specifiy
+  ;; alternate ways of loading the package.
+  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
+
+  ;; Hooks in the `:hook' section run in reverse order. Example:
+  ;; (use-package package-name
+  ;;   :hook
+  ;;   ((x-mode-hook . last)
+  ;;    (x-mode-hook . second)
+  ;;    (x-mode-hook . first)))
+
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq debug-on-error                 t
+          debug-on-event                 'sigusr2
+          garbage-collection-messages    t
+          use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+          use-package-verbose            t
+          use-package-expand-minimally   nil)
+    (debug-on-entry 'projectile-remove-known-project))
 
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer       t
@@ -127,7 +154,7 @@
 
 ;; Asynchronously byte compile packages installed with `package.el'
 (use-package async
-  :straight (async :type git :host github :repo "jwiegley/emacs-async")
+  ;; :straight (async :type git :host github :repo "jwiegley/emacs-async")
   :functions async-bytecomp-package-mode
   :commands async-bytecomp-package-mode
   :init (async-bytecomp-package-mode 1))

@@ -44,7 +44,8 @@
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 
-(bind-key "[escape]" #'keyboard-quit popup-menu-keymap)
+(with-eval-after-load "popup"
+  (bind-key "[escape]" #'keyboard-quit popup-menu-keymap))
 
 (when (eq sb/minibuffer-completion 'ivy)
   (bind-key   "C-x j" #'sb/counsel-all-files-recursively))

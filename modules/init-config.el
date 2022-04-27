@@ -159,6 +159,12 @@ Corfu does not support TUI, so we have to fallback on company."
           (const :tag "company" company))
   :group 'dotemacs)
 
+(defcustom sb/disable-package.el
+  nil
+  "Disable package.el and prefer some other package manager instead."
+  :type 'boolean
+  :group 'dotemacs)
+
 (defconst sb/EMACS27    (= emacs-major-version 27)
   "Non-nil if Emacs version is 27.")
 (defconst sb/EMACS27+   (> emacs-major-version 26)

@@ -45,7 +45,8 @@
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
 (use-package tex
-  :straight auctex
+  ;; :straight auctex
+  :ensure auctex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defines (tex-fontify-script font-latex-fontify-script
                                font-latex-fontify-sectioning
@@ -104,7 +105,7 @@
   ("C-c x q" . TeX-insert-quote))
 
 (use-package bibtex
-  :straight nil
+  ;; :straight nil
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
    (bibtex-mode-hook . lsp-deferred))
@@ -118,7 +119,7 @@
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
 
 (use-package bibtex-completion
-  :straight nil
+  ;; :straight nil
   :after ivy-bibtex
   :demand t
   :custom
@@ -129,7 +130,7 @@
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 (use-package reftex
-  :straight nil
+  ;; :straight nil
   :commands (reftex-get-bibfile-list bibtex-parse-keys
                                      reftex-mode
                                      reftex-toc-rescan
@@ -200,7 +201,7 @@ Ignore if no file is found."
   (sb/reftex-try-add-all-bibitems-from-bibtex))
 
 (use-package bib-cite
-  :straight nil
+  ;; :straight nil
   :disabled t
   :diminish bib-cite-minor-mode
   :commands bib-cite-minor-mode
@@ -279,7 +280,7 @@ Ignore if no file is found."
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
 (use-package math-preview
-:straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
+;; :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
 :disabled t
 :commands (math-preview-all math-preview-at-point math-preview-region)
 :custom
