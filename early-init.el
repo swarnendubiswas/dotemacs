@@ -75,11 +75,12 @@
       inhibit-compacting-font-caches t ; Do not compact font caches during GC
       inhibit-startup-echo-area-message t
       inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
-      load-prefer-newer t ; Prefer new files to avoid loading stale bytecode
       ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start,
       ;; but I use *scratch* for composing emails.
       initial-major-mode 'text-mode
-      initial-scratch-message nil)
+      initial-scratch-message nil
+      ;; Prefer new files to avoid loading stale bytecode
+      load-prefer-newer t)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p' since `window-system'
 ;; is deprecated.
@@ -115,21 +116,9 @@
             (lambda ()
               (setq file-name-handler-alist file-name-handler-alist-orig))))
 
-;; Disable `package.el' in favor of `straight.el'
-(setq package-enable-at-startup nil
-      package-quickstart nil)
-
-;; (when (featurep 'native-compile)
-;;   (defvar package-native-compile)
-;;   (defvar native-comp-always-compile)
-
-;;   ;; Silence compiler warnings as they can be pretty disruptive
-;;   (setq native-comp-async-report-warnings-errors nil
-;;         ;; Enable ahead-of-time compilation when installing a package
-;;         package-native-compile nil)
-
-;;   ;; Set the right directory to store the native compilation cache
-;;   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
+;; Avoid loading packages twice, this is set during `(package-initialize)'. This is also useful if
+;; we prefer "straight.el" over "package.el".
+(setq package-enable-at-startup nil)
 
 (provide 'early-init)
 

@@ -32,6 +32,7 @@
     (load bootstrap-file nil 'nomessage))
 
   (straight-use-package 'use-package)
+
   (setq straight-use-package-by-default t
         straight-disable-native-compile nil
         ;; There is no need to download the whole Git history, and a single branch often suffices
@@ -51,8 +52,20 @@
     (straight-freeze-versions)))
 
 (unless (bound-and-true-p sb/disable-package.el)
-  ;; Avoid loading packages twice, this is set during `(package-initialize)'
-  (setq package-enable-at-startup nil)
+  (setq package-quickstart t)
+
+  (when (featurep 'native-compile)
+    (defvar package-native-compile)
+    (defvar native-comp-always-compile)
+
+    ;; Silence compiler warnings as they can be pretty disruptive
+    (setq native-comp-async-report-warnings-errors nil
+          ;; Enable ahead-of-time compilation when installing a package
+          package-native-compile nil
+          native-comp-deferred-compilation nil)
+
+    ;; Set the right directory to store the native compilation cache
+    (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
 
   (with-eval-after-load 'package
     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
@@ -63,42 +76,36 @@
   ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
   (package-initialize)
 
-  (defvar package-native-compile)
-  (defvar native-comp-always-compile)
-
-  ;; Enable ahead-of-time compilation when installing a package
-  (when sb/EMACS28+
-    (setq package-native-compile nil))
-
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
 
+  ;; Avoid manual installations whenever I modify package installations
   (setq use-package-always-ensure t))
 
-  ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
-  ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
-  ;; implies always load features lazily unless told otherwise. This implies we should use
-  ;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
-  ;; careful about using `:after' and always deferring loading, because then we will need to specifiy
-  ;; alternate ways of loading the package.
-  ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
+;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
+;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
+;; implies always load features lazily unless told otherwise. This implies we should use
+;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
+;; careful about using `:after' and always deferring loading, because then we will need to specifiy
+;; alternate ways of loading the package.
+;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 
-  ;; Hooks in the `:hook' section run in reverse order. Example:
-  ;; (use-package package-name
-  ;;   :hook
-  ;;   ((x-mode-hook . last)
-  ;;    (x-mode-hook . second)
-  ;;    (x-mode-hook . first)))
+;; Hooks in the `:hook' section run in reverse order. Example:
+;; (use-package package-name
+;;   :hook
+;;   ((x-mode-hook . last)
+;;    (x-mode-hook . second)
+;;    (x-mode-hook . first)))
 
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq debug-on-error                 t
-          debug-on-event                 'sigusr2
-          garbage-collection-messages    t
-          use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-          use-package-verbose            t
-          use-package-expand-minimally   nil)
-    (debug-on-entry 'projectile-remove-known-project))
+(when (bound-and-true-p sb/debug-init-file)
+  (setq debug-on-error                 t
+        debug-on-event                 'sigusr2
+        garbage-collection-messages    t
+        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+        use-package-verbose            t
+        use-package-expand-minimally   nil)
+  (debug-on-entry 'projectile-remove-known-project))
 
 (unless (bound-and-true-p sb/debug-init-file)
   (setq use-package-always-defer       t
@@ -108,7 +115,6 @@
         use-package-verbose            nil))
 
 (setq use-package-enable-imenu-support t
-      ;; Avoid manual installations whenever I modify package installations
       use-package-hook-name-suffix     nil)
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
@@ -119,13 +125,13 @@
   (when (bound-and-true-p sb/debug-init-file)
     (setq gcmh-verbose t)))
 
-;; ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from paradox
-;; ;; is `paradox-upgrade-packages' as a single command.
-;; (use-package package
-;;   :if sb/EMACS27+
-;;   :bind
-;;   (("C-c d p" . package-quickstart-refresh)
-;;    ("C-c d l" . package-list-packages)))
+;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from "paradox"
+;; is `paradox-upgrade-packages' as a single command.
+(use-package package
+  :if (and sb/EMACS27+ (not (bound-and-true-p sb/disable-package.el)))
+  :bind
+  (("C-c d p" . package-quickstart-refresh)
+   ("C-c d l" . package-list-packages)))
 
 (use-package f
   :commands (f-exists? f-join f-dirname))

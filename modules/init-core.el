@@ -354,7 +354,9 @@
   (dolist (exclude `(,(file-truename no-littering-etc-directory)
                      ,(file-truename no-littering-var-directory)))
     (add-to-list 'recentf-exclude exclude))
-  ;; (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight")))
+
+  (when (bound-and-true-p sb/disable-package.el)
+    (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight"))))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
   ;; after idling for 30 seconds.

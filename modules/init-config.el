@@ -133,6 +133,7 @@ This location is used for temporary installations and files.")
   :type  'string
   :group 'sb/emacs)
 
+;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow
 (defcustom sb/python-langserver
   'pylsp
   "Choose the Python Language Server implementation."
