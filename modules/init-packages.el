@@ -9,6 +9,8 @@
 
 ;; Bootstrap `straight.el'
 
+(defvar sb/EMACS27+)
+
 (when (bound-and-true-p sb/disable-package.el)
   (setf straight-profiles `((nil . "straight.lockfile.el")))
 

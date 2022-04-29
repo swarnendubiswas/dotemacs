@@ -7,10 +7,6 @@
 
 ;;; Code:
 
-;; (use-package help-fns+
-;;   :ensure nil
-;;   :demand t)
-
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful

@@ -7,6 +7,12 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+
+(declare-function sb/comment-line "init-functions")
+(declare-function sb/save-all-buffers "init-functions")
+(declare-function sb/next-buffer "init-functions")
+
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)

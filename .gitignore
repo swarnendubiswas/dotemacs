@@ -47,6 +47,5 @@ private.el
 tramp
 /checks.json
 
-init.el
 /straight/*
 !/straight/versions

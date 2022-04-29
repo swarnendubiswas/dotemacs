@@ -1003,6 +1003,8 @@
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
   ;; :straight tree-sitter-langs
+  :ensure tree-sitter-langs
+  :ensure t
   :functions tree-sitter-hl-mode
   :commands (global-tree-sitter-mode tree-sitter-hl-mode)
   :diminish tree-sitter-mode

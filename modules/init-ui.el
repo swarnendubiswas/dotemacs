@@ -7,7 +7,10 @@
 
 ;;; Code:
 
+(defvar sb/gui-theme)
+(defvar sb/tui-theme)
 (defvar sb/modeline-theme)
+(defvar sb/window-split)
 
 ;; Install fonts with "M-x all-the-icons-install-fonts"
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
