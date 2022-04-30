@@ -185,36 +185,54 @@
 (use-package define-word
   :commands (define-word define-word-at-point))
 
-(use-package number-separator
-  ;; :straight (number-separator :type git :host github :repo "legalnonsense/number-separator.el")
-  :commands number-separator-mode
-  :disabled t
-  :diminish
-  :custom
-  (number-separator ",")
-  (number-separator-interval 3)
-  (number-separator-ignore-threshold 4)
-  (number-separator-decimal-char "."))
+(if (bound-and-true-p sb/disable-package.el)
+    (use-package number-separator
+      :straight (number-separator :type git :host github :repo "legalnonsense/number-separator.el"))
+  (use-package number-separator))
 
-(use-package eldoc
-  ;; :straight nil
-  :if (symbol-value 'sb/IS-LINUX)
-  :commands turn-on-eldoc-mode
-  :diminish
-  :hook (prog-mode-hook . turn-on-eldoc-mode)
-  :config
-  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
-  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
-  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
-  ;; useful information.
-  ;; (setq eldoc-echo-area-use-multiline-p nil)
+(when nil
+  (progn
+    (declare-function number-separator-mode "number-separator")
 
-  ;; Allow eldoc to trigger after completions
-  (with-eval-after-load "company"
-    (eldoc-add-command 'company-complete-selection
-                       'company-complete-common
-                       'company-capf
-                       'company-abort)))
+    (unless (fboundp 'number-separator-mode)
+      (autoload #'number-separator-mode "number-separator" nil t))
+
+    (with-eval-after-load "number-separator"
+      (defvar number-separator)
+      (defvar number-separator-interval)
+      (defvar number-separator-ignore-threshold)
+      (defvar number-separator-decimal-char)
+
+      (setq number-separator ","
+            number-separator-interval 3
+            number-separator-ignore-threshold 4
+            number-separator-decimal-char ".")
+
+      (diminish 'number-sepator-mode))))
+
+(when (symbol-value 'sb/IS-LINUX)
+  (progn
+    (unless (fboundp 'turn-on-eldoc-mode)
+      (autoload #'turn-on-eldoc-mode "eldoc" nil t))
+
+    (dolist (hook '(prog-mode-hook))
+      (add-hook hook #'turn-on-eldoc-mode))
+
+    (with-eval-after-load "eldoc"
+      ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
+      ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
+      ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
+      ;; useful information.
+      ;; (setq eldoc-echo-area-use-multiline-p nil)
+
+      ;; Allow eldoc to trigger after completions
+      (with-eval-after-load "company"
+        (eldoc-add-command 'company-complete-selection
+                           'company-complete-common
+                           'company-capf
+                           'company-abort))
+
+      (diminish 'eldoc-mode))))
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
@@ -234,22 +252,36 @@
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
 
-(use-package explain-pause-mode
-  ;; :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
-  :if (bound-and-true-p sb/debug-init-file)
-  :disabled t
-  :commands (explain-pause-mode explain-pause-top)
-  :diminish)
+(when nil
+  (when (bound-and-true-p sb/debug-init-file)
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package explain-pause-mode
+          :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode"))
+      (use-package explain-pause-mode))
+
+    (unless (fboundp 'explain-pause-mode)
+      (autoload #'explain-pause-mode "explain-pause-mode" nil t))
+    (unless (fboundp 'explain-pause-top)
+      (autoload #'explain-pause-top "explain-pause-mode" nil t))
+
+    (with-eval-after-load "explain-pause-mode"
+      (diminish 'explain-pause-mode))))
 
 (use-package ace-window
   :bind ([remap other-window] . ace-window))
 
-(use-package windmove ; "Shift + direction" arrows
-  ;; :straight nil
-  :commands windmove-default-keybindings
-  :init (windmove-default-keybindings)
-  :custom
-  (windmove-wrap-around t "Wrap around at edges"))
+;; "Shift + direction" arrows
+(progn
+  (unless (fboundp 'windmove-default-keybindings)
+    (autoload #'windmove-default-keybindings "windmove" nil t))
+
+  (windmove-default-keybindings)
+
+  (with-eval-after-load "windmove"
+    (defvar windmove-wrap-around)
+
+    ;; Wrap around at edges
+    (setq windmove-wrap-around t)))
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
@@ -303,10 +335,6 @@
         ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
         ;; TODO: Reuse the keybinding
         ("M-g l" . ivy-avy)))
-
-(use-package bookmark
-  ;; :straight nil
-  )
 
 (use-package bm
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous

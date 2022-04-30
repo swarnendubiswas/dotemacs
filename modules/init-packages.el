@@ -161,11 +161,17 @@
   :group 'sb/emacs)
 
 ;; Asynchronously byte compile packages installed with `package.el'
-(use-package async
-  ;; :straight (async :type git :host github :repo "jwiegley/emacs-async")
-  :functions async-bytecomp-package-mode
-  :commands async-bytecomp-package-mode
-  :init (async-bytecomp-package-mode 1))
+(if (bound-and-true-p sb/disable-package.el)
+    (use-package async
+      :straight (async :type git :host github :repo "jwiegley/emacs-async"))
+  (use-package async
+    :ensure nil))
+
+(progn
+  (unless (fboundp 'async-bytecomp-package-mode)
+    (autoload #'async-bytecomp-package-mode "async" nil t))
+
+  (async-bytecomp-package-mode 1))
 
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.

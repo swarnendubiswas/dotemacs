@@ -7,47 +7,66 @@
 
 ;;; Code:
 
-(use-package paren
-  ;; :straight nil
-  ;; :init (run-with-idle-timer 2 nil #'show-paren-mode)
-  :hook (after-init-hook . show-paren-mode)
-  :config
-  (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
-        show-paren-when-point-inside-paren t
-        show-paren-when-point-in-periphery t))
+(progn
+  (unless (fboundp 'show-paren-mode)
+    (autoload #'show-paren-mode "paren" nil t))
+
+  ;; (run-with-idle-timer 2 nil #'show-paren-mode)
+  (add-hook 'after-init-hook show-paren-mode)
+
+
+  (with-eval-after-load "paren"
+    (defvar show-paren-style)
+    (defvar show-paren-when-point-inside-paren)
+    (defvar show-paren-when-point-in-periphery)
+
+    (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
+          show-paren-when-point-inside-paren t
+          show-paren-when-point-in-periphery t)))
 
 ;; Enable autopairing
-(use-package elec-pair
-  ;; :straight nil
-  :commands (electric-pair-mode)
-  :disabled t
-  ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)
-  :hook (after-init-hook . electric-pair-mode)
-  :config
-  ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
-  (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
-  (defvar electric-pair-pairs)
-  (defvar electric-pair-text-pairs)
-  (defvar electric-pair-preserve-balance)
+(when nil
+  (progn
+    (unless (fboundp 'electric-pair-mode)
+      (autoload #'electric-pair-mode "elec-pair" nil t))
 
-  (declare-function sb/add-markdown-pairs "init-emacs28")
+    ;; (run-with-idle-timer 2 nil #'electric-pair-mode)
+    (add-hook 'after-init-hook electric-pair-mode)
 
-  (defun sb/add-markdown-pairs ()
-    "Add custom pairs to `markdown-mode'."
-    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
-    (setq-local electric-pair-text-pairs electric-pair-pairs))
+    (with-eval-after-load "elec-pair"
+      ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+      (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+      (defvar electric-pair-pairs)
+      (defvar electric-pair-text-pairs)
+      (defvar electric-pair-preserve-balance)
 
-  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+      (declare-function sb/add-markdown-pairs "init-autoload")
 
-  ;; Avoid balancing parentheses since they can be both irritating and slow
-  (setq electric-pair-preserve-balance nil)
+      (defun sb/add-markdown-pairs ()
+        "Add custom pairs to `markdown-mode'."
+        (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+        (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  ;; Disable pairs when entering minibuffer
-  (add-hook 'minibuffer-setup-hook (lambda ()
-                                     (electric-pair-mode -1)))
-  ;; Re-enable pairs when existing minibuffer
-  (add-hook 'minibuffer-exit-hook (lambda ()
-                                    (electric-pair-mode 1))))
+      (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+
+      (declare-function sb/add-markdown-pairs "init-emacs28")
+
+      (defun sb/add-markdown-pairs ()
+        "Add custom pairs to `markdown-mode'."
+        (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+        (setq-local electric-pair-text-pairs electric-pair-pairs))
+
+      (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+
+      ;; Avoid balancing parentheses since they can be both irritating and slow
+      (setq electric-pair-preserve-balance nil)
+
+      ;; Disable pairs when entering minibuffer
+      (add-hook 'minibuffer-setup-hook (lambda ()
+                                         (electric-pair-mode -1)))
+      ;; Re-enable pairs when existing minibuffer
+      (add-hook 'minibuffer-exit-hook (lambda ()
+                                        (electric-pair-mode 1))))))
 
 ;; `sp-cheat-sheet' will show you all the commands available, with examples. Seems to have
 ;; performance issue with `latex-mode', `markdown-mode', and large JSON files.
