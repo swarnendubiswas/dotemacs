@@ -19,27 +19,40 @@
             (when (display-graphic-p)
               (display-fill-column-indicator-mode 1))))
 
-(use-package subword
-  ;; :straight nil
-  :diminish
-  :hook (prog-mode-hook . subword-mode))
+(progn
+  (unless (fboundp 'subword-mode)
+    (autoload #'subword-mode "subword" nil t))
 
-(use-package outline ; Edit outlines
-  ;; :straight nil
-  :disabled t
-  :hook (prog-mode-hook . outline-minor-mode)
-  :diminish outline-minor-mode)
+  (add-hook 'prog-mode-hook #'subword-mode)
+
+  (with-eval-after-load "subword"
+    (diminish 'subword-mode)))
+
+;; Edit outlines
+(progn
+  (add-hook 'prog-mode-hook #'outline-minor-mode)
+
+  (with-eval-after-load "outline"
+    (diminish 'outline-minor-mode)))
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
-(use-package hideshow
-  ;; :straight nil
-  :disabled t
-  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-  :diminish hs-minor-mode
-  :hook (prog-mode-hook . hs-minor-mode)
-  :custom
-  (hs-isearch-open t "Open all folds while searching."))
+(progn
+  (unless (fboundp 'hs-hide-all)
+    (autoload #'hs-hide-all "hideshow" nil t))
+  (unless (fboundp 'hs-hide-initial-comment-block)
+    (autoload #'hs-hide-initial-comment-block "hideshow" nil t))
+  (unless (fboundp 'hs-show-all)
+    (autoload #'hs-show-all "hideshow" nil t))
+  (unless (fboundp 'hs-show-block)
+    (autoload #'hs-show-block "hideshow" nil t))
+
+  (add-hook 'prog-mode-hook #'hs-minor-mode)
+
+  (with-eval-after-load "hideshow"
+    (setq hs-isearch-open t) ;; Open all folds while searching
+
+    (diminish 'hs-minor-mode)))
 
 (defvar tags-revert-without-query)
 
@@ -135,23 +148,25 @@
   :commands hes-mode
   :hook (prog-mode-hook . hes-mode))
 
-(use-package ini-mode
-  ;; :straight nil
-  :ensure nil
-  :commands ini-mode)
+(unless (fboundp 'ini-mode)
+  (autoload #'ini-mode "ini-mode" nil t))
 
-(use-package elisp-mode
-  ;; :straight nil
-  :ensure nil
-  :mode
-  (("\\.el\\'"  . emacs-lisp-mode)
-   ("\\.elc\\'" . elisp-byte-code-mode))
-  :hook
-  ((lisp-mode emacs-lisp-mode) .
-   (lambda ()
-     (when buffer-file-name
-       (add-hook 'after-save-hook #'check-parens nil t)
-       (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
+(progn
+  (unless (fboundp 'emacs-lisp-mode)
+    (autoload #'emacs-lisp-mode "elisp-mode" nil t))
+  (unless (fboundp 'elisp-byte-code-mode)
+    (autoload #'elisp-byte-code-mode "elisp-mode" nil t))
+
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.el\\'"  . emacs-lisp-mode))
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.elc\\'" . elisp-byte-code-mode))
+
+  (dolist (hook '(lisp-mode-hook emacs-lisp-mode-hook))
+    (add-hook hook (lambda ()
+                     (when buffer-file-name
+                       (add-hook 'after-save-hook #'check-parens nil t)
+                       (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append))))))
 
 (use-package yaml-mode
   :defines lsp-ltex-enabled lsp-disabled-clients
@@ -196,17 +211,20 @@
     :remote? t
     :server-id 'cssls-r)))
 
-(use-package make-mode
-  ;; :straight nil
-  :ensure nil
-  :mode
-  (("\\Makefile\\'"       . makefile-mode)
-   ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-   ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :config
+(progn
+  (unless (fboundp 'makefile-mode)
+    (autoload #'makefile-mode "make-mode" nil t))
+  (unless (fboundp 'makefile-gmake-mode)
+    (autoload #'makefile-gmake-mode "make-mode" nil t))
+
+;;;###autoload
+  (progn
+    (add-to-list 'auto-mode-alist '("\\Makefile\\'"       . makefile-mode))
+    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
+    (add-to-list 'auto-mode-alist '("makefile\\.rules\\'" . makefile-gmake-mode)))
+
   (add-hook 'makefile-mode-hook (lambda()
-                                  (setq-local indent-tabs-mode t)))
-  (use-package makefile-executor))
+                                  (setq-local indent-tabs-mode t))))
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
@@ -221,28 +239,42 @@
   :custom
   (csv-separators '("," ";" "|" " ")))
 
-(use-package antlr-mode
-  ;; :straight nil
-  :ensure nil
-  :mode "\\.g4\\'")
+(progn
+  (unless (fboundp 'antlr-mode)
+    (autoload #'antlr-mode "antlr-mode" nil t))
+
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode)))
 
 (use-package bison-mode
   :mode ("\\.bison\\'"))
 
-(use-package llvm-mode
-  ;; :straight nil
-  ;; :straight (llvm-mode :type git :host github
-  ;;                      :repo "llvm/llvm-project"
-  ;;                      :files "llvm/utils/emacs/llvm-mode.el")
-  :load-path "extras"
-  :commands llvm-mode
-  :mode "\\.ll\\'")
+(if (bound-and-true-p sb/disable-package.el)
+    (use-package llvm-mode
+      ;; :straight (llvm-mode :type git :host github
+      ;;                      :repo "llvm/llvm-project"
+      ;;                      :files "llvm/utils/emacs/llvm-mode.el")
+      :straight nil)
+  (use-package llvm-mode
+    :load-path "extras"))
 
-(use-package tablegen-mode
-  ;; :straight nil
-  :load-path "extras"
-  :commands tablegen-mode
-  :mode "\\.td\\'")
+(progn
+  (declare-function llvm-mode "llvm-mode")
+
+  (unless (fboundp 'llvm-mode)
+    (autoload #'llvm-mode "llvm-mode" nil t)))
+
+(if (bound-and-true-p sb/disable-package.el)
+    (use-package tablegen-mode
+      :straight nil)
+  (use-package tablegen-mode
+    :load-path "extras"))
+
+(progn
+  (declare-function tablegen-mode "tablegen-mode")
+
+  (unless (fboundp 'tablegen-mode)
+    (autoload #'tablegen-mode "tablegen-mode" nil t)))
 
 (use-package autodisass-llvm-bitcode
   :commands autodisass-llvm-bitcode
@@ -316,7 +348,6 @@
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
-  ;; :straight spinner
   :diminish
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
