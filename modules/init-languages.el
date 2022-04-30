@@ -611,44 +611,63 @@
   :diminish
   :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
-(use-package cc-mode
-  ;; :straight nil
-  :ensure nil
-  :defines (c-electric-brace c-enable-auto-newline c-set-style)
-  :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
-  :mode
-  (("\\.h\\'" . c++-mode)
-   ("\\.c\\'" . c++-mode))
-  :hook (c++-mode-hook . lsp-deferred)
-  :custom
-  (c-set-style "cc-mode")
-  (c-basic-offset 2)
-  :config
-  (defvar c-electric-indent)
+(progn
+  (declare-function c-beginning-of-defun "cc-mode")
+  (declare-function c-end-of-defun "cc-mode")
+  (declare-function c-fill-paragraph "cc-mode")
 
-  ;; Disable electric indentation and on-type formatting
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (setq-local c-auto-newline nil
-                          c-electric-brace nil
-                          c-electric-flag nil
-                          c-electric-indent nil
-                          c-enable-auto-newline nil
-                          c-syntactic-indentation nil)))
+  (unless (fboundp 'c++-mode)
+    (autoload #'c++-mode "cc-mode" nil t))
+  (unless (fboundp 'c-beginning-of-defun)
+    (autoload #'c-beginning-of-defun "cc-mode" nil t))
+  (unless (fboundp 'c-end-of-defun)
+    (autoload #'c-end-of-defun "cc-mode" nil t))
+  (unless (fboundp 'c-fill-paragraph)
+    (autoload #'c-fill-paragraph "cc-mode" nil t))
 
-  (unbind-key "C-M-a" c-mode-map)
+;;;###autoload
+  (dolist (pattern '("\\.h\\'" "\\.c\\'"))
+    (add-to-list 'auto-mode-alist (cons pattern 'c++-mode)))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "clangd")
-    :major-modes '(c-mode c++-mode)
-    :remote? t
-    :server-id 'clangd-r))
-  :bind
-  (:map c-mode-base-map
-        ("C-c c a" . c-beginning-of-defun)
-        ("C-c c e" . c-end-of-defun)
-        ("M-q"     . c-fill-paragraph)))
+  (add-hook 'c++-mode-hook #'lsp-deferred)
+
+  (with-eval-after-load "cc-mode"
+    (defvar c-electric-indent)
+    (defvar c-set-style)
+    (defvar c-basic-offset)
+    (defvar c-enable-auto-newline)
+    (defvar c-electric-brace)
+    (defvar c-auto-newline)
+    (defvar c-electric-flag)
+    (defvar c-syntactic-indentation)
+
+    (setq c-set-style "cc-mode"
+          c-basic-offset 2)
+
+    ;; Disable electric indentation and on-type formatting
+    (add-hook 'c++-mode-hook (lambda nil
+                               (setq-local c-auto-newline nil
+                                           c-electric-brace nil
+                                           c-electric-flag nil
+                                           c-electric-indent nil
+                                           c-enable-auto-newline nil
+                                           c-syntactic-indentation nil)))
+
+    (unbind-key "C-M-a" c-mode-map)
+
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection "clangd")
+      :major-modes '(c-mode c++-mode)
+      :remote? t
+      :server-id 'clangd-r))
+    )
+
+  (defvar c-mode-base-map)
+  (bind-keys :package cc-mode :map c-mode-base-map
+             ("C-c c a" . c-beginning-of-defun)
+             ("C-c c e" . c-end-of-defun)
+             ("M-q"     . c-fill-paragraph)))
 
 (use-package modern-cpp-font-lock
   :commands modern-c++-font-lock-mode
@@ -688,37 +707,59 @@
   :commands cmake-font-lock-activate
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
-(use-package python
-  ;; :straight nil
-  :hook (python-mode-hook . lsp-deferred)
-  :mode ("SCon\(struct\|script\)$" . python-mode)
-  :mode ("[./]flake8\\'" . conf-mode)
-  :mode ("/Pipfile\\'" . conf-mode)
-  :bind
-  (:map python-mode-map
-        ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
-        ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
-        ("M-{"   . python-nav-backward-block)
-        ("M-}"   . python-nav-forward-block)
-        ("C-c <" . python-indent-shift-left)
-        ("C-c >" . python-indent-shift-right))
-  :custom
-  (python-shell-completion-native-enable nil "Disable readline based native completion")
-  (python-fill-docstring-style 'django)
-  (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
-  (python-indent-guess-indent-offset nil)
-  (python-indent-offset 4)
-  (python-shell-exec-path "python3")
-  (python-shell-interpreter "python3")
-  :config
-  (setenv "PYTHONPATH" "python3")
+(progn
+  (declare-function python-nav-backward-block "python")
+  (declare-function python-nav-forward-block "python")
+  (declare-function python-indent-shift-left "python")
+  (declare-function python-indent-shift-right "python")
 
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
+  (unless (fboundp 'python-nav-backward-block)
+    (autoload #'python-nav-backward-block "python" nil t))
+  (unless (fboundp 'python-nav-forward-block)
+    (autoload #'python-nav-forward-block "python" nil t))
+  (unless (fboundp 'python-indent-shift-left)
+    (autoload #'python-indent-shift-left "python" nil t))
+  (unless (fboundp 'python-indent-shift-right)
+    (autoload #'python-indent-shift-right "python" nil t))
 
-  ;; (setq auto-mode-alist (append '(("SConstruct\\'" . python-mode)
-  ;;                                 ("SConscript\\'" . python-mode))
-  ;;                               auto-mode-alist))
-  )
+  (add-hook 'python-mode-hook #'lsp-deferred)
+
+  (with-eval-after-load "python"
+    (setenv "PYTHONPATH" "python3")
+
+    (defvar python-shell-completion-native-enable)
+    (defvar python-fill-docstring-style)
+    (defvar python-indent-guess-indent-offset)
+    (defvar python-indent-guess-indent-offset-verbose)
+    (defvar python-indent-offset)
+    (defvar python-shell-exec-path)
+    (defvar python-shell-interpreter)
+
+    (setq python-shell-completion-native-enable nil ; Disable readline based native completion
+          python-fill-docstring-style 'django
+          python-indent-guess-indent-offset-verbose nil ; Remove guess indent python message
+          python-indent-guess-indent-offset nil
+          python-indent-offset 4
+          python-shell-exec-path "python3"
+          python-shell-interpreter "python3")
+
+    ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
+
+    (setq auto-mode-alist (append
+                           '(("SCon\(struct\|script\)$" . python-mode)
+                             ("SConscript\\'" . python-mode)
+                             ("[./]flake8\\'" . conf-mode)
+                             ("/Pipfile\\'" . conf-mode))
+                           auto-mode-alist))
+
+    ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
+    ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
+    (defvar python-mode-map)
+    (bind-keys :package python :map python-mode-map
+               ("M-["   . python-nav-backward-block)
+               ("M-]"   . python-nav-forward-block)
+               ("C-c <" . python-indent-shift-left)
+               ("C-c >" . python-indent-shift-right))))
 
 (use-package python-docstring
   :after python-mode
@@ -799,13 +840,18 @@
   :commands yapf-mode
   :hook (python-mode-hook . yapf-mode))
 
-(use-package cperl-mode
-  ;; :straight nil
-  :mode ("latexmkrc\\'")
-  :hook (cperl-mode-hook . lsp-deferred)
-  :config
-  ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode)
+(progn
+  (unless (fboundp 'cperl-mode)
+    (autoload #'cperl-mode "cperl-mode" nil t))
+
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("latexmkrc\\'" . cperl-mode))
+
+  (add-hook 'cperl-mode-hook #'lsp-deferred)
+
+  (with-eval-after-load "cperl-mode"
+    ;; Prefer CPerl mode to Perl mode
+    (fset 'perl-mode 'cperl-mode))
 
   (lsp-register-client
    (make-lsp-client
@@ -872,24 +918,39 @@
   :commands groovy-mode
   :mode "\\.gradle\\'")
 
-(use-package sh-script ; Shell script mode
-  ;; :straight nil
-  :mode
-  (("\\.zsh\\'"   . sh-mode)
-   ("\\bashrc\\'" . sh-mode))
-  :hook (sh-mode-hook . lsp-deferred)
-  :custom
-  (sh-basic-offset 2)
-  (sh-indent-after-continuation 'always)
-  (sh-indent-comment t "Indent comments as a regular line")
-  :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("bash-language-server" "start"))
-    :major-modes '(sh-mode)
-    :remote? t
-    :server-id 'bashls-r)))
+;; Shell script mode
+(progn
+  (unless (fboundp 'sh-mode)
+    (autoload #'sh-mode "sh-script" nil t))
+
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\.zsh\\'"   . sh-mode))
+;;;###autoload
+  (add-to-list 'auto-mode-alist '("\\bashrc\\'" . sh-mode))
+
+  (add-hook 'sh-mode-hook #'lsp-deferred)
+
+  (with-eval-after-load "sh-script"
+    (defvar sh-basic-offset)
+    (defvar sh-indent-comment)
+    (defvar sh-indent-after-continuation)
+
+    (setq sh-basic-offset 2
+          sh-indent-after-continuation 'always
+          ;; Indent comments as a regular line
+          sh-indent-comment t)
+
+    ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+
+    (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
+
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection
+                       '("bash-language-server" "start"))
+      :major-modes '(sh-mode)
+      :remote? t
+      :server-id 'bashls-r))))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -905,12 +966,14 @@
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
-(use-package bat-mode
-  ;; :straight nil
-  :commands bat-mode
-  :mode
-  (("\\.bat\\'" . bat-mode)
-   ("\\.cmd\\'" . bat-mode)))
+(progn
+  (unless (fboundp 'bat-mode)
+    (autoload #'bat-mode "bat-mode" nil t))
+
+;;;###autoload
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.bat\\'" . bat-mode))
+    (add-to-list 'auto-mode-alist '("\\.cmd\\'" . bat-mode))))
 
 (use-package web-mode
   :commands web-mode
@@ -944,33 +1007,39 @@
   :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
-(use-package nxml-mode
-  ;; :straight nil
-  :ensure nil
-  :commands nxml-mode
-  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
-  :hook
-  (nxml-mode-hook . (lambda ()
-                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
-                      ;; checking.
-                      (make-local-variable 'lsp-disabled-clients)
-                      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                      (spell-fu-mode -1)
-                      (flyspell-mode -1)
-                      (lsp-deferred)))
-  :custom
-  (nxml-auto-insert-xml-declaration-flag t)
-  (nxml-slash-auto-complete-flag t)
-  :config
-  (fset 'xml-mode 'nxml-mode)
+(progn
+  (unless (fboundp 'nxml-mode)
+    (autoload #'nxml-mode "nxml-mode" nil t))
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     '("java" "-jar" lsp-xml-jar-file))
-    :major-modes '(xml-mode nxml-mode)
-    :remote? t
-    :server-id 'xmlls-r)))
+  (add-hook 'nxml-mode-hook
+            (lambda()
+              ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+              (make-local-variable 'lsp-disabled-clients)
+              (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+              (spell-fu-mode -1)
+              (flyspell-mode -1)
+              (lsp-deferred)))
+
+;;;###autoload
+  (dolist (pattern '("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$"))
+    (add-to-list 'auto-mode-alist (cons pattern 'nxml-mode)))
+
+  (with-eval-after-load "nxml-mode"
+    (fset 'xml-mode 'nxml-mode)
+
+    (defvar nxml-auto-insert-xml-declaration-flag)
+    (defvar nxml-slash-auto-complete-flag)
+
+    (setq nxml-auto-insert-xml-declaration-flag t
+          nxml-slash-auto-complete-flag t)
+
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection
+                       '("java" "-jar" lsp-xml-jar-file))
+      :major-modes '(xml-mode nxml-mode)
+      :remote? t
+      :server-id 'xmlls-r))))
 
 (use-package json-mode
   :commands (json-mode jsonc-mode json-mode-beautify)
@@ -1014,11 +1083,8 @@
   :mode "\\.proto$"
   :hook (protobuf-mode-hook . flycheck-mode))
 
-(use-package mlir-mode
-  ;; :straight nil
-  :commands mlir-mode
-  :load-path "extras"
-  :mode "\\.mlir\\'")
+(unless (fboundp 'mlir-mode)
+  (autoload #'mlir-mode "mlir-mode"))
 
 (use-package clang-format
   :if (executable-find "clang-format")
@@ -1032,14 +1098,20 @@
   :custom (clang-format+-always-enable t))
 
 ;; Tree-sitter provides advanced syntax highlighting features
-(use-package tree-sitter
-  ;; :straight tree-sitter-langs
-  :ensure tree-sitter-langs
-  :ensure t
-  :functions tree-sitter-hl-mode
-  :commands (global-tree-sitter-mode tree-sitter-hl-mode)
-  :diminish tree-sitter-mode
-  :preface
+(if (bound-and-true-p sb/disable-package.el)
+    (use-package tree-sitter
+      :straight tree-sitter-langs
+      :straight t)
+  (use-package tree-sitter
+    :ensure tree-sitter-langs
+    :ensure t))
+
+(progn
+  (unless (fboundp 'global-tree-sitter-mode)
+    (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
+  (unless (fboundp 'tree-sitter-hl-mode)
+    (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
+
   (defun sb/enable-tree-sitter ()
     "Delay enabling tree-sitter to avoid slowing down Emacs startup."
     (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
@@ -1050,19 +1122,24 @@
       (add-hook hook (lambda ()
                        (require 'tree-sitter-langs)
                        (global-tree-sitter-mode 1)))))
+
   ;; :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
-  :hook (after-init-hook . sb/enable-tree-sitter)
-  :config
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+  (add-hook 'after-init-hook #'sb/enable-tree-sitter)
+
+  (with-eval-after-load "tree-sitter"
+    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+    (diminish 'tree-sitter-mode)))
 
 (use-package dotenv-mode
   :mode "\\.env\\'")
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
-(use-package ansi-color
-  ;; :straight nil
-  :commands ansi-color-apply-on-region
-  :preface
+(with-eval-after-load "compile"
+  (require 'ansi-color)
+
+  (defvar compilation-filter-start)
+  (declare-function ansi-color-apply-on-region "ansi-color")
+
   (defun sb/colorize-compilation-buffer ()
     "Colorize compile mode output."
     (require 'ansi-color)
@@ -1072,14 +1149,19 @@
   (defun sanityinc/colourise-compilation-buffer ()
     (when (eq major-mode 'compilation-mode)
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
-  :config
-  ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
-  (add-hook 'compilation-filter-hook #'sanityinc/colourise-compilation-buffer))
 
-(use-package info-colors
-  ;; :straight nil
-  :commands info-colors-fontify-node
-  :hook (Info-selection-hook . info-colors-fontify-node))
+  ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
+  (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
+
+
+(progn
+  (declare-function info-colors-fontify-node "info-colors")
+
+  (unless (fboundp 'info-colors-fontify-node)
+    (autoload #'info-colors-fontify-node "info-colors" nil t))
+
+  (with-eval-after-load "info"
+    (add-hook 'Info-selection-hook #'info-colors-fontify-node)))
 
 (use-package consult-lsp
   :after (consult lsp)
@@ -1091,11 +1173,13 @@
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
-;; if they contain a valid shebang line
-(use-package executable
-  ;; :straight nil
-  :commands (executable-make-buffer-file-executable-if-script-p)
-  :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
+;; if they contain a valid shebang line.
+(progn
+  (unless (fboundp 'executable-make-buffer-file-executable-if-script-p)
+    (autoload #'executable-make-buffer-file-executable-if-script-p "executable" nil t))
+
+  (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p))
+
 
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
