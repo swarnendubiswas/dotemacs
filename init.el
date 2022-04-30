@@ -42,7 +42,10 @@
           (lambda ()
             (let ((packages  (length package-activated-list))
                   (gc-time   (float-time gc-elapsed)))
-              (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
-                       (emacs-init-time) packages gc-time gcs-done))))
+              (if (bound-and-true-p sb/disable-package.el)
+                  (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
+                           (emacs-init-time) gc-time gcs-done)
+                (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
+                         (emacs-init-time) packages gc-time gcs-done)))))
 
 ;;; init.el ends here

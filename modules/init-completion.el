@@ -9,23 +9,27 @@
 
 ;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
 ;; expansions in the current buffer and presents suggestions for completion.
-(use-package hippie-exp
-  ;; :straight (:type built-in)
-  :custom
-  (hippie-expand-try-functions-list '(try-expand-dabbrev
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev-from-kill
-                                      try-complete-file-name-partially
-                                      try-complete-file-name
-                                      try-expand-all-abbrevs
-                                      try-expand-list
-                                      try-expand-line
-                                      try-complete-lisp-symbol-partially
-                                      try-complete-lisp-symbol))
-  (hippie-expand-verbose nil)
-  :bind
-  (("M-/"   . hippie-expand)
-   ("C-M-/" . dabbrev-completion)))
+
+(if (bound-and-true-p sb/disable-package.el)
+    (use-package hippie-exp
+      :straight (:type built-in))
+  ((use-package hippie-exp
+     :ensure nil)))
+
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev-from-kill
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-expand-all-abbrevs
+                                         try-expand-list
+                                         try-expand-line
+                                         try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol)
+      hippie-expand-verbose nil)
+
+(bind-key "M-/" #'hippie-expand)
+(bind-key "C-M-/" #'dabbrev-completion)
 
 (use-package ivy
   :functions ivy-format-function-line
@@ -523,14 +527,15 @@
   :after vertico
   :init (marginalia-mode 1))
 
+(if (or (not (display-graphic-p)) (eq sb/capf 'company))
+    (use-package company))
+
 ;; The module does not specify an `autoload'. So we get the following error without the following
 ;; declaration.
 ;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
 ;; function company-capf"
-(use-package company-capf
-  ;; :straight company
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
-  :commands company-capf)
+(unless (fboundp 'company-capf)
+  (autoload #'company-capf "company-capf" nil t))
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with

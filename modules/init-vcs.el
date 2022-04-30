@@ -42,13 +42,15 @@
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
 
-  (use-package magit-diff
-    ;; :straight nil
-    :demand t
-    :custom
-    (magit-diff-refine-hunk  t)
-    (magit-diff-highlight-trailing nil)
-    (magit-diff-paint-whitespace   nil)))
+  (require 'magit-diff)
+
+  (defvar magit-diff-refine-hunk)
+  (defvar magit-diff-paint-whitespace)
+  (defvar magit-diff-highlight-trailing)
+
+  (setq magit-diff-refine-hunk t
+        magit-diff-highlight-trailing nil
+        magit-diff-paint-whitespace nil))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
@@ -99,7 +101,7 @@
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
-  ;; :straight (:type built-in)
+  :straight (:type built-in)
   :after hydra
   :commands (smerge-next smerge-prev smerge-auto-leave
                          smerge-keep-base smerge-keep-upper
@@ -144,7 +146,7 @@
         ("M-g M"   . smerge-popup-context-menu)))
 
 (use-package ediff
-  ;; :straight nil
+  :straight nil
   :after magit
   :demand t
   :defines ediff-window-setup-function

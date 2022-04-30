@@ -210,14 +210,19 @@
    ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
    ))
 
-(use-package consult-projectile
-  ;; :straight (consult-projectile :type git :host gitlab :repo
-  ;;                               "OlMon/consult-projectile" :branch "master")
-  :if (eq sb/minibuffer-completion 'vertico)
-  :commands consult-projectile-recentf
-  :bind
-  (("<f5>" . consult-projectile-switch-project)
-   ("<f6>" . consult-projectile)))
+(when (eq sb/minibuffer-completion 'vertico)
+  (if (bound-and-true-p sb/disable-package.el)
+      (use-package consult-projectile
+        :straight (consult-projectile :type git :host gitlab :repo
+                                      "OlMon/consult-projectile" :branch "master"))
+    ((use-package consult-projectile))))
+
+(unless (fboundp 'consult-projectile-recentf)
+  (autoload #'consult-projectile-recentf "consult-projectile" nil t))
+
+(bind-keys :package consult-projectile
+           ("<f5>" . consult-projectile-switch-project)
+           ("<f6>" . consult-projectile))
 
 (use-package consult-project-extra)
 

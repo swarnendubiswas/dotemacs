@@ -191,66 +191,90 @@
   (when (fboundp mode)
     (funcall mode 1)))
 
-(use-package autorevert ; Auto-refresh all buffers
-  ;; :straight (:type built-in)
-  :commands global-auto-revert-mode
-  :diminish auto-revert-mode
-  ;; :init (run-with-idle-timer 2 nil #'global-auto-revert-mode)
-  :hook (after-init-hook . global-auto-revert-mode)
-  :config
-  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
-        ;; use Emacs. Enabling auto-revert is always safe.
-        auto-revert-remote-files t
-        auto-revert-verbose nil
-        ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
-        ;; contents of the directory changes
-        global-auto-revert-non-file-buffers t))
+;; Auto-refresh all buffers
+(progn
+  (unless (fboundp 'global-auto-revert-mode)
+    (autoload #'global-auto-revert-mode "autorevert" nil t))
 
-;; Revert all (e.g., PDF) files without asking
-(setq revert-without-query '("\\.*"))
+  ;; (run-with-idle-timer 2 nil #'global-auto-revert-mode)
+  (add-hook 'after-init-hook #'global-auto-revert-mode)
 
-;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
-;; timer.
-(use-package saveplace ; Remember cursor position in files
-  ;; :straight (:type built-in)
-  :hook (after-init-hook . save-place-mode))
+  (with-eval-after-load "autorevert"
+    (defvar auto-revert-interval)
+    (defvar auto-revert-remote-files)
+    (defvar auto-revert-use-notify)
+    (defvar auto-revert-verbose)
+    (defvar global-auto-revert-non-file-buffers)
+    (defvar auto-revert-check-vc-info)
 
-(use-package savehist ; Save minibuffer history across sessions
-  ;; :straight (:type built-in)
-  :commands savehist-mode
-  ;; :init (run-with-idle-timer 2 nil #'savehist-mode)
-  :hook (after-init-hook . savehist-mode)
-  :custom
-  (savehist-additional-variables '(extended-command-history
-                                   kill-ring
-                                   regexp-search-ring
-                                   search-ring)))
+    (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+          ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
+          ;; use Emacs. Enabling auto-revert is always safe.
+          auto-revert-remote-files t
+          auto-revert-verbose nil
+          ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
+          ;; contents of the "main" directory changes
+          global-auto-revert-non-file-buffers t)
 
-(use-package uniquify
-  ;; :straight (:type built-in)
-  :init
-  (setq uniquify-after-kill-buffer-p t
-        uniquify-buffer-name-style   'forward
-        uniquify-ignore-buffers-re   "^\\*"
-        uniquify-separator           "/"
-        uniquify-strip-common-suffix t))
+    (diminish 'auto-revert-mode))
+
+  ;; Revert all (e.g., PDF) files without asking
+  (setq revert-without-query '("\\.*")))
+
+(progn
+  (unless (fboundp 'save-place-mode)
+    (autoload #'save-place-mode "saveplace" nil t))
+
+  ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
+  ;; timer.
+  (add-hook 'after-init-hook #'save-place-mode))
+
+
+;; Save minibuffer history across sessions
+(progn
+  (unless (fboundp 'savehist-mode)
+    (autoload #'savehist-mode "savehist" nil t))
+
+  ;; (run-with-idle-timer 3 nil #'savehist-mode)
+  (add-hook 'after-init-hook #'savehist-mode)
+
+  (with-eval-after-load "savehist"
+    (defvar savehist-additional-variables)
+    (defvar savehist-file)
+    (defvar savehist-save-minibuffer-history)
+
+    (setq savehist-additional-variables '(extended-command-history
+                                          kill-ring
+                                          search-ring
+                                          regexp-search-ring)
+          savehist-save-minibuffer-history t)))
+
+(setq uniquify-after-kill-buffer-p t
+      uniquify-buffer-name-style 'forward
+      uniquify-ignore-buffers-re "^\\*"
+      uniquify-separator "/"
+      uniquify-strip-common-suffix t)
 
 ;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
-(use-package abbrev
-  ;; :straight (:type built-in)
-  :diminish
-  :hook (after-init-hook . abbrev-mode)
-  :custom
-  ;; The "abbrev-defs" file is under version control
-  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
-  (save-abbrevs 'silently))
+(progn
+  (unless (fboundp 'abbrev-mode)
+    (autoload #'abbrev-mode "abbrev" nil t))
 
-;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
-(use-package so-long
-  ;; :straight (:type built-in)
-  ;; :init (run-with-idle-timer 2 nil #'global-so-long-mode)
-  :hook (after-init-hook . global-so-long-mode))
+  (add-hook 'after-init-hook #'abbrev-mode)
+
+  (with-eval-after-load "abbrev"
+    (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
+          save-abbrevs 'silently)
+
+    (diminish 'abbrev-mode)))
+
+(progn
+  ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
+  (unless (fboundp 'global-so-long-mode)
+    (autoload #'global-so-long-mode "so-long" nil t))
+
+  ;; (run-with-idle-timer 2 nil #'global-so-long-mode)
+  (add-hook 'after-init-hook #'global-so-long-mode))
 
 ;; Edit remote file: "/method:user@host#port:filename". Shortcut "/ssh::" will connect to default
 ;; "user@host#port".
@@ -266,50 +290,57 @@
 ;; b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in `bookmark-bmenu-mode'
 ;; with `R'.
 ;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/
-(use-package tramp
-  ;; :straight (:type built-in)
-  :defines tramp-ssh-controlmaster-options
-  :config
-  (setq tramp-default-user user-login-name
-        ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
-        ;; files which is faster than SSH.
-        ;; tramp-default-method "ssh"
-        tramp-default-remote-shell "/usr/bin/bash"
-        remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
-        ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
-        ;; settings
-        ;; https://emacs.stackexchange.com/questions/22306/working-with-tramp-mode-on-slow-connection-emacs-does-network-trip-when-i-start
-        ;; https://puppet.com/blog/speed-up-ssh-by-reusing-connections
-        tramp-ssh-controlmaster-options ""
-        tramp-verbose 1
-        ;; Disable version control for remote files to improve performance
-        vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
-                                     vc-ignore-dir-regexp tramp-file-name-regexp))
 
-  (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
+(defvar tramp-default-user)
+(defvar tramp-default-remote-shell)
+(defvar tramp-verbose)
+(defvar tramp-remote-path)
+(defvar tramp-ssh-controlmaster-options)
 
-  ;; Disable backup
-  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
+(setq tramp-default-user user-login-name
+      ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
+      ;; files which is faster than SSH.
+      ;; tramp-default-method "ssh"
+      tramp-default-remote-shell "/usr/bin/bash"
+      remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
+      ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
+      ;; settings
+      ;; https://emacs.stackexchange.com/questions/22306/working-with-tramp-mode-on-slow-connection-emacs-does-network-trip-when-i-start
+      ;; https://puppet.com/blog/speed-up-ssh-by-reusing-connections
+      tramp-ssh-controlmaster-options ""
+      tramp-verbose 1
+      ;; Disable version control for remote files to improve performance
+      vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
+                                   vc-ignore-dir-regexp tramp-file-name-regexp))
 
+(defalias 'exit-tramp 'tramp-cleanup-all-buffers)
+
+;; Disable backup
+(add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
+
+(with-eval-after-load "tramp"
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
-  ;; https://www.gnu.org/software/tramp/
-  (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
-  :bind ("C-S-q" . tramp-cleanup-all-buffers))
+;; https://www.gnu.org/software/tramp/
+(setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
 
-(use-package imenu
-  ;; :straight nil
-  :after (:any markdown-mode yaml-mode prog-mode)
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-items 1000)
-  ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
-  ;; mouse support enabled
-  (imenu-use-popup-menu nil)
-  ;; `nil' implies no sorting and will list by position in the buffer
-  (imenu-sort-function nil))
+(declare-function tramp-cleanup-connection "tramp")
+(bind-key "C-S-q" #'tramp-cleanup-connection)
+
+(with-eval-after-load "imenu"
+  (defvar imenu-auto-rescan)
+  (defvar imenu-max-items)
+  (defvar imenu-use-popup-menu)
+
+  (setq imenu-auto-rescan t
+        imenu-max-items 1000
+        ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
+        ;; mouse support enabled
+        imenu-use-popup-menu nil
+        ;; `nil' implies no sorting and will list by position in the buffer
+        imenu-sort-function nil))
 
 (use-package recentf
   :commands (recentf-mode recentf-add-file recentf-save-file
@@ -389,23 +420,30 @@
                            ;; space-after-tab ; Mixture of space and tab on the same line
                            )))
 
-(use-package image-mode
-  ;; :straight nil
-  :if (display-graphic-p)
-  :commands image-get-display-property
-  :mode "\\.svg$"
-  :preface
-  ;; http://emacs.stackexchange.com/a/7693/289
-  (defun sb/show-image-dimensions-in-mode-line ()
-    (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
-           (width (car image-dimensions))
-           (height (cdr image-dimensions)))
-      (setq mode-line-buffer-identification
-            (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
-  :custom
-  ;;  Enable converting external formats (i.e., webp) to internal ones.
-  (image-use-external-converter t)
-  :hook (image-mode-hook . sb/show-image-dimensions-in-mode-line))
+(progn
+  (eval-and-compile
+    ;; http://emacs.stackexchange.com/a/7693/289
+    (defun sb/show-image-dimensions-in-mode-line nil
+      (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
+             (width (car image-dimensions))
+             (height (cdr image-dimensions)))
+        (setq mode-line-buffer-identification
+              (format "%s %dx%d" (propertized-buffer-identification "%12b") width height)))))
+
+  (when (display-graphic-p)
+    (unless (fboundp 'image-mode)
+      (autoload #'image-mode "image-mode" nil t))
+    (unless (fboundp 'sb/show-image-dimensions-in-mode-line)
+      (autoload #'sb/show-image-dimensions-in-mode-line "image-mode" nil t))
+    (unless (fboundp 'image-get-display-property)
+      (autoload #'image-get-display-property "image-mode" nil t))
+
+    ;; Enable converting external formats (i.e., webp) to internal ones.
+    (setq image-use-external-converter t)
+
+    (add-hook 'image-mode-hook #'sb/show-image-dimensions-in-mode-line)
+
+    (add-to-list 'auto-mode-alist '("\\.svg$" . image-mode))))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
 (use-package server
