@@ -728,7 +728,8 @@
   :custom
   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-  ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix
+  ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
+  ;; Disabling the requirement may help with performance.
   (company-fuzzy-prefix-on-top t))
 
 (use-package company-shell

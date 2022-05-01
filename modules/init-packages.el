@@ -12,9 +12,10 @@
 (defvar sb/EMACS27+)
 
 (when (bound-and-true-p sb/disable-package.el)
+  (defvar bootstrap-version)
+
   (setf straight-profiles `((nil . "straight.lockfile.el")))
 
-  (defvar bootstrap-version)
   (setq straight-build-dir (format "build/%d%s%d"
                                    emacs-major-version
                                    version-separator
@@ -38,20 +39,21 @@
   (setq straight-use-package-by-default t
         straight-disable-native-compile nil
         ;; There is no need to download the whole Git history, and a single branch often suffices.
-        ;; However, it can lead to "git revision parsing" errors while using `straight-pull-all' and
-        ;; `straight-freeze-versions'.
+        ;; However, that seems to lead to "git revision parsing" errors while using
+        ;; `straight-pull-all' and `straight-freeze-versions'.
         ;; straight-vc-git-default-clone-depth '(1 single-branch)
         )
 
   ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
-  ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
-  ;; persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
+  ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions'
+  ;; to persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
   ;; packages to their locked versions, making the config totally reproducible across environments.
 
   ;; Freeze package versions with `straight-freeze-versions' which will write the versions in a
   ;; lockfile. All package versions can be restored to the versions specified in the lockfile with
   ;; `straight-thaw-versions'.
-;;;; Create a version file if it does not yet exist
+
+  ;; Create a version file if it does not yet exist
   (when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
                                               straight-base-dir)))
     (straight-freeze-versions)))
@@ -60,6 +62,7 @@
   (when (featurep 'native-compile)
     (defvar package-native-compile)
     (defvar native-comp-always-compile)
+    (defvar native-comp-async-report-warnings-errors)
 
     ;; Silence compiler warnings as they can be pretty disruptive
     (setq native-comp-async-report-warnings-errors nil
@@ -83,6 +86,8 @@
     (package-refresh-contents)
     (package-install 'use-package))
 
+  (defvar use-package-always-ensure)
+
   ;; Avoid manual installations whenever I modify package installations
   (setq use-package-always-ensure t)
 
@@ -105,6 +110,7 @@
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
 
+;; These variables are set even with `straight.el'.
 (setq use-package-enable-imenu-support t
       use-package-hook-name-suffix     nil)
 
@@ -145,9 +151,6 @@
 (use-package no-littering
   :demand t)
 
-(when (boundp 'package-quickstart)
-  (setq package-quickstart t))
-
 (use-package gcmh ; Allow GC to happen after a period of idle time
   :diminish
   :commands (gcmh-mode gcmh-idle-garbage-collect)
@@ -158,11 +161,13 @@
 
 ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command.
-(use-package package
-  :if (and sb/EMACS27+ (not (bound-and-true-p sb/disable-package.el)))
-  :bind
-  (("C-c d p" . package-quickstart-refresh)
-   ("C-c d l" . package-list-packages)))
+(when (and sb/EMACS27+ (not (bound-and-true-p sb/disable-package.el)))
+  (when (boundp 'package-quickstart)
+    (setq package-quickstart t))
+
+  (bind-keys :package package
+             ("C-c d p" . package-quickstart-refresh)
+             ("C-c d l" . package-list-packages)))
 
 (defcustom sb/custom-file
   (no-littering-expand-var-file-name "custom.el")
@@ -177,17 +182,18 @@
   :type  'string
   :group 'sb/emacs)
 
-;; ;; Asynchronously byte compile packages installed with `package.el'
-;; (if (bound-and-true-p sb/disable-package.el)
-;;     (use-package async
-;;       :straight (async :type git :host github :repo "jwiegley/emacs-async"))
-;;   (use-package async))
+;; Asynchronously byte compile packages installed with `package.el'
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package async
+          :straight (async :type git :host github :repo "jwiegley/emacs-async"))
+      (use-package async)))
 
-;; (progn
-;;   (unless (fboundp 'async-bytecomp-package-mode)
-;;     (autoload #'async-bytecomp-package-mode "async" nil t))
+  (unless (fboundp 'async-bytecomp-package-mode)
+    (autoload #'async-bytecomp-package-mode "async" nil t))
 
-;;   (async-bytecomp-package-mode 1))
+  (async-bytecomp-package-mode 1))
 
 ;; Get PATH with "(getenv "PATH")".
 ;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
@@ -195,17 +201,18 @@
 ;; These are alternative ways to manipulate the `exec-path'.
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
-;; (use-package exec-path-from-shell
-;;   :defines exec-path-from-shell-check-startup-files
-;;   :commands exec-path-from-shell-initialize
-;;   :if (or (daemonp) (memq window-system '(x ns)))
-;;   :init
-;;   ;; "-i" is expensive but Tramp may be unable to find executables without the option
-;;   (setq exec-path-from-shell-arguments '("-l")
-;;         exec-path-from-shell-check-startup-files nil
-;;         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
-;;                                          "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
-;;   (exec-path-from-shell-initialize))
+(use-package exec-path-from-shell
+  :defines exec-path-from-shell-check-startup-files
+  :commands exec-path-from-shell-initialize
+  :if (or (daemonp) (memq window-system '(x ns)))
+  :init
+  ;; "-i" is expensive but Tramp may be unable to find executables without the option. Furthermore,
+  ;; other executables from $PATH are also not found.
+  (setq exec-path-from-shell-arguments '("-l" "-i")
+        exec-path-from-shell-check-startup-files nil
+        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
+                                         "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
+  (exec-path-from-shell-initialize))
 
 (provide 'init-packages)
 

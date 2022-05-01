@@ -15,6 +15,7 @@
 (defvar help-enable-symbol-autoload)
 (defvar sb/fill-column)
 (defvar sb/EMACS28+)
+(defvar warning-minimum-level)
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
@@ -342,83 +343,116 @@
         ;; `nil' implies no sorting and will list by position in the buffer
         imenu-sort-function nil))
 
-(use-package recentf
-  :commands (recentf-mode recentf-add-file recentf-save-file
-                          recentf-save-list
-                          recentf-apply-filename-handlers
-                          recentf-cleanup)
-  :config
-  (setq recentf-auto-cleanup 'never ; Do not stat remote files
-        ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
-        recentf-exclude '("[/\\]elpa/"
-                          "[/\\]\\.git/"
-                          ".*\\.gz\\'"
-                          ".*\\.xz\\'"
-                          ".*\\.zip\\'"
-                          ".*-autoloads.el\\'"
-                          "[/\\]archive-contents\\'"
-                          "[/\\]\\.loaddefs\\.el\\'"
-                          "[/\\]tmp/.*"
-                          ".*/recentf\\'"
-                          ".*/recentf-save.el\\'"
-                          "~$"
-                          "/.autosaves/"
-                          ".*/TAGS\\'"
-                          "*.cache"
-                          ".*/treemacs/persist.org")
-        ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-        ;; Keep remote file without testing if they still exist
-        recentf-keep '(file-remote-p file-readable-p)
-        ;; Larger values help in lookup but takes more time to check if the files exist
-        recentf-max-saved-items 100
-        ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
-        ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
-        recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
+(progn
+  (declare-function recentf-save-file "recentf")
+  (declare-function recentf-save-list "recentf")
+  (declare-function recentf-cleanup "recentf")
 
+  (unless (fboundp 'recentf-mode)
+    (autoload #'recentf-mode "recentf" nil t))
+  (unless (fboundp 'recentf-add-file)
+    (autoload #'recentf-add-file "recentf" nil t))
+  (unless (fboundp 'recentf-save-file)
+    (autoload #'recentf-save-file "recentf" nil t))
+  (unless (fboundp 'recentf-cleanup)
+    (autoload #'recentf-cleanup "recentf" nil t))
+  (unless (fboundp 'recentf-save-list)
+    (autoload #'recentf-save-list "recentf" nil t))
+  (unless (fboundp 'recentf-apply-filename-handlers)
+    (autoload #'recentf-apply-filename-handlers "recentf" nil t))
 
-  ;; (setq recentf-exclude `(,(expand-file-name "straight/build/" user-emacs-directory)
-  ;;                         ,(expand-file-name "eln-cache/" user-emacs-directory)
-  ;;                         ,(expand-file-name "etc/" user-emacs-directory)
-  ;;                         ,(expand-file-name "var/" user-emacs-directory)))
+  ;; Load immediately after start since I use it often
+  (add-hook 'after-init-hook #'recentf-mode)
 
-  ;; Use the true file name and not the symlink name
-  (dolist (exclude `(,(file-truename no-littering-etc-directory)
-                     ,(file-truename no-littering-var-directory)))
-    (add-to-list 'recentf-exclude exclude))
+  (with-eval-after-load "recentf"
+    (defvar recentf-auto-cleanup)
+    (defvar recentf-exclude)
+    (defvar recentf-max-saved-items)
+    (defvar recentf-menu-filter)
+    (defvar recentf-save-file)
+    (defvar recentf-keep)
+    (defvar recentf-filename-handlers)
 
-  (when (bound-and-true-p sb/disable-package.el)
-    (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight"))))
+    (setq recentf-auto-cleanup 'never ; Do not stat remote files
+          ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
+          recentf-exclude '("[/\\]elpa/"
+                            "[/\\]\\.git/"
+                            ".*\\.gz\\'"
+                            ".*\\.xz\\'"
+                            ".*\\.zip\\'"
+                            "[/\\]archive-contents\\'"
+                            "[/\\]\\.loaddefs\\.el\\'"
+                            "[/\\]tmp/.*"
+                            ".*/recentf\\'"
+                            ".*/recentf-save.el\\'"
+                            ".*/init.el\\'"
+                            "~$"
+                            "/.autosaves/"
+                            ".*/TAGS\\'"
+                            "*.cache"
+                            ".*/treemacs/persist.org")
+          ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+          ;; Keep remote file without testing if they still exist
+          recentf-keep '(file-remote-p file-readable-p)
+          recentf-max-saved-items 100 ; Larger values help in lookup
+          ;; recentf-menu-filter 'recentf-sort-descending
+          recentf-filename-handlers (append '(abbreviate-file-name)
+                                            recentf-filename-handlers))
 
-  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
-  ;; after idling for 30 seconds.
-  (run-with-idle-timer 30 t #'recentf-save-list)
+    ;; Use the true file name and not the symlink name
+    (dolist (exclude `(,(file-truename no-littering-etc-directory)
+                       ,(file-truename no-littering-var-directory)))
+      (add-to-list 'recentf-exclude exclude))
 
-  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
-  ;; timers.
-  (run-with-idle-timer 60 t #'recentf-cleanup)
-  :hook (after-init-hook . recentf-mode))
+    (when (bound-and-true-p sb/disable-package.el)
+      (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight"))))
 
-(use-package whitespace
-  :straight nil
-  :disabled t
-  :commands (whitespace-mode global-whitespace-mode
-                             whitespace-buffer whitespace-cleanup
-                             whitespace-turn-off)
-  ;; :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :hook (markdown-mode-hook . whitespace-mode)
-  :config
-  (setq show-trailing-whitespace t
-        whitespace-line-column sb/fill-column
-        whitespace-style '(face ; Visualize using faces
-                           lines-tail
-                           trailing ; Trailing whitespace
-                           ;; tab-mark ; Mark any tabs
-                           ;; empty ; Empty lines at beginning or end of buffer
-                           ;; lines ; Lines that extend beyond `whitespace-line-column'
-                           ;; indentation ; Wrong indentation (tab when spaces and vice versa)
-                           ;; space-before-tab ; Mixture of space and tab on the same line
-                           ;; space-after-tab ; Mixture of space and tab on the same line
-                           )))
+    ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
+    ;; after idling for 30 seconds.
+    (run-with-idle-timer 30 t #'recentf-save-list)
+
+    ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using
+    ;; idle timers.
+    (run-with-idle-timer 60 t #'recentf-cleanup)))
+
+(when nil
+  (progn
+    (declare-function whitespace-buffer "whitespace")
+    (declare-function whitespace-turn-off "whitespace")
+
+    (unless (fboundp 'whitespace-mode)
+      (autoload #'whitespace-mode "whitespace" nil t))
+    (unless (fboundp 'global-whitespace-mode)
+      (autoload #'global-whitespace-mode "whitespace" nil t))
+    (unless (fboundp 'whitespace-buffer)
+      (autoload #'whitespace-buffer "whitespace" nil t))
+    (unless (fboundp 'whitespace-cleanup)
+      (autoload #'whitespace-cleanup "whitespace" nil t))
+    (unless (fboundp 'whitespace-turn-off)
+      (autoload #'whitespace-turn-off "whitespace" nil t))
+
+    (add-hook 'markdown-mode-hook #'whitespace-mode)
+
+    (with-eval-after-load "whitespace"
+      (defvar whitespace-line-column)
+      (defvar whitespace-style)
+
+      (setq show-trailing-whitespace t
+            whitespace-line-column sb/fill-column
+            whitespace-style '(face ; Visualize using faces
+                               lines-tail
+                               trailing ; Trailing whitespace
+                               ;; tab-mark ; Mark any tabs
+                               ;; empty ; Empty lines at beginning or end of buffer
+                               ;; lines ; Lines that extend beyond `whitespace-line-column'
+                               ;; indentation ; Wrong indentation (tab when spaces and vice versa)
+                               ;; space-before-tab ; Mixture of space and tab on the same line
+                               ;; space-after-tab ; Mixture of space and tab on the same line
+                               ))
+
+      (diminish 'global-whitespace-mode)
+      (diminish 'whitespace-mode)
+      (diminish 'whitespace-newline-mode))))
 
 (progn
   (eval-and-compile
@@ -446,15 +480,15 @@
     (add-to-list 'auto-mode-alist '("\\.svg$" . image-mode))))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
-(use-package server
-  :straight nil
-  :disabled t
-  :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
-  :commands server-running-p
-  :init
-  (unless (and (fboundp 'server-running-p)
-               (server-running-p))
-    (server-start)))
+;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
+(progn
+  (when (fboundp 'server-running-p)
+    (autoload #'server-running-p "server" nil t))
+
+  (when nil
+    (unless (string-equal "root" (getenv "USER")) ; Only start server mode if not root
+      (unless (and (fboundp 'server-running-p) (server-running-p))
+        (server-start)))))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."

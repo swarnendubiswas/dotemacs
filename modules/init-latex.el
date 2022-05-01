@@ -42,8 +42,10 @@
     :remote? t
     :server-id 'texlab-r)))
 
-;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
-;; package.
+
+;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
+;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
+;; the tex package.
 
 (eval-when-compile
   (if (bound-and-true-p sb/disable-package.el)

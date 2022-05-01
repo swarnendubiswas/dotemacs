@@ -13,7 +13,7 @@
   :group 'local)
 
 ;; Add "modules" at the head of `load-path' to reduce startup time
-(dolist (dir '("modules" "extras"))
+(dolist (dir '("modules"))
   (push (expand-file-name dir user-emacs-directory) load-path))
 
 (require 'init-config)
@@ -40,12 +40,14 @@
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (let ((packages  (length package-activated-list))
-                  (gc-time   (float-time gc-elapsed)))
-              (if (bound-and-true-p sb/disable-package.el)
+            (if (bound-and-true-p sb/disable-package.el)
+                (let ((gc-time (float-time gc-elapsed)))
                   (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
-                           (emacs-init-time) gc-time gcs-done)
+                           (emacs-init-time) gc-time gcs-done))
+              (let ((packages (length package-activated-list))
+                    (gc-time  (float-time gc-elapsed)))
                 (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
-                         (emacs-init-time) packages gc-time gcs-done)))))
+                         (emacs-init-time) packages gc-time gcs-done))
+              )))
 
 ;;; init.el ends here

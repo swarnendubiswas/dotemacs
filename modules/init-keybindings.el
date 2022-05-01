@@ -84,8 +84,7 @@
   :custom
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
   (which-key-show-early-on-C-h nil)
-  (which-key-sort-order 'which-key-key-order-alpha)
-  (which-key-idle-delay 0.3))
+  (which-key-sort-order 'which-key-key-order-alpha))
 
 (use-package which-key-posframe
   :disabled t

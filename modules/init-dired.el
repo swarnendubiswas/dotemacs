@@ -317,14 +317,15 @@
   :demand t
   :config (treemacs-load-theme "all-the-icons"))
 
-(progn
-  (unless (fboundp 'dired-async-mode)
-    (autoload #'dired-async-mode "dired-async" nil t))
+(with-eval-after-load "async"
+  (with-eval-after-load "dired"
+    (unless (fboundp 'dired-async-mode)
+      (autoload #'dired-async-mode "dired-async" nil t))
 
-  (add-hook 'dired-mode-hook #'dired-async-mode)
+    (add-hook 'dired-mode-hook #'dired-async-mode)
 
-  (with-eval-after-load "dired-async"
-    (diminish 'dired-async-mode)))
+    (with-eval-after-load "dired-async"
+      (diminish 'dired-async-mode))))
 
 (provide 'init-dired)
 

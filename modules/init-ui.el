@@ -208,83 +208,83 @@
   (spaceline-emacs-theme))
 
 ;; Minimal modeline information
-(eval-when-compile
-  (if (bound-and-true-p sb/disable-package.el)
-      (progn
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
         (use-package awesome-tray
           :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")))
-    (progn (use-package awesome-tray
-             :ensure nil
-             :load-path "extras"))))
+    (use-package awesome-tray
+      :ensure nil
+      :load-path "extras"))
 
-(when (eq sb/modeline-theme 'awesome-tray)
-  (declare-function awesome-tray-mode "awesome-tray")
+  (when (eq sb/modeline-theme 'awesome-tray)
+    (declare-function awesome-tray-mode "awesome-tray")
 
-  (unless (fboundp 'awesome-tray-mode)
-    (autoload #'awesome-tray-mode "awesome-tray" nil t))
-  (add-hook 'after-init-hook #'awesome-tray-mode)
+    (unless (fboundp 'awesome-tray-mode)
+      (autoload #'awesome-tray-mode "awesome-tray" nil t))
+    (add-hook 'after-init-hook #'awesome-tray-mode)
 
-  (defvar awesome-tray-active-modules)
-  (defvar awesome-tray-git-update-duration)
-  (defvar awesome-tray-file-path-full-dirname-levels)
+    (defvar awesome-tray-active-modules)
+    (defvar awesome-tray-git-update-duration)
+    (defvar awesome-tray-file-path-full-dirname-levels)
 
-  (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
+    (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
 
-  (with-eval-after-load "awesome-tray"
-    (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
-          awesome-tray-git-update-duration 30 ; seconds
-          awesome-tray-file-path-full-dirname-levels 1))
+    (with-eval-after-load "awesome-tray"
+      (setq awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git")
+            awesome-tray-git-update-duration 30 ; seconds
+            awesome-tray-file-path-full-dirname-levels 1))
 
-  (custom-set-faces
-   (backquote
-    (awesome-tray-default-face
-     ((t
-       (:inherit default :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-awesome-tab-face
-     ((t
-       (:foreground "#b83059" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-buffer-name-face
-     ((t
-       (:foreground "#cc7700" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-date-face
-     ((t
-       (:foreground "#717175" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-file-path-face
-     ((t
-       (:foreground "#5e8e2e" :weight normal :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-git-face
-     ((t
-       (:foreground "#cc2444" :weight normal :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-last-command-face
-     ((t
-       (:foreground "#0061cc" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-location-face
-     ((t
-       (:foreground "#cc7700" :weight normal :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-mode-name-face
-     ((t
-       (:foreground "#00a400" :weight bold :height 0.8))))))
-  (custom-set-faces
-   (backquote
-    (awesome-tray-module-parent-dir-face
-     ((t
-       (:foreground "#5e8e2e" :weight bold :height 0.8)))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-default-face
+       ((t
+         (:inherit default :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-awesome-tab-face
+       ((t
+         (:foreground "#b83059" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-buffer-name-face
+       ((t
+         (:foreground "#cc7700" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-date-face
+       ((t
+         (:foreground "#717175" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-file-path-face
+       ((t
+         (:foreground "#5e8e2e" :weight normal :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-git-face
+       ((t
+         (:foreground "#cc2444" :weight normal :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-last-command-face
+       ((t
+         (:foreground "#0061cc" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-location-face
+       ((t
+         (:foreground "#cc7700" :weight normal :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-mode-name-face
+       ((t
+         (:foreground "#00a400" :weight bold :height 0.8))))))
+    (custom-set-faces
+     (backquote
+      (awesome-tray-module-parent-dir-face
+       ((t
+         (:foreground "#5e8e2e" :weight bold :height 0.8))))))))
 
 (use-package moody
   :if (eq sb/modeline-theme 'moody)
@@ -354,6 +354,8 @@
 
 (when (string= (system-name) "inspiron-7572")
   (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
+  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
+  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -369,6 +371,8 @@
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
   (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
+  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
+  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
@@ -406,9 +410,6 @@
   (set-face-attribute 'default nil :height 160)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
-(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -497,11 +498,13 @@
   :diminish disable-mouse-global-mode
   :hook (after-init-hook . global-disable-mouse-mode))
 
-(use-package avoid ; Move the cursor from the line of view
-  ;; :straight nil
-  :commands mouse-avoidance-mode
-  :if (display-mouse-p)
-  :init (mouse-avoidance-mode 'banish))
+;; Move the cursor from the line of view
+(when (display-mouse-p)
+  (progn
+    (unless (fboundp 'mouse-avoidance-mode)
+      (autoload #'mouse-avoidance-mode "avoid" nil t))
+
+    (mouse-avoidance-mode 'banish)))
 
 (provide 'init-ui)
 
