@@ -806,7 +806,6 @@
 
     (setq company-backends '(company-capf
                              company-files
-                             company-yasnippet
                              company-dabbrev-code
                              company-dabbrev)))
 
@@ -923,7 +922,6 @@
                              company-shell
                              company-shell-env
                              company-dabbrev-code
-                             company-yasnippet
                              company-files
                              company-dabbrev)))
 
@@ -946,7 +944,6 @@
                              company-shell-env
                              company-fish-shell
                              company-dabbrev-code
-                             company-yasnippet
                              company-files
                              company-dabbrev)))
 
@@ -1030,7 +1027,6 @@
 
     ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
     (setq company-backends '(company-capf
-                             company-yasnippet
                              company-dabbrev-code
                              company-files
                              company-dabbrev)))

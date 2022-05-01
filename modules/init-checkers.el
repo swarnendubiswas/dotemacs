@@ -196,15 +196,16 @@
              langtool-check-done
              langtool-show-message-at-point
              langtool-correct-buffer)
-  :init (setq langtool-default-language "en-US")
-  :config
-  (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+  :init
+  (setq langtool-default-language "en-US"
+        languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        ;; The folder should include all the files in addition to the ".jar" files.
         languagetool-console-command (no-littering-expand-etc-file-name
-                                      "languagetool-commandline.jar")
+                                      "languagetool/languagetool-commandline.jar")
         languagetool-server-command (no-littering-expand-etc-file-name
-                                     "languagetool-server.jar")
+                                     "languagetool/languagetool-server.jar")
         langtool-language-tool-jar (no-littering-expand-etc-file-name
-                                    "languagetool-commandline.jar")))
+                                    "languagetool/languagetool-commandline.jar")))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.

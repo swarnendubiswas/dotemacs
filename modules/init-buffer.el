@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+
 (progn
   (unless (fboundp 'ibuffer)
     (autoload #'ibuffer "ibuffer" nil t))
