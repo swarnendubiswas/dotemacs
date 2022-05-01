@@ -54,8 +54,6 @@
     (straight-freeze-versions)))
 
 (unless (bound-and-true-p sb/disable-package.el)
-  (setq package-quickstart t)
-
   (when (featurep 'native-compile)
     (defvar package-native-compile)
     (defvar native-comp-always-compile)
@@ -143,6 +141,9 @@
 
 (use-package no-littering
   :demand t)
+
+(when (boundp 'package-quickstart)
+  (setq package-quickstart t))
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
   :diminish

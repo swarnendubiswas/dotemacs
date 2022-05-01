@@ -147,7 +147,7 @@
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   ;; (unbind-key "C-c ;" LaTeX-mode-map)
 
-  (bind-key "C-c x q" TeX-insert-quote LaTeX-mode-map))
+  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
 
 (add-hook 'bibtex-mode-hook #'lsp-deferred)
 (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
