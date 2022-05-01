@@ -7,36 +7,15 @@
 
 ;;; Code:
 
-(unless (fboundp 'org-indent-mode)
-  (autoload #'org-indent-mode "org" nil t))
-(unless (fboundp 'org-indent-item)
-  (autoload #'org-indent-item "org" nil t))
-(unless (fboundp 'org-outdent-item)
-  (autoload #'org-outdent-item "org" nil t))
-
-(with-eval-after-load "org"
-  (defvar org-fontify-done-headline)
-  (defvar org-fontify-whole-heading-line)
-  (defvar org-hide-emphasis-markers)
-  (defvar org-hide-leading-stars)
-  (defvar org-hide-leading-stars-before-indent-mode)
-  (defvar org-src-fontify-natively)
-  (defvar org-src-preserve-indentation)
-  (defvar org-src-tabs-acts-natively)
-  (defvar org-src-window-setup)
-  (defvar org-startup-indented)
-  (defvar org-startup-truncated)
-  (defvar org-startup-folded)
-  (defvar org-startup-with-inline-images)
-  (defvar org-support-shift-select)
-  (defvar org-use-speed-commands)
-  (defvar org-src-strip-leading-and-trailing-blank-lines)
-  (defvar org-pretty-entities)
-  (defvar org-pretty-entities-include-sub-superscripts)
-  (defvar org-footnote-auto-adjust)
-
-  (setq org-fontify-done-headline t
-        org-fontify-whole-heading-line t
+(use-package org
+  :defines (org-hide-leading-stars-before-indent-mode
+            org-src-strip-leading-and-trailing-blank-lines
+            org-src-tabs-acts-natively)
+  :commands (org-indent-mode org-indent-item org-outdent-item)
+  :hook (org-mode-hook . visual-line-mode)
+  :config
+  (setq org-fontify-done-headline nil
+        org-fontify-whole-heading-line nil
         org-hide-emphasis-markers t
         org-hide-leading-stars t
         org-hide-leading-stars-before-indent-mode t
@@ -64,25 +43,17 @@
         ;; Automatically sorted and renumbered whenever I insert a new one
         org-footnote-auto-adjust t)
 
-  (defvar org-mode-map)
-  ;; (unbind-key "M-<left>" org-mode-map)
-  ;; (unbind-key "M-<right>" org-mode-map)
-
-  (bind-keys :package org :map org-mode-map
-             ("M-<left>")
-             ("M-<right>")
-             ("M-<up>")
-             ("M-<down>")
-             ("C-'")
-             ("<tab>"      . org-indent-item)
-             ("<backtab>"  . org-outdent-item))
-
-  (add-hook 'org-mode-hook (lambda ()
-                             (visual-line-mode 1)
-                             (prettify-symbols-mode 1))))
-
-(with-eval-after-load "org-indent"
-  (diminish 'org-indent-mode))
+  (with-eval-after-load "org-indent"
+    (diminish 'org-indent-mode))
+  :bind
+  (:map org-mode-map
+        ("M-<left>"  . nil)
+        ("M-<right>" . nil)
+        ("M-<up>"    . nil)
+        ("M-<down>"  . nil)
+        ("C-'"       . nil)
+        ("<tab>"     . org-indent-item)
+        ("<backtab>" . org-outdent-item)))
 
 ;; Disabled the package to get consistent styles across themes.
 (use-package org-bullets

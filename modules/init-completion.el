@@ -281,6 +281,22 @@
   )
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes
+                             (vertico-buffer
+                              vertico-directory
+                              vertico-flat
+                              vertico-indexed
+                              vertico-mouse
+                              vertico-quick
+                              vertico-repeat
+                              vertico-reverse)))
+      (use-package vertico))))
+
 (use-package vertico
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
@@ -464,6 +480,16 @@
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
+(when (and (display-graphic-p) (eq sb/capf 'corfu))
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package corfu
+          :straight (corfu :includes (corfu-indexed
+                                      corfu-quick
+                                      corfu-history)
+                           :files (:defaults "extensions/corfu-*.el")))
+      (use-package corfu))))
+
 (use-package corfu
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :preface

@@ -161,7 +161,7 @@ Corfu does not support TUI, so we have to fallback on company."
   :group 'dotemacs)
 
 (defcustom sb/disable-package.el
-  nil
+  t
   "Disable package.el and prefer some other package manager instead."
   :type 'boolean
   :group 'dotemacs)

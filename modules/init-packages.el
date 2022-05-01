@@ -37,8 +37,11 @@
 
   (setq straight-use-package-by-default t
         straight-disable-native-compile nil
-        ;; There is no need to download the whole Git history, and a single branch often suffices
-        straight-vc-git-default-clone-depth '(1 single-branch))
+        ;; There is no need to download the whole Git history, and a single branch often suffices.
+        ;; However, it can lead to "git revision parsing" errors while using `straight-pull-all' and
+        ;; `straight-freeze-versions'.
+        ;; straight-vc-git-default-clone-depth '(1 single-branch)
+        )
 
   ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
   ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
