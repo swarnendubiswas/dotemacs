@@ -7,29 +7,35 @@
 
 ;;; Code:
 
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package ibuffer
-      :straight (:type built-in))
-  ((use-package ibuffer
-     :ensure nil)))
+(progn
+  (unless (fboundp 'ibuffer)
+    (autoload #'ibuffer "ibuffer" nil t))
 
-(defalias 'list-buffers 'ibuffer)
-(setq ibuffer-display-summary nil
-      ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
-      ibuffer-use-header-line t)
-(bind-key "C-x C-b" #'ibuffer)
+  (bind-keys :package ibuffer
+             ("C-x C-b" . ibuffer))
 
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package ibuf-ext
-      :straight (:type built-in))
-  ((use-package ibuffer
-     :ensure nil)))
+  (defalias 'list-buffers 'ibuffer)
 
-(unless (fboundp 'ibuffer-auto-mode)
-  (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
-;; Do not show filter groups if there are no buffers in that group
-(setq ibuffer-show-empty-filter-groups nil)
-(add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+  (defvar ibuffer-display-summary)
+  (defvar ibuffer-default-sorting-mode)
+  (defvar ibuffer-use-header-line)
+
+  (setq ibuffer-display-summary nil
+        ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
+        ibuffer-use-header-line t))
+
+(progn
+  (declare-function ibuffer-auto-mode "ibuffer-ext")
+  (unless (fboundp 'ibuffer-auto-mode)
+    (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
+
+  (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
+
+  (with-eval-after-load "ibuf-ext"
+    ;; Do not show filter groups if there are no buffers in that group
+    (defvar ibuffer-show-empty-filter-groups)
+
+    (setq ibuffer-show-empty-filter-groups nil)))
 
 (use-package ibuffer-projectile ; Group buffers by projectile project
   :commands ibuffer-projectile-set-filter-groups

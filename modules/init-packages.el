@@ -83,7 +83,11 @@
     (package-install 'use-package))
 
   ;; Avoid manual installations whenever I modify package installations
-  (setq use-package-always-ensure t))
+  (setq use-package-always-ensure t)
+
+  ;; (eval-when-compile
+  ;;   (require 'use-package))
+  )
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
@@ -99,6 +103,9 @@
 ;;   ((x-mode-hook . last)
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
+
+(setq use-package-enable-imenu-support t
+      use-package-hook-name-suffix     nil)
 
 (when (bound-and-true-p sb/debug-init-file)
   (setq debug-on-error                 t
@@ -116,8 +123,26 @@
         use-package-compute-statistics nil
         use-package-verbose            nil))
 
-(setq use-package-enable-imenu-support t
-      use-package-hook-name-suffix     nil)
+;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
+;; and the minor modes.
+(use-package bind-key
+  :functions bind-key--remove
+  :bind ("C-c d k" . describe-personal-keybindings))
+
+(use-package diminish
+  :demand t)
+
+(use-package f
+  :commands (f-exists? f-join f-dirname))
+
+(use-package s
+  :commands s-starts-with? s-ends-with?)
+
+(use-package dash
+  :commands (-contains? -tree-map))
+
+(use-package no-littering
+  :demand t)
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
   :diminish
@@ -135,18 +160,6 @@
   (("C-c d p" . package-quickstart-refresh)
    ("C-c d l" . package-list-packages)))
 
-(use-package f
-  :commands (f-exists? f-join f-dirname))
-
-(use-package s
-  :commands s-starts-with? s-ends-with?)
-
-(use-package dash
-  :commands (-contains? -tree-map))
-
-(use-package no-littering
-  :demand t)
-
 (defcustom sb/custom-file
   (no-littering-expand-var-file-name "custom.el")
   "File to write Emacs customizations."
@@ -160,26 +173,17 @@
   :type  'string
   :group 'sb/emacs)
 
-;; Asynchronously byte compile packages installed with `package.el'
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package async
-      :straight (async :type git :host github :repo "jwiegley/emacs-async"))
-  (use-package async
-    :ensure nil))
+;; ;; Asynchronously byte compile packages installed with `package.el'
+;; (if (bound-and-true-p sb/disable-package.el)
+;;     (use-package async
+;;       :straight (async :type git :host github :repo "jwiegley/emacs-async"))
+;;   (use-package async))
 
-(progn
-  (unless (fboundp 'async-bytecomp-package-mode)
-    (autoload #'async-bytecomp-package-mode "async" nil t))
+;; (progn
+;;   (unless (fboundp 'async-bytecomp-package-mode)
+;;     (autoload #'async-bytecomp-package-mode "async" nil t))
 
-  (async-bytecomp-package-mode 1))
-
-;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
-;; and the minor modes.
-(use-package bind-key
-  :functions bind-key--remove
-  :bind ("C-c d k" . describe-personal-keybindings))
-
-(use-package diminish)
+;;   (async-bytecomp-package-mode 1))
 
 ;; Get PATH with "(getenv "PATH")".
 ;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
@@ -187,17 +191,17 @@
 ;; These are alternative ways to manipulate the `exec-path'.
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
-(use-package exec-path-from-shell
-  :defines exec-path-from-shell-check-startup-files
-  :commands exec-path-from-shell-initialize
-  :if (or (daemonp) (memq window-system '(x ns)))
-  :init
-  ;; "-i" is expensive but Tramp may be unable to find executables without the option
-  (setq exec-path-from-shell-arguments '("-l")
-        exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
-                                         "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
-  (exec-path-from-shell-initialize))
+;; (use-package exec-path-from-shell
+;;   :defines exec-path-from-shell-check-startup-files
+;;   :commands exec-path-from-shell-initialize
+;;   :if (or (daemonp) (memq window-system '(x ns)))
+;;   :init
+;;   ;; "-i" is expensive but Tramp may be unable to find executables without the option
+;;   (setq exec-path-from-shell-arguments '("-l")
+;;         exec-path-from-shell-check-startup-files nil
+;;         exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
+;;                                          "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
+;;   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)
 

@@ -249,32 +249,36 @@
 (use-package bison-mode
   :mode ("\\.bison\\'"))
 
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package llvm-mode
-      ;; :straight (llvm-mode :type git :host github
-      ;;                      :repo "llvm/llvm-project"
-      ;;                      :files "llvm/utils/emacs/llvm-mode.el")
-      :straight nil)
-  (use-package llvm-mode
-    :load-path "extras"))
-
 (progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package llvm-mode
+          ;; :straight (llvm-mode :type git :host github
+          ;;                      :repo "llvm/llvm-project"
+          ;;                      :files "llvm/utils/emacs/llvm-mode.el")
+          :straight nil)
+      (use-package llvm-mode
+        :ensure nil
+        :load-path "extras")))
+
   (declare-function llvm-mode "llvm-mode")
 
   (unless (fboundp 'llvm-mode)
     (autoload #'llvm-mode "llvm-mode" nil t)))
 
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package tablegen-mode
-      :straight nil)
-  (use-package tablegen-mode
-    :load-path "extras"))
-
 (progn
-  (declare-function tablegen-mode "tablegen-mode")
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package tablegen-mode
+          :straight nil)
+      (use-package tablegen-mode
+        :ensure nil
+        :load-path "extras"))
 
-  (unless (fboundp 'tablegen-mode)
-    (autoload #'tablegen-mode "tablegen-mode" nil t)))
+    (declare-function tablegen-mode "tablegen-mode")
+
+    (unless (fboundp 'tablegen-mode)
+      (autoload #'tablegen-mode "tablegen-mode" nil t))))
 
 (use-package autodisass-llvm-bitcode
   :commands autodisass-llvm-bitcode
@@ -1098,20 +1102,20 @@
   :custom (clang-format+-always-enable t))
 
 ;; Tree-sitter provides advanced syntax highlighting features
-(if (bound-and-true-p sb/disable-package.el)
+(eval-when-compile
+  (if (bound-and-true-p sb/disable-package.el)
+      (use-package tree-sitter
+        :straight tree-sitter-langs
+        :straight t)
     (use-package tree-sitter
-      :straight tree-sitter-langs
-      :straight t)
-  (use-package tree-sitter
-    :ensure tree-sitter-langs
-    :ensure t))
+      :ensure tree-sitter-langs
+      :ensure t)))
 
-(progn
-  (unless (fboundp 'global-tree-sitter-mode)
-    (autoload #'global-tree-sitter-mode "tree-sitter" nil t))
-  (unless (fboundp 'tree-sitter-hl-mode)
-    (autoload #'tree-sitter-hl-mode "tree-sitter-hl" nil t))
-
+(use-package tree-sitter
+  :functions tree-sitter-hl-mode
+  :commands (global-tree-sitter-mode tree-sitter-hl-mode)
+  :diminish tree-sitter-mode
+  :preface
   (defun sb/enable-tree-sitter ()
     "Delay enabling tree-sitter to avoid slowing down Emacs startup."
     (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
@@ -1122,13 +1126,10 @@
       (add-hook hook (lambda ()
                        (require 'tree-sitter-langs)
                        (global-tree-sitter-mode 1)))))
-
   ;; :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
-  (add-hook 'after-init-hook #'sb/enable-tree-sitter)
-
-  (with-eval-after-load "tree-sitter"
-    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-    (diminish 'tree-sitter-mode)))
+  :hook (after-init-hook . sb/enable-tree-sitter)
+  :config
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 (use-package dotenv-mode
   :mode "\\.env\\'")

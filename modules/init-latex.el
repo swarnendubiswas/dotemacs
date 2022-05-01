@@ -45,11 +45,12 @@
 ;; Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides the tex
 ;; package.
 
-(if (bound-and-true-p sb/disable-package.el)
+(eval-when-compile
+  (if (bound-and-true-p sb/disable-package.el)
+      (use-package tex
+        :straight auctex)
     (use-package tex
-      :straight auctex)
-  (use-package tex
-    :ensure auctex))
+      :ensure auctex)))
 
 (declare-function LaTeX-math-mode "tex")
 (declare-function TeX-PDF-mode "tex")
@@ -410,11 +411,13 @@ Ignore if no file is found."
   (defvar LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
-(if (bound-and-true-p sb/disable-package.el)
+(eval-when-compile
+  (if (bound-and-true-p sb/disable-package.el)
+      (use-package math-preview
+        :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview"))
     (use-package math-preview
-      :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview"))
-  (use-package math-preview
-    :load-path "extras"))
+      :ensure nil
+      :load-path "extras")))
 
 (unless (fboundp 'math-preview-all)
   (autoload #'math-preview-all "math-preview" nil t))

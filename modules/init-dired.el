@@ -123,17 +123,31 @@
         ("/" . dired-narrow)))
 
 ;; Do not create multiple dired buffers
-(use-package dired+
-  :straight  (dired+ :type git :host github :repo "emacsmirror/dired-plus")
-  :commands diredp-toggle-find-file-reuse-dir
-  :init (setq diredp-bind-problematic-terminal-keys nil)
-  :custom
-  (diredp-hide-details-initially-flag nil)
-  (diredp-hide-details-propagate-flag nil)
-  :hook
-  (dired-mode-hook . (lambda ()
-                       (when sb/EMACS27
-                         (diredp-toggle-find-file-reuse-dir 1)))))
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package dired+
+          :straight (dired+ :type git :host github :repo "emacsmirror/dired-plus"))
+      (use-package dired+
+        :ensure nil
+        :load-path "extras")))
+
+  (setq diredp-bind-problematic-terminal-keys nil)
+  (declare-function diredp-toggle-find-file-reuse-dir "dired+")
+
+  (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
+    (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
+
+  (add-hook 'dired-mode-hook (lambda ()
+                               (when sb/EMACS27
+                                 (diredp-toggle-find-file-reuse-dir 1))))
+
+  (with-eval-after-load "dired+"
+    (defvar diredp-hide-details-initially-flag)
+    (defvar diredp-hide-details-propagate-flag)
+
+    (setq diredp-hide-details-initially-flag nil
+          diredp-hide-details-propagate-flag nil)))
 
 ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.

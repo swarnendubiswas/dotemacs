@@ -281,102 +281,94 @@
   )
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
+(use-package vertico
+  :if (eq sb/minibuffer-completion 'vertico)
+  :defines read-extended-command-predicate
+  :commands command-completion-default-include-p
+  :hook (after-init-hook . vertico-mode)
+  :custom
+  (vertico-cycle t)
+  (vertico-resize nil)
+  (vertico-count 12)
+  (vertico-scroll-margin 4)
+  :config
+  ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
+  ;; hidden in normal buffers.
+  (when sb/EMACS28+
+    (setq read-extended-command-predicate #'command-completion-default-include-p))
+  :bind
+  (("<f2>" .  find-file)
+   :map vertico-map
+   ("<escape>" . minibuffer-keyboard-quit)
+   ("?" . minibuffer-completion-help)
+   ("M-RET" . minibuffer-force-complete-and-exit)
+   ("M-TAB" . minibuffer-complete)))
+
+;; More convenient directory navigation commands
 (when (eq sb/minibuffer-completion 'vertico)
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package vertico
-        :straight (vertico :files (:defaults "extensions/*")
-                           :includes
-                           (vertico-buffer
-                            vertico-directory
-                            vertico-flat
-                            vertico-indexed
-                            vertico-mouse
-                            vertico-quick
-                            vertico-repeat
-                            vertico-reverse)))
-    (use-package vertico))
-
-  (add-hook 'after-init-hook #'vertico-mode)
-
-  (with-eval-after-load "vertico"
-    (setq vertico-cycle t
-          vertico-resize nil
-          vertico-count 12
-          vertico-scroll-margin 4)
-
-    ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
-    ;; hidden in normal buffers.
-    (when sb/EMACS28+
-      (setq read-extended-command-predicate #'command-completion-default-include-p)))
-
-  (bind-keys :package vertico
-             ("<f2>" .  find-file)
-             :map vertico-map
-             ("<escape>" . minibuffer-keyboard-quit)
-             ("?" . minibuffer-completion-help)
-             ("M-RET" . minibuffer-force-complete-and-exit)
-             ("M-TAB" . minibuffer-complete))
-
-  ;; More convenient directory navigation commands
-  (if (bound-and-true-p sb/disable-package.el)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-directory
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-directory)))
       (use-package vertico-directory
-        :straight (vertico :files (:defaults "extensions/*")
-                           :includes (vertico-directory))
-        :after vertico)
-    (use-package vertico-directory
-      :after vertico
-      :load-path "extras"))
+        :ensure nil
+        :load-path "extras")))
 
-  (bind-keys :package vertico
-             :map vertico-map
-             ("RET" . vertico-directory-enter)
-             ("DEL" . vertico-directory-delete-char)
-             ("M-DEL" . vertico-directory-delete-word))
+  (use-package vertico-directory
+    :bind
+    (:map vertico-map
+          ("RET" . vertico-directory-enter)
+          ("DEL" . vertico-directory-delete-char)
+          ("M-DEL" . vertico-directory-delete-word))
+    ;; Tidy shadowed file names
+    :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)))
 
-  ;; Tidy shadowed file names
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
-
-  (if (bound-and-true-p sb/disable-package.el)
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-repeat
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-repeat)))
       (use-package vertico-repeat
-        :straight (vertico :files (:defaults "extensions/*")
-                           :includes (vertico-repeat))
-        :after vertico)
-    (use-package vertico-repeat
-      :after vertico
-      :load-path "extras"))
+        :ensure nil
+        :load-path "extras")))
 
-  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+  (use-package vertico-repeat
+    :hook (minibuffer-setup-hook . vertico-repeat-save)
+    :bind
+    (("C-c r" . vertico-repeat-last)
+     ("M-r" . vertico-repeat-select))))
 
-  (bind-keys :package vertico 
-             ("C-c r" . vertico-repeat-last)
-             ("M-r" . vertico-repeat-select))
-
-  (if (bound-and-true-p sb/disable-package.el)
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-indexed
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-indexed)))
       (use-package vertico-indexed
-        :straight (vertico :files (:defaults "extensions/*")
-                           :includes (vertico-indexed))
-        :after vertico)
-    (use-package vertico-indexed
-      :after vertico
-      :load-path "extras"))
+        :ensure nil
+        :load-path "extras")))
 
-  (unless (fboundp 'vertico-indexed-mode)
-    (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
-  (vertico-indexed-mode 1)
+  (use-package vertico-indexed
+    :commands vertico-indexed-mode
+    :init (vertico-indexed-mode 1)))
 
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package vertico-quick 
-        :straight (vertico :files (:defaults "extensions/*")
-                           :includes (vertico-quick))
-        :after vertico)
-    (use-package vertico-quick
-      :after vertico
-      :load-path "extras"))
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-quick
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-quick)))
+      (use-package vertico-quick
+        :ensure nil
+        :load-path "extras")))
 
-  (bind-map :package vertico
-            :map vertico-map
-            ("C-c q" . vertico-quick-insert)
-            ("C-'" . vertico-quick-exit)))
+  (use-package vertico-quick
+    :bind
+    (:map vertico-map
+          ("C-c q" . vertico-quick-insert)
+          ("C-'" . vertico-quick-exit))))
 
 (use-package consult
   :if (eq sb/minibuffer-completion 'vertico)
@@ -472,71 +464,73 @@
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
-(when (and (display-graphic-p) (eq sb/capf 'corfu))
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package corfu
-        :straight (corfu
-                   :files (:defaults "extensions/corfu-*.el")
-                   :includes (corfu-indexed
-                              corfu-quick
-                              corfu-history)))
-    (use-package corfu))
-
+(use-package corfu
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :preface
   (defun sb/corfu-move-to-minibuffer ()
     (interactive)
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
+  :hook (after-init-hook . corfu-global-mode)
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-auto-delay 0)
+  (corfu-auto-prefix 2)
+  (corfu-min-width 60)
+  (corfu-max-width corfu-min-width)
+  (corfu-count 15)
+  (corfu-preselect-first t)
+  :bind
+  (:map corfu-map
+        ([tab] . corfu-next)
+        ([backtab] . corfu-previous)
+        ("M-m" . sb/corfu-move-to-minibuffer)))
 
-  (add-hook 'after-init-hook #'corfu-global-mode)
-
-  (with-eval-after-load "corfu"
-    (setq corfu-cycle t ; Enable cycling for `corfu-next/previous'
-          corfu-auto t ; Enable auto completion
-          corfu-auto-delay 0
-          corfu-auto-prefix 2
-          corfu-min-width 60
-          corfu-max-width corfu-min-width
-          corfu-count 15
-          corfu-preselect-first t)
-
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package corfu-quick
-          :straight (corfu
-                     :files (:defaults "extensions/corfu-*.el")
-                     :includes (corfu-quick)))
-      (use-package corfu-quick
-        :load-path "extras"))
-
-    (bind-keys
-     :map corfu-map
-     ("C-q" . corfu-quick-insert))
-
+(when (and (display-graphic-p) (eq sb/capf 'corfu))
+  (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package corfu-indexed
           :straight (corfu
                      :files (:defaults "extensions/corfu-*.el")
                      :includes (corfu-indexed)))
       (use-package corfu-indexed
-        :load-path "extras"))
+        :ensure nil
+        :load-path "extras")))
 
-    (corfu-indexed-mode 1)
+  (use-package corfu-indexed
+    :init (corfu-indexed-mode 1)))
 
+(when (and (display-graphic-p) (eq sb/capf 'corfu))
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package corfu-quick
+          :straight (corfu
+                     :files (:defaults "extensions/corfu-*.el")
+                     :includes (corfu-quick)))
+      (use-package corfu-quick
+        :ensure nil
+        :load-path "extras")))
+
+  (use-package corfu-quick
+    :bind
+    (:map corfu-map
+          ("C-q" . corfu-quick-insert))))
+
+(when (and (display-graphic-p) (eq sb/capf 'corfu))
+  (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package corfu-history
           :straight (corfu
                      :files (:defaults "extensions/corfu-*.el")
                      :includes (corfu-history)))
       (use-package corfu-history
-        :load-path "extras"))
+        :ensure nil
+        :load-path "extras")))
 
-    (corfu-history-mode 1)
-
-    (bind-keys
-     (:map corfu-map
-           ([tab] . corfu-next)
-           ([backtab] . corfu-previous)
-           ("M-m" . sb/corfu-move-to-minibuffer)))))
+  (use-package corfu-history
+    :init (corfu-history-mode 1)))
 
 (use-package corfu-doc
   :if (and (display-graphic-p) (eq sb/capf 'corfu))

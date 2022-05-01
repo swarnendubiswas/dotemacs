@@ -91,10 +91,11 @@
 
 ;; Make invisible parts of Org elements appear visible
 (progn
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package org-appear
-        :straight (org-appear :type git :host github :repo "awth13/org-appear"))
-    (use-package org-appear))
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package org-appear
+          :straight (org-appear :type git :host github :repo "awth13/org-appear"))
+      (use-package org-appear)))
 
   (unless (fboundp 'org-appear-mode)
     (autoload #'org-appear-mode "org-appear" nil t))

@@ -208,12 +208,14 @@
   (spaceline-emacs-theme))
 
 ;; Minimal modeline information
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package awesome-tray
-      :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray"))
-  ((use-package awesome-tray
-     :ensure nil
-     :load-path sb/extras-directory)))
+(eval-when-compile
+  (if (bound-and-true-p sb/disable-package.el)
+      (progn
+        (use-package awesome-tray
+          :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")))
+    (progn (use-package awesome-tray
+             :ensure nil
+             :load-path "extras"))))
 
 (when (eq sb/modeline-theme 'awesome-tray)
   (declare-function awesome-tray-mode "awesome-tray")

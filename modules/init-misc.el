@@ -185,13 +185,17 @@
 (use-package define-word
   :commands (define-word define-word-at-point))
 
-(if (bound-and-true-p sb/disable-package.el)
-    (use-package number-separator
-      :straight (number-separator :type git :host github :repo "legalnonsense/number-separator.el"))
-  (use-package number-separator))
-
 (when nil
   (progn
+    (eval-when-compile
+      (if (bound-and-true-p sb/disable-package.el)
+          (use-package number-separator
+            :straight (number-separator :type git :host github
+                                        :repo "legalnonsense/number-separator.el"))
+        (use-package number-separator
+          :ensure nil
+          :load-path "extras")))
+
     (declare-function number-separator-mode "number-separator")
 
     (unless (fboundp 'number-separator-mode)
@@ -252,20 +256,26 @@
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
 
-(when nil
-  (when (bound-and-true-p sb/debug-init-file)
+(when (bound-and-true-p sb/debug-init-file)
+  (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package explain-pause-mode
-          :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode"))
-      (use-package explain-pause-mode))
+          :straight (explain-pause-mode :type git :host github
+                                        :repo "lastquestion/explain-pause-mode"))
+      (use-package explain-pause-mode
+        :ensure nil
+        :load-path "extras")))
 
-    (unless (fboundp 'explain-pause-mode)
-      (autoload #'explain-pause-mode "explain-pause-mode" nil t))
-    (unless (fboundp 'explain-pause-top)
-      (autoload #'explain-pause-top "explain-pause-mode" nil t))
+  (declare-function explain-pause-mode "explain-pause-mode")
+  (declare-function explain-pause-top "explain-pause-mode")
 
-    (with-eval-after-load "explain-pause-mode"
-      (diminish 'explain-pause-mode))))
+  (unless (fboundp 'explain-pause-mode)
+    (autoload #'explain-pause-mode "explain-pause-mode" nil t))
+  (unless (fboundp 'explain-pause-top)
+    (autoload #'explain-pause-top "explain-pause-mode" nil t))
+
+  (with-eval-after-load "explain-pause-mode"
+    (diminish 'explain-pause-mode)))
 
 (use-package ace-window
   :bind ([remap other-window] . ace-window))
