@@ -505,7 +505,7 @@
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0)
-  (corfu-auto-prefix 2)
+  (corfu-auto-prefix 3)
   (corfu-min-width 60)
   (corfu-max-width corfu-min-width)
   (corfu-count 15)

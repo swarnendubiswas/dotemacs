@@ -7,7 +7,10 @@
 
 ;;; Code:
 
-(use-package ffap ; Find FILENAME, guessing a default from text around point.
+(defvar sb/user-home-directory)
+(defvar sb/minibuffer-completion)
+
+(use-package ffap ; Find FILENAME, guessing a default from text around point
   :commands ffap)
 
 ;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
@@ -90,15 +93,16 @@
   ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
   ;; projects is disabled for faster startup.
   (setq projectile-auto-discover nil
-        projectile-project-search-path (list
-                                        (concat `,(getenv "HOME") "/bitbucket")
-                                        (expand-file-name "github"            sb/user-home-directory)
-                                        (expand-file-name "iitk-workspace"    sb/user-home-directory)
-                                        (expand-file-name "iitkgp-workspace"  sb/user-home-directory)
-                                        (expand-file-name "iss-workspace"     sb/user-home-directory)
-                                        (expand-file-name "plass-workspace"   sb/user-home-directory)
-                                        (expand-file-name "prospar-workspace" sb/user-home-directory)
-                                        ))
+        projectile-project-search-path
+        (list
+         (concat `,(getenv "HOME") "/bitbucket")
+         (expand-file-name "github"            sb/user-home-directory)
+         (expand-file-name "iitk-workspace"    sb/user-home-directory)
+         (expand-file-name "iitkgp-workspace"  sb/user-home-directory)
+         (expand-file-name "iss-workspace"     sb/user-home-directory)
+         (expand-file-name "plass-workspace"   sb/user-home-directory)
+         (expand-file-name "prospar-workspace" sb/user-home-directory)
+         ))
 
   (dolist (prjs (list
                  (expand-file-name sb/user-home-directory) ; Do not consider $HOME as a project
@@ -142,7 +146,7 @@
 
   ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
 
-  ;; Set these in case `counsel-projectile' is disabled. For `vertico', we use `consult-projectile'.
+  ;; Set in case `counsel-projectile' is disabled. For `vertico', we use `consult-projectile'.
   (when (eq sb/minibuffer-completion 'ivy)
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file))
@@ -216,21 +220,6 @@
   :bind
   (("<f5>" . consult-projectile-switch-project)
    ("<f6>" . consult-projectile)))
-
-;; (when (eq sb/minibuffer-completion 'vertico)
-;;   (eval-when-compile
-;;     (if (bound-and-true-p sb/disable-package.el)
-;;         (use-package consult-projectile
-;;           :straight (consult-projectile :type git :host gitlab :repo
-;;                                         "OlMon/consult-projectile" :branch "master"))
-;;       (use-package consult-projectile)))
-
-;;   (unless (fboundp 'consult-projectile-recentf)
-;;     (autoload #'consult-projectile-recentf "consult-projectile" nil t))
-
-;;   (bind-keys :package consult-projectile
-;;              ("<f5>" . consult-projectile-switch-project)
-;;              ("<f6>" . consult-projectile)))
 
 (use-package consult-project-extra)
 

@@ -7,6 +7,10 @@
 
 ;;; Code:
 
+(defvar sb/modeline-theme)
+(defvar sb/user-home-directory)
+(defvar sb/textlint-directory)
+
 ;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
 ;; also get run for all modes derived from a basic mode such as `text-mode'.
 
@@ -14,11 +18,10 @@
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-;; Identify weasel words, passive voice, and duplicate words, `textlint' includes writegood. I
+;; Identify weasel words, passive voice, and duplicate words, `textlint' includes `writegood'. I
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-  :disabled t
   :commands (writegood-mode writegood-passive-voice-turn-off)
   :diminish
   :hook (text-mode-hook . writegood-mode))

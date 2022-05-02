@@ -48,7 +48,7 @@
   :if (display-graphic-p)
   :commands all-the-icons-ibuffer-mode
   :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
-  :config (setq all-the-icons-ibuffer-icon-size 0.8))
+  :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package counsel-fd
   :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
@@ -83,7 +83,7 @@
   :if (executable-find "fasd")
   ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
   :hook (after-init-hook . global-fasd-mode)
-  :config (setq fasd-enable-initial-prompt nil)
+  :custom (fasd-enable-initial-prompt nil)
   :bind* ("C-c /" . fasd-find-file))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
