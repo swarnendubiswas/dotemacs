@@ -13,6 +13,12 @@
 
 (when (bound-and-true-p sb/disable-package.el)
   (defvar bootstrap-version)
+  (defvar straight-build-dir)
+  (defvar straight-check-for-modifications)
+  (defvar straight-profiles)
+  (defvar straight-use-package-by-default)
+  (defvar straight-disable-native-compile)
+  (defvar straight-base-dir)
 
   (setf straight-profiles `((nil . "straight.lockfile.el")))
 
@@ -110,6 +116,13 @@
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
 
+(defvar use-package-enable-imenu-support)
+(defvar use-package-hook-name-suffix)
+(defvar use-package-compute-statistics)
+(defvar use-package-verbose)
+(defvar use-package-expand-minimally)
+(defvar use-package-always-defer)
+
 ;; These variables are set even with `straight.el'.
 (setq use-package-enable-imenu-support t
       use-package-hook-name-suffix     nil)
@@ -130,14 +143,23 @@
         use-package-compute-statistics nil
         use-package-verbose            nil))
 
+(use-package diminish
+  :demand t)
+
+;; Allow GC to happen after a period of idle time, initialize this package early
+(use-package gcmh
+  :diminish
+  :commands (gcmh-mode gcmh-idle-garbage-collect)
+  :hook (after-init-hook . gcmh-mode)
+  :config
+  (when (bound-and-true-p sb/debug-init-file)
+    (setq gcmh-verbose t)))
+
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.
 (use-package bind-key
   :functions bind-key--remove
   :bind ("C-c d k" . describe-personal-keybindings))
-
-(use-package diminish
-  :demand t)
 
 (use-package f
   :commands (f-exists? f-join f-dirname))
@@ -150,14 +172,6 @@
 
 (use-package no-littering
   :demand t)
-
-(use-package gcmh ; Allow GC to happen after a period of idle time
-  :diminish
-  :commands (gcmh-mode gcmh-idle-garbage-collect)
-  :hook (after-init-hook . gcmh-mode)
-  :config
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose t)))
 
 ;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command.

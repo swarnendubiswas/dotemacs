@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
@@ -442,6 +444,21 @@
 (use-package counsel-tramp
   :if (eq sb/minibuffer-completion 'ivy)
   :bind ("C-c d t" . counsel-tramp))
+
+(when (eq sb/minibuffer-completion 'vertico)
+  (progn
+    (eval-when-compile
+      (if (bound-and-true-p sb/disable-package.el)
+          (use-package consult-tramp
+            :straight (consult-tramp :type git :host github :repo "Ladicle/consult-tramp"))
+        (use-package consult-tramp
+          :ensure nil
+          :load-path "extras")))
+
+    (declare-function consult-tramp "consult-tramp")
+
+    (bind-keys :package consult-tramp
+               ("C-c d t" . consult-tramp))))
 
 ;; TODO: SSH into Gcloud
 ;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9

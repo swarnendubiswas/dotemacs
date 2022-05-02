@@ -8,6 +8,7 @@
 ;;; Code:
 
 (defvar sb/minibuffer-completion)
+(declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
 (progn
   (unless (fboundp 'ibuffer)
@@ -74,14 +75,6 @@
   :hook (after-init-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
-
-(use-package consult-dir
-  :bind
-  (([remap list-directory] . consult-dir)
-   ("C-x C-d" . consult-dir)
-   :map minibuffer-local-completion-map
-   ("C-x C-d" . consult-dir)
-   ("C-x C-j" . consult-dir-jump-file)))
 
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd

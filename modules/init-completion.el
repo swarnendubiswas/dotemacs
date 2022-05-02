@@ -7,6 +7,12 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+(defvar hippie-expand-verbose)
+(defvar sb/extras-directory)
+(defvar sb/EMACS28+)
+(defvar sb/capf)
+
 ;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
 ;; expansions in the current buffer and presents suggestions for completion.
 
@@ -404,7 +410,7 @@
    ([remap switch-to-buffer] . consult-buffer)
    ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
    ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
-   ([remap bookmark-jump] . consult-bookmark)            ;; orig. bookmark-jump
+   ([remap bookmark-jump] . consult-bookmark)
    ("C-x p b" . consult-project-buffer)
    ([remap project-switch-to-buffer] . consult-project-buffer)
    ("M-y" . consult-yank-pop)
@@ -412,8 +418,6 @@
    ([remap apropos] . consult-apropos)
    ;; M-g bindings (goto-map)
    ("M-g e" . consult-compile-error)
-   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-   ("M-g g" . consult-goto-line)             ;; orig. goto-line
    ([remap goto-line] . consult-goto-line)           ;; orig. goto-line
    ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
    ("M-g m" . consult-mark)
@@ -423,17 +427,15 @@
    ("M-g I" . consult-imenu-multi)
    ([remap load-theme] . consult-theme)
    ;; M-s bindings (search-map)
-   ("M-s f" . consult-find)
+   ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
-   ("M-s l" . consult-locate)
-   ("M-s g" . consult-grep)
-   ("M-s G" . consult-git-grep)
-   ("M-s r" . consult-ripgrep)
+   ("C-c s l" . consult-locate)
+   ("C-c s g" . consult-grep)
+   ("C-c s G" . consult-git-grep)
+   ("C-c s r" . consult-ripgrep)
    ("<f4>" . consult-line)
    ("M-s L" . consult-line-multi)
    ("M-s m" . consult-multi-occur)
-   ("M-s k" . consult-keep-lines)
-   ("M-s u" . consult-focus-lines)
    ("<f9>" . consult-recent-file)
    ([remap recentf-open-files] . consult-recent-file)
    ([remap multi-occur] . consult-multi-occur)
@@ -452,7 +454,6 @@
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
-  ;; TODO: Is this what is causing issues with latex?
   (unless (display-graphic-p)
     (setq completion-in-region-function #'consult-completion-in-region))
 
@@ -476,7 +477,7 @@
 
 (use-package embark-consult
   :after (embark consult)
-  :demand t ; only necessary if you have the hook below
+  :demand t ; Only necessary if you have the hook below
   :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
@@ -484,10 +485,11 @@
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package corfu
-          :straight (corfu :includes (corfu-indexed
+          :straight (corfu :files (:defaults "extensions/*")
+                           :includes (corfu-indexed
                                       corfu-quick
-                                      corfu-history)
-                           :files (:defaults "extensions/corfu-*.el")))
+                                      corfu-info
+                                      corfu-history)))
       (use-package corfu))))
 
 (use-package corfu
@@ -498,7 +500,7 @@
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
-  :hook (after-init-hook . corfu-global-mode)
+  :hook (after-init-hook . global-corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -518,9 +520,8 @@
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package corfu-indexed
-          :straight (corfu
-                     :files (:defaults "extensions/corfu-*.el")
-                     :includes (corfu-indexed)))
+          :straight (corfu :files (:defaults "extensions/*")
+                           :includes (corfu-indexed)))
       (use-package corfu-indexed
         :ensure nil
         :load-path "extras")))
@@ -532,9 +533,8 @@
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package corfu-quick
-          :straight (corfu
-                     :files (:defaults "extensions/corfu-*.el")
-                     :includes (corfu-quick)))
+          :straight (corfu :files (:defaults "extensions/*")
+                           :includes (corfu-quick)))
       (use-package corfu-quick
         :ensure nil
         :load-path "extras")))
@@ -548,9 +548,8 @@
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
         (use-package corfu-history
-          :straight (corfu
-                     :files (:defaults "extensions/corfu-*.el")
-                     :includes (corfu-history)))
+          :straight (corfu :files (:defaults "extensions/*")
+                           :includes (corfu-history)))
       (use-package corfu-history
         :ensure nil
         :load-path "extras")))
@@ -562,9 +561,19 @@
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :hook (corfu-mode-hook . corfu-doc-mode))
 
+;; (when (and (not (display-graphic-p)) (eq sb/capf 'corfu))
+;;   (declare-function corfu-popup-mode "corfu-unless")
+
+;;   (popup (fboundp 'corfu-popup-mode)
+;;          (autoload #'corfu-popup-mode "corfu-popup" nil t))
+
+;;   (add-hook 'corfu-mode-hook #'corfu-popup-mode))
+
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
   :init
+  ;; Complete from Eshell, Comint or minibuffer history
+  (add-to-list 'completion-at-point-functions #'cape-history)
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
   (add-to-list 'completion-at-point-functions #'cape-file)
   ;; Complete programming language keyword
@@ -607,15 +616,15 @@
   :after vertico
   :init (marginalia-mode 1))
 
-(if (or (not (display-graphic-p)) (eq sb/capf 'company))
-    (use-package company))
+(when (or (not (display-graphic-p)) (eq sb/capf 'company))
+  (use-package company)
 
-;; The module does not specify an `autoload'. So we get the following error without the following
-;; declaration.
-;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
-;; function company-capf"
-(unless (fboundp 'company-capf)
-  (autoload #'company-capf "company-capf" nil t))
+  ;; The module does not specify an `autoload'. So we get the following error without the following
+  ;; declaration.
+  ;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
+  ;; function company-capf"
+  (unless (fboundp 'company-capf)
+    (autoload #'company-capf "company-capf" nil t)))
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
@@ -644,7 +653,7 @@
         company-dabbrev-other-buffers t
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 2 ; Small words can be faster to type
+        company-minimum-prefix-length 3 ; Small words can be faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
         company-show-quick-access t ; Speed up completion
@@ -1083,6 +1092,7 @@
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
+  :disabled t
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t))

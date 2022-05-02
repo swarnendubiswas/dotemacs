@@ -7,6 +7,12 @@
 
 ;;; Code:
 
+(defvar sb/EMACS27)
+(defvar sb/EMACS28+)
+(defvar sb/user-home-directory)
+(defvar sb/gui-theme)
+(defvar sb/minibuffer-completion)
+
 (progn
   (declare-function dired-next-line "dired")
   (declare-function dired-jump "dired")
@@ -29,7 +35,7 @@
   (eval-and-compile
     (defun sb/dired-go-home nil
       (interactive)
-      (dired sb/user-home))
+      (dired sb/user-home-directory))
 
     (defun sb/dired-jump-to-top nil
       (interactive)
@@ -57,9 +63,8 @@
           dired-listing-switches "-ABhl --si --group-directories-first"
           dired-ls-F-marks-symlinks t ; -F marks links with @
           dired-recursive-copies 'always ; Single prompt for all n directories
-          dired-recursive-deletes 'always ; Single prompt for all n directories
-          ;; Do not ask whether to kill buffers visiting deleted files
-          dired-clean-confirm-killing-deleted-buffers nil)
+          ;; Single prompt for all n directories
+          dired-recursive-deletes 'always)
 
     (when (boundp 'dired-kill-when-opening-new-dired-buffer)
       (setq dired-kill-when-opening-new-dired-buffer t))
@@ -75,7 +80,6 @@
                ("M-<up>"   . sb/dired-jump-to-top)
                ("M-<down>" . sb/dired-jump-to-bottom))))
 
-
 (progn
   (declare-function dired-omit-mode "dired-x")
 
@@ -90,10 +94,15 @@
   (with-eval-after-load "dired-x"
     ;; Do not show messages when omitting files
     (defvar dired-omit-verbose)
+    (defvar dired-cleanup-buffers-too)
+    (defvar dired-clean-confirm-killing-deleted-buffers)
+    (defvar dired-bind-jump)
 
     (setq dired-cleanup-buffers-too t
           ;; Do not show messages when omitting files
-          dired-omit-verbose nil)
+          dired-omit-verbose nil
+          ;; Do not ask whether to kill buffers visiting deleted files
+          dired-clean-confirm-killing-deleted-buffers nil)
 
     ;; (setq dired-omit-files
     ;;       (concat dired-omit-files
@@ -132,7 +141,9 @@
         :ensure nil
         :load-path "extras")))
 
+  ;; Set before the module is loaded
   (setq diredp-bind-problematic-terminal-keys nil)
+
   (declare-function diredp-toggle-find-file-reuse-dir "dired+")
 
   (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
@@ -326,6 +337,15 @@
 
     (with-eval-after-load "dired-async"
       (diminish 'dired-async-mode))))
+
+(use-package consult-dir
+  :if (eq sb/minibuffer-completion 'vertico)
+  :bind
+  (([remap list-directory] . consult-dir)
+   ("C-x C-d" . consult-dir)
+   :map minibuffer-local-completion-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file)))
 
 (provide 'init-dired)
 
