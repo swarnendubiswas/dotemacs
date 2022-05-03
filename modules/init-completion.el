@@ -1092,7 +1092,6 @@
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
-  :disabled t
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t))
@@ -1102,7 +1101,6 @@
   :after company
   :demand t
   :commands company-prescient-mode
-  :disabled t
   :config
   ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
   ;; `:separate' keyword in `company'.
