@@ -7,6 +7,9 @@
 
 ;;; Code:
 
+(defvar sb/extras-directory)
+(defvar sb/minibuffer-completion)
+
 (when (symbol-value 'sb/IS-LINUX)
   (with-eval-after-load "ispell"
     (defvar ispell-dictionary)
@@ -56,8 +59,6 @@
 (unless (fboundp 'flyspell-correct-next)
   (autoload #'flyspell-correct-next "flyspell" nil t))
 
-;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
-;; language-specific words
 (add-hook 'text-mode-hook #'flyspell-mode)
 ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
 ;; language-specific words
@@ -126,19 +127,7 @@
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil)
 
-  (diminish 'flyspell-mode)
-
-  ;; Flyspell popup is more efficient. Ivy completion does not show the "Save" option in a few
-  ;; cases.
-  (unless (fboundp 'flyspell-popup-correct)
-    (autoload #'flyspell-popup-correct "flyspell-popup" nil t))
-
-  (defvar flyspell-popup-correct-delay)
-
-  (setq flyspell-popup-correct-delay 0.2)
-
-  (bind-keys :package flyspell-popup
-             ("C-;" . flyspell-popup-correct)))
+  (diminish 'flyspell-mode))
 
 (defvar flyspell-mode-map)
 (bind-keys :package flyspell
@@ -155,7 +144,7 @@
   :bind
   (:map flyspell-mode-map
         ("C-;" . flyspell-popup-correct))
-  :config (setq flyspell-popup-correct-delay 0.1))
+  :custom (flyspell-popup-correct-delay 0.1))
 
 (use-package flyspell-correct
   :after flyspell
@@ -221,8 +210,8 @@
                                              markdown-plain-url-face
                                              markdown-reference-face
                                              markdown-url-face
-                                             hl-line
-                                             pandoc-citation-key-face))
+                                             pandoc-citation-key-face
+                                             hl-line))
               (spell-fu-mode)))
 
   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
@@ -240,8 +229,9 @@
    ("C-c f a" . spell-fu-word-add)))
 
 (use-package consult-flyspell
+  :if (eq sb/minibuffer-completion 'vertico)
   :after (consult flyspell)
-  :commands consult-flyspell)
+  :bind ("C-c f l" . consult-flyspell))
 
 (provide 'init-spell)
 
