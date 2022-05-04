@@ -9,6 +9,9 @@
 
 (defvar sb/fill-column)
 (defvar hs-isearch-open)
+(defvar sb/minibuffer-completion)
+(defvar sb/user-home-directory)
+(defvar sb/python-langserver)
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
@@ -41,6 +44,11 @@
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 (progn
+  (declare-function hs-show-all "hideshow")
+  (declare-function hs-show-block "hideshow")
+  (declare-function hs-hide-initial-comment-block "hideshow")
+  (declare-function hs-hide-all "hideshow")
+
   (unless (fboundp 'hs-hide-all)
     (autoload #'hs-hide-all "hideshow" nil t))
   (unless (fboundp 'hs-hide-initial-comment-block)
