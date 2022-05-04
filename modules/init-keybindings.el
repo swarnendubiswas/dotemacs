@@ -8,10 +8,14 @@
 ;;; Code:
 
 (defvar sb/minibuffer-completion)
+(defvar popup-menu-keymap)
 
 (declare-function sb/comment-line "init-functions")
 (declare-function sb/save-all-buffers "init-functions")
 (declare-function sb/next-buffer "init-functions")
+(declare-function sb/previous-buffer "init-functions")
+(declare-function sb/switch-to-scratch "init-functions")
+(declare-function sb/counsel-all-files-recursively "init-functions")
 
 (bind-keys
  ("RET"       . newline-and-indent)
@@ -49,6 +53,9 @@
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
+
+;; Both `counsel-imenu' and `consult-imenu' show lot of unnecessary information
+(bind-key "C-c C-j" #'imenu)
 
 (with-eval-after-load "popup"
   (bind-key "[escape]" #'keyboard-quit popup-menu-keymap))

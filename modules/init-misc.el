@@ -85,6 +85,7 @@
   :defines undo-tree-map
   :commands (global-undo-tree-mode undo-tree-redo)
   :diminish
+  :disabled t
   :config
   (setq undo-tree-auto-save-history              t
         undo-tree-visualizer-diff                t

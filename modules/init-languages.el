@@ -36,6 +36,9 @@
 
 ;; Edit outlines
 (progn
+  (unless (fboundp 'outline-minor-mode)
+    (autoload #'outline-minor-mode "outline" nil t))
+
   (add-hook 'prog-mode-hook #'outline-minor-mode)
 
   (with-eval-after-load "outline"
@@ -89,9 +92,9 @@
   :after xref
   :demand t
   :commands dumb-jump-xref-activate
+  :custom
+  (dumb-jump-quiet t)
   :config
-  (setq dumb-jump-quiet t)
-
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package ivy-xref
@@ -242,11 +245,11 @@
   :defines lsp-disabled-clients
   :commands csv-mode
   :hook
-  (csv-mode . (lambda ()
-                (make-local-variable 'lsp-disabled-clients)
-                (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                (spell-fu-mode -1)
-                (flyspell-mode -1)))
+  (csv-mode-hook . (lambda ()
+                     (make-local-variable 'lsp-disabled-clients)
+                     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                     (spell-fu-mode -1)
+                     (flyspell-mode -1)))
   :custom
   (csv-separators '("," ";" "|" " ")))
 
@@ -408,7 +411,7 @@
   ;; https://github.com/minad/corfu/wiki
   (defun sb/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(flex)))
+          '(orderless)))
   :hook
   ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
    (lsp-mode-hook . lsp-enable-which-key-integration)

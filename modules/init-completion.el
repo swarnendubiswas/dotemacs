@@ -12,6 +12,12 @@
 (defvar sb/extras-directory)
 (defvar sb/EMACS28+)
 (defvar sb/capf)
+(defvar savehist-additional-variables)
+(defvar recentf-list)
+(defvar dabbrev-ignored-buffer-regexps)
+(defvar which-key-use-C-h-commands)
+
+(declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
 ;; Replace `dabbrev-exp' with `hippie-expand'. Use "C-M-/" for `dabbrev-completion' which finds all
 ;; expansions in the current buffer and presents suggestions for completion.
@@ -26,7 +32,8 @@
                                          try-expand-line
                                          try-complete-lisp-symbol-partially
                                          try-complete-lisp-symbol)
-      hippie-expand-verbose nil)
+      hippie-expand-verbose nil
+      dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
 
 (bind-key "M-/" #'hippie-expand)
 (bind-key "C-M-/" #'dabbrev-completion)
@@ -58,14 +65,11 @@
         ;;                         (t                 . ivy--regex-ignore-order))
         ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
         ivy-wrap t
-        ;; Do not start searches with ^
-        ivy-initial-inputs-alist nil
-        ;; don't show recent files in switch-buffer
-        ivy-use-virtual-buffers nil
-        ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
-        ;; is way too big (30,000). Turn it down so big repos affect project
-        ;; navigation less.
-        ivy-sort-max-size 7500)
+        ivy-initial-inputs-alist nil ; Do not start searches with ^
+        ivy-use-virtual-buffers nil ; Do not show recent files in `switch-buffer'
+        ;; The default sorter is much to slow and the default for `ivy-sort-max-size' is way too big
+        ;; (30,000). Turn it down so big repos affect project navigation less.
+        ivy-sort-max-size 10000)
 
   (dolist (buffer
            '("TAGS" "magit-process" "*emacs*" "*xref*"
@@ -121,7 +125,6 @@
    ;; Enabling preview can make switching over remote buffers slow
    ("S-<f3>"                         . counsel-switch-buffer)
    ("<f4>"                           . counsel-grep-or-swiper))
-  :bind* ("C-c C-j"                  . counsel-imenu)
   :diminish
   :hook (ivy-mode-hook . counsel-mode)
   :config
@@ -337,14 +340,28 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package vertico-directory
-    :bind
-    (:map vertico-map
-          ("RET" . vertico-directory-enter)
-          ("DEL" . vertico-directory-delete-char)
-          ("M-DEL" . vertico-directory-delete-word))
-    ;; Tidy shadowed file names
-    :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)))
+  (declare-function vertico-directory-tidy "vertico-directory")
+  (declare-function vertico-directory-enter "vertico-directory")
+  (declare-function vertico-directory-delete-char "vertico-directory")
+  (declare-function vertico-directory-delete-word "vertico-directory")
+
+  (unless (fboundp 'vertico-directory-tidy)
+    (autoload #'vertico-directory-tidy "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-enter)
+    (autoload #'vertico-directory-enter "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-delete-char)
+    (autoload #'vertico-directory-delete-char "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-delete-word)
+    (autoload #'vertico-directory-delete-word "vertico-directory" nil t))
+
+  ;; Tidy shadowed file names
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+
+  (bind-keys :package vertico
+             :map vertico-map
+             ("RET" . vertico-directory-enter)
+             ("DEL" . vertico-directory-delete-char)
+             ("M-DEL" . vertico-directory-delete-word)))
 
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
@@ -356,11 +373,18 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package vertico-repeat
-    :hook (minibuffer-setup-hook . vertico-repeat-save)
-    :bind
-    (("C-c r" . vertico-repeat-last)
-     ("M-r" . vertico-repeat-select))))
+  (declare-function vertico-repeat-save "vertico-repeat")
+  (declare-function vertico-repeat-last "vertico-repeat")
+  (declare-function vertico-repeat-select "vertico-repeat")
+
+  (unless (fboundp 'vertico-repeat-save)
+    (autoload #'vertico-repeat-save "vertico-repeat" nil t))
+
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+
+  (bind-keys :package vertico
+             ("C-c r" . vertico-repeat-last)
+             ("M-r" . vertico-repeat-select)))
 
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
@@ -372,9 +396,12 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package vertico-indexed
-    :commands vertico-indexed-mode
-    :init (vertico-indexed-mode 1)))
+  (declare-function vertico-indexed-mode "vertico-indexed")
+
+  (unless (fboundp 'vertico-indexed-mode)
+    (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
+
+  (vertico-indexed-mode 1))
 
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
@@ -386,11 +413,13 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package vertico-quick
-    :bind
-    (:map vertico-map
-          ("C-c q" . vertico-quick-insert)
-          ("C-'" . vertico-quick-exit))))
+  (declare-function vertico-quick-insert "vertico-quick")
+  (declare-function vertico-quick-exit "vertico-quick")
+
+  (bind-keys :package vertico
+             :map vertico-map
+             ("C-c q" . vertico-quick-insert)
+             ("C-'" . vertico-quick-exit)))
 
 (use-package consult
   :if (eq sb/minibuffer-completion 'vertico)
@@ -422,9 +451,6 @@
    ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
    ("M-g m" . consult-mark)
    ("M-g k" . consult-global-mark)
-   ("C-c C-j" . consult-imenu)
-   ([remap imenu] . consult-imenu)
-   ("M-g I" . consult-imenu-multi)
    ([remap load-theme] . consult-theme)
    ;; M-s bindings (search-map)
    ("C-c s f" . consult-find)
@@ -527,8 +553,10 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package corfu-indexed
-    :init (corfu-indexed-mode 1)))
+  (unless (fboundp 'corfu-indexed-mode)
+    (autoload #'corfu-indexed-mode "corfu-indexed" nil t))
+
+  (corfu-indexed-mode 1))
 
 (when (and (display-graphic-p) (eq sb/capf 'corfu))
   (eval-when-compile
@@ -540,10 +568,9 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package corfu-quick
-    :bind
-    (:map corfu-map
-          ("C-q" . corfu-quick-insert))))
+  (bind-keys :package corfu
+             :map corfu-map
+             ("C-'" . corfu-quick-insert)))
 
 (when (and (display-graphic-p) (eq sb/capf 'corfu))
   (eval-when-compile
@@ -555,8 +582,13 @@
         :ensure nil
         :load-path "extras")))
 
-  (use-package corfu-history
-    :init (corfu-history-mode 1)))
+  (unless (fboundp 'corfu-history-mode)
+    (autoload #'corfu-history-mode "corfu-history" nil t))
+
+  (with-eval-after-load "corfu"
+    (with-eval-after-load "savehist"
+      (add-to-list 'savehist-additional-variables 'corfu-history)
+      (corfu-history-mode 1))))
 
 (use-package corfu-doc
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
@@ -573,6 +605,7 @@
 
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
+  :commands cape-history
   :init
   ;; Complete from Eshell, Comint or minibuffer history
   (add-to-list 'completion-at-point-functions #'cape-history)
@@ -585,7 +618,7 @@
   ;; Complete abbreviation at point.
   ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
   ;; Complete word from dictionary at point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
   ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
@@ -611,6 +644,7 @@
   :custom
   (kind-icon-face 'corfu-default)
   (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
+  (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 1.0 :scale 0.8))
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
@@ -1059,7 +1093,7 @@
     ;; (defvar ivy-re-builders-alist)
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-  (setq completion-styles '(orderless partial-completion) ; initials, basic, emacs22
+  (setq completion-styles '(orderless partial-completion basic) ; initials, emacs22
         orderless-matching-styles '(orderless-regexp)
         completion-category-defaults nil
         completion-category-overrides '((file (styles basic-remote orderless partial-completion))
@@ -1091,10 +1125,13 @@
   :config (yasnippet-snippets-initialize))
 
 (use-package ivy-yasnippet
+  :if (eq sb/minibuffer-completion 'ivy)
   :after ivy
   :bind ("C-M-y" . ivy-yasnippet))
 
 (use-package consult-yasnippet
+  :if (eq sb/minibuffer-completion 'vertico)
+  :after consult
   :bind ("C-M-y" . consult-yasnippet))
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
