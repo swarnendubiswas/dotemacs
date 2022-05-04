@@ -368,7 +368,7 @@
   ;; Must be set before `bm' is loaded
   (setq bm-restore-repository-on-load t)
   ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
-  ;; usability
+  ;; usability.
   ;; (run-with-idle-timer 2 nil #'sb/bm-setup)
   :hook (after-init-hook . sb/bm-setup)
   :config (setq-default bm-buffer-persistence t)

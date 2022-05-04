@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+
 ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; `isearch' candidates.
 (progn
@@ -38,7 +40,8 @@
   :commands (isearch-forward-symbol ; "M-s _"
              isearch-symbol-at-point
              isearch-forward-symbol-at-point ; "M-s ."
-             isearch-backward-symbol-at-point))
+             isearch-backward-symbol-at-point)
+  :bind ("C-c s p" . isearch-symbol-at-point))
 
 (use-package anzu
   :diminish anzu-mode

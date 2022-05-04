@@ -512,8 +512,9 @@
   (corfu-preselect-first t)
   :bind
   (:map corfu-map
-        ([tab] . corfu-next)
-        ([backtab] . corfu-previous)
+        ("[tab]" . corfu-next)
+        ("[backtab]" . corfu-previous)
+        ("<escape>" . corfu-quit)
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (when (and (display-graphic-p) (eq sb/capf 'corfu))
@@ -559,6 +560,7 @@
 
 (use-package corfu-doc
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
+  :disabled t
   :hook (corfu-mode-hook . corfu-doc-mode))
 
 ;; (when (and (not (display-graphic-p)) (eq sb/capf 'corfu))
@@ -1064,10 +1066,14 @@
                                         ;; (minibuffer (initials))))
                                         )))
 
+;; To use YASnippet as a non-global minor mode, don't call `yas-global-mode'; instead call
+;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
+;; major-modes where you want YASnippet enabled.
+;; https://github.com/joaotavora/yasnippet/blob/master/README.mdown
 (use-package yasnippet
-  :commands (yas-global-mode snippet-mode yas-hippie-try-expand)
+  :commands (yas-global-mode snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((text-mode-hook prog-mode-hook) . yas-global-mode)
+  :hook (prog-mode-hook . yas-global-mode)
   :diminish yas-minor-mode
   :custom
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -1077,6 +1083,7 @@
     (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
   (unbind-key "<tab>" yas-minor-mode-map))
 
+;; YASnippet no longer bundles snippets directly
 (use-package yasnippet-snippets
   :after yasnippet
   :demand t

@@ -7,6 +7,9 @@
 
 ;;; Code:
 
+(defvar sb/fill-column)
+(defvar hs-isearch-open)
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
 
@@ -1154,7 +1157,6 @@
   ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
   (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
 
-
 (progn
   (declare-function info-colors-fontify-node "info-colors")
 
@@ -1166,7 +1168,8 @@
 
 (use-package consult-lsp
   :after (consult lsp)
-  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :commands (consult-lsp-diagnostics consult-lsp-symbols
+                                     consult-lsp-file-symbols consult-lsp-marginalia-mode)
   :config (consult-lsp-marginalia-mode 1))
 
 (use-package rainbow-delimiters
