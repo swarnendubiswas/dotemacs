@@ -22,14 +22,13 @@
 ;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
 ;; style.
 (use-package writegood-mode
-  :commands (writegood-mode writegood-passive-voice-turn-off)
+  :commands (writegood-passive-voice-turn-off)
   :diminish
   :hook (text-mode-hook . writegood-mode))
 
 (use-package flycheck
   :commands (flycheck-add-next-checker flycheck-next-checker
                                        flycheck-mode
-                                       global-flycheck-mode
                                        flycheck-previous-error
                                        flycheck-describe-checker
                                        flycheck-buffer
@@ -48,8 +47,8 @@
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
         flycheck-checker-error-threshold 1500
-        flycheck-idle-buffer-switch-delay 10 ; Increase the time (s) to allow for quick transitions
-        flycheck-idle-change-delay 10 ; Increase the time (s) to allow for edits
+        flycheck-idle-buffer-switch-delay 5 ; Increase the time (s) to allow for quick transitions
+        flycheck-idle-change-delay 5 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
         ;; Show error messages only if the error list is not already visible
         ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
@@ -61,6 +60,7 @@
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))
 
+  ;; These themes have their own styles for displaying flycheck info.
   (when (or (eq sb/modeline-theme 'doom-modeline) (eq sb/modeline-theme 'spaceline))
     (setq flycheck-mode-line nil))
 
@@ -148,7 +148,7 @@
   (advice-add 'flycheck-may-check-automatically
               :after-while #'sb/flycheck-may-check-automatically)
 
-  ;; Chain flycheck checkers with lsp, we can also use per-project directory local variables
+  ;; Chain flycheck checkers with lsp-mode.
   ;; https://github.com/flycheck/flycheck/issues/1762
 
   (defvar-local sb/flycheck-local-checkers nil)
@@ -158,6 +158,8 @@
         (funcall fn checker property)))
 
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
+
+  ;; We prefer to use per-project directory local variables.
 
   ;; (add-hook 'lsp-managed-mode-hook
   ;;           (lambda ()
@@ -176,7 +178,6 @@
 ;; https://github.com/flycheck/flycheck-popup-tip
 (use-package flycheck-pos-tip
   :disabled t
-  :commands flycheck-pos-tip-mode
   :if (display-graphic-p)
   :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
 
@@ -213,7 +214,7 @@
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
-  :commands (format-all-ensure-formatter format-all-buffer)
+  :commands (format-all-buffer)
   :diminish
   :preface
   (defun sb/enable-format-all ()
@@ -252,7 +253,7 @@
   :hook (text-mode-hook . flycheck-languagetool-setup)
   :init
   (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
-                                          "languagetool-server.jar")
+                                          "languagetool/languagetool-server.jar")
         flycheck-checkers (delete 'languagetool flycheck-checkers)
         flycheck-languagetool-check-time 3)
 
@@ -278,11 +279,10 @@
           (lambda ()
             (when (and (featurep 'flycheck-grammarly) (string= (buffer-name) "*scratch*"))
               (flycheck-select-checker 'grammarly))
-            ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-            ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
-            ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-            ;;   (flycheck-select-checker 'languagetool))
-            ))
+            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+              (flycheck-add-next-checker 'grammarly 'languagetool))
+            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+              (flycheck-select-checker 'languagetool))))
 
 ;; `markdown-mode' is derived from `text-mode'
 ;; markdown-markdownlint-cli -> grammarly -> languagetool

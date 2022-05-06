@@ -40,13 +40,11 @@
 
     (setq ibuffer-show-empty-filter-groups nil)))
 
-(use-package ibuffer-projectile ; Group buffers by projectile project
-  :commands ibuffer-projectile-set-filter-groups
+(use-package ibuffer-projectile ; Group buffers by Projectile project
   :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
   :if (display-graphic-p)
-  :commands all-the-icons-ibuffer-mode
   :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
@@ -65,13 +63,11 @@
   (require 'vlf-setup))
 
 (use-package immortal-scratch
-  :commands immortal-scratch-mode
   ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
   :hook (after-init-hook . immortal-scratch-mode))
 
 ;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
-  :commands persistent-scratch-setup-default
   :hook (after-init-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
@@ -79,7 +75,6 @@
 ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
 (use-package fasd
   :defines fasd-enable-initial-prompt
-  :commands (global-fasd-mode fasd-find-file)
   :if (executable-find "fasd")
   ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
   :hook (after-init-hook . global-fasd-mode)
@@ -89,7 +84,6 @@
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-  :commands popwin-mode
   :hook (after-init-hook . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)

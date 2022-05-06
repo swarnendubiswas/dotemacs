@@ -124,7 +124,9 @@
    ("C-c C-m"                        . counsel-mark-ring)
    ;; Enabling preview can make switching over remote buffers slow
    ("S-<f3>"                         . counsel-switch-buffer)
-   ("<f4>"                           . counsel-grep-or-swiper))
+   ("<f4>"                           . counsel-grep-or-swiper)
+   ([remap imenu]                    . counsel-imenu)
+   ("C-c C-j"                        . counsel-imenu))
   :diminish
   :hook (ivy-mode-hook . counsel-mode)
   :config
@@ -451,6 +453,9 @@
    ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
    ("M-g m" . consult-mark)
    ("M-g k" . consult-global-mark)
+   ("C-c C-j" . consult-imenu)
+   ([remap imenu] . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
    ([remap load-theme] . consult-theme)
    ;; M-s bindings (search-map)
    ("C-c s f" . consult-find)
