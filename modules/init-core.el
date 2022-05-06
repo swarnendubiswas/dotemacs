@@ -168,10 +168,14 @@
 
 (fset 'display-startup-echo-area-message #'ignore)
 
-(if (boundp 'use-short-answers)
-    (setq use-short-answers t)
-  ;; Type "y"/"n" instead of "yes"/"no"
-  (fset 'yes-or-no-p 'y-or-n-p))
+(progn
+  (if (boundp 'use-short-answers)
+      (setq use-short-answers t)
+    ;; Type "y"/"n" instead of "yes"/"no"
+    (fset 'yes-or-no-p 'y-or-n-p))
+
+  ;; Make RETURN key act the same way as "y" key for "y-or-n" prompts.
+  (define-key y-or-n-p-map [return] 'act))
 
 (when (bound-and-true-p enable-recursive-minibuffers)
   (minibuffer-depth-indicate-mode 1))

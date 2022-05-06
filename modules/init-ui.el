@@ -469,6 +469,8 @@
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
 
+(display-battery-mode 1)
+
 (use-package hl-line
   :commands hl-line-highlight
   :if (display-graphic-p)

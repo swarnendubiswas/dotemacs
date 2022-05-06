@@ -329,7 +329,10 @@
    ("<escape>" . minibuffer-keyboard-quit)
    ("?" . minibuffer-completion-help)
    ("M-RET" . minibuffer-force-complete-and-exit)
-   ("M-TAB" . minibuffer-complete)))
+   ("M-TAB" . minibuffer-complete)
+   ("C-M-j" . vertico-exit-input)
+   ("<return>" . vertico-exit)
+   ("<tab>" . vertico-insert)))
 
 ;; More convenient directory navigation commands
 (when (eq sb/minibuffer-completion 'vertico)
