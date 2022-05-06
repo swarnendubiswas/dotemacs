@@ -119,10 +119,30 @@
                                hydra-show-hint hydra-set-transient-map
                                hydra--call-interactively-remap-maybe))
 
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package hydra-posframe
+          :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe"))
+      (use-package hydra-posframe
+        :ensure nil
+        :load-path "extras")))
+
+  (declare-function hydra-posframe-mode "hydra-posframe")
+
+  (unless (fboundp 'hydra-posframe-mode)
+    (autoload #'hydra-posframe-mode "hydra-posframe" nil t))
+
+  (with-eval-after-load "hydra"
+    (hydra-posframe-mode 1)))
+
 (use-package ivy-hydra ; Additional keybindings for `ivy'
   :after (ivy hydra)
   :demand t
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
+
+(use-package pretty-hydra
+  :commands pretty-hydra-define)
 
 ;; (declare-function spell-fu-goto-next-error "spell-fu")
 ;; (declare-function spell-fu-goto-previous-error "spell-fu")

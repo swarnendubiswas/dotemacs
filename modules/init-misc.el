@@ -313,12 +313,12 @@
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
-  :commands amx-mode
+  :commands execute-extended-command-for-buffer
   :hook (after-init-hook . amx-mode)
   :bind
   ;; We need this if we use `vertico' and `consult'
   (("M-x"  . execute-extended-command)
-   ("<f1>" . execute-extended-command-for-buffer))
+   ("<f1>" . execute-extended-command))
   :custom
   (amx-auto-update-interval 10 "Update the command list every n minutes"))
 

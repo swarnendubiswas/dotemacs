@@ -40,7 +40,7 @@
 
 (use-package ivy
   :functions ivy-format-function-line
-  :commands (ivy-read ivy-mode)
+  :commands (ivy-read)
   :if (eq sb/minibuffer-completion 'ivy)
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
@@ -93,7 +93,6 @@
 
 (use-package counsel
   :if (eq sb/minibuffer-completion 'ivy)
-  :commands counsel-mode
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun sb/counsel-goto-recent-directory ()
@@ -180,7 +179,6 @@
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
-  :commands all-the-icons-ivy-rich-mode
   :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
   :custom (all-the-icons-ivy-rich-icon-size 0.9)
@@ -238,7 +236,9 @@
      :delimiter "\t")))
 
 (use-package ivy-rich
-  :commands (ivy-rich-modify-column ivy-rich-set-columns ivy-rich-modify-columns)
+  :commands (ivy-rich-mode ivy-rich-modify-column
+                           ivy-rich-set-columns ivy-rich-modify-columns
+                           ivy-format-function-line)
   :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
   :preface
   ;; Adapted from
@@ -321,8 +321,8 @@
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
-  (when sb/EMACS28+
-    (setq read-extended-command-predicate #'command-completion-default-include-p))
+  ;; (when sb/EMACS28+
+  ;;   (setq read-extended-command-predicate #'command-completion-default-include-p))
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
@@ -478,9 +478,9 @@
    ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
    ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
    )
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode-hook . consult-preview-at-point-mode)
+  ;; ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; ;; relevant when you use the default completion UI.
+  ;; :hook (completion-list-mode-hook . consult-preview-at-point-mode)
   :config
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
