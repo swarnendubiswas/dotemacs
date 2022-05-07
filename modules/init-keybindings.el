@@ -236,28 +236,21 @@
 ;; (declare-function flycheck-disable-checker "flycheck")
 ;; (declare-function flycheck-buffer "flycheck")
 
-(defhydra sb/hydra-flycheck (:color blue)
-  "
-                                              ^
-                                              ^Flycheck^          ^Errors^            ^Checker^
-                                              ^────────^──────────^──────^────────────^───────^─────
-                                              _q_ quit            _<_ previous        _?_ describe
-                                              _M_ manual          _>_ next            _d_ disable
-                                              _v_ verify setup    _f_ check           _m_ mode
-                                              ^^                  _l_ list            _s_ select
-                                              ^^                  ^^                  ^^
-                                              "
-  ("q" nil)
-  ("<" flycheck-previous-error :color pink)
-  (">" flycheck-next-error :color pink)
-  ("?" flycheck-describe-checker)
-  ("M" flycheck-manual)
-  ("d" flycheck-disable-checker)
-  ("f" flycheck-buffer)
-  ("l" flycheck-list-errors)
-  ("m" flycheck-mode)
-  ("s" flycheck-select-checker)
-  ("v" flycheck-verify-setup))
+(pretty-hydra-define sb/hydra-flycheck
+  (:color blue :quit-key "q")
+  ("Flycheck actions"
+   (("M" flycheck-manual "Manual")
+    ("v" flycheck-verify-setup "Verify setup")
+
+    ("<" flycheck-previous-error :color pink "previous error")
+    (">" flycheck-next-error :color pink "next error")
+    ("f" flycheck-buffer "check buffer")
+    ("l" flycheck-list-errors "list")
+
+    ("d" flycheck-disable-checker "disable")
+    ("m" flycheck-mode "enable mode")
+    ("s" flycheck-select-checker "select checker")
+    ("?" flycheck-describe-checker "describe checker"))))
 
 (defhydra sb/hydra-python-indent ()
   "Adjust Python indentation."
@@ -432,34 +425,29 @@
   ("W" markdown-insert-wiki-link :color blue)
   ("R" markdown-insert-reference-link-dwim :color blue))
 
-(defhydra sb/hydra-straight (:hint nil)
-  "
-    _c_heck all       |_f_etch all     |_m_erge all      |_n_ormalize all   |p_u_sh all
-    _C_heck package   |_F_etch package |_M_erge package  |_N_ormlize package|p_U_sh package
-    ----------------^^+--------------^^+---------------^^+----------------^^+------------||_q_uit||
-    _r_ebuild all     |_p_ull all      |_v_ersions freeze|_w_atcher start   |_g_et recipe
-    _R_ebuild package |_P_ull package  |_V_ersions thaw  |_W_atcher quit    |prun_e_ build"
-  ("c" straight-check-all)
-  ("C" straight-check-package)
-  ("r" straight-rebuild-all)
-  ("R" straight-rebuild-package)
-  ("f" straight-fetch-all)
-  ("F" straight-fetch-package)
-  ("p" straight-pull-all)
-  ("P" straight-pull-package)
-  ("m" straight-merge-all)
-  ("M" straight-merge-package)
-  ("n" straight-normalize-all)
-  ("N" straight-normalize-package)
-  ("u" straight-push-all)
-  ("U" straight-push-package)
-  ("v" straight-freeze-versions)
-  ("V" straight-thaw-versions)
-  ("w" straight-watcher-start)
-  ("W" straight-watcher-quit)
-  ("g" straight-get-recipe)
-  ("e" straight-prune-build)
-  ("q" nil))
+(pretty-hydra-define sb/hydra-straight
+  (:hint nil :quit-key "q")
+  ("Straight actions")
+  (("c" straight-check-all "check all")
+   ("C" straight-check-package "check package")
+   ("r" straight-rebuild-all "rebuild all")
+   ("R" straight-rebuild-package "rebuild package")
+   ("f" straight-fetch-all "fetch all")
+   ("F" straight-fetch-package "fetch package")
+   ("p" straight-pull-all "pull all")
+   ("P" straight-pull-package "pull package")
+   ("m" straight-merge-all "merge all")
+   ("M" straight-merge-package "merge package")
+   ("n" straight-normalize-all "normalize all")
+   ("N" straight-normalize-package "normalize package")
+   ("u" straight-push-all "push all")
+   ("U" straight-push-package "push package")
+   ("v" straight-freeze-versions "freeze versions")
+   ("V" straight-thaw-versions "thaw versions")
+   ("w" straight-watcher-start "watcher start")
+   ("W" straight-watcher-quit "watcher quit")
+   ("g" straight-get-recipe "get recipe")
+   ("e" straight-prune-build "prune build")))
 
 (bind-key "C-c h a" #'sb/hydra-avy/body)
 (bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
