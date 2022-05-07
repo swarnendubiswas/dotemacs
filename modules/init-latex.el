@@ -7,6 +7,9 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+(defvar sb/user-tmp-directory)
+
 ;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
@@ -142,14 +145,7 @@
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
   ;; Enable rainbow mode after applying styles to the buffer
-  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
-
-  ;; Disable "LaTeX-insert-item" in favor of imenu
-  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
-  ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  ;; (unbind-key "C-c ;" LaTeX-mode-map)
-
-  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
+  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode))
 
 (add-hook 'bibtex-mode-hook #'lsp-deferred)
 (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
@@ -277,6 +273,10 @@ Ignore if no file is found."
   (defvar reftex-use-multiple-selection-buffers)
   (defvar reftex-toc-split-windows-horizontally)
   (defvar reftex-toc-split-windows-fraction)
+  (defvar reftex-guess-label-type)
+  (defvar reftex-use-fonts)
+  (defvar reftex-auto-recenter-toc)
+  (defvar reftex-revisit-to-follow)
 
   (setq reftex-enable-partial-scans t
         reftex-highlight-selection 'both
@@ -381,7 +381,9 @@ Ignore if no file is found."
 (declare-function TeX-run-TeX "tex")
 
 (defun sb/latex-compile-open-pdf ()
-  "Save the current buffer, run LaTeXMk, and switch to the PDF after a successful compilation."
+  "Helper function to compile files.
+Save the current buffer, run LaTeXMk, and switch to the PDF
+after a successful compilation."
   (interactive)
   (let ((TeX-save-query nil)
         (process (TeX-active-process))
@@ -411,26 +413,37 @@ Ignore if no file is found."
 
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
+
+  ;; Disable "LaTeX-insert-item" in favor of imenu
+  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
+  ;; Unset "C-c ;" since we want to bind it to 'comment-line
+  ;; (unbind-key "C-c ;" LaTeX-mode-map)
+
+  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
-(eval-when-compile
-  (if (bound-and-true-p sb/disable-package.el)
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package math-preview
+          :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview"))
       (use-package math-preview
-        :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview"))
-    (use-package math-preview
-      :ensure nil
-      :load-path "extras")))
+        :ensure nil
+        :load-path "extras")))
 
-(unless (fboundp 'math-preview-all)
-  (autoload #'math-preview-all "math-preview" nil t))
-(unless (fboundp 'math-preview-at-point)
-  (autoload #'math-preview-at-point "math-preview" nil t))
-(unless (fboundp 'math-preview-region)
-  (autoload #'math-preview-region "math-preview" nil t))
+  (declare-function math-preview-at-point "math-preview")
+  (declare-function math-preview-region "math-preview")
 
-(with-eval-after-load "math-preview"
-  (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                               sb/user-tmp-directory)))
+  (unless (fboundp 'math-preview-all)
+    (autoload #'math-preview-all "math-preview" nil t))
+  (unless (fboundp 'math-preview-at-point)
+    (autoload #'math-preview-at-point "math-preview" nil t))
+  (unless (fboundp 'math-preview-region)
+    (autoload #'math-preview-region "math-preview" nil t))
+
+  (with-eval-after-load "math-preview"
+    (setq math-preview-command (expand-file-name "node_modules/.bin/math-preview"
+                                                 sb/user-tmp-directory))))
 
 (provide 'init-latex)
 

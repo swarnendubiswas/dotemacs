@@ -142,111 +142,90 @@
   :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (use-package pretty-hydra
+  :after hydra
   :commands pretty-hydra-define)
 
-;; (declare-function spell-fu-goto-next-error "spell-fu")
-;; (declare-function spell-fu-goto-previous-error "spell-fu")
+(declare-function spell-fu-goto-next-error "spell-fu")
+(declare-function spell-fu-goto-previous-error "spell-fu")
+(declare-function spell-fu-word-add "spell-fu")
 
-(defhydra sb/hydra-spelling (:color amaranth)
-  "
-  ^Spell Check^          ^Errors^            ^Spell fu^
-  ^────────^──────────^──────^────────────^───────^─────────────^
-  _c_ ispell            _<_ previous         _p_ previous error
-  _f_ flyspell          _>_ next             _n_ next error
-  _q_ quit              ^^                   _a_ add word
-  "
-  ("c" ispell)
-  ("f" flyspell-buffer)
+(pretty-hydra-define sb/hydra-spelling
+  (:color amaranth :quit-key "q")
+  ("Action"
+   (("c" ispell "ispell")
+    ("f" flyspell-buffer "flyspell buffer")
 
-  ("<" flyspell-correct-previous)
-  (">" flyspell-correct-next)
+    ("<" flyspell-correct-previous "correct previous error")
+    (">" flyspell-correct-next "correct next error")
 
-  ("n" spell-fu-goto-next-error)
-  ("p" spell-fu-goto-previous-error)
-  ("a" spell-fu-word-add)
+    ("n" spell-fu-goto-next-error "next error")
+    ("p" spell-fu-goto-previous-error "previous error")
+    ("a" spell-fu-word-add "add word"))))
 
-  ("q" nil "quit"))
+(pretty-hydra-define sb/hydra-text-scale-zoom
+  (:color amaranth :quit-key "q")
+  ("Zoom action"
+   (("i" default-text-scale-increase "zoom in")
+    ("o" default-text-scale-decrease "zoom out"))))
 
-(defhydra sb/hydra-text-scale-zoom (:color amaranth)
-  "Zoom the text"
-  ("i" default-text-scale-increase "in")
-  ("o" default-text-scale-decrease "out")
-
-  ("q" nil "quit"))
-
-;; (defhydra sb/hydra-error (:color amaranth)
-;;   "Navigate errors"
-;;   ("h" first-error "first")
-;;   ("j" next-error "next")
-;;   ("k" previous-error "prev")
-;;   ("v" recenter-top-bottom "recenter")
-;;   ("q" nil "quit"))
+(pretty-hydra-define sb/hydra-error
+  (:color amaranth :quit-key "q")
+  ("Navigate errors"
+   (("h" first-error "first error")
+    ("j" next-error "next error")
+    ("k" previous-error "previous error")
+    ("v" recenter-top-bottom "recenter"))))
 
 ;; https://github.com/abo-abo/hydra/wiki/avy
-(defhydra sb/hydra-avy (:color red)
-  "
-  Line^^       Region^^        Goto
-----------------------------------q------------------------
- [_y_] yank   [_Y_] yank      [_c_] timed char  [_C_] char
- [_m_] move   [_M_] move      [_w_] word        [_W_] any word
- [_k_] kill   [_K_] kill      [_l_] line        [_L_] end of line"
+(pretty-hydra-define sb/hydra-avy
+  (:color red)
+  ("Actions"
+   (("y" avy-copy-line "yank line")
+    ("m" avy-move-line "move line")
+    ("k" avy-kill-whole-line "kill whole line")
 
-  ("y" avy-copy-line)
-  ("m" avy-move-line)
-  ("k" avy-kill-whole-line)
+    ("Y" avy-copy-region "copy region ")
+    ("M" avy-move-region "move region")
+    ("K" avy-kill-region "kill region")
 
-  ("Y" avy-copy-region)
-  ("M" avy-move-region)
-  ("K" avy-kill-region)
+    ("c" avy-goto-char-timer "go to char with timer")
+    ("w" avy-goto-word-1 "go to word")
+    ("l" avy-goto-line "go to line")
 
-  ("c" avy-goto-char-timer)
-  ("w" avy-goto-word-1)
-  ("l" avy-goto-line)
+    ("C" avy-goto-char "go to char")
+    ("W" avy-goto-word-0 "go to word")
+    ("L" avy-goto-end-of-line "go to end of line"))))
 
-  ("C" avy-goto-char)
-  ("W" avy-goto-word-0)
-  ("L" avy-goto-end-of-line))
+(pretty-hydra-define sb/hydra-projectile
+  (:color teal :hint nil global-map "C-c p" :quit-key "q")
+  ("PROJECTILE: %(projectile-project-root)"
+   (("p"   projectile-switch-project "switch project")
+    ("s"   projectile-switch-project "switch project")
+    ("a"   projectile-add-known-project "add known project")
+    ("x"   projectile-remove-known-project "remove known project")
+    ("X"   projectile-cleanup-known-projects "clean up known projects")
 
-(defhydra sb/hydra-projectile (:color teal :hint nil global-map "C-c p")
-  "
-     PROJECTILE: %(projectile-project-root)
+    ("f"   projectile-find-file "find file")
+    ("F"   projectile-find-file-dwim "find file dwim")
+    ("d"   projectile-find-dir "find directory")
+    ("D"   projectile-find-file-in-directory "file file in directory")
 
-  Project                    Find File             Buffers                  Misc
------------------------------------------------------------------------------------------------------------
-  _p_: switch project        _f_: find file        _i_: ibuffer           _c_: invalidate cache
-  _s_: switch project        _F_: find file dwim   _b_: switch to buffer  _z_: cache current
-  _a_: add known project     _d_: find directory   _r_: recent file       _g_: find tag
-  _x_: remove known project  _D_: find file cwd    _k_: kill all buffers  _o_: multi-occur
-  _X_: clean known project   ^^                    ^^                     _m_: compile
-"
-  ("p"   projectile-switch-project)
-  ("s"   projectile-switch-project)
-  ("a"   projectile-add-known-project)
-  ("x"   projectile-remove-known-project)
-  ("X"   projectile-cleanup-known-projects)
+    ("i"   projectile-ibuffer "ibuffer")
+    ("b"   projectile-switch-to-buffer "switch to buffer")
+    ("r"   projectile-recentf "recent files")
+    ("k"   projectile-kill-buffers "kill all buffers")
 
-  ("f"   projectile-find-file)
-  ("F"   projectile-find-file-dwim)
-  ("d"   projectile-find-dir)
-  ("D"   projectile-find-file-in-directory)
+    ("c"   projectile-invalidate-cache "invalidate cache")
+    ("z"   projectile-cache-current-file "cache current file")
+    ("g"   projectile-find-tag "find tag")
+    ("o"   projectile-multi-occur "multi occur")
+    ("m"   projectile-compile "compile"))))
 
-  ("i"   projectile-ibuffer)
-  ("b"   projectile-switch-to-buffer)
-  ("r"   projectile-recentf)
-  ("k"   projectile-kill-buffers)
-
-  ("c"   projectile-invalidate-cache)
-  ("z"   projectile-cache-current-file)
-  ("g"   projectile-find-tag)
-  ("o"   projectile-multi-occur)
-  ("m"   projectile-compile)
-  ("q"   nil "cancel"))
-
-(defhydra sb/hydra-move-text ()
-  "Move text"
-  ("u" move-text-up "up")
-  ("d" move-text-down "down")
-  ("q"   nil "cancel"))
+(pretty-hydra-define sb/hydra-move-text
+  (:quit-key "q")
+  ("Move text"
+   (("u" move-text-up "up")
+    ("d" move-text-down "down"))))
 
 ;; (declare-function flycheck-verify-setup "flycheck")
 ;; (declare-function flycheck-previous-error "flycheck")

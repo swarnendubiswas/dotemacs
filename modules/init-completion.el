@@ -1104,7 +1104,7 @@
   (setq completion-styles '(orderless partial-completion basic) ; initials, emacs22
         orderless-matching-styles '(orderless-regexp)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles basic-remote orderless partial-completion))
+        completion-category-overrides '((file (styles basic remote orderless partial-completion))
                                         ;; (minibuffer (initials))))
                                         )))
 

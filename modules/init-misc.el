@@ -458,6 +458,9 @@
 
     (declare-function consult-tramp "consult-tramp")
 
+    (unless (fboundp 'consult-tramp)
+      (autoload #'consult-tramp "consult-tramp" nil t))
+
     (bind-keys :package consult-tramp
                ("C-c d t" . consult-tramp))))
 

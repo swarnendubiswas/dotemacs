@@ -189,22 +189,6 @@
         spaceline-buffer-encoding-p nil
         spaceline-persp-name-p nil)
 
-  ;; (set-face-attribute 'powerline-inactive1 nil
-  ;;                     :background "gray40"
-  ;;                     :foreground "white"
-  ;;                     :weight 'light)
-  ;; (set-face-attribute 'powerline-inactive2 nil
-  ;;                     :background "grey50"
-  ;;                     :foreground "white")
-  ;; (when (eq dotemacs-theme 'leuven)
-  ;;   (set-face-attribute 'powerline-active1 nil
-  ;;                       :background "gray22"
-  ;;                       :foreground "white"
-  ;;                       :weight 'light)
-  ;;   (set-face-attribute 'mode-line-inactive nil
-  ;;                       :background "grey88"
-  ;;                       :foreground "black"))
-
   (spaceline-emacs-theme))
 
 ;; Minimal modeline information
