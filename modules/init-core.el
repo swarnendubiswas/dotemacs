@@ -490,9 +490,11 @@
     (autoload #'server-running-p "server" nil t))
 
   (when nil
-    (unless (string-equal "root" (getenv "USER")) ; Only start server mode if not root
-      (unless (and (fboundp 'server-running-p) (server-running-p))
-        (server-start)))))
+    (add-hook 'after-init-hook
+              (lambda ()
+                (unless (string-equal "root" (getenv "USER")) ; Only start server mode if not root
+                  (unless (and (fboundp 'server-running-p) (server-running-p))
+                    (server-start)))))))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."

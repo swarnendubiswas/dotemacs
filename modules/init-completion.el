@@ -404,9 +404,7 @@
   (declare-function vertico-indexed-mode "vertico-indexed")
 
   (unless (fboundp 'vertico-indexed-mode)
-    (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
-
-  (vertico-indexed-mode 1))
+    (autoload #'vertico-indexed-mode "vertico-indexed" nil t)))
 
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
@@ -423,8 +421,9 @@
 
   (bind-keys :package vertico
              :map vertico-map
-             ("C-c q" . vertico-quick-insert)
-             ("C-'" . vertico-quick-exit)))
+             ;; ("C-c q" . vertico-quick-insert)
+             ;; ("C-'" . vertico-quick-exit)
+             ("C-'" . vertico-quick-jump)))
 
 (use-package consult
   :if (eq sb/minibuffer-completion 'vertico)
@@ -600,8 +599,8 @@
 
 (use-package corfu-doc
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
-  :disabled t
-  :hook (corfu-mode-hook . corfu-doc-mode))
+  ;; :hook (corfu-mode-hook . corfu-doc-mode)
+  )
 
 ;; (when (and (not (display-graphic-p)) (eq sb/capf 'corfu))
 ;;   (declare-function corfu-popup-mode "corfu-unless")

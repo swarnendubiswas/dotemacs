@@ -372,7 +372,9 @@
   ;; usability.
   ;; (run-with-idle-timer 2 nil #'sb/bm-setup)
   :hook (after-init-hook . sb/bm-setup)
-  :config (setq-default bm-buffer-persistence t)
+  :config
+  ;; Save bookmarks
+  (setq-default bm-buffer-persistence t)
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)

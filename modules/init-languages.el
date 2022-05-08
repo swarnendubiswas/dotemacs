@@ -810,7 +810,7 @@
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
   :custom
-  (py-isort-options '("-l 100")))
+  (py-isort-options '("-lines=100")))
 
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright

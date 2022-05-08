@@ -120,6 +120,21 @@
 ;; we prefer "straight.el" over "package.el".
 (setq package-enable-at-startup nil)
 
+(when (featurep 'native-compile)
+  (defvar package-native-compile)
+  (defvar native-comp-always-compile)
+  (defvar native-comp-async-report-warnings-errors)
+
+  ;; Silence compiler warnings as they can be pretty disruptive
+  (setq native-comp-async-report-warnings-errors nil
+        ;; Enable ahead-of-time compilation when installing a package
+        package-native-compile t
+        ;; Compile loaded packages asynchronously
+        native-comp-deferred-compilation t)
+
+  ;; Set the right directory to store the native compilation cache
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
+
 (provide 'early-init)
 
 ;;; early-init.el ends here

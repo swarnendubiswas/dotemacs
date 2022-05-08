@@ -159,6 +159,7 @@
   (:map projectile-command-map
         ("A"    . projectile-add-known-project)))
 
+;; `counsel-projectile' has poor performance with large projects, unlike `projectile'. Furthermore,
 ;; I am unsure how does this package advances `projectile' in terms of usability.
 (use-package counsel-projectile
   :disabled t

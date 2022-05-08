@@ -65,20 +65,6 @@
     (straight-freeze-versions)))
 
 (unless (bound-and-true-p sb/disable-package.el)
-  (when (featurep 'native-compile)
-    (defvar package-native-compile)
-    (defvar native-comp-always-compile)
-    (defvar native-comp-async-report-warnings-errors)
-
-    ;; Silence compiler warnings as they can be pretty disruptive
-    (setq native-comp-async-report-warnings-errors nil
-          ;; Enable ahead-of-time compilation when installing a package
-          package-native-compile nil
-          native-comp-deferred-compilation nil)
-
-    ;; Set the right directory to store the native compilation cache
-    (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
-
   (with-eval-after-load 'package
     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
     (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
@@ -97,9 +83,8 @@
   ;; Avoid manual installations whenever I modify package installations
   (setq use-package-always-ensure t)
 
-  ;; (eval-when-compile
-  ;;   (require 'use-package))
-  )
+  (eval-when-compile
+    (require 'use-package)))
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
