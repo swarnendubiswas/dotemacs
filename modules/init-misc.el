@@ -434,50 +434,6 @@
   :commands (vr/replace vr/query-replace vr/mark)
   :bind ([remap query-replace] . vr/query-replace))
 
-;; (declare-function sb/sshlist "private")
-
-;; (progn
-;;   (defun sb/ivy-tramp ()
-;;     "Invoke remote hosts with ivy and tramp."
-;;     (interactive)
-;;     (counsel-find-file (ivy-read "Remote Tramp targets: " (sb/sshlist))))
-
-;;   (bind-key "C-c d t" #'sb/ivy-tramp))
-
-(use-package counsel-tramp
-  :if (eq sb/minibuffer-completion 'ivy)
-  :bind ("C-c d t" . counsel-tramp))
-
-(when (eq sb/minibuffer-completion 'vertico)
-  (progn
-    (eval-when-compile
-      (if (bound-and-true-p sb/disable-package.el)
-          (use-package consult-tramp
-            :straight (consult-tramp :type git :host github :repo "Ladicle/consult-tramp"))
-        (use-package consult-tramp
-          :ensure nil
-          :load-path "extras")))
-
-    (declare-function consult-tramp "consult-tramp")
-
-    (unless (fboundp 'consult-tramp)
-      (autoload #'consult-tramp "consult-tramp" nil t))
-
-    (bind-keys :package consult-tramp
-               ("C-c d t" . consult-tramp))))
-
-;; TODO: SSH into Gcloud
-;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
-;; Make sure you have set your default project with:
-;; "gcloud config set project <project-name>"
-;; "C-x C-f /gcssh:compute-instance:/path/to/filename.clj"
-
-;; LATER: Can we shorten long Tramp file names? This does not work with Tramp.
-;; (add-to-list 'directory-abbrev-alist
-;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
-;; (add-to-list 'directory-abbrev-alist
-;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
-
 (use-package rainbow-mode
   :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))

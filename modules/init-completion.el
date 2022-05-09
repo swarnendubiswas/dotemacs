@@ -610,8 +610,8 @@
 
 (use-package corfu-doc
   :if (eq sb/capf 'corfu)
-  ;; :hook (corfu-mode-hook . corfu-doc-mode)
-  )
+  :disabled t
+  :hook (corfu-mode-hook . corfu-doc-mode))
 
 (progn
   (eval-when-compile

@@ -439,3 +439,9 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 *** Combining ~find~ and ~grep~
 
 The use case is to search all files in a file hierarchy for some regular expression with a ~find~/~grep~ pipeline. For example, to search the ~lisp~ directory and all of its subdirectories for file containing the ~mapcar~ function, one could use ~find ~/lisp -name "*.lisp" -exec grep -H mapcar {} \;~. In GNU Emacs, we can use ~find-grep-dired~.
+
+*** Batch rename multiple files in a directory
+
+- Turn on ~wdired~ mode (~Ctrl+x Ctrl+q~ by default)
+- Make changes to the dired listing which are reflected back to the actual files. For example, use your favorite search-and-replace method to change the target file names.
+- Type ~Ctrl+c Ctrl+c~ to exit ~wdired~ mode and rename the files

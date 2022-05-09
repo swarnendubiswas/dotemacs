@@ -1528,6 +1528,7 @@
     ("paediatrician" "pediatrician" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("profilign" "Profiling" nil :count 0)
+    ("progess" "progress" nil :count 0)
     ("protal" "portal" nil :count 0)
     ("prototye" "prototype" nil :count 0)
     ("pyton" "Python" nil :count 0)

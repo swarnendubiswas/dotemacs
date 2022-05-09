@@ -15,7 +15,7 @@
 Emacs searches for the initiation files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
 To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
-~M-:~ to evaluate an Emacs Lisp expression and print the result. Only an interactive function can be
+~M-:~ to evaluate an Emacs Lisp expression and print the result. Only interactive functions can be
 invoked with ~M-x~ or a key binding.
 
 The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~ since they cause eager loading and
@@ -99,7 +99,7 @@ The equivalent version with ~with-eval-after-load~ would be:
 
 *** [[https://occasionallycogent.com/emacs_advice/index.html][Using Emacs advice]]
 
-*** Difference between ~~setq~ and ~custom~
+*** Difference between ~setq~ and ~custom~
 
 https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variables/
 
