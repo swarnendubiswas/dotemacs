@@ -165,6 +165,7 @@ Show a vertical scroll bar of size BAR + 1 from LOth line."
 (corfu-popup--patch-out-display-graphic-p
  corfu--in-region corfu-popup--in-region)
 
+;;;###autoload
 (define-minor-mode corfu-popup-mode
   "Corfu popup on terminal."
   nil nil nil

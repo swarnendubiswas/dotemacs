@@ -12,7 +12,6 @@
   "Personal configuration for dotemacs."
   :group 'local)
 
-;; Add "modules" at the head of `load-path' to reduce startup time
 (dolist (dir '("modules" "extras"))
   (push (expand-file-name dir user-emacs-directory) load-path))
 

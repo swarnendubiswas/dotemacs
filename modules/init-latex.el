@@ -355,6 +355,7 @@ Ignore if no file is found."
 ;; We can disable this once `lsp-latex-build' works well
 (use-package auctex-latexmk
   :after tex-mode
+  :straight (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")
   :demand t
   :commands (auctex-latexmk-setup auctex-latexmk)
   :custom
