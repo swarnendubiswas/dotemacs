@@ -142,6 +142,9 @@
    ("C->"     . mc/mark-next-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
 
+
+;; LATER: Check for continuous scroll support at https://github.com/dalanicolai/image-roll.el
+
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools

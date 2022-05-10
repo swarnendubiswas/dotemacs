@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'none
+  'nano-dark
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -27,6 +27,8 @@
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
+           (const :tag "nano-light"      nano-light)
+           (const :tag "nano-dark"       nano-dark)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
@@ -52,7 +54,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'none
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -63,6 +65,7 @@
            (const :tag "mini-modeline"   mini)
            (const :tag "airline"         airline)
            (const :tag "telephone-line"  telephone)
+           (const :tag "nano"            nano)
            ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)

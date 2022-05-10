@@ -414,8 +414,8 @@
           '(orderless)))
   :hook
   ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
-   (lsp-mode-hook . lsp-enable-which-key-integration)
-   (lsp-mode-hook . lsp-lens-mode))
+   ;; (lsp-mode-hook . lsp-lens-mode)
+   (lsp-mode-hook . lsp-enable-which-key-integration))
   :custom-face
   ;; Reduce the height
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
@@ -447,10 +447,11 @@
         lsp-eldoc-enable-hover nil
         lsp-enable-dap-auto-configure nil
         lsp-enable-on-type-formatting nil ; Reduce unexpected modifications to code
-        lsp-enable-folding nil
+        lsp-enable-folding nil ; I do not find the feature useful
         lsp-enable-text-document-color nil
         ;; lsp-semantic-tokens-enable t
         lsp-headerline-breadcrumb-enable nil ; Breadcrumb is not useful for all modes
+        ;; Do not customize breadcrumb faces based on errors
         lsp-headerline-breadcrumb-enable-diagnostics nil
         lsp-html-format-wrap-line-length sb/fill-column
         lsp-html-format-end-with-newline t
@@ -460,66 +461,26 @@
         lsp-log-io nil ; Increases memory usage because of JSON parsing if enabled
         ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
         ;; additional errors. The problem is that the modeline can get too congested.
-        lsp-modeline-diagnostics-enable nil
+        lsp-modeline-diagnostics-enable (display-graphic-p)
         lsp-modeline-diagnostics-scope :file ; Focus on the errors at hand
         lsp-modeline-workspace-status-enable nil
         ;; Sudden changes in the height of the echo area causes the cursor to lose position,
         ;; manually request via `lsp-signature-activate'
-        ;; lsp-signature-auto-activate nil
+        lsp-signature-auto-activate nil
         ;; Disable showing function documentation with `eldoc'
         ;; lsp-signature-render-documentation nil
         ;; lsp-signature-function 'lsp-signature-posframe
-        ;; Avoid annoying questions. We expect a server restart to succeed more often than not.
+        ;; Avoid annoying questions, we expect a server restart to succeed more often than not
         lsp-restart 'auto-restart
         ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
         lsp-use-plists nil
         lsp-xml-logs-client nil
-        lsp-yaml-print-width sb/fill-column)
-
-  (if (display-graphic-p)
-      (setq lsp-modeline-code-actions-enable t)
-    (setq lsp-modeline-code-actions-enable nil))
+        lsp-yaml-print-width sb/fill-column
+        lsp-modeline-code-actions-enable (display-graphic-p))
 
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
     (setq lsp-enable-snippet t))
-
-  (defvar lsp-pylsp-configuration-sources)
-  (defvar lsp-pylsp-plugins-autopep8-enable)
-  (defvar lsp-pylsp-plugins-mccabe-enabled)
-  (defvar lsp-pylsp-plugins-pycodestyle-enabled)
-  (defvar lsp-pylsp-plugins-pycodestyle-max-line-length)
-  (defvar lsp-pylsp-plugins-pydocstyle-convention)
-  (defvar lsp-pylsp-plugins-pydocstyle-enabled)
-  (defvar lsp-pylsp-plugins-pydocstyle-ignore)
-  (defvar lsp-pylsp-plugins-pyflakes-enabled)
-  (defvar lsp-pylsp-plugins-pylint-args)
-  (defvar lsp-pylsp-plugins-pylint-enabled)
-  (defvar lsp-pylsp-plugins-yapf-enabled)
-  (defvar lsp-pyright-langserver-command-args)
-  (defvar lsp-pylsp-plugins-preload-modules)
-
-  (when (eq sb/python-langserver 'pylsp)
-    (setq lsp-pylsp-configuration-sources []
-          lsp-pylsp-plugins-autopep8-enable nil
-          ;; Do not turn on fuzzy completion with jedi, `lsp-mode' is fuzzy on the client side
-          ;; lsp-pylsp-plugins-jedi-completion-fuzzy nil
-          lsp-pylsp-plugins-mccabe-enabled nil
-          ;; We can also set this per-project
-          lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
-          lsp-pylsp-plugins-pycodestyle-enabled nil
-          lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
-          lsp-pylsp-plugins-pydocstyle-convention "pep257"
-          lsp-pylsp-plugins-pydocstyle-enabled nil
-          lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-          lsp-pylsp-plugins-pyflakes-enabled nil
-          lsp-pylsp-plugins-pylint-args (vconcat
-                                         (list "-j 2"
-                                               (concat "--rcfile="
-                                                       (expand-file-name ".config/pylintrc"
-                                                                         sb/user-home-directory))))
-          lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
-          lsp-pylsp-plugins-yapf-enabled t))
 
   (dolist (ignore-dirs '("/build\\'"
                          "/\\.metadata\\'"
@@ -613,7 +574,6 @@
 
 (use-package lsp-ivy
   :after (lsp-mode ivy)
-  :demand t
   :bind
   (:map lsp-command-map
         ("G" . lsp-ivy-global-workspace-symbol)
@@ -688,7 +648,6 @@
              ("M-q"     . c-fill-paragraph)))
 
 (use-package modern-cpp-font-lock
-  :commands modern-c++-font-lock-mode
   :diminish modern-c++-font-lock-mode
   :hook (c++-mode-hook . modern-c++-font-lock-mode))
 
@@ -722,7 +681,6 @@
     :server-id 'cmakels-r)))
 
 (use-package cmake-font-lock
-  :commands cmake-font-lock-activate
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 (progn
@@ -769,6 +727,44 @@
                              ("[./]flake8\\'" . conf-mode)
                              ("/Pipfile\\'" . conf-mode))
                            auto-mode-alist))
+
+    (with-eval-after-load "lsp-mode"
+      (defvar lsp-pylsp-configuration-sources)
+      (defvar lsp-pylsp-plugins-autopep8-enable)
+      (defvar lsp-pylsp-plugins-mccabe-enabled)
+      (defvar lsp-pylsp-plugins-pycodestyle-enabled)
+      (defvar lsp-pylsp-plugins-pycodestyle-max-line-length)
+      (defvar lsp-pylsp-plugins-pydocstyle-convention)
+      (defvar lsp-pylsp-plugins-pydocstyle-enabled)
+      (defvar lsp-pylsp-plugins-pydocstyle-ignore)
+      (defvar lsp-pylsp-plugins-pyflakes-enabled)
+      (defvar lsp-pylsp-plugins-pylint-args)
+      (defvar lsp-pylsp-plugins-pylint-enabled)
+      (defvar lsp-pylsp-plugins-yapf-enabled)
+      (defvar lsp-pyright-langserver-command-args)
+      (defvar lsp-pylsp-plugins-preload-modules)
+      (defvar lsp-pylsp-plugins-flake8-enabled)
+      (defvar lsp-pylsp-plugins-jedi-use-pyenv-environment)
+
+      (when (eq sb/python-langserver 'pylsp)
+        (setq lsp-pylsp-configuration-sources []
+              lsp-pylsp-plugins-mccabe-enabled nil
+              ;; We can also set this per-project
+              lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
+              lsp-pylsp-plugins-pycodestyle-enabled nil
+              lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
+              lsp-pylsp-plugins-pydocstyle-convention "pep257"
+              lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+              lsp-pylsp-plugins-pyflakes-enabled nil
+              lsp-pylsp-plugins-pylint-args (vconcat
+                                             (list "-j 2"
+                                                   (concat "--rcfile="
+                                                           (expand-file-name ".config/pylintrc"
+                                                                             sb/user-home-directory))))
+              lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
+              lsp-pylsp-plugins-yapf-enabled t
+              lsp-pylsp-plugins-flake8-enabled nil
+              lsp-pylsp-plugins-jedi-use-pyenv-environment t)))
 
     ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
     ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
@@ -1023,7 +1019,6 @@
 
 (use-package emmet-mode
   :defines emmet-move-cursor-between-quote
-  :commands emmet-mode
   :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
@@ -1103,8 +1098,11 @@
   :mode "\\.proto$"
   :hook (protobuf-mode-hook . flycheck-mode))
 
-(unless (fboundp 'mlir-mode)
-  (autoload #'mlir-mode "mlir-mode"))
+(progn
+  (declare-function mlir-mode "mlir-mode")
+
+  (unless (fboundp 'mlir-mode)
+    (autoload #'mlir-mode "mlir-mode")))
 
 (use-package clang-format
   :if (executable-find "clang-format")
@@ -1113,6 +1111,7 @@
   :custom (clang-format-style "file"))
 
 (use-package clang-format+
+  :if (executable-find "clang-format")
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
   :custom (clang-format+-always-enable t))
@@ -1152,14 +1151,11 @@
 
 ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (with-eval-after-load "compile"
-  (require 'ansi-color)
-
   (defvar compilation-filter-start)
   (declare-function ansi-color-apply-on-region "ansi-color")
 
   (defun sb/colorize-compilation-buffer ()
     "Colorize compile mode output."
-    (require 'ansi-color)
     (let ((inhibit-read-only t))
       (ansi-color-apply-on-region (point-min) (point-max))))
 
@@ -1180,14 +1176,15 @@
     (add-hook 'Info-selection-hook #'info-colors-fontify-node)))
 
 (use-package consult-lsp
+  :if (eq sb/minibuffer-completion 'vertico)
   :after (consult lsp)
   :commands (consult-lsp-diagnostics consult-lsp-symbols
                                      consult-lsp-file-symbols consult-lsp-marginalia-mode)
-  :config (consult-lsp-marginalia-mode 1))
+  :init (consult-lsp-marginalia-mode 1))
 
 (use-package rainbow-delimiters
-  :commands rainbow-delimiters-mode
-  :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
+  :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook
+                         org-src-mode-hook) . rainbow-delimiters-mode))
 
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line.
@@ -1196,7 +1193,6 @@
     (autoload #'executable-make-buffer-file-executable-if-script-p "executable" nil t))
 
   (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p))
-
 
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
 ;; for now.
@@ -1222,7 +1218,7 @@
   :commands apt-sources-list-mode)
 
 (use-package ssh-config-mode
-  :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode turn-on-font-lock)
+  :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
   :hook (ssh-config-mode-hook . turn-on-font-lock))
 
 (provide 'init-languages)

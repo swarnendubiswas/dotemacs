@@ -14,7 +14,6 @@
   ;; (run-with-idle-timer 2 nil #'show-paren-mode)
   (add-hook 'after-init-hook show-paren-mode)
 
-
   (with-eval-after-load "paren"
     (defvar show-paren-style)
     (defvar show-paren-when-point-inside-paren)
@@ -126,3 +125,5 @@
    ("C-M-k" . sp-splice-sexp)))
 
 (provide 'init-parens)
+
+;;; init-parens.el ends here

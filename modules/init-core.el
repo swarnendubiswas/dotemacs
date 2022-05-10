@@ -16,6 +16,11 @@
 (defvar sb/fill-column)
 (defvar sb/EMACS28+)
 (defvar warning-minimum-level)
+(defvar sb/extras-directory)
+(defvar no-littering-etc-directory)
+(defvar no-littering-var-directory)
+
+(declare-function straight--emacs-dir "straight")
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
@@ -45,7 +50,6 @@
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
       create-lockfiles nil
-      cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
       echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
@@ -99,6 +103,7 @@
       visible-bell nil
       ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
       warning-minimum-level :emergency
+      window-combination-resize t ; Resize windows proportionally
       x-gtk-use-system-tooltips nil ; Do not use system tooltips
       x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
       ;; Underline looks a bit better when drawn lower
@@ -111,7 +116,8 @@
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
-(setq-default fill-column sb/fill-column
+(setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+              fill-column sb/fill-column
               ;; electric-indent-inhibit nil
               indent-tabs-mode nil ; Spaces instead of tabs
               indicate-empty-lines nil
@@ -131,6 +137,7 @@
                 ".dll"
                 ".elc"
                 ".exe"
+                ".fdb_latexmk"
                 ".fls"
                 ".lof"
                 ".o"
@@ -138,6 +145,7 @@
                 ".rel"
                 ".rip"
                 ".so"
+                ".synctex.gz"
                 ".toc"))
   (add-to-list 'completion-ignored-extensions exts))
 
@@ -145,11 +153,11 @@
 (set-language-environment    "UTF-8")
 (setq locale-coding-system   'utf-8)
 (setq-default buffer-file-coding-system 'utf-8)
-(prefer-coding-system        'utf-8)
-(set-default-coding-systems  'utf-8)
-(set-keyboard-coding-system  'utf-8)
+(prefer-coding-system        'utf-8) ; Add utf-8 at the front for automatic detection
+(set-default-coding-systems  'utf-8) ; Set default value of various coding systems
+(set-keyboard-coding-system  'utf-8) ; Set coding system for keyboard input on TERMINAL
 (set-selection-coding-system 'utf-8)
-(set-terminal-coding-system  'utf-8)
+(set-terminal-coding-system  'utf-8) ; Set coding system of terminal output
 
 ;; Scroll settings from Doom Emacs
 (setq scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
@@ -249,6 +257,9 @@
     (defvar savehist-save-minibuffer-history)
 
     (setq savehist-additional-variables '(extended-command-history
+                                          command-history
+                                          bookmark-history
+                                          file-name-history
                                           kill-ring
                                           search-ring
                                           regexp-search-ring)
@@ -298,6 +309,8 @@
   (declare-function recentf-save-file "recentf")
   (declare-function recentf-save-list "recentf")
   (declare-function recentf-cleanup "recentf")
+  (declare-function recentf-add-file "recentf")
+  (declare-function recentf-apply-filename-handlers "recentf")
 
   (unless (fboundp 'recentf-mode)
     (autoload #'recentf-mode "recentf" nil t))
@@ -406,6 +419,15 @@
       (diminish 'whitespace-newline-mode))))
 
 (progn
+  (declare-function image-get-display-property "image-mode")
+
+  (unless (fboundp 'image-mode)
+    (autoload #'image-mode "image-mode" nil t))
+  (unless (fboundp 'sb/show-image-dimensions-in-mode-line)
+    (autoload #'sb/show-image-dimensions-in-mode-line "image-mode" nil t))
+  (unless (fboundp 'image-get-display-property)
+    (autoload #'image-get-display-property "image-mode" nil t))
+
   (eval-and-compile
     ;; http://emacs.stackexchange.com/a/7693/289
     (defun sb/show-image-dimensions-in-mode-line nil
@@ -416,13 +438,6 @@
               (format "%s %dx%d" (propertized-buffer-identification "%12b") width height)))))
 
   (when (display-graphic-p)
-    (unless (fboundp 'image-mode)
-      (autoload #'image-mode "image-mode" nil t))
-    (unless (fboundp 'sb/show-image-dimensions-in-mode-line)
-      (autoload #'sb/show-image-dimensions-in-mode-line "image-mode" nil t))
-    (unless (fboundp 'image-get-display-property)
-      (autoload #'image-get-display-property "image-mode" nil t))
-
     ;; Enable converting external formats (i.e., webp) to internal ones.
     (setq image-use-external-converter t)
 

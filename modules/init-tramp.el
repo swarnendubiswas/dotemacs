@@ -28,6 +28,7 @@
 (defvar tramp-verbose)
 (defvar tramp-remote-path)
 (defvar tramp-ssh-controlmaster-options)
+(defvar sb/minibuffer-completion)
 
 (setq tramp-default-user user-login-name
       ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
@@ -59,7 +60,8 @@
   (defun sb/intercept-tramp-send-command (vec command &rest args)
     (when (string-match "\\(.projectile\\|/git\\)" command)
       (debug)))
-  (advice-add 'tramp-send-command :before 'sb/intercept-tramp-send-command))
+  ;; (advice-add 'tramp-send-command :before 'sb/intercept-tramp-send-command)
+  )
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))

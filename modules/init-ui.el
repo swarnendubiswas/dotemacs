@@ -108,6 +108,22 @@
      ((eq sb/tui-theme 'modus-operandi) (load-theme 'modus-operandi t))
      ((eq sb/tui-theme 'modus-vivendi) (load-theme 'modus-vivendi t)))))
 
+(use-package nano-theme
+  :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
+  :if (and (display-graphic-p)
+           (or (eq sb/gui-theme 'nano-light)
+               (eq sb/gui-theme 'nano-dark)))
+  :init
+  (when (display-graphic-p)
+    (progn
+      (setq nano-fonts-use t)
+      (cond
+       ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
+       ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t)))
+      ;; (when (eq sb/modeline-theme 'none)
+      ;;   (powerline-nano-theme))
+      )))
+
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
   (progn
@@ -121,12 +137,13 @@
 ;; Set `sb/gui-theme' and `sb/tui-theme' to `none' if you use this package
 (use-package circadian
   :commands circadian-setup
+  :disabled t
   :init
   (require 'solar)
   (setq calendar-latitude 26.50
         calendar-location-name "Kanpur, UP, India"
         calendar-longitude 80.23
-        circadian-themes '((:sunrise . modus-vivendi)
+        circadian-themes '((:sunrise . nano-light)
                            (:sunset  . modus-vivendi)))
   (circadian-setup))
 
@@ -309,6 +326,14 @@
   :config (load-theme 'airline-doom-one t)
   :custom
   (airline-display-directory 'airline-directory-shortened))
+
+(use-package nano-modeline
+  :straight (nano-modeline :type git :host github
+                           :repo "rougier/nano-modeline")
+  :if (and (display-graphic-p) (eq sb/modeline-theme 'nano))
+  :init
+  (when (and (display-graphic-p) (eq sb/modeline-theme 'nano)
+             (nano-modeline 1))))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.

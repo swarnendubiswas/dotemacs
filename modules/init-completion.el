@@ -642,7 +642,11 @@
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
   :if (eq sb/capf 'corfu)
-  :commands cape-history
+  :after corfu
+  :demand t
+  :commands (cape-history cape-file cape-keyword cape-tex
+                          cape-abbrev cape-dict cape-line cape-symbol cape-ispell
+                          cape-dabbrev)
   :init
   ;; Complete from Eshell, Comint or minibuffer history
   (add-to-list 'completion-at-point-functions #'cape-history)
@@ -658,7 +662,7 @@
   (add-to-list 'completion-at-point-functions #'cape-dict)
   ;; Complete current line from other lines in buffer.
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
+  (add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
   ;; Complete word at point with Ispell.
   (add-to-list 'completion-at-point-functions #'cape-ispell)
   ;; Complete with Dabbrev at point.

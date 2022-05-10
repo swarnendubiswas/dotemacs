@@ -20,6 +20,9 @@
   (defvar straight-disable-native-compile)
   (defvar straight-base-dir)
 
+  (declare-function straight-freeze-versions "straight")
+  (declare-function straight-use-package "straight")
+
   (setf straight-profiles `((nil . "straight.lockfile.el")))
 
   (setq straight-build-dir (format "build/%d%s%d"
@@ -60,9 +63,11 @@
   ;; `straight-thaw-versions'.
 
   ;; Create a version file if it does not yet exist
-  (when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
-                                              straight-base-dir)))
-    (straight-freeze-versions)))
+
+  ;; (when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
+  ;;                                             straight-base-dir)))
+  ;;   (straight-freeze-versions))
+  )
 
 (unless (bound-and-true-p sb/disable-package.el)
   (with-eval-after-load 'package
