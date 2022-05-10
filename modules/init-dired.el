@@ -13,6 +13,9 @@
 (defvar sb/gui-theme)
 (defvar sb/minibuffer-completion)
 
+(declare-function s-starts-with? "s")
+(declare-function s-ends-with? "s")
+
 (progn
   (declare-function dired-next-line "dired")
   (declare-function dired-jump "dired")

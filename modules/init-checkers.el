@@ -11,6 +11,9 @@
 (defvar sb/user-home-directory)
 (defvar sb/textlint-directory)
 
+(declare-function lsp-register-client "lsp-mode")
+(declare-function make-lsp-client "lsp-mode")
+
 ;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
 ;; also get run for all modes derived from a basic mode such as `text-mode'.
 
@@ -18,9 +21,9 @@
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
-;; Identify weasel words, passive voice, and duplicate words, `textlint' includes `writegood'. I
-;; prefer `grammarly' and `lsp-ltex'. The module does not check grammar but checks the writing
-;; style.
+;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar but
+;; checks the writing style. `textlint' includes `writegood' but I prefer `grammarly' and
+;; `lsp-ltex'.
 (use-package writegood-mode
   :commands (writegood-passive-voice-turn-off)
   :diminish
@@ -134,7 +137,7 @@
   ;; Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
 
-  (declare-function sb/flycheck-may-check-automatically "init-emacs28.el")
+  (declare-function sb/flycheck-may-check-automatically "init-checkers.el")
 
   (defvar sb/excluded-directory-regexps
     '(".git/" "elpa/" ".cache" ".clangd"))
@@ -170,8 +173,8 @@
 
 ;; Showing error messages in the echo area is less intrusive.
 (use-package flycheck-popup-tip ; Show error messages in popups
-  :unless (display-graphic-p)
   :disabled t
+  :unless (display-graphic-p)
   :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
 
 ;; Does not display popup under TTY, check possible workarounds at
@@ -183,7 +186,6 @@
 
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 (use-package flycheck-posframe
-  :disabled t
   :if (display-graphic-p)
   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
   :hook (flycheck-mode-hook . flycheck-posframe-mode)
@@ -191,25 +193,12 @@
   (flycheck-posframe-position 'point-bottom-left-corner)
   (flycheck-posframe-border-width 1)
   :config
-  (flycheck-posframe-configure-pretty-defaults))
+  (flycheck-posframe-configure-pretty-defaults)
+  ;; Do not display popups if company is open
+  (with-eval-after-load "company"
+    (declare-function company--active-p "company")
 
-;; https://languagetool.org/download/LanguageTool-stable.zip
-(use-package langtool
-  :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
-  :commands (langtool-check
-             langtool-check-done
-             langtool-show-message-at-point
-             langtool-correct-buffer)
-  :init
-  (setq langtool-default-language "en-US"
-        languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-        ;; The folder should include all the files in addition to the ".jar" files.
-        languagetool-console-command (no-littering-expand-etc-file-name
-                                      "languagetool/languagetool-commandline.jar")
-        languagetool-server-command (no-littering-expand-etc-file-name
-                                     "languagetool/languagetool-server.jar")
-        langtool-language-tool-jar (no-littering-expand-etc-file-name
-                                    "languagetool/languagetool-commandline.jar")))
+    (add-hook 'flycheck-posframe-inhibit-functions #'company--active-p)))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
@@ -219,14 +208,16 @@
   :preface
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook))
+    (dolist (hook '(bazel-mode-hook LaTeX-mode-hook web-mode-hook
+                                    markdown-mode-hook emacs-lisp-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
   ;; :init (run-with-idle-timer 2 nil #'sb/enable-format-all)
   :diminish
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode)))
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook
+                     markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode)))
 
 (use-package editorconfig
   :if (executable-find "editorconfig")
@@ -245,6 +236,24 @@
         flycheck-checkers (delete 'grammarly flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'grammarly t))
+
+;; https://languagetool.org/download/LanguageTool-stable.zip
+(use-package langtool
+  :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
+  :commands (langtool-check
+             langtool-check-done
+             langtool-show-message-at-point
+             langtool-correct-buffer)
+  :init
+  (setq langtool-default-language "en-US"
+        languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+        ;; The folder should include all the files in addition to the ".jar" files.
+        languagetool-console-command (no-littering-expand-etc-file-name
+                                      "languagetool/languagetool-commandline.jar")
+        languagetool-server-command (no-littering-expand-etc-file-name
+                                     "languagetool/languagetool-server.jar")
+        langtool-language-tool-jar (no-littering-expand-etc-file-name
+                                    "languagetool/languagetool-commandline.jar")))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 (use-package flycheck-languagetool

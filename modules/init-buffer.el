@@ -8,6 +8,7 @@
 ;;; Code:
 
 (defvar sb/minibuffer-completion)
+
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
 (progn
@@ -19,16 +20,18 @@
 
   (defalias 'list-buffers 'ibuffer)
 
-  (defvar ibuffer-display-summary)
-  (defvar ibuffer-default-sorting-mode)
-  (defvar ibuffer-use-header-line)
+  (with-eval-after-load "ibuffer"
+    (defvar ibuffer-display-summary)
+    (defvar ibuffer-default-sorting-mode)
+    (defvar ibuffer-use-header-line)
 
-  (setq ibuffer-display-summary nil
-        ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
-        ibuffer-use-header-line t))
+    (setq ibuffer-display-summary nil
+          ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
+          ibuffer-use-header-line t)))
 
 (progn
   (declare-function ibuffer-auto-mode "ibuffer-ext")
+
   (unless (fboundp 'ibuffer-auto-mode)
     (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
 

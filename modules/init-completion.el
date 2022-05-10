@@ -16,6 +16,7 @@
 (defvar recentf-list)
 (defvar dabbrev-ignored-buffer-regexps)
 (defvar which-key-use-C-h-commands)
+(defvar dabbrev-completion-ignored-buffer-regexps)
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 

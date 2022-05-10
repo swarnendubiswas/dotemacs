@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'nano-dark
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -54,7 +54,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'none
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)

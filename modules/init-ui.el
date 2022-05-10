@@ -119,10 +119,7 @@
       (setq nano-fonts-use t)
       (cond
        ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
-       ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t)))
-      ;; (when (eq sb/modeline-theme 'none)
-      ;;   (powerline-nano-theme))
-      )))
+       ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -165,7 +162,9 @@
     (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
                         :foreground "black" :background "gray88"))
 
-  (powerline-default-theme))
+  (if (or (eq sb/gui-theme 'nano-light) (eq sb/gui-theme 'nano-dark))
+      (powerline-nano-theme)
+    (powerline-default-theme)))
 
 (use-package doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
