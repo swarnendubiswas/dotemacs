@@ -99,6 +99,11 @@
    ("C-z"   . undo-tree-undo)
    ("C-x u" . undo-tree-visualize)))
 
+(use-package vundo
+  :straight (vundo :type git :host github :repo "casouri/vundo")
+  :if sb/EMACS28+
+  :commands vundo)
+
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
 

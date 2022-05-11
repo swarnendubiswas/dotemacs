@@ -162,8 +162,11 @@
   :commands hes-mode
   :hook (prog-mode-hook . hes-mode))
 
-(unless (fboundp 'ini-mode)
-  (autoload #'ini-mode "ini-mode" nil t))
+(progn
+  (declare-function ini-mode "ini-mode")
+
+  (unless (fboundp 'ini-mode)
+    (autoload #'ini-mode "ini-mode" nil t)))
 
 (progn
   (unless (fboundp 'emacs-lisp-mode)

@@ -691,6 +691,7 @@
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
+  :if (display-graphic-p)
   :custom
   (kind-icon-face 'corfu-default)
   (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
