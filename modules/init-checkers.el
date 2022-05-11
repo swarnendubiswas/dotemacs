@@ -10,6 +10,7 @@
 (defvar sb/modeline-theme)
 (defvar sb/user-home-directory)
 (defvar sb/textlint-directory)
+(defvar sb/minibuffer-completion)
 
 (declare-function lsp-register-client "lsp-mode")
 (declare-function make-lsp-client "lsp-mode")
@@ -406,7 +407,8 @@
        error-callback)))))
 
 (use-package consult-flycheck
-  :after (consult flycheck)
+  :if (eq sb/minibuffer-completion 'vertico)
+  :after (flycheck)
   :bind
   (:map flycheck-command-map
         ("!" . consult-flycheck)))

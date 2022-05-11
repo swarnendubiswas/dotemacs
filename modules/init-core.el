@@ -480,6 +480,19 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
+;; "Shift + direction" arrows
+(progn
+  (unless (fboundp 'windmove-default-keybindings)
+    (autoload #'windmove-default-keybindings "windmove" nil t))
+
+  (windmove-default-keybindings)
+
+  (with-eval-after-load "windmove"
+    (defvar windmove-wrap-around)
+
+    ;; Wrap around at edges
+    (setq windmove-wrap-around t)))
+
 (provide 'init-core)
 
 ;;; init-core.el ends here

@@ -13,8 +13,11 @@
 (use-package ffap ; Find FILENAME, guessing a default from text around point
   :commands ffap)
 
-;; v8.1: This seems a reasonable alternative to `projectile', but does not remember remote projects
-;; yet.
+;; TODO: Try https://github.com/redguardtoo/find-file-in-project
+
+;; Projectile is unable to remember remote projects which is also not supported by the
+;; current version of `project'. So then why not rely on `project'?
+
 (use-package project
   :commands (project-switch-project project-current
                                     project-find-file project-execute-extended-command
@@ -26,19 +29,26 @@
                                     project-search
                                     project-compile)
   :bind
-  (:map project-prefix-map
-        ("f" . project-find-file)
-        ("F" . project-or-external-find-file)
-        ("b" . project-switch-to-buffer)
-        ("d" . project-dired)
-        ("v" . project-vc-dir)
-        ("c" . project-compile)
-        ("k" . project-kill-buffers)
-        ("p" . project-switch-project)
-        ("g" . project-find-regexp)
-        ("r" . project-query-replace-regexp)))
+  (("<f5>" . project-switch-project)
+   ("<f6>" . project-find-file)
+   :map project-prefix-map
+   ("f" . project-find-file)
+   ("F" . project-or-external-find-file)
+   ("b" . project-switch-to-buffer)
+   ("d" . project-dired)
+   ("v" . project-vc-dir)
+   ("c" . project-compile)
+   ("k" . project-kill-buffers)
+   ("p" . project-switch-project)
+   ("g" . project-find-regexp)
+   ("r" . project-query-replace-regexp)))
+
+(use-package consult-project-extra
+  :if (eq sb/minibuffer-completion 'vertico)
+  :after (consult project))
 
 (use-package projectile
+  :disabled t
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
@@ -217,12 +227,11 @@
 
 (use-package consult-projectile
   :if (eq sb/minibuffer-completion 'vertico)
+  :after projectile
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
    ("<f6>" . consult-projectile)))
-
-(use-package consult-project-extra)
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
 (use-package treemacs-projectile

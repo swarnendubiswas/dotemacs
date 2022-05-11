@@ -38,7 +38,6 @@
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
   :commands (isearch-forward-symbol ; "M-s _"
-             isearch-symbol-at-point
              isearch-forward-symbol-at-point ; "M-s ."
              isearch-backward-symbol-at-point)
   :bind ("C-c s p" . isearch-symbol-at-point))

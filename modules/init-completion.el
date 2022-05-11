@@ -652,35 +652,27 @@
   :if (eq sb/capf 'corfu)
   :after corfu
   :demand t
-  :commands (cape-history cape-file cape-keyword cape-tex
-                          cape-abbrev cape-dict cape-line cape-symbol cape-ispell
-                          cape-dabbrev)
+  :commands (cape-history ; Complete from Eshell, Comint or minibuffer history
+             cape-file
+             cape-keyword ; Complete programming language keyword
+             cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
+             cape-abbrev ; Complete abbreviation at point
+             cape-dict ; Complete word from dictionary at point
+             cape-line ; Complete current line from other lines in buffer
+             cape-symbol ; Elisp symbol
+             cape-ispell ; Complete word at point with Ispell
+             ;; Complete with Dabbrev at point
+             cape-dabbrev)
   :init
-  ;; Complete from Eshell, Comint or minibuffer history
-  (add-to-list 'completion-at-point-functions #'cape-history)
-  ;; Add `completion-at-point-functions', used by `completion-at-point'.
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  ;; Complete programming language keyword
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;; Complete unicode char from TeX command, e.g. \hbar.
-  (add-to-list 'completion-at-point-functions #'cape-tex)
-  ;; Complete abbreviation at point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;; Complete word from dictionary at point.
-  (add-to-list 'completion-at-point-functions #'cape-dict)
-  ;; Complete current line from other lines in buffer.
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  (add-to-list 'completion-at-point-functions #'cape-symbol) ; Elisp symbol
-  ;; Complete word at point with Ispell.
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
-  ;; Complete with Dabbrev at point.
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (dolist (backends '(cape-symbol cape-keyword cape-file cape-dabbrev cape-history))
+    (add-to-list 'completion-at-point-functions backends))
   :custom
   (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
 
 ;; We prefer to use "kind-icon" package for icons for Corfu because it has more active commits but I
 ;; do not know which is better.
 (use-package all-the-icons-completion
+  :if (display-graphic-p)
   :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
@@ -696,6 +688,8 @@
   (kind-icon-face 'corfu-default)
   (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 1.0 :scale 0.8))
+  (kind-icon-blend-background nil)
+  (kind-icon-blend-frac 0.08)
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 

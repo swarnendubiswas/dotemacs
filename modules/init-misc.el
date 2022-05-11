@@ -59,14 +59,12 @@
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
-  ;; :init (run-with-idle-timer 3 nil #'smart-mark-mode)
   :hook (after-init-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :commands (whole-line-or-region-local-mode whole-line-or-region-global-mode)
+  :commands (whole-line-or-region-local-mode)
   :diminish (whole-line-or-region-local-mode)
-  ;; :init (run-with-idle-timer 3 nil #'whole-line-or-region-global-mode)
   :hook (after-init-hook . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
@@ -75,12 +73,12 @@
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
-  ;; :init (run-with-idle-timer 3 nil #'beginend-global-mode)
   :hook (after-init-hook . beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
 
+;; The package has many bugs, and it has never worked well for me. I am trying out `vundo'.
 (use-package undo-tree
   :defines undo-tree-map
   :commands (global-undo-tree-mode undo-tree-redo)
@@ -100,9 +98,12 @@
    ("C-x u" . undo-tree-visualize)))
 
 (use-package vundo
-  :straight (vundo :type git :host github :repo "casouri/vundo")
   :if sb/EMACS28+
-  :commands vundo)
+  :straight (vundo :type git :host github :repo "casouri/vundo")
+  :commands vundo
+  :bind
+  (([remap undo] . vundo)
+   ("C-z" . vundo)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
@@ -114,8 +115,6 @@
   :hook (after-init-hook . session-initialize))
 
 (use-package hl-todo
-  :commands global-hl-todo-mode
-  ;; :init (run-with-idle-timer 3 nil #'global-hl-todo-mode)
   :hook (after-init-hook . global-hl-todo-mode)
   :config
   (setq hl-todo-highlight-punctuation ":"
@@ -129,26 +128,22 @@
                                       hl-todo-keyword-faces)))
 
 (use-package highlight-numbers
-  :commands highlight-numbers-mode
   :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook
                          css-mode-hook html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :diminish
-  :commands (global-page-break-lines-mode page-break-lines-mode)
-  ;; :init (run-with-idle-timer 3 nil #'global-page-break-lines-mode)
+  :commands (page-break-lines-mode)
   :hook (after-init-hook . global-page-break-lines-mode))
 
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
+  :disabled t
   :bind
   (("C-<"     . mc/mark-previous-like-this)
    ("C->"     . mc/mark-next-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
-
-
-;; LATER: Check for continuous scroll support at https://github.com/dalanicolai/image-roll.el
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
@@ -160,7 +155,6 @@
                                pdf-annot-add-text-annotation)
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
-  ;; :init (run-with-idle-timer 3 nil #'require 'pdf-tools nil t) ; Expensive to load
   :hook (after-init-hook . (lambda ()
                              (require 'pdf-tools nil t)))
   :config
@@ -185,6 +179,8 @@
 (use-package saveplace-pdf-view
   :after (pdf-tools saveplace)
   :demand t)
+
+;; LATER: Check for continuous scroll support at https://github.com/dalanicolai/image-roll.el
 
 (use-package logview
   :commands logview-mode)
@@ -251,7 +247,7 @@
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
-  :commands (eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+  :commands (eldoc-box-hover-at-point-mode)
   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
   :custom
   (eldoc-box-clear-with-C-g t)
@@ -263,7 +259,6 @@
   :if (bound-and-true-p sb/debug-init-file))
 
 (use-package bug-hunter
-  :disabled t
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
 
@@ -291,19 +286,6 @@
 (use-package ace-window
   :bind ([remap other-window] . ace-window))
 
-;; "Shift + direction" arrows
-(progn
-  (unless (fboundp 'windmove-default-keybindings)
-    (autoload #'windmove-default-keybindings "windmove" nil t))
-
-  (windmove-default-keybindings)
-
-  (with-eval-after-load "windmove"
-    (defvar windmove-wrap-around)
-
-    ;; Wrap around at edges
-    (setq windmove-wrap-around t)))
-
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
 ;; given that we have `auto-save-visited-mode' enabled.
@@ -324,8 +306,7 @@
   :commands execute-extended-command-for-buffer
   :hook (after-init-hook . amx-mode)
   :bind
-  ;; We need this if we use `vertico' and `consult'
-  (("M-x"  . execute-extended-command)
+  (("M-x"  . execute-extended-command) ; We need this if we use `vertico' and `consult'
    ("<f1>" . execute-extended-command))
   :custom
   (amx-auto-update-interval 10 "Update the command list every n minutes"))
@@ -337,25 +318,23 @@
   :bind
   (("M-b"   . avy-goto-word-1)
    ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
-   ("M-g c" . avy-goto-char-timer) ; TODO: Reuse the keybinding
-   ("C-/"   . avy-goto-line) ; Does not work with TUI, but works with Alacritty
-   ;; TODO: Reuse the keybinding
-   ("M-g l" . avy-goto-line)))
+   ;; Does not work with TUI, but works with Alacritty
+   ("C-/"   . avy-goto-line)))
 
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
-  :config
-  (setq ajb-max-window-height 30
-        ajb-sort-function 'bs--sort-by-name))
+  :custom
+  (ajb-max-window-height 30)
+  (ajb-bs-configuration "files-and-scratch")
+  (ajb-sort-function 'bs--sort-by-filename))
 
 ;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
 (use-package ivy-avy
   :after ivy
   :bind
   (:map ivy-minibuffer-map
-        ("C-'"   . ivy-avy) ; Does not work with TUI, but works with Alacritty
-        ;; TODO: Reuse the keybinding
-        ("M-g l" . ivy-avy)))
+        ;; Does not work with TUI, but works with Alacritty
+        ("C-'"   . ivy-avy)))
 
 (use-package bm
   :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
@@ -375,14 +354,12 @@
     (add-hook 'after-init-hook        #'bm-repository-load))
   :init
   ;; Must be set before `bm' is loaded
-  (setq bm-restore-repository-on-load t)
-  ;; We need to use a reasonable delay so that reading the saved bookmarks file does not affect
-  ;; usability.
-  ;; (run-with-idle-timer 2 nil #'sb/bm-setup)
+  (setq bm-restore-repository-on-load t
+        bm-verbosity-level 1
+        bm-modeline-display-total t)
   :hook (after-init-hook . sb/bm-setup)
   :config
-  ;; Save bookmarks
-  (setq-default bm-buffer-persistence t)
+  (setq-default bm-buffer-persistence t) ; Save bookmarks
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)
@@ -413,7 +390,6 @@
               (buffer-face-mode t))))
 
 (use-package vterm-toggle
-  :commands vterm-toggle
   :bind ("C-`" . vterm-toggle))
 
 ;; This is different from `whitespace-cleanup-mode' since this is unconditional
@@ -445,12 +421,6 @@
 (use-package rainbow-mode
   :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
-
-(use-package init-open-recentf
-  :after recentf
-  :demand t
-  :disabled t
-  :config (init-open-recentf))
 
 (provide 'init-misc)
 

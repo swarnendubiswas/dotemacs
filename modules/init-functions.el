@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/ctags-path)
+
 ;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."

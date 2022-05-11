@@ -443,5 +443,9 @@ The use case is to search all files in a file hierarchy for some regular express
 *** Batch rename multiple files in a directory
 
 - Turn on ~wdired~ mode (~Ctrl+x Ctrl+q~ by default)
-- Make changes to the dired listing which are reflected back to the actual files. For example, use your favorite search-and-replace method to change the target file names.
+- Make changes to the ~dired~ listing which are reflected back to the actual files. For example, use your favorite search-and-replace method to change the target file names.
 - Type ~Ctrl+c Ctrl+c~ to exit ~wdired~ mode and rename the files
+
+*** Copy file path
+
+Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This calls ~dired-copy-filename-as-kill~ with the zero-prefix argument, and will copy the file path to the clipboard.
