@@ -110,16 +110,19 @@
 
 (use-package nano-theme
   :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
-  :if (and (display-graphic-p)
-           (or (eq sb/gui-theme 'nano-light)
-               (eq sb/gui-theme 'nano-dark)))
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'nano-light)
+                   (eq sb/gui-theme 'nano-dark)))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'nano-dark)))
   :init
+  (setq nano-fonts-use t)
   (when (display-graphic-p)
-    (progn
-      (setq nano-fonts-use t)
-      (cond
-       ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
-       ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))))
+    (cond
+     ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
+     ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/tui-theme 'nano-dark) (load-theme 'nano-dark t)))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -477,7 +480,8 @@
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
 
-(display-battery-mode 1)
+(when (display-graphic-p)
+  (display-battery-mode 1))
 
 (use-package hl-line
   :commands hl-line-highlight

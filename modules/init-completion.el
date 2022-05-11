@@ -548,17 +548,21 @@
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0)
-  (corfu-auto-prefix 3)
+  (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
+  (corfu-auto-prefix 2)
   (corfu-min-width 60)
-  (corfu-max-width corfu-min-width)
+  (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
   (corfu-preselect-first t)
   :bind
   (:map corfu-map
         ("[tab]" . corfu-next)
+        ("C-n" . corfu-next)
         ("[backtab]" . corfu-previous)
+        ("C-p" . corfu-previous)
         ("<escape>" . corfu-quit)
+        ("M-d" . corfu-show-documentation)
+        ("M-l" . corfu-show-location)
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (when (eq sb/capf 'corfu)
@@ -574,8 +578,9 @@
   (unless (fboundp 'corfu-indexed-mode)
     (autoload #'corfu-indexed-mode "corfu-indexed" nil t))
 
-  (with-eval-after-load "corfu"
-    (corfu-indexed-mode 1)))
+  ;; (with-eval-after-load "corfu"
+  ;;   (corfu-indexed-mode 1))
+  )
 
 (when (eq sb/capf 'corfu)
   (eval-when-compile
@@ -611,8 +616,10 @@
 
 (use-package corfu-doc
   :if (eq sb/capf 'corfu)
-  :disabled t
-  :hook (corfu-mode-hook . corfu-doc-mode))
+  :hook (corfu-mode-hook . corfu-doc-mode)
+  :custom
+  ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
+  (corfu-echo-documentation nil))
 
 (progn
   (eval-when-compile
@@ -671,14 +678,15 @@
   :custom
   (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
 
-;; We prefer to use "kind-icon" package for icons since it has more active commits but I do not know
-;; which is better.
+;; We prefer to use "kind-icon" package for icons for Corfu because it has more active commits but I
+;; do not know which is better.
 (use-package all-the-icons-completion
   :disabled t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode))
 
+;; Provide icons for Corfu
 (use-package kind-icon
   :after corfu
   :demand t

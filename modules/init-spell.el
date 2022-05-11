@@ -61,8 +61,8 @@
 
 (add-hook 'text-mode-hook #'flyspell-mode)
 ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
-;; language-specific words
-(add-hook 'prog-mode-hook #'flyspell-prog-mode)
+;; language-specific words. Furthermore, it is supposedly slow.
+;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
 ;; (add-hook 'before-save-hook #'flyspell-buffer) ; Saving files will be slow
 

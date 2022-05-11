@@ -76,6 +76,7 @@
   :commands free-keys)
 
 (use-package keyfreq
+  :disabled t
   :hook
   (after-init-hook . (lambda ()
                        (keyfreq-mode 1)
@@ -394,7 +395,18 @@
     ("W" markdown-insert-wiki-link :color blue "Insert wiki link")
     ("R" markdown-insert-reference-link-dwim :color blue "Insert reference link"))))
 
-(declare-function straight-check-all "straight.el")
+(declare-function straight-check-all "straight")
+(declare-function straight-check-package "straight")
+(declare-function straight-rebuild-all "straight")
+(declare-function straight-rebuild-package "straight")
+(declare-function straight-fetch-all "straight")
+(declare-function straight-fetch-package "straight")
+(declare-function straight-pull-all "straight")
+(declare-function straight-pull-package "straight")
+(declare-function straight-merge-all "straight")
+(declare-function straight-merge-package "straight")
+(declare-function straight-normalize-all "straight")
+(declare-function straight-normalize-package "straight")
 
 (pretty-hydra-define sb/hydra-straight
   (:hint nil :quit-key "q" :title "Straight actions")
@@ -441,6 +453,15 @@
 (bind-key "C-c h t" #'sb/hydra-move-text/body)
 (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
 (bind-key "C-c h i" #'sb/hydra-straight/body)
+
+(use-package term-keys
+  :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
+  :hook (after-init-hook . term-keys-mode)
+  :config
+  (require 'term-keys-alacritty)
+  (with-temp-buffer
+    (insert (term-keys/alacritty-config))
+    (write-region (point-min) (point-max) "~/alacritty-for-term-keys.yml")))
 
 (provide 'init-keybindings)
 

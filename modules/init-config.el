@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -36,7 +36,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'none
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -48,6 +48,7 @@
            (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
+           (const :tag "nano-dark"       nano-dark)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
@@ -138,7 +139,7 @@ This location is used for temporary installations and files.")
 
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow
 (defcustom sb/python-langserver
-  'pyright
+  'pylsp
   "Choose the Python Language Server implementation."
   :type  '(radio
            (const :tag "pylsp"   pylsp)
