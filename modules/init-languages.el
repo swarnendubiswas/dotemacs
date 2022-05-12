@@ -813,7 +813,6 @@
                                    (setq python-shell-interpreter "python3")))))
 
 (use-package py-isort
-  :disabled t
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :commands (py-isort-before-save py-isort-buffer py-isort-region)
   :hook

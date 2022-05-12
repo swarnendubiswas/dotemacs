@@ -139,7 +139,6 @@
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
 (use-package multiple-cursors
-  :disabled t
   :bind
   (("C-<"     . mc/mark-previous-like-this)
    ("C->"     . mc/mark-next-like-this)

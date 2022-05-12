@@ -13,10 +13,8 @@
 (use-package ffap ; Find FILENAME, guessing a default from text around point
   :commands ffap)
 
-;; TODO: Try https://github.com/redguardtoo/find-file-in-project
-
 ;; Projectile is unable to remember remote projects which is also not supported by the
-;; current version of `project'. So then why not rely on `project'?
+;; current version of `project'. So then why not rely only on `project'?
 
 (use-package project
   :commands (project-switch-project project-current
@@ -48,7 +46,6 @@
   :after (consult project))
 
 (use-package projectile
-  :disabled t
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root

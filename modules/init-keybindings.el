@@ -73,6 +73,7 @@
    ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
+  :disabled t
   :commands free-keys)
 
 (use-package keyfreq
@@ -259,6 +260,9 @@
     ("s" flycheck-select-checker "select checker")
     ("?" flycheck-describe-checker "describe checker"))))
 
+(declare-function python-indent-shift-left "python")
+(declare-function python-indent-shift-right "python")
+
 (pretty-hydra-define sb/hydra-python-indent
   (:quit-key "q" :title "Adjust Python indentation.")
   (""
@@ -269,6 +273,15 @@
   (defvar python-mode-map)
 
   (bind-key "C-c" #'sb/hydra-python-indent/body python-mode-map))
+
+(declare-function smerge-keep-all "smerge-mode")
+(declare-function smerge-keep-base "smerge-mode")
+(declare-function smerge-keep-upper "smerge-mode")
+(declare-function smerge-keep-lower "smerge-mode")
+(declare-function smerge-keep-current "smerge-mode")
+(declare-function smerge-next "smerge-mode")
+(declare-function smerge-prev "smerge-mode")
+(declare-function smerge-auto-leave "smerge-mode")
 
 (pretty-hydra-define sb/smerge-hydra
   (:color pink :hint nil :post (smerge-auto-leave) :quit-key "q" :title "Merge actions")
@@ -347,8 +360,23 @@
     ("K" sp-backward-kill-sexp "Backward kill sexp")
     ("w" sp-copy-sexp "Copy sexp"))))
 
+(declare-function lsp-format-buffer "lsp-mode")
+(declare-function lsp-ui-imenu "lsp-mode")
+(declare-function lsp-execute-code-action "lsp-mode")
+(declare-function lsp-describe-session "lsp-mode")
+(declare-function lsp-workspace-restart "lsp-mode")
+(declare-function lsp-workspace-shutdown "lsp-mode")
+(declare-function lsp-find-declaration "lsp-mode")
+(declare-function lsp-ui-peek-find-definitions "lsp-mode")
+(declare-function lsp-ui-peek-find-references "lsp-mode")
+(declare-function lsp-ui-peek-find-implementation "lsp-mode")
+(declare-function lsp-find-type-definition "lsp-mode")
+(declare-function lsp-signature-help "lsp-mode")
+(declare-function lsp-describe-thing-at-point "lsp-mode")
+(declare-function lsp-rename "lsp-mode")
+
 (pretty-hydra-define sb/hydra-lsp
-  (:exit t :hint nil :quit-key "q" :title "LSP Actions")
+  (:exit t :hint nil :quit-key "q" :title "LSP Mode")
   ("Buffer"
    (("f" lsp-format-buffer "Format buffer")
     ("m" lsp-ui-imenu "Imenu")
@@ -407,6 +435,14 @@
 (declare-function straight-merge-package "straight")
 (declare-function straight-normalize-all "straight")
 (declare-function straight-normalize-package "straight")
+(declare-function straight-push-all "straight")
+(declare-function straight-push-package "straight")
+(declare-function straight-freeze-versions "straight")
+(declare-function straight-thaw-versions "straight")
+(declare-function straight-watcher-start "straight")
+(declare-function straight-watcher-quit "straight")
+(declare-function straight-get-recipe "straight")
+(declare-function straight-prune-build "straight")
 
 (pretty-hydra-define sb/hydra-straight
   (:hint nil :quit-key "q" :title "Straight actions")
@@ -455,6 +491,7 @@
 (bind-key "C-c h i" #'sb/hydra-straight/body)
 
 (use-package term-keys
+  :disabled t
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
   :hook (after-init-hook . term-keys-mode)
   :config

@@ -52,6 +52,7 @@
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package counsel-fd
+  :disabled t
   :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
@@ -79,7 +80,6 @@
 (use-package fasd
   :defines fasd-enable-initial-prompt
   :if (executable-find "fasd")
-  ;; :init (run-with-idle-timer 3 nil #'global-fasd-mode)
   :hook (after-init-hook . global-fasd-mode)
   :custom (fasd-enable-initial-prompt nil)
   :bind* ("C-c /" . fasd-find-file))
@@ -87,6 +87,7 @@
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
+  :disabled t
   :hook (after-init-hook . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)

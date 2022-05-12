@@ -45,132 +45,131 @@
     :remote? t
     :server-id 'texlab-r)))
 
-
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
 
-(eval-when-compile
-  (if (bound-and-true-p sb/disable-package.el)
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package tex
+          :straight auctex)
       (use-package tex
-        :straight auctex)
-    (use-package tex
-      :ensure auctex)))
+        :ensure auctex)))
 
-(declare-function LaTeX-math-mode "tex")
-(declare-function TeX-PDF-mode "tex")
-(declare-function TeX-source-correlate-mode "tex")
-(declare-function TeX-save-document "tex")
-(declare-function TeX-command-menu "tex")
-(declare-function TeX-revert-document-buffer "tex")
+  (declare-function LaTeX-math-mode "tex")
+  (declare-function TeX-PDF-mode "tex")
+  (declare-function TeX-source-correlate-mode "tex")
+  (declare-function TeX-save-document "tex")
+  (declare-function TeX-command-menu "tex")
+  (declare-function TeX-revert-document-buffer "tex")
 
-(unless (fboundp 'tex-site)
-  (autoload 'tex-site "tex-site.el" nil t))
-(unless (fboundp 'LaTeX-mode)
-  (autoload #'LaTeX-mode "tex" nil t))
-(unless (fboundp 'LaTeX-math-mode)
-  (autoload #'LaTeX-math-mode "tex" nil t))
-(unless (fboundp 'TeX-PDF-mode)
-  (autoload #'TeX-PDF-mode "tex" nil t))
-(unless (fboundp 'TeX-source-correlate-mode)
-  (autoload #'TeX-source-correlate-mode "tex" nil t))
-(unless (fboundp 'rainbow-delimiters-mode)
-  (autoload #'rainbow-delimiters-mode "tex" nil t))
-(unless (fboundp 'TeX-active-process)
-  (autoload #'TeX-active-process "tex" nil t))
-(unless (fboundp 'TeX-save-document)
-  (autoload #'TeX-save-document "tex" nil t))
-(unless (fboundp 'TeX-command-menu)
-  (autoload #'TeX-command-menu "tex" nil t))
-(unless (fboundp 'TeX-revert-document-buffer)
-  (autoload #'TeX-revert-document-buffer "tex" nil t))
+  (unless (fboundp 'tex-site)
+    (autoload 'tex-site "tex-site.el" nil t))
+  (unless (fboundp 'LaTeX-mode)
+    (autoload #'LaTeX-mode "tex" nil t))
+  (unless (fboundp 'LaTeX-math-mode)
+    (autoload #'LaTeX-math-mode "tex" nil t))
+  (unless (fboundp 'TeX-PDF-mode)
+    (autoload #'TeX-PDF-mode "tex" nil t))
+  (unless (fboundp 'TeX-source-correlate-mode)
+    (autoload #'TeX-source-correlate-mode "tex" nil t))
+  (unless (fboundp 'rainbow-delimiters-mode)
+    (autoload #'rainbow-delimiters-mode "tex" nil t))
+  (unless (fboundp 'TeX-active-process)
+    (autoload #'TeX-active-process "tex" nil t))
+  (unless (fboundp 'TeX-save-document)
+    (autoload #'TeX-save-document "tex" nil t))
+  (unless (fboundp 'TeX-command-menu)
+    (autoload #'TeX-command-menu "tex" nil t))
+  (unless (fboundp 'TeX-revert-document-buffer)
+    (autoload #'TeX-revert-document-buffer "tex" nil t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
+  (add-to-list 'auto-mode-alist '("\\.tex\\'" . LaTeX-mode))
 
-(dolist (hook '(LaTex-mode-hook latex-mode-hook))
-  (add-hook hook (lambda()
-                   (LaTeX-math-mode)
-                   (TeX-PDF-mode) ; Use `pdflatex'
-                   (TeX-source-correlate-mode)
-                   (turn-on-auto-fill))))
+  (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+    (add-hook hook (lambda()
+                     (LaTeX-math-mode)
+                     (TeX-PDF-mode) ; Use `pdflatex'
+                     (TeX-source-correlate-mode)
+                     (turn-on-auto-fill))))
 
-(with-eval-after-load "tex"
-  (defvar TeX-auto-save)
-  (defvar TeX-auto-untabify)
-  (defvar TeX-clean-confirm)
-  (defvar TeX-electric-sub-and-superscript)
-  (defvar TeX-parse-self)
-  (defvar TeX-quote-after-quote)
-  (defvar TeX-save-query)
-  (defvar TeX-source-correlate-method)
-  (defvar TeX-source-correlate-start-server)
-  (defvar TeX-syntactic-comment)
-  (defvar TeX-view-program-selection)
-  (defvar TeX-view-program-list)
-  (defvar LaTeX-item-indent)
-  (defvar LaTeX-syntactic-comments)
-  (defvar LaTeX-fill-break-at-separators)
-  (defvar tex-fontify-script)
-  (defvar font-latex-fontify-script)
-  (defvar font-latex-fontify-sectioning)
+  (with-eval-after-load "tex"
+    (defvar TeX-auto-save)
+    (defvar TeX-auto-untabify)
+    (defvar TeX-clean-confirm)
+    (defvar TeX-electric-sub-and-superscript)
+    (defvar TeX-parse-self)
+    (defvar TeX-quote-after-quote)
+    (defvar TeX-save-query)
+    (defvar TeX-source-correlate-method)
+    (defvar TeX-source-correlate-start-server)
+    (defvar TeX-syntactic-comment)
+    (defvar TeX-view-program-selection)
+    (defvar TeX-view-program-list)
+    (defvar LaTeX-item-indent)
+    (defvar LaTeX-syntactic-comments)
+    (defvar LaTeX-fill-break-at-separators)
+    (defvar tex-fontify-script)
+    (defvar font-latex-fontify-script)
+    (defvar font-latex-fontify-sectioning)
 
-  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
-        TeX-auto-untabify t ; Remove all tabs before saving
-        TeX-clean-confirm nil
-        ;; Automatically insert braces after typing ^ and _ in math mode
-        TeX-electric-sub-and-superscript t
-        TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
-        TeX-parse-self t ; Parse documents
-        TeX-quote-after-quote nil ; Allow original LaTeX quotes
-        TeX-save-query nil ; Save buffers automatically when compiling
-        TeX-source-correlate-method 'synctex
-        ;; Do not start the emacs server when correlating sources
-        TeX-source-correlate-start-server t
-        TeX-syntactic-comment t
-        TeX-view-program-selection '((output-pdf "PDF Tools"))
-        TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-        LaTeX-item-indent 0 ; Indent lists by two spaces
-        LaTeX-syntactic-comments t
-        LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
-        tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
-        ;; Avoid superscripts and subscripts from being displayed in a different font size
-        font-latex-fontify-script nil
-        ;; Avoid emphasizing section headers
-        font-latex-fontify-sectioning 1.0)
+    (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+          TeX-auto-untabify t ; Remove all tabs before saving
+          TeX-clean-confirm nil
+          ;; Automatically insert braces after typing ^ and _ in math mode
+          TeX-electric-sub-and-superscript t
+          TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
+          TeX-parse-self t ; Parse documents
+          TeX-quote-after-quote nil ; Allow original LaTeX quotes
+          TeX-save-query nil ; Save buffers automatically when compiling
+          TeX-source-correlate-method 'synctex
+          ;; Do not start the emacs server when correlating sources
+          TeX-source-correlate-start-server t
+          TeX-syntactic-comment t
+          TeX-view-program-selection '((output-pdf "PDF Tools"))
+          TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+          LaTeX-item-indent 0 ; Indent lists by two spaces
+          LaTeX-syntactic-comments t
+          LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
+          tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
+          ;; Avoid superscripts and subscripts from being displayed in a different font size
+          font-latex-fontify-script nil
+          ;; Avoid emphasizing section headers
+          font-latex-fontify-sectioning 1.0)
 
-  (setq-default TeX-master nil) ; Query for master file
+    (setq-default TeX-master nil) ; Query for master file
 
-  ;; Revert PDF buffer after TeX compilation has finished
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+    ;; Revert PDF buffer after TeX compilation has finished
+    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
-  ;; Enable rainbow mode after applying styles to the buffer
-  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode))
+    ;; Enable rainbow mode after applying styles to the buffer
+    (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)))
 
-(add-hook 'bibtex-mode-hook #'lsp-deferred)
-(add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
+(progn
+  (add-hook 'bibtex-mode-hook #'lsp-deferred)
+  (add-hook 'bibtex-mode-hook #'turn-on-auto-revert-mode)
 
-(with-eval-after-load "bibtex"
-  (defvar bibtex-align-at-equal-sign)
-  (defvar bibtex-maintain-sorted-entries)
+  (with-eval-after-load "bibtex"
+    (defvar bibtex-align-at-equal-sign)
+    (defvar bibtex-maintain-sorted-entries)
 
-  (setq bibtex-align-at-equal-sign t
-        bibtex-maintain-sorted-entries t))
+    (setq bibtex-align-at-equal-sign t
+          bibtex-maintain-sorted-entries t)))
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
+  :defines (ivy-bibtex-default-action
+            bibtex-completion-cite-default-as-initial-input
+            bibtex-completion-cite-prompt-for-optional-arguments
+            bibtex-completion-display-formats)
   :bind ("C-c x b" . ivy-bibtex)
-  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation))
-
-(with-eval-after-load "ivy-bibtex"
-  (defvar ivy-bibtex-default-action)
+  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+  :config
   (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
   (require 'bibtex-completion)
-
-  (defvar bibtex-completion-cite-default-as-initial-input)
-  (defvar bibtex-completion-cite-prompt-for-optional-arguments)
-  (defvar bibtex-completion-display-formats)
 
   (setq bibtex-completion-cite-default-as-initial-input t
         bibtex-completion-cite-prompt-for-optional-arguments nil
@@ -180,137 +179,138 @@
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 
-(declare-function reftex-reference "reftex")
-(declare-function reftex-label "reftex")
-(declare-function reftex-get-bibfile-list "reftex")
-(declare-function reftex-default-bibliography "reftex")
-(declare-function bibtex-parse-keys "reftex")
-(declare-function bib-apropos "reftex")
-(declare-function bib-make-bibliography "reftex")
-(declare-function bib-display "reftex")
-(declare-function bib-etags "reftex")
-(declare-function bib-find "reftex")
-(declare-function bib-find-next "reftex")
-(declare-function bib-highlight-mouse "reftex")
+(progn
+  (declare-function reftex-reference "reftex")
+  (declare-function reftex-label "reftex")
+  (declare-function reftex-get-bibfile-list "reftex")
+  (declare-function reftex-default-bibliography "reftex")
+  (declare-function bibtex-parse-keys "reftex")
+  (declare-function bib-apropos "reftex")
+  (declare-function bib-make-bibliography "reftex")
+  (declare-function bib-display "reftex")
+  (declare-function bib-etags "reftex")
+  (declare-function bib-find "reftex")
+  (declare-function bib-find-next "reftex")
+  (declare-function bib-highlight-mouse "reftex")
 
-(unless (fboundp 'reftex-mode)
-  (autoload #'reftex-mode "reftex" nil t))
-(unless (fboundp 'reftex-citation)
-  (autoload #'reftex-citation "reftex" nil t))
-(unless (fboundp 'reftex-reference)
-  (autoload #'reftex-reference "reftex" nil t))
-(unless (fboundp 'reftex-label)
-  (autoload #'reftex-label "reftex" nil t))
-(unless (fboundp 'reftex-get-bibfile-list)
-  (autoload #'reftex-get-bibfile-list "reftex" nil t))
-(unless (fboundp 'bibtex-parse-keys)
-  (autoload #'bibtex-parse-keys "reftex" nil t))
-(unless (fboundp 'reftex-default-bibliography)
-  (autoload #'reftex-default-bibliography "reftex" nil t))
+  (unless (fboundp 'reftex-mode)
+    (autoload #'reftex-mode "reftex" nil t))
+  (unless (fboundp 'reftex-citation)
+    (autoload #'reftex-citation "reftex" nil t))
+  (unless (fboundp 'reftex-reference)
+    (autoload #'reftex-reference "reftex" nil t))
+  (unless (fboundp 'reftex-label)
+    (autoload #'reftex-label "reftex" nil t))
+  (unless (fboundp 'reftex-get-bibfile-list)
+    (autoload #'reftex-get-bibfile-list "reftex" nil t))
+  (unless (fboundp 'bibtex-parse-keys)
+    (autoload #'bibtex-parse-keys "reftex" nil t))
+  (unless (fboundp 'reftex-default-bibliography)
+    (autoload #'reftex-default-bibliography "reftex" nil t))
 
-(add-hook 'LaTeX-mode-hook #'reftex-mode)
-(add-hook 'latex-mode-hook #'reftex-mode)
+  (add-hook 'LaTeX-mode-hook #'reftex-mode)
+  (add-hook 'latex-mode-hook #'reftex-mode)
 
-;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
-(eval-and-compile
-  (defun sb/get-bibtex-keys (file)
-    (with-current-buffer
-        (find-file-noselect file)
-      (mapcar 'car
-              (bibtex-parse-keys))))
+  ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+  (eval-and-compile
+    (defun sb/get-bibtex-keys (file)
+      (with-current-buffer
+          (find-file-noselect file)
+        (mapcar 'car
+                (bibtex-parse-keys))))
 
-  (defun sb/reftex-add-all-bibitems-from-bibtex nil
-    (interactive)
-    (mapc 'LaTeX-add-bibitems
-          (apply 'append
-                 (mapcar 'sb/get-bibtex-keys
-                         (reftex-get-bibfile-list)))))
-
-  (defun sb/find-bibliography-file nil
-    "Try to find a bibliography file using RefTeX.
-Returns a string with text properties (as expected by
-read-file-name) or empty string if no file can be found"
-    (interactive)
-    (let
-        ((bibfile-list nil))
-      (condition-case nil
-          (setq bibfile-list
-                (reftex-get-bibfile-list))
-        (error
-         (ignore-errors
-           (setq bibfile-list
-                 (reftex-default-bibliography)))))
-      (if bibfile-list
-          (car bibfile-list)
-        "")))
-
-  (defun sb/reftex-try-add-all-bibitems-from-bibtex nil
-    "Try to find a bibliography file using RefTex and parse the bib keys.
-Ignore if no file is found."
-    (interactive)
-    (let
-        ((bibfile-list nil))
-      (condition-case nil
-          (setq bibfile-list
-                (reftex-get-bibfile-list))
-        (error
-         (ignore-errors
-           (setq bibfile-list
-                 (reftex-default-bibliography)))))
+    (defun sb/reftex-add-all-bibitems-from-bibtex nil
+      (interactive)
       (mapc 'LaTeX-add-bibitems
             (apply 'append
-                   (mapcar 'sb/get-bibtex-keys bibfile-list))))))
+                   (mapcar 'sb/get-bibtex-keys
+                           (reftex-get-bibfile-list)))))
 
-(dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-  (add-hook hook #'reftex-mode))
+    (defun sb/find-bibliography-file nil
+      "Try to find a bibliography file using RefTeX.
+Returns a string with text properties (as expected by
+read-file-name) or empty string if no file can be found"
+      (interactive)
+      (let
+          ((bibfile-list nil))
+        (condition-case nil
+            (setq bibfile-list
+                  (reftex-get-bibfile-list))
+          (error
+           (ignore-errors
+             (setq bibfile-list
+                   (reftex-default-bibliography)))))
+        (if bibfile-list
+            (car bibfile-list)
+          "")))
 
-(with-eval-after-load "reftex"
-  (defvar reftex-enable-partial-scans)
-  (defvar reftex-highlight-selection)
-  (defvar reftex-plug-into-AUCTeX)
-  (defvar reftex-save-parse-info)
-  (defvar reftex-toc-follow-mode)
-  (defvar reftex-use-multiple-selection-buffers)
-  (defvar reftex-toc-split-windows-horizontally)
-  (defvar reftex-toc-split-windows-fraction)
-  (defvar reftex-guess-label-type)
-  (defvar reftex-use-fonts)
-  (defvar reftex-auto-recenter-toc)
-  (defvar reftex-revisit-to-follow)
+    (defun sb/reftex-try-add-all-bibitems-from-bibtex nil
+      "Try to find a bibliography file using RefTex and parse the bib keys.
+Ignore if no file is found."
+      (interactive)
+      (let
+          ((bibfile-list nil))
+        (condition-case nil
+            (setq bibfile-list
+                  (reftex-get-bibfile-list))
+          (error
+           (ignore-errors
+             (setq bibfile-list
+                   (reftex-default-bibliography)))))
+        (mapc 'LaTeX-add-bibitems
+              (apply 'append
+                     (mapcar 'sb/get-bibtex-keys bibfile-list))))))
 
-  (setq reftex-enable-partial-scans t
-        reftex-highlight-selection 'both
-        reftex-plug-into-AUCTeX t
-        ;; Save parse info to avoid reparsing every time a file is visited
-        reftex-save-parse-info t
-        reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
-        reftex-use-multiple-selection-buffers t
-        ;; Make the toc display with a vertical split, since it is easy to read long lines
-        reftex-toc-split-windows-horizontally nil
-        ;; Adjust the fraction
-        reftex-toc-split-windows-fraction 0.3
-        reftex-guess-label-type t ; Try to guess the label type before prompting
-        reftex-use-fonts t ; Use nice fonts for toc
-        reftex-revisit-to-follow t ; Revisit files if necessary when browsing toc
-        reftex-auto-recenter-toc t ; Center on the section currently being edited
-        ;; Cache selection buffers for faster access
-        reftex-use-multiple-selection-buffers t)
+  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+    (add-hook hook #'reftex-mode))
 
-  (sb/reftex-try-add-all-bibitems-from-bibtex)
+  (with-eval-after-load "reftex"
+    (defvar reftex-enable-partial-scans)
+    (defvar reftex-highlight-selection)
+    (defvar reftex-plug-into-AUCTeX)
+    (defvar reftex-save-parse-info)
+    (defvar reftex-toc-follow-mode)
+    (defvar reftex-use-multiple-selection-buffers)
+    (defvar reftex-toc-split-windows-horizontally)
+    (defvar reftex-toc-split-windows-fraction)
+    (defvar reftex-guess-label-type)
+    (defvar reftex-use-fonts)
+    (defvar reftex-auto-recenter-toc)
+    (defvar reftex-revisit-to-follow)
 
-  ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-  ;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
-  ;; consistent but this is expensive. We can use an idle timer.
-  ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
-  (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)
+    (setq reftex-enable-partial-scans t
+          reftex-highlight-selection 'both
+          reftex-plug-into-AUCTeX t
+          ;; Save parse info to avoid reparsing every time a file is visited
+          reftex-save-parse-info t
+          reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
+          reftex-use-multiple-selection-buffers t
+          ;; Make the toc display with a vertical split, since it is easy to read long lines
+          reftex-toc-split-windows-horizontally nil
+          ;; Adjust the fraction
+          reftex-toc-split-windows-fraction 0.3
+          reftex-guess-label-type t ; Try to guess the label type before prompting
+          reftex-use-fonts t ; Use nice fonts for toc
+          reftex-revisit-to-follow t ; Revisit files if necessary when browsing toc
+          reftex-auto-recenter-toc t ; Center on the section currently being edited
+          ;; Cache selection buffers for faster access
+          reftex-use-multiple-selection-buffers t)
 
-  (diminish 'reftex-mode))
+    (sb/reftex-try-add-all-bibitems-from-bibtex)
 
-(bind-keys :package reftex
-           ("C-c [" . reftex-citation)
-           ("C-c )" . reftex-reference)
-           ("C-c (" . reftex-label)
-           ("C-c =" . reftex-toc))
+    ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+    ;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
+    ;; consistent but this is expensive. We can use an idle timer.
+    ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
+    (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)
+
+    (diminish 'reftex-mode))
+
+  (bind-keys :package reftex
+             ("C-c [" . reftex-citation)
+             ("C-c )" . reftex-reference)
+             ("C-c (" . reftex-label)
+             ("C-c =" . reftex-toc)))
 
 (progn
   (unless (fboundp 'bib-apropos)

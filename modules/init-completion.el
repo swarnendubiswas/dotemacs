@@ -554,6 +554,9 @@
   (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
   (corfu-preselect-first t)
+  :config
+  (unless (featurep 'corfu-doc)
+    (setq corfu-echo-documentation t))
   :bind
   (:map corfu-map
         ("[tab]" . corfu-next)
@@ -616,6 +619,7 @@
 
 (use-package corfu-doc
   :if (eq sb/capf 'corfu)
+  :disabled t
   :hook (corfu-mode-hook . corfu-doc-mode)
   :custom
   ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
@@ -664,7 +668,8 @@
              ;; Complete with Dabbrev at point
              cape-dabbrev)
   :init
-  (dolist (backends '(cape-symbol cape-keyword cape-file cape-dabbrev cape-history))
+  (dolist (backends '(cape-symbol cape-keyword cape-file
+                                  cape-dabbrev cape-ispell cape-dict cape-history))
     (add-to-list 'completion-at-point-functions backends))
   :custom
   (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
@@ -1138,7 +1143,8 @@
   :defines orderless-component-separator
   :config
   (with-eval-after-load "ivy"
-    ;; (defvar ivy-re-builders-alist)
+    (defvar ivy-re-builders-alist)
+
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
   (setq completion-styles '(orderless partial-completion basic) ; initials, emacs22
@@ -1148,7 +1154,7 @@
                                         ;; (minibuffer (initials))))
                                         )))
 
-;; To use YASnippet as a non-global minor mode, don't call `yas-global-mode'; instead call
+;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
 ;; major-modes where you want YASnippet enabled.
 ;; https://github.com/joaotavora/yasnippet/blob/master/README.mdown
@@ -1184,12 +1190,14 @@
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
+  :disabled t
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t))
 
 ;; We are using `company-fuzzy' for sorting completion candidates
 (use-package company-prescient
+  :disabled t
   :after company
   :demand t
   :commands company-prescient-mode

@@ -45,6 +45,7 @@
 
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
+  :bind-keymap ("C-c o" . org-mode-map)
   :bind
   (:map org-mode-map
         ("M-<left>"  . nil)
@@ -56,7 +57,7 @@
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)))
 
-;; Disabled the package to get consistent styles across themes.
+;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
   :commands org-bullets-mode
   :hook (org-mode-hook . org-bullets-mode))
@@ -84,8 +85,6 @@
   :after org
   :demand t
   :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
-
-;; TODO: Use "C-c o" as the binding for `org-mode-map'
 
 (provide 'init-org)
 

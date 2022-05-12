@@ -14,6 +14,7 @@
 
 (declare-function lsp-register-client "lsp-mode")
 (declare-function make-lsp-client "lsp-mode")
+(declare-function f-dirname "f")
 
 ;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
 ;; also get run for all modes derived from a basic mode such as `text-mode'.
@@ -138,8 +139,6 @@
   ;; Exclude directories and files from being checked
   ;; https://github.com/flycheck/flycheck/issues/1745
 
-  (declare-function sb/flycheck-may-check-automatically "init-checkers.el")
-
   (defvar sb/excluded-directory-regexps
     '(".git/" "elpa/" ".cache" ".clangd"))
 
@@ -187,6 +186,7 @@
 
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 (use-package flycheck-posframe
+  :disabled t
   :if (display-graphic-p)
   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
   :hook (flycheck-mode-hook . flycheck-posframe-mode)
@@ -287,12 +287,14 @@
 ;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
 (add-hook 'text-mode-hook
           (lambda ()
-            (when (and (featurep 'flycheck-grammarly) (string= (buffer-name) "*scratch*"))
-              (flycheck-select-checker 'grammarly))
-            (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-              (flycheck-add-next-checker 'grammarly 'languagetool))
-            (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-              (flycheck-select-checker 'languagetool))))
+            (when (string= (buffer-name) "*scratch*")
+              (if (featurep 'flycheck-grammarly)
+                  (progn
+                    (flycheck-select-checker 'grammarly)
+                    (when (featurep 'flycheck-languagetool)
+                      (flycheck-add-next-checker 'grammarly 'languagetool))))
+              (when (featurep 'flycheck-languagetool)
+                (flycheck-select-checker 'languagetool)))))
 
 ;; `markdown-mode' is derived from `text-mode'
 ;; markdown-markdownlint-cli -> grammarly -> languagetool
@@ -326,7 +328,6 @@
 ;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
 ;; keytar-install".
 (use-package lsp-grammarly
-  :disabled t
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands (lsp-grammarly--server-command lsp-grammarly--init
                                            lsp-grammarly--get-credentials lsp-grammarly--get-token
