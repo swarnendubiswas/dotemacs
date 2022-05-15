@@ -52,7 +52,6 @@
   :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package counsel-fd
-  :disabled t
   :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory

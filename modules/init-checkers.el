@@ -187,7 +187,6 @@
 
 ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 (use-package flycheck-posframe
-  :disabled t
   :if (display-graphic-p)
   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
   :hook (flycheck-mode-hook . flycheck-posframe-mode)

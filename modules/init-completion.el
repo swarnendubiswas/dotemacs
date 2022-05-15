@@ -617,7 +617,6 @@
 
 (use-package corfu-doc
   :if (eq sb/capf 'corfu)
-  :disabled t
   :hook (corfu-mode-hook . corfu-doc-mode)
   :custom
   ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup

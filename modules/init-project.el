@@ -168,6 +168,7 @@
 
 ;; `counsel-projectile' has poor performance with large projects, unlike `projectile'. Furthermore,
 ;; I am unsure how does this package advances `projectile' in terms of usability.
+;; https://github.com/ericdanan/counsel-projectile/issues/179
 (use-package counsel-projectile
   :disabled t
   :if (eq sb/minibuffer-completion 'ivy)

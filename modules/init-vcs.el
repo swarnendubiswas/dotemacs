@@ -88,14 +88,14 @@
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
+  (diff-hl-flydiff-mode 1)
   ;; Display margin since the fringe is unavailable in TTY
   (unless (display-graphic-p)
     (diff-hl-margin-mode 1))
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
   :hook
   ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
    (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
-   (dired-mode-hook         . diff-hl-dired-mode-unless-remote)
-   (diff-hl-mode-hook       . diff-hl-flydiff-mode)
    (after-init-hook         . global-diff-hl-mode)))
 
 (use-package git-commit

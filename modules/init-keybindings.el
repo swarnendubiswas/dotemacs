@@ -73,11 +73,9 @@
    ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
-  :disabled t
   :commands free-keys)
 
 (use-package keyfreq
-  :disabled t
   :hook
   (after-init-hook . (lambda ()
                        (keyfreq-mode 1)
