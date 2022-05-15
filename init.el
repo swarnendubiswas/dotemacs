@@ -26,6 +26,7 @@
 (require 'init-spell)
 (require 'init-search)
 (require 'init-parens)
+(require 'init-whitespace)
 (require 'init-tramp)
 (require 'init-misc)
 (require 'init-checkers)

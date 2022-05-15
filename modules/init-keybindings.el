@@ -113,6 +113,7 @@
 ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
 ;; blue" means exit.
 
+(defvar lv-use-separator)
 (setq lv-use-separator t)
 
 (use-package hydra
@@ -395,6 +396,15 @@
     ("o" lsp-describe-thing-at-point "Describe thing at point")
     ("r" lsp-rename "Rename"))))
 
+(declare-function markdown-insert-bold "markdown-mode")
+(declare-function markdown-insert-italic "markdown-mode")
+(declare-function markdown-insert-blockquote "markdown-mode")
+(declare-function markdown-insert-pre "markdown-mode")
+(declare-function markdown-insert-code "markdown-mode")
+(declare-function markdown-insert-header-dwim "markdown-mode")
+(declare-function markdown-insert-header-atx-1 "markdown-mode")
+(declare-function markdown-insert-header-atx-2 "markdown-mode")
+
 (pretty-hydra-define sb/hydra-markdown-mode
   (:hint nil :title "Markdown mode" :quit-key "q")
   ("Formatting"
@@ -491,14 +501,14 @@
 (bind-key "C-c h i" #'sb/hydra-straight/body)
 
 (use-package term-keys
-  :disabled t
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
   :hook (after-init-hook . term-keys-mode)
   :config
   (require 'term-keys-alacritty)
-  (with-temp-buffer
-    (insert (term-keys/alacritty-config))
-    (write-region (point-min) (point-max) "~/alacritty-for-term-keys.yml")))
+  ;; (with-temp-buffer
+  ;;   (insert (term-keys/alacritty-config))
+  ;;   (write-region (point-min) (point-max) "~/alacritty-for-term-keys.yml"))
+  )
 
 (provide 'init-keybindings)
 

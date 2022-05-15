@@ -54,7 +54,7 @@
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
       echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
-      enable-recursive-minibuffers t ; Keeping track of the minibuffer nesting is difficult
+      enable-recursive-minibuffers nil ; Keeping track of the minibuffer nesting is difficult
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
       ;; variables, but I edit files over Tramp a lot.
       enable-remote-dir-locals t
@@ -379,45 +379,6 @@
     ;; idle timers.
     (run-with-idle-timer 60 t #'recentf-cleanup)))
 
-(when nil
-  (progn
-    (declare-function whitespace-buffer "whitespace")
-    (declare-function whitespace-turn-off "whitespace")
-
-    (unless (fboundp 'whitespace-mode)
-      (autoload #'whitespace-mode "whitespace" nil t))
-    (unless (fboundp 'global-whitespace-mode)
-      (autoload #'global-whitespace-mode "whitespace" nil t))
-    (unless (fboundp 'whitespace-buffer)
-      (autoload #'whitespace-buffer "whitespace" nil t))
-    (unless (fboundp 'whitespace-cleanup)
-      (autoload #'whitespace-cleanup "whitespace" nil t))
-    (unless (fboundp 'whitespace-turn-off)
-      (autoload #'whitespace-turn-off "whitespace" nil t))
-
-    (add-hook 'markdown-mode-hook #'whitespace-mode)
-
-    (with-eval-after-load "whitespace"
-      (defvar whitespace-line-column)
-      (defvar whitespace-style)
-
-      (setq show-trailing-whitespace t
-            whitespace-line-column sb/fill-column
-            whitespace-style '(face ; Visualize using faces
-                               lines-tail
-                               trailing ; Trailing whitespace
-                               ;; tab-mark ; Mark any tabs
-                               ;; empty ; Empty lines at beginning or end of buffer
-                               ;; lines ; Lines that extend beyond `whitespace-line-column'
-                               ;; indentation ; Wrong indentation (tab when spaces and vice versa)
-                               ;; space-before-tab ; Mixture of space and tab on the same line
-                               ;; space-after-tab ; Mixture of space and tab on the same line
-                               ))
-
-      (diminish 'global-whitespace-mode)
-      (diminish 'whitespace-mode)
-      (diminish 'whitespace-newline-mode))))
-
 (progn
   (declare-function image-get-display-property "image-mode")
 
@@ -492,6 +453,9 @@
 
     ;; Wrap around at edges
     (setq windmove-wrap-around t)))
+
+(when (fboundp 'pixel-scroll-precision-mode)
+  (pixel-scroll-mode 1))
 
 (provide 'init-core)
 

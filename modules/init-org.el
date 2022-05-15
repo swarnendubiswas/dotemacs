@@ -86,6 +86,10 @@
   :demand t
   :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
+(use-package ox-pandoc
+  :after org
+  :demand t)
+
 (provide 'init-org)
 
 ;;; init-org.el ends here

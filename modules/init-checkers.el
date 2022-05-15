@@ -52,14 +52,15 @@
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
         flycheck-checker-error-threshold 1500
-        flycheck-idle-buffer-switch-delay 5 ; Increase the time (s) to allow for quick transitions
-        flycheck-idle-change-delay 5 ; Increase the time (s) to allow for edits
+        flycheck-idle-buffer-switch-delay 2 ; Increase the time (s) to allow for quick transitions
+        flycheck-idle-change-delay 2 ; Increase the time (s) to allow for edits
         flycheck-emacs-lisp-load-path 'inherit
         ;; Show error messages only if the error list is not already visible
         ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
         ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
         ;; derived from `text-mode'.
-        flycheck-global-modes '(not csv-mode))
+        flycheck-global-modes '(not csv-mode)
+        flycheck-indication-mode 'right-fringe)
 
   ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
@@ -231,6 +232,7 @@
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
+  :disabled t
   :config
   (setq flycheck-grammarly-check-time 3
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
@@ -338,6 +340,9 @@
    (lambda ()
      (require 'lsp-grammarly)
      (lsp-deferred)))
+  :custom
+  (lsp-grammarly-suggestions-oxford-comma t)
+  (lsp-grammarly-suggestions-passive-voice t)
   :config
   ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
   ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
@@ -413,6 +418,11 @@
   :bind
   (:map flycheck-command-map
         ("!" . consult-flycheck)))
+
+(when (eq sb/minibuffer-completion 'ivy)
+  (with-eval-after-load "counsel"
+    (with-eval-after-load "flycheck"
+      (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map))))
 
 (provide 'init-checkers)
 

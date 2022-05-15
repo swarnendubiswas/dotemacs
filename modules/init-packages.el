@@ -10,6 +10,8 @@
 ;; Bootstrap `straight.el'
 
 (defvar sb/EMACS27+)
+(defvar use-package-enable-imenu-support)
+(defvar use-package-hook-name-suffix)
 
 (when (bound-and-true-p sb/disable-package.el)
   (defvar bootstrap-version)
@@ -43,13 +45,17 @@
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
+  ;; These variables need to best before loading `use-package'.
+  (setq use-package-enable-imenu-support t
+        use-package-hook-name-suffix     nil)
+
   (straight-use-package 'use-package)
 
   (setq straight-use-package-by-default t
         straight-disable-native-compile nil
         ;; There is no need to download the whole Git history, and a single branch often suffices.
         ;; However, that seems to lead to "git revision parsing" errors while using
-        ;; `straight-pull-all' and `straight-freeze-versions'.
+        ;; `straight-pull-all' and `straight-freeze-versions', which is irritating.
         ;; straight-vc-git-default-clone-depth '(1 single-branch)
         )
 
@@ -57,16 +63,6 @@
   ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions'
   ;; to persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
   ;; packages to their locked versions, making the config totally reproducible across environments.
-
-  ;; Freeze package versions with `straight-freeze-versions' which will write the versions in a
-  ;; lockfile. All package versions can be restored to the versions specified in the lockfile with
-  ;; `straight-thaw-versions'.
-
-  ;; Create a version file if it does not yet exist
-
-  ;; (when (not (file-exists-p (expand-file-name "straight/versions/straight.lockfile.el"
-  ;;                                             straight-base-dir)))
-  ;;   (straight-freeze-versions))
   )
 
 (unless (bound-and-true-p sb/disable-package.el)
@@ -86,7 +82,10 @@
   (defvar use-package-always-ensure)
 
   ;; Avoid manual installations whenever I modify package installations
-  (setq use-package-always-ensure t)
+  (setq use-package-always-ensure t
+        ;; These variables need to best before loading `use-package'
+        use-package-enable-imenu-support t
+        use-package-hook-name-suffix     nil)
 
   (eval-when-compile
     (require 'use-package)))
@@ -106,32 +105,25 @@
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
 
-(defvar use-package-enable-imenu-support)
-(defvar use-package-hook-name-suffix)
 (defvar use-package-compute-statistics)
 (defvar use-package-verbose)
 (defvar use-package-expand-minimally)
 (defvar use-package-always-defer)
 
-;; These variables are set even with `straight.el'.
-(setq use-package-enable-imenu-support t
-      use-package-hook-name-suffix     nil)
-
-(when (bound-and-true-p sb/debug-init-file)
-  (setq debug-on-error                 t
-        debug-on-event                 'sigusr2
-        garbage-collection-messages    t
-        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-        use-package-verbose            t
-        use-package-expand-minimally   nil)
-  (debug-on-entry 'projectile-remove-known-project))
-
-(unless (bound-and-true-p sb/debug-init-file)
-  (setq use-package-always-defer       t
-        ;; Avoid printing errors and warnings since the configuration is known to work
-        use-package-expand-minimally   t
-        use-package-compute-statistics nil
-        use-package-verbose            nil))
+(if (bound-and-true-p sb/debug-init-file)
+    (progn
+      (setq debug-on-error                 t
+            debug-on-event                 'sigusr2
+            garbage-collection-messages    t
+            use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+            use-package-verbose            t
+            use-package-expand-minimally   nil))
+  (progn
+    (setq use-package-always-defer       t
+          ;; Avoid printing errors and warnings since the configuration just works
+          use-package-expand-minimally   t
+          use-package-compute-statistics nil
+          use-package-verbose            nil)))
 
 (use-package diminish
   :demand t)
@@ -151,19 +143,10 @@
   :functions bind-key--remove
   :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package f
-  :commands (f-exists? f-join f-dirname))
-
-(use-package s
-  :commands s-starts-with? s-ends-with?)
-
-(use-package dash
-  :commands (-contains? -tree-map))
-
 (use-package no-littering
   :demand t)
 
-;; We can do `package-list-packages', then press `U' and `x'. The only thing missing from "paradox"
+;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command.
 (when (and sb/EMACS27+ (not (bound-and-true-p sb/disable-package.el)))
   (when (boundp 'package-quickstart)
@@ -210,11 +193,11 @@
   :commands exec-path-from-shell-initialize
   :if (or (daemonp) (memq window-system '(x ns)))
   :init
-  ;; "-i" is expensive but Tramp may be unable to find executables without the option. Furthermore,
-  ;; other executables from $PATH are also not found.
+  ;; "-i" is expensive but Tramp is unable to find executables without the option. Furthermore,
+  ;; other executables like "prettier" from $PATH are also not found.
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "MANPATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
+        exec-path-from-shell-variables '("PATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
                                          "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
   (exec-path-from-shell-initialize))
 

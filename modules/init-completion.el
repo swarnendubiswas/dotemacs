@@ -30,18 +30,19 @@
   (bind-key "C-M-/" #'dabbrev-completion))
 
 ;; Replace `dabbrev-exp' with `hippie-expand'.
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-all-abbrevs
-                                         try-expand-list
-                                         try-expand-line
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol)
-      hippie-expand-verbose nil)
-(bind-key "M-/" #'hippie-expand)
+(progn
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                           try-expand-dabbrev-all-buffers
+                                           try-expand-dabbrev-from-kill
+                                           try-complete-file-name-partially
+                                           try-complete-file-name
+                                           try-expand-all-abbrevs
+                                           try-expand-list
+                                           try-expand-line
+                                           try-complete-lisp-symbol-partially
+                                           try-complete-lisp-symbol)
+        hippie-expand-verbose nil)
+  (bind-key "M-/" #'hippie-expand))
 
 (use-package ivy
   :functions ivy-format-function-line
@@ -116,8 +117,6 @@
    ([remap completion-at-point]      . counsel-company)
    ("C-M-i"                          . counsel-company)
    ([remap find-file]                . counsel-find-file)
-   ;; `counsel-flycheck' shows less information than `flycheck-list-errors'
-   ;; ([remap flycheck-list-errors]  . counsel-flycheck)
    ("<f1>"                           . counsel-M-x)
    ("<f2>"                           . counsel-find-file)
    ("C-c s g"                        . counsel-git-grep)
@@ -322,118 +321,119 @@
   (vertico-cycle t)
   (vertico-resize nil)
   (vertico-count 12)
-  (vertico-scroll-margin 4)
+  (vertico-scroll-margin 2)
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
-  ;; (when sb/EMACS28+
-  ;;   (setq read-extended-command-predicate #'command-completion-default-include-p))
+  (when sb/EMACS28+
+    (setq read-extended-command-predicate #'command-completion-default-include-p))
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
    ("<escape>" . minibuffer-keyboard-quit)
-   ("?" . minibuffer-completion-help)
-   ("M-RET" . minibuffer-force-complete-and-exit)
-   ("M-TAB" . minibuffer-complete)
+   ;; ("?" . minibuffer-completion-help)
+   ;; ("M-RET" . minibuffer-force-complete-and-exit)
+   ;; ("M-TAB" . minibuffer-complete)
    ("C-M-j" . vertico-exit-input)
    ("<tab>" . vertico-insert)))
 
 ;; More convenient directory navigation commands
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-directory
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-directory)))
-      (use-package vertico-directory
-        :ensure nil
-        :load-path "extras")))
 
-  (declare-function vertico-directory-tidy "vertico-directory")
-  (declare-function vertico-directory-enter "vertico-directory")
-  (declare-function vertico-directory-delete-char "vertico-directory")
-  (declare-function vertico-directory-delete-word "vertico-directory")
+;; (when (eq sb/minibuffer-completion 'vertico)
+;;   (eval-when-compile
+;;     (if (bound-and-true-p sb/disable-package.el)
+;;         (use-package vertico-directory
+;;           :straight (vertico :files (:defaults "extensions/*")
+;;                              :includes (vertico-directory)))
+;;       (use-package vertico-directory
+;;         :ensure nil
+;;         :load-path "extras")))
 
-  (unless (fboundp 'vertico-directory-tidy)
-    (autoload #'vertico-directory-tidy "vertico-directory" nil t))
-  (unless (fboundp 'vertico-directory-enter)
-    (autoload #'vertico-directory-enter "vertico-directory" nil t))
-  (unless (fboundp 'vertico-directory-delete-char)
-    (autoload #'vertico-directory-delete-char "vertico-directory" nil t))
-  (unless (fboundp 'vertico-directory-delete-word)
-    (autoload #'vertico-directory-delete-word "vertico-directory" nil t))
+;;   (declare-function vertico-directory-tidy "vertico-directory")
+;;   (declare-function vertico-directory-enter "vertico-directory")
+;;   (declare-function vertico-directory-delete-char "vertico-directory")
+;;   (declare-function vertico-directory-delete-word "vertico-directory")
 
-  ;; Tidy shadowed file names
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+;;   (unless (fboundp 'vertico-directory-tidy)
+;;     (autoload #'vertico-directory-tidy "vertico-directory" nil t))
+;;   (unless (fboundp 'vertico-directory-enter)
+;;     (autoload #'vertico-directory-enter "vertico-directory" nil t))
+;;   (unless (fboundp 'vertico-directory-delete-char)
+;;     (autoload #'vertico-directory-delete-char "vertico-directory" nil t))
+;;   (unless (fboundp 'vertico-directory-delete-word)
+;;     (autoload #'vertico-directory-delete-word "vertico-directory" nil t))
 
-  (bind-keys :package vertico
-             :map vertico-map
-             ("RET" . vertico-directory-enter)
-             ("DEL" . vertico-directory-delete-char)
-             ("M-DEL" . vertico-directory-delete-word)))
+;;   ;; Tidy shadowed file names
+;;   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-repeat
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-repeat)))
-      (use-package vertico-repeat
-        :ensure nil
-        :load-path "extras")))
+;;   (bind-keys :package vertico
+;;              :map vertico-map
+;;              ("RET" . vertico-directory-enter)
+;;              ("DEL" . vertico-directory-delete-char)
+;;              ("M-DEL" . vertico-directory-delete-word)))
 
-  (declare-function vertico-repeat-save "vertico-repeat")
-  (declare-function vertico-repeat-last "vertico-repeat")
-  (declare-function vertico-repeat-select "vertico-repeat")
+;; (when (eq sb/minibuffer-completion 'vertico)
+;;   (eval-when-compile
+;;     (if (bound-and-true-p sb/disable-package.el)
+;;         (use-package vertico-repeat
+;;           :straight (vertico :files (:defaults "extensions/*")
+;;                              :includes (vertico-repeat)))
+;;       (use-package vertico-repeat
+;;         :ensure nil
+;;         :load-path "extras")))
 
-  (unless (fboundp 'vertico-repeat-save)
-    (autoload #'vertico-repeat-save "vertico-repeat" nil t))
+;;   (declare-function vertico-repeat-save "vertico-repeat")
+;;   (declare-function vertico-repeat-last "vertico-repeat")
+;;   (declare-function vertico-repeat-select "vertico-repeat")
 
-  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+;;   (unless (fboundp 'vertico-repeat-save)
+;;     (autoload #'vertico-repeat-save "vertico-repeat" nil t))
 
-  (bind-keys :package vertico
-             ("C-c r" . vertico-repeat-last)
-             ("M-r" . vertico-repeat-select)))
+;;   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-indexed
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-indexed)))
-      (use-package vertico-indexed
-        :ensure nil
-        :load-path "extras")))
+;;   (bind-keys :package vertico
+;;              ("C-c r" . vertico-repeat-last)
+;;              ("M-r" . vertico-repeat-select)))
 
-  (declare-function vertico-indexed-mode "vertico-indexed")
+;; (when (eq sb/minibuffer-completion 'vertico)
+;;   (eval-when-compile
+;;     (if (bound-and-true-p sb/disable-package.el)
+;;         (use-package vertico-indexed
+;;           :straight (vertico :files (:defaults "extensions/*")
+;;                              :includes (vertico-indexed)))
+;;       (use-package vertico-indexed
+;;         :ensure nil
+;;         :load-path "extras")))
 
-  (unless (fboundp 'vertico-indexed-mode)
-    (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
+;;   (declare-function vertico-indexed-mode "vertico-indexed")
 
-  ;; (with-eval-after-load "vertico"
-  ;;   (vertico-indexed-mode 1))
-  )
+;;   (unless (fboundp 'vertico-indexed-mode)
+;;     (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
 
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-quick
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-quick)))
-      (use-package vertico-quick
-        :ensure nil
-        :load-path "extras")))
+;;   ;; (with-eval-after-load "vertico"
+;;   ;;   (vertico-indexed-mode 1))
+;;   )
 
-  (declare-function vertico-quick-insert "vertico-quick")
-  (declare-function vertico-quick-exit "vertico-quick")
-  (declare-function vertico-quick-jump "vertico-quick")
+;; (when (eq sb/minibuffer-completion 'vertico)
+;;   (eval-when-compile
+;;     (if (bound-and-true-p sb/disable-package.el)
+;;         (use-package vertico-quick
+;;           :straight (vertico :files (:defaults "extensions/*")
+;;                              :includes (vertico-quick)))
+;;       (use-package vertico-quick
+;;         :ensure nil
+;;         :load-path "extras")))
 
-  (with-eval-after-load "vertico"
-    (bind-keys :package vertico
-               :map vertico-map
-               ;; ("C-c q" . vertico-quick-insert)
-               ;; ("C-'" . vertico-quick-exit)
-               ("C-'" . vertico-quick-jump))))
+;;   (declare-function vertico-quick-insert "vertico-quick")
+;;   (declare-function vertico-quick-exit "vertico-quick")
+;;   (declare-function vertico-quick-jump "vertico-quick")
+
+;;   (with-eval-after-load "vertico"
+;;     (bind-keys :package vertico
+;;                :map vertico-map
+;;                ;; ("C-c q" . vertico-quick-insert)
+;;                ;; ("C-'" . vertico-quick-exit)
+;;                ("C-'" . vertico-quick-jump))))
 
 (use-package consult
   :after vertico
@@ -506,24 +506,6 @@
    consult-recent-file consult-buffer
    :preview-key nil))
 
-;; https://karthinks.com/software/fifteen-ways-to-use-embark/
-(use-package embark
-  :after vertico
-  :init
-  ;; Replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command
-        which-key-use-C-h-commands nil)
-  :bind
-  (([remap describe-bindings] . embark-bindings)
-   :map vertico-map
-   ("C-l" . embark-act)
-   ("C-c C-l" . embark-export)))
-
-(use-package embark-consult
-  :after (embark consult)
-  :demand t ; Only necessary if you have the hook below
-  :hook (embark-collect-mode-hook . consult-preview-at-point-mode))
-
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (when (eq sb/capf 'corfu))
 (eval-when-compile
@@ -536,14 +518,28 @@
                                     corfu-history)))
     (use-package corfu)))
 
+;; https://github.com/minad/corfu/wiki
 (use-package corfu
   :if (eq sb/capf 'corfu)
+  :commands corfu--goto
   :preface
   (defun sb/corfu-move-to-minibuffer ()
     (interactive)
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
+
+  (defun sb/corfu-beginning-of-prompt ()
+    "Move to beginning of completion input."
+    (interactive)
+    (corfu--goto -1)
+    (goto-char (car completion-in-region--data)))
+
+  (defun sb/corfu-end-of-prompt ()
+    "Move to end of completion input."
+    (interactive)
+    (corfu--goto -1)
+    (goto-char (cadr completion-in-region--data)))
   :hook (after-init-hook . global-corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
@@ -566,6 +562,8 @@
         ("<escape>" . corfu-quit)
         ("M-d" . corfu-show-documentation)
         ("M-l" . corfu-show-location)
+        ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
+        ([remap move-end-of-line] . sb/corfu-end-of-prompt)
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
 (when (eq sb/capf 'corfu)
@@ -651,6 +649,11 @@
   (when (and (not (display-graphic-p)) (eq sb/capf 'corfu))
     (add-hook 'corfu-mode-hook #'corfu-popup-mode)))
 
+;; Here is a snippet to show how to support `company' backends with `cape'.
+;; https://github.com/minad/cape/issues/20
+;; (fset #'cape-path (cape-company-to-capf #'company-files))
+;; (add-hook 'completion-at-point-functions #'cape-path)
+
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
   :if (eq sb/capf 'corfu)
@@ -672,16 +675,30 @@
                                   cape-dabbrev cape-ispell cape-dict cape-history))
     (add-to-list 'completion-at-point-functions backends))
   :custom
-  (cape-dict-file "/home/swarnendu/.config/Code/User/spellright.dict"))
+  (cape-dabbrev-min-length 3)
+  :config
+  ;; (add-hook 'emacs-lisp-mode-hook
+  ;;           (lambda ()
+  ;;             (setq-local completion-at-point-functions
+  ;;                         (list (cape-super-capf #'cape-symbol #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
+  ;; (add-hook 'prog-mode-hook
+  ;;           (lambda ()
+  ;;             (setq-local completion-at-point-functions
+  ;;                         (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
+  ;; (add-hook 'text-mode-hook
+  ;;           (lambda ()
+  ;;             (setq-local completion-at-point-functions
+  ;;                         (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
+  )
 
 ;; We prefer to use "kind-icon" package for icons for Corfu because it has more active commits but I
 ;; do not know which is better.
 (use-package all-the-icons-completion
   :if (display-graphic-p)
-  :disabled t
+  :commands all-the-icons-completion-mode
   :after (marginalia all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
-  :init (all-the-icons-completion-mode))
+  :init (all-the-icons-completion-mode 1))
 
 ;; Provide icons for Corfu
 (use-package kind-icon
@@ -697,10 +714,6 @@
   (kind-icon-blend-frac 0.08)
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
-(use-package marginalia
-  :after vertico
-  :init (marginalia-mode 1))
 
 (when (eq sb/capf 'company)
   (use-package company)
@@ -739,7 +752,7 @@
         company-dabbrev-other-buffers t
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 3 ; Small words can be faster to type
+        company-minimum-prefix-length 2 ; Small words can be faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
         company-show-quick-access t ; Speed up completion
@@ -792,7 +805,7 @@
   :diminish
   :config
   (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
-        company-posframe-show-indicator nil ; Hide the backends, the display is not great
+        company-posframe-show-indicator t ; Hide the backends, the display is not great
         ;; Disable showing the help frame
         company-posframe-quickhelp-delay nil)
   (company-posframe-mode 1))
@@ -813,8 +826,6 @@
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
-  :ensure flx
-  :ensure t
   :if (eq sb/capf 'company)
   :after company
   :diminish (company-fuzzy-mode global-company-fuzzy-mode)
@@ -825,7 +836,8 @@
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
   ;; Disabling the requirement may help with performance.
-  (company-fuzzy-prefix-on-top t))
+  (company-fuzzy-prefix-on-top t)
+  (company-fuzzy-passthrough-backends '(company-capf)))
 
 (use-package company-shell
   :if (eq sb/capf 'company)
@@ -893,6 +905,8 @@
 
 (with-eval-after-load "company"
   (progn
+    (declare-function sb/company-xml-mode "init-completion")
+
     (defun sb/company-xml-mode ()
       "Add backends for completion with company."
       (defvar company-minimum-prefix-length)
@@ -914,6 +928,8 @@
 
 (with-eval-after-load "company"
   (progn
+    (declare-function sb/company-latex-mode "init-completion")
+
     (defun sb/company-latex-mode ()
       "Add backends for latex completion in company mode."
 
@@ -947,6 +963,8 @@
 
 (with-eval-after-load "company"
   (progn
+    (declare-function sb/company-text-mode "init-completion")
+
     (defun sb/company-text-mode ()
       "Add backends for text completion in company mode."
       (defvar company-minimum-prefix-length)
@@ -957,10 +975,10 @@
                   company-transformers '(delete-dups))
 
       (set (make-local-variable 'company-backends)
-           '(company-files
-             company-dabbrev
+           '(company-dabbrev
              ;; company-abbrev
-             company-ispell)))
+             company-ispell
+             company-files)))
 
     (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
       (add-hook hook (lambda ()
@@ -1008,6 +1026,8 @@
 
 (with-eval-after-load "company"
   (progn
+    (declare-function sb/company-sh-mode "init-completion")
+
     (defun sb/company-sh-mode ()
       "Add backends for shell script completion in company mode."
       (defvar company-minimum-prefix-length)
@@ -1030,6 +1050,8 @@
 
 (with-eval-after-load "company"
   (progn
+    (declare-function sb/company-fish-mode "init-completion")
+
     (defun sb/company-fish-mode ()
       "Add backends for fish shell script completion in company mode."
       (defvar company-minimum-prefix-length)
@@ -1116,6 +1138,8 @@
 
 (with-eval-after-load "company"
   (progn
+    (declare-function sb/company-prog-mode "init-completion")
+
     (defun sb/company-prog-mode ()
       "Add backends for program completion in company mode."
       (defvar company-minimum-prefix-length)
@@ -1190,20 +1214,17 @@
 
 ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
 (use-package prescient
-  :disabled t
   :commands prescient-persist-mode
   :hook (after-init-hook . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t))
 
-;; We are using `company-fuzzy' for sorting completion candidates
+;; We want `capf' sort for programming modes, not with recency. This breaks support for the
+;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates
 (use-package company-prescient
-  :disabled t
   :after company
   :demand t
   :commands company-prescient-mode
   :config
-  ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
-  ;; `:separate' keyword in `company'.
   ;; (setq company-prescient-sort-length-enable nil)
   (company-prescient-mode 1))
 

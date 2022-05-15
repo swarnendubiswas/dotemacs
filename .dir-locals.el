@@ -20,12 +20,6 @@
                                ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
                                )
 
-                             (when (derived-mode-p 'gfm-mode)
-                               (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers . (markdown-markdownlint-cli))))))
-                               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
-                               )
-
                              (when (derived-mode-p 'sh-mode)
                                (setq sb/flycheck-local-checkers
                                      '((lsp . ((next-checkers . (sh-shellcheck)))))))

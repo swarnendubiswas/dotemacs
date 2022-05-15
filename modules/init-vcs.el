@@ -33,6 +33,12 @@
                                             (untracked . show)
                                             (unpushed  . show)
                                             (unpulled  . show)))
+  (magit-repository-directories '(("/home/swarnendu/books" . 0)
+                                  ("/home/swarnendu/bitbucket" . 1)
+                                  ("/home/swarnendu/github" . 1)
+                                  ("/home/swarnendu/prospar-workspace")
+                                  ("/home/swarnendu/plass-workspace")
+                                  ("/home/swarnendu/iss-workspace")))
   :config
   ;; These give a performance boost to Magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)

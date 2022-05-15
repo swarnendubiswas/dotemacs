@@ -13,9 +13,6 @@
 (defvar sb/user-home-directory)
 (defvar sb/python-langserver)
 
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.conf\\'" . conf-unix-mode))
-
 (add-hook 'prog-mode-hook
           (lambda ()
             ;; Highlight and allow to open http links in strings and comments in programming
@@ -152,12 +149,6 @@
   ;; Delay highlighting to allow for transient cursor placements
   (symbol-overlay-idle-time 2))
 
-;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :commands ws-butler-mode
-  :diminish
-  :hook (prog-mode-hook . ws-butler-mode))
-
 (use-package highlight-escape-sequences
   :commands hes-mode
   :hook (prog-mode-hook . hes-mode))
@@ -167,6 +158,16 @@
 
   (unless (fboundp 'ini-mode)
     (autoload #'ini-mode "ini-mode" nil t)))
+
+(progn
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package conf-mode
+          :straight (:type built-in)
+          :mode "\\.cfg\\'" "\\.conf\\'")
+      (use-package conf-mode
+        :ensure nil
+        :mode "\\.cfg\\'" "\\.conf\\'"))))
 
 (progn
   (unless (fboundp 'emacs-lisp-mode)
@@ -417,7 +418,6 @@
           '(orderless)))
   :hook
   ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
-   ;; (lsp-mode-hook . lsp-lens-mode)
    (lsp-mode-hook . lsp-enable-which-key-integration))
   :custom-face
   ;; Reduce the height
@@ -461,6 +461,7 @@
         lsp-html-format-indent-inner-html t
         lsp-imenu-sort-methods '(position)
         ;; lsp-keep-workspace-alive nil
+        lsp-lens-enable nil
         lsp-log-io nil ; Increases memory usage because of JSON parsing if enabled
         ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
         ;; additional errors. The problem is that the modeline can get too congested.

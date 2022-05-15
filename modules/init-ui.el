@@ -489,17 +489,21 @@
   :hook (after-init-hook . global-hl-line-mode))
 
 (use-package centaur-tabs
-  :commands centaur-tabs-group-by-projectile-project
+  :commands (centaur-tabs-group-by-projectile-project centaur-tabs-headline-match)
   :hook (emacs-startup-hook . centaur-tabs-mode)
-  :init
-  (setq centaur-tabs-set-icons nil ; The icons often do not blend well with the theme
-        centaur-tabs-set-modified-marker t
-        centaur-tabs-modified-marker "*"
-        centaur-tabs-cycle-scope 'tabs
-        centaur-tabs-set-close-button nil
-        centaur-tabs-show-new-tab-button nil
-        centaur-tabs-enable-ido-completion nil)
+  :custom
+  (centaur-tabs-set-icons t "The icons may not blend well with the theme")
+  (centaur-tabs-set-modified-marker t)
+  ;; (centaur-tabs-modified-marker "*")
+  (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
+  (centaur-tabs-cycle-scope 'tabs)
+  (centaur-tabs-gray-out-icons t)
+  (centaur-tabs-set-close-button nil)
+  (centaur-tabs-show-new-tab-button nil)
+  (centaur-tabs-enable-ido-completion nil)
+  (centaur-tabs-style "wave")
   :config
+  (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)

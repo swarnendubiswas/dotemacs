@@ -415,7 +415,9 @@ after a successful compilation."
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
 
-  ;; Disable "LaTeX-insert-item" in favor of imenu
+  ;; Disable `LaTeX-insert-item' in favor of `imenu'
+  (unbind-key "C-c C-j" LaTeX-mode-map)
+
   ;; (unbind-key "C-c C-d" LaTeX-mode-map)
   ;; Unset "C-c ;" since we want to bind it to 'comment-line
   ;; (unbind-key "C-c ;" LaTeX-mode-map)

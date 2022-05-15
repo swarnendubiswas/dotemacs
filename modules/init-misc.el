@@ -103,7 +103,14 @@
   :commands vundo
   :bind
   (([remap undo] . vundo)
-   ("C-z" . vundo)))
+   ("C-z" . vundo)
+   :map vundo-mode-map
+   ("C-f" . vundo-forward)
+   ("C-b" . vundo-backward)
+   ("C-n" . vundo-next)
+   ("C-p" . vundo-previous)
+   ("C-a" . vundo-stem-root)
+   ("C-e" . vundo-stem-end)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
@@ -308,7 +315,8 @@
   (("M-x"  . execute-extended-command) ; We need this if we use `vertico' and `consult'
    ("<f1>" . execute-extended-command))
   :custom
-  (amx-auto-update-interval 10 "Update the command list every n minutes"))
+  (amx-auto-update-interval 10 "Update the command list every n minutes")
+  (amx-history-length 15))
 
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
@@ -378,11 +386,11 @@
 ;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
 ;; Check https://github.com/akermu/emacs-libvterm.
 (use-package vterm
+  :custom
+  (vterm-always-compile-module t)
+  (vterm-max-scrollback 5000)
+  (vterm-term-environment-variable "xterm-24bit")
   :config
-  (setq vterm-always-compile-module t
-        vterm-max-scrollback 5000
-        vterm-term-environment-variable "xterm-24bit")
-
   (add-hook 'vterm-mode-hook
             (lambda ()
               (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
@@ -396,18 +404,6 @@
   (setq delete-trailing-lines t) ; "M-x delete-trailing-whitespace" deletes trailing lines
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
-;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
-;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
-;; to `t' in the `.dir-locals.el' file.
-(use-package whitespace-cleanup-mode
-  :disabled t
-  :diminish
-  :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
-  :config
-  (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
-  :custom
-  (whitespace-cleanup-mode-preserve-point t))
-
 (progn
   (defvar reb-re-syntax)
 
@@ -420,6 +416,52 @@
 (use-package rainbow-mode
   :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
+
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/
+(use-package embark
+  :after vertico
+  :init
+  ;; Replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command
+        which-key-use-C-h-commands nil)
+  :bind
+  (([remap describe-bindings] . embark-bindings)
+   :map vertico-map
+   ("C-l" . embark-act)
+   ("C-," . embark-dwim)
+   ("C-c C-l" . embark-export)))
+
+(use-package embark-consult
+  :after (embark consult)
+  ;; :demand t ; Only necessary if you have the hook below
+  ;; :hook (embark-collect-mode-hook . consult-preview-at-point-mode)
+  )
+
+(use-package marginalia
+  :after vertico
+  :init (marginalia-mode 1)
+  :config
+  ;; Add project-buffer annotator.
+  (add-to-list 'marginalia-annotator-registry
+               '(project-buffer marginalia-annotate-project-buffer))
+  (with-eval-after-load "projectile"
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-switch-project . file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-switch-open-project . file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-find-file . project-file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-recentf . project-file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-display-buffer . project-buffer))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-switch-to-buffer . project-buffer))))
+
+
+(use-package volatile-highlights
+  :diminish volatile-highlights-mode
+  :hook (after-init-hook . volatile-highlights-mode))
 
 (provide 'init-misc)
 
