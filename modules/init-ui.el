@@ -332,10 +332,10 @@
 (use-package nano-modeline
   :straight (nano-modeline :type git :host github
                            :repo "rougier/nano-modeline")
-  :if (and (display-graphic-p) (eq sb/modeline-theme 'nano))
+  :if (eq sb/modeline-theme 'nano)
   :init
-  (when (and (display-graphic-p) (eq sb/modeline-theme 'nano)
-             (nano-modeline 1))))
+  (when (eq sb/modeline-theme 'nano)
+    (nano-modeline-mode 1)))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
@@ -364,11 +364,11 @@
        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
-  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
-  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
-  (set-face-attribute 'mode-line nil :height 110)
-  (set-face-attribute 'mode-line-inactive nil :height 110))
+  (set-face-attribute 'default nil :font "Cascadia Code" :height 120)
+  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 120)
+  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 120 :weight 'light)
+  (set-face-attribute 'mode-line nil :height 100)
+  (set-face-attribute 'mode-line-inactive nil :height 100))
 
 (when (string= (system-name) "dell-7506")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
@@ -492,7 +492,7 @@
   :commands (centaur-tabs-group-by-projectile-project centaur-tabs-headline-match)
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :custom
-  (centaur-tabs-set-icons t "The icons may not blend well with the theme")
+  (centaur-tabs-set-icons nil "The icons may not blend well with the theme")
   (centaur-tabs-set-modified-marker t)
   ;; (centaur-tabs-modified-marker "*")
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
@@ -501,7 +501,9 @@
   (centaur-tabs-set-close-button nil)
   (centaur-tabs-show-new-tab-button nil)
   (centaur-tabs-enable-ido-completion nil)
-  (centaur-tabs-style "wave")
+  ;; Other styles like "wave" is not rendered on the terminal, and also does not work well with many
+  ;; themes
+  (centaur-tabs-style "bar")
   :config
   (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project)

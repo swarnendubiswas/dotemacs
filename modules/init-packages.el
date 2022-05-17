@@ -147,7 +147,8 @@
   :demand t)
 
 ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
-;; is `paradox-upgrade-packages' as a single command.
+;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
+;; command.
 (when (and sb/EMACS27+ (not (bound-and-true-p sb/disable-package.el)))
   (when (boundp 'package-quickstart)
     (setq package-quickstart t))

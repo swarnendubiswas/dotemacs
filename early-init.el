@@ -47,7 +47,7 @@
 ;; https://github.com/emacs-lsp/lsp-mode#performance
 (defun sb/restore-garbage-collection ()
   "Restore garbage collection."
-  (setq gc-cons-threshold sb/emacs-32MB))
+  (setq gc-cons-threshold sb/emacs-4MB))
 
 ;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last hook to load
 ;; customizations.

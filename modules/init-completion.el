@@ -8,10 +8,11 @@
 ;;; Code:
 
 (defvar sb/minibuffer-completion)
-(defvar hippie-expand-verbose)
 (defvar sb/extras-directory)
 (defvar sb/EMACS28+)
 (defvar sb/capf)
+
+(defvar hippie-expand-verbose)
 (defvar savehist-additional-variables)
 (defvar recentf-list)
 (defvar dabbrev-ignored-buffer-regexps)
@@ -119,15 +120,15 @@
    ([remap find-file]                . counsel-find-file)
    ("<f1>"                           . counsel-M-x)
    ("<f2>"                           . counsel-find-file)
-   ("C-c s g"                        . counsel-git-grep)
    ("C-<f9>"                         . sb/counsel-goto-recent-directory)
-   ("C-c d m"                        . counsel-minor)
    ("<f9>"                           . counsel-recentf)
+   ("C-c d m"                        . counsel-minor)
+   ("C-c s g"                        . counsel-git-grep)
    ("C-c s r"                        . counsel-rg)
+   ("<f4>"                           . counsel-grep-or-swiper)
    ("C-c C-m"                        . counsel-mark-ring)
    ;; Enabling preview can make switching over remote buffers slow
    ("S-<f3>"                         . counsel-switch-buffer)
-   ("<f4>"                           . counsel-grep-or-swiper)
    ([remap imenu]                    . counsel-imenu)
    ("C-c C-j"                        . counsel-imenu))
   :diminish
@@ -339,101 +340,102 @@
 
 ;; More convenient directory navigation commands
 
-;; (when (eq sb/minibuffer-completion 'vertico)
-;;   (eval-when-compile
-;;     (if (bound-and-true-p sb/disable-package.el)
-;;         (use-package vertico-directory
-;;           :straight (vertico :files (:defaults "extensions/*")
-;;                              :includes (vertico-directory)))
-;;       (use-package vertico-directory
-;;         :ensure nil
-;;         :load-path "extras")))
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-directory
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-directory)))
+      (use-package vertico-directory
+        :ensure nil
+        :load-path "extras")))
 
-;;   (declare-function vertico-directory-tidy "vertico-directory")
-;;   (declare-function vertico-directory-enter "vertico-directory")
-;;   (declare-function vertico-directory-delete-char "vertico-directory")
-;;   (declare-function vertico-directory-delete-word "vertico-directory")
+  (declare-function vertico-directory-tidy "vertico-directory")
+  (declare-function vertico-directory-enter "vertico-directory")
+  (declare-function vertico-directory-delete-char "vertico-directory")
+  (declare-function vertico-directory-delete-word "vertico-directory")
 
-;;   (unless (fboundp 'vertico-directory-tidy)
-;;     (autoload #'vertico-directory-tidy "vertico-directory" nil t))
-;;   (unless (fboundp 'vertico-directory-enter)
-;;     (autoload #'vertico-directory-enter "vertico-directory" nil t))
-;;   (unless (fboundp 'vertico-directory-delete-char)
-;;     (autoload #'vertico-directory-delete-char "vertico-directory" nil t))
-;;   (unless (fboundp 'vertico-directory-delete-word)
-;;     (autoload #'vertico-directory-delete-word "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-tidy)
+    (autoload #'vertico-directory-tidy "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-enter)
+    (autoload #'vertico-directory-enter "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-delete-char)
+    (autoload #'vertico-directory-delete-char "vertico-directory" nil t))
+  (unless (fboundp 'vertico-directory-delete-word)
+    (autoload #'vertico-directory-delete-word "vertico-directory" nil t))
 
-;;   ;; Tidy shadowed file names
-;;   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+  (with-eval-after-load "vertico"
+    ;; Tidy shadowed file names
+    (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
-;;   (bind-keys :package vertico
-;;              :map vertico-map
-;;              ("RET" . vertico-directory-enter)
-;;              ("DEL" . vertico-directory-delete-char)
-;;              ("M-DEL" . vertico-directory-delete-word)))
+    (bind-keys :package vertico
+               :map vertico-map
+               ("RET" . vertico-directory-enter)
+               ("DEL" . vertico-directory-delete-char)
+               ("M-DEL" . vertico-directory-delete-word))))
 
-;; (when (eq sb/minibuffer-completion 'vertico)
-;;   (eval-when-compile
-;;     (if (bound-and-true-p sb/disable-package.el)
-;;         (use-package vertico-repeat
-;;           :straight (vertico :files (:defaults "extensions/*")
-;;                              :includes (vertico-repeat)))
-;;       (use-package vertico-repeat
-;;         :ensure nil
-;;         :load-path "extras")))
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-repeat
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-repeat)))
+      (use-package vertico-repeat
+        :ensure nil
+        :load-path "extras")))
 
-;;   (declare-function vertico-repeat-save "vertico-repeat")
-;;   (declare-function vertico-repeat-last "vertico-repeat")
-;;   (declare-function vertico-repeat-select "vertico-repeat")
+  (declare-function vertico-repeat-save "vertico-repeat")
+  (declare-function vertico-repeat-last "vertico-repeat")
+  (declare-function vertico-repeat-select "vertico-repeat")
 
-;;   (unless (fboundp 'vertico-repeat-save)
-;;     (autoload #'vertico-repeat-save "vertico-repeat" nil t))
+  (unless (fboundp 'vertico-repeat-save)
+    (autoload #'vertico-repeat-save "vertico-repeat" nil t))
 
-;;   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+  (with-eval-after-load "vertico"
+    (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
-;;   (bind-keys :package vertico
-;;              ("C-c r" . vertico-repeat-last)
-;;              ("M-r" . vertico-repeat-select)))
+    (bind-keys :package vertico
+               ("C-c r" . vertico-repeat-last)
+               ("M-r" . vertico-repeat-select))))
 
-;; (when (eq sb/minibuffer-completion 'vertico)
-;;   (eval-when-compile
-;;     (if (bound-and-true-p sb/disable-package.el)
-;;         (use-package vertico-indexed
-;;           :straight (vertico :files (:defaults "extensions/*")
-;;                              :includes (vertico-indexed)))
-;;       (use-package vertico-indexed
-;;         :ensure nil
-;;         :load-path "extras")))
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-indexed
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-indexed)))
+      (use-package vertico-indexed
+        :ensure nil
+        :load-path "extras")))
 
-;;   (declare-function vertico-indexed-mode "vertico-indexed")
+  (declare-function vertico-indexed-mode "vertico-indexed")
 
-;;   (unless (fboundp 'vertico-indexed-mode)
-;;     (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
+  (unless (fboundp 'vertico-indexed-mode)
+    (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
 
-;;   ;; (with-eval-after-load "vertico"
-;;   ;;   (vertico-indexed-mode 1))
-;;   )
+  (with-eval-after-load "vertico"
+    (vertico-indexed-mode 1)))
 
-;; (when (eq sb/minibuffer-completion 'vertico)
-;;   (eval-when-compile
-;;     (if (bound-and-true-p sb/disable-package.el)
-;;         (use-package vertico-quick
-;;           :straight (vertico :files (:defaults "extensions/*")
-;;                              :includes (vertico-quick)))
-;;       (use-package vertico-quick
-;;         :ensure nil
-;;         :load-path "extras")))
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-quick
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-quick)))
+      (use-package vertico-quick
+        :ensure nil
+        :load-path "extras")))
 
-;;   (declare-function vertico-quick-insert "vertico-quick")
-;;   (declare-function vertico-quick-exit "vertico-quick")
-;;   (declare-function vertico-quick-jump "vertico-quick")
+  (declare-function vertico-quick-insert "vertico-quick")
+  (declare-function vertico-quick-exit "vertico-quick")
+  (declare-function vertico-quick-jump "vertico-quick")
 
-;;   (with-eval-after-load "vertico"
-;;     (bind-keys :package vertico
-;;                :map vertico-map
-;;                ;; ("C-c q" . vertico-quick-insert)
-;;                ;; ("C-'" . vertico-quick-exit)
-;;                ("C-'" . vertico-quick-jump))))
+  (with-eval-after-load "vertico"
+    (bind-keys :package vertico
+               :map vertico-map
+               ;; ("C-c q" . vertico-quick-insert)
+               ;; ("C-'" . vertico-quick-exit)
+               ("C-'" . vertico-quick-jump))))
 
 (use-package consult
   :after vertico
@@ -579,9 +581,8 @@
   (unless (fboundp 'corfu-indexed-mode)
     (autoload #'corfu-indexed-mode "corfu-indexed" nil t))
 
-  ;; (with-eval-after-load "corfu"
-  ;;   (corfu-indexed-mode 1))
-  )
+  (with-eval-after-load "corfu"
+    (corfu-indexed-mode 1)))
 
 (when (eq sb/capf 'corfu)
   (eval-when-compile
@@ -675,7 +676,7 @@
     (add-to-list 'completion-at-point-functions backends))
   :custom
   (cape-dabbrev-min-length 3)
-  :config
+  ;; :config
   ;; (add-hook 'emacs-lisp-mode-hook
   ;;           (lambda ()
   ;;             (setq-local completion-at-point-functions
@@ -835,7 +836,7 @@
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
   ;; Disabling the requirement may help with performance.
-  (company-fuzzy-prefix-on-top t)
+  (company-fuzzy-prefix-on-top nil)
   (company-fuzzy-passthrough-backends '(company-capf)))
 
 (use-package company-shell
@@ -1039,6 +1040,7 @@
                                company-shell
                                company-shell-env
                                company-dabbrev-code
+                               company-keywords
                                company-files
                                company-dabbrev)))
 
@@ -1064,6 +1066,7 @@
                                company-shell-env
                                company-fish-shell
                                company-dabbrev-code
+                               company-keywords
                                company-files
                                company-dabbrev)))
 
@@ -1150,8 +1153,10 @@
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-capf
                                company-dabbrev-code
+                               company-keywords
                                company-files
-                               company-dabbrev)))
+                               company-dabbrev
+                               company-ispell)))
 
     (add-hook 'prog-mode-hook
               (lambda ()

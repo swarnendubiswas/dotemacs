@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-one
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -36,7 +36,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'doom-one
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -148,7 +148,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (defcustom sb/minibuffer-completion
-  'ivy
+  'vertico
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)
@@ -156,7 +156,7 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point.
 Corfu does not support TUI, so we have to fallback on company."
   :type '(radio

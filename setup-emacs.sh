@@ -91,7 +91,7 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 make distclean
 ./autogen.sh
 # We do not need POP3 support
-./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the Emacs distribution instead of after startup
 make -j"$(nproc)" NATIVE_FULL_AOT=1
 

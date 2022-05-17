@@ -425,6 +425,8 @@ after a successful compilation."
   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map)
   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
 
+;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
+;; in "$PATH".
 (progn
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)

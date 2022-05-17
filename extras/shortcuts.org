@@ -449,3 +449,9 @@ The use case is to search all files in a file hierarchy for some regular express
 *** Copy file path
 
 Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This calls ~dired-copy-filename-as-kill~ with the zero-prefix argument, and will copy the file path to the clipboard.
+
+*** [[https://200ok.ch/posts/edit-remote-files-with-emacs.html][Edit remote files with Emacs]]
+
+- Open eshell
+- Change to a remote directory: ~cd /ssh:swarnendu@swarnendu6.cse.iitk.ac.in:~
+- Edit files

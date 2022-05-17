@@ -1,41 +1,39 @@
 # GNU Emacs
 
-This repository lists my preferred configuration for GNU Emacs, my primary editor. The setup should work on a GNU/Linux platform.
-
-Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my preferred configuration for GNU Emacs, my primary editor. The setup should work on a GNU/Linux platform. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ## Installation
 
-Back up the contents of your `.emacs.d` directory if it is not empty. Use the following command to check out the source.
+Back up the contents of your `.emacs.d` directory if it is not empty, and then check out the source.
 
 ```shell
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 ```
 
+## Install GNU Emacs from PPA
+
+The Emacs version on Ubuntu is usually outdated. Use the [Emacs stable releases](https://launchpad.net/~kelleyk/+archive/ubuntu/emacs) PPA to install the latest stable version.
+
+```shell
+sudo add-apt-repository -y ppa:kelleyk/emacs
+sudo apt update
+sudo apt install emacs28
+```
+
 ## Build GNU Emacs from source
 
-Add the following PPA for Ubuntu 18.04.
-
 ```shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-```
+# Install gcc-10 packages with required support for libgccjit
+sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
 
-Add the following PPA for Ubuntu 20.04.
-
-```shell
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-```
-
-Install `gcc-10` packages with required support for `libgccjit`: `sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev`.
-
-```shell
-# Choose the source folder
-tar -xf emacs-28.0.91.tar.xz
-# git clone git://git.sv.gnu.org/emacs.git
+wget https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz
+tar -xf emacs-28.1.tar.xz
 export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+make distclean
 ./autogen.sh
-./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
-make -j2 NATIVE_FULL_AOT=1
+./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+make -j4 NATIVE_FULL_AOT=1
 sudo make install
 ```
 
@@ -48,11 +46,7 @@ Evaluate the following to test that both fast JSON and native compilation are wo
        (native-comp-available-p))
   (message "Native compilation is available")
 (message "Native complation is *not* available"))
-```
 
-Evaluate the following to test fast JSON is working.
-
-```emacs-lisp
 (if (functionp 'json-serialize)
   (message "Native JSON is available")
 (message "Native JSON is *not* available"))
@@ -207,8 +201,8 @@ Name=GNU Emacs
 GenericName=Text Editor
 Comment=Edit text
 MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-Exec=/home/swarnendu/software/emacs-28.0.91/src/emacs
-Icon=/home/swarnendu/software/emacs-28.0.91/etc/images/icons/hicolor/scalable/apps/emacs.svg
+Exec=/usr/local/bin/emacs
+Icon=emacs
 Type=Application
 Terminal=false
 Categories=Development;TextEditor;Utility;
@@ -256,6 +250,10 @@ This may lead to failures when accessing remote systems. In such cases, we can f
 
 `emacs -Q -l /home/swarnendu/github/dotemacs/extras/profile-dotemacs.el -f profile-dotemacs`
 
+[Advanced Techniques for Reducing Emacs Startup Time](https://blog.d46.us/advanced-emacs-startup/)
+
+Estimate the best possible startup time: `emacs -q --eval='(message "%s" (emacs-init-time))'`
+
 ## TODO
 
 - Fix "C-\`" vterm keybinding in TUI
@@ -265,12 +263,8 @@ This may lead to failures when accessing remote systems. In such cases, we can f
 
 ```shell
 conda create --prefix /home/hangingpawns/emacs_lsp
-
 conda activate /home/hangingpawns/emacs_lsp
-
 conda install clang clangd libclang bear
-
 export PATH=/home/hangingpawns/emacs_lsp/bin (or wherever the bin is)
-
 Do the same with ld_library_path
 ```
