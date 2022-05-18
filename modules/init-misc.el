@@ -10,6 +10,9 @@
 (defvar sb/minibuffer-completion)
 (defvar which-key-use-C-h-commands)
 
+(use-package transient
+  :demand t)
+
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
@@ -25,7 +28,6 @@
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
-  :commands (hungry-delete-mode global-hungry-delete-mode)
   :diminish
   :hook
   ((minibuffer-setup-hook . (lambda ()
@@ -37,7 +39,7 @@
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
-  :bind* ("C-c C-d" . duplicate-thing))
+  :bind ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
@@ -65,7 +67,7 @@
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
   :commands (whole-line-or-region-local-mode)
-  :diminish (whole-line-or-region-local-mode)
+  :diminish whole-line-or-region-local-mode
   :hook (after-init-hook . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
@@ -106,21 +108,17 @@
   (([remap undo] . vundo)
    ("C-z" . vundo)
    :map vundo-mode-map
+   ("C-a" . vundo-stem-root)
+   ("C-e" . vundo-stem-end)
+   ;; These are for horizontal movements.
    ("C-f" . vundo-forward)
    ("C-b" . vundo-backward)
+   ;; These are for vertical movements.
    ("C-n" . vundo-next)
-   ("C-p" . vundo-previous)
-   ("C-a" . vundo-stem-root)
-   ("C-e" . vundo-stem-end)))
+   ("C-p" . vundo-previous)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
-
-;; Avoid the "Overwrite old session file (not loaded)?" warning by loading the `session' package
-(use-package session
-  :disabled t
-  :commands (session-initialize)
-  :hook (after-init-hook . session-initialize))
 
 (use-package hl-todo
   :hook (after-init-hook . global-hl-todo-mode)
@@ -187,7 +185,10 @@
   :after (pdf-tools saveplace)
   :demand t)
 
-;; LATER: Check for continuous scroll support at https://github.com/dalanicolai/image-roll.el
+;; LATER: Check for continuous scroll support with `pdf-tools'
+(use-package image-roll
+  :straight (image-roll :type git :host github
+                        :repo "dalanicolai/image-roll.el"))
 
 (use-package logview
   :commands logview-mode)
@@ -294,18 +295,16 @@
   :bind ([remap other-window] . ace-window))
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
-;; `after-save-hook' and leads to auto-formatters being invoked more frequently. We do not need this
-;; given that we have `auto-save-visited-mode' enabled.
+;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
 (use-package super-save
-  :defines (super-save-remote-files super-save-triggers)
-  :commands super-save-mode
-  :disabled t
+  :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
   :diminish
-  ;; :init (run-with-idle-timer 3 nil #'super-save-mode)
   :hook (after-init-hook . super-save-mode)
+  :custom
+  (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
   :config
-  (setq super-save-remote-files nil) ; Ignore remote files, can cause Emacs to hang
-  (add-to-list 'super-save-triggers 'ace-window))
+  (add-to-list 'super-save-triggers 'ace-window)
+  (add-to-list 'super-save-hook-triggers 'find-file-hook))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
@@ -341,7 +340,6 @@
   :after ivy
   :bind
   (:map ivy-minibuffer-map
-        ;; Does not work with TUI, but works with Alacritty
         ("C-'"   . ivy-avy)))
 
 (use-package bm
@@ -400,28 +398,23 @@
 (use-package vterm-toggle
   :bind ("C-`" . vterm-toggle))
 
-;; This is different from `whitespace-cleanup-mode' since this is unconditional
-(when (bound-and-true-p sb/delete-trailing-whitespace-p)
-  (setq delete-trailing-lines t) ; "M-x delete-trailing-whitespace" deletes trailing lines
-  (add-hook 'before-save-hook #'delete-trailing-whitespace))
-
 (progn
   (defvar reb-re-syntax)
 
   (setq reb-re-syntax 'string))
 
 (use-package visual-regexp
-  :commands (vr/replace vr/query-replace vr/mark)
+  :commands (vr/replace vr/mark)
   :bind ([remap query-replace] . vr/query-replace))
 
 (use-package rainbow-mode
-  :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
 
 ;; Provide context-dependent actions similar to a content menu
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 (use-package embark
   :after vertico
+  :defines vertico-map
   :init
   ;; Replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command

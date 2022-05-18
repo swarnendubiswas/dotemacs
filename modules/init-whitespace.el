@@ -66,6 +66,11 @@
   :diminish
   :hook (prog-mode-hook . ws-butler-mode))
 
+;; This is different from `whitespace-cleanup-mode' since this is unconditional
+(when (bound-and-true-p sb/delete-trailing-whitespace-p)
+  (setq delete-trailing-lines t) ; "M-x delete-trailing-whitespace" deletes trailing lines
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
+
 (provide 'init-whitespace)
 
 ;;; init-whitespace.el ends here

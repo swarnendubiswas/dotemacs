@@ -515,25 +515,6 @@
   ;;   (write-region (point-min) (point-max) "~/alacritty-for-term-keys.yml"))
   )
 
-(with-eval-after-load "symbol-overlay"
-  (define-transient-command symbol-overlay-transient ()
-    "Symbol Overlay transient"
-    ["Symbol Overlay"
-     ["Overlays"
-      ("." "Add/Remove at point" symbol-overlay-put)
-      ("k" "Remove All" symbol-overlay-remove-all)
-      ]
-     ["Move to Symbol"
-      ("n" "Next" symbol-overlay-switch-forward)
-      ("p" "Previous" symbol-overlay-switch-backward)
-      ]
-     ["Other"
-      ("m" "Highlight symbol-at-point" symbol-overlay-mode)
-      ]
-     ]
-    )
-  (global-set-key (kbd "M-o") 'symbol-overlay-transient))
-
 (provide 'init-keybindings)
 
 ;;; init-keybindings.el ends here

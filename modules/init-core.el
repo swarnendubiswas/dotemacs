@@ -353,8 +353,7 @@
                             "~$"
                             "/.autosaves/"
                             ".*/TAGS\\'"
-                            "*.cache"
-                            ".*/treemacs/persist.org")
+                            "*.cache")
           ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
           ;; Keep remote file without testing if they still exist
           recentf-keep '(file-remote-p file-readable-p)
@@ -369,7 +368,7 @@
       (add-to-list 'recentf-exclude exclude))
 
     (when (bound-and-true-p sb/disable-package.el)
-      (add-to-list 'recentf-exclude `(recentf-expand-file-name ,(straight--emacs-dir "straight"))))
+      (add-to-list 'recentf-exclude `,(recentf-expand-file-name (straight--emacs-dir "straight"))))
 
     ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
     ;; after idling for 30 seconds.

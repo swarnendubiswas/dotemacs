@@ -147,7 +147,25 @@
    ("M-n" . symbol-overlay-jump-next))
   :custom
   ;; Delay highlighting to allow for transient cursor placements
-  (symbol-overlay-idle-time 2))
+  (symbol-overlay-idle-time 2)
+  :config
+  (transient-define-prefix sb/symbol-overlay-transient ()
+    "Symbol Overlay transient"
+    ["Symbol Overlay"
+     ["Overlays"
+      ("." "Add/Remove at point" symbol-overlay-put)
+      ("k" "Remove All" symbol-overlay-remove-all)
+      ]
+     ["Move to Symbol"
+      ("n" "Next" symbol-overlay-jump-next)
+      ("p" "Previous" symbol-overlay-jump-prev)
+      ]
+     ["Other"
+      ("m" "Highlight symbol-at-point" symbol-overlay-mode)
+      ]
+     ]
+    )
+  (bind-key "M-o" #'sb/symbol-overlay-transient))
 
 (use-package highlight-escape-sequences
   :commands hes-mode
