@@ -8,6 +8,7 @@
 ;;; Code:
 
 (defvar sb/minibuffer-completion)
+(defvar which-key-use-C-h-commands)
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
@@ -417,6 +418,7 @@
   :commands rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
 
+;; Provide context-dependent actions similar to a content menu
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 (use-package embark
   :after vertico
@@ -432,11 +434,9 @@
    ("C-c C-l" . embark-export)))
 
 (use-package embark-consult
-  :after (embark consult)
-  ;; :demand t ; Only necessary if you have the hook below
-  ;; :hook (embark-collect-mode-hook . consult-preview-at-point-mode)
-  )
+  :after (embark consult))
 
+;; Enriches the completion display with annotations, e.g., documentation strings or file information
 (use-package marginalia
   :after vertico
   :init (marginalia-mode 1)
@@ -458,10 +458,13 @@
     (add-to-list 'marginalia-command-categories
                  '(projectile-switch-to-buffer . project-buffer))))
 
-
 (use-package volatile-highlights
   :diminish volatile-highlights-mode
   :hook (after-init-hook . volatile-highlights-mode))
+
+;; Use Emacsclient as the $EDITOR of child processes
+(use-package with-editor
+  :hook (after-init-hook . shell-command-with-editor-mode))
 
 (provide 'init-misc)
 

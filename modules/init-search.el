@@ -87,6 +87,12 @@
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
+(use-package affe
+  :if (eq sb/minibuffer-completion 'vertico)
+  :commands (affe-grep affe-find)
+  :config
+  (consult-customize affe-grep :preview-key (kbd "M-.")))
+
 (provide 'init-search)
 
 ;;; init-search.el ends here

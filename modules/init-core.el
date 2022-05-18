@@ -54,7 +54,7 @@
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
       echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
-      enable-recursive-minibuffers nil ; Keeping track of the minibuffer nesting is difficult
+      enable-recursive-minibuffers t ; Keeping track of the minibuffer nesting is difficult
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
       ;; variables, but I edit files over Tramp a lot.
       enable-remote-dir-locals t

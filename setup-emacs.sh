@@ -70,13 +70,13 @@ apt install -y clang${LLVM_VERSION} clangd${LLVM_VERSION} clang-{format,tidy,too
 
 # Download GNU Emacs source
 
-EMACS_VERSION="28.0.91"
+EMACS_VERSION="28.1"
 
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 EMACS_NAME="emacs-${EMACS_VERSION}"
 EMACS_FILENAME="${EMACS_NAME}.tar.xz"
 if [ ! -f "${EMACS_FILENAME}" ]; then
-    wget https://alpha.gnu.org/gnu/emacs/pretest/"${EMACS_FILENAME}"
+    wget https://ftp.gnu.org/gnu/emacs/"${EMACS_FILENAME}"
 fi
 tar xf "${EMACS_FILENAME}"
 rm "${EMACS_FILENAME}"* || true

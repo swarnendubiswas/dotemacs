@@ -1193,7 +1193,10 @@
   :after (consult lsp)
   :commands (consult-lsp-diagnostics consult-lsp-symbols
                                      consult-lsp-file-symbols consult-lsp-marginalia-mode)
-  :init (consult-lsp-marginalia-mode 1))
+  :init (consult-lsp-marginalia-mode 1)
+  :bind
+  (:map lsp-mode-map
+        ([remap xref-find-apropos] . consult-lsp-symbols)))
 
 (use-package rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook
@@ -1233,6 +1236,11 @@
 (use-package ssh-config-mode
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
   :hook (ssh-config-mode-hook . turn-on-font-lock))
+
+(use-package string-inflection
+  :bind
+  (:map prog-mode-map
+        ("C-c C-u" . string-inflection-all-cycle)))
 
 (provide 'init-languages)
 

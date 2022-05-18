@@ -181,6 +181,11 @@
   :after (treemacs magit)
   :demand t)
 
+(use-package consult-ls-git
+  :bind
+  (("C-c g f" . #'consult-ls-git)
+   ("C-c g F" . #'consult-ls-git-other-window)))
+
 (provide 'init-vcs)
 
 ;;; init-vcs.el ends here

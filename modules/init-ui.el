@@ -364,11 +364,19 @@
        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 120)
-  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 120)
-  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 120 :weight 'light)
-  (set-face-attribute 'mode-line nil :height 100)
-  (set-face-attribute 'mode-line-inactive nil :height 100))
+  (if (display-graphic-p)
+      (progn
+        (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
+        (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
+        (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
+        (set-face-attribute 'mode-line nil :height 110)
+        (set-face-attribute 'mode-line-inactive nil :height 110))
+    (progn
+      (set-face-attribute 'default nil :font "Cascadia Code" :height 120)
+      (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 120)
+      (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 120 :weight 'light)
+      (set-face-attribute 'mode-line nil :height 100)
+      (set-face-attribute 'mode-line-inactive nil :height 100))))
 
 (when (string= (system-name) "dell-7506")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
@@ -525,6 +533,13 @@
       (autoload #'mouse-avoidance-mode "avoid" nil t))
 
     (mouse-avoidance-mode 'banish)))
+
+(use-package all-the-icons-completion
+  :if (display-graphic-p)
+  :commands all-the-icons-completion-mode
+  :after (all-the-icons)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
+  :init (all-the-icons-completion-mode 1))
 
 (provide 'init-ui)
 

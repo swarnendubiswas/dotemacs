@@ -109,6 +109,8 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
 *** Ripgrep
 
+-
+  
 *** Swiper
 
 - ~X M-n~ - Search for the symbol at point in the current file, where ~X~ is the shortcut to invoke ~swiper~ (~swiper~ ~thing-at-point~)
@@ -208,9 +210,8 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
 - ~C-c C-q C-e~ - Fill and indent the current environment (~LaTeX-fill-environment~)
 - ~C-c C-q C-s~ - Fill and indent the current logical sectional unit (~LaTeX-fill-section~)
 - ~C-c C-q C-r~ - Fill and indent the current region (~LaTeX-fill-region~)
--
 
-*** Reftex
+** Reftex
 
 - ~C-c (~ - Create a label (~reftex-label~)
 - ~C-c )~ - Look up a reference (~reftex-reference~)
@@ -236,7 +237,6 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c C-c p~ - Live preview in a browser (~markdown-preview~)
 - ~C-c <~ - Outdent the region (~markdown-outdent-region~)
 - ~C-c >~ - Indent the region (~markdown-indent-region~)
-
 
 ** Outline
 
@@ -286,6 +286,8 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-M-j~ - Select a tag to jump to from tags defined in current directory (~moo-jump-directory~)
 - ~C-M-i~ - Complete symbol at point (~complete-symbol~)
 
+** LSP
+
 ** Python with LSP
 
 - ~M-e~ - Jump to the next block (~python-nav-forward-block~)
@@ -299,6 +301,7 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 
 ** C/C++ with LSP
 
+- ~~ - Jump to 
 
 ** Flycheck
 
@@ -313,9 +316,7 @@ The following key bindings are available in ~flycheck-error-list-mode~.
 - ~S~ - Sort the error list by the column at point (~~)
 - ~g~ - Check the source buffer and update the error list (~~)
 - ~q~ - Quit the error list and hide its window (~~)
-
-** LSP
-
+  
 ** Git with Magit
 
 Use ~magit-status~ to display information about the current Git repository, and ~magit-dispatch-popup~ to see help with keybindings.
@@ -455,3 +456,15 @@ Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This cal
 - Open eshell
 - Change to a remote directory: ~cd /ssh:swarnendu@swarnendu6.cse.iitk.ac.in:~
 - Edit files
+
+*** Insert file path into buffer
+
+Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the file path in the buffer.
+
+*** Operate on matching lines
+
+- consult-line -> embark-export to occur-mode buffer -> occur-edit-mode for editing of matches in buffer.
+- consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all matches.
+- consult-find -> embark-export to dired-mode buffer -> wdired-change-to-wdired-mode for editing.
+
+  

@@ -43,7 +43,8 @@
                                            try-complete-lisp-symbol-partially
                                            try-complete-lisp-symbol)
         hippie-expand-verbose nil)
-  (bind-key "M-/" #'hippie-expand))
+  (bind-key "M-/" #'hippie-expand)
+  (bind-key [remap dabbrev-expand] #'hippie-expand))
 
 (use-package ivy
   :functions ivy-format-function-line
@@ -451,6 +452,9 @@
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
+   ;; Press SPC to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by files,
+   ;; "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list will be
+   ;; shown again.
    ("C-x b" . consult-buffer)
    ("<f3>" . consult-buffer)
    ([remap switch-to-buffer] . consult-buffer)
@@ -476,6 +480,7 @@
    ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
    ("C-c s l" . consult-locate)
+   ;; Prefix argument "C-u" allows to specify the directory
    ("C-c s g" . consult-grep)
    ("C-c s G" . consult-git-grep)
    ("C-c s r" . consult-ripgrep)
@@ -493,20 +498,15 @@
    ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
    ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
    )
-  ;; ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; ;; relevant when you use the default completion UI.
-  ;; :hook (completion-list-mode-hook . consult-preview-at-point-mode)
   :config
   ;; Optionally replace `completing-read-multiple' with an enhanced version.
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
-  (unless (display-graphic-p)
-    (setq completion-in-region-function #'consult-completion-in-region))
-
   ;; Disable live preview
-  (consult-customize
-   consult-recent-file consult-buffer
-   :preview-key nil))
+  (consult-customize consult-recent-file consult-buffer consult-theme
+                     consult-ripgrep consult-git-grep consult-grep consult-bookmark
+                     consult-xref
+                     :preview-key nil))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 (when (eq sb/capf 'corfu))
@@ -691,15 +691,6 @@
   ;;                         (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
   )
 
-;; We prefer to use "kind-icon" package for icons for Corfu because it has more active commits but I
-;; do not know which is better.
-(use-package all-the-icons-completion
-  :if (display-graphic-p)
-  :commands all-the-icons-completion-mode
-  :after (marginalia all-the-icons)
-  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
-  :init (all-the-icons-completion-mode 1))
-
 ;; Provide icons for Corfu
 (use-package kind-icon
   :after corfu
@@ -828,7 +819,6 @@
 (use-package company-fuzzy
   :if (eq sb/capf 'company)
   :after company
-  :diminish (company-fuzzy-mode global-company-fuzzy-mode)
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
   :custom
@@ -836,7 +826,7 @@
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
   ;; Disabling the requirement may help with performance.
-  (company-fuzzy-prefix-on-top nil)
+  (company-fuzzy-prefix-on-top t)
   (company-fuzzy-passthrough-backends '(company-capf)))
 
 (use-package company-shell
@@ -975,10 +965,10 @@
                   company-transformers '(delete-dups))
 
       (set (make-local-variable 'company-backends)
-           '(company-dabbrev
-             ;; company-abbrev
+           '(company-files
              company-ispell
-             company-files)))
+             ;; company-abbrev
+             company-dabbrev)))
 
     (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
       (add-hook hook (lambda ()
@@ -1002,28 +992,6 @@
 
 ;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
 
-;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;; `company-clang' is slow
-;; (progn
-;;   (defun sb/company-c-mode ()
-;;     "Add backends for C/C++ completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-
-;;     (setq company-backends '(company-capf
-;;                              company-dabbrev-code
-;;                              company-files
-;;                              company-yasnippet
-;;                              company-dabbrev)))
-
-;;   (add-hook 'c-mode-common-hook (lambda ()
-;;                                   (sb/company-c-mode)
-;;                                   (company-fuzzy-mode 1)
-;;                                   (diminish 'company-fuzzy-mode))))
-
 (with-eval-after-load "company"
   (progn
     (declare-function sb/company-sh-mode "init-completion")
@@ -1040,7 +1008,6 @@
                                company-shell
                                company-shell-env
                                company-dabbrev-code
-                               company-keywords
                                company-files
                                company-dabbrev)))
 
@@ -1066,7 +1033,6 @@
                                company-shell-env
                                company-fish-shell
                                company-dabbrev-code
-                               company-keywords
                                company-files
                                company-dabbrev)))
 
@@ -1074,49 +1040,6 @@
                                 (sb/company-fish-mode)
                                 (company-fuzzy-mode 1)
                                 (diminish 'company-fuzzy-mode)))))
-
-;; (progn
-;;   (defun sb/company-elisp-mode ()
-;;     "Set up company for elisp mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 2)
-;;     (make-local-variable 'company-backends)
-
-;;     (setq company-backends '(company-capf
-;;                              company-yasnippet
-;;                              company-files
-;;                              company-dabbrev-code
-;;                              company-dabbrev)))
-
-;;   (add-hook 'emacs-lisp-mode-hook (lambda ()
-;;                                     (when (or (not (display-graphic-p)) (eq sb/capf 'company))
-;;                                       (sb/company-elisp-mode)
-;;                                       (company-fuzzy-mode 1)
-;;                                       (diminish 'company-fuzzy-mode)))))
-
-;; (progn
-;;   (defun sb/company-python-mode ()
-;;     "Add backends for Python completion in company mode."
-;;     (defvar company-minimum-prefix-length)
-;;     (defvar company-backends)
-
-;;     (setq-local company-minimum-prefix-length 3)
-;;     (make-local-variable 'company-backends)
-
-;;     ;; `company-dabbrev-code' is useful for variable names
-;;     (setq company-backends '(company-capf
-;;                              company-yasnippet
-;;                              company-dabbrev-code
-;;                              company-files
-;;                              company-dabbrev)))
-
-;;   (add-hook 'python-mode-hook (lambda ()
-;;                                 (when (or (not (display-graphic-p)) (eq sb/capf 'company))
-;;                                   (sb/company-python-mode)
-;;                                   (company-fuzzy-mode 1)
-;;                                   (diminish 'company-fuzzy-mode)))))
 
 ;; (progn
 ;;   ;; `web-mode' is derived from `prog-mode'
@@ -1138,6 +1061,8 @@
 ;;                        (company-fuzzy-mode 1)
 ;;                        (diminish 'company-fuzzy-mode))))))
 
+;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; `company-clang' is slow
 (with-eval-after-load "company"
   (progn
     (declare-function sb/company-prog-mode "init-completion")
@@ -1152,7 +1077,7 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-capf
-                               company-dabbrev-code
+                               company-dabbrev-code ; Useful for variable names
                                company-keywords
                                company-files
                                company-dabbrev
@@ -1231,6 +1156,11 @@
   :config
   ;; (setq company-prescient-sort-length-enable nil)
   (company-prescient-mode 1))
+
+(use-package consult-company
+  :bind
+  (:map company-mode-map
+        ([remap completion-at-point] . consult-company)))
 
 (provide 'init-completion)
 

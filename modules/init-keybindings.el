@@ -22,7 +22,8 @@
  ("C-l"       . goto-line)
  ("C-c z"     . repeat)
  ("C-z"       . undo)
- ;; ("<f11>"     . delete-other-windows) ; Conflicts with Gnome window manager keybindings
+ ;; "<f11>" conflicts with Gnome window manager keybindings
+ ("C-<f11>"   . delete-other-windows)
  ("C-x k"     . kill-this-buffer)
  ("M-<left>"  . previous-buffer)
  ("C-S-<iso-lefttab>" . previous-buffer)
@@ -39,15 +40,19 @@
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
-(bind-keys*
+(bind-keys
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)
  ("C-c ;" . sb/comment-line)
  ("C-c b" . comment-box))
 
-(bind-keys*
+(bind-keys
  ("C-s"   . save-buffer)
  ("C-S-s" . sb/save-all-buffers))
+
+(bind-keys
+ ("M-\\" . delete-horizontal-space)
+ ("M-#" . cycle-spacing))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 
@@ -61,7 +66,7 @@
   (bind-key "[escape]" #'keyboard-quit popup-menu-keymap))
 
 (when (eq sb/minibuffer-completion 'ivy)
-  (bind-key   "C-x j" #'sb/counsel-all-files-recursively))
+  (bind-key "C-x j" #'sb/counsel-all-files-recursively))
 
 (unless (featurep 'centaur-tabs)
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
@@ -111,8 +116,8 @@
 ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
 ;; blue" means exit.
 
-(defvar lv-use-separator)
-(setq lv-use-separator t)
+;; (defvar lv-use-separator)
+;; (setq lv-use-separator t)
 
 (use-package hydra
   :commands (hydra-default-pre hydra-keyboard-quit defhydra
@@ -484,19 +489,21 @@
     ("l" comment-line)
     ("r" comment-region))))
 
-(bind-key "C-c h a" #'sb/hydra-avy/body)
-(bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
-(bind-key "C-c h e" #'sb/hydra-error/body)
-(bind-key "C-c h f" #'sb/hydra-flycheck/body)
-(bind-key "C-c h g" #'sb/smerge-hydra/body)
-(bind-key "C-c h j" #'sb/hydra-projectile/body)
-(bind-key "C-c h l" #'sb/hydra-lsp/body)
-(bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
-(bind-key "C-c h p" #'sb/hydra-smartparens/body)
-(bind-key "C-c h s" #'sb/hydra-spelling/body)
-(bind-key "C-c h t" #'sb/hydra-move-text/body)
-(bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
-(bind-key "C-c h i" #'sb/hydra-straight/body)
+(when (display-graphic-p)
+  (progn
+    (bind-key "C-c h a" #'sb/hydra-avy/body)
+    (bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
+    (bind-key "C-c h e" #'sb/hydra-error/body)
+    (bind-key "C-c h f" #'sb/hydra-flycheck/body)
+    (bind-key "C-c h g" #'sb/smerge-hydra/body)
+    (bind-key "C-c h j" #'sb/hydra-projectile/body)
+    (bind-key "C-c h l" #'sb/hydra-lsp/body)
+    (bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
+    (bind-key "C-c h p" #'sb/hydra-smartparens/body)
+    (bind-key "C-c h s" #'sb/hydra-spelling/body)
+    (bind-key "C-c h t" #'sb/hydra-move-text/body)
+    (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
+    (bind-key "C-c h i" #'sb/hydra-straight/body)))
 
 (use-package term-keys
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
@@ -507,6 +514,25 @@
   ;;   (insert (term-keys/alacritty-config))
   ;;   (write-region (point-min) (point-max) "~/alacritty-for-term-keys.yml"))
   )
+
+(with-eval-after-load "symbol-overlay"
+  (define-transient-command symbol-overlay-transient ()
+    "Symbol Overlay transient"
+    ["Symbol Overlay"
+     ["Overlays"
+      ("." "Add/Remove at point" symbol-overlay-put)
+      ("k" "Remove All" symbol-overlay-remove-all)
+      ]
+     ["Move to Symbol"
+      ("n" "Next" symbol-overlay-switch-forward)
+      ("p" "Previous" symbol-overlay-switch-backward)
+      ]
+     ["Other"
+      ("m" "Highlight symbol-at-point" symbol-overlay-mode)
+      ]
+     ]
+    )
+  (global-set-key (kbd "M-o") 'symbol-overlay-transient))
 
 (provide 'init-keybindings)
 
