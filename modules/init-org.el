@@ -90,6 +90,9 @@
   :after org
   :demand t)
 
+(use-package org-modern
+  :hook (org-mode-hook . org-modern-mode))
+
 (provide 'init-org)
 
 ;;; init-org.el ends here

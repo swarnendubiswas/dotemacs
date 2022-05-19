@@ -535,9 +535,7 @@
     (mouse-avoidance-mode 'banish)))
 
 (use-package all-the-icons-completion
-  :if (display-graphic-p)
   :commands all-the-icons-completion-mode
-  :after (all-the-icons)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode 1))
 

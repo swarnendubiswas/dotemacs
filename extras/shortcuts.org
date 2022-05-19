@@ -453,7 +453,7 @@ Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This cal
 
 *** [[https://200ok.ch/posts/edit-remote-files-with-emacs.html][Edit remote files with Emacs]]
 
-- Open eshell
+- Open ~eshell~
 - Change to a remote directory: ~cd /ssh:swarnendu@swarnendu6.cse.iitk.ac.in:~
 - Edit files
 
@@ -463,8 +463,8 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
 
 *** Operate on matching lines
 
-- consult-line -> embark-export to occur-mode buffer -> occur-edit-mode for editing of matches in buffer.
-- consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all matches.
-- consult-find -> embark-export to dired-mode buffer -> wdired-change-to-wdired-mode for editing.
+- ~consult-line~ -> ~embark-export~ to ~occur-mode~ buffer -> ~occur-edit-mode~ for editing of matches in buffer.
+- ~consult-grep~ -> ~embark-export~ to ~grep-mode~ buffer -> ~wgrep~ for editing of all matches.
+- ~consult-find~ -> ~embark-export~ to ~dired-mode~ buffer -> ~wdired-change-to-wdired-mode~ for editing.
 
   

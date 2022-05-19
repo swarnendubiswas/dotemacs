@@ -499,8 +499,8 @@
    ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
    )
   :config
-  ;; Optionally replace `completing-read-multiple' with an enhanced version.
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+  ;; ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
 
   ;; Disable live preview
   (consult-customize consult-recent-file consult-buffer consult-theme
@@ -1100,12 +1100,16 @@
 
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-  (setq completion-styles '(orderless partial-completion basic) ; initials, emacs22
+  (setq completion-styles '(orderless
+                            ;;basic partial-completion initials emacs22
+                            )
         orderless-matching-styles '(orderless-regexp)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles basic remote orderless partial-completion))
-                                        ;; (minibuffer (initials))))
-                                        )))
+        ;; LATER: I do not understand this.
+        ;; completion-category-overrides '((file (styles basic substring remote orderless partial-completion))
+        ;;                                 ;; (minibuffer (initials))))
+        ;;                                 )
+        ))
 
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
