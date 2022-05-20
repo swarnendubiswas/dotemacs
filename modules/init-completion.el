@@ -734,7 +734,7 @@
   :hook (after-init-hook . global-company-mode)
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
-  :diminish
+  ;; :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
@@ -815,6 +815,8 @@
   :commands company-statistics-mode
   :config (company-statistics-mode 1))
 
+(use-package flx)
+
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
   :if (eq sb/capf 'company)
@@ -822,7 +824,7 @@
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
   :custom
-  (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+  (company-fuzzy-sorting-backend 'flx) ; Using "flx" slows down completion significantly
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
   ;; Disabling the requirement may help with performance.
@@ -1072,23 +1074,25 @@
       (defvar company-minimum-prefix-length)
       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 2)
+      (setq-local company-minimum-prefix-length 3)
       (make-local-variable 'company-backends)
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-capf
                                company-dabbrev-code ; Useful for variable names
-                               company-keywords
+                               ;; company-keywords
                                company-files
                                company-dabbrev
-                               company-ispell)))
+                               ;; company-ispell
+                               )))
 
     (add-hook 'prog-mode-hook
               (lambda ()
                 (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
                   (sb/company-prog-mode)
-                  (company-fuzzy-mode 1)
-                  (diminish 'company-fuzzy-mode))))))
+                  ;; (company-fuzzy-mode 1)
+                  ;; (diminish 'company-fuzzy-mode)
+                  )))))
 
 (use-package orderless
   :after (:any ivy vertico)
