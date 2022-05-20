@@ -21,19 +21,19 @@
   (declare-function dired-jump "dired")
 
   (unless (fboundp 'sb/dired-go-home)
-    (autoload #'sb/dired-go-home "init-autoload" nil t))
-  (unless (fboundp 'find-file)
-    (autoload #'find-file "dired" nil t))
+    (autoload #'sb/dired-go-home "init-dired" nil t))
   (unless (fboundp 'sb/dired-jump-to-top)
-    (autoload #'sb/dired-jump-to-top "init-autoload" nil t))
+    (autoload #'sb/dired-jump-to-top "init-dired" nil t))
   (unless (fboundp 'sb/dired-jump-to-bottom)
-    (autoload #'sb/dired-jump-to-bottom "init-autoload" nil t))
+    (autoload #'sb/dired-jump-to-bottom "init-dired" nil t))
   (unless (fboundp 'auto-revert-mode)
     (autoload #'auto-revert-mode "dired" nil t))
   (unless (fboundp 'dired-next-line)
     (autoload #'dired-next-line "dired" nil t))
   (unless (fboundp 'dired-jump)
     (autoload #'dired-jump "dired" nil t))
+  (unless (fboundp 'find-file)
+    (autoload #'find-file "dired" nil t))
 
   (eval-and-compile
     (defun sb/dired-go-home nil
@@ -100,6 +100,7 @@
     (defvar dired-cleanup-buffers-too)
     (defvar dired-clean-confirm-killing-deleted-buffers)
     (defvar dired-bind-jump)
+    (defvar dired-omit-files)
 
     (setq dired-cleanup-buffers-too t
           ;; Do not show messages when omitting files
@@ -107,16 +108,16 @@
           ;; Do not ask whether to kill buffers visiting deleted files
           dired-clean-confirm-killing-deleted-buffers nil)
 
-    ;; (setq dired-omit-files
-    ;;       (concat dired-omit-files
-    ;;               "\\|^.DS_Store\\'"
-    ;;               "\\|^.project\\(?:ile\\)?\\'"
-    ;;               "\\|^.\\(svn\\|git\\)\\'"
-    ;;               "\\|^.ccls-cache\\'"
-    ;;               ;; FIXME: Fix the regexp
-    ;;               ;; "\\|__pycache__"
-    ;;               "\\|\\(?:\\.js\\)?\\.meta\\'"
-    ;;               "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+    (setq dired-omit-files
+          (concat dired-omit-files
+                  "\\|^.DS_Store\\'"
+                  "\\|^.project\\(?:ile\\)?\\'"
+                  "\\|^.\\(svn\\|git\\)\\'"
+                  "\\|^.ccls-cache\\'"
+                  ;; FIXME: Fix the regexp
+                  ;; "\\|__pycache__"
+                  "\\|\\(?:\\.js\\)?\\.meta\\'"
+                  "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
     (unless sb/EMACS28+ ; Obsolete from Emacs 28+
       (setq dired-bind-jump t))
@@ -176,7 +177,6 @@
 (use-package all-the-icons-dired
   :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
   :diminish
-  :if (display-graphic-p)
   :hook
   (dired-mode-hook . (lambda ()
                        (unless (file-remote-p default-directory)

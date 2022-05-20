@@ -304,20 +304,17 @@
         (use-package vertico
           :straight (vertico :files (:defaults "extensions/*")
                              :includes
-                             (vertico-buffer
-                              vertico-directory
-                              vertico-flat
+                             (vertico-directory
+                              vertico-grid
                               vertico-indexed
-                              vertico-mouse
                               vertico-quick
-                              vertico-repeat
-                              vertico-reverse)))
+                              vertico-repeat)))
       (use-package vertico))))
 
 (use-package vertico
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
-  :commands command-completion-default-include-p
+  :commands (command-completion-default-include-p minibuffer-keyboard-quit)
   :hook (after-init-hook . vertico-mode)
   :custom
   (vertico-cycle t)
@@ -329,18 +326,15 @@
   ;; hidden in normal buffers.
   (when sb/EMACS28+
     (setq read-extended-command-predicate #'command-completion-default-include-p))
+  (when (display-graphic-p)
+    (bind-key "<escape>" #'minibuffer-keyboard-quit vertico-map))
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
-   ("<escape>" . minibuffer-keyboard-quit)
-   ;; ("?" . minibuffer-completion-help)
-   ;; ("M-RET" . minibuffer-force-complete-and-exit)
-   ;; ("M-TAB" . minibuffer-complete)
    ("C-M-j" . vertico-exit-input)
    ("<tab>" . vertico-insert)))
 
 ;; More convenient directory navigation commands
-
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
@@ -420,6 +414,26 @@
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
+        (use-package vertico-grid
+          :straight (vertico :files (:defaults "extensions/*")
+                             :includes (vertico-grid)))
+      (use-package vertico-grid
+        :ensure nil
+        :load-path "extras")))
+
+  (declare-function vertico-grid-mode "vertico-grid")
+
+  (unless (fboundp 'vertico-grid-mode)
+    (autoload #'vertico-grid-mode "vertico-grid" nil t))
+
+  (with-eval-after-load "vertico"
+    (setq vertico-grid-max-columns 4)
+
+    (vertico-grid-mode 1)))
+
+(when (eq sb/minibuffer-completion 'vertico)
+  (eval-when-compile
+    (if (bound-and-true-p sb/disable-package.el)
         (use-package vertico-quick
           :straight (vertico :files (:defaults "extensions/*")
                              :includes (vertico-quick)))
@@ -484,6 +498,7 @@
    ("C-c s g" . consult-grep)
    ("C-c s G" . consult-git-grep)
    ("C-c s r" . consult-ripgrep)
+   ("C-c s h" . consult-isearch-history)
    ("<f4>" . consult-line)
    ("M-s L" . consult-line-multi)
    ("M-s m" . consult-multi-occur)
@@ -491,21 +506,15 @@
    ([remap recentf-open-files] . consult-recent-file)
    ([remap multi-occur] . consult-multi-occur)
    ;; Isearch integration
-   ("M-s e" . consult-isearch-history)
    :map isearch-mode-map
-   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-   ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-   )
+   ("M-s e" . consult-isearch-history)
+   ("M-s l" . consult-line)
+   ("M-s L" . consult-line-multi))
   :config
-  ;; ;; Optionally replace `completing-read-multiple' with an enhanced version.
-  ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
   ;; Disable live preview
   (consult-customize consult-recent-file consult-buffer consult-theme
                      consult-ripgrep consult-git-grep consult-grep consult-bookmark
-                     consult-xref
+                     consult-xref consult-projectile
                      :preview-key nil))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
@@ -630,24 +639,24 @@
           (use-package popon
             :straight (popon :type git
                              :repo "https://codeberg.org/akib/emacs-popon.git"))
-          (use-package corfu-popup
-            :straight (corfu-popup :type git
-                                   :repo "https://codeberg.org/akib/emacs-corfu-popup.git")))
+          (use-package corfu-terminal
+            :straight (corfu-terminal :type git
+                                      :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")))
       (progn
         (use-package popon
           :ensure nil
           :load-path "extras")
-        (use-package corfu-popup
+        (use-package corfu-terminal
           :ensure nil
           :load-path "extras"))))
 
-  (declare-function corfu-popup-mode "corfu-popup")
+  (declare-function corfu-terminal-mode "corfu-terminal")
 
-  (unless (fboundp 'corfu-popup-mode)
-    (autoload #'corfu-popup-mode "corfu-popup" nil t))
+  (unless (fboundp 'corfu-terminal-mode)
+    (autoload #'corfu-terminal-mode "corfu-terminal" nil t))
 
   (when (and (not (display-graphic-p)) (eq sb/capf 'corfu))
-    (add-hook 'corfu-mode-hook #'corfu-popup-mode)))
+    (add-hook 'corfu-mode-hook #'corfu-terminal-mode)))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -969,7 +978,6 @@
       (set (make-local-variable 'company-backends)
            '(company-files
              company-ispell
-             ;; company-abbrev
              company-dabbrev)))
 
     (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
@@ -1003,7 +1011,7 @@
       (defvar company-minimum-prefix-length)
       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 2)
+      (setq-local company-minimum-prefix-length 3)
       (make-local-variable 'company-backends)
 
       (setq company-backends '(company-capf
@@ -1027,7 +1035,7 @@
       (defvar company-minimum-prefix-length)
       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 2)
+      (setq-local company-minimum-prefix-length 3)
       (make-local-variable 'company-backends)
 
       (setq company-backends '(company-capf
@@ -1156,8 +1164,9 @@
   :custom (prescient-sort-full-matches-first t))
 
 ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
-;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates
+;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
 (use-package company-prescient
+  :if (eq sb/capf 'company)
   :after company
   :demand t
   :commands company-prescient-mode

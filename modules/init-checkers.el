@@ -213,7 +213,6 @@
                                     markdown-mode-hook emacs-lisp-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
-  ;; :init (run-with-idle-timer 2 nil #'sb/enable-format-all)
   :diminish
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
