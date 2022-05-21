@@ -7,15 +7,9 @@
 
 (
  (nil . (
-         ;; (mode . whitespace-cleanup)
-
          (eval . (add-hook 'lsp-managed-mode-hook
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
-                               (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
-
-                             (when (derived-mode-p 'gfm-mode)
                                (setq sb/flycheck-local-checkers
                                      '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
 
@@ -46,9 +40,12 @@
                              (when (derived-mode-p 'xml-mode)
                                (setq sb/flycheck-local-checkers
                                      '((lsp . ((next-checkers . (xml-xmllint)))))))
-
                              )))
          ))
+
+ (yaml-mode . (
+               (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+               ))
 
  (json-mode . (
                (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))

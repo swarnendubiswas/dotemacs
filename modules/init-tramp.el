@@ -54,6 +54,7 @@
 (with-eval-after-load "tramp"
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
+  ;; https://stackoverflow.com/questions/26630640/tramp-ignores-tramp-remote-path#26649558
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
   ;; https://www.reddit.com/r/emacs/comments/ukyeb6/how_to_disable_emacs_from_trying_to_connect_to_a/

@@ -7,9 +7,11 @@
 
 ;;; Code:
 
+(declare-function sb/smerge-hydra/body "init-keybindings")
+
 (setq vc-follow-symlinks t ; No need to ask
       ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
-      ;; information on the modeline
+      ;; information on the modeline.
       vc-handled-backends '(Git))
 
 ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil

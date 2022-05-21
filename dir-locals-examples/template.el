@@ -207,6 +207,7 @@
 
  (dired-mode . (
                 (dired-omit-mode . t)
+                (dired-omit-files . "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|^stream.f\\'")
                 ))
  )
 
@@ -241,3 +242,6 @@
   )
  )
 
+;; Local Variables:
+;; eval: (flycheck-mode -1)
+;; End:

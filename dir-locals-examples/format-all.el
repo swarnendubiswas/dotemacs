@@ -24,3 +24,7 @@
                      (format-all-mode . t)
                      ))
  )
+
+;; Local Variables:
+;; eval: (flycheck-mode -1)
+;; End:

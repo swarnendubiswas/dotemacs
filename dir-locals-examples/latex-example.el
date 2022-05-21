@@ -1,6 +1,8 @@
 (
  (nil . (
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.lof$\\|.log$\\|.lot$\\|.out$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$")
+         (projectile-project-compilation-dir . ".")
+         (projectile-project-compilation-cmd . "latexmk")
          (eval . (add-hook 'lsp-managed-mode-hook
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
@@ -32,7 +34,9 @@
 
  (latex-mode . (
                 ;; (flycheck-checker . tex-chktex)
-                (TeX-master . (expand-file-name "paper.tex" (projectile-project-root)))
+                ;; (TeX-master . (expand-file-name "paper.tex" (projectile-project-root)))
+                (TeX-master . "paper.tex")
+
                 (eval . (progn
                           (let (
                                 (bibpath "/home/swarnendu/prospar-workspace/references/references.bib")
