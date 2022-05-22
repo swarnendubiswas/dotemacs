@@ -216,7 +216,7 @@
   :diminish
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook
                      markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode)))
 
 (use-package editorconfig

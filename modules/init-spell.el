@@ -43,6 +43,7 @@
     (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}"))))
 
 (declare-function flyspell-overlay-p "flyspell")
+(declare-function flyspell-auto-correct-previous-word "flyspell")
 
 (unless (fboundp 'flyspell-prog-mode)
   (autoload #'flyspell-prog-mode "flyspell" nil t))
@@ -58,6 +59,8 @@
   (autoload #'flyspell-correct-previous "flyspell" nil t))
 (unless (fboundp 'flyspell-correct-next)
   (autoload #'flyspell-correct-next "flyspell" nil t))
+(unless (fboundp 'flyspell-auto-correct-previous-word)
+  (autoload #'flyspell-auto-correct-previous-word "flyspell" nil t))
 
 (add-hook 'text-mode-hook #'flyspell-mode)
 ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
@@ -134,13 +137,13 @@
            ("C-c f f" . flyspell-mode)
            ("C-c f b" . flyspell-buffer)
            :map flyspell-mode-map
-           ("C-;")
+           ("C-;"     . flyspell-auto-correct-previous-word)
            ("C-,"     . sb/flyspell-goto-previous-error))
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
+;; TODO: The keybinding is the same
 (use-package flyspell-popup
   :after flyspell
-  :disabled t
   :bind
   (:map flyspell-mode-map
         ("C-;" . flyspell-popup-correct))

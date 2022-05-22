@@ -556,7 +556,7 @@
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
-  (corfu-auto-prefix 2)
+  (corfu-auto-prefix 3)
   (corfu-min-width 60)
   (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
@@ -746,13 +746,15 @@
   ;; :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
-        company-dabbrev-ignore-case nil ; Do not ignore case when collecting completion candidates
+        ;; Do not ignore case when collecting completion candidates. It is recommended to change the
+        ;; default value of "keep-prefix" if we modify `company-dabbrev-downcase'.
+        company-dabbrev-ignore-case nil
         ;; Search in other buffers with the same major mode. This can cause
         ;; performance overhead if there are lots of open buffers.
         company-dabbrev-other-buffers t
         company-ispell-available t
         company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 2 ; Small words can be faster to type
+        company-minimum-prefix-length 3 ; Small words can be faster to type
         company-require-match nil ; Allow input string that do not match candidates
         company-selection-wrap-around t
         company-show-quick-access t ; Speed up completion
@@ -765,6 +767,7 @@
         ;; https://github.com/company-mode/company-mode/discussions/1211
         company-search-regexp-function 'company-search-words-in-any-order-regexp
         company-frontends '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+                            company-preview-frontend
                             ;; show selected candidate docs in echo area
                             company-echo-metadata-frontend)
         company-backends '(company-capf))
@@ -879,6 +882,11 @@
   :demand t
   :commands company-bibtex)
 
+(use-package company-anywhere
+  :straight (company-anywhere :type git :host github :repo "zk-phi/company-anywhere")
+  :after company
+  :demand t)
+
 ;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
 ;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
 ;; context (major mode, inside strings or comments). That is why it is better to put it at the end.
@@ -940,6 +948,7 @@
       ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
       ;; labels and citations.
 
+      ;; FIXME: Cannot autocomplete "\includegraphics" without texlab
       (setq company-backends '(company-capf
                                company-files
                                company-reftex-citations
@@ -982,7 +991,7 @@
 
     (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
       (add-hook hook (lambda ()
-                       (unless (derived-mode-p 'latex-mode)
+                       (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
                          (sb/company-text-mode)
                          (company-fuzzy-mode 1)
                          (diminish 'company-fuzzy-mode)))))))

@@ -436,7 +436,8 @@
           '(orderless)))
   :hook
   ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
-   (lsp-mode-hook . lsp-enable-which-key-integration))
+   (lsp-mode-hook . lsp-enable-which-key-integration)
+   (lsp-mode-hook . lsp-dired-mode))
   :custom-face
   ;; Reduce the height
   (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
