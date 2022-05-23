@@ -14,36 +14,36 @@
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 
-(use-package lsp-latex
-  :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
-                                       lsp-latex-bibtex-formatter-line-length
-                                       lsp-latex-chktex-on-open-and-save
-                                       lsp-latex-build-on-save
-                                       lsp-latex-build-is-continuous
-                                       lsp-latex-build-args
-                                       lsp-latex-diagnostics-delay)
-  :hook
-  (latex-mode-hook . (lambda()
-                       (require 'lsp-latex)
-                       (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter             "latexindent")
-  (lsp-latex-latex-formatter              "latexindent")
-  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-  (lsp-latex-chktex-on-open-and-save      t)
-  (lsp-latex-build-is-continuous          t)
-  ;; Delay time in milliseconds before reporting diagnostics
-  (lsp-latex-diagnostics-delay            2000)
-  :config
-  (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc")
+;; (use-package lsp-latex
+;;   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
+;;                                        lsp-latex-bibtex-formatter-line-length
+;;                                        lsp-latex-chktex-on-open-and-save
+;;                                        lsp-latex-build-on-save
+;;                                        lsp-latex-build-is-continuous
+;;                                        lsp-latex-build-args
+;;                                        lsp-latex-diagnostics-delay)
+;;   :hook
+;;   (latex-mode-hook . (lambda()
+;;                        (require 'lsp-latex)
+;;                        (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter             "latexindent")
+;;   (lsp-latex-latex-formatter              "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+;;   (lsp-latex-chktex-on-open-and-save      t)
+;;   (lsp-latex-build-is-continuous          t)
+;;   ;; Delay time in milliseconds before reporting diagnostics
+;;   (lsp-latex-diagnostics-delay            2000)
+;;   :config
+;;   (add-to-list 'lsp-latex-build-args "-c")
+;;   (add-to-list 'lsp-latex-build-args "-pvc")
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "texlab")
-    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-    :remote? t
-    :server-id 'texlab-r)))
+;;   (lsp-register-client
+;;    (make-lsp-client
+;;     :new-connection (lsp-tramp-connection "texlab")
+;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+;;     :remote? t
+;;     :server-id 'texlab-r)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
@@ -145,7 +145,10 @@
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
     ;; Enable rainbow mode after applying styles to the buffer
-    (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)))
+    (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
+
+    (unbind-key "C-c ;" TeX-mode-map)))
+
 
 (progn
   (add-hook 'bibtex-mode-hook #'lsp-deferred)
@@ -207,9 +210,8 @@
     (autoload #'bibtex-parse-keys "reftex" nil t))
   (unless (fboundp 'reftex-default-bibliography)
     (autoload #'reftex-default-bibliography "reftex" nil t))
-
-  (add-hook 'LaTeX-mode-hook #'reftex-mode)
-  (add-hook 'latex-mode-hook #'reftex-mode)
+  (unless (fboundp 'reftex-toc)
+    (autoload #'reftex-toc "reftex" nil t))
 
   ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
   (eval-and-compile
@@ -283,26 +285,26 @@ Ignore if no file is found."
           reftex-plug-into-AUCTeX t
           ;; Save parse info to avoid reparsing every time a file is visited
           reftex-save-parse-info t
-          reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
+          ;; reftex-toc-follow-mode t ; Other buffer follows the point in toc buffer
+          ;; Cache selection buffers for faster access
           reftex-use-multiple-selection-buffers t
           ;; Make the toc display with a vertical split, since it is easy to read long lines
           reftex-toc-split-windows-horizontally nil
           ;; Adjust the fraction
           reftex-toc-split-windows-fraction 0.3
-          reftex-guess-label-type t ; Try to guess the label type before prompting
-          reftex-use-fonts t ; Use nice fonts for toc
-          reftex-revisit-to-follow t ; Revisit files if necessary when browsing toc
-          reftex-auto-recenter-toc t ; Center on the section currently being edited
-          ;; Cache selection buffers for faster access
-          reftex-use-multiple-selection-buffers t)
+          ;; reftex-guess-label-type t ; Try to guess the label type before prompting
+          ;; reftex-use-fonts t ; Use nice fonts for toc
+          ;; reftex-revisit-to-follow t ; Revisit files if necessary when browsing toc
+          ;; reftex-auto-recenter-toc t ; Center on the section currently being edited
+          )
 
-    (sb/reftex-try-add-all-bibitems-from-bibtex)
+    ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
 
     ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
     ;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
     ;; consistent but this is expensive. We can use an idle timer.
     ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
-    (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)
+    ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)
 
     (diminish 'reftex-mode))
 
