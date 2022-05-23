@@ -86,7 +86,6 @@
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 (use-package popwin
-  :disabled t
   :hook (after-init-hook . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
@@ -115,22 +114,22 @@
   (add-to-list 'popwin:special-display-config '(deadgrep-mode))
   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
-;; Learn about display actions, see [[info:elisp#Display Action Functions]]
-;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-(add-to-list 'display-buffer-alist '("*Faces*"                  display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck checkers*"      display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Flycheck errors*"        display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Help*"                   display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*deadgrep*"            display-buffer-same-window))
-;; Open shell in same window.
-(add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
-(add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
+;; ;; Learn about display actions, see [[info:elisp#Display Action Functions]]
+;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
+;; (add-to-list 'display-buffer-alist '("*Faces*"                  display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*Flycheck checkers*"      display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*Flycheck errors*"        display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*Help*"                   display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("^\\*deadgrep*"            display-buffer-same-window))
+;; ;; Open shell in same window.
+;; (add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
+;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
 
 ;; ;; Do not popup the *Async Shell Command* buffer
 ;; (add-to-list 'display-buffer-alist

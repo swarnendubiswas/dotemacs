@@ -803,6 +803,7 @@
     ;; python-nav-backward-statement
     ;; python-nav-forward-statement
     (bind-keys :package python :map python-mode-map
+               ("C-c C-d")
                ("M-a"   . python-nav-backward-block)
                ("M-e"   . python-nav-forward-block)
                ("C-c <" . python-indent-shift-left)
@@ -988,7 +989,7 @@
           ;; Indent comments as a regular line
           sh-indent-comment t)
 
-    ;; (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
+    (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
 
     (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
 

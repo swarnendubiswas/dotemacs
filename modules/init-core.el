@@ -357,7 +357,7 @@
           ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
           ;; Keep remote file without testing if they still exist
           recentf-keep '(file-remote-p file-readable-p)
-          recentf-max-saved-items 100 ; Larger values help in lookup
+          recentf-max-saved-items 150 ; Larger values help in lookup
           ;; recentf-menu-filter 'recentf-sort-descending
           recentf-filename-handlers (append '(abbreviate-file-name)
                                             recentf-filename-handlers))

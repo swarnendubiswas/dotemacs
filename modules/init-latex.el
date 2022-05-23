@@ -147,8 +147,9 @@
     ;; Enable rainbow mode after applying styles to the buffer
     (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
 
-    (unbind-key "C-c ;" TeX-mode-map)))
-
+    (unbind-key "C-c ;" TeX-mode-map)
+    (unbind-key "C-c C-d" TeX-mode-map)
+    (bind-key "$" #'self-insert-command TeX-mode-map)))
 
 (progn
   (add-hook 'bibtex-mode-hook #'lsp-deferred)
@@ -299,12 +300,13 @@ Ignore if no file is found."
           )
 
     ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
-
     ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+
     ;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
     ;; consistent but this is expensive. We can use an idle timer.
     ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)
     ;; (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)
+    (run-with-idle-timer 10 nil #'reftex-toc-Rescan)
 
     (diminish 'reftex-mode))
 
@@ -410,9 +412,9 @@ after a successful compilation."
 ;;                         (lambda ()
 ;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
 
-(with-eval-after-load "tex-mode"
-  (defvar latex-mode-map)
-  (bind-key "C-x C-s" #'sb/latex-compile-open-pdf latex-mode-map))
+;; (with-eval-after-load "tex-mode"
+;;   (defvar latex-mode-map)
+;;   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf latex-mode-map))
 
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
