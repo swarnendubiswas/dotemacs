@@ -411,6 +411,7 @@
   (with-eval-after-load "vertico"
     (vertico-indexed-mode 1)))
 
+;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
     (if (bound-and-true-p sb/disable-package.el)
@@ -426,10 +427,11 @@
   (unless (fboundp 'vertico-grid-mode)
     (autoload #'vertico-grid-mode "vertico-grid" nil t))
 
-  (with-eval-after-load "vertico"
-    (setq vertico-grid-max-columns 4)
+  ;; (with-eval-after-load "vertico"
+  ;;   (setq vertico-grid-max-columns 4)
 
-    (vertico-grid-mode 1)))
+  ;;   (vertico-grid-mode 1))
+  )
 
 (when (eq sb/minibuffer-completion 'vertico)
   (eval-when-compile
@@ -801,7 +803,7 @@
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
-  :if (eq sb/capf 'company)
+  :if (and (display-graphic-p) (eq sb/capf 'company))
   :after company
   :demand t
   :commands company-posframe-mode

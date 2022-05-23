@@ -333,7 +333,6 @@ chown -R $USER:$USER "${CTAGS_DIR}"
 
 cd "${CTAGS_DIR}" || echo "Failed: cd ${CTAGS_DIR}"
 ./autogen.sh
-# "--prefix=/where/you/want" defaults to "/usr/local"
 ./configure
 make
 make install
@@ -348,7 +347,7 @@ make install
 
 # Alacritty
 
-# ALACRITTY_VER="0.10.0"
+# ALACRITTY_VER="0.10.1"
 # cd "$GITHUB"
 # wget https://github.com/alacritty/alacritty/archive/refs/tags/v"${ALACRITTY_VER}".tar.gz
 # tar xz alacritty-"${ALACRITTY_VER}".tar.gz
