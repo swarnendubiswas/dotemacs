@@ -11,37 +11,22 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
-(progn
-  (unless (fboundp 'ibuffer)
-    (autoload #'ibuffer "ibuffer" nil t))
-
-  (bind-keys :package ibuffer
-             ("C-x C-b" . ibuffer))
-
+(use-package ibuffer
+  :straight nil
+  :config
   (defalias 'list-buffers 'ibuffer)
+  (setq ibuffer-display-summary nil
+        ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
+        ibuffer-use-header-line t)
+  :bind ("C-x C-b" . ibuffer))
 
-  (with-eval-after-load "ibuffer"
-    (defvar ibuffer-display-summary)
-    (defvar ibuffer-default-sorting-mode)
-    (defvar ibuffer-use-header-line)
-
-    (setq ibuffer-display-summary nil
-          ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
-          ibuffer-use-header-line t)))
-
-(progn
-  (declare-function ibuffer-auto-mode "ibuffer-ext")
-
-  (unless (fboundp 'ibuffer-auto-mode)
-    (autoload #'ibuffer-auto-mode "ibuf-ext" nil t))
-
-  (add-hook 'ibuffer-hook #'ibuffer-auto-mode)
-
-  (with-eval-after-load "ibuf-ext"
-    ;; Do not show filter groups if there are no buffers in that group
-    (defvar ibuffer-show-empty-filter-groups)
-
-    (setq ibuffer-show-empty-filter-groups nil)))
+(use-package ibuf-ext
+  :straight nil
+  :commands ibuffer-auto-mode
+  :config
+  ;; Do not show filter groups if there are no buffers in that group
+  (setq ibuffer-show-empty-filter-groups nil)
+  :hook (ibuffer-hook . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
   :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))

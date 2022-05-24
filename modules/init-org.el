@@ -63,23 +63,15 @@
   :hook (org-mode-hook . org-bullets-mode))
 
 ;; Make invisible parts of Org elements appear visible
-(progn
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package org-appear
-          :straight (org-appear :type git :host github :repo "awth13/org-appear"))
-      (use-package org-appear)))
-
-  (unless (fboundp 'org-appear-mode)
-    (autoload #'org-appear-mode "org-appear" nil t))
-
-  (add-hook 'org-mode-hook #'org-appear-mode)
-
-  (with-eval-after-load "org-appear"
-    (setq org-appear-autosubmarkers t
-          org-appear-autoentities   t
-          org-appear-autolinks      t
-          org-appear-autoemphasis   t)))
+(use-package org-appear ; Make invisible parts of Org elements appear visible
+  :straight (org-appear :type git :host github :repo "awth13/org-appear")
+  :commands org-appear-mode
+  :hook (org-mode-hook . org-appear-mode)
+  :custom
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities   t)
+  (org-appear-autolinks      t)
+  (org-appear-autoemphasis  t))
 
 (use-package ox-gfm
   :after org

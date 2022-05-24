@@ -108,14 +108,8 @@
   (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
-(eval-when-compile
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package smerge-mode
-        :straight (:type built-in))
-    (use-package smerge-mode
-      :ensure nil)))
-
 (use-package smerge-mode
+  :straight (:type built-in)
   :after hydra
   :commands (smerge-next smerge-prev smerge-auto-leave
                          smerge-keep-base smerge-keep-upper
@@ -159,14 +153,8 @@
         ("M-g m"   . smerge-context-menu)
         ("M-g M"   . smerge-popup-context-menu)))
 
-(eval-when-compile
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package ediff
-        :straight (:type built-in))
-    (use-package ediff
-      :ensure nil)))
-
 (use-package ediff
+  :straight (:type built-in)
   :after magit
   :demand t
   :defines ediff-window-setup-function
@@ -184,6 +172,7 @@
   :demand t)
 
 (use-package consult-ls-git
+  :commands (consult-ls-git consult-ls-git-other-window)
   :bind
   (("C-c g f" . #'consult-ls-git)
    ("C-c g F" . #'consult-ls-git-other-window)))

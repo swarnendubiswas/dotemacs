@@ -7,52 +7,46 @@
 
 ;;; Code:
 
-(progn
-  (unless (fboundp 'show-paren-mode)
-    (autoload #'show-paren-mode "paren" nil t))
-
-  (add-hook 'after-init-hook show-paren-mode)
-
-  (with-eval-after-load "paren"
-    (defvar show-paren-style)
-    (defvar show-paren-when-point-inside-paren)
-    (defvar show-paren-when-point-in-periphery)
-
-    (setq show-paren-style 'parenthesis ; `mixed' may lead to performance problems
-          show-paren-when-point-inside-paren t
-          show-paren-when-point-in-periphery t)))
+(use-package paren
+  :straight nil
+  :hook (after-init-hook . show-paren-mode)
+  :custom
+  (show-paren-style 'parenthesis); `mixed' may lead to performance problems
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t))
 
 ;; Enable autopairing
-(when nil
-  (progn
-    (unless (fboundp 'electric-pair-mode)
-      (autoload #'electric-pair-mode "elec-pair" nil t))
+(use-package elec-pair
+  :straight nil
+  :commands (electric-pair-mode)
+  :disabled t
+  ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)
+  :hook (after-init-hook . electric-pair-mode)
+  :config
+  ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+  (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+  (defvar electric-pair-pairs)
+  (defvar electric-pair-text-pairs)
+  (defvar electric-pair-preserve-balance)
 
-    (add-hook 'after-init-hook electric-pair-mode)
+  (declare-function sb/add-markdown-pairs "init-emacs28")
 
-    (with-eval-after-load "elec-pair"
-      ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
-      (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
-      (defvar electric-pair-pairs)
-      (defvar electric-pair-text-pairs)
-      (defvar electric-pair-preserve-balance)
+  (defun sb/add-markdown-pairs ()
+    "Add custom pairs to `markdown-mode'."
+    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-      (declare-function sb/add-markdown-pairs "init-parens")
+  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-      (defun sb/add-markdown-pairs ()
-        "Add custom pairs to `markdown-mode'."
-        (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
-        (setq-local electric-pair-text-pairs electric-pair-pairs))
+  ;; Avoid balancing parentheses since they can be both irritating and slow
+  (setq electric-pair-preserve-balance nil)
 
-      (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
-
-      ;; Avoid balancing parentheses since they can be both irritating and slow
-      (setq electric-pair-preserve-balance nil)
-
-      (add-hook 'minibuffer-setup-hook (lambda ()
-                                         (electric-pair-mode -1)))
-      (add-hook 'minibuffer-exit-hook (lambda ()
-                                        (electric-pair-mode 1))))))
+  ;; Disable pairs when entering minibuffer
+  (add-hook 'minibuffer-setup-hook (lambda ()
+                                     (electric-pair-mode -1)))
+  ;; Re-enable pairs when existing minibuffer
+  (add-hook 'minibuffer-exit-hook (lambda ()
+                                    (electric-pair-mode 1))))
 
 ;; `sp-cheat-sheet' will show you all the commands available, with examples. Seems to have
 ;; performance issue with `latex-mode', `markdown-mode', and large JSON files.

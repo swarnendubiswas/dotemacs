@@ -204,219 +204,162 @@
   (when (fboundp mode)
     (funcall mode 1)))
 
-;; Auto-refresh all buffers
-(progn
-  (unless (fboundp 'global-auto-revert-mode)
-    (autoload #'global-auto-revert-mode "autorevert" nil t))
-
-  ;; (run-with-idle-timer 2 nil #'global-auto-revert-mode)
-  (add-hook 'after-init-hook #'global-auto-revert-mode)
-
-  (with-eval-after-load "autorevert"
-    (defvar auto-revert-interval)
-    (defvar auto-revert-remote-files)
-    (defvar auto-revert-use-notify)
-    (defvar auto-revert-verbose)
-    (defvar global-auto-revert-non-file-buffers)
-    (defvar auto-revert-check-vc-info)
-
-    (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-          ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
-          ;; use Emacs. Enabling auto-revert is always safe.
-          auto-revert-remote-files t
-          auto-revert-verbose nil
-          ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
-          ;; contents of the "main" directory changes
-          global-auto-revert-non-file-buffers t)
-
-    (diminish 'auto-revert-mode))
+(use-package autorevert ; Auto-refresh all buffers
+  :straight nil
+  :commands global-auto-revert-mode
+  :diminish auto-revert-mode
+  :hook (after-init-hook . global-auto-revert-mode)
+  :config
+  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
+        ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
+        ;; use Emacs. Enabling auto-revert is always safe.
+        auto-revert-remote-files t
+        auto-revert-verbose nil
+        ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
+        ;; contents of the directory changes
+        global-auto-revert-non-file-buffers t)
 
   ;; Revert all (e.g., PDF) files without asking
   (setq revert-without-query '("\\.*")))
 
-(progn
-  (unless (fboundp 'save-place-mode)
-    (autoload #'save-place-mode "saveplace" nil t))
-
-  ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
-  ;; timer.
-  (add-hook 'after-init-hook #'save-place-mode))
-
+;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
+;; timer.
+(use-package saveplace ; Remember cursor position in files
+  :straight nil
+  :hook (after-init-hook . save-place-mode))
 
 ;; Save minibuffer history across sessions
-(progn
-  (unless (fboundp 'savehist-mode)
-    (autoload #'savehist-mode "savehist" nil t))
+(use-package savehist ; Save minibuffer history across sessions
+  :straight nil
+  :commands savehist-mode
+  :hook (after-init-hook . savehist-mode)
+  :custom
+  (savehist-additional-variables '(extended-command-history
+                                   command-history
+                                   bookmark-history
+                                   file-name-history
+                                   kill-ring
+                                   search-ring
+                                   regexp-search-ring)))
 
-  ;; (run-with-idle-timer 3 nil #'savehist-mode)
-  (add-hook 'after-init-hook #'savehist-mode)
-
-  (with-eval-after-load "savehist"
-    (defvar savehist-additional-variables)
-    (defvar savehist-file)
-    (defvar savehist-save-minibuffer-history)
-
-    (setq savehist-additional-variables '(extended-command-history
-                                          command-history
-                                          bookmark-history
-                                          file-name-history
-                                          kill-ring
-                                          search-ring
-                                          regexp-search-ring)
-          savehist-save-minibuffer-history t)))
-
-(setq uniquify-after-kill-buffer-p t
-      uniquify-buffer-name-style 'forward
-      uniquify-ignore-buffers-re "^\\*"
-      uniquify-separator "/"
-      uniquify-strip-common-suffix t)
+(use-package uniquify
+  :straight nil
+  :init
+  (setq uniquify-after-kill-buffer-p t
+        uniquify-buffer-name-style   'forward
+        uniquify-ignore-buffers-re   "^\\*"
+        uniquify-separator           "/"
+        uniquify-strip-common-suffix t))
 
 ;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
-(progn
-  (unless (fboundp 'abbrev-mode)
-    (autoload #'abbrev-mode "abbrev" nil t))
+(use-package abbrev
+  :straight nil
+  :diminish
+  :hook (after-init-hook . abbrev-mode)
+  :custom
+  ;; The "abbrev-defs" file is under version control
+  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
+  (save-abbrevs 'silently))
 
-  (add-hook 'after-init-hook #'abbrev-mode)
+;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
+(use-package so-long
+  :straight nil
+  :hook (after-init-hook . global-so-long-mode))
 
-  (with-eval-after-load "abbrev"
-    (setq abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory)
-          save-abbrevs 'silently)
+(use-package imenu
+  :straight nil
+  :after (:any markdown-mode yaml-mode prog-mode)
+  :custom
+  (imenu-auto-rescan t)
+  (imenu-max-items 1000)
+  ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
+  ;; mouse support enabled
+  (imenu-use-popup-menu nil)
+  ;; `nil' implies no sorting and will list by position in the buffer
+  (imenu-sort-function nil))
 
-    (diminish 'abbrev-mode)))
+(use-package recentf
+  :straight nil
+  :commands (recentf-mode recentf-add-file recentf-save-file
+                          recentf-save-list
+                          recentf-apply-filename-handlers
+                          recentf-cleanup)
+  :config
+  (setq recentf-auto-cleanup 'never ; Do not stat remote files
+        ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
+        recentf-exclude '("[/\\]elpa/"
+                          "[/\\]\\.git/"
+                          ".*\\.gz\\'"
+                          ".*\\.xz\\'"
+                          ".*\\.zip\\'"
+                          ".*-autoloads.el\\'"
+                          "[/\\]archive-contents\\'"
+                          "[/\\]\\.loaddefs\\.el\\'"
+                          "[/\\]tmp/.*"
+                          ".*/recentf\\'"
+                          ".*/recentf-save.el\\'"
+                          "~$"
+                          "/.autosaves/"
+                          ".*/TAGS\\'"
+                          "*.cache"
+                          ".*/treemacs/persist.org")
+        ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+        ;; Keep remote file without testing if they still exist
+        recentf-keep '(file-remote-p file-readable-p)
+        ;; Larger values help in lookup but takes more time to check if the files exist
+        recentf-max-saved-items 100
+        ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
+        ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
+        recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
-(progn
-  ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
-  (unless (fboundp 'global-so-long-mode)
-    (autoload #'global-so-long-mode "so-long" nil t))
+  ;; Use the true file name and not the symlink name
+  (dolist (exclude `(,(file-truename no-littering-etc-directory)
+                     ,(file-truename no-littering-var-directory)))
+    (add-to-list 'recentf-exclude exclude))
 
-  ;; (run-with-idle-timer 2 nil #'global-so-long-mode)
-  (add-hook 'after-init-hook #'global-so-long-mode))
+  (when (bound-and-true-p sb/disable-package.el)
+    (add-to-list 'recentf-exclude `,(recentf-expand-file-name (straight--emacs-dir "straight"))))
 
-(with-eval-after-load "imenu"
-  (defvar imenu-auto-rescan)
-  (defvar imenu-max-items)
-  (defvar imenu-use-popup-menu)
+  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
+  ;; after idling for 30 seconds.
+  (run-with-idle-timer 30 t #'recentf-save-list)
 
-  (setq imenu-auto-rescan t
-        imenu-max-items 1000
-        ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
-        ;; mouse support enabled
-        imenu-use-popup-menu nil
-        ;; `nil' implies no sorting and will list by position in the buffer
-        imenu-sort-function nil))
+  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
+  ;; timers.
+  (run-with-idle-timer 60 t #'recentf-cleanup)
+  :hook (after-init-hook . recentf-mode))
 
-(progn
-  (declare-function recentf-save-file "recentf")
-  (declare-function recentf-save-list "recentf")
-  (declare-function recentf-cleanup "recentf")
-  (declare-function recentf-add-file "recentf")
-  (declare-function recentf-apply-filename-handlers "recentf")
-
-  (unless (fboundp 'recentf-mode)
-    (autoload #'recentf-mode "recentf" nil t))
-  (unless (fboundp 'recentf-add-file)
-    (autoload #'recentf-add-file "recentf" nil t))
-  (unless (fboundp 'recentf-save-file)
-    (autoload #'recentf-save-file "recentf" nil t))
-  (unless (fboundp 'recentf-cleanup)
-    (autoload #'recentf-cleanup "recentf" nil t))
-  (unless (fboundp 'recentf-save-list)
-    (autoload #'recentf-save-list "recentf" nil t))
-  (unless (fboundp 'recentf-apply-filename-handlers)
-    (autoload #'recentf-apply-filename-handlers "recentf" nil t))
-
-  ;; Load immediately after start since I use it often
-  (add-hook 'after-init-hook #'recentf-mode)
-
-  (with-eval-after-load "recentf"
-    (defvar recentf-auto-cleanup)
-    (defvar recentf-exclude)
-    (defvar recentf-max-saved-items)
-    (defvar recentf-menu-filter)
-    (defvar recentf-save-file)
-    (defvar recentf-keep)
-    (defvar recentf-filename-handlers)
-
-    (setq recentf-auto-cleanup 'never ; Do not stat remote files
-          ;; Check regex with `re-builder', use `recentf-cleanup' to update the list
-          recentf-exclude '("[/\\]elpa/"
-                            "[/\\]\\.git/"
-                            ".*\\.gz\\'"
-                            ".*\\.xz\\'"
-                            ".*\\.zip\\'"
-                            "[/\\]archive-contents\\'"
-                            "[/\\]\\.loaddefs\\.el\\'"
-                            "[/\\]tmp/.*"
-                            ".*/recentf\\'"
-                            ".*/recentf-save.el\\'"
-                            ".*/init.el\\'"
-                            "~$"
-                            "/.autosaves/"
-                            ".*/TAGS\\'"
-                            "*.cache")
-          ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-          ;; Keep remote file without testing if they still exist
-          recentf-keep '(file-remote-p file-readable-p)
-          recentf-max-saved-items 150 ; Larger values help in lookup
-          ;; recentf-menu-filter 'recentf-sort-descending
-          recentf-filename-handlers (append '(abbreviate-file-name)
-                                            recentf-filename-handlers))
-
-    ;; Use the true file name and not the symlink name
-    (dolist (exclude `(,(file-truename no-littering-etc-directory)
-                       ,(file-truename no-littering-var-directory)))
-      (add-to-list 'recentf-exclude exclude))
-
-    (when (bound-and-true-p sb/disable-package.el)
-      (add-to-list 'recentf-exclude `,(recentf-expand-file-name (straight--emacs-dir "straight"))))
-
-    ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
-    ;; after idling for 30 seconds.
-    (run-with-idle-timer 30 t #'recentf-save-list)
-
-    ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using
-    ;; idle timers.
-    (run-with-idle-timer 60 t #'recentf-cleanup)))
-
-(progn
-  (declare-function image-get-display-property "image-mode")
-
-  (unless (fboundp 'image-mode)
-    (autoload #'image-mode "image-mode" nil t))
-  (unless (fboundp 'sb/show-image-dimensions-in-mode-line)
-    (autoload #'sb/show-image-dimensions-in-mode-line "image-mode" nil t))
-  (unless (fboundp 'image-get-display-property)
-    (autoload #'image-get-display-property "image-mode" nil t))
-
-  (eval-and-compile
-    ;; http://emacs.stackexchange.com/a/7693/289
-    (defun sb/show-image-dimensions-in-mode-line nil
-      (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
-             (width (car image-dimensions))
-             (height (cdr image-dimensions)))
-        (setq mode-line-buffer-identification
-              (format "%s %dx%d" (propertized-buffer-identification "%12b") width height)))))
-
-  (when (display-graphic-p)
-    ;; Enable converting external formats (i.e., webp) to internal ones.
-    (setq image-use-external-converter t)
-
-    (add-hook 'image-mode-hook #'sb/show-image-dimensions-in-mode-line)
-
-    (add-to-list 'auto-mode-alist '("\\.svg$" . image-mode))))
+(use-package image-mode
+  :straight nil
+  :if (display-graphic-p)
+  :commands image-get-display-property
+  :mode "\\.svg$"
+  :preface
+  ;; http://emacs.stackexchange.com/a/7693/289
+  (defun sb/show-image-dimensions-in-mode-line ()
+    (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
+           (width (car image-dimensions))
+           (height (cdr image-dimensions)))
+      (setq mode-line-buffer-identification
+            (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
+  :custom
+  ;;  Enable converting external formats (i.e., webp) to internal ones.
+  (image-use-external-converter t)
+  :hook (image-mode-hook . sb/show-image-dimensions-in-mode-line))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
-(progn
-  (when (fboundp 'server-running-p)
-    (autoload #'server-running-p "server" nil t))
-
-  (when nil
-    (add-hook 'after-init-hook
-              (lambda ()
-                (unless (string-equal "root" (getenv "USER")) ; Only start server mode if not root
-                  (unless (and (fboundp 'server-running-p) (server-running-p))
-                    (server-start)))))))
+(use-package server
+  :straight nil
+  :disabled t
+  :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
+  :commands server-running-p
+  :hook
+  (after-init-hook . (lambda ()
+                       ;; Only start server mode if not root
+                       (unless (string-equal "root" (getenv "USER"))
+                         (unless (and (fboundp 'server-running-p) (server-running-p))
+                           (server-start))))))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."
@@ -440,18 +383,12 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; "Shift + direction" arrows
-(progn
-  (unless (fboundp 'windmove-default-keybindings)
-    (autoload #'windmove-default-keybindings "windmove" nil t))
-
-  (windmove-default-keybindings)
-
-  (with-eval-after-load "windmove"
-    (defvar windmove-wrap-around)
-
-    ;; Wrap around at edges
-    (setq windmove-wrap-around t)))
+(use-package windmove ; "Shift + direction" arrows
+  :straight nil
+  :commands windmove-default-keybindings
+  :init (windmove-default-keybindings)
+  :custom
+  (windmove-wrap-around t "Wrap around at edges"))
 
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-mode 1))

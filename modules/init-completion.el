@@ -23,28 +23,30 @@
 
 ;; Use "C-M-/" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
-(progn
-  (unless (fboundp 'dabbrev-completion)
-    (autoload #'dabbrev-completion "dabbrev" nil t))
-
-  (setq dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
-  (bind-key "C-M-/" #'dabbrev-completion))
+(use-package dabbrev
+  :straight nil
+  :custom
+  (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
+  :bind ("C-M-/" . dabbrev-completion))
 
 ;; Replace `dabbrev-exp' with `hippie-expand'.
-(progn
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                           try-expand-dabbrev-all-buffers
-                                           try-expand-dabbrev-from-kill
-                                           try-complete-file-name-partially
-                                           try-complete-file-name
-                                           try-expand-all-abbrevs
-                                           try-expand-list
-                                           try-expand-line
-                                           try-complete-lisp-symbol-partially
-                                           try-complete-lisp-symbol)
-        hippie-expand-verbose nil)
-  (bind-key "M-/" #'hippie-expand)
-  (bind-key [remap dabbrev-expand] #'hippie-expand))
+(use-package hippie-exp
+  :straight nil
+  :custom
+  (hippie-expand-try-functions-list '(try-expand-dabbrev
+                                      try-expand-dabbrev-all-buffers
+                                      try-expand-dabbrev-from-kill
+                                      try-complete-file-name-partially
+                                      try-complete-file-name
+                                      try-expand-all-abbrevs
+                                      try-expand-list
+                                      try-expand-line
+                                      try-complete-lisp-symbol-partially
+                                      try-complete-lisp-symbol))
+  (hippie-expand-verbose nil)
+  :bind
+  (("M-/"   . hippie-expand)
+   ([remap dabbrev-expand] . hippie-expand)))
 
 (use-package ivy
   :functions ivy-format-function-line
@@ -298,20 +300,15 @@
   )
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes
-                             (vertico-directory
-                              vertico-grid
-                              vertico-indexed
-                              vertico-quick
-                              vertico-repeat)))
-      (use-package vertico))))
-
 (use-package vertico
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes
+                     (vertico-directory
+                      vertico-grid
+                      vertico-indexed
+                      vertico-quick
+                      vertico-repeat))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands (command-completion-default-include-p minibuffer-keyboard-quit)
@@ -328,6 +325,7 @@
     (setq read-extended-command-predicate #'command-completion-default-include-p))
   (when (display-graphic-p)
     (bind-key "<escape>" #'minibuffer-keyboard-quit vertico-map))
+
   :bind
   (("<f2>" .  find-file)
    :map vertico-map
@@ -335,124 +333,58 @@
    ("<tab>" . vertico-insert)))
 
 ;; More convenient directory navigation commands
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-directory
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-directory)))
-      (use-package vertico-directory
-        :ensure nil
-        :load-path "extras")))
+(use-package vertico-directory
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-directory))
+  :if  (eq sb/minibuffer-completion 'vertico)
+  :after vertico
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy) ; Tidy shadowed file names
+  :bind
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word)))
 
-  (declare-function vertico-directory-tidy "vertico-directory")
-  (declare-function vertico-directory-enter "vertico-directory")
-  (declare-function vertico-directory-delete-char "vertico-directory")
-  (declare-function vertico-directory-delete-word "vertico-directory")
+(use-package vertico-repeat
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-repeat))
+  :after vertico
+  :hook (minibuffer-setup-hook . vertico-repeat-save)
+  :bind
+  (("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)))
 
-  (unless (fboundp 'vertico-directory-tidy)
-    (autoload #'vertico-directory-tidy "vertico-directory" nil t))
-  (unless (fboundp 'vertico-directory-enter)
-    (autoload #'vertico-directory-enter "vertico-directory" nil t))
-  (unless (fboundp 'vertico-directory-delete-char)
-    (autoload #'vertico-directory-delete-char "vertico-directory" nil t))
-  (unless (fboundp 'vertico-directory-delete-word)
-    (autoload #'vertico-directory-delete-word "vertico-directory" nil t))
-
-  (with-eval-after-load "vertico"
-    ;; Tidy shadowed file names
-    (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
-
-    (bind-keys :package vertico
-               :map vertico-map
-               ("RET" . vertico-directory-enter)
-               ("DEL" . vertico-directory-delete-char)
-               ("M-DEL" . vertico-directory-delete-word))))
-
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-repeat
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-repeat)))
-      (use-package vertico-repeat
-        :ensure nil
-        :load-path "extras")))
-
-  (declare-function vertico-repeat-save "vertico-repeat")
-  (declare-function vertico-repeat-last "vertico-repeat")
-  (declare-function vertico-repeat-select "vertico-repeat")
-
-  (unless (fboundp 'vertico-repeat-save)
-    (autoload #'vertico-repeat-save "vertico-repeat" nil t))
-
-  (with-eval-after-load "vertico"
-    (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-
-    (bind-keys :package vertico
-               ("C-c r" . vertico-repeat-last)
-               ("M-r" . vertico-repeat-select))))
-
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-indexed
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-indexed)))
-      (use-package vertico-indexed
-        :ensure nil
-        :load-path "extras")))
-
-  (declare-function vertico-indexed-mode "vertico-indexed")
-
-  (unless (fboundp 'vertico-indexed-mode)
-    (autoload #'vertico-indexed-mode "vertico-indexed" nil t))
-
-  (with-eval-after-load "vertico"
-    (vertico-indexed-mode 1)))
+(use-package vertico-indexed
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-indexed))
+  :after vertico
+  :commands vertico-indexed-mode
+  :init (vertico-indexed-mode 1))
 
 ;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-grid
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-grid)))
-      (use-package vertico-grid
-        :ensure nil
-        :load-path "extras")))
+(use-package vertico-grid
+  :if  (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-grid))
+  :after vertico
+  :disabled t
+  :commands vertico-grid-mode
+  :init (vertico-grid-mode 1)
+  :custom
+  (vertico-grid-max-columns 4))
 
-  (declare-function vertico-grid-mode "vertico-grid")
-
-  (unless (fboundp 'vertico-grid-mode)
-    (autoload #'vertico-grid-mode "vertico-grid" nil t))
-
-  ;; (with-eval-after-load "vertico"
-  ;;   (setq vertico-grid-max-columns 4)
-
-  ;;   (vertico-grid-mode 1))
-  )
-
-(when (eq sb/minibuffer-completion 'vertico)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package vertico-quick
-          :straight (vertico :files (:defaults "extensions/*")
-                             :includes (vertico-quick)))
-      (use-package vertico-quick
-        :ensure nil
-        :load-path "extras")))
-
-  (declare-function vertico-quick-insert "vertico-quick")
-  (declare-function vertico-quick-exit "vertico-quick")
-  (declare-function vertico-quick-jump "vertico-quick")
-
-  (with-eval-after-load "vertico"
-    (bind-keys :package vertico
-               :map vertico-map
-               ;; ("C-c q" . vertico-quick-insert)
-               ;; ("C-'" . vertico-quick-exit)
-               ("C-'" . vertico-quick-jump))))
+(use-package vertico-quick
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-quick))
+  :after vertico
+  :bind
+  (:map vertico-map
+        ;; ("C-c q" . vertico-quick-insert)
+        ;; ("C-'" . vertico-quick-exit)
+        ("C-'" . vertico-quick-jump)))
 
 (use-package consult
   :after vertico
@@ -520,20 +452,14 @@
                      :preview-key nil))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
-(when (eq sb/capf 'corfu))
-(eval-when-compile
-  (if (bound-and-true-p sb/disable-package.el)
-      (use-package corfu
-        :straight (corfu :files (:defaults "extensions/*")
-                         :includes (corfu-indexed
-                                    corfu-quick
-                                    corfu-info
-                                    corfu-history)))
-    (use-package corfu)))
-
 ;; https://github.com/minad/corfu/wiki
 (use-package corfu
   :if (eq sb/capf 'corfu)
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (corfu-indexed
+                              corfu-quick
+                              corfu-info
+                              corfu-history))
   :commands corfu--goto
   :preface
   (defun sb/corfu-move-to-minibuffer ()
@@ -579,53 +505,32 @@
         ([remap move-end-of-line] . sb/corfu-end-of-prompt)
         ("M-m" . sb/corfu-move-to-minibuffer)))
 
-(when (eq sb/capf 'corfu)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package corfu-indexed
-          :straight (corfu :files (:defaults "extensions/*")
-                           :includes (corfu-indexed)))
-      (use-package corfu-indexed
-        :ensure nil
-        :load-path "extras")))
+(use-package corfu-indexed
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (corfu-indexed))
+  :if (eq sb/capf 'corfu)
+  :after corfu
+  :commands corfu-indexed-mode
+  :init (corfu-indexed-mode 1))
 
-  (unless (fboundp 'corfu-indexed-mode)
-    (autoload #'corfu-indexed-mode "corfu-indexed" nil t))
+(use-package corfu-quick
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (corfu-quick))
+  :if (eq sb/capf 'corfu)
+  :after corfu
+  :bind
+  (:map corfu-map
+        ("C-'" . corfu-quick-insert)))
 
-  (with-eval-after-load "corfu"
-    (corfu-indexed-mode 1)))
-
-(when (eq sb/capf 'corfu)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package corfu-quick
-          :straight (corfu :files (:defaults "extensions/*")
-                           :includes (corfu-quick)))
-      (use-package corfu-quick
-        :ensure nil
-        :load-path "extras")))
-
-  (bind-keys :package corfu
-             :map corfu-map
-             ("C-'" . corfu-quick-insert)))
-
-(when (eq sb/capf 'corfu)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package corfu-history
-          :straight (corfu :files (:defaults "extensions/*")
-                           :includes (corfu-history)))
-      (use-package corfu-history
-        :ensure nil
-        :load-path "extras")))
-
-  (unless (fboundp 'corfu-history-mode)
-    (autoload #'corfu-history-mode "corfu-history" nil t))
-
-  (with-eval-after-load "corfu"
-    (with-eval-after-load "savehist"
-      (add-to-list 'savehist-additional-variables 'corfu-history)
-      (corfu-history-mode 1))))
+(use-package corfu-history
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (corfu-history))
+  :if (eq sb/capf 'corfu)
+  :commands corfu-history-mode
+  :after (corfu savehist)
+  :init
+  (add-to-list 'savehist-additional-variables 'corfu-history)
+  (corfu-history-mode 1))
 
 (use-package corfu-doc
   :if (eq sb/capf 'corfu)
@@ -634,31 +539,15 @@
   ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
   (corfu-echo-documentation nil))
 
-(progn
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (progn
-          (use-package popon
-            :straight (popon :type git
-                             :repo "https://codeberg.org/akib/emacs-popon.git"))
-          (use-package corfu-terminal
-            :straight (corfu-terminal :type git
-                                      :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")))
-      (progn
-        (use-package popon
-          :ensure nil
-          :load-path "extras")
-        (use-package corfu-terminal
-          :ensure nil
-          :load-path "extras"))))
+(use-package popon
+  :straight (popon :type git
+                   :repo "https://codeberg.org/akib/emacs-popon.git"))
 
-  (declare-function corfu-terminal-mode "corfu-terminal")
-
-  (unless (fboundp 'corfu-terminal-mode)
-    (autoload #'corfu-terminal-mode "corfu-terminal" nil t))
-
-  (when (and (not (display-graphic-p)) (eq sb/capf 'corfu))
-    (add-hook 'corfu-mode-hook #'corfu-terminal-mode)))
+(use-package corfu-terminal
+  :straight (corfu-terminal :type git
+                            :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+  :if (and (not (display-graphic-p)) (eq sb/capf 'corfu))
+  :hook (corfu-mode-hook . corfu-terminal-mode))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -682,9 +571,9 @@
              ;; Complete with Dabbrev at point
              cape-dabbrev)
   :init
-  (dolist (backends '(cape-symbol cape-keyword cape-file cape-tex
-                                  cape-dabbrev cape-ispell cape-dict cape-history))
-    (add-to-list 'completion-at-point-functions backends))
+  ;; (dolist (backends '(cape-symbol cape-keyword cape-file cape-tex
+  ;;                                 cape-dabbrev cape-ispell cape-dict cape-history))
+  ;;   (add-to-list 'completion-at-point-functions backends))
   :custom
   (cape-dabbrev-min-length 3)
   ;; :config
@@ -717,15 +606,14 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-(when (eq sb/capf 'company)
-  (use-package company)
-
-  ;; The module does not specify an `autoload'. So we get the following error without the following
-  ;; declaration.
-  ;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
-  ;; function company-capf"
-  (unless (fboundp 'company-capf)
-    (autoload #'company-capf "company-capf" nil t)))
+;; The module does not specify an `autoload'. So we get the following error without the following
+;; declaration.
+;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
+;; function company-capf"
+(use-package company-capf
+  :straight company
+  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
+  :commands company-capf)
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with

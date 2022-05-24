@@ -200,58 +200,36 @@
 (use-package define-word
   :commands (define-word define-word-at-point))
 
-(when nil
-  (progn
-    (eval-when-compile
-      (if (bound-and-true-p sb/disable-package.el)
-          (use-package number-separator
-            :straight (number-separator :type git :host github
-                                        :repo "legalnonsense/number-separator.el"))
-        (use-package number-separator
-          :ensure nil
-          :load-path "extras")))
+(use-package number-separator
+  :straight (number-separator :type git :host github
+                              :repo "legalnonsense/number-separator.el")
+  :commands number-separator-mode
+  :custom
+  (number-separator ",")
+  (number-separator-interval 3)
+  (number-separator-ignore-threshold 4)
+  (number-separator-decimal-char ".")
+  :diminish)
 
-    (declare-function number-separator-mode "number-separator")
+(use-package eldoc
+  :straight nil
+  :if (symbol-value 'sb/IS-LINUX)
+  :commands turn-on-eldoc-mode
+  :diminish
+  :hook (prog-mode-hook . turn-on-eldoc-mode)
+  :config
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
+  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
+  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
+  ;; useful information.
+  ;; (setq eldoc-echo-area-use-multiline-p nil)
 
-    (unless (fboundp 'number-separator-mode)
-      (autoload #'number-separator-mode "number-separator" nil t))
-
-    (with-eval-after-load "number-separator"
-      (defvar number-separator)
-      (defvar number-separator-interval)
-      (defvar number-separator-ignore-threshold)
-      (defvar number-separator-decimal-char)
-
-      (setq number-separator ","
-            number-separator-interval 3
-            number-separator-ignore-threshold 4
-            number-separator-decimal-char ".")
-
-      (diminish 'number-sepator-mode))))
-
-(when (symbol-value 'sb/IS-LINUX)
-  (progn
-    (unless (fboundp 'turn-on-eldoc-mode)
-      (autoload #'turn-on-eldoc-mode "eldoc" nil t))
-
-    (dolist (hook '(prog-mode-hook))
-      (add-hook hook #'turn-on-eldoc-mode))
-
-    (with-eval-after-load "eldoc"
-      ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
-      ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
-      ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
-      ;; useful information.
-      ;; (setq eldoc-echo-area-use-multiline-p nil)
-
-      ;; Allow eldoc to trigger after completions
-      (with-eval-after-load "company"
-        (eldoc-add-command 'company-complete-selection
-                           'company-complete-common
-                           'company-capf
-                           'company-abort))
-
-      (diminish 'eldoc-mode))))
+  ;; Allow eldoc to trigger after completions
+  (with-eval-after-load "company"
+    (eldoc-add-command 'company-complete-selection
+                       'company-complete-common
+                       'company-capf
+                       'company-abort)))
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 (use-package eldoc-box
@@ -270,26 +248,12 @@
   :if (bound-and-true-p sb/debug-init-file)
   :commands (bug-hunter-init-file bug-hunter-file))
 
-(when (bound-and-true-p sb/debug-init-file)
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package explain-pause-mode
-          :straight (explain-pause-mode :type git :host github
-                                        :repo "lastquestion/explain-pause-mode"))
-      (use-package explain-pause-mode
-        :ensure nil
-        :load-path "extras")))
-
-  (declare-function explain-pause-mode "explain-pause-mode")
-  (declare-function explain-pause-top "explain-pause-mode")
-
-  (unless (fboundp 'explain-pause-mode)
-    (autoload #'explain-pause-mode "explain-pause-mode" nil t))
-  (unless (fboundp 'explain-pause-top)
-    (autoload #'explain-pause-top "explain-pause-mode" nil t))
-
-  (with-eval-after-load "explain-pause-mode"
-    (diminish 'explain-pause-mode)))
+(use-package explain-pause-mode
+  :straight (explain-pause-mode :type git :host github
+                                :repo "lastquestion/explain-pause-mode")
+  :if (bound-and-true-p sb/debug-init-file)
+  :commands (explain-pause-mode explain-pause-top)
+  :diminish)
 
 (use-package ace-window
   :bind ([remap other-window] . ace-window))

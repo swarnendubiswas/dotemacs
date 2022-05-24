@@ -16,118 +16,81 @@
 (declare-function s-starts-with? "s")
 (declare-function s-ends-with? "s")
 
-(progn
-  (declare-function dired-next-line "dired")
-  (declare-function dired-jump "dired")
+(use-package dired
+  :straight nil
+  :commands (dired-next-line dired-jump)
+  :defines dired-clean-confirm-killing-deleted-buffers
+  :preface
+  (defun sb/dired-go-home ()
+    (interactive)
+    (dired sb/user-home-directory))
 
-  (unless (fboundp 'sb/dired-go-home)
-    (autoload #'sb/dired-go-home "init-dired" nil t))
-  (unless (fboundp 'sb/dired-jump-to-top)
-    (autoload #'sb/dired-jump-to-top "init-dired" nil t))
-  (unless (fboundp 'sb/dired-jump-to-bottom)
-    (autoload #'sb/dired-jump-to-bottom "init-dired" nil t))
-  (unless (fboundp 'auto-revert-mode)
-    (autoload #'auto-revert-mode "dired" nil t))
-  (unless (fboundp 'dired-next-line)
-    (autoload #'dired-next-line "dired" nil t))
-  (unless (fboundp 'dired-jump)
-    (autoload #'dired-jump "dired" nil t))
-  (unless (fboundp 'find-file)
-    (autoload #'find-file "dired" nil t))
+  (defun sb/dired-jump-to-top ()
+    (interactive)
+    (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
+    (dired-next-line 2))
 
-  (eval-and-compile
-    (defun sb/dired-go-home nil
-      (interactive)
-      (dired sb/user-home-directory))
+  (defun sb/dired-jump-to-bottom ()
+    (interactive)
+    (goto-char (point-max)) ; Faster than `(end-of-buffer)'
+    (dired-next-line -1))
+  :bind
+  (:map dired-mode-map
+        ("M-<home>" . sb/dired-go-home)
+        ("M-<up>"   . sb/dired-jump-to-top)
+        ("M-<down>" . sb/dired-jump-to-bottom)
+        ("i"        . find-file))
+  :hook
+  ;; Auto refresh dired when files change
+  (dired-mode-hook . auto-revert-mode)
+  :config
+  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
+        ;; Guess a default target directory. When there are two dired buffers, Emacs will select
+        ;; another buffer as the target (e.g., target for copying files).
+        dired-dwim-target t
+        ;; Check "ls" for additional options
+        dired-listing-switches "-ABhl --si --group-directories-first"
+        dired-ls-F-marks-symlinks t ; -F marks links with @
+        dired-recursive-copies 'always ; Single prompt for all n directories
+        dired-recursive-deletes 'always ; Single prompt for all n directories
+        ;; Do not ask whether to kill buffers visiting deleted files
+        dired-clean-confirm-killing-deleted-buffers nil)
 
-    (defun sb/dired-jump-to-top nil
-      (interactive)
-      (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
-      (dired-next-line 2))
+  (when (boundp 'dired-kill-when-opening-new-dired-buffer)
+    (setq dired-kill-when-opening-new-dired-buffer t)))
 
-    (defun sb/dired-jump-to-bottom nil
-      (interactive)
-      (goto-char (point-max)) ; Faster than `(end-of-buffer)'
-      (dired-next-line -1)))
+(use-package dired-x
+  :straight nil
+  :defines dired-cleanup-buffers-too
+  :commands (dired-omit-mode)
+  :hook (dired-mode-hook . dired-omit-mode)
+  :bind ("C-x C-j"  . dired-jump)
+  :config
+  (setq dired-cleanup-buffers-too t
+        ;; Do not show messages when omitting files
+        dired-omit-verbose nil
+        ;; Do not ask whether to kill buffers visiting deleted files
+        dired-clean-confirm-killing-deleted-buffers nil)
 
-  (with-eval-after-load "dired"
-    (defvar dired-auto-revert-buffer)
-    (defvar dired-dwim-target)
-    (defvar dired-ls-F-marks-symlinks)
-    (defvar dired-recursive-copies)
-    (defvar dired-recursive-deletes)
-    (defvar dired-omit-verbose)
+  ;; Obsolete from Emacs 28+
+  (unless sb/EMACS28+
+    (setq dired-bind-jump t))
 
-    (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
-          ;; Guess a default target directory. When there are two dired buffers, Emacs will select
-          ;; another buffer as the target (e.g., target for copying files).
-          dired-dwim-target t
-          ;; Check "ls" for additional options
-          dired-listing-switches "-ABhl --si --group-directories-first"
-          dired-ls-F-marks-symlinks t ; -F marks links with @
-          dired-recursive-copies 'always ; Single prompt for all n directories
-          ;; Single prompt for all n directories
-          dired-recursive-deletes 'always)
+  ;; ":diminish dired-omit-mode" does not work
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Remove 'Omit' from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map)
 
-    (when (boundp 'dired-kill-when-opening-new-dired-buffer)
-      (setq dired-kill-when-opening-new-dired-buffer t))
-
-    ;; Auto refresh dired when files change
-    (add-hook 'dired-mode-hook #'auto-revert-mode)
-
-    (defvar dired-mode-map)
-
-    (bind-keys :package dired :map dired-mode-map
-               ("M-<home>" . sb/dired-go-home)
-               ("i"        . find-file)
-               ("M-<up>"   . sb/dired-jump-to-top)
-               ("M-<down>" . sb/dired-jump-to-bottom))))
-
-(progn
-  (declare-function dired-omit-mode "dired-x")
-
-  (unless (fboundp 'dired-omit-mode)
-    (autoload #'dired-omit-mode "dired-x" nil t))
-
-  (add-hook 'dired-mode-hook #'dired-omit-mode)
-
-  (bind-keys :package dired
-             ("C-x C-j" . dired-jump))
-
-  (with-eval-after-load "dired-x"
-    ;; Do not show messages when omitting files
-    (defvar dired-omit-verbose)
-    (defvar dired-cleanup-buffers-too)
-    (defvar dired-clean-confirm-killing-deleted-buffers)
-    (defvar dired-bind-jump)
-    (defvar dired-omit-files)
-
-    (setq dired-cleanup-buffers-too t
-          ;; Do not show messages when omitting files
-          dired-omit-verbose nil
-          ;; Do not ask whether to kill buffers visiting deleted files
-          dired-clean-confirm-killing-deleted-buffers nil)
-
-    (setq dired-omit-files
-          (concat dired-omit-files
-                  "\\|^.DS_Store\\'"
-                  "\\|^.project\\(?:ile\\)?\\'"
-                  "\\|^.\\(svn\\|git\\)\\'"
-                  "\\|^.ccls-cache\\'"
-                  ;; FIXME: Fix the regexp
-                  ;; "\\|__pycache__"
-                  "\\|\\(?:\\.js\\)?\\.meta\\'"
-                  "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
-
-    (unless sb/EMACS28+ ; Obsolete from Emacs 28+
-      (setq dired-bind-jump t))
-
-    ;; ":diminish dired-omit-mode" does not work
-    ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-    (defadvice dired-omit-startup (after diminish-dired-omit activate)
-      "Remove 'Omit' from the modeline."
-      (diminish 'dired-omit-mode)
-      dired-mode-map)))
+  (setq dired-omit-files
+        (concat dired-omit-files
+                "\\|^.DS_Store\\'"
+                "\\|^.project\\(?:ile\\)?\\'"
+                "\\|^.\\(svn\\|git\\)\\'"
+                "\\|^.ccls-cache\\'"
+                "\\|^__pycache__\\'"
+                "\\|\\(?:\\.js\\)?\\.meta\\'"
+                "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'")))
 
 (use-package dired-narrow ; Narrow `dired' to match filter
   :after dired
@@ -136,33 +99,19 @@
         ("/" . dired-narrow)))
 
 ;; Do not create multiple dired buffers
-(progn
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package dired+
-          :straight (dired+ :type git :host github :repo "emacsmirror/dired-plus"))
-      (use-package dired+
-        :ensure nil
-        :load-path "extras")))
-
+(use-package dired+
+  :straight (dired+ :type git :host github :repo "emacsmirror/dired-plus")
+  :commands diredp-toggle-find-file-reuse-dir
+  :init
   ;; Set before the module is loaded
   (setq diredp-bind-problematic-terminal-keys nil)
-
-  (declare-function diredp-toggle-find-file-reuse-dir "dired+")
-
-  (unless (fboundp 'diredp-toggle-find-file-reuse-dir)
-    (autoload #'diredp-toggle-find-file-reuse-dir "dired+" nil t))
-
-  (add-hook 'dired-mode-hook (lambda ()
-                               (when sb/EMACS27
-                                 (diredp-toggle-find-file-reuse-dir 1))))
-
-  (with-eval-after-load "dired+"
-    (defvar diredp-hide-details-initially-flag)
-    (defvar diredp-hide-details-propagate-flag)
-
-    (setq diredp-hide-details-initially-flag nil
-          diredp-hide-details-propagate-flag nil)))
+  :custom
+  (diredp-hide-details-initially-flag nil)
+  (diredp-hide-details-propagate-flag nil)
+  :hook
+  (dired-mode-hook . (lambda ()
+                       (when sb/EMACS27
+                         (diredp-toggle-find-file-reuse-dir 1)))))
 
 ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
@@ -331,15 +280,11 @@
   :demand t
   :config (treemacs-load-theme "all-the-icons"))
 
-(with-eval-after-load "async"
-  (with-eval-after-load "dired"
-    (unless (fboundp 'dired-async-mode)
-      (autoload #'dired-async-mode "dired-async" nil t))
-
-    (add-hook 'dired-mode-hook #'dired-async-mode)
-
-    (with-eval-after-load "dired-async"
-      (diminish 'dired-async-mode))))
+(use-package dired-async
+  :straight async
+  :after (dired async)
+  :hook (dired-mode-hook . dired-async-mode)
+  :diminish)
 
 (use-package consult-dir
   :if (eq sb/minibuffer-completion 'vertico)

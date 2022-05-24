@@ -13,6 +13,10 @@
 (defvar use-package-enable-imenu-support)
 (defvar use-package-hook-name-suffix)
 
+;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
+;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions'
+;; to persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
+;; packages to their locked versions, making the config totally reproducible across environments.
 (when (bound-and-true-p sb/disable-package.el)
   (defvar bootstrap-version)
   (defvar straight-build-dir)
@@ -31,7 +35,13 @@
                                    emacs-major-version
                                    version-separator
                                    emacs-minor-version)
-        straight-check-for-modifications nil)
+        straight-check-for-modifications nil
+        straight-use-package-by-default t
+        ;; There is no need to download the whole Git history, and a single branch often suffices.
+        ;; However, that seems to lead to "git revision parsing" errors while using
+        ;; `straight-pull-all' and `straight-freeze-versions', which is irritating.
+        ;; straight-vc-git-default-clone-depth '(1 single-branch)
+        straight-disable-native-compile nil)
 
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -49,21 +59,7 @@
   (setq use-package-enable-imenu-support t
         use-package-hook-name-suffix     nil)
 
-  (straight-use-package 'use-package)
-
-  (setq straight-use-package-by-default t
-        straight-disable-native-compile nil
-        ;; There is no need to download the whole Git history, and a single branch often suffices.
-        ;; However, that seems to lead to "git revision parsing" errors while using
-        ;; `straight-pull-all' and `straight-freeze-versions', which is irritating.
-        ;; straight-vc-git-default-clone-depth '(1 single-branch)
-        )
-
-  ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
-  ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions'
-  ;; to persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
-  ;; packages to their locked versions, making the config totally reproducible across environments.
-  )
+  (straight-use-package 'use-package))
 
 (unless (bound-and-true-p sb/disable-package.el)
   (with-eval-after-load 'package
@@ -149,9 +145,10 @@
 ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
 ;; command.
-(when (and sb/EMACS27+ (not (bound-and-true-p sb/disable-package.el)))
-  (when (boundp 'package-quickstart)
-    (setq package-quickstart t))
+(with-eval-after-load "no-littering"
+  (when (not (bound-and-true-p sb/disable-package.el))
+    (when (boundp 'package-quickstart)
+      (setq package-quickstart t)))
 
   (bind-keys :package package
              ("C-c d p" . package-quickstart-refresh)
@@ -171,17 +168,10 @@
   :group 'sb/emacs)
 
 ;; Asynchronously byte compile packages installed with `package.el'
-(progn
-  (eval-when-compile
-    (if (bound-and-true-p sb/disable-package.el)
-        (use-package async
-          :straight (async :type git :host github :repo "jwiegley/emacs-async"))
-      (use-package async)))
-
-  (unless (fboundp 'async-bytecomp-package-mode)
-    (autoload #'async-bytecomp-package-mode "async" nil t))
-
-  (async-bytecomp-package-mode 1))
+(use-package async
+  :straight (async :type git :host github :repo "jwiegley/emacs-async")
+  :commands async-bytecomp-package-mode
+  :init (async-bytecomp-package-mode 1))
 
 ;; Get PATH with "(getenv "PATH")".
 ;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".

@@ -11,29 +11,22 @@
 
 ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; `isearch' candidates.
-(progn
-  (unless (fboundp 'isearch-forward-regexp)
-    (autoload #'isearch-forward-regexp "isearch" nil t))
-  (unless (fboundp 'isearch-repeat-forward)
-    (autoload #'isearch-repeat-forward "isearch" nil t))
-  (unless (fboundp 'isearch-occur)
-    (autoload #'isearch-occur "isearch" nil t))
-
-  (with-eval-after-load "isearch"
-    (setq search-highlight t ; Highlight incremental search
-          isearch-lazy-highlight t
-          isearch-lazy-count t)
-
-    ;; Change the binding for `isearch-forward-regexp' and `isearch-repeat-forward'
-    (bind-keys :package isearch
-               ("C-s")
-               ;; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
-               ("C-M-f")
-               ("C-f"     . isearch-forward-regexp)
-               :map isearch-mode-map
-               ("C-s")
-               ("C-f"     . isearch-repeat-forward)
-               ("C-c C-o" . isearch-occur))))
+(use-package isearch
+  :straight nil
+  :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
+  :custom
+  (search-highlight t "Highlight incremental search")
+  (isearch-lazy-highlight t)
+  (isearch-lazy-count t)
+  :bind
+  ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
+  (("C-s"     . nil)
+   ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
+   ("C-f"     . isearch-forward-regexp)
+   :map isearch-mode-map
+   ("C-s"     . nil)
+   ("C-f"     . isearch-repeat-forward)
+   ("C-c C-o" . isearch-occur)))
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
