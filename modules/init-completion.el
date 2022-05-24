@@ -489,6 +489,8 @@
   (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
   (corfu-preselect-first t)
+  (corfu-separator ?\s) ; Use space
+  (corfu-quit-no-match 'separator)
   :config
   (unless (featurep 'corfu-doc)
     (setq corfu-echo-documentation t))
@@ -499,11 +501,19 @@
         ("[backtab]" . corfu-previous)
         ("C-p" . corfu-previous)
         ("<escape>" . corfu-quit)
-        ("M-d" . corfu-show-documentation)
-        ("M-l" . corfu-show-location)
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
         ([remap move-end-of-line] . sb/corfu-end-of-prompt)
         ("M-m" . sb/corfu-move-to-minibuffer)))
+
+(use-package corfu-info
+  :straight (corfu :files (:defaults "extensions/*")
+                   :includes (corfu-info))
+  :if (eq sb/capf 'corfu)
+  :after corfu
+  :bind
+  (:map corfu-map
+        ("M-d" . corfu-info-documentation)
+        ("M-l" . corfu-info-location)))
 
 (use-package corfu-indexed
   :straight (corfu :files (:defaults "extensions/*")
@@ -535,6 +545,11 @@
 (use-package corfu-doc
   :if (eq sb/capf 'corfu)
   :hook (corfu-mode-hook . corfu-doc-mode)
+  :bind
+  (:map corfu-map
+        ("M-p" . corfu-doc-scroll-down)
+        ("M-n" . corfu-doc-scroll-up)
+        ([remap corfu-info-documentation] . corfu-doc-toggle))
   :custom
   ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
   (corfu-echo-documentation nil))
@@ -577,20 +592,37 @@
   ;;   (add-to-list 'completion-at-point-functions backends))
   :custom
   (cape-dabbrev-min-length 3)
-  ;; :config
-  ;; (add-hook 'emacs-lisp-mode-hook
-  ;;           (lambda ()
-  ;;             (setq-local completion-at-point-functions
-  ;;                         (list (cape-super-capf #'cape-symbol #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
-  ;; (add-hook 'prog-mode-hook
-  ;;           (lambda ()
-  ;;             (setq-local completion-at-point-functions
-  ;;                         (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
-  ;; (add-hook 'text-mode-hook
-  ;;           (lambda ()
-  ;;             (setq-local completion-at-point-functions
-  ;;                         (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
-  )
+  :config
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              ;; (setq-local completion-at-point-functions
+              ;;             (list (cape-super-capf #'cape-symbol #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
+              (add-to-list 'completion-at-point-functions #'cape-file)
+              (add-to-list 'completion-at-point-functions #'cape-symbol)
+              (add-to-list 'completion-at-point-functions #'cape-keyword)
+              (add-to-list 'completion-at-point-functions #'cape-history)
+              (add-to-list 'completion-at-point-functions #'cape-dict)
+              (add-to-list 'completion-at-point-functions #'cape-ispell)
+              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              ;; (setq-local completion-at-point-functions
+              ;;             (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
+              (add-to-list 'completion-at-point-functions #'cape-file)
+              (add-to-list 'completion-at-point-functions #'cape-keyword)
+              (add-to-list 'completion-at-point-functions #'cape-history)
+              (add-to-list 'completion-at-point-functions #'cape-dict)
+              (add-to-list 'completion-at-point-functions #'cape-ispell)
+              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
+  (add-hook 'text-mode-hook
+            (lambda ()
+              ;; (setq-local completion-at-point-functions
+              ;;             (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
+              (add-to-list 'completion-at-point-functions #'cape-file)
+              (add-to-list 'completion-at-point-functions #'cape-history)
+              (add-to-list 'completion-at-point-functions #'cape-dict)
+              (add-to-list 'completion-at-point-functions #'cape-ispell)
+              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append))))
 
 ;; Provide icons for Corfu
 (use-package kind-icon
@@ -1006,10 +1038,11 @@
 
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-  (setq completion-styles '(orderless
+  (setq orderless-matching-styles '(orderless-regexp)
+        orderless-component-separator #'orderless-escapable-split-on-space
+        completion-styles '(orderless
                             ;;basic partial-completion initials emacs22
                             )
-        orderless-matching-styles '(orderless-regexp)
         completion-category-defaults nil
         ;; LATER: I do not understand this.
         ;; completion-category-overrides '((file (styles basic substring remote orderless partial-completion))
