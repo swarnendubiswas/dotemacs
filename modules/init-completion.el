@@ -541,7 +541,8 @@
 
 (use-package popon
   :straight (popon :type git
-                   :repo "https://codeberg.org/akib/emacs-popon.git"))
+                   :repo "https://codeberg.org/akib/emacs-popon.git")
+  :if (and (not (display-graphic-p)) (eq sb/capf 'corfu)))
 
 (use-package corfu-terminal
   :straight (corfu-terminal :type git

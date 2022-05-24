@@ -105,7 +105,6 @@
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
 (use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
-  :commands aggressive-indent-mode
   :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
   :diminish
   :custom
@@ -732,19 +731,30 @@
                                  (lambda ()
                                    (setq python-shell-interpreter "python3")))))
 
+;; FIXME: There is an error in passing options to isort
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
+  :disabled t
   :commands (py-isort-before-save py-isort-buffer py-isort-region)
   :hook
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
   :custom
-  (py-isort-options '("-lines=100")))
+  (py-isort-options '("-l 100"
+                      "--up" ; Use parentheses
+                      "--tc" ; Use a trailing comma on multiline imports
+                      )))
+
+(use-package python-isort
+  :straight (python-isort :type git :host github :repo "wyuenho/emacs-python-isort")
+  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
+  :custom
+  (python-isort-arguments '("--stdout" "--atomic" "-l 100" "--up" "--tc" "-"))
+  :hook (python-mode-hook . python-isort-on-save-mode))
 
 ;; "pyright --createstub pandas"
 (use-package lsp-pyright
   :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
-  :disabled t
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode-hook . (lambda ()
@@ -785,7 +795,6 @@
 (use-package yapfify
   :diminish yapf-mode
   :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
-  :commands yapf-mode
   :hook (python-mode-hook . yapf-mode))
 
 (use-package cperl-mode
@@ -1025,8 +1034,7 @@
 (use-package tree-sitter
   :straight tree-sitter-langs
   :straight t
-  :functions tree-sitter-hl-mode
-  :commands (global-tree-sitter-mode tree-sitter-hl-mode)
+  :commands global-tree-sitter-mode
   :diminish tree-sitter-mode
   :preface
   (defun sb/enable-tree-sitter ()
@@ -1039,10 +1047,9 @@
       (add-hook hook (lambda ()
                        (require 'tree-sitter-langs)
                        (global-tree-sitter-mode 1)))))
-  ;; :init (run-with-idle-timer 2 nil #'sb/enable-tree-sitter)
-  :hook (after-init-hook . sb/enable-tree-sitter)
-  :config
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+  :hook
+  ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
+   (after-init-hook . sb/enable-tree-sitter)))
 
 (use-package dotenv-mode
   :mode "\\.env\\'")
