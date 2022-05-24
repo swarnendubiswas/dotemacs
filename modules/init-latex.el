@@ -220,7 +220,6 @@ Ignore if no file is found."
 (use-package bib-cite
   :straight nil
   :diminish bib-cite-minor-mode
-  :commands bib-cite-minor-mode
   :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
   :custom (bib-cite-use-reftex-view-crossref t)
   :bind (:map bib-cite-minor-mode-map

@@ -693,22 +693,18 @@
 (use-package company-posframe
   :if (and (display-graphic-p) (eq sb/capf 'company))
   :after company
-  :demand t
   :commands company-posframe-mode
   :diminish
-  :config
-  (setq company-posframe-show-metadata nil ; Difficult to distinguish the help text from completions
-        company-posframe-show-indicator t ; Hide the backends, the display is not great
-        ;; Disable showing the help frame
-        company-posframe-quickhelp-delay nil)
+  :custom
+  (company-posframe-show-metadata nil "Difficult to distinguish the help text from completions")
+  (company-posframe-show-indicator t "Hide the backends, the display is not great")
+  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+  :init
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :if (eq sb/capf 'company)
-  :after company
-  :commands company-quickhelp-mode
-  ;; :init (run-with-idle-timer 3 nil #'company-quickhelp-mode)
-  :hook (after-init-hook . company-quickhelp-mode))
+  :hook (company-mode-hook . company-quickhelp-mode))
 
 (use-package company-statistics
   :if (eq sb/capf 'company)
@@ -1025,7 +1021,7 @@
 ;; major-modes where you want YASnippet enabled.
 ;; https://github.com/joaotavora/yasnippet/blob/master/README.mdown
 (use-package yasnippet
-  :commands (yas-global-mode snippet-mode yas-hippie-try-expand yas-reload-all)
+  :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (prog-mode-hook . yas-global-mode)
   :diminish yas-minor-mode

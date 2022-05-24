@@ -18,9 +18,7 @@
 ;; Enable autopairing
 (use-package elec-pair
   :straight nil
-  :commands (electric-pair-mode)
   :disabled t
-  ;; :init (run-with-idle-timer 2 nil #'electric-pair-mode)
   :hook (after-init-hook . electric-pair-mode)
   :config
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode

@@ -101,7 +101,6 @@
     (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
 
 (use-package highlight-indentation
-  :commands highlight-indentation-mode
   :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
@@ -1086,7 +1085,6 @@
 ;; The following section helper ensures that files are given `+x' permissions when they are saved,
 ;; if they contain a valid shebang line.
 (use-package executable
-  :commands (executable-make-buffer-file-executable-if-script-p)
   :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
 ;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'

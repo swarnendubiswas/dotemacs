@@ -206,7 +206,6 @@
 
 (use-package autorevert ; Auto-refresh all buffers
   :straight nil
-  :commands global-auto-revert-mode
   :diminish auto-revert-mode
   :hook (after-init-hook . global-auto-revert-mode)
   :config
@@ -280,10 +279,10 @@
 
 (use-package recentf
   :straight nil
-  :commands (recentf-mode recentf-add-file recentf-save-file
-                          recentf-save-list
-                          recentf-apply-filename-handlers
-                          recentf-cleanup)
+  :commands (recentf-add-file recentf-save-file
+                              recentf-save-list
+                              recentf-apply-filename-handlers
+                              recentf-cleanup)
   :config
   (setq recentf-auto-cleanup 'never ; Do not stat remote files
         ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
@@ -307,7 +306,7 @@
         ;; Keep remote file without testing if they still exist
         recentf-keep '(file-remote-p file-readable-p)
         ;; Larger values help in lookup but takes more time to check if the files exist
-        recentf-max-saved-items 100
+        recentf-max-saved-items 150
         ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
         ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
         recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))

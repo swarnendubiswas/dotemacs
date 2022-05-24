@@ -59,13 +59,11 @@
 
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
-  :commands org-bullets-mode
   :hook (org-mode-hook . org-bullets-mode))
 
 ;; Make invisible parts of Org elements appear visible
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (org-appear :type git :host github :repo "awth13/org-appear")
-  :commands org-appear-mode
   :hook (org-mode-hook . org-appear-mode)
   :custom
   (org-appear-autosubmarkers t)

@@ -103,7 +103,6 @@
 (use-package vundo
   :if sb/EMACS28+
   :straight (vundo :type git :host github :repo "casouri/vundo")
-  :commands vundo
   :bind
   (([remap undo] . vundo)
    ("C-z" . vundo)
@@ -214,7 +213,6 @@
 (use-package eldoc
   :straight nil
   :if (symbol-value 'sb/IS-LINUX)
-  :commands turn-on-eldoc-mode
   :diminish
   :hook (prog-mode-hook . turn-on-eldoc-mode)
   :config

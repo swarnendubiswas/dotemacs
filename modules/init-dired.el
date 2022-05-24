@@ -62,7 +62,6 @@
 (use-package dired-x
   :straight nil
   :defines dired-cleanup-buffers-too
-  :commands (dired-omit-mode)
   :hook (dired-mode-hook . dired-omit-mode)
   :bind ("C-x C-j"  . dired-jump)
   :config

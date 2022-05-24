@@ -88,7 +88,7 @@
 
 (use-package which-key ; Show help popups for prefix keys
   :diminish
-  :commands (which-key-mode which-key-setup-side-window-right-bottom)
+  :commands which-key-setup-side-window-right-bottom
   ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
   :hook (after-init-hook . which-key-mode)
   :config

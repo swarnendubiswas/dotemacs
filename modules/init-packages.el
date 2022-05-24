@@ -127,7 +127,7 @@
 ;; Allow GC to happen after a period of idle time, initialize this package early
 (use-package gcmh
   :diminish
-  :commands (gcmh-mode gcmh-idle-garbage-collect)
+  :commands gcmh-idle-garbage-collect
   :hook (after-init-hook . gcmh-mode)
   :config
   (when (bound-and-true-p sb/debug-init-file)

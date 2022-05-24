@@ -22,10 +22,9 @@
 
 (use-package ibuf-ext
   :straight nil
-  :commands ibuffer-auto-mode
-  :config
+  :custom
   ;; Do not show filter groups if there are no buffers in that group
-  (setq ibuffer-show-empty-filter-groups nil)
+  (ibuffer-show-empty-filter-groups nil)
   :hook (ibuffer-hook . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project

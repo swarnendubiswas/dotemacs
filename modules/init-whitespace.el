@@ -43,7 +43,6 @@
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
-  :commands ws-butler-mode
   :diminish
   :hook (prog-mode-hook . ws-butler-mode))
 

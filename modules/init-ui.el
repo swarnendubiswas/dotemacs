@@ -171,7 +171,6 @@
 
 (use-package doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
-  :commands doom-modeline-mode
   :init
   ;; Requires the fonts included with `all-the-icons', run "M-x all-the-icons-install-fonts".
   (when (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
@@ -185,7 +184,7 @@
         ;; Reduce space on the modeline
         doom-modeline-buffer-file-name-style 'truncate-with-project
         doom-modeline-unicode-fallback t)
-  (doom-modeline-mode 1))
+  :hook (after-init-hook . doom-modeline-mode))
 
 (use-package spaceline
   :defines (spaceline-hud-p spaceline-selection-info-p
@@ -213,7 +212,6 @@
 ;; Minimal modeline information
 (use-package awesome-tray ; Minimal modeline information
   :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
-  :commands awesome-tray-mode
   :if (eq sb/modeline-theme 'awesome-tray)
   :hook (after-init-hook . awesome-tray-mode)
   :custom
@@ -283,8 +281,7 @@
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
 (use-package auto-dim-other-buffers
-  :commands (adob--rescan-windows auto-dim-other-buffers-mode)
-  ;; :init (run-with-idle-timer 3 nil #'auto-dim-other-buffers-mode)
+  :commands adob--rescan-windows
   :hook (after-init-hook . auto-dim-other-buffers-mode))
 
 ;; (cond
@@ -390,7 +387,6 @@
               (setq resize-mini-windows nil))))
 
 (use-package beacon
-  :commands beacon-mode
   :diminish
   :hook (after-init-hook . beacon-mode))
 
@@ -465,7 +461,6 @@
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
   :if (display-mouse-p)
-  :commands global-disable-mouse-mode
   :diminish disable-mouse-global-mode
   :hook (after-init-hook . global-disable-mouse-mode))
 

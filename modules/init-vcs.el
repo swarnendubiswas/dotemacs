@@ -85,8 +85,7 @@
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
   :if (boundp 'vc-handled-backends)
-  :commands (diff-hl-magit-pre-refresh diff-hl-magit-post-refresh
-                                       diff-hl-dired-mode-unless-remote global-diff-hl-mode)
+  :commands diff-hl-dired-mode-unless-remote
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -172,7 +171,6 @@
   :demand t)
 
 (use-package consult-ls-git
-  :commands (consult-ls-git consult-ls-git-other-window)
   :bind
   (("C-c g f" . #'consult-ls-git)
    ("C-c g F" . #'consult-ls-git-other-window)))
