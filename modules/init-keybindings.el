@@ -17,12 +17,12 @@
 (declare-function sb/switch-to-scratch "init-functions")
 (declare-function sb/counsel-all-files-recursively "init-functions")
 
+;; "<f10" and "<f11>" conflict with Gnome window manager keybindings
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
  ("C-c z"     . repeat)
  ("C-z"       . undo)
- ;; "<f11>" conflicts with Gnome window manager keybindings
  ("C-<f11>"   . delete-other-windows)
  ("C-x k"     . kill-this-buffer)
  ("M-<left>"  . previous-buffer)
@@ -35,7 +35,7 @@
  ("M-l"       . downcase-dwim)
  ("<f7>"      . previous-error)
  ("<f8>"      . next-error)
- ;; The default keybinding "C-S-backspace" does not work with the TUI.
+ ;; The default keybinding "C-S-backspace" does not work with the TUI without Alacritty customizations.
  ("M-k"       . kill-whole-line))
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
@@ -59,9 +59,6 @@
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
 
-;; Both `counsel-imenu' and `consult-imenu' show lot of unnecessary information
-(bind-key "C-c C-j" #'imenu)
-
 (with-eval-after-load "popup"
   (bind-key "[escape]" #'keyboard-quit popup-menu-keymap))
 
@@ -73,6 +70,7 @@
   (global-set-key [remap previous-buffer] #'sb/previous-buffer))
 
 (use-package default-text-scale
+  :if (display-graphic-p)
   :bind
   (("C-M-+" . default-text-scale-increase)
    ("C-M--" . default-text-scale-decrease)))
@@ -89,7 +87,6 @@
 (use-package which-key ; Show help popups for prefix keys
   :diminish
   :commands which-key-setup-side-window-right-bottom
-  ;; :init (run-with-idle-timer 3 nil #'which-key-mode)
   :hook (after-init-hook . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
@@ -100,7 +97,6 @@
 
 (use-package which-key-posframe
   :if (display-graphic-p)
-  :commands which-key-posframe-mode
   :hook (which-key-mode-hook . which-key-posframe-mode)
   :config
   ;; Modify the posframe background if it has a low contrast
@@ -116,9 +112,6 @@
 ;; ":exit nil" means the hydra state will continue, ":exit t" will quit the hydra. ":color red"
 ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
 ;; blue" means exit.
-
-;; (defvar lv-use-separator)
-;; (setq lv-use-separator t)
 
 (use-package hydra
   :commands (hydra-default-pre hydra-keyboard-quit defhydra
@@ -480,31 +473,25 @@
     ("l" comment-line)
     ("r" comment-region))))
 
-(when (display-graphic-p)
-  (progn
-    (bind-key "C-c h a" #'sb/hydra-avy/body)
-    (bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
-    (bind-key "C-c h e" #'sb/hydra-error/body)
-    (bind-key "C-c h f" #'sb/hydra-flycheck/body)
-    (bind-key "C-c h g" #'sb/smerge-hydra/body)
-    (bind-key "C-c h j" #'sb/hydra-projectile/body)
-    (bind-key "C-c h l" #'sb/hydra-lsp/body)
-    (bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
-    (bind-key "C-c h p" #'sb/hydra-smartparens/body)
-    (bind-key "C-c h s" #'sb/hydra-spelling/body)
-    (bind-key "C-c h t" #'sb/hydra-move-text/body)
-    (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
-    (bind-key "C-c h i" #'sb/hydra-straight/body)))
+(bind-key "C-c h a" #'sb/hydra-avy/body)
+(bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
+(bind-key "C-c h e" #'sb/hydra-error/body)
+(bind-key "C-c h f" #'sb/hydra-flycheck/body)
+(bind-key "C-c h g" #'sb/smerge-hydra/body)
+(bind-key "C-c h j" #'sb/hydra-projectile/body)
+(bind-key "C-c h l" #'sb/hydra-lsp/body)
+(bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
+(bind-key "C-c h p" #'sb/hydra-smartparens/body)
+(bind-key "C-c h s" #'sb/hydra-spelling/body)
+(bind-key "C-c h t" #'sb/hydra-move-text/body)
+(bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
+(bind-key "C-c h i" #'sb/hydra-straight/body)
 
 (use-package term-keys
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
   :hook (after-init-hook . term-keys-mode)
   :config
-  (require 'term-keys-alacritty)
-  ;; (with-temp-buffer
-  ;;   (insert (term-keys/alacritty-config))
-  ;;   (write-region (point-min) (point-max) "~/alacritty-for-term-keys.yml"))
-  )
+  (require 'term-keys-alacritty))
 
 (provide 'init-keybindings)
 

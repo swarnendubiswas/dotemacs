@@ -23,7 +23,7 @@
               (display-fill-column-indicator-mode 1))))
 
 (use-package subword
-  :straight nil
+  :straight (:type built-in)
   :diminish
   :hook (prog-mode-hook . subword-mode))
 
@@ -34,7 +34,7 @@
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 (use-package hideshow
-  :straight nil
+  :straight (:type built-in)
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
   :hook (prog-mode-hook . hs-minor-mode)
@@ -51,6 +51,7 @@
 
 (use-package xref
   :commands xref-etags-mode
+  :custom (xref-search-program 'ripgrep)
   :bind
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
@@ -65,12 +66,11 @@
   :after xref
   :demand t
   :commands dumb-jump-xref-activate
-  :custom
-  (dumb-jump-quiet t)
-  :config
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+  :custom (dumb-jump-quiet t)
+  :hook (xref-backend-functions . dumb-jump-xref-activate))
 
 (use-package ivy-xref
+  :if (eq sb/minibuffer-completion 'ivy)
   :after (ivy xref)
   :demand t
   :custom
@@ -90,18 +90,18 @@
   :config
   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local)))
-
   (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd" ".cache"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
 
   (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
-    (add-to-list 'counsel-etags-ignore-filenames ignore-files)))
+    (add-to-list 'counsel-etags-ignore-filenames ignore-files))
+
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
 
 (use-package highlight-indentation
-  :diminish (highlight-indentation-mode highlight-indentation-current-column-mode)
+  :diminish highlight-indentation-current-column-mode
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
 (use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
@@ -114,7 +114,7 @@
 
 (use-package symbol-overlay ; Highlight symbol under point
   :diminish
-  :commands (symbol-overlay-mode)
+  :commands transient-define-prefix
   :hook (prog-mode-hook . symbol-overlay-mode)
   :bind
   (("M-p" . symbol-overlay-jump-prev)
@@ -142,7 +142,6 @@
   (bind-key "M-o" #'sb/symbol-overlay-transient))
 
 (use-package highlight-escape-sequences
-  :commands hes-mode
   :hook (prog-mode-hook . hes-mode))
 
 (use-package ini-mode
@@ -153,10 +152,8 @@
   :mode "\\.cfg\\'" "\\.conf\\'")
 
 (use-package elisp-mode
-  :straight nil
-  :mode
-  (("\\.el\\'"  . emacs-lisp-mode)
-   ("\\.elc\\'" . elisp-byte-code-mode))
+  :straight (:type built-in)
+  :mode ("\\.el\\'"  . emacs-lisp-mode)
   :hook
   ((lisp-mode-hook emacs-lisp-mode-hook) .
    (lambda ()
@@ -194,7 +191,6 @@
 
 (use-package css-mode
   :commands css-mode
-  :defines sb/flycheck-local-checkers
   :hook (css-mode-hook . lsp-deferred)
   :custom
   (css-indent-offset 2)
@@ -208,15 +204,17 @@
     :server-id 'cssls-r)))
 
 (use-package make-mode
-  :straight nil
+  :straight (:type built-in)
   :mode
   (("\\Makefile\\'"       . makefile-mode)
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :config
-  (add-hook 'makefile-mode-hook (lambda()
-                                  (setq-local indent-tabs-mode t)))
-  (use-package makefile-executor))
+  :hook
+  (makefile-mode-hook . (lambda()
+                          (setq-local indent-tabs-mode t))))
+
+(use-package makefile-executor
+  :hook (makefile-mode-hook . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
@@ -232,7 +230,7 @@
   (csv-separators '("," ";" "|" " ")))
 
 (use-package antlr-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode "\\.g4\\'")
 
 (use-package bison-mode
@@ -303,11 +301,11 @@
   (:map markdown-mode-map
         ("C-c C-j" . nil)))
 
-;; ;; Generate TOC with `markdown-toc-generate-toc'
-;; (use-package markdown-toc
-;;   :after markdown-mode
-;;   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
-;;                                       markdown-toc-generate-or-refresh-toc))
+;; Generate TOC with `markdown-toc-generate-toc'
+(use-package markdown-toc
+  :after markdown-mode
+  :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
+                                      markdown-toc-generate-or-refresh-toc))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 ;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
@@ -372,7 +370,7 @@
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless)))
   :hook
-  ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
+  (;;(lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
    (lsp-mode-hook . lsp-enable-which-key-integration)
    (lsp-mode-hook . lsp-dired-mode))
   :custom-face
@@ -510,8 +508,7 @@
   (when (not (display-graphic-p))
     (setq lsp-ui-doc-enable nil
           lsp-ui-peek-enable nil))
-
-  (lsp-ui-mode 1)
+  :hook (lsp-mode-hook . lsp-ui-mode)
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
@@ -540,7 +537,7 @@
         ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
-  :commands (dap-debug dap-hydra dap-mode dap-ui-mode)
+  :commands (dap-debug dap-hydra)
   :hook
   ((lsp-mode-hook . dap-mode)
    (lsp-mode-hook . dap-ui-mode)))
@@ -550,16 +547,16 @@
   :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
 (use-package cc-mode
-  :ensure nil
+  :straight (:type built-in)
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode
   (("\\.h\\'" . c++-mode)
    ("\\.c\\'" . c++-mode))
-  :hook (c++-mode-hook . lsp-deferred)
-  :custom
-  (c-set-style "cc-mode")
-  (c-basic-offset 2)
+  :hook (c++-mode-hook . (lambda ()
+                           (setq-local c-set-style "cc-mode"
+                                       c-basic-offset 2)
+                           (lsp-deferred)))
   :config
   (defvar c-electric-indent)
 
@@ -624,7 +621,7 @@
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 (use-package python
-  :ensure nil
+  :straight (:type built-in)
   :hook (python-mode-hook . lsp-deferred)
   :mode
   (("SCon\(struct\|script\)$" . python-mode)
@@ -798,7 +795,6 @@
   :hook (python-mode-hook . yapf-mode))
 
 (use-package cperl-mode
-  :ensure nil
   :mode ("latexmkrc\\'")
   :hook (cperl-mode-hook . lsp-deferred)
   :config
@@ -846,8 +842,8 @@
                                        lsp-java-add-import)
   :hook
   (java-mode-hook . (lambda ()
-                      (setq-default c-basic-offset 4
-                                    c-set-style "java")
+                      (setq-local c-basic-offset 4
+                                  c-set-style "java")
                       (lsp-deferred)))
   :custom
   (lsp-java-inhibit-message t)
@@ -871,7 +867,8 @@
   :mode "\\.gradle\\'")
 
 (use-package sh-script ; Shell script mode
-  :ensure nil
+  :straight (:type built-in)
+  :commands flycheck-add-next-checker
   :mode
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
@@ -907,7 +904,7 @@
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 (use-package bat-mode
-  :straight nil
+  :straight (:type built-in)
   :mode
   (("\\.bat\\'" . bat-mode)
    ("\\.cmd\\'" . bat-mode)))
@@ -944,7 +941,7 @@
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
-  :straight nil
+  :straight (:type built-in)
   :commands nxml-mode
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
@@ -1072,7 +1069,6 @@
   (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
 
 (use-package info-colors
-  :commands info-colors-fontify-node
   :hook (Info-selection-hook . info-colors-fontify-node))
 
 (use-package consult-lsp
@@ -1093,22 +1089,6 @@
 ;; if they contain a valid shebang line.
 (use-package executable
   :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
-
-;; LATER: Prettier times out setting up the process on a remote machine. I am using `format-all'
-;; for now.
-;; https://github.com/jscheid/prettier.el/issues/84
-(use-package prettier
-  :if (executable-find "prettier")
-  :disabled t
-  :commands prettier-mode
-  :hook
-  ;; Should work with `gfm-mode', `css-mode', and `html-mode' as they are derived modes
-  ((markdown-mode-hook web-mode-hook json-mode-hook jsonc-mode-hook js2-mode-hook)
-   . (lambda ()
-       (when (and buffer-file-name ; Returns `nil' if not visiting a file
-                  (not (file-remote-p buffer-file-name)))
-         (prettier-mode 1))))
-  :config (setq prettier-lighter nil))
 
 (use-package highlight-doxygen
   :commands highlight-doxygen-global-mode

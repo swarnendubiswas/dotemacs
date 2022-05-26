@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'lambda-light-faded
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -29,6 +29,8 @@
            (const :tag "modus-vivendi"   modus-vivendi)
            (const :tag "nano-light"      nano-light)
            (const :tag "nano-dark"       nano-dark)
+           (const :tag "lambda-light"    lambda-light)
+           (const :tag "lambda-light-faded"    lambda-light-faded)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
@@ -36,7 +38,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'lambda-dark-faded
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -49,6 +51,8 @@
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            (const :tag "nano-dark"       nano-dark)
+           (const :tag "lambda-dark"     lambda-dark)
+           (const :tag "lambda-dark-faded"     lambda-dark-faded)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))

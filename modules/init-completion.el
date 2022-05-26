@@ -454,7 +454,6 @@
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 ;; https://github.com/minad/corfu/wiki
 (use-package corfu
-  :if (eq sb/capf 'corfu)
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-indexed
                               corfu-quick
@@ -479,7 +478,7 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :hook (after-init-hook . global-corfu-mode)
+  :hook (prog-mode-hook . corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -508,7 +507,6 @@
 (use-package corfu-info
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-info))
-  :if (eq sb/capf 'corfu)
   :after corfu
   :bind
   (:map corfu-map
@@ -518,7 +516,6 @@
 (use-package corfu-indexed
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-indexed))
-  :if (eq sb/capf 'corfu)
   :after corfu
   :commands corfu-indexed-mode
   :init (corfu-indexed-mode 1))
@@ -526,7 +523,6 @@
 (use-package corfu-quick
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-quick))
-  :if (eq sb/capf 'corfu)
   :after corfu
   :bind
   (:map corfu-map
@@ -535,7 +531,6 @@
 (use-package corfu-history
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-history))
-  :if (eq sb/capf 'corfu)
   :commands corfu-history-mode
   :after (corfu savehist)
   :init
@@ -543,7 +538,7 @@
   (corfu-history-mode 1))
 
 (use-package corfu-doc
-  :if (eq sb/capf 'corfu)
+  :if (display-graphic-p)
   :hook (corfu-mode-hook . corfu-doc-mode)
   :bind
   (:map corfu-map
@@ -557,12 +552,12 @@
 (use-package popon
   :straight (popon :type git
                    :repo "https://codeberg.org/akib/emacs-popon.git")
-  :if (and (not (display-graphic-p)) (eq sb/capf 'corfu)))
+  :unless (display-graphic-p))
 
 (use-package corfu-terminal
   :straight (corfu-terminal :type git
                             :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
-  :if (and (not (display-graphic-p)) (eq sb/capf 'corfu))
+  :unless (display-graphic-p)
   :hook (corfu-mode-hook . corfu-terminal-mode))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
@@ -572,7 +567,6 @@
 
 ;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
-  :if (eq sb/capf 'corfu)
   :after corfu
   :demand t
   :commands (cape-history ; Complete from Eshell, Comint or minibuffer history
@@ -586,7 +580,7 @@
              cape-ispell ; Complete word at point with Ispell
              ;; Complete with Dabbrev at point
              cape-dabbrev)
-  :init
+  ;; :init
   ;; (dolist (backends '(cape-symbol cape-keyword cape-file cape-tex
   ;;                                 cape-dabbrev cape-ispell cape-dict cape-history))
   ;;   (add-to-list 'completion-at-point-functions backends))
@@ -597,32 +591,36 @@
             (lambda ()
               ;; (setq-local completion-at-point-functions
               ;;             (list (cape-super-capf #'cape-symbol #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-              (add-to-list 'completion-at-point-functions #'cape-file)
-              (add-to-list 'completion-at-point-functions #'cape-symbol)
-              (add-to-list 'completion-at-point-functions #'cape-keyword)
-              (add-to-list 'completion-at-point-functions #'cape-history)
-              (add-to-list 'completion-at-point-functions #'cape-dict)
-              (add-to-list 'completion-at-point-functions #'cape-ispell)
+              (add-to-list 'completion-at-point-functions #'cape-file 'append)
+              (add-to-list 'completion-at-point-functions #'cape-symbol 'append)
+              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+              (add-to-list 'completion-at-point-functions #'cape-history 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+              (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
               (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
   (add-hook 'prog-mode-hook
             (lambda ()
               ;; (setq-local completion-at-point-functions
               ;;             (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-              (add-to-list 'completion-at-point-functions #'cape-file)
-              (add-to-list 'completion-at-point-functions #'cape-keyword)
-              (add-to-list 'completion-at-point-functions #'cape-history)
-              (add-to-list 'completion-at-point-functions #'cape-dict)
-              (add-to-list 'completion-at-point-functions #'cape-ispell)
+              (add-to-list 'completion-at-point-functions #'cape-file 'append)
+              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+              (add-to-list 'completion-at-point-functions #'cape-history 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+              (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
               (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
-  (add-hook 'text-mode-hook
-            (lambda ()
-              ;; (setq-local completion-at-point-functions
-              ;;             (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-              (add-to-list 'completion-at-point-functions #'cape-file)
-              (add-to-list 'completion-at-point-functions #'cape-history)
-              (add-to-list 'completion-at-point-functions #'cape-dict)
-              (add-to-list 'completion-at-point-functions #'cape-ispell)
-              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append))))
+  ;; (add-hook 'text-mode-hook
+  ;;           (lambda ()
+  ;;             ;; (setq-local completion-at-point-functions
+  ;;             ;;             (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
+  ;;             (setq-local completion-at-point-functions
+  ;;                         (list (cape-capf-properties #'lsp-completion-at-point :exclusive 'no) t))
+
+  ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
+  )
 
 ;; Provide icons for Corfu
 (use-package kind-icon
@@ -645,14 +643,12 @@
 ;; function company-capf"
 (use-package company-capf
   :straight company
-  :if (or (not (display-graphic-p)) (eq sb/capf 'company))
   :commands company-capf)
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
-  :if (eq sb/capf 'company)
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -663,10 +659,14 @@
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
-  :hook (after-init-hook . global-company-mode)
+  :hook
+  ((after-init-hook . (lambda ()
+                        (when (string= (buffer-name) "*scratch*")
+                          (company-mode 1))))
+   (text-mode-hook . company-mode))
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
-  ;; :diminish
+  :diminish
   :config
   (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
         ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -724,7 +724,7 @@
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
-  :if (and (display-graphic-p) (eq sb/capf 'company))
+  :if (display-graphic-p)
   :after company
   :commands company-posframe-mode
   :diminish
@@ -736,11 +736,10 @@
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
-  :if (eq sb/capf 'company)
+  :disabled t
   :hook (company-mode-hook . company-quickhelp-mode))
 
 (use-package company-statistics
-  :if (eq sb/capf 'company)
   :after company
   :demand t
   :commands company-statistics-mode
@@ -750,7 +749,6 @@
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
-  :if (eq sb/capf 'company)
   :after company
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
@@ -764,7 +762,7 @@
   (company-fuzzy-passthrough-backends '(company-capf)))
 
 (use-package company-shell
-  :if (eq sb/capf 'company)
+  :disabled t
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
@@ -772,7 +770,6 @@
   :custom (company-shell-delete-duplictes t))
 
 (use-package company-auctex
-  :if (eq sb/capf 'company)
   :after tex-mode
   :demand t
   :commands (company-auctex-init company-auctex-labels
@@ -780,26 +777,22 @@
                                  company-auctex-symbols company-auctex-environments))
 
 (use-package math-symbols
-  :if (eq sb/capf 'company)
   :after tex-mode
   :demand t) ; Required by `ac-math' and `company-math'
 
 (use-package company-math
   :after tex-mode
-  :if (eq sb/capf 'company)
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
 ;; Uses RefTeX to complete label references and citations
 (use-package company-reftex
   :after tex-mode
-  :if (eq sb/capf 'company)
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 
 ;; (use-package company-bibtex
 ;;   :after tex-mode
-;;   :if (eq sb/capf 'company)
 ;;   :demand t
 ;;   :commands company-bibtex)
 
@@ -837,28 +830,28 @@
 ;; The ‘prefix’ bool command always returns non-nil for following backends even when their
 ;; ‘candidates’ list command is empty: `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
 
-(with-eval-after-load "company"
-  (progn
-    (declare-function sb/company-xml-mode "init-completion")
+;; (with-eval-after-load "company"
+;;   (progn
+;;     (declare-function sb/company-xml-mode "init-completion")
 
-    (defun sb/company-xml-mode ()
-      "Add backends for completion with company."
-      (defvar company-minimum-prefix-length)
-      (defvar company-backends)
+;;     (defun sb/company-xml-mode ()
+;;       "Add backends for completion with company."
+;;       (defvar company-minimum-prefix-length)
+;;       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 3)
-      (make-local-variable 'company-backends)
+;;       (setq-local company-minimum-prefix-length 3)
+;;       (make-local-variable 'company-backends)
 
-      (setq company-backends '(company-capf
-                               company-files
-                               company-dabbrev-code
-                               company-dabbrev)))
+;;       (setq company-backends '(company-capf
+;;                                company-files
+;;                                company-dabbrev-code
+;;                                company-dabbrev)))
 
-    (dolist (hook '(nxml-mode-hook))
-      (add-hook hook (lambda ()
-                       (sb/company-xml-mode)
-                       (company-fuzzy-mode 1)
-                       (diminish 'company-fuzzy-mode))))))
+;;     (dolist (hook '(nxml-mode-hook))
+;;       (add-hook hook (lambda ()
+;;                        (sb/company-xml-mode)
+;;                        (company-fuzzy-mode 1)
+;;                        (diminish 'company-fuzzy-mode))))))
 
 (with-eval-after-load "company"
   (progn
@@ -944,89 +937,89 @@
 
 ;;   (add-hook 'java-mode-hook #'sb/company-java-mode))
 
-(with-eval-after-load "company"
-  (progn
-    (declare-function sb/company-sh-mode "init-completion")
+;; (with-eval-after-load "company"
+;;   (progn
+;;     (declare-function sb/company-sh-mode "init-completion")
 
-    (defun sb/company-sh-mode ()
-      "Add backends for shell script completion in company mode."
-      (defvar company-minimum-prefix-length)
-      (defvar company-backends)
+;;     (defun sb/company-sh-mode ()
+;;       "Add backends for shell script completion in company mode."
+;;       (defvar company-minimum-prefix-length)
+;;       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 3)
-      (make-local-variable 'company-backends)
+;;       (setq-local company-minimum-prefix-length 3)
+;;       (make-local-variable 'company-backends)
 
-      (setq company-backends '(company-capf
-                               company-shell
-                               company-shell-env
-                               company-dabbrev-code
-                               company-files
-                               company-dabbrev)))
+;;       (setq company-backends '(company-capf
+;;                                company-shell
+;;                                company-shell-env
+;;                                company-dabbrev-code
+;;                                company-files
+;;                                company-dabbrev)))
 
-    (add-hook 'sh-mode-hook (lambda ()
-                              (sb/company-sh-mode)
-                              ;; (company-fuzzy-mode 1)
-                              ;; (diminish 'company-fuzzy-mode)
-                              ))))
+;;     (add-hook 'sh-mode-hook (lambda ()
+;;                               (sb/company-sh-mode)
+;;                               ;; (company-fuzzy-mode 1)
+;;                               ;; (diminish 'company-fuzzy-mode)
+;;                               ))))
 
-(with-eval-after-load "company"
-  (progn
-    (declare-function sb/company-fish-mode "init-completion")
+;; (with-eval-after-load "company"
+;;   (progn
+;;     (declare-function sb/company-fish-mode "init-completion")
 
-    (defun sb/company-fish-mode ()
-      "Add backends for fish shell script completion in company mode."
-      (defvar company-minimum-prefix-length)
-      (defvar company-backends)
+;;     (defun sb/company-fish-mode ()
+;;       "Add backends for fish shell script completion in company mode."
+;;       (defvar company-minimum-prefix-length)
+;;       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 3)
-      (make-local-variable 'company-backends)
+;;       (setq-local company-minimum-prefix-length 3)
+;;       (make-local-variable 'company-backends)
 
-      (setq company-backends '(company-capf
-                               company-shell
-                               company-shell-env
-                               company-fish-shell
-                               company-dabbrev-code
-                               company-files
-                               company-dabbrev)))
+;;       (setq company-backends '(company-capf
+;;                                company-shell
+;;                                company-shell-env
+;;                                company-fish-shell
+;;                                company-dabbrev-code
+;;                                company-files
+;;                                company-dabbrev)))
 
-    (add-hook 'fish-mode-hook (lambda ()
-                                (sb/company-fish-mode)
-                                ;; (company-fuzzy-mode 1)
-                                ;; (diminish 'company-fuzzy-mode)
-                                ))))
+;;     (add-hook 'fish-mode-hook (lambda ()
+;;                                 (sb/company-fish-mode)
+;;                                 ;; (company-fuzzy-mode 1)
+;;                                 ;; (diminish 'company-fuzzy-mode)
+;;                                 ))))
 
-;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;; `company-clang' is slow
-(with-eval-after-load "company"
-  (progn
-    (declare-function sb/company-prog-mode "init-completion")
+;; ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; ;; `company-clang' is slow
+;; (with-eval-after-load "company"
+;;   (progn
+;;     (declare-function sb/company-prog-mode "init-completion")
 
-    (defun sb/company-prog-mode ()
-      "Add backends for program completion in company mode."
-      (defvar company-minimum-prefix-length)
-      (defvar company-backends)
+;;     (defun sb/company-prog-mode ()
+;;       "Add backends for program completion in company mode."
+;;       (defvar company-minimum-prefix-length)
+;;       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 3
-                  ;; Other choices: `company-sort-by-length', `company-sort-by-occurrence',
-                  ;; `company-sort-by-backend-importance', `company-sort-prefer-same-case-prefix'
-                  company-transformers '(delete-dups
-                                         company-sort-by-statistics))
-      (make-local-variable 'company-backends)
+;;       (setq-local company-minimum-prefix-length 3
+;;                   ;; Other choices: `company-sort-by-length', `company-sort-by-occurrence',
+;;                   ;; `company-sort-by-backend-importance', `company-sort-prefer-same-case-prefix'
+;;                   company-transformers '(delete-dups
+;;                                          company-sort-by-statistics))
+;;       (make-local-variable 'company-backends)
 
-      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-      (setq company-backends '(company-files
-                               (company-capf :with company-yasnippet)
-                               company-etags
-                               (company-dabbrev-code ; Useful for variable names
-                                company-dabbrev))))
+;;       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+;;       (setq company-backends '(company-files
+;;                                (company-capf :with company-yasnippet)
+;;                                company-etags
+;;                                (company-dabbrev-code ; Useful for variable names
+;;                                 company-dabbrev))))
 
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
-                  (sb/company-prog-mode)
-                  ;; (company-fuzzy-mode 1)
-                  ;; (diminish 'company-fuzzy-mode)
-                  )))))
+;;     (add-hook 'prog-mode-hook
+;;               (lambda ()
+;;                 (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
+;;                   (sb/company-prog-mode)
+;;                   ;; (company-fuzzy-mode 1)
+;;                   ;; (diminish 'company-fuzzy-mode)
+;;                   )))))
 
 (use-package orderless
   :after (:any ivy vertico)
@@ -1093,7 +1086,6 @@
 ;; ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
 ;; ;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
 ;; (use-package company-prescient
-;;   :if (eq sb/capf 'company)
 ;;   :after (company prescient)
 ;;   :demand t
 ;;   :commands company-prescient-mode

@@ -203,7 +203,7 @@ Ignore if no file is found."
   ;; Make the toc display with a vertical split, since it is easy to read long lines
   (reftex-toc-split-windows-horizontally nil)
   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
-  ;; (reftex-use-fonts t "Use nice fonts for toc")
+  (reftex-use-fonts t "Use nice fonts for toc")
   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
   ;; (reftex-auto-recenter-toc t "Center on the section currently being edited")
   ;; (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")

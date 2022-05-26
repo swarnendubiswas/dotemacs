@@ -476,6 +476,28 @@
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode 1))
 
+(use-package lambda-themes
+  :straight (:type git :host github :repo "lambda-emacs/lambda-themes")
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'lambda-light)
+                   (eq sb/gui-theme 'lambda-light-faded)))
+          (and (not (display-graphic-p))
+               (or (eq sb/tui-theme 'lambda-dark)
+                   (eq sb/tui-theme 'lambda-dark-faded))))
+  :custom
+  (lambda-themes-set-italic-comments t)
+  (lambda-themes-set-italic-keywords t)
+  (lambda-themes-set-variable-pitch t)
+  :init
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'lambda-light) (load-theme 'lambda-light t))
+     ((eq sb/gui-theme 'lambda-light-faded) (load-theme 'lambda-light-faded t))))
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/tui-theme 'lambda-dark) (load-theme 'lambda-dark t))
+     ((eq sb/tui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t)))))
+
 (provide 'init-ui)
 
 ;;; init-ui.el ends here
