@@ -17,7 +17,7 @@
 (declare-function s-ends-with? "s")
 
 (use-package dired
-  :straight nil
+  :straight (:type built-in)
   :commands (dired-next-line dired-jump)
   :defines dired-clean-confirm-killing-deleted-buffers
   :preface
@@ -60,7 +60,7 @@
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
-  :straight nil
+  :straight (:type built-in)
   :defines dired-cleanup-buffers-too
   :hook (dired-mode-hook . dired-omit-mode)
   :bind ("C-x C-j"  . dired-jump)

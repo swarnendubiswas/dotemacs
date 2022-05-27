@@ -114,7 +114,7 @@
   ("C-c x q" . TeX-insert-quote))
 
 (use-package bibtex
-  :straight nil
+  :straight (:type built-in)
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
    (bibtex-mode-hook . lsp-deferred))
@@ -144,7 +144,7 @@
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 
 (use-package reftex
-  :ensure nil
+  :straight (:type built-in)
   :commands (reftex-get-bibfile-list bibtex-parse-keys
                                      reftex-mode
                                      reftex-toc-rescan
@@ -218,7 +218,7 @@ Ignore if no file is found."
   (run-with-idle-timer 10 nil #'reftex-toc-Rescan))
 
 (use-package bib-cite
-  :straight nil
+  :straight (:type built-in)
   :diminish bib-cite-minor-mode
   :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
   :custom (bib-cite-use-reftex-view-crossref t)

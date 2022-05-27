@@ -211,7 +211,7 @@
   :diminish)
 
 (use-package eldoc
-  :straight nil
+  :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
   :diminish
   :hook (prog-mode-hook . turn-on-eldoc-mode)

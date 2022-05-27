@@ -11,7 +11,7 @@
 (defvar sb/minibuffer-completion)
 
 (use-package ispell
-  :straight nil
+  :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
   :config
   (setq ispell-dictionary "en_US"
@@ -42,7 +42,7 @@
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}")))
 
 (use-package flyspell
-  :straight nil
+  :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
   :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :diminish
@@ -107,6 +107,12 @@
    :map flyspell-mode-map
    ("C-;"     . flyspell-auto-correct-previous-word)
    ("C-,"     . sb/flyspell-goto-previous-error)))
+
+;; Silence "Starting 'look' process..." message
+(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+;; Hide the "Starting new Ispell process" message
+(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
 ;; TODO: The keybinding is the same

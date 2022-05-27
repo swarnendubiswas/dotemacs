@@ -8,7 +8,7 @@
 ;;; Code:
 
 (use-package paren
-  :straight nil
+  :straight (:type built-in)
   :hook (after-init-hook . show-paren-mode)
   :custom
   (show-paren-style 'parenthesis); `mixed' may lead to performance problems
@@ -17,7 +17,7 @@
 
 ;; Enable autopairing
 (use-package elec-pair
-  :straight nil
+  :straight (:type built-in)
   :disabled t
   :hook (after-init-hook . electric-pair-mode)
   :config

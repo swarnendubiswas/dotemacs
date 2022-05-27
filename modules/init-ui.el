@@ -258,9 +258,16 @@
   :if (not (bound-and-true-p doom-modeline-lsp))
   :hook (doom-modeline-mode-hook . minions-mode))
 
+;; https://github.com/dbordak/telephone-line/blob/master/examples.org
 (use-package telephone-line
-  :if (eq sb/modeline-theme 'telephone-line)
-  :init (telephone-line-mode 1))
+  :if (eq sb/modeline-theme 'telephone)
+  :init
+  (setq telephone-line-primary-left-separator 'telephone-line-gradient
+        telephone-line-secondary-left-separator 'telephone-line-nil
+        telephone-line-primary-right-separator 'telephone-line-gradient
+        telephone-line-secondary-right-separator 'telephone-line-nil
+        telephone-line-height 24)
+  (telephone-line-mode 1))
 
 ;; https://github.com/AnthonyDiGirolamo/airline-themes/issues/28
 (use-package airline-themes
@@ -466,7 +473,7 @@
 
 ;; Move the cursor from the line of view
 (use-package avoid
-  :straight nil
+  :straight (:type built-in)
   :commands mouse-avoidance-mode
   :if (display-mouse-p)
   :init (mouse-avoidance-mode 'banish))

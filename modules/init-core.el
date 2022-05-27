@@ -205,7 +205,7 @@
     (funcall mode 1)))
 
 (use-package autorevert ; Auto-refresh all buffers
-  :straight nil
+  :straight (:type built-in)
   :diminish auto-revert-mode
   :hook (after-init-hook . global-auto-revert-mode)
   :config
@@ -224,12 +224,12 @@
 ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
 ;; timer.
 (use-package saveplace ; Remember cursor position in files
-  :straight nil
+  :straight (:type built-in)
   :hook (after-init-hook . save-place-mode))
 
 ;; Save minibuffer history across sessions
 (use-package savehist ; Save minibuffer history across sessions
-  :straight nil
+  :straight (:type built-in)
   :commands savehist-mode
   :hook (after-init-hook . savehist-mode)
   :custom
@@ -242,7 +242,7 @@
                                    regexp-search-ring)))
 
 (use-package uniquify
-  :straight nil
+  :straight (:type built-in)
   :init
   (setq uniquify-after-kill-buffer-p t
         uniquify-buffer-name-style   'forward
@@ -252,7 +252,7 @@
 
 ;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
-  :straight nil
+  :straight (:type built-in)
   :diminish
   :hook (after-init-hook . abbrev-mode)
   :custom
@@ -262,11 +262,11 @@
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
-  :straight nil
+  :straight (:type built-in)
   :hook (after-init-hook . global-so-long-mode))
 
 (use-package imenu
-  :straight nil
+  :straight (:type built-in)
   :after (:any markdown-mode yaml-mode prog-mode)
   :custom
   (imenu-auto-rescan t)
@@ -278,38 +278,39 @@
   (imenu-sort-function nil))
 
 (use-package recentf
-  :straight nil
+  :straight (:type built-in)
   :commands (recentf-add-file recentf-save-file
                               recentf-save-list
                               recentf-apply-filename-handlers
                               recentf-cleanup)
+  :custom
+  (recentf-auto-cleanup 'never "Do not stat remote files")
+  ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
+  (recentf-exclude '("[/\\]elpa/"
+                     "[/\\]\\.git/"
+                     ".*\\.gz\\'"
+                     ".*\\.xz\\'"
+                     ".*\\.zip\\'"
+                     ".*-autoloads.el\\'"
+                     "[/\\]archive-contents\\'"
+                     "[/\\]\\.loaddefs\\.el\\'"
+                     "[/\\]tmp/.*"
+                     ".*/recentf\\'"
+                     ".*/recentf-save.el\\'"
+                     "~$"
+                     "/.autosaves/"
+                     ".*/TAGS\\'"
+                     "*.cache"
+                     ".*/treemacs/persist.org"))
+  ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
+  ;; Keep remote file without testing if they still exist
+  (recentf-keep '(file-remote-p file-readable-p))
+  ;; Larger values help in lookup but takes more time to check if the files exist
+  (recentf-max-saved-items 150)
   :config
-  (setq recentf-auto-cleanup 'never ; Do not stat remote files
-        ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
-        recentf-exclude '("[/\\]elpa/"
-                          "[/\\]\\.git/"
-                          ".*\\.gz\\'"
-                          ".*\\.xz\\'"
-                          ".*\\.zip\\'"
-                          ".*-autoloads.el\\'"
-                          "[/\\]archive-contents\\'"
-                          "[/\\]\\.loaddefs\\.el\\'"
-                          "[/\\]tmp/.*"
-                          ".*/recentf\\'"
-                          ".*/recentf-save.el\\'"
-                          "~$"
-                          "/.autosaves/"
-                          ".*/TAGS\\'"
-                          "*.cache"
-                          ".*/treemacs/persist.org")
-        ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
-        ;; Keep remote file without testing if they still exist
-        recentf-keep '(file-remote-p file-readable-p)
-        ;; Larger values help in lookup but takes more time to check if the files exist
-        recentf-max-saved-items 150
-        ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
-        ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
-        recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
+  ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
+  ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
+  (setq recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
 
   ;; Use the true file name and not the symlink name
   (dolist (exclude `(,(file-truename no-littering-etc-directory)
@@ -329,7 +330,7 @@
   :hook (after-init-hook . recentf-mode))
 
 (use-package image-mode
-  :straight nil
+  :straight (:type built-in)
   :if (display-graphic-p)
   :commands image-get-display-property
   :mode "\\.svg$"
@@ -349,7 +350,7 @@
 ;; Use "emacsclient -c -nw" to start a new frame.
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 (use-package server
-  :straight nil
+  :straight (:type built-in)
   :disabled t
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
   :commands server-running-p
@@ -383,7 +384,7 @@
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
 (use-package windmove ; "Shift + direction" arrows
-  :straight nil
+  :straight (:type built-in)
   :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
   :custom

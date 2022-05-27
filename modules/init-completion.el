@@ -24,14 +24,14 @@
 ;; Use "C-M-/" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
 (use-package dabbrev
-  :straight nil
+  :straight (:type built-in)
   :custom
   (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
-  :bind ("C-M-/" . dabbrev-completion))
+  :bind ("C-M-;" . dabbrev-completion))
 
 ;; Replace `dabbrev-exp' with `hippie-expand'.
 (use-package hippie-exp
-  :straight nil
+  :straight (:type built-in)
   :custom
   (hippie-expand-try-functions-list '(try-expand-dabbrev
                                       try-expand-dabbrev-all-buffers
@@ -301,7 +301,6 @@
 
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
-  :if (eq sb/minibuffer-completion 'vertico)
   :straight (vertico :files (:defaults "extensions/*")
                      :includes
                      (vertico-directory
@@ -483,7 +482,7 @@
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
-  (corfu-auto-prefix 3)
+  (corfu-auto-prefix 2)
   (corfu-min-width 60)
   (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
@@ -580,34 +579,40 @@
              cape-ispell ; Complete word at point with Ispell
              ;; Complete with Dabbrev at point
              cape-dabbrev)
-  ;; :init
-  ;; (dolist (backends '(cape-symbol cape-keyword cape-file cape-tex
-  ;;                                 cape-dabbrev cape-ispell cape-dict cape-history))
-  ;;   (add-to-list 'completion-at-point-functions backends))
   :custom
   (cape-dabbrev-min-length 3)
   :config
+  ;; (dolist (backends '(cape-symbol cape-keyword cape-file cape-tex
+  ;;                                 cape-dabbrev cape-ispell cape-dict cape-history))
+  ;; (add-to-list 'completion-at-point-functions backends))
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
-              ;; (setq-local completion-at-point-functions
-              ;;             (list (cape-super-capf #'cape-symbol #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-              (add-to-list 'completion-at-point-functions #'cape-file 'append)
-              (add-to-list 'completion-at-point-functions #'cape-symbol 'append)
-              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-              (add-to-list 'completion-at-point-functions #'cape-history 'append)
-              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-              (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              ;; (setq-local completion-at-point-functions
-              ;;             (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-              (add-to-list 'completion-at-point-functions #'cape-file 'append)
-              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-              (add-to-list 'completion-at-point-functions #'cape-history 'append)
-              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-              (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
+              (setq-local completion-at-point-functions
+                          (list (cape-super-capf #'cape-file
+                                                 #'cape-symbol
+                                                 #'cape-keyword
+                                                 #'cape-history
+                                                 #'cape-dict
+                                                 #'cape-ispell
+                                                 #'cape-dabbrev)))
+              ;; (add-to-list 'completion-at-point-functions #'cape-file 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-symbol 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-history 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+              ))
+  ;; (add-hook 'prog-mode-hook
+  ;;           (lambda ()
+  ;;             ;; (setq-local completion-at-point-functions
+  ;;             ;;             (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
+  ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+  ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
   ;; (add-hook 'text-mode-hook
   ;;           (lambda ()
   ;;             ;; (setq-local completion-at-point-functions
@@ -664,37 +669,34 @@
                         (when (string= (buffer-name) "*scratch*")
                           (company-mode 1))))
    (text-mode-hook . company-mode))
-  ;; The `company-posframe' completion kind indicator is not great, but we are now using
-  ;; `company-fuzzy'.
-  :diminish
+  :custom
+  (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  ;; Do not ignore case when collecting completion candidates. It is recommended to change the
+  ;; default value of "keep-prefix" if we modify `company-dabbrev-downcase'.
+  (company-dabbrev-ignore-case nil)
+  ;; Search in other buffers with the same major mode. This can cause performance overhead if
+  ;; there are lots of open buffers.
+  (company-dabbrev-other-buffers t)
+  (company-ispell-available t)
+  (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
+  (company-minimum-prefix-length 3 "Small words can be faster to type")
+  (company-require-match nil "Allow input string that do not match candidates")
+  (company-selection-wrap-around t)
+  (company-show-quick-access t "Speed up completion")
+  ;; Align additional metadata, like type signatures, to the right-hand side
+  (company-tooltip-align-annotations t)
+  (company-clang-insert-arguments nil "Disable insertion of arguments")
+  ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
+  ;; strings
+  ;; https://github.com/company-mode/company-mode/discussions/1211
+  (company-search-regexp-function 'company-search-words-in-any-order-regexp)
+  (company-frontends '(;; company-pseudo-tooltip-unless-just-one-frontend
+                       company-pseudo-tooltip-frontend ; Always show candidates in overlay tooltip
+                       company-preview-frontend ; Too instrusive
+                       ;; company-preview-if-just-one-frontend ; Show in-place preview if there is only choice
+                       ;; Show selected candidate docs in echo area
+                       company-echo-metadata-frontend))
   :config
-  (setq company-dabbrev-downcase nil ; Do not downcase returned candidates
-        ;; Do not ignore case when collecting completion candidates. It is recommended to change the
-        ;; default value of "keep-prefix" if we modify `company-dabbrev-downcase'.
-        company-dabbrev-ignore-case nil
-        ;; Search in other buffers with the same major mode. This can cause performance overhead if
-        ;; there are lots of open buffers.
-        company-dabbrev-other-buffers t
-        company-ispell-available t
-        company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory)
-        company-minimum-prefix-length 3 ; Small words can be faster to type
-        company-require-match nil ; Allow input string that do not match candidates
-        company-selection-wrap-around t
-        company-show-quick-access t ; Speed up completion
-        ;; Align additional metadata, like type signatures, to the right-hand side
-        company-tooltip-align-annotations t
-        company-clang-insert-arguments nil ; Disable insertion of arguments
-        ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
-        ;; strings
-        ;; https://github.com/company-mode/company-mode/discussions/1211
-        company-search-regexp-function 'company-search-words-in-any-order-regexp
-        company-frontends '(;; company-pseudo-tooltip-unless-just-one-frontend
-                            company-pseudo-tooltip-frontend ; Always show candidates in overlay tooltip
-                            company-preview-frontend ; Too instrusive
-                            company-preview-if-just-one-frontend ; Show in-place preview if there is only choice
-                            ;; Show selected candidate docs in echo area
-                            company-echo-metadata-frontend))
-
   ;; We set `company-backends' as a local variable, so it is not important to delete backends
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake company-clang))
   ;;   (delq backends company-backends))
@@ -705,20 +707,19 @@
                          (lambda (c)
                            (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
+
+  ;; The `company-posframe' completion kind indicator is not great, but we are now using
+  ;; `company-fuzzy'.
+  (when (display-graphic-p)
+    (diminish 'company-mode))
   :bind
   (:map company-active-map
         ("C-n"      . company-select-next)
         ("C-p"      . company-select-previous)
         ;; Insert the common part of all candidates, or select the next one
         ("<tab>"    . company-complete-common-or-cycle)
-        ("C-M-/"    . company-other-backend) ; Was bound to `dabbrev-completion'
+        ("C-M-/"    . company-other-backend)
         ("<escape>" . company-abort)))
-
-;; Silence "Starting 'look' process..." message
-(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
-;; Hide the "Starting new Ispell process" message
-(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
@@ -730,20 +731,20 @@
   :diminish
   :custom
   (company-posframe-show-metadata nil "Difficult to distinguish the help text from completions")
-  (company-posframe-show-indicator t "Hide the backends, the display is not great")
+  (company-posframe-show-indicator t "The display is not great")
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
   :init
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :disabled t
-  :hook (company-mode-hook . company-quickhelp-mode))
+  :after company
+  :hook (prog-mode-hook . company-quickhelp-mode))
 
 (use-package company-statistics
   :after company
-  :demand t
   :commands company-statistics-mode
-  :config (company-statistics-mode 1))
+  :init (company-statistics-mode 1))
 
 (use-package flx)
 
@@ -1025,6 +1026,7 @@
   :after (:any ivy vertico)
   :demand t
   :defines orderless-component-separator
+  :commands orderless-escapable-split-on-space
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)

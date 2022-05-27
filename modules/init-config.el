@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'lambda-light-faded
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -28,6 +28,7 @@
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            (const :tag "nano-light"      nano-light)
+           ;; Does not pair brackets
            (const :tag "nano-dark"       nano-dark)
            (const :tag "lambda-light"    lambda-light)
            (const :tag "lambda-light-faded"    lambda-light-faded)
@@ -38,7 +39,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'lambda-dark-faded
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -59,7 +60,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'telephone
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)

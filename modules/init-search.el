@@ -12,7 +12,7 @@
 ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
 ;; `isearch' candidates.
 (use-package isearch
-  :straight nil
+  :straight (:type built-in)
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
   :custom
   (search-highlight t "Highlight incremental search")

@@ -11,26 +11,27 @@
   :commands (global-whitespace-mode whitespace-buffer
                                     whitespace-cleanup whitespace-turn-off)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode)
-  :hook (markdown-mode-hook . whitespace-mode)
+  :hook
+  (markdown-mode-hook . (lambda ()
+                          (setq show-trailing-whitespace t
+                                whitespace-style '(face ; Visualize using faces
+                                                   ;; tabs
+                                                   ;; spaces
+                                                   trailing ; Trailing whitespace
+                                                   ;; newline
+                                                   ;; tab-mark ; Mark any tabs
+                                                   ;; empty ; Empty lines at beginning or end of buffer
+                                                   ;; lines ; Lines that extend beyond `whitespace-line-column'
+                                                   ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
+                                                   ;; space-mark
+                                                   ;; space-before-tab ; Mixture of space and tab on the same line
+                                                   ;; space-after-tab ; Mixture of space and tab on the same line
+                                                   ;; empty
+                                                   ;; newline-mark
+                                                   missing-newline-at-eof))
+                          (whitespace-mode 1)))
   :custom
-  (show-trailing-whitespace t)
-  (whitespace-line-column sb/fill-column)
-  (whitespace-style '(face ; Visualize using faces
-                      ;; tabs
-                      ;; spaces
-                      trailing ; Trailing whitespace
-                      ;; newline
-                      ;; tab-mark ; Mark any tabs
-                      ;; empty ; Empty lines at beginning or end of buffer
-                      ;; lines ; Lines that extend beyond `whitespace-line-column'
-                      ;; indentation ; Wrong kind of indentation (tab when spaces and vice versa)
-                      ;; space-mark
-                      ;; space-before-tab ; Mixture of space and tab on the same line
-                      ;; space-after-tab ; Mixture of space and tab on the same line
-                      ;; empty
-                      ;; newline-mark
-                      missing-newline-at-eof
-                      )))
+  (whitespace-line-column sb/fill-column))
 
 ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
 ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'

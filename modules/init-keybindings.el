@@ -270,6 +270,9 @@
 (declare-function smerge-next "smerge-mode")
 (declare-function smerge-prev "smerge-mode")
 (declare-function smerge-auto-leave "smerge-mode")
+(declare-function smerge-diff-base-upper "smerge-mode")
+(declare-function smerge-diff-upper-lower "smerge-mode")
+(declare-function smerge-diff-base-lower "smerge-mode")
 
 (pretty-hydra-define sb/smerge-hydra
   (:color pink :hint nil :post (smerge-auto-leave) :quit-key "q" :title "Merge actions")
