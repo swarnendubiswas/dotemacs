@@ -52,24 +52,30 @@
                                   projectile-mode
                                   projectile-compile
                                   projectile-compile-project)
-  :preface
-  (defun sb/close-treemacs-with-projectile (orig-fun &rest args)
-    (let ((res (apply orig-fun args)))
-      (treemacs)
-      res))
+  :custom
+  (projectile-enable-caching nil "Caching will not watch for file system changes")
+  (projectile-file-exists-remote-cache-expire nil)
+  (projectile-mode-line-prefix "" "Save modeline space")
+  (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
+  ;; The contents of ".projectile" are ignored when using the `alien' project indexing method
+  (projectile-indexing-method 'alien)
+  ;; No sorting should be faster, note that files are not sorted if `projectile-indexing-method' is
+  ;; set to `alien'.
+  (projectile-sort-order 'recently-active)
+  (projectile-verbose nil)
+  (projectile-project-root-files '("build.gradle"
+                                   "setup.py"
+                                   "requirements.txt"
+                                   "package.json"
+                                   "composer.json"
+                                   "CMakeLists.txt"
+                                   "Makefile"
+                                   "WORKSPACE"
+                                   "meson.build"
+                                   "SConstruct"
+                                   "configure.ac"
+                                   "configure.in"))
   :config
-  (setq projectile-enable-caching nil ; Caching will not watch for file system changes
-        projectile-file-exists-remote-cache-expire nil
-        projectile-mode-line-prefix "" ; Save modeline space
-        ;; Use only in desired directories, too much noise otherwise
-        projectile-require-project-root t
-        ;; The contents of ".projectile" are ignored when using the `alien' project indexing method
-        projectile-indexing-method 'alien
-        ;; No sorting should be faster, note that files are not sorted if
-        ;; `projectile-indexing-method' is set to `alien'.
-        projectile-sort-order 'recently-active
-        projectile-verbose nil)
-
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and (symbol-value 'sb/IS-WINDOWS)
              (executable-find "tr"))
@@ -83,19 +89,6 @@
       ;;         projectile-mode-line-prefix
       ;;         (or project-name "-"))
       (format " [%s]" (or project-name "-"))))
-
-  (setq projectile-project-root-files '("build.gradle"
-                                        "setup.py"
-                                        "requirements.txt"
-                                        "package.json"
-                                        "composer.json"
-                                        "CMakeLists.txt"
-                                        "Makefile"
-                                        "WORKSPACE"
-                                        "meson.build"
-                                        "SConstruct"
-                                        "configure.ac"
-                                        "configure.in"))
 
   ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
   ;; projects is disabled for faster startup.
@@ -130,28 +123,8 @@
 
   (dolist (exts
            '(".a" ".aux" ".bak" ".blg" ".class" ".deb" ".doc" ".docx" "egg-info" ".elc" ".o" ".odt"
-             ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"
-             ))
+             ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
-
-  (projectile-mode 1)
-
-  ;; https://github.com/Alexander-Miller/treemacs/issues/660
-  ;; TODO: These do not achieve what I want.
-
-  ;; (add-hook 'projectile-after-switch-project-hook
-  ;;           (lambda ()
-  ;;             (treemacs-add-and-display-current-project)
-  ;;             (treemacs-display-current-project-exclusively)
-  ;;             (other-window 1)))
-
-  ;; (add-hook 'projectile-after-switch-project-hook
-  ;;           (lambda ()
-  ;;             (treemacs)
-  ;;             (treemacs-display-current-project-exclusively)
-  ;;             (other-window 1)))
-
-  ;; (advice-add 'projectile-kill-buffers :around #'sb/close-treemacs-with-projectile)
 
   ;; Set in case `counsel-projectile' is disabled. For `vertico', we use `consult-projectile'.
   (when (eq sb/minibuffer-completion 'ivy)
@@ -159,7 +132,7 @@
     (bind-key "<f6>" #'projectile-find-file))
 
   :bind-keymap ("C-c p" . projectile-command-map)
-  ;; :init (run-with-idle-timer 2 nil #'projectile-mode)
+
   ;; We can open a project file without enabling projectile via bind-keys
   :hook (after-init-hook . projectile-mode)
   :bind
@@ -174,54 +147,20 @@
   :if (eq sb/minibuffer-completion 'ivy)
   :defines counsel-projectile-default-file
   :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
-  :preface
-  (defun sb/counsel-projectile-switch-project-magit (project)
-    "Open Magit for the PROJECT."
-    (let ((projectile-switch-project-action 'magit-status))
-      (counsel-projectile-switch-project-by-name project)))
-
-  ;; Set a default landing file: https://github.com/ericdanan/counsel-projectile/issues/172
-  (defun sb/counsel-projectile-open-default-file ()
-    "Open the current project's default file.
-        This file is specified in `counsel-projectile-default-file'."
-    (interactive)
-    (let ((file counsel-projectile-default-file))
-      (if (and file
-               (setq file (projectile-expand-root file))
-               (file-exists-p file))
-          (find-file file)
-        (message "File %s doesn't exist." file))))
-
-  ;; Set `counsel-projectile-switch-project-action' to the following action
-  (defun sb/counsel-projectile-switch-project-action-default-file (project)
-    "Open PROJECT's default file.
-        This file is specified in `counsel-projectile-default-file'."
-    (let ((projectile-switch-project-action #'sb/counsel-projectile-open-default-file))
-      (counsel-projectile-switch-project-by-name project)))
-  :config
+  :custom
   ;; Setting these to `t' can be slow for large projects
-  (setq counsel-projectile-remove-current-buffer t
-        counsel-projectile-sort-directories nil
-        counsel-projectile-find-file-more-chars 0
-        counsel-projectile-sort-buffers nil
-        counsel-projectile-sort-projects nil
-        counsel-projectile-sort-files nil)
-
+  (counsel-projectile-remove-current-buffer t)
+  (counsel-projectile-sort-directories nil)
+  (counsel-projectile-find-file-more-chars 0)
+  (counsel-projectile-sort-buffers nil)
+  (counsel-projectile-sort-projects nil)
+  (counsel-projectile-sort-files nil)
+  :config
   (counsel-projectile-mode 1)
-
-  ;; (counsel-projectile-modify-action
-  ;;  'counsel-projectile-switch-project-action
-  ;;  '((default sb/counsel-projectile-switch-project-action-default-file)))
   :bind
   ;; The `counsel' actions seem to be slower than base `projectile'
   (("<f5>" . counsel-projectile-switch-project)
-   ("<f6>" . counsel-projectile-find-file)
-   ;; ("<f7>" . counsel-projectile-rg)
-   ;; ([remap projectile-switch-project]   . counsel-projectile-switch-project)
-   ;; ([remap projectile-find-file]        . counsel-projectile-find-file)
-   ;; ([remap projectile-find-dir]         . counsel-projectile-find-dir)
-   ;; ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
-   ))
+   ("<f6>" . counsel-projectile-find-file)))
 
 (use-package consult-projectile
   :if (eq sb/minibuffer-completion 'vertico)

@@ -43,53 +43,58 @@
   :hook
   ;; Auto refresh dired when files change
   (dired-mode-hook . auto-revert-mode)
+  :custom
+  (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
+  ;; Guess a default target directory. When there are two dired buffers, Emacs will select another
+  ;; buffer as the target (e.g., target for copying files).
+  (dired-dwim-target t)
+  ;; Check "ls" for additional options
+  (dired-listing-switches "-ABhl --si --group-directories-first")
+  (dired-ls-F-marks-symlinks t "-F marks links with @")
+  (dired-recursive-copies 'always "Single prompt for all n directories")
+  (dired-recursive-deletes 'always "Single prompt for all n directories")
+  ;; Do not ask whether to kill buffers visiting deleted files
+  (dired-clean-confirm-killing-deleted-buffers nil)
   :config
-  (setq dired-auto-revert-buffer t ; Revert each dired buffer automatically when you revisit it
-        ;; Guess a default target directory. When there are two dired buffers, Emacs will select
-        ;; another buffer as the target (e.g., target for copying files).
-        dired-dwim-target t
-        ;; Check "ls" for additional options
-        dired-listing-switches "-ABhl --si --group-directories-first"
-        dired-ls-F-marks-symlinks t ; -F marks links with @
-        dired-recursive-copies 'always ; Single prompt for all n directories
-        dired-recursive-deletes 'always ; Single prompt for all n directories
-        ;; Do not ask whether to kill buffers visiting deleted files
-        dired-clean-confirm-killing-deleted-buffers nil)
-
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
   :straight (:type built-in)
   :defines dired-cleanup-buffers-too
-  :hook (dired-mode-hook . dired-omit-mode)
+  :hook
+  ;; Load Dired X when Dired is loaded
+  (dired-mode-hook . (lambda ()
+                       (require 'dired-x)
+                       (dired-omit-mode)))
   :bind ("C-x C-j"  . dired-jump)
+  :custom
+  (dired-cleanup-buffers-too t)
+  (dired-omit-verbose nil "Do not show messages when omitting files")
+  ;; Do not ask whether to kill buffers visiting deleted files
+  (dired-clean-confirm-killing-deleted-buffers nil)
   :config
-  (setq dired-cleanup-buffers-too t
-        ;; Do not show messages when omitting files
-        dired-omit-verbose nil
-        ;; Do not ask whether to kill buffers visiting deleted files
-        dired-clean-confirm-killing-deleted-buffers nil)
-
   ;; Obsolete from Emacs 28+
   (unless sb/EMACS28+
     (setq dired-bind-jump t))
-
-  ;; ":diminish dired-omit-mode" does not work
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Remove 'Omit' from the modeline."
-    (diminish 'dired-omit-mode) dired-mode-map)
 
   (setq dired-omit-files
         (concat dired-omit-files
                 "\\|^.DS_Store\\'"
                 "\\|^.project\\(?:ile\\)?\\'"
                 "\\|^.\\(svn\\|git\\)\\'"
+                "\\|^.cache\\'"
                 "\\|^.ccls-cache\\'"
                 "\\|^__pycache__\\'"
+                "\\|^eln-cache\\'"
                 "\\|\\(?:\\.js\\)?\\.meta\\'"
-                "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'")))
+                "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+
+  ;; ":diminish dired-omit-mode" does not work
+  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  (defadvice dired-omit-startup (after diminish-dired-omit activate)
+    "Remove 'Omit' from the modeline."
+    (diminish 'dired-omit-mode) dired-mode-map))
 
 (use-package dired-narrow ; Narrow `dired' to match filter
   :after dired
@@ -123,7 +128,7 @@
         ("r" . dired-efap)))
 
 (use-package all-the-icons-dired
-  :commands (all-the-icons-dired-mode all-the-icons-dired--refresh-advice)
+  :commands all-the-icons-dired--refresh-advice
   :diminish
   :hook
   (dired-mode-hook . (lambda ()
@@ -282,14 +287,13 @@
 (use-package dired-async
   :straight async
   :after (dired async)
-  :hook (dired-mode-hook . dired-async-mode)
-  :diminish)
+  :diminish
+  :hook (dired-mode-hook . dired-async-mode))
 
 (use-package consult-dir
   :if (eq sb/minibuffer-completion 'vertico)
   :bind
-  (([remap list-directory] . consult-dir)
-   ("C-x C-d" . consult-dir)
+  (("C-x C-d" . consult-dir)
    :map minibuffer-local-completion-map
    ("C-x C-d" . consult-dir)
    ("C-x C-j" . consult-dir-jump-file)))

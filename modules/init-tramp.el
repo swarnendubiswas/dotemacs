@@ -21,6 +21,7 @@
 ;; bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump' ("C-x r
 ;; b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in `bookmark-bmenu-mode'
 ;; with `R'.
+
 ;; https://helpdeskheadesk.net/help-desk-head-desk/2021-05-19/
 
 (defvar tramp-default-user)
@@ -55,14 +56,7 @@
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   ;; https://stackoverflow.com/questions/26630640/tramp-ignores-tramp-remote-path#26649558
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-
-  ;; https://www.reddit.com/r/emacs/comments/ukyeb6/how_to_disable_emacs_from_trying_to_connect_to_a/
-  (defun sb/intercept-tramp-send-command (vec command &rest args)
-    (when (string-match "\\(.projectile\\|/git\\)" command)
-      (debug)))
-  ;; (advice-add 'tramp-send-command :before 'sb/intercept-tramp-send-command)
-  )
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))

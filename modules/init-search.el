@@ -86,6 +86,18 @@
   :config
   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
+;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
+;; select one of the currently visible `isearch' candidates using `avy'.
+(use-package avy
+  :commands avy-setup-default
+  :custom
+  (avy-style 'pre)
+  :bind
+  (("M-b"   . avy-goto-word-1)
+   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
+   ;; Does not work with TUI, but works with Alacritty
+   ("C-/"   . avy-goto-line)))
+
 (provide 'init-search)
 
 ;;; init-search.el ends here

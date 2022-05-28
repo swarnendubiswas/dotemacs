@@ -446,8 +446,7 @@
   :config
   ;; Disable live preview
   (consult-customize consult-recent-file consult-buffer consult-theme
-                     consult-ripgrep consult-git-grep consult-grep consult-bookmark
-                     consult-xref consult-projectile
+                     consult-bookmark consult-xref consult-projectile
                      :preview-key nil))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
@@ -460,12 +459,6 @@
                               corfu-history))
   :commands corfu--goto
   :preface
-  (defun sb/corfu-move-to-minibuffer ()
-    (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
-
   (defun sb/corfu-beginning-of-prompt ()
     "Move to beginning of completion input."
     (interactive)
@@ -500,8 +493,7 @@
         ("C-p" . corfu-previous)
         ("<escape>" . corfu-quit)
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
-        ([remap move-end-of-line] . sb/corfu-end-of-prompt)
-        ("M-m" . sb/corfu-move-to-minibuffer)))
+        ([remap move-end-of-line] . sb/corfu-end-of-prompt)))
 
 (use-package corfu-info
   :straight (corfu :files (:defaults "extensions/*")
@@ -685,6 +677,7 @@
   (company-show-quick-access t "Speed up completion")
   ;; Align additional metadata, like type signatures, to the right-hand side
   (company-tooltip-align-annotations t)
+  (company-tooltip-limit 15)
   (company-clang-insert-arguments nil "Disable insertion of arguments")
   ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
   ;; strings

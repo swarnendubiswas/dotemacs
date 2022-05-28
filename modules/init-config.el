@@ -19,7 +19,6 @@
   :type  '(radio
            (const :tag "leuven"          leuven)
            (const :tag "zenburn"         zenburn)
-           (const :tag "doom-one-light"  doom-one-light)
            (const :tag "doom-one"        doom-one)
            (const :tag "doom-nord"       doom-nord)
            (const :tag "doom-molokai"    doom-molokai)
@@ -60,7 +59,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'telephone
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)

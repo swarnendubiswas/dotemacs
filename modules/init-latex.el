@@ -199,11 +199,11 @@ Ignore if no file is found."
   (reftex-highlight-selection 'both)
   (reftex-plug-into-AUCTeX t)
   (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
-  (reftex-toc-follow-mode t "Other buffer follows the point in toc buffer")
+  (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
   ;; Make the toc display with a vertical split, since it is easy to read long lines
   (reftex-toc-split-windows-horizontally nil)
   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
-  (reftex-use-fonts t "Use nice fonts for toc")
+  (reftex-use-fonts t "Use nice fonts for TOC")
   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
   ;; (reftex-auto-recenter-toc t "Center on the section currently being edited")
   ;; (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
@@ -211,29 +211,42 @@ Ignore if no file is found."
   ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
 
-  ;; TODO: Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be
-  ;; consistent but this is expensive. We can use an idle timer.
-  ;; (reftex-toc-mode-hook . reftex-toc-rescan)
-  ;; (reftex-toc-mode-hook . reftex-toc-Rescan)
-  (run-with-idle-timer 10 nil #'reftex-toc-Rescan))
+  (with-eval-after-load "reftex-toc"
+    (bind-keys :package reftex-toc
+               :map reftex-toc-mode-map
+               ("n" . reftex-toc-next)
+               ("p" . reftex-toc-previous)
+               ("r" . reftex-toc-rescan)
+               ("R" . reftex-toc-Rescan)
+               ("g" . revert-buffer)
+               ("q" . reftex-toc-quit)
+               ("z" . reftex-toc-jump)
+               (">" . reftex-toc-demote)
+               ("<" . reftex-toc-promote))
+
+    ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
+    ;; but this is expensive.
+    (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)))
 
 (use-package bib-cite
-  :straight (:type built-in)
+  :straight auctex
   :diminish bib-cite-minor-mode
-  :hook ((LaTeX-mode-hook latex-mode-hook) . bib-cite-minor-mode )
-  :custom (bib-cite-use-reftex-view-crossref t)
-  :bind (:map bib-cite-minor-mode-map
-              ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-              ("C-c l a" . bib-apropos)
-              ("C-c l b" . bib-make-bibliography)
-              ("C-c l d" . bib-display)
-              ("C-c l t" . bib-etags)
-              ("C-c l f" . bib-find)
-              ("C-c l n" . bib-find-next)
-              ("C-c l h" . bib-highlight-mouse)))
+  :hook
+  ((LaTeX-mode-hook latex-mode-hook) . (lambda()
+                                         (bib-cite-minor-mode 1)))
+  :custom
+  (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+  :bind
+  (:map bib-cite-minor-mode-map
+        ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+        ("C-c l a" . bib-apropos)
+        ("C-c l b" . bib-make-bibliography)
+        ("C-c l d" . bib-display)
+        ("C-c l t" . bib-etags)
+        ("C-c l f" . bib-find)
+        ("C-c l n" . bib-find-next)))
 
 ;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
-;; We can disable this once `lsp-latex-build' works well
 (use-package auctex-latexmk
   :after tex-mode
   :straight (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")

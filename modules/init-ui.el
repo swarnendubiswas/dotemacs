@@ -20,11 +20,6 @@
       t
     nil))
 
-;; https://emacsredux.com/blog/2021/12/22/check-if-a-font-is-available-with-emacs-lisp/
-(defun sb/font-available-p (font-name)
-  "Find font specified by FONT-NAME."
-  (find-font (font-spec :name font-name)))
-
 (use-package all-the-icons
   :if (display-graphic-p)
   :commands all-the-icons-install-fonts
@@ -36,10 +31,9 @@
   (all-the-icons-color-icons nil))
 
 (use-package all-the-icons-ivy
+  :if (eq sb/minibuffer-completion 'ivy)
   :after ivy
-  :demand t
-  :commands all-the-icons-ivy-setup
-  :config (all-the-icons-ivy-setup))
+  :hook (after-init-hook . all-the-icons-ivy-setup))
 
 (use-package leuven-theme
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'leuven))
@@ -290,16 +284,6 @@
 (use-package auto-dim-other-buffers
   :commands adob--rescan-windows
   :hook (after-init-hook . auto-dim-other-buffers-mode))
-
-;; (cond
-;;  ((sb/font-available-p "Cascadia Code")
-;;   (set-frame-font "Cascadia Code-14"))
-;;  ((sb/font-available-p "Menlo")
-;;   (set-frame-font "Menlo-14"))
-;;  ((sb/font-available-p "Inconsolata")
-;;   (set-frame-font "Inconsolata-14"))
-;;  ((sb/font-available-p "DejaVu Sans Mono")
-;;   (set-frame-font "DejaVu Sans Mono-14")))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)

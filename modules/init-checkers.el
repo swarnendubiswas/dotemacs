@@ -47,21 +47,21 @@
                                        flycheck-display-error-messages-unless-error-list
                                        flycheck-sexp-to-string)
   :hook (after-init-hook . global-flycheck-mode)
-  :config
+  :custom
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
-  (setq flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change)
-        flycheck-checker-error-threshold 1500
-        flycheck-idle-buffer-switch-delay 2 ; Increase the time (s) to allow for quick transitions
-        flycheck-idle-change-delay 2 ; Increase the time (s) to allow for edits
-        flycheck-emacs-lisp-load-path 'inherit
-        ;; Show error messages only if the error list is not already visible
-        ;; flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list
-        ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
-        ;; derived from `text-mode'.
-        flycheck-global-modes '(not csv-mode)
-        flycheck-indication-mode 'right-fringe)
-
+  (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
+  (flycheck-checker-error-threshold 1500)
+  (flycheck-idle-buffer-switch-delay 2 "Increase the time (s) to allow for quick transitions")
+  (flycheck-idle-change-delay 2 "Increase the time (s) to allow for edits")
+  (flycheck-emacs-lisp-load-path 'inherit)
+  ;; Show error messages only if the error list is not already visible
+  ;; (flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
+  ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
+  ;; derived from `text-mode'.
+  (flycheck-global-modes '(not csv-mode))
+  (flycheck-indication-mode 'right-fringe)
+  :config
   ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))

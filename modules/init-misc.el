@@ -280,23 +280,6 @@
   (amx-auto-update-interval 10 "Update the command list every n minutes")
   (amx-history-length 15))
 
-;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
-;; select one of the currently visible `isearch' candidates using `avy'.
-(use-package avy
-  :commands avy-setup-default
-  :bind
-  (("M-b"   . avy-goto-word-1)
-   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
-   ;; Does not work with TUI, but works with Alacritty
-   ("C-/"   . avy-goto-line)))
-
-(use-package ace-jump-buffer
-  :bind ("C-b" . ace-jump-buffer)
-  :custom
-  (ajb-max-window-height 30)
-  (ajb-bs-configuration "files-and-scratch")
-  (ajb-sort-function 'bs--sort-by-filename))
-
 ;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
 (use-package ivy-avy
   :after ivy

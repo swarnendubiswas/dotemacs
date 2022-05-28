@@ -13,14 +13,14 @@
 (use-package ispell
   :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
+  :custom
+  (ispell-dictionary "en_US")
+  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
+  (ispell-local-dictionary "en_US")
+  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+  ;; Save a new word to personal dictionary without asking
+  (ispell-silently-savep t)
   :config
-  (setq ispell-dictionary "en_US"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")
-        ispell-local-dictionary "en_US"
-        ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory)
-        ;; Save a new word to personal dictionary without asking
-        ispell-silently-savep t)
-
   ;; Skip regions in Org-mode
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
@@ -105,7 +105,6 @@
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
    :map flyspell-mode-map
-   ("C-;"     . flyspell-auto-correct-previous-word)
    ("C-,"     . sb/flyspell-goto-previous-error)))
 
 ;; Silence "Starting 'look' process..." message
@@ -114,8 +113,6 @@
 (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
 (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
-;; Flyspell popup is more efficient. Ivy-completion does not show the "Save" option in a few cases.
-;; TODO: The keybinding is the same
 (use-package flyspell-popup
   :after flyspell
   :bind

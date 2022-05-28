@@ -15,15 +15,16 @@
   :straight (:type built-in)
   :config
   (defalias 'list-buffers 'ibuffer)
-  (setq ibuffer-display-summary nil
-        ibuffer-default-sorting-mode 'alphabetic ; Options: `major-mode', `recency'
-        ibuffer-use-header-line t)
+  :custom
+  (ibuffer-display-summary nil)
+  (ibuffer-default-sorting-mode 'alphabetic) ; Options: `major-mode', `recency'
+  (ibuffer-use-header-line t)
   :bind ("C-x C-b" . ibuffer))
 
+;; Do not show filter groups if there are no buffers in that group
 (use-package ibuf-ext
   :straight (:type built-in)
   :custom
-  ;; Do not show filter groups if there are no buffers in that group
   (ibuffer-show-empty-filter-groups nil)
   :hook (ibuffer-hook . ibuffer-auto-mode))
 
@@ -50,7 +51,6 @@
   (require 'vlf-setup))
 
 (use-package immortal-scratch
-  ;; :init (run-with-idle-timer 2 nil #'immortal-scratch-mode)
   :hook (after-init-hook . immortal-scratch-mode))
 
 ;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
@@ -64,7 +64,8 @@
   :defines fasd-enable-initial-prompt
   :if (executable-find "fasd")
   :hook (after-init-hook . global-fasd-mode)
-  :custom (fasd-enable-initial-prompt nil)
+  :custom
+  (fasd-enable-initial-prompt nil "We can narrow down easily with Ivy/Vertico")
   :bind* ("C-c /" . fasd-find-file))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
@@ -119,6 +120,13 @@
 ;; (add-to-list 'display-buffer-alist
 ;;              (cons "\\*Async Shell Command\\*.*"
 ;;                    (cons #'display-buffer-no-window nil)))
+
+(use-package ace-jump-buffer
+  :bind ("C-b" . ace-jump-buffer)
+  :custom
+  (ajb-max-window-height 30)
+  (ajb-bs-configuration "files-and-scratch")
+  (ajb-sort-function 'bs--sort-by-filename))
 
 (provide 'init-buffer)
 
