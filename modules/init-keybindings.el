@@ -134,12 +134,36 @@
   :after hydra
   :commands pretty-hydra-define)
 
+(declare-function s-concat "s")
+(declare-function all-the-icons-octicon "all-the-icons")
+(declare-function all-the-icons-alltheicon "all-the-icons")
+(declare-function all-the-icons-faicon "all-the-icons")
+(declare-function all-the-icons-fileicon "all-the-icons")
+
+;; https://github.com/WalkerGriggs/dot-emacs/blob/master/configs/hydra.el
+(defun sb/with-alltheicon (icon str &optional height v-adjust)
+  "Displays an icon from all-the-icon."
+  (s-concat (all-the-icons-alltheicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+(defun sb/with-faicon (icon str &optional height v-adjust)
+  "Displays an icon from Font Awesome icon."
+  (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+(defun sb/with-fileicon (icon str &optional height v-adjust)
+  "Displays an icon from the Atom File Icons package."
+  (s-concat (all-the-icons-fileicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+(defun sb/with-octicon (icon str &optional height v-adjust)
+  "Displays an icon from the GitHub Octicons."
+  (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
 (declare-function spell-fu-goto-next-error "spell-fu")
 (declare-function spell-fu-goto-previous-error "spell-fu")
 (declare-function spell-fu-word-add "spell-fu")
 
 (pretty-hydra-define sb/hydra-spelling
-  (:color amaranth :quit-key "q" :title "Spell check")
+  (:color amaranth :quit-key "q" :title (sb/with-faicon "magic" "Spell check" 1 -0.05)
+          :foreign-keys warn)
   ("Action"
    (("c" ispell "ispell")
     ("f" flyspell-buffer "flyspell buffer"))
@@ -152,14 +176,14 @@
     ("a" spell-fu-word-add "add word"))))
 
 (pretty-hydra-define sb/hydra-text-scale-zoom
-  (:color amaranth :quit-key "q" :title "Zoom action")
+  (:color amaranth :quit-key "q" :title "Zoom action" :foreign-keys warn)
   (""
    (("i" default-text-scale-increase "zoom in")
     ("o" default-text-scale-decrease "zoom out")
     ("r" default-text-scale-reset "reset"))))
 
 (pretty-hydra-define sb/hydra-error
-  (:color amaranth :quit-key "q" :title "Navigate errors")
+  (:color amaranth :quit-key "q" :title "Navigate errors" :foreign-keys warn)
   (""
    (("h" first-error "first error")
     ("j" next-error "next error")
@@ -168,7 +192,7 @@
 
 ;; https://github.com/abo-abo/hydra/wiki/avy
 (pretty-hydra-define sb/hydra-avy
-  (:color red :title "Actions" :quit-key "q")
+  (:color red :title "Actions" :quit-key "q" :foreign-keys warn)
   ("Line"
    (("y" avy-copy-line "yank line")
     ("m" avy-move-line "move line")
@@ -191,9 +215,11 @@
 (declare-function projectile-find-dir "projectile")
 (declare-function projectile-invalidate-cache "projectile")
 (declare-function projectile-compile "projectile")
+(declare-function projectile-add-known-project "projectile")
+(declare-function projectile-remove-known-project "projectile")
 
 (pretty-hydra-define sb/hydra-projectile
-  (:color teal :hint nil global-map "C-c p" :quit-key "q")
+  (:color teal :hint nil global-map "C-c p" :quit-key "q" :foreign-keys warn)
   ("PROJECTILE: %(projectile-project-root)"
    (("p"   projectile-switch-project "switch project")
     ("s"   projectile-switch-project "switch project")
@@ -218,7 +244,7 @@
     ("m"   projectile-compile "compile"))))
 
 (pretty-hydra-define sb/hydra-move-text
-  (:quit-key "q" :title "Move text")
+  (:quit-key "q" :title "Move text" :foreign-keys warn)
   (""
    (("u" move-text-up "up")
     ("d" move-text-down "down"))))
@@ -233,7 +259,8 @@
 (declare-function flycheck-buffer "flycheck")
 
 (pretty-hydra-define sb/hydra-flycheck
-  (:color blue :quit-key "q" :title "Flycheck actions")
+  (:color blue :quit-key "q" :title (sb/with-faicon "plane" "Flycheck actions" 1 -0.05)
+          :foreign-keys warn)
   ("Setup"
    (("M" flycheck-manual "Manual")
     ("m" flycheck-mode "enable mode")
@@ -252,7 +279,7 @@
 (declare-function python-indent-shift-right "python")
 
 (pretty-hydra-define sb/hydra-python-indent
-  (:quit-key "q" :title "Adjust Python indentation.")
+  (:quit-key "q" :title "Adjust Python indentation." :foreign-keys warn)
   (""
    ((">" python-indent-shift-right "right")
     ("<" python-indent-shift-left "left"))))
@@ -273,9 +300,14 @@
 (declare-function smerge-diff-base-upper "smerge-mode")
 (declare-function smerge-diff-upper-lower "smerge-mode")
 (declare-function smerge-diff-base-lower "smerge-mode")
+(declare-function smerge-refine "smerge-mode")
+(declare-function smerge-resolve "smerge-mode")
+(declare-function smerge-combine-with-next "smerge-mode")
+(declare-function smerge-kill-current "smerge-mode")
 
-(pretty-hydra-define sb/smerge-hydra
-  (:color pink :hint nil :post (smerge-auto-leave) :quit-key "q" :title "Merge actions")
+(pretty-hydra-define sb/hydra-smerge
+  (:color pink :hint nil :post (smerge-auto-leave) :quit-key "q"
+          :title (with-alltheicon "git" "Merge actions" 1 -0.05) :foreign-keys warn)
   ("Conflict actions"
    (("n" smerge-next "Next conflict")
     ("p" smerge-prev "Previous conflict"))
@@ -298,7 +330,7 @@
     ("k" smerge-kill-current "Kill current"))))
 
 (pretty-hydra-define sb/hydra-multiple-cursors
-  (:hint nil :quit-key "q" :title "Multiple cursors")
+  (:hint nil :quit-key "q" :title "Multiple cursors" :foreign-keys warn)
   ("Up"
    (("p" mc/mark-previous-like-this "Up next")
     ("P" mc/skip-to-previous-like-this "Up skip")
@@ -312,8 +344,40 @@
     ("a" mc/mark-all-like-this :exit t "Mark all")
     ("r" mc/mark-all-in-region-regexp :exit t "Mark by regexp"))))
 
+(declare-function sp-beginning-of-sexp "smartparens")
+(declare-function sp-end-of-sexp "smartparens")
+(declare-function sp-forward-sexp "smartparens")
+(declare-function sp-backward-sexp "smartparens")
+(declare-function sp-backward-down-sexp "smartparens")
+(declare-function sp-backward-up-sexp "smartparens")
+(declare-function sp-up-sexp "smartparens")
+(declare-function sp-down-sexp "smartparens")
+(declare-function sp-backward-slurp-sexp "smartparens")
+(declare-function sp-backward-barf-sexp "smartparens")
+(declare-function sp-forward-slurp-sexp "smartparens")
+(declare-function sp-forward-barf-sexp "smartparens")
+(declare-function sp-rewrap-sexp "smartparens")
+(declare-function sp-unwrap-sexp "smartparens")
+(declare-function sp-backward-unwrap-sexp "smartparens")
+(declare-function sp-wrap-round "smartparens")
+(declare-function sp-wrap-curly "smartparens")
+(declare-function sp-wrap-square "smartparens")
+(declare-function sp-split-sexp "smartparens")
+(declare-function sp-splice-sexp "smartparens")
+(declare-function sp-raise-sexp "smartparens")
+(declare-function sp-join-sexp "smartparens")
+(declare-function sp-transpose-sexp "smartparens")
+(declare-function sp-absorb-sexp "smartparens")
+(declare-function sp-emit-sexp "smartparens")
+(declare-function sp-convolute-sexp "smartparens")
+(declare-function sp-change-inner "smartparens")
+(declare-function sp-change-enclosing "smartparens")
+(declare-function sp-kill-sexp "smartparens")
+(declare-function sp-backward-kill-sexp "smartparens")
+(declare-function sp-copy-sexp "smartparens")
+
 (pretty-hydra-define sb/hydra-smartparens
-  (:hint nil :quit-key "q" :title "Smartparens")
+  (:hint nil :quit-key "q" :title "Smartparens" :foreign-keys warn)
   ("Moving"
    (("a" sp-beginning-of-sexp "Beginning")
     ("e" sp-end-of-sexp "End")
@@ -367,7 +431,7 @@
 (declare-function lsp-rename "lsp-mode")
 
 (pretty-hydra-define sb/hydra-lsp
-  (:exit t :hint nil :quit-key "q" :title "LSP Mode")
+  (:exit t :hint nil :quit-key "q" :title "LSP Mode" :foreign-keys warn)
   ("Buffer"
    (("f" lsp-format-buffer "Format buffer")
     ("m" lsp-ui-imenu "Imenu")
@@ -394,9 +458,21 @@
 (declare-function markdown-insert-header-dwim "markdown-mode")
 (declare-function markdown-insert-header-atx-1 "markdown-mode")
 (declare-function markdown-insert-header-atx-2 "markdown-mode")
+(declare-function markdown-insert-header-atx-3 "markdown-mode")
+(declare-function markdown-insert-header-atx-4 "markdown-mode")
+(declare-function markdown-insert-list-item "markdown-mode")
+(declare-function markdown-promote "markdown-mode")
+(declare-function markdown-demote "markdown-mode")
+(declare-function markdown-move-up "markdown-mode")
+(declare-function markdown-move-down "markdown-mode")
+(declare-function markdown-insert-link "markdown-mode")
+(declare-function markdown-insert-uri "markdown-mode")
+(declare-function markdown-insert-footnote "markdown-mode")
+(declare-function markdown-insert-wiki-link "markdown-mode")
+(declare-function markdown-insert-reference-link-dwim "markdown-mode")
 
 (pretty-hydra-define sb/hydra-markdown-mode
-  (:hint nil :title "Markdown mode" :quit-key "q")
+  (:hint nil :title "Markdown mode" :quit-key "q" :foreign-keys warn)
   ("Formatting"
    (("s" markdown-insert-bold "Bold")
     ("e" markdown-insert-italic "Italic")
@@ -435,17 +511,12 @@
 (declare-function straight-merge-package "straight")
 (declare-function straight-normalize-all "straight")
 (declare-function straight-normalize-package "straight")
-(declare-function straight-push-all "straight")
-(declare-function straight-push-package "straight")
 (declare-function straight-freeze-versions "straight")
 (declare-function straight-thaw-versions "straight")
-(declare-function straight-watcher-start "straight")
-(declare-function straight-watcher-quit "straight")
 (declare-function straight-get-recipe "straight")
-(declare-function straight-prune-build "straight")
 
 (pretty-hydra-define sb/hydra-straight
-  (:hint nil :quit-key "q" :title "Straight actions")
+  (:hint nil :quit-key "q" :title "Straight actions" :foreign-keys warn)
   (""
    (("c" straight-check-all "check all")
     ("C" straight-check-package "check package")
@@ -459,28 +530,34 @@
     ("M" straight-merge-package "merge package")
     ("n" straight-normalize-all "normalize all")
     ("N" straight-normalize-package "normalize package")
-    ("u" straight-push-all "push all")
-    ("U" straight-push-package "push package")
     ("v" straight-freeze-versions "freeze versions")
     ("V" straight-thaw-versions "thaw versions")
-    ("w" straight-watcher-start "watcher start")
-    ("W" straight-watcher-quit "watcher quit")
-    ("g" straight-get-recipe "get recipe")
-    ("e" straight-prune-build "prune build"))))
+    ("g" straight-get-recipe "get recipe"))))
 
 (pretty-hydra-define sb/hydra-comments
-  (:hint nil :color teal :exit t :title "Commentary Actions")
+  (:hint nil :color teal :exit t :title "Commentary Actions" :foreign-keys warn)
   (""
    (("b" comment-box)
     ("c" comment-dwim)
     ("l" comment-line)
     ("r" comment-region))))
 
+(pretty-hydra-define sb/hydra-magit
+  (:hint nil :color teal :quit-key "q" :title (sb/with-faicon "code-fork" "Git" 1 -0.05)
+         :foreign-keys warn)
+  ("Action"
+   (("b" magit-blame "blame")
+    ("c" magit-commit "commit")
+    ("i" magit-init "init")
+    ("l" magit-log-buffer-file "commit log (current file)")
+    ("L" magit-log-current "commit log (project)")
+    ("s" magit-status "status"))))
+
 (bind-key "C-c h a" #'sb/hydra-avy/body)
 (bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
 (bind-key "C-c h e" #'sb/hydra-error/body)
 (bind-key "C-c h f" #'sb/hydra-flycheck/body)
-(bind-key "C-c h g" #'sb/smerge-hydra/body)
+(bind-key "C-c h g" #'sb/hydra-smerge/body)
 (bind-key "C-c h j" #'sb/hydra-projectile/body)
 (bind-key "C-c h l" #'sb/hydra-lsp/body)
 (bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
@@ -489,6 +566,29 @@
 (bind-key "C-c h t" #'sb/hydra-move-text/body)
 (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
 (bind-key "C-c h i" #'sb/hydra-straight/body)
+(bind-key "C-c h v" #'sb/hydra-magit/body)
+(bind-key "C-c h y" #'sb/hydra-python-indent/body)
+
+(pretty-hydra-define sb/hydra-help
+  (:color teal :title "Hydra Overview" :foreign-keys warn)
+  ("Groups"
+   (("a" sb/hydra-avy/body "+ avy")
+    ("d" sb/hydra-markdown-mode/body "+ markdown")
+    ("e" sb/hydra-error/body "+ error")
+    ("f" sb/hydra-flycheck/body "+ flycheck")
+    ("g" sb/hydra-smerge/body "+ smerge")
+    ("j" sb/hydra-projectile/body "+ projectile")
+    ("l" sb/hydra-lsp/body "+ lsp")
+    ("m" sb/hydra-multiple-cursors/body "+ multiple cursors")
+    ("p" sb/hydra-smartparens/body "+ smartparens")
+    ("s" sb/hydra-spelling/body "+ spelling")
+    ("t" sb/hydra-move-text/body "+ move text")
+    ("z" sb/hydra-text-scale-zoom/body "+ text scale")
+    ("i" sb/hydra-straight/body "+ straight")
+    ("v" sb/hydra-magit/body "+ magit")
+    ("y" sb/hydra-python-indent/body "+ python indent"))))
+
+(bind-key "C-c h h" #'sb/hydra-help/body)
 
 (use-package term-keys
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")

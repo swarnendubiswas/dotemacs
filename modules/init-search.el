@@ -94,8 +94,7 @@
   (avy-style 'pre)
   :bind
   (("M-b"   . avy-goto-word-1)
-   ("C-'"   . avy-goto-char-timer) ; Does not work with TUI, but works with Alacritty
-   ;; Does not work with TUI, but works with Alacritty
+   ("C-'"   . avy-goto-char-timer)
    ("C-/"   . avy-goto-line)))
 
 (provide 'init-search)

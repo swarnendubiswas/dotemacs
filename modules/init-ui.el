@@ -11,6 +11,7 @@
 (defvar sb/tui-theme)
 (defvar sb/modeline-theme)
 (defvar sb/window-split)
+(defvar sb/minibuffer-completion)
 
 ;; Install fonts with "M-x all-the-icons-install-fonts"
 ;; https://github.com/domtronn/all-the-icons.el/issues/120
@@ -47,7 +48,6 @@
 
 (use-package doom-themes
   :if (or (eq sb/gui-theme 'doom-molokai)
-          (eq sb/gui-theme 'doom-one-light)
           (eq sb/gui-theme 'doom-one)
           (eq sb/gui-theme 'doom-nord)
           (eq sb/gui-theme 'doom-gruvbox))
@@ -56,16 +56,14 @@
   (if (display-graphic-p)
       (cond
        ((eq sb/gui-theme 'doom-molokai) (load-theme 'doom-molokai t))
-       ((eq sb/gui-theme 'doom-one-light) (load-theme 'doom-one-light t))
        ((eq sb/gui-theme 'doom-one) (load-theme 'doom-one t))
        ((eq sb/gui-theme 'doom-nord) (load-theme 'doom-nord t))
        ((eq sb/gui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))
     (cond
-     ((eq sb/tui-theme 'doom-molokai)   (load-theme 'doom-molokai t))
-     ((eq sb/tui-theme 'doom-one-light) (load-theme 'doom-one-light t))
+     ((eq sb/tui-theme 'doom-molokai) (load-theme 'doom-molokai t))
      ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
-     ((eq sb/tui-theme 'doom-nord)      (load-theme 'doom-nord t))
-     ((eq sb/tui-theme 'doom-gruvbox)   (load-theme 'doom-gruvbox t)))))
+     ((eq sb/tui-theme 'doom-nord) (load-theme 'doom-nord t))
+     ((eq sb/tui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))))
 
 (use-package monokai-theme
   :if (or (and (display-graphic-p) (eq sb/gui-theme 'monokai))
@@ -121,8 +119,6 @@
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
   (progn
-    ;; (setq frame-background-mode 'light)
-    ;; (set-background-color "#ffffff")
     (set-foreground-color "#333333")
     (with-eval-after-load "hl-line"
       (set-face-attribute 'hl-line nil :background "light yellow"))
@@ -132,14 +128,10 @@
 (use-package circadian
   :commands circadian-setup
   :disabled t
-  :init
-  (require 'solar)
-  (setq calendar-latitude 26.50
-        calendar-location-name "Kanpur, UP, India"
-        calendar-longitude 80.23
-        circadian-themes '((:sunrise . nano-light)
-                           (:sunset  . modus-vivendi)))
-  (circadian-setup))
+  :custom
+  (circadian-themes '((:sunrise . nano-light)
+                      (:sunset  . modus-vivendi)))
+  :hook (after-init-hook . circadian-setup))
 
 ;; The Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
@@ -175,8 +167,7 @@
         doom-modeline-indent-info nil
         doom-modeline-lsp t
         doom-modeline-minor-modes t
-        ;; Reduce space on the modeline
-        doom-modeline-buffer-file-name-style 'truncate-with-project
+        doom-modeline-buffer-file-name-style 'truncate-with-project ; Reduce space on the modeline
         doom-modeline-unicode-fallback t)
   :hook (after-init-hook . doom-modeline-mode))
 
@@ -249,7 +240,7 @@
 ;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
 ;; takes up lot of horizontal space.
 (use-package minions
-  :if (not (bound-and-true-p doom-modeline-lsp))
+  :unless (bound-and-true-p doom-modeline-lsp)
   :hook (doom-modeline-mode-hook . minions-mode))
 
 ;; https://github.com/dbordak/telephone-line/blob/master/examples.org
@@ -266,14 +257,12 @@
 ;; https://github.com/AnthonyDiGirolamo/airline-themes/issues/28
 (use-package airline-themes
   :if (eq sb/modeline-theme 'airline)
-  :demand t
-  :config (load-theme 'airline-doom-one t)
+  :init (load-theme 'airline-doom-one t)
   :custom
   (airline-display-directory 'airline-directory-shortened))
 
 (use-package nano-modeline
-  :straight (nano-modeline :type git :host github
-                           :repo "rougier/nano-modeline")
+  :straight (nano-modeline :type git :host github :repo "rougier/nano-modeline")
   :if (eq sb/modeline-theme 'nano)
   :init
   (when (eq sb/modeline-theme 'nano)
@@ -372,17 +361,21 @@
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information.
-(when nil
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (setq resize-mini-windows nil))))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq resize-mini-windows nil
+                  max-mini-window-height 5)))
 
 (use-package beacon
   :diminish
   :hook (after-init-hook . beacon-mode))
 
-;; Show dividers on the right of each window, more prominent than the default
-(add-hook 'after-init-hook #'window-divider-mode)
+(when (display-graphic-p)
+  ;; Show dividers on the right of each window, more prominent than the default
+  (add-hook 'after-init-hook #'window-divider-mode)
+  ;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
+  (global-display-line-numbers-mode 1)
+  (display-battery-mode 1))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other.
@@ -400,10 +393,6 @@
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
 
-;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
-(when (display-graphic-p)
-  (global-display-line-numbers-mode 1))
-
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)
 
@@ -417,9 +406,6 @@
 
 ;; Make the cursor a thin horizontal bar, not a block
 ;; (set-default 'cursor-type '(bar . 4))
-
-(when (display-graphic-p)
-  (display-battery-mode 1))
 
 (use-package hl-line
   :commands hl-line-highlight

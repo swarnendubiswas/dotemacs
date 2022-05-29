@@ -907,6 +907,7 @@
     ("ocllects" "collects" nil :count 0)
     ("ocnflicts" "conflicts" nil :count 1)
     ("ocur" "occur" nil :count 0)
+    ("ocurrences" "occurrences" nil :count 0)
     ("odbc" "ODBC" nil :count 0)
     ("oeprations" "operations" nil :count 1)
     ("oeprator" "operator" nil :count 0)

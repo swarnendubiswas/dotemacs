@@ -110,7 +110,6 @@
     (progn
       (setq debug-on-error                 t
             debug-on-event                 'sigusr2
-            garbage-collection-messages    t
             use-package-compute-statistics t ; Use "M-x use-package-report" to see results
             use-package-verbose            t
             use-package-expand-minimally   nil))
@@ -128,10 +127,7 @@
 (use-package gcmh
   :diminish
   :commands gcmh-idle-garbage-collect
-  :hook (after-init-hook . gcmh-mode)
-  :config
-  (when (bound-and-true-p sb/debug-init-file)
-    (setq gcmh-verbose t)))
+  :hook (after-init-hook . gcmh-mode))
 
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
 ;; and the minor modes.

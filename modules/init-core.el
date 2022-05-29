@@ -393,6 +393,13 @@
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-mode 1))
 
+(use-package solar
+  :straight (:type built-in)
+  :custom
+  (calendar-latitude 26.50)
+  (calendar-location-name "Kanpur, UP, India")
+  (calendar-longitude 80.23))
+
 (provide 'init-core)
 
 ;;; init-core.el ends here

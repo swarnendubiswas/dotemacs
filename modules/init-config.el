@@ -111,7 +111,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
