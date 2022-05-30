@@ -595,16 +595,15 @@
               ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
               ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
               ))
-  ;; (add-hook 'prog-mode-hook
-  ;;           (lambda ()
-  ;;             ;; (setq-local completion-at-point-functions
-  ;;             ;;             (list (cape-super-capf #'cape-keyword #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-  ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-to-list 'completion-at-point-functions #'cape-file 'append)
+              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+              (add-to-list 'completion-at-point-functions #'cape-history 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+              (add-to-list 'completion-at-point-functions #'cape-ispell 'append)))
+
   ;; (add-hook 'text-mode-hook
   ;;           (lambda ()
   ;;             ;; (setq-local completion-at-point-functions
@@ -683,10 +682,12 @@
   ;; strings
   ;; https://github.com/company-mode/company-mode/discussions/1211
   (company-search-regexp-function 'company-search-words-in-any-order-regexp)
-  (company-frontends '(;; company-pseudo-tooltip-unless-just-one-frontend
-                       company-pseudo-tooltip-frontend ; Always show candidates in overlay tooltip
-                       company-preview-frontend ; Too instrusive
-                       ;; company-preview-if-just-one-frontend ; Show in-place preview if there is only choice
+  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                       ;; Always show candidates in overlay tooltip
+                       ;; company-pseudo-tooltip-frontend
+                       ;; company-preview-frontend ; Too instrusive
+                       ;; Show in-place preview if there is only choice
+                       company-preview-if-just-one-frontend
                        ;; Show selected candidate docs in echo area
                        company-echo-metadata-frontend))
   :config
@@ -865,12 +866,12 @@
       ;; FIXME: Cannot autocomplete "\includegraphics" without texlab
       (setq company-backends '(;; company-capf ; Necessary if we are using a language server
                                company-files
-                               company-reftex-citations
+                               company-math-symbols-latex
+                               company-latex-commands
                                company-reftex-labels
+                               company-reftex-citations
                                company-auctex-environments
                                company-auctex-macros
-                               company-latex-commands
-                               company-math-symbols-latex
                                company-math-symbols-unicode
                                company-auctex-symbols
                                ;; company-reftex is expected to be better than `company-auctex-bibs' and `company-auctex-labels'
@@ -879,8 +880,8 @@
                                ;; `company-reftex-citations' is better than `company-bibtex'
                                ;; company-bibtex
                                ;; company-yasnippet ; FIXME: Untested
-                               company-dabbrev
-                               company-ispell)))
+                               (company-ispell :with
+                                               company-dabbrev))))
 
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook hook (lambda ()
@@ -905,8 +906,8 @@
 
       (set (make-local-variable 'company-backends)
            '(company-files
-             company-ispell
-             company-dabbrev)))
+             (company-ispell :with
+                             company-dabbrev))))
 
     (dolist (hook '(text-mode-hook)) ; Extends to derived modes like `markdown-mode' and `org-mode'
       (add-hook hook (lambda ()

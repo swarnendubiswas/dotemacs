@@ -342,11 +342,6 @@
   (lsp-grammarly-suggestions-oxford-comma t)
   (lsp-grammarly-suggestions-passive-voice t)
   :config
-  ;; (setq lsp-grammarly-active-modes '(text-mode latex-mode
-  ;;                                              LaTeX-mode org-mode markdown-mode gfm-mode)
-  ;;       lsp-grammarly-user-words '(
-  ;;                                  ))
-
   (defvar lsp-grammarly-active-modes)
 
   (lsp-register-client

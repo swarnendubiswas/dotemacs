@@ -103,7 +103,6 @@
   :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
   :custom
-  (git-commit-summary-max-length 50)
   (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
@@ -172,8 +171,8 @@
 
 (use-package consult-ls-git
   :bind
-  (("C-c g f" . #'consult-ls-git)
-   ("C-c g F" . #'consult-ls-git-other-window)))
+  (("C-c g f" . consult-ls-git)
+   ("C-c g F" . consult-ls-git-other-window)))
 
 (provide 'init-vcs)
 

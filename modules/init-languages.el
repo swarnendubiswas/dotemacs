@@ -37,7 +37,9 @@
   :straight (:type built-in)
   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :diminish hs-minor-mode
-  :hook (prog-mode-hook . hs-minor-mode)
+  :hook
+  ;; Hideshow is not defined for `ini-mode'.
+  ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
   :custom
   (hs-isearch-open t "Open all folds while searching"))
 
