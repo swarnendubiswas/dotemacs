@@ -470,7 +470,7 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :hook (prog-mode-hook . corfu-mode)
+  ;; :hook (prog-mode-hook . corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -659,7 +659,7 @@
   ((after-init-hook . (lambda ()
                         (when (string= (buffer-name) "*scratch*")
                           (company-mode 1))))
-   (text-mode-hook . company-mode))
+   (after-init-hook . global-company-mode))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -983,38 +983,39 @@
 ;;                                 ;; (diminish 'company-fuzzy-mode)
 ;;                                 ))))
 
-;; ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;; ;; `company-clang' is slow
-;; (with-eval-after-load "company"
-;;   (progn
-;;     (declare-function sb/company-prog-mode "init-completion")
+;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
+;; `company-clang' is slow
+(with-eval-after-load "company"
+  (progn
+    (declare-function sb/company-prog-mode "init-completion")
 
-;;     (defun sb/company-prog-mode ()
-;;       "Add backends for program completion in company mode."
-;;       (defvar company-minimum-prefix-length)
-;;       (defvar company-backends)
+    (defun sb/company-prog-mode ()
+      "Add backends for program completion in company mode."
+      (defvar company-minimum-prefix-length)
+      (defvar company-backends)
 
-;;       (setq-local company-minimum-prefix-length 3
-;;                   ;; Other choices: `company-sort-by-length', `company-sort-by-occurrence',
-;;                   ;; `company-sort-by-backend-importance', `company-sort-prefer-same-case-prefix'
-;;                   company-transformers '(delete-dups
-;;                                          company-sort-by-statistics))
-;;       (make-local-variable 'company-backends)
+      (setq-local company-minimum-prefix-length 2)
 
-;;       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-;;       (setq company-backends '(company-files
-;;                                (company-capf :with company-yasnippet)
-;;                                company-etags
-;;                                (company-dabbrev-code ; Useful for variable names
-;;                                 company-dabbrev))))
+      ;; Other choices: `company-sort-by-length', `company-sort-by-occurrence',
+      ;; `company-sort-by-backend-importance', `company-sort-prefer-same-case-prefix'
 
-;;     (add-hook 'prog-mode-hook
-;;               (lambda ()
-;;                 (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
-;;                   (sb/company-prog-mode)
-;;                   ;; (company-fuzzy-mode 1)
-;;                   ;; (diminish 'company-fuzzy-mode)
-;;                   )))))
+      (make-local-variable 'company-backends)
+
+      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+      (setq company-backends '(company-files
+                               company-capf
+                               (company-dabbrev-code ; Useful for variable names
+                                company-etags)
+                               (company-ispell :with
+                                               company-dabbrev))))
+
+    (add-hook 'prog-mode-hook
+              (lambda ()
+                (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
+                  (sb/company-prog-mode)
+                  ;; (company-fuzzy-mode 1)
+                  ;; (diminish 'company-fuzzy-mode)
+                  )))))
 
 (use-package orderless
   :after (:any ivy vertico)
