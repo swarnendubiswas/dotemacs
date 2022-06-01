@@ -13,36 +13,36 @@
             org-src-tabs-acts-natively)
   :commands (org-indent-mode org-indent-item org-outdent-item)
   :hook (org-mode-hook . visual-line-mode)
+  :custom
+  (org-fontify-done-headline nil)
+  (org-fontify-whole-heading-line nil)
+  (org-hide-emphasis-markers t)
+  (org-hide-leading-stars t)
+  (org-hide-leading-stars-before-indent-mode t)
+  ;; Code block fontification using the major-mode of the code
+  (org-src-fontify-natively t)
+  (org-src-preserve-indentation t)
+  (org-src-tabs-acts-natively t)
+  (org-src-window-setup 'current-window)
+  ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
+  ;; feels better with the mode disabled.
+  (org-startup-indented nil)
+  (org-startup-truncated nil)
+  (org-startup-folded 'showeverything)
+  (org-startup-with-inline-images t)
+  (org-support-shift-select t)
+  ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
+  ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
+  ;; blocks commands and their related keys.
+  (org-use-speed-commands t)
+  (org-src-strip-leading-and-trailing-blank-lines t)
+  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
+  (org-pretty-entities t)
+  ;; Render subscripts and superscripts in org buffers
+  (org-pretty-entities-include-sub-superscripts t)
+  ;; Automatically sorted and renumbered whenever I insert a new one
+  (org-footnote-auto-adjust t)
   :config
-  (setq org-fontify-done-headline nil
-        org-fontify-whole-heading-line nil
-        org-hide-emphasis-markers t
-        org-hide-leading-stars t
-        org-hide-leading-stars-before-indent-mode t
-        ;; Code block fontification using the major-mode of the code
-        org-src-fontify-natively t
-        org-src-preserve-indentation t
-        org-src-tabs-acts-natively t
-        org-src-window-setup 'current-window
-        ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
-        ;; feels better with the mode disabled.
-        org-startup-indented nil
-        org-startup-truncated nil
-        org-startup-folded 'showeverything
-        org-startup-with-inline-images t
-        org-support-shift-select t
-        ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
-        ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
-        ;; blocks commands and their related keys.
-        org-use-speed-commands t
-        org-src-strip-leading-and-trailing-blank-lines t
-        ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
-        org-pretty-entities t
-        ;; Render subscripts and superscripts in org buffers
-        org-pretty-entities-include-sub-superscripts t
-        ;; Automatically sorted and renumbered whenever I insert a new one
-        org-footnote-auto-adjust t)
-
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
   :bind-keymap ("C-c o" . org-mode-map)
@@ -69,7 +69,7 @@
   (org-appear-autosubmarkers t)
   (org-appear-autoentities   t)
   (org-appear-autolinks      t)
-  (org-appear-autoemphasis  t))
+  (org-appear-autoemphasis   t))
 
 (use-package ox-gfm
   :after org
@@ -78,7 +78,10 @@
 
 (use-package ox-pandoc
   :after org
-  :demand t)
+  :demand t
+  :commands (org-pandoc-export-to-markdown
+             org-pandoc-export-as-markdown
+             org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern
   :hook (org-mode-hook . org-modern-mode))

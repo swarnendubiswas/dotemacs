@@ -361,10 +361,11 @@
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information.
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq resize-mini-windows nil
-                  max-mini-window-height 5)))
+
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (setq resize-mini-windows nil
+;;                   max-mini-window-height 5)))
 
 (use-package beacon
   :diminish

@@ -81,7 +81,7 @@
   (setq use-package-always-ensure t
         ;; These variables need to best before loading `use-package'
         use-package-enable-imenu-support t
-        use-package-hook-name-suffix     nil)
+        use-package-hook-name-suffix nil)
 
   (eval-when-compile
     (require 'use-package)))

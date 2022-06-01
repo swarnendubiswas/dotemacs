@@ -404,6 +404,9 @@
 (use-package with-editor
   :hook (after-init-hook . shell-command-with-editor-mode))
 
+(use-package unfill
+  :commands (unfill-region unfill-paragraph unfill-toggle))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here
