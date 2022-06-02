@@ -105,6 +105,7 @@ https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variabl
 
 * Reference Configurations
 
+- https://github.com/caisah/emacs.dz
 - https://protesilaos.com/dotemacs
 - https://github.com/CSRaghunandan/.emacs.d
 - https://github.com/purcell/emacs.d

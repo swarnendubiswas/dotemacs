@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-one
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"          leuven)
@@ -143,7 +143,7 @@ This location is used for temporary installations and files.")
 
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow
 (defcustom sb/python-langserver
-  'pyright
+  'pylsp
   "Choose the Python Language Server implementation."
   :type  '(radio
            (const :tag "pylsp"   pylsp)
