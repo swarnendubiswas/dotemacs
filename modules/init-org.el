@@ -53,6 +53,7 @@
         ("M-<up>"    . nil)
         ("M-<down>"  . nil)
         ("C-'"       . nil)
+        ("C-c C-d"   . nil) ; Was bound to `org-deadline'
         ("C-c C-j"   . nil) ; Was bound to `org-goto'
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)))

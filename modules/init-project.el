@@ -26,6 +26,9 @@
                                     project-switch-to-buffer
                                     project-search
                                     project-compile)
+  :config
+  (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+  ;; :bind-keymap ("C-x p" . project-prefix-map)
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
@@ -39,11 +42,13 @@
    ("k" . project-kill-buffers)
    ("p" . project-switch-project)
    ("g" . project-find-regexp)
-   ("r" . project-query-replace-regexp)))
+   ("r" . project-query-replace-regexp)
+   ("m" . magit-project-status)))
 
 (use-package consult-project-extra
   :if (eq sb/minibuffer-completion 'vertico)
-  :after (consult project))
+  :after (consult project)
+  :commands (consult-project-extra-find consult-project-extra-find-other-window))
 
 (use-package projectile
   :commands (projectile-project-p projectile-project-name
