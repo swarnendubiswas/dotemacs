@@ -80,11 +80,11 @@
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep))
 
-(use-package affe
-  :if (eq sb/minibuffer-completion 'vertico)
-  :commands (affe-grep affe-find)
-  :config
-  (consult-customize affe-grep :preview-key (kbd "M-.")))
+;; (use-package affe
+;;   :if (eq sb/minibuffer-completion 'vertico)
+;;   :commands (affe-grep affe-find consult--customize-put)
+;;   :config
+;;   (consult-customize affe-grep :preview-key (kbd "M-.")))
 
 ;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.

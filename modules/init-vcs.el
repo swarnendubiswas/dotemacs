@@ -63,24 +63,24 @@
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
-(use-package git-gutter
-  :if (unless (boundp 'vc-handled-backends))
-  :disabled t
-  :commands global-git-gutter-mode
-  :diminish
-  :bind
-  (("C-x p" . git-gutter:previous-hunk)
-   ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init-hook . global-git-gutter-mode)
-  :custom
-  (git-gutter:added-sign " ")
-  (git-gutter:deleted-sign " ")
-  (git-gutter:modified-sign " ")
-  (git-gutter:update-interval 1)
-  :config
-  ;; https://github.com/syl20bnr/spacemacs/issues/10555
-  ;; https://github.com/syohex/emacs-git-gutter/issues/24
-  (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
+;; (use-package git-gutter
+;;   :if (unless (boundp 'vc-handled-backends))
+;;   :disabled t
+;;   :commands global-git-gutter-mode
+;;   :diminish
+;;   :bind
+;;   (("C-x p" . git-gutter:previous-hunk)
+;;    ("C-x n" . git-gutter:next-hunk))
+;;   :hook (after-init-hook . global-git-gutter-mode)
+;;   :custom
+;;   (git-gutter:added-sign " ")
+;;   (git-gutter:deleted-sign " ")
+;;   (git-gutter:modified-sign " ")
+;;   (git-gutter:update-interval 1)
+;;   :config
+;;   ;; https://github.com/syl20bnr/spacemacs/issues/10555
+;;   ;; https://github.com/syohex/emacs-git-gutter/issues/24
+;;   (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
 
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
@@ -151,28 +151,28 @@
         ("M-g m"   . smerge-context-menu)
         ("M-g M"   . smerge-popup-context-menu)))
 
-(use-package ediff
-  :straight (:type built-in)
-  :after magit
-  :demand t
-  :defines ediff-window-setup-function
-  :commands (ediff-setup-windows-plain ediff-set-diff-options)
-  :custom
-  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-  (ediff-window-setup-function #'ediff-setup-windows-plain)
-  ;; Split windows horizontally in ediff (instead of vertically)
-  (ediff-split-window-function #'split-window-horizontally)
-  :config
-  (ediff-set-diff-options 'ediff-diff-options "-w"))
+;; (use-package ediff
+;;   :straight (:type built-in)
+;;   :after magit
+;;   :demand t
+;;   :defines ediff-window-setup-function
+;;   :commands (ediff-setup-windows-plain ediff-set-diff-options)
+;;   :custom
+;;   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+;;   (ediff-window-setup-function #'ediff-setup-windows-plain)
+;;   ;; Split windows horizontally in ediff (instead of vertically)
+;;   (ediff-split-window-function #'split-window-horizontally)
+;;   :config
+;;   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :demand t)
+;; (use-package treemacs-magit
+;;   :after (treemacs magit)
+;;   :demand t)
 
-(use-package consult-ls-git
-  :bind
-  (("C-c g f" . consult-ls-git)
-   ("C-c g F" . consult-ls-git-other-window)))
+;; (use-package consult-ls-git
+;;   :bind
+;;   (("C-c g f" . consult-ls-git)
+;;    ("C-c g F" . consult-ls-git-other-window)))
 
 (provide 'init-vcs)
 

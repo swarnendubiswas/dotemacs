@@ -16,35 +16,36 @@
   (show-paren-when-point-in-periphery t))
 
 ;; Enable autopairing
-(use-package elec-pair
-  :straight (:type built-in)
-  :disabled t
-  :hook (after-init-hook . electric-pair-mode)
-  :config
-  ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
-  (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
-  (defvar electric-pair-pairs)
-  (defvar electric-pair-text-pairs)
-  (defvar electric-pair-preserve-balance)
 
-  (declare-function sb/add-markdown-pairs "init-emacs28")
+;; (use-package elec-pair
+;;   :straight (:type built-in)
+;;   :disabled t
+;;   :hook (after-init-hook . electric-pair-mode)
+;;   :config
+;;   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
+;;   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
+;;   (defvar electric-pair-pairs)
+;;   (defvar electric-pair-text-pairs)
+;;   (defvar electric-pair-preserve-balance)
 
-  (defun sb/add-markdown-pairs ()
-    "Add custom pairs to `markdown-mode'."
-    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
-    (setq-local electric-pair-text-pairs electric-pair-pairs))
+;;   (declare-function sb/add-markdown-pairs "init-parens")
 
-  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+;;   (defun sb/add-markdown-pairs ()
+;;     "Add custom pairs to `markdown-mode'."
+;;     (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  ;; Avoid balancing parentheses since they can be both irritating and slow
-  (setq electric-pair-preserve-balance nil)
+;;   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-  ;; Disable pairs when entering minibuffer
-  (add-hook 'minibuffer-setup-hook (lambda ()
-                                     (electric-pair-mode -1)))
-  ;; Re-enable pairs when existing minibuffer
-  (add-hook 'minibuffer-exit-hook (lambda ()
-                                    (electric-pair-mode 1))))
+;;   ;; Avoid balancing parentheses since they can be both irritating and slow
+;;   (setq electric-pair-preserve-balance nil)
+
+;;   ;; Disable pairs when entering minibuffer
+;;   (add-hook 'minibuffer-setup-hook (lambda ()
+;;                                      (electric-pair-mode -1)))
+;;   ;; Re-enable pairs when existing minibuffer
+;;   (add-hook 'minibuffer-exit-hook (lambda ()
+;;                                     (electric-pair-mode 1))))
 
 ;; `sp-cheat-sheet' will show you all the commands available, with examples. Seems to have
 ;; performance issue with `latex-mode', `markdown-mode', and large JSON files.

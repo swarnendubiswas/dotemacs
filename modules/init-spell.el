@@ -10,6 +10,8 @@
 (defvar sb/extras-directory)
 (defvar sb/minibuffer-completion)
 
+(declare-function sb/inhibit-message-call-orig-fun "init-core.el")
+
 (use-package ispell
   :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
@@ -21,7 +23,7 @@
   ;; Save a new word to personal dictionary without asking
   (ispell-silently-savep t)
   :config
-  ;; Skip regions in Org-mode
+  ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_EXAMPLE" . "#\\+END_EXAMPLE"))
@@ -39,7 +41,11 @@
   ;; Skip some math environments
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
-  (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}")))
+  (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}"))
+
+  ;; Hide the "Starting new Ispell process" message
+  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package flyspell
   :straight (:type built-in)
@@ -104,27 +110,25 @@
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
-   :map flyspell-mode-map
-   ("C-,"     . sb/flyspell-goto-previous-error)))
+   ;; :map flyspell-mode-map
+   ;; ("C-,"     . sb/flyspell-goto-previous-error)
+   ))
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
-;; Hide the "Starting new Ispell process" message
-(advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-(advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
-(use-package flyspell-popup
-  :after flyspell
-  :bind
-  (:map flyspell-mode-map
-        ("C-;" . flyspell-popup-correct))
-  :custom (flyspell-popup-correct-delay 0.1))
+;; (use-package flyspell-popup
+;;   :after flyspell
+;;   :bind
+;;   (:map flyspell-mode-map
+;;         ("C-;" . flyspell-popup-correct))
+;;   :custom (flyspell-popup-correct-delay 0.1))
 
 (use-package flyspell-correct
   :after flyspell
   :bind
   (:map flyspell-mode-map
-        ("C-;" . flyspell-correct-wrapper)))
+        ("C-;" . flyspell-correct-at-point)))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
@@ -204,8 +208,13 @@
 
 (use-package consult-flyspell
   :if (eq sb/minibuffer-completion 'vertico)
+  :defines consult-flyspell-select-function
   :after (consult flyspell)
-  :bind ("C-c f l" . consult-flyspell))
+  :bind ("C-c f l" . consult-flyspell)
+  :config
+  (setq consult-flyspell-select-function (lambda ()
+                                           (flyspell-correct-at-point)
+                                           (consult-flyspell))))
 
 (provide 'init-spell)
 

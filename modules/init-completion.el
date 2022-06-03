@@ -394,7 +394,6 @@
   ;; Use Consult to select xref locations with preview
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
-  (consult-project-function #'projectile-project-root)
   (consult-line-numbers-widen t)
   :bind
   (("C-x M-:" . consult-complex-command)
@@ -408,7 +407,6 @@
    ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
    ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
    ([remap bookmark-jump] . consult-bookmark)
-   ("C-x p b" . consult-project-buffer)
    ([remap project-switch-to-buffer] . consult-project-buffer)
    ("M-y" . consult-yank-pop)
    ([remap yank-pop] . consult-yank-pop)
@@ -446,8 +444,12 @@
   :config
   ;; Disable live preview
   (consult-customize consult-recent-file consult-buffer consult-theme
-                     consult-bookmark consult-xref consult-projectile
-                     :preview-key nil))
+                     consult-bookmark consult-xref
+                     :preview-key nil)
+
+  (when (featurep 'projectile)
+    (setq consult-project-function #'projectile-project-root)
+    (consult-customize consult-projectile :preview-key nil)))
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 ;; https://github.com/minad/corfu/wiki
@@ -708,6 +710,8 @@
     (diminish 'company-mode))
   :bind
   (:map company-active-map
+        ("C-s"      . nil) ; Was bound to `company-search-candidates'
+        ("C-M-s"    . nil) ; Was bound to `company-filter-candidates'
         ("C-n"      . company-select-next)
         ("C-p"      . company-select-previous)
         ;; Insert the common part of all candidates, or select the next one

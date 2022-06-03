@@ -35,7 +35,7 @@
                                    emacs-major-version
                                    version-separator
                                    emacs-minor-version)
-        straight-check-for-modifications nil
+        ;; straight-check-for-modifications nil
         straight-use-package-by-default t
         ;; There is no need to download the whole Git history, and a single branch often suffices.
         ;; However, that seems to lead to "git revision parsing" errors while using
@@ -61,30 +61,30 @@
 
   (straight-use-package 'use-package))
 
-(unless (bound-and-true-p sb/disable-package.el)
-  (with-eval-after-load 'package
-    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
-    (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-    (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+;; (unless (bound-and-true-p sb/disable-package.el)
+;;   (with-eval-after-load 'package
+;;     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+;;     (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+;;     (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
-  ;; Initialise the package management system. Another option is to construct the `load-path'
-  ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-  (package-initialize)
+;;   ;; Initialise the package management system. Another option is to construct the `load-path'
+;;   ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+;;   (package-initialize)
 
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+;;   (unless (package-installed-p 'use-package)
+;;     (package-refresh-contents)
+;;     (package-install 'use-package))
 
-  (defvar use-package-always-ensure)
+;;   (defvar use-package-always-ensure)
 
-  ;; Avoid manual installations whenever I modify package installations
-  (setq use-package-always-ensure t
-        ;; These variables need to best before loading `use-package'
-        use-package-enable-imenu-support t
-        use-package-hook-name-suffix nil)
+;;   ;; Avoid manual installations whenever I modify package installations
+;;   (setq use-package-always-ensure t
+;;         ;; These variables need to best before loading `use-package'
+;;         use-package-enable-imenu-support t
+;;         use-package-hook-name-suffix nil)
 
-  (eval-when-compile
-    (require 'use-package)))
+;;   (eval-when-compile
+;;     (require 'use-package)))
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'

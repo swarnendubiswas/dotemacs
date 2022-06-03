@@ -257,7 +257,8 @@
 ;; https://github.com/AnthonyDiGirolamo/airline-themes/issues/28
 (use-package airline-themes
   :if (eq sb/modeline-theme 'airline)
-  :init (load-theme 'airline-doom-one t)
+  :demand t
+  :config (load-theme 'airline-doom-one t)
   :custom
   (airline-display-directory 'airline-directory-shortened))
 
