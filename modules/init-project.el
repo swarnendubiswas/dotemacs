@@ -43,7 +43,8 @@
    ("p" . project-switch-project)
    ("g" . project-find-regexp)
    ("r" . project-query-replace-regexp)
-   ("m" . magit-project-status)))
+   ("m" . magit-project-status)
+   ("C" . recompile)))
 
 (use-package consult-project-extra
   :if (eq sb/minibuffer-completion 'vertico)

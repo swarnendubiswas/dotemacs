@@ -17,20 +17,20 @@
   'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "leuven"          leuven)
-           (const :tag "zenburn"         zenburn)
+           ;; (const :tag "leuven"          leuven)
+           ;; (const :tag "zenburn"         zenburn)
            (const :tag "doom-one"        doom-one)
            (const :tag "doom-nord"       doom-nord)
-           (const :tag "doom-molokai"    doom-molokai)
-           (const :tag "doom-gruvbox"    doom-gruvbox)
-           (const :tag "monokai"         monokai)
+           ;; (const :tag "doom-molokai"    doom-molokai)
+           ;; (const :tag "doom-gruvbox"    doom-gruvbox)
+           ;; (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
-           (const :tag "nano-light"      nano-light)
+           ;; (const :tag "nano-light"      nano-light)
            ;; Does not pair brackets
-           (const :tag "nano-dark"       nano-dark)
-           (const :tag "lambda-light"    lambda-light)
-           (const :tag "lambda-light-faded"    lambda-light-faded)
+           ;; (const :tag "nano-dark"       nano-dark)
+           ;; Company popups cannot be distinguished
+           ;; (const :tag "lambda-dark-faded"    lambda-dark-faded)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
@@ -41,18 +41,18 @@
   'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "leuven"          leuven)
-           (const :tag "zenburn"         zenburn)
+           ;; (const :tag "leuven"          leuven)
+           ;; (const :tag "zenburn"         zenburn)
            (const :tag "doom-one"        doom-one)
-           (const :tag "doom-molokai"    doom-molokai)
-           (const :tag "doom-gruvbox"    doom-gruvbox)
+           ;; (const :tag "doom-molokai"    doom-molokai)
+           ;; (const :tag "doom-gruvbox"    doom-gruvbox)
            (const :tag "doom-nord"       doom-nord)
-           (const :tag "monokai"         monokai)
+           ;; (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
-           (const :tag "nano-dark"       nano-dark)
-           (const :tag "lambda-dark"     lambda-dark)
-           (const :tag "lambda-dark-faded"     lambda-dark-faded)
+           ;; (const :tag "nano-dark"       nano-dark)
+           ;; (const :tag "lambda-dark"     lambda-dark)
+           ;; (const :tag "lambda-dark-faded"     lambda-dark-faded)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
@@ -64,13 +64,14 @@
   :type  '(radio
            (const :tag "powerline"       powerline)
            (const :tag "doom-modeline"   doom-modeline)
-           (const :tag "awesome-tray"    awesome-tray)
-           (const :tag "spaceline"       spaceline)
-           (const :tag "moody"           moody)
-           (const :tag "mini-modeline"   mini)
-           (const :tag "airline"         airline)
-           (const :tag "telephone-line"  telephone)
-           (const :tag "nano"            nano)
+           ;; (const :tag "awesome-tray"    awesome-tray)
+           ;; (const :tag "spaceline"       spaceline)
+           ;; (const :tag "moody"           moody)
+           ;; (const :tag "mini-modeline"   mini)
+           ;; (const :tag "airline"         airline)
+           ;; (const :tag "telephone-line"  telephone)
+           ;; (const :tag "nano"            nano)
+           ;; (const :tag "lambda-line"     lambda-line)
            ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
@@ -111,7 +112,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -160,7 +161,7 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/capf
-  'corfu
+  'company
   "Choose the framework to use for completion at point.
 Corfu does not support TUI, so we have to fallback on company."
   :type '(radio

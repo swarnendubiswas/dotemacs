@@ -9,15 +9,19 @@
 
 (declare-function sb/smerge-hydra/body "init-keybindings")
 
-(setq vc-follow-symlinks t ; No need to ask
-      ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
-      ;; information on the modeline.
-      vc-handled-backends '(Git))
-
-;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-(if (boundp 'vc-handled-backends)
-    (add-hook 'find-file-hook #'vc-refresh-state)
-  (remove-hook 'find-file-hook #'vc-refresh-state))
+(use-package vc-hooks
+  :straight (:type built-in)
+  :demand t
+  :custom
+  (vc-follow-symlinks t "No need to ask")
+  ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
+  ;; information on the modeline.
+  (vc-handled-backends '(Git))
+  :config
+  ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
+  (if (boundp 'vc-handled-backends)
+      (add-hook 'find-file-hook #'vc-refresh-state)
+    (remove-hook 'find-file-hook #'vc-refresh-state)))
 
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1

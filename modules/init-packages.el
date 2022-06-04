@@ -35,7 +35,8 @@
                                    emacs-major-version
                                    version-separator
                                    emacs-minor-version)
-        ;; straight-check-for-modifications nil
+        ;; Do not check packages on startup to reduce load time
+        straight-check-for-modifications '(check-on-save find-when-checking)
         straight-use-package-by-default t
         ;; There is no need to download the whole Git history, and a single branch often suffices.
         ;; However, that seems to lead to "git revision parsing" errors while using
@@ -105,6 +106,7 @@
 (defvar use-package-verbose)
 (defvar use-package-expand-minimally)
 (defvar use-package-always-defer)
+(defvar use-package-minimum-reported-time)
 
 (if (bound-and-true-p sb/debug-init-file)
     (progn
@@ -112,6 +114,7 @@
             debug-on-event                 'sigusr2
             use-package-compute-statistics t ; Use "M-x use-package-report" to see results
             use-package-verbose            t
+            use-package-minimum-reported-time 0
             use-package-expand-minimally   nil))
   (progn
     (setq use-package-always-defer       t

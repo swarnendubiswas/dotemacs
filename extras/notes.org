@@ -132,3 +132,4 @@ https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variabl
 - https://github.com/croqaz/dotfiles/blob/main/emacs/Emacs.org
 - https://github.com/mattduck/dotfiles
 - https://alhassy.github.io/emacs.d/index.html
+- https://github.com/Lambda-Emacs/lambda-emacs

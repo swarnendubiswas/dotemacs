@@ -596,6 +596,63 @@
   :config
   (require 'term-keys-alacritty))
 
+(transient-define-prefix sb/help-transient ()
+  ["Help Commands"
+   ["Mode & Bindings"
+    ("m" "Mode" describe-mode)
+    ("b" "Major Bindings" which-key-show-full-major-mode)
+    ("B" "Minor Bindings" which-key-show-full-minor-mode-keymap)
+    ("d" "Descbinds" describe-bindings)
+    ]
+   ["Describe"
+    ("c" "Command" helpful-command)
+    ("f" "Function" helpful-callable)
+    ("o" "Symbol"  helpful-symbol)
+    ("v" "Variable" helpful-variable)
+    ("k" "Key" helpful-key)
+    ]
+   ["Info on"
+    ("C-c" "Emacs Command" Info-goto-emacs-command-node)
+    ("C-f" "Function" info-lookup-symbol)
+    ("C-v" "Variable" info-lookup-symbol)
+    ("C-k" "Emacs Key" Info-goto-emacs-key-command-node)
+    ]
+   ["Goto Source"
+    ("L" "Library" find-library)
+    ("F" "Function" find-function)
+    ("V" "Variable" find-variable)
+    ("K" "Key" find-function-on-key)
+    ]
+   ]
+  [
+   ["Internals"
+    ("e" "Echo Messages" view-echo-area-messages)
+    ("l" "Lossage" view-lossage)
+    ]
+   ["Describe"
+    ("s" "Symbol" helpful-symbol)
+    ("." "At Point   " helpful-at-point)
+    ("C-d" "Face" describe-face)
+    ("w" "Where Is" where-is)
+    ("=" "Position" what-cursor-position)
+    ]
+   ["Info Manuals"
+    ("C-i" "Info" info)
+    ("C-4" "Other Window " info-other-window)
+    ]
+   ["Exit"
+    ("q" "Quit" transient-quit-one)
+    ("<escape>" "Quit" transient-quit-one)
+    ]
+   ]
+  [
+   ["External"
+    ("W" "Dictionary" dictionary-lookup-definition)
+    ]
+   ]
+  )
+(bind-key "M-H" #'sb/help-transient)
+
 (provide 'init-keybindings)
 
 ;;; init-keybindings.el ends here

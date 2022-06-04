@@ -13,15 +13,6 @@
 (defvar sb/user-home-directory)
 (defvar sb/python-langserver)
 
-(add-hook 'prog-mode-hook
-          (lambda ()
-            ;; Highlight and allow to open http links in strings and comments in programming
-            ;; buffers.
-            (goto-address-prog-mode 1)
-            ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-            (when (display-graphic-p)
-              (display-fill-column-indicator-mode 1))))
-
 (use-package subword
   :straight (:type built-in)
   :diminish
@@ -58,7 +49,7 @@
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
    ("C-M-." . xref-find-apropos)
-   ("M-,"   . xref-pop-marker-stack)
+   ("M-,"   . xref-go-back)
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
@@ -305,7 +296,7 @@
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-  :after markdown-mode
+  :hook (markdown-mode-hook . markdown-toc)
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
                                       markdown-toc-generate-or-refresh-toc))
 
@@ -686,7 +677,7 @@
     (defvar lsp-pylsp-plugins-jedi-use-pyenv-environment)
 
     (when (eq sb/python-langserver 'pylsp)
-      (setq lsp-pylsp-configuration-sources []
+      (setq lsp-pylsp-configuration-sources ["setup.cfg"]
             lsp-pylsp-plugins-mccabe-enabled nil
             ;; We can also set this per-project
             lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
@@ -1069,9 +1060,6 @@
 
   ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
   (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
-
-(use-package info-colors
-  :hook (Info-selection-hook . info-colors-fontify-node))
 
 (use-package consult-lsp
   :if (eq sb/minibuffer-completion 'vertico)

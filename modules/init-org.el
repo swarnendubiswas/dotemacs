@@ -8,6 +8,7 @@
 ;;; Code:
 
 (use-package org
+  :defer 5
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)

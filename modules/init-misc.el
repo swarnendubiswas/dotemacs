@@ -173,7 +173,17 @@
   (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes)
   :bind
   (:map pdf-view-mode-map
+        ("j"  . pdf-view-next-line-or-next-page)
+        ("k"  . pdf-view-previous-line-or-previous-page)
+        ("n"  . pdf-view-next-page-command)
+        ("p"  . pdf-view-previous-page-command)
+        ("a"  . pdf-view-first-page)
+        ("e"  . pdf-view-last-page)
+        ("l"  . pdf-view-goto-page)
         ("C-s" . isearch-forward)
+        ("C-S-s" . isearch-backward)
+        ("="  . pdf-view-fit-page-to-window)
+        ("r"  . pdf-view-revert-buffer)
         ("d"   . pdf-annot-delete)
         ("h"   . pdf-annot-add-highlight-markup-annotation)
         ("t"   . pdf-annot-add-text-annotation)
@@ -406,6 +416,15 @@
 
 (use-package unfill
   :commands (unfill-region unfill-paragraph unfill-toggle))
+
+;; Better looking info pages
+(use-package info-colors
+  :hook (Info-selection-hook . info-colors-fontify-node))
+
+;; Highlight and allow to open http links in strings and comments in buffers.
+(use-package goto-addr
+  :hook ((prog-mode-hook . goto-address-prog-mode)
+         (text-mode-hook . goto-address-mode)))
 
 (provide 'init-misc)
 

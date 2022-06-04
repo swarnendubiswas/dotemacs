@@ -273,9 +273,9 @@
   (add-to-list 'treemacs-ignored-file-predicates #'sb/treemacs-ignore-files)
   :bind*
   (;; The keybinding interferes with `dired-jump' and imenu `C-c C-j'
-   ("C-j"     . treemacs)
-   ("C-c t d" . treemacs-add-and-display-current-project)
-   ("C-c t e" . treemacs-display-current-project-exclusively)
+   ;; ("C-j"     . treemacs)
+   ;; ("C-c t d" . treemacs-add-and-display-current-project)
+   ;; ("C-c t e" . treemacs-display-current-project-exclusively)
    ("M-0"     . treemacs-select-window)))
 
 (use-package treemacs-all-the-icons
