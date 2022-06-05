@@ -1508,6 +1508,7 @@
     ("processig" "Processing" nil :count 0)
     ("proessing" "processing" nil :count 0)
     ("recompiliation" "recompilation" nil :count 0)
+    ("remeber" "Remember" nil :count 0)
     ("sceptical" "skeptical" nil :count 0)
     ("scheduliing" "scheduling" nil :count 0)
     ("sequenes" "sequence" nil :count 0)

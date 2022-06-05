@@ -19,6 +19,7 @@
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
+  :if (eq sb/capf 'company)
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -107,7 +108,6 @@
   (company-posframe-mode 1))
 
 (use-package company-quickhelp
-  :disabled t
   :after company
   :hook (prog-mode-hook . company-quickhelp-mode))
 
@@ -115,8 +115,6 @@
   :after company
   :commands company-statistics-mode
   :init (company-statistics-mode 1))
-
-(use-package flx)
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
@@ -193,7 +191,12 @@
 ;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
 ;; that come from different backends are sorted separately in the combined list.
 
-;; LATER: I do not understand the difference between the following two, and the explanation.
+;; The first merges completions from `company-capf' and `company-dabbrev'. In the second case,
+;; `company' will use only the backends before `:with' for determining the prefix (the text to be
+;; completed). This implies that the candidates from backends after `:with' will be ignored by
+;; `company', irrespective of whether the backends return a prefix or no, if none of the backends
+;; before `:with' return a prefix.
+
 ;; `(add-to-list 'company-backends '(company-capf company-dabbrev))'
 ;; `(add-to-list 'company-backends '(company-capf :with company-dabbrev))'
 

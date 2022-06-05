@@ -35,7 +35,7 @@
                         (add-hook 'before-save-hook #'lsp-format-buffer nil t)
                         (add-to-list 'lsp-clients-clangd-args
                                      (concat "--compile-commands-dir="
-                                             (expand-file-name "./build" (projectile-project-root)))
+                                             (expand-file-name "./build"))
                                      'append)
                         ))
               ))

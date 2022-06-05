@@ -19,7 +19,7 @@
                  (eval . (let (
                                (paths
                                 (vconcat (list
-                                          (expand-file-name "src" (projectile-project-root))
+                                          (expand-file-name "src")
                                           ))
                                 )
                                )

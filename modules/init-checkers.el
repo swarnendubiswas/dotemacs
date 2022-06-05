@@ -16,16 +16,8 @@
 (declare-function make-lsp-client "lsp-mode")
 (declare-function f-dirname "f")
 
-;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
-;; also get run for all modes derived from a basic mode such as `text-mode'.
-
-;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
-;; wrapped around automatically.
-;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
-
-;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar but
-;; checks the writing style. `textlint' includes `writegood' but I prefer `grammarly' and
-;; `lsp-ltex'.
+;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
+;; checks only the writing style. `textlint' includes `writegood'.
 (use-package writegood-mode
   :commands (writegood-passive-voice-turn-off)
   :diminish
@@ -53,14 +45,14 @@
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
   (flycheck-checker-error-threshold 1500)
   (flycheck-idle-buffer-switch-delay 2 "Increase the time (s) to allow for quick transitions")
-  (flycheck-idle-change-delay 2 "Increase the time (s) to allow for edits")
-  (flycheck-emacs-lisp-load-path 'inherit)
+  (flycheck-idle-change-delay 2 "Increase the time (s) to allow for transient edits")
   ;; Show error messages only if the error list is not already visible
   ;; (flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
+  (flycheck-emacs-lisp-load-path 'inherit)
   ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
   ;; derived from `text-mode'.
   (flycheck-global-modes '(not csv-mode))
-  (flycheck-indication-mode 'right-fringe)
+  (flycheck-indication-mode 'left-fringe)
   :config
   ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
@@ -231,7 +223,6 @@
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
-  :disabled t
   :config
   (setq flycheck-grammarly-check-time 3
         ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
@@ -240,6 +231,7 @@
   (add-to-list 'flycheck-checkers 'grammarly t))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
+;; The "languagetool" folder should include all files in addition to the ".jar" files.
 (use-package langtool
   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
   :commands (langtool-check
@@ -249,7 +241,6 @@
   :init
   (setq langtool-default-language "en-US"
         languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-        ;; The folder should include all the files in addition to the ".jar" files.
         languagetool-console-command (no-littering-expand-etc-file-name
                                       "languagetool/languagetool-commandline.jar")
         languagetool-server-command (no-littering-expand-etc-file-name
@@ -258,6 +249,7 @@
                                     "languagetool/languagetool-commandline.jar")))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
+;; The "languagetool" folder should include all files in addition to the ".jar" files.
 (use-package flycheck-languagetool
   :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
@@ -269,60 +261,6 @@
         flycheck-languagetool-check-time 3)
 
   (add-to-list 'flycheck-checkers 'languagetool t))
-
-;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
-;; support. We only need to enable `flycheck-grammarly' support for the "*scratch*" buffer which is
-;; in `text-mode'.
-
-;; org -> grammarly -> languagetool
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (flycheck-select-checker 'org-lint)
-;;             (when (featurep 'flycheck-grammarly)
-;;               (flycheck-add-next-checker 'org-lint 'grammarly))
-;;             (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-;;               (flycheck-add-next-checker 'grammarly 'languagetool))
-;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
-
-;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
-(add-hook 'text-mode-hook
-          (lambda ()
-            (when (string= (buffer-name) "*scratch*")
-              (if (featurep 'flycheck-grammarly)
-                  (progn
-                    (flycheck-select-checker 'grammarly)
-                    (when (featurep 'flycheck-languagetool)
-                      (flycheck-add-next-checker 'grammarly 'languagetool))))
-              (when (featurep 'flycheck-languagetool)
-                (flycheck-select-checker 'languagetool)))))
-
-;; `markdown-mode' is derived from `text-mode'
-;; markdown-markdownlint-cli -> grammarly -> languagetool
-;; (add-hook 'markdown-mode-hook
-;;           (lambda()
-;;             (flycheck-select-checker 'markdown-markdownlint-cli)
-;;             (when (featurep 'flycheck-grammarly)
-;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
-;;               ;; (setq flycheck-error-list-minimum-level 'warning
-;;               ;;       flycheck-navigation-minimum-level 'warning)
-;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
-;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
-;;             ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-;;             ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
-;;             ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-;;             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))
-;;             ))
-
-;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
-;;   (add-hook hook (lambda ()
-;;                    (flycheck-select-checker 'tex-chktex)
-;;                    (when (featurep 'flycheck-grammarly)
-;;                      (flycheck-add-next-checker 'tex-chktex 'grammarly))
-;;                    (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
-;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
@@ -417,6 +355,59 @@
   (with-eval-after-load "counsel"
     (with-eval-after-load "flycheck"
       (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map))))
+
+;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
+;; support. We need to enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
+
+;; org -> grammarly -> languagetool
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (flycheck-select-checker 'org-lint)
+;;             (when (featurep 'flycheck-grammarly)
+;;               (flycheck-add-next-checker 'org-lint 'grammarly))
+;;             (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
+
+;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
+(add-hook 'text-mode-hook
+          (lambda ()
+            (when (string= (buffer-name) "*scratch*")
+              (if (featurep 'flycheck-grammarly)
+                  (progn
+                    (flycheck-select-checker 'grammarly)
+                    (when (featurep 'flycheck-languagetool)
+                      (flycheck-add-next-checker 'grammarly 'languagetool)))
+                (when (featurep 'flycheck-languagetool)
+                  (flycheck-select-checker 'languagetool))))))
+
+;; `markdown-mode' is derived from `text-mode'
+;; markdown-markdownlint-cli -> grammarly -> languagetool
+;; (add-hook 'markdown-mode-hook
+;;           (lambda()
+;;             (flycheck-select-checker 'markdown-markdownlint-cli)
+;;             (when (featurep 'flycheck-grammarly)
+;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
+;;               ;; (setq flycheck-error-list-minimum-level 'warning
+;;               ;;       flycheck-navigation-minimum-level 'warning)
+;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
+;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
+;;             ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
+;;             ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))
+;;             ))
+
+;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
+;;   (add-hook hook (lambda ()
+;;                    (flycheck-select-checker 'tex-chktex)
+;;                    (when (featurep 'flycheck-grammarly)
+;;                      (flycheck-add-next-checker 'tex-chktex 'grammarly))
+;;                    (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
+;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
+;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
 
 (provide 'init-checkers)
 

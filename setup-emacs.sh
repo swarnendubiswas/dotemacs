@@ -192,7 +192,7 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
 # Install Texlab. The language server seems feature-incomplete and slow, so I still prefer AuCTeX.
 
-TEXLAB_VER="3.3.2"
+TEXLAB_VER="3.4.0"
 
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz

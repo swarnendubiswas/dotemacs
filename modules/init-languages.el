@@ -296,7 +296,7 @@
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-  :hook (markdown-mode-hook . markdown-toc)
+  :hook (markdown-mode-hook . markdown-toc-generate-toc)
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
                                       markdown-toc-generate-or-refresh-toc))
 

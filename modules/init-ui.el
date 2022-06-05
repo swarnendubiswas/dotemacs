@@ -32,7 +32,7 @@
   (all-the-icons-color-icons nil))
 
 (use-package all-the-icons-ivy
-  :if (eq sb/minibuffer-completion 'ivy)
+  :if (and (eq sb/minibuffer-completion 'ivy) (display-graphic-p))
   :after ivy
   :hook (after-init-hook . all-the-icons-ivy-setup))
 
@@ -367,9 +367,9 @@
 (when (display-graphic-p)
   ;; Show dividers on the right of each window, more prominent than the default
   (add-hook 'after-init-hook #'window-divider-mode)
+  ;; (display-battery-mode 1)
   ;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
-  (global-display-line-numbers-mode 1)
-  (display-battery-mode 1))
+  (global-display-line-numbers-mode 1))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other.

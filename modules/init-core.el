@@ -400,6 +400,13 @@
   (calendar-location-name "Kanpur, UP, India")
   (calendar-longitude 80.23))
 
+;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
+;; also get run for all modes derived from a basic mode such as `text-mode'.
+
+;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
+;; wrapped around automatically.
+;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+
 (provide 'init-core)
 
 ;;; init-core.el ends here

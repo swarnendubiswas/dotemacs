@@ -40,7 +40,7 @@
                 (eval . (progn
                           (let (
                                 (bibpath "/home/swarnendu/prospar-workspace/references/references.bib")
-                                (projectroot (projectile-project-root))
+                                (projectroot (expand-file-name "."))
                                 )
                             (setq-local reftex-default-bibliography    bibpath
                                         company-bibtex-bibliography    bibpath

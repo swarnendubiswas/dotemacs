@@ -21,7 +21,7 @@
   (ibuffer-use-header-line t)
   :bind ("C-x C-b" . ibuffer))
 
-;; Do not show filter groups if there are no buffers in that group
+;; Do not show groups if there are no buffers in that group
 (use-package ibuf-ext
   :straight (:type built-in)
   :custom
@@ -115,11 +115,6 @@
 ;; (add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
 ;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 ;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
-
-;; ;; Do not popup the *Async Shell Command* buffer
-;; (add-to-list 'display-buffer-alist
-;;              (cons "\\*Async Shell Command\\*.*"
-;;                    (cons #'display-buffer-no-window nil)))
 
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)

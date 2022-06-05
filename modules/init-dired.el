@@ -128,6 +128,7 @@
         ("r" . dired-efap)))
 
 (use-package all-the-icons-dired
+  :if (display-graphic-p)
   :commands all-the-icons-dired--refresh-advice
   :diminish
   :hook
