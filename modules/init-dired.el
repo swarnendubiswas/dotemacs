@@ -134,7 +134,9 @@
   :hook
   (dired-mode-hook . (lambda ()
                        (unless (file-remote-p default-directory)
-                         (all-the-icons-dired-mode 1)))))
+                         (all-the-icons-dired-mode 1))))
+  :custom
+  (all-the-icons-dired-monochrome nil))
 
 (use-package treemacs
   :functions treemacs-tag-follow-mode

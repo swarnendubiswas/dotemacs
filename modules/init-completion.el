@@ -50,6 +50,7 @@
 
 (use-package orderless
   :after (:any ivy vertico)
+  :disabled t
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
@@ -125,6 +126,16 @@
   :bind
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
+
+(use-package fussy
+  :straight (fussy :type git :host github :repo "jojojames/fussy")
+  :init
+  (push 'fussy completion-styles)
+  (setq
+   ;; For example, project-find-file uses 'project-files which uses substring completion by default.
+   ;; Set to nil to make sure it's using flx.
+   completion-category-defaults nil
+   completion-category-overrides nil))
 
 (provide 'init-completion)
 

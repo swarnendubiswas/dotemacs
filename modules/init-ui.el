@@ -29,7 +29,13 @@
     (all-the-icons-install-fonts t))
   :custom
   (all-the-icons-scale-factor 0.9)
-  (all-the-icons-color-icons nil))
+  (all-the-icons-faicon-scale-factor 0.9)
+  (all-the-icons-wicon-scale-factor 0.9)
+  (all-the-icons-octicon-scale-factor 0.9)
+  (all-the-icons-fileicon-scale-factor 0.9)
+  (all-the-icons-material-scale-factor 0.9)
+  (all-the-icons-alltheicon-scale-factor 0.9)
+  (all-the-icons-color-icons t))
 
 (use-package all-the-icons-ivy
   :if (and (eq sb/minibuffer-completion 'ivy) (display-graphic-p))
