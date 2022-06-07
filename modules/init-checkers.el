@@ -253,7 +253,7 @@
 (use-package flycheck-languagetool
   :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
-  :hook (text-mode-hook . flycheck-languagetool-setup)
+  :demand t
   :init
   (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool/languagetool-server.jar")

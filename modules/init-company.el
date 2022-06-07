@@ -19,7 +19,6 @@
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
-  :if (eq sb/capf 'company)
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -34,7 +33,7 @@
   ((after-init-hook . (lambda ()
                         (when (string= (buffer-name) "*scratch*")
                           (company-mode 1))))
-   (after-init-hook . global-company-mode))
+   (text-mode-hook . company-mode))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the

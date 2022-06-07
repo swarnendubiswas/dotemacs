@@ -49,7 +49,10 @@
 (use-package consult-project-extra
   :if (eq sb/minibuffer-completion 'vertico)
   :after (consult project)
-  :commands (consult-project-extra-find consult-project-extra-find-other-window))
+  :commands consult-project-extra-find-other-window
+  :bind
+  (:map project-prefix-map
+        ("z" . consult-project-extra-find)))
 
 ;; (use-package projectile
 ;;   :commands (projectile-project-p projectile-project-name

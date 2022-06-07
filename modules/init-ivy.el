@@ -191,16 +191,17 @@
      :predicate (lambda (cand) (get-buffer cand))
      :delimiter "\t"))
 
-  (plist-put
-   all-the-icons-ivy-rich-display-transformers-list
-   'projectile-completing-read
-   '(:columns
-     ((all-the-icons-ivy-rich-file-icon)
-      (all-the-icons-ivy-rich-project-find-file-transformer (:width 0.4))
-      (all-the-icons-ivy-rich-project-file-id (:width 15 :face
-                                                      all-the-icons-ivy-rich-file-owner-face
-                                                      :align right)))
-     :delimiter "\t")))
+  (with-eval-after-load "projectile"
+    (plist-put
+     all-the-icons-ivy-rich-display-transformers-list
+     'projectile-completing-read
+     '(:columns
+       ((all-the-icons-ivy-rich-file-icon)
+        (all-the-icons-ivy-rich-project-find-file-transformer (:width 0.4))
+        (all-the-icons-ivy-rich-project-file-id (:width 15 :face
+                                                        all-the-icons-ivy-rich-file-owner-face
+                                                        :align right)))
+       :delimiter "\t"))))
 
 (use-package ivy-rich
   :commands (ivy-rich-mode ivy-rich-modify-column

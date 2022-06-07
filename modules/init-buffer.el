@@ -29,6 +29,7 @@
   :hook (ibuffer-hook . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
+  :after (projectile)
   :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
@@ -86,7 +87,8 @@
   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
   (push '("*xref*"              :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode          :noselect t)   popwin:special-display-config)
+  (push '(helpful-mode :noselect t :position bottom :height 20)
+        popwin:special-display-config)
   (push "*Shell Command Output*"               popwin:special-display-config)
   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))

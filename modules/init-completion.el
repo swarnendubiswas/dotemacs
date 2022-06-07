@@ -50,7 +50,6 @@
 
 (use-package orderless
   :after (:any ivy vertico)
-  :disabled t
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
@@ -62,9 +61,7 @@
 
   (setq orderless-matching-styles '(orderless-regexp)
         orderless-component-separator #'orderless-escapable-split-on-space
-        completion-styles '(orderless
-                            ;;basic partial-completion initials emacs22
-                            )
+        completion-styles '(orderless basic partial-completion initials emacs22)
         completion-category-defaults nil
         ;; LATER: I do not understand this.
         ;; completion-category-overrides '((file (styles basic substring remote orderless partial-completion))
@@ -92,9 +89,7 @@
 ;; YASnippet no longer bundles snippets directly
 (use-package yasnippet-snippets
   :after yasnippet
-  :demand t
-  :commands yasnippet-snippets-initialize
-  :config (yasnippet-snippets-initialize))
+  :commands yasnippet-snippets-initialize)
 
 (use-package ivy-yasnippet
   :if (eq sb/minibuffer-completion 'ivy)

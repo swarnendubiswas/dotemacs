@@ -75,12 +75,10 @@
 
 (use-package ox-gfm
   :after org
-  :demand t
   :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
 (use-package ox-pandoc
   :after org
-  :demand t
   :commands (org-pandoc-export-to-markdown
              org-pandoc-export-as-markdown
              org-pandoc-export-to-markdown-and-open))

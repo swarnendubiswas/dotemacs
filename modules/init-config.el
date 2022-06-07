@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-vivendi
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -26,7 +26,6 @@
            ;; (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
-           ;; (const :tag "nano-light"      nano-light)
            ;; Does not pair brackets
            ;; (const :tag "nano-dark"       nano-dark)
            ;; Company popups cannot be distinguished
@@ -44,9 +43,9 @@
            ;; (const :tag "leuven"          leuven)
            ;; (const :tag "zenburn"         zenburn)
            (const :tag "doom-one"        doom-one)
+           (const :tag "doom-nord"       doom-nord)
            ;; (const :tag "doom-molokai"    doom-molokai)
            ;; (const :tag "doom-gruvbox"    doom-gruvbox)
-           (const :tag "doom-nord"       doom-nord)
            ;; (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)

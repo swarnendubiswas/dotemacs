@@ -419,13 +419,12 @@
   :hook (after-init-hook . global-hl-line-mode))
 
 (use-package centaur-tabs
-  :commands (centaur-tabs-group-by-projectile-project centaur-tabs-headline-match)
+  :commands (;; centaur-tabs-group-by-projectile-project
+             centaur-tabs-headline-match)
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :custom
-  (centaur-tabs-set-icons nil "The icons may not blend well with the theme")
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-  ;; (centaur-tabs-cycle-scope 'tabs)
   (centaur-tabs-gray-out-icons t)
   (centaur-tabs-set-close-button nil)
   (centaur-tabs-show-new-tab-button nil)
@@ -434,7 +433,17 @@
   ;; themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
-  ;; :config
+  :config
+  ;; The icons do not blend well with all themes.
+  (let ((themes '("doom-one"
+                  "doom-nord"
+                  "doom-molokai"
+                  "doom-gruvbox")))
+    (progn
+      (if (-contains? themes (symbol-name sb/gui-theme))
+          (setq centaur-tabs-set-icons t)
+        (setq centaur-tabs-set-icons nil))))
+
   ;; (centaur-tabs-headline-match)
   ;; (centaur-tabs-group-by-projectile-project)
   :bind*

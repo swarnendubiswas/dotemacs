@@ -15,7 +15,6 @@
                               corfu-quick
                               corfu-info
                               corfu-history))
-  :if (eq sb/capf 'corfu)
   :commands corfu--goto
   :preface
   (defun sb/corfu-beginning-of-prompt ()
@@ -30,10 +29,11 @@
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
   :hook
-  ((after-init-hook . (lambda ()
-                        (when (string= (buffer-name) "*scratch*")
-                          (corfu-mode 1))))
-   (after-init-hook . global-corfu-mode))
+  (
+   ;; (after-init-hook . (lambda ()
+   ;;                      (when (string= (buffer-name) "*scratch*")
+   ;;                        (corfu-mode 1))))
+   (prog-mode-hook . corfu-mode))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
