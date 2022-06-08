@@ -418,6 +418,7 @@
   :if (display-graphic-p)
   :hook (after-init-hook . global-hl-line-mode))
 
+;; https://github.com/ema2159/centaur-tabs/issues/181
 (use-package centaur-tabs
   :commands (;; centaur-tabs-group-by-projectile-project
              centaur-tabs-headline-match)
@@ -445,7 +446,7 @@
         (setq centaur-tabs-set-icons nil))))
 
   ;; (centaur-tabs-headline-match)
-  ;; (centaur-tabs-group-by-projectile-project)
+  (centaur-tabs-group-by-projectile-project)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
    ("M-<left>"  . centaur-tabs-backward-tab)))

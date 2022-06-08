@@ -33,7 +33,7 @@
   ((after-init-hook . (lambda ()
                         (when (string= (buffer-name) "*scratch*")
                           (company-mode 1))))
-   (text-mode-hook . company-mode))
+   (after-init-hook . global-company-mode))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -278,9 +278,13 @@
       (defvar company-backends)
 
       ;; Slightly larger value to have more precise matches and so that the popup does not block
-      (setq-local company-minimum-prefix-length 3
-                  company-transformers '(company-sort-by-backend-importance
-                                         delete-dups))
+      (setq-local company-minimum-prefix-length 3)
+
+      ;; Options: company-sort-prefer-same-case-prefix, company-sort-by-occurrence,
+      ;; company-sort-by-statistics, company-sort-by-length,
+      ;; company-sort-by-backend-importance
+      ;; (setq-local company-transformers '(company-sort-by-backend-importance
+      ;;                                    delete-dups))
 
       (set (make-local-variable 'company-backends)
            '(company-files
