@@ -63,7 +63,8 @@
         orderless-component-separator #'orderless-escapable-split-on-space
         completion-styles '(orderless basic partial-completion initials emacs22)
         completion-category-defaults nil
-        ;; LATER: I do not understand this.
+        ;; basic matches only the prefix, substring matches the whole string as expected.
+
         ;; completion-category-overrides '((file (styles basic substring remote orderless partial-completion))
         ;;                                 ;; (minibuffer (initials))))
         ;;                                 )

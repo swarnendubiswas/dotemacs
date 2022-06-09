@@ -11,6 +11,8 @@
 
                  (flycheck-pylintrc . "setup.cfg")
 
+                 (py-isort-options . '("--settings-path=setup.cfg"))
+
                  (lsp-pylsp-plugins-yapf-enable   . t)
                  (lsp-pylsp-plugins-pylint-enable . t)
                  ;; Default is jedi (slow and old)
@@ -27,13 +29,16 @@
                            ))
 
                  (eval . (lsp-deferred))
-                 (eval . (add-hook 'before-save-hook
-                                   #'lsp-format-buffer nil t))
 
-                 (py-isort-options . '("--settings-path=setup.cfg"))
+                 ;; We do not use `lsp-format-buffer' since `pyright' does not support document
+                 ;; formatting.
 
-                 (eval . (require 'dap-python))
-                 (eval . (dap-register-debug-template <...>))
+                 ;; (eval . (add-hook 'before-save-hook
+                 ;;                   #'lsp-format-buffer nil t))
+
+
+                 ;; (eval . (require 'dap-python))
+                 ;; (eval . (dap-register-debug-template <...>))
                  ))
  )
 

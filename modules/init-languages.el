@@ -296,7 +296,7 @@
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-  :hook (markdown-mode-hook . markdown-toc-generate-toc)
+  ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
                                       markdown-toc-generate-or-refresh-toc))
 
@@ -781,10 +781,10 @@
      ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
-;; used.
+;; used. We do not use `lsp-format-buffer' since `pyright' does not support document formatting.
 (use-package yapfify
   :diminish yapf-mode
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "yapf"))
+  :if (executable-find "yapf")
   :hook (python-mode-hook . yapf-mode))
 
 (use-package cperl-mode

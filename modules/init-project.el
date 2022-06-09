@@ -180,7 +180,9 @@
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
-   ("<f6>" . consult-projectile)))
+   ("<f6>" . consult-projectile))
+  :config
+  (consult-customize consult-projectile :preview-key nil))
 
 ;; Allows to quickly add projectile projects to the treemacs workspace
 

@@ -121,15 +121,14 @@
    ([remap apropos] . consult-apropos)
    ;; M-g bindings (goto-map)
    ("M-g e" . consult-compile-error)
-   ([remap goto-line] . consult-goto-line)           ;; orig. goto-line
-   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+   ([remap goto-line] . consult-goto-line)
+   ("M-g o" . consult-outline)
    ("M-g m" . consult-mark)
    ("M-g k" . consult-global-mark)
    ("C-c C-j" . consult-imenu)
    ([remap imenu] . consult-imenu)
    ("M-g I" . consult-imenu-multi)
    ([remap load-theme] . consult-theme)
-   ;; M-s bindings (search-map)
    ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
    ("C-c s l" . consult-locate)
@@ -156,8 +155,7 @@
                      :preview-key nil)
 
   (when (featurep 'projectile)
-    (setq consult-project-function #'projectile-project-root)
-    (consult-customize consult-projectile :preview-key nil)))
+    (setq consult-project-function #'projectile-project-root)))
 
 (provide 'init-vertico)
 
