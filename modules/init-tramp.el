@@ -17,6 +17,8 @@
 ;; Multihop with sudo with custom user: "C-x C-f
 ;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 
+;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
+
 ;; Use bookmarks to speed up remote file access: upon visiting a location with TRAMP, save it as a
 ;; bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump' ("C-x r
 ;; b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in `bookmark-bmenu-mode'

@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-one
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -111,7 +111,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)

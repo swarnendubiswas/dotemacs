@@ -96,6 +96,7 @@
 ;; https://github.com/company-mode/company-mode/issues/1010
 (use-package company-posframe
   :if (display-graphic-p)
+  :disabled t
   :after company
   :commands company-posframe-mode
   :diminish

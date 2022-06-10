@@ -204,6 +204,13 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
+(defun sb/compile-and-run-c-program ()
+  "Run C programs directly from within Emacs."
+  (interactive)
+  (defvar sb/foo)
+  (setq sb/foo (concat "gcc " (buffer-name) " && ./a.out" ))
+  (shell-command sb/foo))
+
 (provide 'init-functions)
 
 ;;; init-functions.el ends here
