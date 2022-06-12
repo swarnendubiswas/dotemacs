@@ -104,7 +104,16 @@
   (unless (display-graphic-p)
     (cond
      ((eq sb/tui-theme 'modus-operandi) (load-theme 'modus-operandi t))
-     ((eq sb/tui-theme 'modus-vivendi) (load-theme 'modus-vivendi t)))))
+     ((eq sb/tui-theme 'modus-vivendi) (load-theme 'modus-vivendi t))))
+  :custom
+  (modus-themes-hl-line '(intense))
+  (modus-themes-subtle-line-numbers t)
+  (modus-themes-paren-match '(intense))
+  (modus-themes-lang-checkers '(faint))
+  (modus-themes-fringe 'intense)
+  (modus-themes-completions '((matches . (extrabold background intense))
+                              (selection . (semibold accented intense))
+                              (popup . (accented)))))
 
 (use-package nano-theme
   :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
@@ -399,13 +408,14 @@
 (with-eval-after-load "simple"
   (diminish 'visual-line-mode))
 
-;; Default is 8 pixels, we have increased it to make it more prominent on the TUI
-(if (display-graphic-p)
-    (fringe-mode '(10 . 0))
-  (fringe-mode '(10 . 10)))
+;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems pointless.
+(when (display-graphic-p)
+  (fringe-mode '(10 . 0)))
 
-;; Make the cursor a thin horizontal bar, not a block
-;; (set-default 'cursor-type '(bar . 4))
+;; Make the cursor a thin horizontal bar, not a block.
+;; FIXME: This is not working.
+(setq-default cursor-type 'box)
+(set-cursor-color "#ffffff") ; Set cursor color to white
 
 (add-hook 'prog-mode-hook
           (lambda ()

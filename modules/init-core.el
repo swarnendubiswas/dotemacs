@@ -383,6 +383,7 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
+;; TODO: We use the keybindings for moving around windows in tmux
 (use-package windmove ; "Shift + direction" arrows
   :straight (:type built-in)
   :commands windmove-default-keybindings

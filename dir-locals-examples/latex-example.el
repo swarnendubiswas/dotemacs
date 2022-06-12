@@ -1,8 +1,8 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.dvi$\\|.elc$\\|.fdb_latexmk$\\|.fls$\\|.lof$\\|.log$\\|.lot$\\|.out$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$")
+         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.dvi$\\|.fdb_latexmk$\\|.fls$\\|.lof$\\|.log$\\|.lot$\\|.out$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$")
          (projectile-project-compilation-dir . ".")
-         (projectile-project-compilation-cmd . "latexmk")
+         (projectile-project-compilation-cmd . "latexmk -f paper.tex")
          (eval . (add-hook 'lsp-managed-mode-hook
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
@@ -12,12 +12,6 @@
                                ;; Use this if `grammarly-ls' is disabled
                                ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
                                )
-
-                             ;; (when (derived-mode-p 'gfm-mode)
-                             ;;   (setq sb/flycheck-local-checkers
-                             ;;         '((lsp . ((next-checkers
-                             ;;                    . (markdown-markdownlint-cli))))))
-                             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
 
                              ;; (when (derived-mode-p 'latex-mode)
                              ;;   (setq sb/flycheck-local-checkers
@@ -34,12 +28,11 @@
 
  (latex-mode . (
                 ;; (flycheck-checker . tex-chktex)
-                ;; (TeX-master . (expand-file-name "paper.tex" (projectile-project-root)))
-                (TeX-master . "paper.tex")
+                (TeX-master . (expand-file-name "paper.tex"))
 
                 (eval . (progn
                           (let (
-                                (bibpath "/home/swarnendu/prospar-workspace/references/references.bib")
+                                (bibpath (expand-file-name "./references/references.bib"))
                                 (projectroot (expand-file-name "."))
                                 )
                             (setq-local reftex-default-bibliography    bibpath

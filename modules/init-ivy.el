@@ -19,27 +19,27 @@
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :hook (after-init-hook . ivy-mode)
+  :custom
+  (ivy-count-format "(%d/%d) " "Helps identify wrap around")
+  (ivy-extra-directories nil "Hide . and ..")
+  (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
+  (ivy-height 12)
+  ;; Make the height of the minibuffer proportionate to the screen
+  ;; ivy-height-alist '((t
+  ;;                      lambda (_caller)
+  ;;                      (/ (frame-height) 2)))
+  ;; We update `ivy-re-builders-alist' after loading `orderless'
+  ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
+  ;;                         (counsel-find-file . ivy--regex-fuzzy)
+  ;;                         (t                 . ivy--regex-ignore-order))
+  (ivy-truncate-lines nil) ; `counsel-flycheck' output gets truncated
+  (ivy-wrap t)
+  (ivy-initial-inputs-alist nil "Do not start searches with ^")
+  (ivy-use-virtual-buffers t "Do not show recent files in `switch-buffer'")
+  ;; The default sorter is much too slow and the default for `ivy-sort-max-size' is way too
+  ;; big (30,000). Turn it down so big repos affect project navigation less.
+  (ivy-sort-max-size 10000)
   :config
-  (setq ivy-count-format "(%d/%d) " ; Helps identify wrap around
-        ivy-extra-directories nil ; Hide . and ..
-        ivy-fixed-height-minibuffer t ; Distracting if the height keeps changing
-        ivy-height 12
-        ;; Make the height of the minibuffer proportionate to the screen
-        ;; ivy-height-alist '((t
-        ;;                      lambda (_caller)
-        ;;                      (/ (frame-height) 2)))
-        ;; We update `ivy-re-builders-alist' after loading `orderless'
-        ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
-        ;;                         (counsel-find-file . ivy--regex-fuzzy)
-        ;;                         (t                 . ivy--regex-ignore-order))
-        ivy-truncate-lines nil ; `counsel-flycheck' output gets truncated
-        ivy-wrap t
-        ivy-initial-inputs-alist nil ; Do not start searches with ^
-        ivy-use-virtual-buffers nil ; Do not show recent files in `switch-buffer'
-        ;; The default sorter is much to slow and the default for `ivy-sort-max-size' is way too big
-        ;; (30,000). Turn it down so big repos affect project navigation less.
-        ivy-sort-max-size 10000)
-
   (dolist (buffer
            '("TAGS" "magit-process" "*emacs*" "*xref*"
              ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
@@ -77,13 +77,13 @@
   :bind
   (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
    ([remap execute-extended-command] . counsel-M-x)
+   ("<f1>"                           . counsel-M-x)
    ([remap completion-at-point]      . counsel-company)
    ("C-M-i"                          . counsel-company)
    ([remap find-file]                . counsel-find-file)
-   ("<f1>"                           . counsel-M-x)
    ("<f2>"                           . counsel-find-file)
-   ("C-<f9>"                         . sb/counsel-goto-recent-directory)
    ("<f9>"                           . counsel-recentf)
+   ("C-<f9>"                         . sb/counsel-goto-recent-directory)
    ("C-c d m"                        . counsel-minor)
    ("C-c s g"                        . counsel-git-grep)
    ("C-c s r"                        . counsel-rg)
@@ -95,60 +95,60 @@
    ("C-c C-j"                        . counsel-imenu))
   :diminish
   :hook (ivy-mode-hook . counsel-mode)
-  :config
-  (setq counsel-describe-function-function #'helpful-callable
-        counsel-describe-variable-function #'helpful-variable
-        counsel-find-file-at-point t
-        counsel-find-file-ignore-regexp (concat
-                                         "\\(?:\\`[#.]\\)"
-                                         "\\|\\(?:\\`.+?[#~]\\'\\)"
-                                         "\\|.cb$"
-                                         "\\|.cb2$"
-                                         "\\|.class$"
-                                         "\\|.djvu$"
-                                         "\\|.doc$"
-                                         "\\|.docx$"
-                                         "\\|.elc$"
-                                         "\\|.fdb_latexmk$"
-                                         "\\|.fls$"
-                                         "\\|.lof$"
-                                         "\\|.lot$"
-                                         "\\|.o$"
-                                         "\\|.ppt$"
-                                         "\\|.pptx$"
-                                         "\\|.pyc$"
-                                         "\\|.rel$"
-                                         "\\|.rip$"
-                                         "\\|.so$"
-                                         "\\|.synctex$"
-                                         "\\|.synctex.gz$"
-                                         "\\|.toc$"
-                                         "\\|.xls$"
-                                         "\\|.xlsx$"
-                                         "\\|tags"
-                                         "\\|TAGS"
-                                         "\\|GPATH"
-                                         "\\|GRTAGS"
-                                         "\\|GTAGS"
-                                         "\\|tramp"
-                                         "\\|.clangd"
-                                         "\\|.cache"
-                                         "\\|.metadata"
-                                         "\\|.recommenders"
-                                         "\\|typings"
-                                         "\\|__pycache__")
-        counsel-mode-override-describe-bindings t
-        counsel-preselect-current-file t
-        counsel-switch-buffer-preview-virtual-buffers nil ; Removes recent files and bookmarks
-        counsel-yank-pop-preselect-last t
-        counsel-yank-pop-separator "\n------------------------------------------\n"))
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  (counsel-find-file-at-point t)
+  (counsel-find-file-ignore-regexp (concat
+                                    "\\(?:\\`[#.]\\)"
+                                    "\\|\\(?:\\`.+?[#~]\\'\\)"
+                                    "\\|.cb$"
+                                    "\\|.cb2$"
+                                    "\\|.class$"
+                                    "\\|.djvu$"
+                                    "\\|.doc$"
+                                    "\\|.docx$"
+                                    "\\|.elc$"
+                                    "\\|.fdb_latexmk$"
+                                    "\\|.fls$"
+                                    "\\|.lof$"
+                                    "\\|.lot$"
+                                    "\\|.o$"
+                                    "\\|.ppt$"
+                                    "\\|.pptx$"
+                                    "\\|.pyc$"
+                                    "\\|.rel$"
+                                    "\\|.rip$"
+                                    "\\|.so$"
+                                    "\\|.synctex$"
+                                    "\\|.synctex.gz$"
+                                    "\\|.toc$"
+                                    "\\|.xls$"
+                                    "\\|.xlsx$"
+                                    "\\|tags"
+                                    "\\|TAGS"
+                                    "\\|GPATH"
+                                    "\\|GRTAGS"
+                                    "\\|GTAGS"
+                                    "\\|tramp"
+                                    "\\|.clangd"
+                                    "\\|.cache"
+                                    "\\|.metadata"
+                                    "\\|.recommenders"
+                                    "\\|typings"
+                                    "\\|__pycache__"))
+  (counsel-mode-override-describe-bindings t)
+  (counsel-preselect-current-file t)
+  (counsel-switch-buffer-preview-virtual-buffers nil "Removes recent files and bookmarks")
+  (counsel-yank-pop-preselect-last t)
+  (counsel-yank-pop-separator "\n------------------------------------------\n"))
 
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
-  :if (display-graphic-p)
   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
-  :custom (all-the-icons-ivy-rich-icon-size 0.9)
+  :custom
+  (all-the-icons-ivy-rich-icon-size 0.9)
   :config
   (plist-put all-the-icons-ivy-rich-display-transformers-list
              'counsel-recentf
@@ -207,7 +207,7 @@
   :commands (ivy-rich-mode ivy-rich-modify-column
                            ivy-rich-set-columns ivy-rich-modify-columns
                            ivy-format-function-line)
-  :after (ivy counsel) ; We do not enable `all-the-icons-ivy-rich' in TUI mode
+  :after (ivy counsel)
   :preface
   ;; Adapted from
   ;; https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el

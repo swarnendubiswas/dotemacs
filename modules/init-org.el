@@ -14,11 +14,10 @@
   :commands (org-indent-mode org-indent-item org-outdent-item)
   :hook (org-mode-hook . visual-line-mode)
   :custom
-  (org-fontify-done-headline nil)
   (org-fontify-whole-heading-line nil)
   (org-hide-emphasis-markers t)
-  (org-hide-leading-stars t)
-  (org-hide-leading-stars-before-indent-mode t)
+  (org-hide-leading-stars nil)
+  (org-hide-leading-stars-before-indent-mode nil)
   ;; Code block fontification using the major-mode of the code
   (org-src-fontify-natively t)
   (org-src-preserve-indentation t)

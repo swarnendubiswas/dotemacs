@@ -36,10 +36,7 @@ esac
 
 # Add necessary repositories
 case "${DIST_VERSION}" in
-    Ubuntu_18.04)
-        add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        ;;
-    Ubuntu_20.04)
+    Ubuntu_18.04 | Ubuntu_20.04)
         add-apt-repository ppa:ubuntu-toolchain-r/test -y
         ;;
     *)
@@ -52,7 +49,7 @@ apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-
 
 # Install LLVM
 
-LLVM_VERSION="-13"
+LLVM_VERSION="-14"
 
 case "${DIST_VERSION}" in
     Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
@@ -118,27 +115,29 @@ fi
 
 cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 
-if [ -d "$DOTEMACS" ]; then
-    cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
-    echo "Pulling dotemacs repository from GitHub..."
-    sudo -u swarnendu git pull
-else
-    echo "Cloning dotemacs repository from GitHub..."
-    sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotemacs.git
-fi
-echo "...Done"
-chown -R $USER:$USER $DOTEMACS
+# TODO: There does not seem to be a good way to checkout private repositories
 
-if [ -d "$DOTFILES" ]; then
-    cd "$DOTFILES" || echo "Failed: cd ${DOTEMACS}"
-    echo "Pulling dotfiles repository from GitHub..."
-    sudo -u swarnendu git pull
-else
-    echo "Cloning dotfiles repository from GitHub..."
-    sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotfiles.git
-fi
-echo "...Done"
-chown -R $USER:$USER $DOTFILES
+# if [ -d "$DOTEMACS" ]; then
+#     cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
+#     echo "Pulling dotemacs repository from GitHub..."
+#     sudo -u swarnendu git pull
+# else
+#     echo "Cloning dotemacs repository from GitHub..."
+#     sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotemacs.git
+# fi
+# echo "...Done"
+# chown -R $USER:$USER $DOTEMACS
+
+# if [ -d "$DOTFILES" ]; then
+#     cd "$DOTFILES" || echo "Failed: cd ${DOTEMACS}"
+#     echo "Pulling dotfiles repository from GitHub..."
+#     sudo -u swarnendu git pull
+# else
+#     echo "Cloning dotfiles repository from GitHub..."
+#     sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotfiles.git
+# fi
+# echo "...Done"
+# chown -R $USER:$USER $DOTFILES
 
 # Link .emacs.d
 
@@ -155,7 +154,7 @@ sudo -u swarnendu python3 -m pip install --upgrade pip pygments isort yapf jedi 
 
 # Install Nodejs
 
-NODEJS_VER="17"
+NODEJS_VER="18"
 
 curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
 apt install -y nodejs
@@ -192,7 +191,7 @@ npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
 # Install Texlab. The language server seems feature-incomplete and slow, so I still prefer AuCTeX.
 
-TEXLAB_VER="3.4.0"
+TEXLAB_VER="4.0.0"
 
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -306,7 +305,7 @@ else
 fi
 
 cd cppcheck || echo "Failed: cd cppcheck"
-git checkout 2.7.3
+git checkout 2.8
 mkdir -p build
 cd build || echo "Failed: cd build"
 cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
@@ -338,9 +337,9 @@ make
 make install
 
 # GNU Global
-# wget http://tamacom.com/global/global-6.6.7.tar.gz
-# tar -xzvf global-6.6.7.tar.gz
-# cd global-6.6.7
+# wget http://tamacom.com/global/global-6.6.8.tar.gz
+# tar -xzvf global-6.6.8.tar.gz
+# cd global-6.6.8
 # ./configure --with-universal-ctags=/usr/local/bin/ctags; make; sudo make install;
 # echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >> $HOME/.bashrc
 # echo "GTAGSLABEL=new-ctags" >> $HOME/.bashrc
@@ -392,6 +391,10 @@ make all
 make install
 cd ../..
 rm -rf bear
+
+# Tmux
+
+# Powerline
 
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"

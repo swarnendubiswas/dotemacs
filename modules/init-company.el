@@ -42,6 +42,7 @@
   ;; Search in other buffers with the same major mode. This can cause performance overhead if
   ;; there are lots of open buffers.
   (company-dabbrev-other-buffers t)
+  (company-etags-ignore-case t)
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
@@ -204,9 +205,15 @@
 ;; The ‘prefix’ bool command always returns non-nil for following backends even when their
 ;; ‘candidates’ list command is empty: `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
 
+;; Options: company-sort-prefer-same-case-prefix, company-sort-by-occurrence,
+;; company-sort-by-statistics, company-sort-by-length,
+;; company-sort-by-backend-importance
+;; (setq-local company-transformers '(company-sort-by-backend-importance
+;;                                    delete-dups))
+
 ;; (with-eval-after-load "company"
 ;;   (progn
-;;     (declare-function sb/company-xml-mode "init-completion")
+;;     (declare-function sb/company-xml-mode "init-company")
 
 ;;     (defun sb/company-xml-mode ()
 ;;       "Add backends for completion with company."
@@ -229,7 +236,7 @@
 
 (with-eval-after-load "company"
   (progn
-    (declare-function sb/company-latex-mode "init-completion")
+    (declare-function sb/company-latex-mode "init-company")
 
     (defun sb/company-latex-mode ()
       "Add backends for latex completion in company mode."
@@ -271,7 +278,7 @@
 
 (with-eval-after-load "company"
   (progn
-    (declare-function sb/company-text-mode "init-completion")
+    (declare-function sb/company-text-mode "init-company")
 
     (defun sb/company-text-mode ()
       "Add backends for text completion in company mode."
@@ -281,11 +288,6 @@
       ;; Slightly larger value to have more precise matches and so that the popup does not block
       (setq-local company-minimum-prefix-length 3)
 
-      ;; Options: company-sort-prefer-same-case-prefix, company-sort-by-occurrence,
-      ;; company-sort-by-statistics, company-sort-by-length,
-      ;; company-sort-by-backend-importance
-      ;; (setq-local company-transformers '(company-sort-by-backend-importance
-      ;;                                    delete-dups))
 
       (set (make-local-variable 'company-backends)
            '(company-files
@@ -299,6 +301,33 @@
                          ;; (company-fuzzy-mode 1)
                          ;; (diminish 'company-fuzzy-mode)
                          ))))))
+
+(with-eval-after-load "company"
+  (progn
+    (declare-function sb/company-conf-mode "init-company")
+
+    (defun sb/company-conf-mode ()
+      "Add backends for `conf-mode' completion in company mode."
+      (defvar company-minimum-prefix-length)
+      (defvar company-backends)
+
+      ;; Slightly larger value to have more precise matches and so that the popup does not block
+      (setq-local company-minimum-prefix-length 3)
+
+      (set (make-local-variable 'company-backends)
+           '(company-files
+             company-capf
+             (company-dabbrev-code
+              company-etags)
+             (company-ispell :with
+                             company-dabbrev))))
+
+    (add-hook 'conf-mode-hook
+              (lambda ()
+                (sb/company-conf-mode)
+                ;; (company-fuzzy-mode 1)
+                ;; (diminish 'company-fuzzy-mode)
+                ))))
 
 ;; (progn
 ;;   (defun sb/company-java-mode ()
@@ -366,27 +395,24 @@
 ;;                                 ;; (diminish 'company-fuzzy-mode)
 ;;                                 ))))
 
+;; `company-clang' is slow:
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-;; `company-clang' is slow
 (with-eval-after-load "company"
   (progn
-    (declare-function sb/company-prog-mode "init-completion")
+    (declare-function sb/company-prog-mode "init-company")
 
     (defun sb/company-prog-mode ()
-      "Add backends for program completion in company mode."
+      "Add backends for `prog-mode' completion in company mode."
       (defvar company-minimum-prefix-length)
       (defvar company-backends)
 
       (setq-local company-minimum-prefix-length 2)
 
-      ;; Other choices: `company-sort-by-length', `company-sort-by-occurrence',
-      ;; `company-sort-by-backend-importance', `company-sort-prefer-same-case-prefix'
-
       (make-local-variable 'company-backends)
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-files
-                               company-capf
+                               (company-capf :with company-yasnippet)
                                (company-dabbrev-code ; Useful for variable names
                                 company-etags)
                                (company-ispell :with
@@ -394,11 +420,11 @@
 
     (add-hook 'prog-mode-hook
               (lambda ()
-                (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
-                  (sb/company-prog-mode)
-                  ;; (company-fuzzy-mode 1)
-                  ;; (diminish 'company-fuzzy-mode)
-                  )))))
+                ;; (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
+                (sb/company-prog-mode)
+                ;; (company-fuzzy-mode 1)
+                ;; (diminish 'company-fuzzy-mode)
+                ))))
 
 (provide 'init-company)
 

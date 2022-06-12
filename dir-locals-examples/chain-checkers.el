@@ -4,7 +4,8 @@
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
                                (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers . (markdown-markdownlint-cli))))))
+                                     '((lsp . ((next-checkers
+                                                . (markdown-markdownlint-cli))))))
                                ;; Use this if `grammarly-ls' is disabled
                                ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
                                )
@@ -46,10 +47,11 @@
                                      '((lsp . ((next-checkers . (xml-xmllint)))))))
 
                              ;; Chktex can report lot of errors
-                             (when (derived-mode-p 'latex-mode)
-                               (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers . (tex-chktex))))))
-                               (flycheck-add-next-checker 'tex-chktex 'grammarly))
+
+                             ;; (when (derived-mode-p 'latex-mode)
+                             ;;   (setq sb/flycheck-local-checkers
+                             ;;         '((lsp . ((next-checkers . (tex-chktex))))))
+                             ;;   (flycheck-add-next-checker 'tex-chktex 'grammarly))
                              )))
          ))
 

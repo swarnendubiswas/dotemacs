@@ -52,8 +52,12 @@
   ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
   ;; derived from `text-mode'.
   (flycheck-global-modes '(not csv-mode))
-  (flycheck-indication-mode 'left-fringe)
   :config
+  ;; Terminal Emacs does not support fringes
+  (if (display-graphic-p)
+      (setq flycheck-indication-mode 'left-fringe)
+    (setq flycheck-indication-mode 'left-margin))
+
   ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))

@@ -118,6 +118,7 @@
 ;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 ;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
 
+;; The keybinding will be hidden if we use tmux
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
   :custom
