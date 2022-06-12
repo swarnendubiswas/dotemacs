@@ -157,7 +157,8 @@
                 (all-the-icons-ivy-rich-file-name (:width 0.5))
                 (all-the-icons-ivy-rich-file-id (:width 15
                                                         :face all-the-icons-ivy-rich-file-owner-face
-                                                        :align right)))
+                                                        :align right))
+                (ivy-rich-file-last-modified-time (:face all-the-icons-ivy-rich-time-face)))
                :delimiter "\t"))
 
   (plist-put all-the-icons-ivy-rich-display-transformers-list

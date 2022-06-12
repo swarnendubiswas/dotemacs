@@ -60,15 +60,7 @@
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
   (setq orderless-matching-styles '(orderless-regexp)
-        orderless-component-separator #'orderless-escapable-split-on-space
-        completion-styles '(orderless basic partial-completion initials emacs22)
-        completion-category-defaults nil
-        ;; basic matches only the prefix, substring matches the whole string as expected.
-
-        ;; completion-category-overrides '((file (styles basic substring remote orderless partial-completion))
-        ;;                                 ;; (minibuffer (initials))))
-        ;;                                 )
-        ))
+        orderless-component-separator #'orderless-escapable-split-on-space))
 
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
@@ -102,7 +94,10 @@
   :after consult
   :bind ("C-M-y" . consult-yasnippet))
 
-;; ;; Ivy is not well supported, and we are using `company-fuzzy' for sorting completion frameworks
+;; Prescient uses frequency + recency for sorting. Vertico does its own sorting based on recency,
+;; and corfu has corfu-history. Company has company-statistics. Furthermore, ivy is not well
+;; supported with prescient. So, I do not see a reason to use prescient.
+
 ;; (use-package prescient
 ;;   :commands prescient-persist-mode
 ;;   :hook (after-init-hook . prescient-persist-mode)
@@ -119,19 +114,27 @@
 ;;   (company-prescient-mode 1))
 
 (use-package consult-company
+  :if (eq sb/minibuffer-completion 'vertico)
   :bind
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
 
 (use-package fussy
   :straight (fussy :type git :host github :repo "jojojames/fussy")
-  :init
-  (push 'fussy completion-styles)
-  (setq
-   ;; For example, project-find-file uses 'project-files which uses substring completion by default.
-   ;; Set to nil to make sure it's using flx.
-   completion-category-defaults nil
-   completion-category-overrides nil))
+  :demand t
+  :commands fussy-all-completions)
+
+(use-package minibuffer
+  :straight (:type built-in)
+  :custom
+  (completion-styles '(fussy orderless basic partial-completion initials emacs22))
+  ;; For example, project-find-file uses 'project-files which uses substring completion by default.
+  ;; Set to nil to make sure it's using flx.
+  (completion-category-defaults nil)
+  ;; basic matches only the prefix, substring matches the whole string as expected.
+  (completion-category-overrides '((file (styles basic fussy substring remote orderless partial-completion))
+                                   ;; (minibuffer (initials))))
+                                   )))
 
 (provide 'init-completion)
 
