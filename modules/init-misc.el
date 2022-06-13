@@ -161,13 +161,13 @@
   :magic ("%PDF" . pdf-view-mode)
   :hook (after-init-hook . (lambda ()
                              (require 'pdf-tools nil t)))
+  :custom
+  (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
+  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
   :config
   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
-
-  (setq pdf-annot-activate-created-annotations t  ; Automatically annotate highlights
-        pdf-view-resize-factor 1.1) ; Fine-grained zoom factor of 10%
 
   ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
   (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes)

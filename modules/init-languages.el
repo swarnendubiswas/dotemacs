@@ -1022,24 +1022,13 @@
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
-  :straight tree-sitter-langs
-  :straight t
-  :commands global-tree-sitter-mode
   :diminish tree-sitter-mode
-  :preface
-  (defun sb/enable-tree-sitter ()
-    "Delay enabling tree-sitter to avoid slowing down Emacs startup."
-    (dolist (hook '(sh-mode-hook c-mode-hook c++-mode-hook
-                                 css-mode-hook html-mode-hook
-                                 java-mode-hook json-mode-hook
-                                 jsonc-mode-hook php-mode-hook
-                                 python-mode-hook))
-      (add-hook hook (lambda ()
-                       (require 'tree-sitter-langs)
-                       (global-tree-sitter-mode 1)))))
   :hook
   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
-   (after-init-hook . sb/enable-tree-sitter)))
+   (after-init-hook . global-tree-sitter-mode))
+  :config
+  (use-package tree-sitter-langs
+    :demand t))
 
 (use-package dotenv-mode
   :mode "\\.env\\'")

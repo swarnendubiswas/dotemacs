@@ -408,6 +408,16 @@
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
+;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
+;; Auto-create missing directories on a file create and save
+(defun sb/auto-create-missing-dirs ()
+  (let ((target-dir (file-name-directory buffer-file-name)))
+    (unless (file-exists-p target-dir)
+      (make-directory target-dir t))))
+
+(add-to-list 'find-file-not-found-functions #'sb/auto-create-missing-dirs)
+
+
 (provide 'init-core)
 
 ;;; init-core.el ends here
