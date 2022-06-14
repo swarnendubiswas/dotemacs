@@ -292,6 +292,7 @@
   (markdown-hide-urls t)
   :bind
   (:map markdown-mode-map
+        ("C-c C-d" . nil)
         ("C-c C-j" . nil)))
 
 ;; Generate TOC with `markdown-toc-generate-toc'
@@ -362,6 +363,10 @@
   (defun sb/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless)))
+  :init
+  ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
+  (add-hook 'text-mode-hook (lambda ()
+                              (setq-local lsp-completion-enable nil)))
   :hook
   (;;(lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
    (lsp-mode-hook . lsp-enable-which-key-integration)

@@ -51,7 +51,7 @@
   (flycheck-emacs-lisp-load-path 'inherit)
   ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
   ;; derived from `text-mode'.
-  (flycheck-global-modes '(not csv-mode))
+  (flycheck-global-modes '(not csv-mode conf-mode))
   :config
   ;; Terminal Emacs does not support fringes
   (if (display-graphic-p)

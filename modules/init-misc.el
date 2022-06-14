@@ -263,9 +263,6 @@
   :commands (explain-pause-mode explain-pause-top)
   :diminish)
 
-(use-package ace-window
-  :bind ([remap other-window] . ace-window))
-
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
 (use-package super-save

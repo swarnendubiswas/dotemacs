@@ -34,7 +34,7 @@
     (bind-key "<escape>" #'minibuffer-keyboard-quit vertico-map))
 
   :bind
-  (("<f2>" .  find-file)
+  (("<f2>"  .  find-file)
    :map vertico-map
    ("C-M-j" . vertico-exit-input)
    ("<tab>" . vertico-insert)))
@@ -70,17 +70,17 @@
   :commands vertico-indexed-mode
   :init (vertico-indexed-mode 1))
 
-;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
-(use-package vertico-grid
-  :if  (eq sb/minibuffer-completion 'vertico)
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-grid))
-  :after vertico
-  :disabled t
-  :commands vertico-grid-mode
-  :init (vertico-grid-mode 1)
-  :custom
-  (vertico-grid-max-columns 4))
+;; ;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
+;; (use-package vertico-grid
+;;   :if  (eq sb/minibuffer-completion 'vertico)
+;;   :straight (vertico :files (:defaults "extensions/*")
+;;                      :includes (vertico-grid))
+;;   :after vertico
+;;   :disabled t
+;;   :commands vertico-grid-mode
+;;   :init (vertico-grid-mode 1)
+;;   :custom
+;;   (vertico-grid-max-columns 4))
 
 (use-package vertico-quick
   :if (eq sb/minibuffer-completion 'vertico)

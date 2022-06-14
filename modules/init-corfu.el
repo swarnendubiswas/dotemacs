@@ -28,12 +28,8 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  ;; :hook
-  ;; (
-  ;;  ;; (after-init-hook . (lambda ()
-  ;;  ;;                      (when (string= (buffer-name) "*scratch*")
-  ;;  ;;                        (corfu-mode 1))))
-  ;;  (prog-mode-hook . corfu-mode))
+  :hook
+  (after-init-hook . global-corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -167,18 +163,18 @@
               (add-to-list 'completion-at-point-functions #'cape-dict 'append)
               (add-to-list 'completion-at-point-functions #'cape-ispell 'append)))
 
-  ;; (add-hook 'text-mode-hook
-  ;;           (lambda ()
-  ;;             ;; (setq-local completion-at-point-functions
-  ;;             ;;             (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))
-  ;;             (setq-local completion-at-point-functions
-  ;;                         (list (cape-capf-properties #'lsp-completion-at-point :exclusive 'no) t))
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (setq-local completion-at-point-functions
+                          (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
+  ;; (setq-local completion-at-point-functions
+  ;;             (list (cape-capf-properties #'lsp-completion-at-point :exclusive 'no) t))
 
-  ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
+  ;; (add-to-list 'completion-at-point-functions #'cape-file 'append)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+  ;; (add-to-list 'completion-at-point-functions #'cape-history 'append)
+  ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
   )
 
 ;; Provide icons for Corfu

@@ -56,7 +56,7 @@
   (("C-c r"    . ivy-resume)
    ("<f3>"     . ivy-switch-buffer)
    :map ivy-minibuffer-map
-   ("<return>" . ivy-alt-done) ; Continue completion
+   ("<RET>"    . ivy-alt-done) ; Continue completion
    ("<left>"   . ivy-previous-line)
    ("<right>"  . ivy-next-line)))
 

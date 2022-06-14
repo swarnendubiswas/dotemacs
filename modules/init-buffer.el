@@ -29,7 +29,7 @@
   :hook (ibuffer-hook . ibuffer-auto-mode))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
-  :after (projectile)
+  :after projectile
   :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
@@ -71,35 +71,36 @@
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
-(use-package popwin
-  :hook (after-init-hook . popwin-mode)
-  :config
-  (defvar popwin:special-display-config-backup popwin:special-display-config)
 
-  (push '("*Help*"              :noselect t)   popwin:special-display-config)
-  (push '(compilation-mode      :noselect t)   popwin:special-display-config)
-  (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
-  (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
-  (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
-  (push '("*Selection Ring:")                  popwin:special-display-config)
-  (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
-  (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
-  (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
-  (push '("*xref*"              :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode :noselect t :position bottom :height 20)
-        popwin:special-display-config)
-  (push "*Shell Command Output*"               popwin:special-display-config)
-  (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-  (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-  (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-  (add-to-list 'popwin:special-display-config '(deadgrep-mode))
-  (add-to-list 'popwin:special-display-config '("*lsp session*")))
+;; (use-package popwin
+;;   :hook (after-init-hook . popwin-mode)
+;;   :config
+;;   (defvar popwin:special-display-config-backup popwin:special-display-config)
+
+;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
+;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
+;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
+;;   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
+;;   (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
+;;   (push '("*Selection Ring:")                  popwin:special-display-config)
+;;   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+;;   (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
+;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
+;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
+;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
+;;   (push '(helpful-mode :noselect t :position bottom :height 20)
+;;         popwin:special-display-config)
+;;   (push "*Shell Command Output*"               popwin:special-display-config)
+;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+;;   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+;;   (add-to-list 'popwin:special-display-config '("*Apropos*"))
+;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
+;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+;;   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+;;   (add-to-list 'popwin:special-display-config '("*lsp session*")))
 
 ;; ;; Learn about display actions, see [[info:elisp#Display Action Functions]]
 ;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
@@ -118,8 +119,11 @@
 ;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 ;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
 
-;; The keybinding will be hidden if we use tmux
+(use-package ace-window
+  :bind ([remap other-window] . ace-window))
+
 (use-package ace-jump-buffer
+  ;; The keybinding will be hidden if we use tmux
   :bind ("C-b" . ace-jump-buffer)
   :custom
   (ajb-max-window-height 30)

@@ -29,11 +29,11 @@
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
-  :hook
-  ((after-init-hook . (lambda ()
-                        (when (string= (buffer-name) "*scratch*")
-                          (company-mode 1))))
-   (after-init-hook . global-company-mode))
+  ;; :hook
+  ;; ((after-init-hook . (lambda ()
+  ;;                       (when (string= (buffer-name) "*scratch*")
+  ;;                         (company-mode 1))))
+  ;;  (after-init-hook . global-company-mode))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the

@@ -114,7 +114,7 @@
             debug-on-event                 'sigusr2
             use-package-compute-statistics t ; Use "M-x use-package-report" to see results
             use-package-verbose            t
-            use-package-minimum-reported-time 0
+            use-package-minimum-reported-time 0 ; Show everything
             use-package-expand-minimally   nil))
   (progn
     (setq use-package-always-defer       t
