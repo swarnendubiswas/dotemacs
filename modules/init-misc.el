@@ -149,6 +149,11 @@
    ("C->"     . mc/mark-next-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
 
+(use-package doc-view
+  :custom
+  (doc-view-continuous t)
+  (doc-view-resolution 120))
+
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
@@ -422,6 +427,10 @@
 (use-package goto-addr
   :hook ((prog-mode-hook . goto-address-prog-mode)
          (text-mode-hook . goto-address-mode)))
+
+(use-package xclip
+  :unless (display-graphic-p)
+  :init (xclip-mode 1))
 
 (provide 'init-misc)
 

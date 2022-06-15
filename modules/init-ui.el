@@ -110,26 +110,23 @@
   (modus-themes-subtle-line-numbers t)
   (modus-themes-paren-match '(intense))
   (modus-themes-lang-checkers '(faint))
-  (modus-themes-fringe 'intense)
-  (modus-themes-completions '((matches . (extrabold background intense))
-                              (selection . (semibold accented intense))
-                              (popup . (accented)))))
+  (modus-themes-fringe 'intense))
 
-(use-package nano-theme
-  :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
-  :if (or (and (display-graphic-p)
-               (or (eq sb/gui-theme 'nano-light)
-                   (eq sb/gui-theme 'nano-dark)))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'nano-dark)))
-  :init
-  (setq nano-fonts-use t)
-  (when (display-graphic-p)
-    (cond
-     ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
-     ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))
-  (unless (display-graphic-p)
-    (cond
-     ((eq sb/tui-theme 'nano-dark) (load-theme 'nano-dark t)))))
+;; (use-package nano-theme
+;;   :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
+;;   :if (or (and (display-graphic-p)
+;;                (or (eq sb/gui-theme 'nano-light)
+;;                    (eq sb/gui-theme 'nano-dark)))
+;;           (and (not (display-graphic-p)) (eq sb/tui-theme 'nano-dark)))
+;;   :init
+;;   (setq nano-fonts-use t)
+;;   (when (display-graphic-p)
+;;     (cond
+;;      ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
+;;      ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))
+;;   (unless (display-graphic-p)
+;;     (cond
+;;      ((eq sb/tui-theme 'nano-dark) (load-theme 'nano-dark t)))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -474,6 +471,7 @@
   :if (display-mouse-p)
   :init (mouse-avoidance-mode 'banish))
 
+;; Icons for minibuffer completion
 (use-package all-the-icons-completion
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode

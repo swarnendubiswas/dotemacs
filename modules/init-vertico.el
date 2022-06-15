@@ -10,12 +10,11 @@
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
   :straight (vertico :files (:defaults "extensions/*")
-                     :includes
-                     (vertico-directory
-                      vertico-grid
-                      vertico-indexed
-                      vertico-quick
-                      vertico-repeat))
+                     :includes (vertico-directory
+                                vertico-grid
+                                vertico-indexed
+                                vertico-quick
+                                vertico-repeat))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands (command-completion-default-include-p minibuffer-keyboard-quit)
@@ -40,10 +39,11 @@
    ("<tab>" . vertico-insert)))
 
 ;; More convenient directory navigation commands
+
 (use-package vertico-directory
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-directory))
-  :if  (eq sb/minibuffer-completion 'vertico)
+  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy) ; Tidy shadowed file names
   :bind
@@ -52,23 +52,23 @@
         ("DEL" . vertico-directory-delete-char)
         ("M-DEL" . vertico-directory-delete-word)))
 
-(use-package vertico-repeat
-  :if (eq sb/minibuffer-completion 'vertico)
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-repeat))
-  :after vertico
-  :hook (minibuffer-setup-hook . vertico-repeat-save)
-  :bind
-  (("C-c r" . vertico-repeat-last)
-   ("M-r" . vertico-repeat-select)))
+;; (use-package vertico-repeat
+;;   :if (eq sb/minibuffer-completion 'vertico)
+;;   :straight (vertico :files (:defaults "extensions/*")
+;;                      :includes (vertico-repeat))
+;;   :after vertico
+;;   :hook (minibuffer-setup-hook . vertico-repeat-save)
+;;   :bind
+;;   (("C-c r" . vertico-repeat-last)
+;;    ("M-r" . vertico-repeat-select)))
 
-(use-package vertico-indexed
-  :if (eq sb/minibuffer-completion 'vertico)
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-indexed))
-  :after vertico
-  :commands vertico-indexed-mode
-  :init (vertico-indexed-mode 1))
+;; (use-package vertico-indexed
+;;   :if (eq sb/minibuffer-completion 'vertico)
+;;   :straight (vertico :files (:defaults "extensions/*")
+;;                      :includes (vertico-indexed))
+;;   :after vertico
+;;   :commands vertico-indexed-mode
+;;   :init (vertico-indexed-mode 1))
 
 ;; ;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
 ;; (use-package vertico-grid
@@ -82,16 +82,16 @@
 ;;   :custom
 ;;   (vertico-grid-max-columns 4))
 
-(use-package vertico-quick
-  :if (eq sb/minibuffer-completion 'vertico)
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-quick))
-  :after vertico
-  :bind
-  (:map vertico-map
-        ;; ("C-c q" . vertico-quick-insert)
-        ;; ("C-'" . vertico-quick-exit)
-        ("C-'" . vertico-quick-jump)))
+;; (use-package vertico-quick
+;;   :if (eq sb/minibuffer-completion 'vertico)
+;;   :straight (vertico :files (:defaults "extensions/*")
+;;                      :includes (vertico-quick))
+;;   :after vertico
+;;   :bind
+;;   (:map vertico-map
+;;         ;; ("C-c q" . vertico-quick-insert)
+;;         ;; ("C-'" . vertico-quick-exit)
+;;         ("C-'" . vertico-quick-jump)))
 
 (use-package consult
   :after vertico

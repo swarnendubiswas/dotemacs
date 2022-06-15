@@ -13,7 +13,6 @@
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-indexed
                               corfu-quick
-                              corfu-info
                               corfu-history))
   :commands corfu--goto
   :preface
@@ -38,9 +37,6 @@
   (corfu-min-width 60)
   (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
-  (corfu-preselect-first t)
-  (corfu-separator ?\s) ; Use space
-  (corfu-quit-no-match 'separator)
   :config
   (unless (featurep 'corfu-doc)
     (setq corfu-echo-documentation t))
@@ -63,6 +59,7 @@
         ("M-d" . corfu-info-documentation)
         ("M-l" . corfu-info-location)))
 
+;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-indexed))
@@ -132,10 +129,8 @@
              cape-dabbrev)
   :custom
   (cape-dabbrev-min-length 3)
+  (cape-dict-file (expand-file-name "wordlist.5" sb/extras-directory))
   :config
-  ;; (dolist (backends '(cape-symbol cape-keyword cape-file cape-tex
-  ;;                                 cape-dabbrev cape-ispell cape-dict cape-history))
-  ;; (add-to-list 'completion-at-point-functions backends))
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
@@ -145,17 +140,11 @@
                                                  #'cape-history
                                                  #'cape-dict
                                                  #'cape-ispell
-                                                 #'cape-dabbrev)))
-              ;; (add-to-list 'completion-at-point-functions #'cape-file 'append)
-              ;; (add-to-list 'completion-at-point-functions #'cape-symbol 'append)
-              ;; (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-              ;; (add-to-list 'completion-at-point-functions #'cape-history 'append)
-              ;; (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-              ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-              ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-              ))
+                                                 #'cape-dabbrev)))))
+
   (add-hook 'prog-mode-hook
             (lambda ()
+              (setq-local corfu-auto-prefix 2)
               (add-to-list 'completion-at-point-functions #'cape-file 'append)
               (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
               (add-to-list 'completion-at-point-functions #'cape-history 'append)
@@ -165,32 +154,39 @@
 
   (add-hook 'text-mode-hook
             (lambda ()
-              (setq-local completion-at-point-functions
-                          (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history #'cape-ispell #'cape-dict)))))
-  ;; (setq-local completion-at-point-functions
-  ;;             (list (cape-capf-properties #'lsp-completion-at-point :exclusive 'no) t))
-
-  ;; (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;; (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-  ;; (add-to-list 'completion-at-point-functions #'cape-history 'append)
-  ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)))
-  )
+              (setq-local corfu-auto-prefix 3
+                          completion-at-point-functions
+                          (list (cape-super-capf #'cape-file
+                                                 #'cape-dabbrev
+                                                 #'cape-history
+                                                 #'cape-ispell
+                                                 #'cape-dict))))))
 
 ;; Provide icons for Corfu
-(use-package kind-icon
+
+;; (use-package kind-icon
+;;   :after corfu
+;;   :demand t
+;;   :commands kind-icon-margin-formatter
+;;   :if (display-graphic-p)
+;;   :custom
+;;   (kind-icon-face 'corfu-default)
+;;   (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
+;;   ;; Prefer smaller icons and a more compact popup
+;;   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+;;   (kind-icon-blend-background nil)
+;;   (kind-icon-blend-frac 0.08)
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;; all-the-icons integration with corfu
+;; https://github.com/lynnux/.emacs.d/blob/master/packages/corfu/corfu-icon.el
+(use-package corfu-icon
+  :straight nil
   :after corfu
   :demand t
-  :commands kind-icon-margin-formatter
   :if (display-graphic-p)
-  :custom
-  (kind-icon-face 'corfu-default)
-  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
-  (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 1.0 :scale 0.8))
-  (kind-icon-blend-background nil)
-  (kind-icon-blend-frac 0.08)
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  :load-path "extras")
 
 (provide 'init-corfu)
 

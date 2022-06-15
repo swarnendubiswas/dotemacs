@@ -9,6 +9,8 @@
 
 (setq delete-trailing-lines t)
 
+(add-hook 'write-file-functions #'delete-trailing-whitespace)
+
 ;; (use-package whitespace
 ;;   :commands (global-whitespace-mode whitespace-buffer
 ;;                                     whitespace-cleanup whitespace-turn-off)

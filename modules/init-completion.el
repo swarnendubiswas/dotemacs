@@ -127,14 +127,15 @@
 (use-package minibuffer
   :straight (:type built-in)
   :custom
-  (completion-styles '(fussy orderless basic partial-completion initials emacs22))
+  (completion-styles '(orderless fussy basic partial-completion initials emacs22))
   ;; For example, project-find-file uses 'project-files which uses substring completion by default.
   ;; Set to nil to make sure it's using flx.
   (completion-category-defaults nil)
   ;; basic matches only the prefix, substring matches the whole string as expected.
-  (completion-category-overrides '((file (styles basic fussy substring remote orderless partial-completion))
-                                   ;; (minibuffer (initials))))
-                                   )))
+  ;; (completion-category-overrides '((file (styles basic fussy substring remote orderless partial-completion))
+  ;; (minibuffer (initials))))
+  ;; ))
+  )
 
 (provide 'init-completion)
 
