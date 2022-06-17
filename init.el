@@ -32,6 +32,7 @@
 (require 'init-misc)
 (require 'init-checkers)
 (require 'init-languages)
+(require 'init-lsp)
 (require 'init-vcs)
 (require 'init-org)
 (require 'init-latex)
