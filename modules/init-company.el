@@ -13,12 +13,14 @@
 ;; function company-capf"
 (use-package company-capf
   :straight company
+  :if (eq sb/capf 'company)
   :commands company-capf)
 
 ;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
 ;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
 ;; regex search.
 (use-package company
+  :if (eq sb/capf 'company)
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
@@ -133,6 +135,7 @@
 
 (use-package company-shell
   :disabled t
+  :after company
   :after (:any sh-mode fish-mode)
   :demand t
   :defines company-shell-delete-duplictes
@@ -140,24 +143,24 @@
   :custom (company-shell-delete-duplictes t))
 
 (use-package company-auctex
-  :after tex-mode
+  :after (tex-mode company)
   :demand t
   :commands (company-auctex-init company-auctex-labels
                                  company-auctex-bibs company-auctex-macros
                                  company-auctex-symbols company-auctex-environments))
 
 (use-package math-symbols
-  :after tex-mode
+  :after (tex-mode company)
   :demand t) ; Required by `ac-math' and `company-math'
 
 (use-package company-math
-  :after tex-mode
+  :after (tex-mode company)
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
 ;; Uses RefTeX to complete label references and citations
 (use-package company-reftex
-  :after tex-mode
+  :after (tex-mode company)
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 

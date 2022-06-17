@@ -5,6 +5,7 @@
          (projectile-project-compilation-dir . ".")
          (projectile-project-compilation-cmd .
                                              "mkdir -p build; cd build; cmake ..; cmake --build .;")
+         (compile-command . "mkdir -p build; cd build; cmake ..; cmake --build .;")
          (eval . (progn
                    (add-to-list 'lsp-file-watch-ignored-directories "build")
                    ))

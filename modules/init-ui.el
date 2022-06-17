@@ -109,7 +109,7 @@
   (modus-themes-hl-line '(accented intense))
   (modus-themes-subtle-line-numbers t)
   (modus-themes-paren-match '(intense bold))
-  (modus-themes-lang-checkers '(intense text-also))
+  (modus-themes-lang-checkers '(intense))
   (modus-themes-prompts '(intense bold gray background))
   (modus-themes-fringes 'intense)
   (modus-themes-tabs-accented t)

@@ -10,6 +10,7 @@
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 ;; https://github.com/minad/corfu/wiki
 (use-package corfu
+  :if (eq sb/capf 'corfu)
   :straight (corfu :files (:defaults "extensions/*")
                    :includes (corfu-indexed
                               corfu-quick
@@ -85,7 +86,7 @@
   (corfu-history-mode 1))
 
 (use-package corfu-doc
-  :if (display-graphic-p)
+  :if (and (display-graphic-p) (eq sb/capf 'corfu))
   :hook (corfu-mode-hook . corfu-doc-mode)
   :bind
   (:map corfu-map
@@ -97,11 +98,13 @@
   (corfu-echo-documentation nil))
 
 (use-package popon
+  :if (eq sb/capf 'corfu)
   :straight (popon :type git
                    :repo "https://codeberg.org/akib/emacs-popon.git")
   :unless (display-graphic-p))
 
 (use-package corfu-terminal
+  :if (eq sb/capf 'corfu)
   :straight (corfu-terminal :type git
                             :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
   :unless (display-graphic-p)
