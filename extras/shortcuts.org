@@ -1,3 +1,14 @@
+#+TITLE: Emacs Notes
+#+AUTHOR: Swarnendu Biswas
+#+DATE: <21-06-2021>
+#+EMAIL: swarnendu@cse.iitk.ac.in
+#+CREATOR: Emacs 27 (Org mode 9.4.4)
+#+STARTUP: showall noindent showstars nohideblocks
+#+OPTIONS: ':t '^:{} H:4 num:3 author:nil date:nil toc:nil tags:nil TeX:t LaTeX:t timestamp:t
+#+LaTeX_CLASS_OPTIONS: [10pt]
+#+LATEX_HEADER: \usepackage{palatino}
+#+LATEX_HEADER: \usepackage[letterpaper]{geometry}
+
 * Useful Keyboard Shortcuts
 
 This file lists keyboard shortcuts and describes how to deal with frequent use cases. I am maintaining this for ease of reference, although most keybindings are from a default installation of GNU Emacs.
@@ -36,7 +47,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~C-M-h~ - Select whole function definition (~mark-defun~)
 - ~C-M-@~ - Set mark after end of following balanced expression (~mark-sexp~)
 - ~C-M-SPC~ - Put the mark at the end of the s-expression (~mark-sexp~)
-- ~C-x C-p~ - Move point to the beginning of the current page, and set mark at the end (~mark-page~)
+- ~C-x C-p~ - Move point to the beginning of the current page, and set a mark at the end (~mark-page~)
 - ~C-c C-m~ - Jump to a visited position in the current buffer (~counsel-mark-ring~)
 - ~C-x C-@~ - Jump to the buffer and position of the latest entry in the global mark ring (~pop-global-mark~)
 
@@ -54,7 +65,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~M-a~ - Move back to the beginning of the sentence (~backward-sentence~)
 - ~M-e~ - Move forward to the end of the sentence (~forward-sentence~)
 - ~M-{~ - Move back to the previous paragraph beginning (~backward-paragraph~)
-- ~M-}~ - Move forward to the next paragraph end (~markdown-forward-paragraph~)
+- ~M-}~ - Move forward to the end of the next paragraph (~markdown-forward-paragraph~)
 - ~C-up~ - Move forward to end of paragraph (~forward-paragraph~)
 - ~C-down~ - Move backward to start of paragraph (~backward-paragraph~)
 - ~M-r~ - Without a prefix argument, position the cursor at the center of the window (~move-to-window-line-top-bottom~)
@@ -110,7 +121,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 *** Ripgrep
 
 -
-  
+
 *** Swiper
 
 - ~X M-n~ - Search for the symbol at point in the current file, where ~X~ is the shortcut to invoke ~swiper~ (~swiper~ ~thing-at-point~)
@@ -144,6 +155,7 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
 
 ** Org mode
 
+- ~TAB~ - Visibility cycling (~org-cycle~)
 - ~M-ret~ - Insert a new heading or wrap a region in a table (~org-meta-return~)
 - ~C-c C-l~ - Insert a link (~org-insert-link~). When the cursor is on a link, then edit the invisible link and the description.
 - ~C-c C-o~ - Open link at point (~org-open-at-point~)
@@ -152,22 +164,29 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
 - ~C-c C-s~ - Insert "SCHEDULED" keyword along with a timestamp (~org-schedule~)
 - ~C-c C-,~ - Insert a block structure from a list (~org-insert-structure-template~)
 - ~C-c |~ - Convert region to table, or create an empty table (~org-table-create-or-convert-from-region~)
+- ~C-c C-n~ - Go to the next visible heading (~org-next-visible-heading~)
+- ~C-c C-p~ - Go to the previous visible heading (~org-previous-visible-heading~)
+- ~C-c C-f~ - Go to the next heading at the same level (~org-forward-heading-same-level~)
+- ~C-c C-b~ - Go to the previous heading same level (~org-backward-heading-same-level~)
+- ~C-c C-u~ - Go backward to a higher-level heading (~outline-up-heading~)
+
+
 
 ** Projectile
 
 - ~C-c p f~ - Display a list of all files in the project (~projectile-find-file~)
 - ~C-c p g~ - Jump to files using completion based on context (~projectile-find-file-dwim~)
 - ~C-c p d~ - Display a list of all directories in the project (~projectile-find-dir~)
-- ~C-c p b~ - List buffers local to current project (~projectile-switch-to-buffer~)
-- ~C-c p e~ - Jump to recently-visited files in project (~projectile-recentf~)
-- ~C-c p r~ - Simple refactoring with text replace in current project (~projectile-replace~)
+- ~C-c p b~ - List buffers local to the current project (~projectile-switch-to-buffer~)
+- ~C-c p e~ - Jump to recently-visited files in the project (~projectile-recentf~)
+- ~C-c p r~ - Simple refactoring with text replace in the current project (~projectile-replace~)
 - ~C-c p S~ - Save all project buffers (~projectile-save-project-buffers~)
 - ~C-c p a~ - Switch between ~.h~ and ~.c~ or ~.cpp~ files, useful for C/C++ projects (~projectile-find-other-file~)
 - ~C-c p i~ - Invalidate the project cache (if existing) (~projectile-invalidate-cache~)
 - ~<f5>~ - Switch project (~counsel-projectile-switch-project~)
 - ~<f6>~ - Find file (~counsel-projectile-find-file~)
 - ~<f7>~ - Run a ~rg~ search in the project (~counsel-projectile-rg~)
-- ~C-c p s g~ - Grep in project (~counsel-projectile-grep~)
+- ~C-c p s g~ - Grep in the project (~counsel-projectile-grep~)
 - ~C-c p v~ - Run ~vc-dir~ on the project root (~projectile-vc~)
 - ~C-c p k~ - Kill all project buffers (~projectile-kill-buffers~)
 - ~C-c p E~ - Opens the root ~dir-locals-file~ of the project
@@ -228,7 +247,7 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c C-s i~ - Make region or word italic (~markdown-insert-italic~)
 - ~C-c C-s e~ - Make region or word emphasis (~markdown-insert-emphasis~)
 - ~C-c C-s s~ - Insert markup to make a region or word strikethrough (~markdown-insert-strike-through~)
-- ~C-c C-s p~ - Insert pre-formatted code blocks (~markdown-insert-p~)
+- ~C-c C-s p~ - Insert preformatted code blocks (~markdown-insert-p~)
 - ~C-c C-s b~ - Insert markup to make a region or word bold (~markdown-insert-bold~)
 - ~C-c C-s C~ - Insert GFM code block for a given language (~markdown-insert-gfm-code-block~)
 - ~C-c -~ - Insert a horizontal rule (~markdown-insert-hr~)
@@ -246,10 +265,10 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c @ C-q~	- Hide everything but top levels headers
 - ~C-c @ TAB~ - Show all direct subheadings of this heading
 - ~C-c @ C-k~	- Show all subheadings, but not bodies
-- ~M-x outline-previous-heading~ - Go to previous heading
-- ~M-x outline-next-heading~ - Go to next heading
-- ~C-c @ C-p~	- Go to previous visible heading
-- ~C-c @ C-n~	- Go to next visible heading
+- ~M-x outline-previous-heading~ - Go to the previous heading
+- ~M-x outline-next-heading~ - Go to the next heading
+- ~C-c @ C-p~	- Go to the previous visible heading
+- ~C-c @ C-n~	- Go to the next visible heading
 
 ** JSON
 
@@ -284,7 +303,7 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-M-e~ - Jump forward to the end of the current function (~c-end-of-defun~)
 - ~C-M-h~ - Mark the current function (~c-mark-function~)
 - ~C-M-k~ - Jump to a tag in the current file (~moo-jump-local~)
-- ~C-M-j~ - Select a tag to jump to from tags defined in current directory (~moo-jump-directory~)
+- ~C-M-j~ - Select a tag to jump to from tags defined in the current directory (~moo-jump-directory~)
 - ~C-M-i~ - Complete symbol at point (~complete-symbol~)
 
 ** LSP
@@ -302,7 +321,7 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 
 ** C/C++ with LSP
 
-- ~~ - Jump to 
+- ~~ - Jump to
 
 ** Flycheck
 
@@ -317,10 +336,10 @@ The following key bindings are available in ~flycheck-error-list-mode~.
 - ~S~ - Sort the error list by the column at point (~~)
 - ~g~ - Check the source buffer and update the error list (~~)
 - ~q~ - Quit the error list and hide its window (~~)
-  
+
 ** Git with Magit
 
-Use ~magit-status~ to display information about the current Git repository, and ~magit-dispatch-popup~ to see help with keybindings.
+Use ~magit-status~ to display information about the current Git repository and ~magit-dispatch-popup~ to see help with keybindings.
 
 [[https://magit.vc/manual/magit/Automatic-Refreshing-of-Magit-Buffers.html#Automatic-Refreshing-of-Magit-Buffers]]
 
@@ -344,7 +363,7 @@ Use ~magit-status~ to display information about the current Git repository, and 
 - ~k~ - Delete file(s)
 - ~C-u S~ - Stage all untracked and tracked files
 - ~g~ - Refresh the current buffer (~magit-refresh~)
-- ~G~ - Refreshes all magit buffers (~magit-refresh-all~)
+- ~G~ - Refreshes all Magit buffers (~magit-refresh-all~)
 - ~k~ - Discard changes in an item (~magit-discard-item~)
 - ~v~ - Revert item (~magit-revert-item~)
 - ~F~ - Pull (~magit-pull~)
@@ -475,4 +494,3 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
 - Split the window and open the source and destination directories with ~dired~
 - Mark the desired directories/files in one ~dired~ window
 - Move the files with ~R~, the destination directory will the default prompt
-  

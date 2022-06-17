@@ -106,11 +106,14 @@
      ((eq sb/tui-theme 'modus-operandi) (load-theme 'modus-operandi t))
      ((eq sb/tui-theme 'modus-vivendi) (load-theme 'modus-vivendi t))))
   :custom
-  (modus-themes-hl-line '(intense))
+  (modus-themes-hl-line '(accented intense))
   (modus-themes-subtle-line-numbers t)
-  (modus-themes-paren-match '(intense))
-  (modus-themes-lang-checkers '(faint))
-  (modus-themes-fringe 'intense))
+  (modus-themes-paren-match '(intense bold))
+  (modus-themes-lang-checkers '(intense text-also))
+  (modus-themes-prompts '(intense bold gray background))
+  (modus-themes-fringes 'intense)
+  (modus-themes-tabs-accented t)
+  (modus-themes-org-blocks 'tinted-background))
 
 ;; (use-package nano-theme
 ;;   :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
@@ -407,12 +410,14 @@
 
 ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems pointless.
 (when (display-graphic-p)
-  (fringe-mode '(10 . 0)))
+  (fringe-mode '(10 . 0))
 
-;; Make the cursor a thin horizontal bar, not a block.
-;; FIXME: This is not working.
-(setq-default cursor-type 'box)
-(set-cursor-color "#ffffff") ; Set cursor color to white
+  ;; Use a blinking bar for the cursor style to help identify it easily. This does not work on the TUI
+  ;; Emacs because the cursor style then is controlled by the terminal application.
+  (setq-default cursor-type 'box)
+  ;; Set cursor color to white
+  (set-cursor-color "#ffffff")
+  (blink-cursor-mode 1))
 
 (add-hook 'prog-mode-hook
           (lambda ()

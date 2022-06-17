@@ -21,7 +21,9 @@
 (use-package writegood-mode
   :commands (writegood-passive-voice-turn-off)
   :diminish
-  :hook (text-mode-hook . writegood-mode))
+  :hook (text-mode-hook . writegood-mode)
+  :config
+  (add-to-list 'writegood-weasel-words "actionable"))
 
 (use-package flycheck
   :commands (flycheck-add-next-checker flycheck-next-checker

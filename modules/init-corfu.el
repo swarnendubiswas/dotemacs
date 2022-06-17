@@ -34,8 +34,8 @@
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
   (corfu-auto-prefix 2)
-  (corfu-min-width 60)
-  (corfu-max-width corfu-min-width "Always have the same width")
+  ;; (corfu-min-width 60)
+  ;; (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
   :config
   (unless (featurep 'corfu-doc)
@@ -128,7 +128,9 @@
              ;; Complete with Dabbrev at point
              cape-dabbrev)
   :custom
-  (cape-dabbrev-min-length 3)
+  (cape-dabbrev-min-length 4)
+  ;; Checking all other buffers for completetion ignoring the major mode seems to be expensive
+  (cape-dabbrev-check-other-buffers nil)
   (cape-dict-file (expand-file-name "wordlist.5" sb/extras-directory))
   :config
   (add-hook 'emacs-lisp-mode-hook
@@ -139,18 +141,19 @@
                                                  #'cape-keyword
                                                  #'cape-history
                                                  #'cape-dict
-                                                 #'cape-ispell
+                                                 ;; #'cape-ispell
                                                  #'cape-dabbrev)))))
 
   (add-hook 'prog-mode-hook
             (lambda ()
-              (setq-local corfu-auto-prefix 2)
-              (add-to-list 'completion-at-point-functions #'cape-file 'append)
-              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-              (add-to-list 'completion-at-point-functions #'cape-history 'append)
-              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-              (add-to-list 'completion-at-point-functions #'cape-ispell 'append)))
+              (unless (derived-mode-p 'emacs-lisp-mode)
+                (setq-local corfu-auto-prefix 2)
+                (add-to-list 'completion-at-point-functions #'cape-file 'append)
+                (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+                (add-to-list 'completion-at-point-functions #'cape-history 'append)
+                (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+                (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+                (add-to-list 'completion-at-point-functions #'cape-ispell 'append))))
 
   (add-hook 'text-mode-hook
             (lambda ()
@@ -159,7 +162,7 @@
                           (list (cape-super-capf #'cape-file
                                                  #'cape-dabbrev
                                                  #'cape-history
-                                                 #'cape-ispell
+                                                 ;; #'cape-ispell
                                                  #'cape-dict))))))
 
 ;; Provide icons for Corfu

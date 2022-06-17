@@ -195,7 +195,6 @@
 
 ;; Enable the following modes
 (dolist (mode '(auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
-                blink-cursor-mode
                 column-number-mode
                 delete-selection-mode ; Typing with the mark active will overwrite the marked region
                 ;; Use soft wraps, wrap lines without the ugly continuation marks

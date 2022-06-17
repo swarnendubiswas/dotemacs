@@ -19,6 +19,9 @@
   :defines read-extended-command-predicate
   :commands (command-completion-default-include-p minibuffer-keyboard-quit)
   :hook (after-init-hook . vertico-mode)
+  :custom-face
+  ;; (vertico-current ((t (:background "#3a3f5a"))))
+  (vertico-current ((t (:background "#384551"))))
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
@@ -52,23 +55,23 @@
         ("DEL" . vertico-directory-delete-char)
         ("M-DEL" . vertico-directory-delete-word)))
 
-;; (use-package vertico-repeat
-;;   :if (eq sb/minibuffer-completion 'vertico)
-;;   :straight (vertico :files (:defaults "extensions/*")
-;;                      :includes (vertico-repeat))
-;;   :after vertico
-;;   :hook (minibuffer-setup-hook . vertico-repeat-save)
-;;   :bind
-;;   (("C-c r" . vertico-repeat-last)
-;;    ("M-r" . vertico-repeat-select)))
+(use-package vertico-repeat
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-repeat))
+  :after vertico
+  :hook (minibuffer-setup-hook . vertico-repeat-save)
+  :bind
+  (("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)))
 
-;; (use-package vertico-indexed
-;;   :if (eq sb/minibuffer-completion 'vertico)
-;;   :straight (vertico :files (:defaults "extensions/*")
-;;                      :includes (vertico-indexed))
-;;   :after vertico
-;;   :commands vertico-indexed-mode
-;;   :init (vertico-indexed-mode 1))
+(use-package vertico-indexed
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-indexed))
+  :after vertico
+  :commands vertico-indexed-mode
+  :init (vertico-indexed-mode 1))
 
 ;; ;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
 ;; (use-package vertico-grid
@@ -82,16 +85,16 @@
 ;;   :custom
 ;;   (vertico-grid-max-columns 4))
 
-;; (use-package vertico-quick
-;;   :if (eq sb/minibuffer-completion 'vertico)
-;;   :straight (vertico :files (:defaults "extensions/*")
-;;                      :includes (vertico-quick))
-;;   :after vertico
-;;   :bind
-;;   (:map vertico-map
-;;         ;; ("C-c q" . vertico-quick-insert)
-;;         ;; ("C-'" . vertico-quick-exit)
-;;         ("C-'" . vertico-quick-jump)))
+(use-package vertico-quick
+  :if (eq sb/minibuffer-completion 'vertico)
+  :straight (vertico :files (:defaults "extensions/*")
+                     :includes (vertico-quick))
+  :after vertico
+  :bind
+  (:map vertico-map
+        ;; ("C-c q" . vertico-quick-insert)
+        ;; ("C-'" . vertico-quick-exit)
+        ("C-'" . vertico-quick-jump)))
 
 (use-package consult
   :after vertico
@@ -156,6 +159,47 @@
 
   (when (featurep 'projectile)
     (setq consult-project-function #'projectile-project-root)))
+
+;; Provide context-dependent actions similar to a content menu
+;; https://karthinks.com/software/fifteen-ways-to-use-embark/
+(use-package embark
+  :after vertico
+  :defines vertico-map
+  :init
+  ;; Replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command
+        which-key-use-C-h-commands nil)
+  :bind
+  (([remap describe-bindings] . embark-bindings)
+   :map vertico-map
+   ("C-l" . embark-act)
+   ("C-," . embark-dwim)
+   ("C-c C-l" . embark-export)))
+
+(use-package embark-consult
+  :after (embark consult))
+
+;; Enriches the completion display with annotations, e.g., documentation strings or file information
+(use-package marginalia
+  :after vertico
+  :init (marginalia-mode 1)
+  :config
+  ;; Add project-buffer annotator.
+  (add-to-list 'marginalia-annotator-registry
+               '(project-buffer marginalia-annotate-project-buffer))
+  (with-eval-after-load "projectile"
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-switch-project . file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-switch-open-project . file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-find-file . project-file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-recentf . project-file))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-display-buffer . project-buffer))
+    (add-to-list 'marginalia-command-categories
+                 '(projectile-switch-to-buffer . project-buffer))))
 
 (provide 'init-vertico)
 

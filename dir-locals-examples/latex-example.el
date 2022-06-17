@@ -3,6 +3,9 @@
          (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.dvi$\\|.fdb_latexmk$\\|.fls$\\|.lof$\\|.log$\\|.lot$\\|.out$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$")
          (projectile-project-compilation-dir . ".")
          (projectile-project-compilation-cmd . "latexmk -f paper.tex")
+         (projectile-enable-caching . t)
+         (compile-command . "latexmk -f paper.tex")
+
          (eval . (add-hook 'lsp-managed-mode-hook
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
@@ -33,7 +36,7 @@
                 (eval . (progn
                           (let (
                                 (bibpath (expand-file-name "./references/references.bib"))
-                                (projectroot (expand-file-name "."))
+                                (projectroot (expand-file-name "./"))
                                 )
                             (setq-local reftex-default-bibliography    bibpath
                                         company-bibtex-bibliography    bibpath
@@ -42,6 +45,7 @@
                           ))
                 ))
  )
+
 
 ;; Local Variables:
 ;; eval: (flycheck-mode -1)

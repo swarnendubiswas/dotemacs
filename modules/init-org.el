@@ -15,13 +15,14 @@
   :hook (org-mode-hook . visual-line-mode)
   :custom
   (org-fontify-whole-heading-line nil)
-  (org-hide-emphasis-markers t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text")
   (org-hide-leading-stars nil)
   (org-hide-leading-stars-before-indent-mode nil)
   ;; Code block fontification using the major-mode of the code
   (org-src-fontify-natively t)
   (org-src-preserve-indentation t)
-  (org-src-tabs-acts-natively t)
+  (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
   (org-src-window-setup 'current-window)
   ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
   ;; feels better with the mode disabled.
@@ -41,6 +42,18 @@
   (org-pretty-entities-include-sub-superscripts t)
   ;; Automatically sorted and renumbered whenever I insert a new one
   (org-footnote-auto-adjust t)
+  (org-return-follows-link t)
+  (org-adapt-indentation t)
+  (org-odd-levels-only t "Use odd levels to add more indentation")
+  (org-export-with-smart-quotes t "#+OPTIONS ':t")
+  (org-export-with-section-numbers nil "#+OPTIONS num:nil")
+  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a headline
+  (org-export-with-toc nil)
+  (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
+  ;; This exports broken links as [BROKEN LINK %s], so we can actually find them. The default value
+  ;; nil just aborts the export process with an error message "Unable to resolve link: nil". This
+  ;; doesn't give any hint on which line the broken link actually is.
+  (org-export-with-broken-links 'mark)
   :config
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
@@ -55,10 +68,15 @@
         ("C-c C-d"   . nil) ; Was bound to `org-deadline'
         ("C-c C-j"   . nil) ; Was bound to `org-goto'
         ("<tab>"     . org-indent-item)
-        ("<backtab>" . org-outdent-item)))
+        ("<backtab>" . org-outdent-item)
+        ("M-a" . org-backward-paragraph)
+        ("M-e" . org-forward-paragraph)
+        ("M-{" . org-backward-element)
+        ("M-}" . org-forward-element)))
 
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
+  :disabled t
   :hook (org-mode-hook . org-bullets-mode))
 
 ;; Make invisible parts of Org elements appear visible
@@ -82,6 +100,7 @@
              org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern
+  :disabled t
   :hook (org-mode-hook . org-modern-mode))
 
 (provide 'init-org)

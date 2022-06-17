@@ -245,13 +245,14 @@
                        'company-abort)))
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
-(use-package eldoc-box
-  :commands (eldoc-box-hover-at-point-mode)
-  :hook (eldoc-mode-hook . eldoc-box-hover-mode)
-  :custom
-  (eldoc-box-clear-with-C-g t)
-  (eldoc-box-fringe-use-same-bg nil)
-  :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+
+;; (use-package eldoc-box
+;;   :commands (eldoc-box-hover-at-point-mode)
+;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
+;;   :custom
+;;   (eldoc-box-clear-with-C-g t)
+;;   (eldoc-box-fringe-use-same-bg nil)
+;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package esup
   :commands esup
@@ -366,47 +367,6 @@
 
 (use-package rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
-
-;; Provide context-dependent actions similar to a content menu
-;; https://karthinks.com/software/fifteen-ways-to-use-embark/
-(use-package embark
-  :after vertico
-  :defines vertico-map
-  :init
-  ;; Replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command
-        which-key-use-C-h-commands nil)
-  :bind
-  (([remap describe-bindings] . embark-bindings)
-   :map vertico-map
-   ("C-l" . embark-act)
-   ("C-," . embark-dwim)
-   ("C-c C-l" . embark-export)))
-
-(use-package embark-consult
-  :after (embark consult))
-
-;; Enriches the completion display with annotations, e.g., documentation strings or file information
-(use-package marginalia
-  :after vertico
-  :init (marginalia-mode 1)
-  :config
-  ;; Add project-buffer annotator.
-  (add-to-list 'marginalia-annotator-registry
-               '(project-buffer marginalia-annotate-project-buffer))
-  (with-eval-after-load "projectile"
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-switch-project . file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-switch-open-project . file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-find-file . project-file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-recentf . project-file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-display-buffer . project-buffer))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-switch-to-buffer . project-buffer))))
 
 (use-package volatile-highlights
   :diminish volatile-highlights-mode

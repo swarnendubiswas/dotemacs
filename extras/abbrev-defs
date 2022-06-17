@@ -570,6 +570,7 @@
     ("executiosn" "executions" nil :count 0)
     ("executoins" "executions" nil :count 1)
     ("exeperiments" "experiments" nil :count 0)
+    ("exeuction" "execution" nil :count 0)
     ("exhcange" "exchange" nil :count 0)
     ("exhcanges" "exchanges" nil :count 0)
     ("expectatoins" "expectations" nil :count 1)
@@ -765,6 +766,7 @@
     ("infracstructure" "infrastructure" nil :count 0)
     ("inital" "initial" nil :count 2)
     ("initalization" "initialization" nil :count 0)
+    ("insead" "instead" nil :count 0)
     ("insignts" "insights" nil :count 0)
     ("insititute" "institute" nil :count 0)
     ("instaleld" "installed" nil :count 0)
@@ -1484,6 +1486,7 @@
     ("quizes" "quizzes" nil :count 0)
     ("trainign" "training" nil :count 0)
     ("tunned" "tuned" nil :count 0)
+    ("utilised" "utilized" nil :count 0)
    ))
 
 (define-abbrev-table 'markdown-mode-abbrev-table
