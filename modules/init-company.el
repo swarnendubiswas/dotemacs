@@ -24,18 +24,17 @@
   :commands (company-abort company-files company-yasnippet
                            company-ispell company-dabbrev
                            company-capf company-dabbrev-code
-                           company-clang-set-prefix
-                           global-company-mode)
+                           company-clang-set-prefix)
   :defines (company-dabbrev-downcase company-dabbrev-ignore-case
                                      company-dabbrev-other-buffers
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
-  ;; :hook
-  ;; ((after-init-hook . (lambda ()
-  ;;                       (when (string= (buffer-name) "*scratch*")
-  ;;                         (company-mode 1))))
-  ;;  (after-init-hook . global-company-mode))
+  :hook
+  (after-init-hook . (lambda ()
+                       (global-company-mode 1)
+                       (when (string= (buffer-name) "*scratch*")
+                         (company-mode 1))))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -174,9 +173,10 @@
   :after company
   :demand t)
 
-;; A few backends are applicable to all modes and can be blocking: `company-yasnippet',
-;; `company-ispell', and `company-dabbrev'. `company-dabbrev' returns a non-nil prefix in almost any
-;; context (major mode, inside strings or comments). That is why it is better to put it at the end.
+;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
+;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
+;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
+;; why it is better to put `company-dabbrev' at the end.
 
 ;; https://tychoish.com/post/better-company/
 ;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
@@ -415,7 +415,9 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-files
-                               (company-capf :with company-yasnippet)
+                               ;; FIXME: This seems to be throwing useless suggestions
+                               ;; (company-capf :with company-yasnippet)
+                               company-capf
                                (company-dabbrev-code ; Useful for variable names
                                 company-etags)
                                (company-ispell :with

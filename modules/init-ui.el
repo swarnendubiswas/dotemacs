@@ -173,10 +173,6 @@
 (use-package doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
   :init
-  ;; Requires the fonts included with `all-the-icons', run "M-x all-the-icons-install-fonts".
-  (when (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
-    (all-the-icons-install-fonts t))
-
   (setq doom-modeline-buffer-encoding nil
         doom-modeline-checker-simple-format nil
         doom-modeline-indent-info nil

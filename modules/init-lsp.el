@@ -88,8 +88,8 @@
                              ;; Increases memory usage but can improve performance
                              "--pch-storage=memory"
                              "--pretty"))
-  ;; Enable integration of custom backends other than `company-capf'
-  ;; lsp-completion-provider :none
+  ;; Enable integration of custom backends other than `capf'
+  (lsp-completion-provider :none)
   (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
   ;; (lsp-completion-show-kind nil)
   (lsp-eldoc-enable-hover nil)

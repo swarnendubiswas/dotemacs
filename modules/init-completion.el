@@ -53,14 +53,19 @@
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
+  :preface
+  (defun sb/just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
+  :custom
+  (orderless-component-separator "[ _]")
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)
-
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
 
-  (setq orderless-matching-styles '(orderless-regexp)
-        orderless-component-separator #'orderless-escapable-split-on-space))
+  (with-eval-after-load "company"
+    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
@@ -119,23 +124,25 @@
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
 
-(use-package fussy
-  :straight (fussy :type git :host github :repo "jojojames/fussy")
-  :demand t
-  :commands fussy-all-completions)
+;; (use-package fussy
+;;   :straight (fussy :type git :host github :repo "jojojames/fussy")
+;;   :demand t
+;;   :commands fussy-all-completions)
 
+;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
+;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
+;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
+;; "/u/s/l" for "/usr/share/local"
 (use-package minibuffer
   :straight (:type built-in)
   :custom
-  (completion-styles '(orderless fussy basic partial-completion initials emacs22))
-  ;; For example, project-find-file uses 'project-files which uses substring completion by default.
-  ;; Set to nil to make sure it's using flx.
-  (completion-category-defaults nil)
-  ;; basic matches only the prefix, substring matches the whole string as expected.
-  ;; (completion-category-overrides '((file (styles basic fussy substring remote orderless partial-completion))
-  ;; (minibuffer (initials))))
-  ;; ))
-  )
+  (completion-styles '(orderless basic))
+  ;;  The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
+  ;;  completion to work.
+  (completion-category-overrides '((file (styles basic partial-completion))
+                                   (minibuffer (orderless basic initials))))
+  ;; Serves as a default value for `completion-category-overrides'
+  (completion-category-defaults nil))
 
 (provide 'init-completion)
 

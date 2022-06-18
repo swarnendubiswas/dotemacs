@@ -169,7 +169,7 @@ cd "${NPM_HOME}" || echo "Failed: cd ${NPM_HOME}"
 
 npm init --yes
 # This list matches with "package.json" in $DOTFILES
-npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver pyright unofficial-grammarly-language-server-2 @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php stylelint
+npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver pyright @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php stylelint remark-language-server
 
 npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 

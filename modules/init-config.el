@@ -161,8 +161,9 @@ This location is used for temporary installations and files.")
           (const :tag "ivy" ivy))
   :group 'dotemacs)
 
+;; Corfu seems to again not work with LSP with langservers
 (defcustom sb/capf
-  'corfu
+  'company
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)

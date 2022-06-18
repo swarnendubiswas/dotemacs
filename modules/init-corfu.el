@@ -28,8 +28,7 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :hook
-  (after-init-hook . global-corfu-mode)
+  :hook (after-init-hook . global-corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
