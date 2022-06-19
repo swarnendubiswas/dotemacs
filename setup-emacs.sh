@@ -392,9 +392,11 @@ make install
 cd ../..
 rm -rf bear
 
-# Tmux
-
 # Powerline
+
+cd $HOME
+
+# Tmux
 
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"

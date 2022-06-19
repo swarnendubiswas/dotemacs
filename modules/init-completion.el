@@ -58,7 +58,8 @@
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
   :custom
-  (orderless-component-separator "[ _]")
+  ;; Allow escaping space with backslash
+  (orderless-component-separator 'orderless-escapable-split-on-space)
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)
@@ -137,9 +138,12 @@
   :straight (:type built-in)
   :custom
   (completion-styles '(orderless basic))
-  ;;  The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
-  ;;  completion to work.
-  (completion-category-overrides '((file (styles basic partial-completion))
+  ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
+  ;; completion to work. I want substring matching for file names.
+  ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
+  (completion-category-overrides '((file (styles basic substring partial-completion))
+                                   (buffer (styles basic substring flex))
+                                   (project-file (styles basic substring flex))
                                    (minibuffer (orderless basic initials))))
   ;; Serves as a default value for `completion-category-overrides'
   (completion-category-defaults nil))

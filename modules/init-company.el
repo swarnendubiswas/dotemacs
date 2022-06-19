@@ -176,24 +176,25 @@
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
 ;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
-;; why it is better to put `company-dabbrev' at the end.
+;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
+;; non-nil for following backends even when their ‘candidates’ list command is empty:
+;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
 
-;; https://tychoish.com/post/better-company/
-;; https://www.reddit.com/r/emacs/comments/l03dy1/priority_for_companymode/
-;; https://emacs.stackexchange.com/questions/64038/how-to-use-multiple-backends-in-priority-for-company-mode
+;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
+;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
+;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
+;; `:separate', the candidates that come from different backends are sorted separately in the
+;; combined list.
 
-;; Try completion backends in order till there is a non-empty completion list
+;; Try completion backends in order untill there is a non-empty completion list.
 ;; `(setq company-backends '(company-xxx company-yyy company-zzz))'
+
 ;; Merge completions of all the backends
 ;; `(setq company-backends '((company-xxx company-yyy company-zzz)))'
+
 ;; Merge completions of all the backends, give priority to `company-xxx'
 ;; `(setq company-backends '((company-xxx :separate company-yyy company-zzz)))'
-;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
-;; what `prefix' returns.
-
-;; If the group contains keyword `:with', the backends listed after this keyword are ignored for
-;; the purpose of the `prefix' command. If the group contains keyword `:separate', the candidates
-;; that come from different backends are sorted separately in the combined list.
+;; (setq company-backends '((company-tabnine :separate company-capf company-yasnippet)))
 
 ;; The first merges completions from `company-capf' and `company-dabbrev'. In the second case,
 ;; `company' will use only the backends before `:with' for determining the prefix (the text to be
@@ -204,13 +205,10 @@
 ;; `(add-to-list 'company-backends '(company-capf company-dabbrev))'
 ;; `(add-to-list 'company-backends '(company-capf :with company-dabbrev))'
 
-;; https://github.com/sboosali/.emacs.d/sboo/sboo-company.el
-;; The ‘prefix’ bool command always returns non-nil for following backends even when their
-;; ‘candidates’ list command is empty: `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
-
 ;; Options: company-sort-prefer-same-case-prefix, company-sort-by-occurrence,
 ;; company-sort-by-statistics, company-sort-by-length,
 ;; company-sort-by-backend-importance
+
 ;; (setq-local company-transformers '(company-sort-by-backend-importance
 ;;                                    delete-dups))
 
@@ -415,11 +413,8 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-files
-                               ;; FIXME: This seems to be throwing useless suggestions
-                               ;; (company-capf :with company-yasnippet)
-                               company-capf
-                               (company-dabbrev-code ; Useful for variable names
-                                company-etags)
+                               (company-capf :with company-yasnippet)
+                               company-dabbrev-code ; Useful for variable names
                                (company-ispell :with
                                                company-dabbrev))))
 
