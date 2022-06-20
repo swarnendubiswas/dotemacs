@@ -120,10 +120,11 @@
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
+  :straight flx
+  :straight t
   :after company
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :demand t
-  :disabled t
   :custom
   (company-fuzzy-sorting-backend 'flx) ; Using "flx" slows down completion significantly
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
@@ -256,23 +257,30 @@
       ;; `company-bibtex' and `company-auctex-bibs'
       (setq company-backends '(company-capf ; Necessary if we are using a language server
                                company-files
-                               company-math-symbols-latex
-                               company-latex-commands
-                               company-reftex-labels
-                               company-reftex-citations
-                               company-auctex-environments
-                               company-auctex-macros
-                               company-math-symbols-unicode
-                               company-auctex-symbols
-                               ;; company-yasnippet ; FIXME: Untested
+
+                               ;; `company-capf' seems to be working well with Texlab v4.1+.
+                               ;; company-math-symbols-latex
+                               ;; company-latex-commands
+                               ;; company-reftex-labels
+                               ;; company-reftex-citations
+                               ;; company-auctex-environments
+                               ;; company-auctex-macros
+                               ;; company-math-symbols-unicode
+                               ;; company-auctex-symbols
+
+                               ;; FIXME: Untested
+                               ;; company-yasnippet
+
                                (company-ispell :with
                                                company-dabbrev))))
 
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook hook (lambda ()
                        (sb/company-latex-mode)
-                       ;; (company-fuzzy-mode 1)
-                       ;; (diminish 'company-fuzzy-mode)
+                       ;; `company-capf' does not pass to later backends with Texlab, so we use
+                       ;; `company-fuzzy-mode' to merge results from all backends.
+                       (company-fuzzy-mode 1)
+                       (diminish 'company-fuzzy-mode)
                        )))))
 
 (with-eval-after-load "company"

@@ -324,19 +324,25 @@
      (require 'lsp-ltex)
      (lsp-deferred)))
   :init
-  (setq lsp-ltex-check-frequency "save"
-        ;; lsp-ltex-dictionary ("microbenchmarks")
-        lsp-ltex-java-path "/usr/lib/jvm/java-11-openjdk-amd64"
-        lsp-ltex-version "15.2.0")
+  (setq lsp-ltex-language "en-US"
+        lsp-ltex-check-frequency "save"
+        lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64"
+        lsp-ltex-version "15.2.0"
+        lsp-ltex-dictionary (json-parse-string "{\"en-US\": [\"microbenchmarks\"]}"))
   :config
   ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
-  (setq lsp-ltex-disabled-rules
-        #s(hash-table size 30 data
-                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])
-                      ("en-US" ["WHITESPACE_RULE"])))
 
-  (defvar lsp-ltex-active-modes)
+  ;; (setq lsp-ltex-disabled-rules
+  ;;       #s(hash-table size 30 data
+  ;;                     ("en-US" ["MORFOLOGIK_RULE_EN_US"])
+  ;;                     ("en-US" ["WHITESPACE_RULE"])))
+
+  ;; (setq lsp-ltex-disabled-rules
+  ;;       (json-parse-string
+  ;;        "{\"en-US\": [\"WHITESPACE_RULE\", \"MORFOLOGIK_RULE_EN_US\"]}"))
+
+  ;; (defvar lsp-ltex-active-modes)
 
   ;; SB: I prefer using Terminal Emacs over Tramp for editing remote files, which obviates the need
   ;; for a remote langsever.
@@ -388,7 +394,8 @@
 ;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
 ;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
 
-;; We only limit to "*scratch*" buffer since we can use `grammarly' and `ltex' for directories.
+;; We only limit to "*scratch*" buffer since we can use `lsp-grammarly' and `lsp-ltex' for files in
+;; directories.
 (add-hook 'text-mode-hook
           (lambda ()
             (when (string= (buffer-name) "*scratch*")
@@ -426,6 +433,18 @@
 ;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
 ;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
 ;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
+
+(use-package clang-format
+  :if (executable-find "clang-format")
+  :after (mlir-mode)
+  :commands (clang-format clang-format-buffer clang-format-region)
+  :custom (clang-format-style "file"))
+
+(use-package clang-format+
+  :if (executable-find "clang-format")
+  :defines clang-format+-always-enable
+  :hook (mlir-mode-hook . clang-format+-mode)
+  :custom (clang-format+-always-enable t))
 
 (provide 'init-checkers)
 

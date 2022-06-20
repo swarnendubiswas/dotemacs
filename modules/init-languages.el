@@ -724,18 +724,6 @@
   :load-path "extras"
   :mode "\\.mlir\\'")
 
-(use-package clang-format
-  :if (executable-find "clang-format")
-  :after (mlir-mode)
-  :commands (clang-format clang-format-buffer clang-format-region)
-  :custom (clang-format-style "file"))
-
-(use-package clang-format+
-  :if (executable-find "clang-format")
-  :defines clang-format+-always-enable
-  :hook (mlir-mode-hook . clang-format+-mode)
-  :custom (clang-format+-always-enable t))
-
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
   :diminish tree-sitter-mode
@@ -748,41 +736,6 @@
 
 (use-package dotenv-mode
   :mode "\\.env\\'")
-
-(with-eval-after-load "compile"
-  ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
-  (defvar compilation-filter-start)
-  (declare-function ansi-color-apply-on-region "ansi-color")
-
-  (defun sb/colorize-compilation-buffer ()
-    "Colorize compile mode output."
-    (let ((inhibit-read-only t))
-      (ansi-color-apply-on-region (point-min) (point-max))))
-
-  (defun sanityinc/colourise-compilation-buffer ()
-    (when (eq major-mode 'compilation-mode)
-      (ansi-color-apply-on-region compilation-filter-start (point-max))))
-
-  ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
-  (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer)
-
-  ;; https://stackoverflow.com/questions/11043004/emacs-compile-buffer-auto-close
-  (defun sb/bury-compile-buffer-if-successful (buffer string)
-    "Bury a compilation buffer if succeeded without warnings "
-    (when (and
-           (buffer-live-p buffer)
-           (string-match "compilation" (buffer-name buffer))
-           (string-match "finished" string)
-           (not
-            (with-current-buffer buffer
-              (goto-char (point-min))
-              (search-forward "warning" nil t))))
-      (run-with-timer 1 nil
-                      (lambda (buf)
-                        (bury-buffer buf)
-                        (switch-to-prev-buffer (get-buffer-window buf) 'kill))
-                      buffer)))
-  (add-hook 'compilation-finish-functions #'bury-compile-buffer-if-successful))
 
 (use-package rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook

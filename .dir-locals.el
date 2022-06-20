@@ -52,6 +52,10 @@
                              ;; (when (derived-mode-p 'latex-mode)
                              ;;   (setq sb/flycheck-local-checkers
                              ;;         '((lsp . ((next-checkers . (tex-chktex)))))))
+
+                             (when (derived-mode-p 'org-mode)
+                               (setq sb/flycheck-local-checkers
+                                     '((lsp . ((next-checkers . (org-lint)))))))
                              )))
          ))
 

@@ -235,17 +235,17 @@ Ignore if no file is found."
   :hook
   ((LaTeX-mode-hook latex-mode-hook) . (lambda()
                                          (bib-cite-minor-mode 1)))
+  ;; :bind
+  ;; (:map bib-cite-minor-mode-map
+  ;;       ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+  ;;       ("C-c l a" . bib-apropos)
+  ;;       ("C-c l b" . bib-make-bibliography)
+  ;;       ("C-c l d" . bib-display)
+  ;;       ("C-c l t" . bib-etags)
+  ;;       ("C-c l f" . bib-find)
+  ;;       ("C-c l n" . bib-find-next))
   :custom
-  (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
-  :bind
-  (:map bib-cite-minor-mode-map
-        ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-        ("C-c l a" . bib-apropos)
-        ("C-c l b" . bib-make-bibliography)
-        ("C-c l d" . bib-display)
-        ("C-c l t" . bib-etags)
-        ("C-c l f" . bib-find)
-        ("C-c l n" . bib-find-next)))
+  (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files"))
 
 ;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 (use-package auctex-latexmk
