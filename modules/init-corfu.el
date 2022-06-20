@@ -155,17 +155,31 @@
                 (add-to-list 'completion-at-point-functions #'cape-history 'append)
                 (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
                 (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-                (add-to-list 'completion-at-point-functions #'cape-ispell 'append))))
+                ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+                )))
+
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (setq-local corfu-auto-prefix 3)
+              (add-to-list 'completion-at-point-functions #'cape-file 'append)
+              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+              (add-to-list 'completion-at-point-functions #'cape-tex 'append)
+              (add-to-list 'completion-at-point-functions #'cape-history 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+              ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+              ))
 
   (add-hook 'text-mode-hook
             (lambda ()
-              (setq-local corfu-auto-prefix 3
-                          completion-at-point-functions
-                          (list (cape-super-capf #'cape-file
-                                                 #'cape-dabbrev
-                                                 #'cape-history
-                                                 ;; #'cape-ispell
-                                                 #'cape-dict))))))
+              (unless (derived-mode-p 'LaTeX-mode-hook)
+                (setq-local corfu-auto-prefix 3
+                            completion-at-point-functions
+                            (list (cape-super-capf #'cape-file
+                                                   #'cape-dabbrev
+                                                   #'cape-history
+                                                   ;; #'cape-ispell
+                                                   #'cape-dict)))))))
 
 ;; Provide icons for Corfu
 

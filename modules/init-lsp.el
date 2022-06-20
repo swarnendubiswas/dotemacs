@@ -58,8 +58,9 @@
           '(orderless)))
   :init
   ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
-  (add-hook 'text-mode-hook (lambda ()
-                              (setq-local lsp-completion-enable nil)))
+  (when (eq sb/capf 'corfu)
+    (add-hook 'text-mode-hook (lambda ()
+                                (setq-local lsp-completion-enable nil))))
   :hook
   (;;(lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
    (lsp-mode-hook . lsp-enable-which-key-integration)

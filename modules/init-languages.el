@@ -147,6 +147,7 @@
 (use-package elisp-mode
   :straight (:type built-in)
   :mode ("\\.el\\'"  . emacs-lisp-mode)
+  :mode (".dir-locals" . emacs-lisp-mode)
   :hook
   ((lisp-mode-hook emacs-lisp-mode-hook) .
    (lambda ()
@@ -157,7 +158,7 @@
 (use-package yaml-mode
   :defines lsp-ltex-enabled lsp-disabled-clients
   :commands yaml-mode
-  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy")
+  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy" ".clangd")
   :hook
   (yaml-mode-hook .
                   (lambda ()
@@ -748,8 +749,8 @@
 (use-package dotenv-mode
   :mode "\\.env\\'")
 
-;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
 (with-eval-after-load "compile"
+  ;; https://github.com/purcell/emacs.d/blob/master/lisp/init-compile.el
   (defvar compilation-filter-start)
   (declare-function ansi-color-apply-on-region "ansi-color")
 
@@ -763,7 +764,25 @@
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
   ;; (add-hook 'compilation-filter-hook #'sb/colorize-compilation-buffer)
-  (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer))
+  (add-hook 'compilation-filter-hook 'sanityinc/colourise-compilation-buffer)
+
+  ;; https://stackoverflow.com/questions/11043004/emacs-compile-buffer-auto-close
+  (defun sb/bury-compile-buffer-if-successful (buffer string)
+    "Bury a compilation buffer if succeeded without warnings "
+    (when (and
+           (buffer-live-p buffer)
+           (string-match "compilation" (buffer-name buffer))
+           (string-match "finished" string)
+           (not
+            (with-current-buffer buffer
+              (goto-char (point-min))
+              (search-forward "warning" nil t))))
+      (run-with-timer 1 nil
+                      (lambda (buf)
+                        (bury-buffer buf)
+                        (switch-to-prev-buffer (get-buffer-window buf) 'kill))
+                      buffer)))
+  (add-hook 'compilation-finish-functions #'bury-compile-buffer-if-successful))
 
 (use-package rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook

@@ -25,6 +25,7 @@
   (defvar straight-use-package-by-default)
   (defvar straight-disable-native-compile)
   (defvar straight-base-dir)
+  (defvar straight-vc-git-default-clone-depth)
 
   (declare-function straight-freeze-versions "straight")
   (declare-function straight-use-package "straight")
@@ -39,9 +40,9 @@
         straight-check-for-modifications '(check-on-save find-when-checking)
         straight-use-package-by-default t
         ;; There is no need to download the whole Git history, and a single branch often suffices.
-        ;; However, that seems to lead to "git revision parsing" errors while using
+        ;; FIXME: However, that seems to lead to "git revision parsing" errors while using
         ;; `straight-pull-all' and `straight-freeze-versions', which is irritating.
-        ;; straight-vc-git-default-clone-depth '(1 single-branch)
+        straight-vc-git-default-clone-depth '(1 single-branch)
         straight-disable-native-compile nil)
 
   (let ((bootstrap-file

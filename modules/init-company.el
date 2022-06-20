@@ -242,8 +242,8 @@
     (defun sb/company-latex-mode ()
       "Add backends for latex completion in company mode."
 
-      (setq-local company-minimum-prefix-length 3
-                  company-transformers '(company-sort-by-backend-importance))
+      (setq-local company-minimum-prefix-length 3)
+
       (make-local-variable 'company-backends)
 
       ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
@@ -251,7 +251,10 @@
 
       ;; https://github.com/TheBB/company-reftex/issues/10
       ;; FIXME: Cannot autocomplete "\includegraphics" without texlab
-      (setq company-backends '(;; company-capf ; Necessary if we are using a language server
+      ;; `company-reftex-labels' is expected to be better than
+      ;; `company-auctex-labels'. `company-reftex-citations' is better than
+      ;; `company-bibtex' and `company-auctex-bibs'
+      (setq company-backends '(company-capf ; Necessary if we are using a language server
                                company-files
                                company-math-symbols-latex
                                company-latex-commands
@@ -261,11 +264,6 @@
                                company-auctex-macros
                                company-math-symbols-unicode
                                company-auctex-symbols
-                               ;; company-reftex is expected to be better than `company-auctex-bibs' and `company-auctex-labels'
-                               ;; company-auctex-bibs
-                               ;; company-auctex-labels
-                               ;; `company-reftex-citations' is better than `company-bibtex'
-                               ;; company-bibtex
                                ;; company-yasnippet ; FIXME: Untested
                                (company-ispell :with
                                                company-dabbrev))))

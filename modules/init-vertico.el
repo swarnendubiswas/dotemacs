@@ -152,10 +152,17 @@
    ("M-s l" . consult-line)
    ("M-s L" . consult-line-multi))
   :config
-  ;; Disable live preview
-  (consult-customize consult-recent-file consult-buffer consult-theme
-                     consult-bookmark consult-xref
-                     :preview-key nil)
+  (setq completion-in-region-function #'consult-completion-in-region)
+
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-recent-file consult-buffer consult-bookmark consult-xref
+   consult-ripgrep consult-git-grep consult-grep consult-yank-from-kill-ring
+   :preview-key (kbd "M-.")
+   consult-find
+   :sort t)
 
   (when (featurep 'projectile)
     (setq consult-project-function #'projectile-project-root)))
