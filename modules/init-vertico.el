@@ -42,13 +42,14 @@
    ("<tab>" . vertico-insert)))
 
 ;; More convenient directory navigation commands
-
 (use-package vertico-directory
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-directory))
   :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
-  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy) ; Tidy shadowed file names
+  ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
+  ;; the following fixes the path so the selected path does not have prepended junk left behind.
+  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
   :bind
   (:map vertico-map
         ("RET" . vertico-directory-enter)
@@ -190,6 +191,8 @@
 (use-package marginalia
   :after vertico
   :init (marginalia-mode 1)
+  :custom
+  (marginalia-align 'right)
   :config
   ;; Add project-buffer annotator.
   (add-to-list 'marginalia-annotator-registry

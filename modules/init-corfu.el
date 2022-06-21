@@ -129,6 +129,16 @@
              cape-ispell ; Complete word at point with Ispell
              ;; Complete with Dabbrev at point
              cape-dabbrev)
+  :preface
+  ;; https://kristofferbalintona.me/posts/202203130102/
+  (defun sb/cape-capf-setup-lsp ()
+    "Replace the default `lsp-completion-at-point' with its
+`cape-capf-buster' version. Also add `cape-file' and
+`company-yasnippet' backends."
+    (setf (elt (cl-member 'lsp-completion-at-point completion-at-point-functions) 0)
+          (cape-capf-buster #'lsp-completion-at-point))
+    (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-yasnippet))
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev t))
   :custom
   (cape-dabbrev-min-length 4)
   ;; Checking all other buffers for completetion ignoring the major mode seems to be expensive
@@ -161,6 +171,12 @@
   (add-hook 'LaTeX-mode-hook
             (lambda ()
               (setq-local corfu-auto-prefix 3)
+              ;; (rquire 'company-auctex)
+              ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-bibs))
+              ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-labels))
+              ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-symbols))
+              ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-environments))
+              ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-macros))
               (add-to-list 'completion-at-point-functions #'cape-file 'append)
               (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
               (add-to-list 'completion-at-point-functions #'cape-tex 'append)

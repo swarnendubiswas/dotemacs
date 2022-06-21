@@ -247,14 +247,12 @@
 
       (make-local-variable 'company-backends)
 
-      ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-      ;; labels and citations.
-
       ;; https://github.com/TheBB/company-reftex/issues/10
-      ;; FIXME: Cannot autocomplete "\includegraphics" without texlab
-      ;; `company-reftex-labels' is expected to be better than
-      ;; `company-auctex-labels'. `company-reftex-citations' is better than
-      ;; `company-bibtex' and `company-auctex-bibs'
+
+      ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+      ;; labels and citations. `company-reftex-labels' is expected to be better than
+      ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
+      ;; `company-auctex-bibs'
       (setq company-backends '(company-capf ; Necessary if we are using a language server
                                company-files
 

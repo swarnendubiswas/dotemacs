@@ -15,8 +15,7 @@
 Emacs searches for the initiation files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
 To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
-~M-:~ to evaluate an Emacs Lisp expression and print the result. Only interactive functions can be
-invoked with ~M-x~ or a key binding.
+~M-:~ to evaluate an Emacs Lisp expression and print the result. Only interactive functions can be invoked with ~M-x~ or a key binding.
 
 The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~ since they cause eager loading and
 are expensive. A cheaper alternative is to use ~autoload~.
@@ -55,7 +54,7 @@ http://ergoemacs.org/emacs/elisp_check_defined.html
 
 *** Difference between ~eval-after-load~ and ~with-eval-after-load~
 
-      ~eval-after-load~ is considered ill-behaved because it is a function, not a macro, and thus requires the code inside it to be quoted, which means that it cannot be byte-compiled. It also accepts only one form. If we have more than one, you need to use ~progn~. For example:
+~eval-after-load~ is considered ill-behaved because it is a function, not a macro, and thus requires the code inside it to be quoted, which means that it cannot be byte-compiled. It also accepts only one form. If we have more than one, you need to use ~progn~. For example:
 
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "foo"
@@ -102,6 +101,10 @@ The equivalent version with ~with-eval-after-load~ would be:
 *** Difference between ~setq~ and ~custom~
 
 https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variables/
+
+*** Difference between ~push~ and ~add-to-list~
+
+~add-to-list~ adds elements to the front of a list. ~add-to-list~ is almost always preferable to ~push~ because ~push~ adds an element to a list even if it is already in the list, whereas ~add-to-list~ will not.
 
 * Reference Configurations
 

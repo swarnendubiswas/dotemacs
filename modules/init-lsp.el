@@ -62,7 +62,7 @@
     (add-hook 'text-mode-hook (lambda ()
                                 (setq-local lsp-completion-enable nil))))
   :hook
-  (;;(lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
+  ((lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
    (lsp-mode-hook . lsp-enable-which-key-integration)
    (lsp-mode-hook . lsp-dired-mode))
   :custom-face

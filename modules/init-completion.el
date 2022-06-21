@@ -48,6 +48,7 @@
   (("M-/"   . hippie-expand)
    ([remap dabbrev-expand] . hippie-expand)))
 
+;; Use "M-SPC" for space-separated completion lookups
 (use-package orderless
   :after (:any ivy vertico)
   :demand t
@@ -60,6 +61,10 @@
   :custom
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
+  (orderless-matching-styles '(orderless-literal
+                               orderless-prefixes
+                               orderless-initialism
+                               orderless-regexp))
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)
