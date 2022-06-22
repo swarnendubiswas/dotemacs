@@ -533,6 +533,8 @@
   :if (executable-find "yapf")
   :hook (python-mode-hook . yapf-mode))
 
+(use-package pip-requirements)
+
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
   :hook (cperl-mode-hook . lsp-deferred)

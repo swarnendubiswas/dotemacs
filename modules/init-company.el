@@ -66,7 +66,8 @@
                        ;; Show in-place preview if there is only choice
                        company-preview-if-just-one-frontend
                        ;; Show selected candidate docs in echo area
-                       company-echo-metadata-frontend))
+                       ;; company-echo-metadata-frontend
+                       ))
   :config
   ;; We set `company-backends' as a local variable, so it is not important to delete backends
   ;; (dolist (backends '(company-semantic company-bbdb company-oddmuse company-cmake company-clang))
@@ -180,6 +181,19 @@
   :after company
   :demand t)
 
+(use-package company-dict
+  :custom
+  (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
+  (company-dict-enable-fuzzy t)
+  (company-dict-enable-yasnippet nil))
+
+;; You can set `company-ctags-extra-tags-files' to load extra tags files.
+(use-package company-ctags
+  :straight (:type git :host github :repo "redguardtoo/company-ctags")
+  :custom
+  (company-ctags-fuzzy-match-p t)
+  (company-ctags-everywhere t))
+
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
 ;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
@@ -275,6 +289,7 @@
                                ;; FIXME: Untested
                                ;; company-yasnippet
 
+                               company-dict
                                (company-ispell :with
                                                company-dabbrev))))
 
@@ -299,9 +314,9 @@
       ;; Slightly larger value to have more precise matches and so that the popup does not block
       (setq-local company-minimum-prefix-length 3)
 
-
       (set (make-local-variable 'company-backends)
            '(company-files
+             company-dict
              (company-ispell :with
                              company-dabbrev))))
 
@@ -427,6 +442,7 @@
       (setq company-backends '(company-files
                                (company-capf :with company-yasnippet)
                                company-dabbrev-code ; Useful for variable names
+                               company-dict
                                (company-ispell :with
                                                company-dabbrev))))
 

@@ -11,18 +11,25 @@
 (defvar which-key-use-C-h-commands)
 
 (use-package transient
-  :demand t)
+  :demand t
+  :config
+  ;; Allow using `q' to quit out of popups, in addition to `C-g'
+  (transient-bind-q-to-quit))
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
   :bind
-  (("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h f" . helpful-callable)
+  (([remap describe-function] . helpful-callable)
+   ([remap describe-variable] . helpful-variable)
+   ([remap describe-symbol]   . helpful-symbol)
+   ([remap describe-key]      . helpful-key)
+   ;; ("C-h v" . helpful-variable)
+   ;; ("C-h k" . helpful-key)
+   ;; ("C-h f" . helpful-callable)
    ("C-h c" . helpful-command)
    ("C-h p" . helpful-at-point)
-   ("C-h o" . helpful-symbol)
+   ;; ("C-h o" . helpful-symbol)
    :map helpful-mode-map
    ("q"     . helpful-kill-buffers)))
 
@@ -355,15 +362,6 @@
 
 (use-package vterm-toggle
   :bind ("C-`" . vterm-toggle))
-
-(progn
-  (defvar reb-re-syntax)
-
-  (setq reb-re-syntax 'string))
-
-(use-package visual-regexp
-  :commands (vr/replace vr/mark)
-  :bind ([remap query-replace] . vr/query-replace))
 
 (use-package rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))

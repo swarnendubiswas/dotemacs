@@ -124,6 +124,9 @@
           use-package-compute-statistics nil
           use-package-verbose            nil)))
 
+;; One suggested order of `use-package' keywords:
+;; https://github.com/radian-software/radian/blob/develop/emacs/use-package-keywords.md
+
 ;; Feature `straight-x' from package `straight' provides experimental/unstable extensions to
 ;; straight.el which are not yet ready for official inclusion.
 (use-package straight-x
@@ -139,8 +142,10 @@
   :commands gcmh-idle-garbage-collect
   :hook (after-init-hook . gcmh-mode))
 
-;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
-;; and the minor modes.
+;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
+;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
+;; all the bindings available in a buffer, "C-h m" shows the keybindings for the major and the minor
+;; modes.
 (use-package bind-key
   :functions bind-key--remove
   :bind ("C-c d k" . describe-personal-keybindings))

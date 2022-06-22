@@ -39,11 +39,6 @@
       bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
       case-fold-search t ; Searches and matches should ignore case
       comment-auto-fill-only-comments t
-      compilation-always-kill t ; Kill a compilation process before starting a new one
-      compilation-ask-about-save nil ; Save all modified buffers without asking
-      ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
-      ;; error.
-      compilation-scroll-output 'first-error
       completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
@@ -52,9 +47,11 @@
       create-lockfiles nil
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
-      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
       ;; enable-local-variables :all ; Avoid "defvar" warnings
-      enable-recursive-minibuffers t ; Keeping track of the minibuffer nesting is difficult
+      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      ;; Allow doing a command that requires candidate-selection when you are already in the middle
+      ;; of candidate-selection. But keeping track of the minibuffer nesting is difficult.
+      enable-recursive-minibuffers t
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
       ;; variables, but I edit files over Tramp a lot.
       enable-remote-dir-locals t
@@ -86,6 +83,11 @@
       read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound
+      ;; If you have something on the system clipboard, and then kill something in Emacs, then by
+      ;; default whatever you had on the system clipboard is gone and there is no way to get it
+      ;; back. Setting the following option makes it so that when you kill something in Emacs,
+      ;; whatever was previously on the system clipboard is pushed into the kill ring. This way, you
+      ;; can paste it with `yank-pop'.
       save-interprogram-paste-before-kill t
       save-silently t ; Error messages will still be printed
       ;; Enable use of system clipboard across Emacs and other applications, does not work on the
@@ -448,7 +450,13 @@
   :hook
   ((compilation-filter-hook . sanityinc/colourise-compilation-buffer)
    ;; (compilation-filter-hook . sb/colorize-compilation-buffer)
-   (compilation-finish-functions . sb/bury-compile-buffer-if-successful)))
+   (compilation-finish-functions . sb/bury-compile-buffer-if-successful))
+  :custom
+  (compilation-always-kill t "Kill a compilation process before starting a new one")
+  (compilation-ask-about-save nil "Save all modified buffers without asking")
+  ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
+  ;; error.
+  (compilation-scroll-output 'first-error))
 
 (provide 'init-core)
 

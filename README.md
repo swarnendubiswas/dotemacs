@@ -76,9 +76,9 @@ The following examples of customization options defined in [`init.el`](./init-us
 - `sb/fill-column` -- Column beyond which lines should not extend
 - `sb/delete-trailing-whitespace-p` -- Control whether trailing whitespace should be deleted or not
 
-## Browsing Source Code
+## Support for Tags
 
-Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by the `lsp` mode, or you cannot create a compilation database.
+Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by `lsp-mode', or you cannot create a compilation database.
 
 Use GNU Global with `counsel-gtags`: `gtags -cv --gtagslabel=new-ctags`
 
@@ -133,6 +133,8 @@ ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exc
 ```shell
 ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=doc --exclude=PTRacer-solver
 ```
+
+> LaTeX project: `find . -name "*.tex*" | ctags -e -L -`
 
 > **Ignore directories and files**
 

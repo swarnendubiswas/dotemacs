@@ -97,6 +97,17 @@
    ("C-'"   . avy-goto-char-timer)
    ("C-/"   . avy-goto-line)))
 
+(progn
+  (defvar reb-re-syntax)
+
+  (setq reb-re-syntax 'string))
+
+;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
+;; and replacements as you type.
+(use-package visual-regexp
+  :commands (vr/replace vr/mark)
+  :bind ([remap query-replace] . vr/query-replace))
+
 (provide 'init-search)
 
 ;;; init-search.el ends here
