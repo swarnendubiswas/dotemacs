@@ -124,6 +124,12 @@
           use-package-compute-statistics nil
           use-package-verbose            nil)))
 
+;; Feature `straight-x' from package `straight' provides experimental/unstable extensions to
+;; straight.el which are not yet ready for official inclusion.
+(use-package straight-x
+  :straight nil
+  :commands straight-x-fetch-all)
+
 (use-package diminish
   :demand t)
 

@@ -145,7 +145,7 @@ This location is used for temporary installations and files.")
 ;; Furthermore, candidate `pylsp' versions depend on the OS version, and capf sometimes does not
 ;; work consistently.
 (defcustom sb/python-langserver
-  'pyright
+  'pylsp
   "Choose the Python Language Server implementation."
   :type  '(radio
            (const :tag "pylsp"   pylsp)

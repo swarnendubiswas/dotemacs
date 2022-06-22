@@ -33,8 +33,9 @@
   :hook
   (after-init-hook . (lambda ()
                        (global-company-mode 1)
-                       (when (string= (buffer-name) "*scratch*")
-                         (company-mode 1))))
+                       ;; (when (string= (buffer-name) "*scratch*")
+                       ;;   (company-mode 1))
+                       ))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -54,10 +55,10 @@
   (company-tooltip-align-annotations t)
   (company-tooltip-limit 15)
   (company-clang-insert-arguments nil "Disable insertion of arguments")
-  ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
-  ;; strings
-  ;; https://github.com/company-mode/company-mode/discussions/1211
-  (company-search-regexp-function 'company-search-words-in-any-order-regexp)
+  ;; ;; Start a search using `company-filter-candidates' (bound to "C-s") to narrow out-of-order
+  ;; ;; strings
+  ;; ;; https://github.com/company-mode/company-mode/discussions/1211
+  ;; (company-search-regexp-function 'company-search-words-in-any-order-regexp)
   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
                        ;; Always show candidates in overlay tooltip
                        ;; company-pseudo-tooltip-frontend
@@ -77,6 +78,7 @@
                          (lambda (c)
                            (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
+  (add-to-list 'company-transformers 'company-sort-by-backend-importance)
 
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
@@ -131,8 +133,10 @@
   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
   ;; Disabling the requirement may help with performance.
   (company-fuzzy-prefix-on-top t)
-  (company-fuzzy-passthrough-backends '(company-capf)))
+  ;; (company-fuzzy-passthrough-backends '(company-capf))
+  )
 
+;; FIXME: Do we need this with the bash language sever?
 (use-package company-shell
   :disabled t
   :after company
@@ -149,9 +153,10 @@
                                  company-auctex-bibs company-auctex-macros
                                  company-auctex-symbols company-auctex-environments))
 
+;; Required by `ac-math' and `company-math'
 (use-package math-symbols
   :after (tex-mode company)
-  :demand t) ; Required by `ac-math' and `company-math'
+  :demand t)
 
 (use-package company-math
   :after (tex-mode company)
@@ -169,6 +174,7 @@
 ;;   :demand t
 ;;   :commands company-bibtex)
 
+;; Complete in the middle of words
 (use-package company-anywhere
   :straight (company-anywhere :type git :host github :repo "zk-phi/company-anywhere")
   :after company
@@ -411,7 +417,9 @@
       (defvar company-minimum-prefix-length)
       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 2)
+      (setq-local company-minimum-prefix-length 2
+                  company-transformers '(company-sort-by-occurrence
+                                         company-sort-by-backend-importance))
 
       (make-local-variable 'company-backends)
 

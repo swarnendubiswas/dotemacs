@@ -103,6 +103,7 @@
    (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
    (after-init-hook         . global-diff-hl-mode)))
 
+;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit
   :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)

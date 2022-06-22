@@ -109,20 +109,20 @@
 ;; and corfu has corfu-history. Company has company-statistics. Furthermore, ivy is not well
 ;; supported with prescient. So, I do not see a reason to use prescient.
 
-;; (use-package prescient
-;;   :commands prescient-persist-mode
-;;   :hook (after-init-hook . prescient-persist-mode)
-;;   :custom (prescient-sort-full-matches-first t))
+(use-package prescient
+  :commands prescient-persist-mode
+  :hook (after-init-hook . prescient-persist-mode)
+  :custom (prescient-sort-full-matches-first t))
 
-;; ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
-;; ;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
-;; (use-package company-prescient
-;;   :after (company prescient)
-;;   :demand t
-;;   :commands company-prescient-mode
-;;   :config
-;;   ;; (setq company-prescient-sort-length-enable nil)
-;;   (company-prescient-mode 1))
+;; We want `capf' sort for programming modes, not with recency. This breaks support for the
+;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
+(use-package company-prescient
+  :after (company prescient)
+  :demand t
+  :commands company-prescient-mode
+  :config
+  ;; (setq company-prescient-sort-length-enable nil)
+  (company-prescient-mode 1))
 
 (use-package consult-company
   :if (eq sb/minibuffer-completion 'vertico)
