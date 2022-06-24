@@ -127,6 +127,7 @@
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
   (lsp-modeline-code-actions-enable (display-graphic-p))
+  (lsp-warn-no-matched-clients nil)
   :config
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
