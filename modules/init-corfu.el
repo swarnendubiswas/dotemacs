@@ -34,7 +34,7 @@
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
   (corfu-auto-prefix 2)
-  ;; (corfu-min-width 60)
+  (corfu-min-width 10)
   ;; (corfu-max-width corfu-min-width "Always have the same width")
   (corfu-count 15)
   :config
@@ -188,7 +188,7 @@
 
   (add-hook 'text-mode-hook
             (lambda ()
-              (unless (derived-mode-p 'LaTeX-mode-hook)
+              (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
                 (setq-local corfu-auto-prefix 3
                             completion-at-point-functions
                             (list (cape-super-capf #'cape-file

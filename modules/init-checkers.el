@@ -218,9 +218,11 @@
    ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook
                      markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode)))
 
+;; Enable using ".dir-locals.el" file
 (use-package editorconfig
   :if (executable-find "editorconfig")
-  :commands editorconfig-mode)
+  ;; :hook (prog-mode-hook . editorconfig-mode)
+  )
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly

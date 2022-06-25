@@ -179,6 +179,11 @@
 ;;   (("C-c g f" . consult-ls-git)
 ;;    ("C-c g F" . consult-ls-git-other-window)))
 
+;; Add the "delta" config into the global "~/.gitconfig" file.
+;; https://github.com/dandavison/delta#get-started
+(use-package magit-delta
+  :hook (magit-mode . magit-delta-mode))
+
 (provide 'init-vcs)
 
 ;;; init-vcs.el ends here

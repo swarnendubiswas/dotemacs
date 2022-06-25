@@ -458,6 +458,10 @@
   ;; error.
   (compilation-scroll-output 'first-error))
 
+;; Enable commands that are disabled by default
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
 (provide 'init-core)
 
 ;;; init-core.el ends here

@@ -398,6 +398,39 @@ cd "$HOME"
 
 # Tmux
 
+# Delta
+
+# Zoxide
+
+curl -sS https://webinstall.dev/zoxide | bash
+
+# For bash, add this line to ~/.bashrc
+echo "eval \"$(zoxide init bash)\"" >>"$USER_HOME/.bashrc"
+
+# For fish, add this line to ~/.config/fish/config.fish
+echo "zoxide init fish | source" >>"$CONFIG_DIR/fish/config.fish"
+
+# Bat
+
+BAT_VER="0.21.0"
+
+wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
+dpkg -i bat_"$BAT_VER"_amd64.deb
+rm -rf bat_"$BAT_VER"_amd64.deb
+
+# FZF
+cd $GITHUB
+if [ ! -d fzf ]; then
+    sudo -u swarnendu git clone --depth 1 https://github.com/junegunn/fzf.git
+else
+    cd fzf || echo "Failed: cd fzf"
+    sudo -u swarnendu git pull
+    cd ..
+fi
+
+cd fzf
+bash ./install
+
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 apt autoremove

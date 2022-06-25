@@ -390,6 +390,12 @@
   :unless (display-graphic-p)
   :init (xclip-mode 1))
 
+(use-package fix-word
+  :bind
+  (("M-u" . fix-word-upcase)
+   ("M-l" . fix-word-downcase)
+   ("M-c" . fix-word-capitalize)))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

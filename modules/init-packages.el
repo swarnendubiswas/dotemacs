@@ -193,14 +193,13 @@
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
-  :if (or (daemonp) (memq window-system '(x ns)))
+  :if (or (daemonp) (not (display-graphic-p)))
   :init
   ;; "-i" is expensive but Tramp is unable to find executables without the option. Furthermore,
   ;; other executables like "prettier" from $PATH are also not found.
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "NODE_PATH" "JAVA_HOME" "PYTHONPATH"
-                                         "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
+        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)

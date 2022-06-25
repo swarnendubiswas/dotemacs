@@ -88,15 +88,15 @@
     (diminish 'company-mode))
   :bind
   (:map company-active-map
-        ("C-s"      . nil) ; Was bound to `company-search-candidates'
-        ("C-M-s"    . nil) ; Was bound to `company-filter-candidates'
+        ;; ("C-s"      . nil) ; Was bound to `company-search-candidates'
+        ;; ("C-M-s"    . nil) ; Was bound to `company-filter-candidates'
+        ("C-j"      . company-search-candidates)
         ("C-n"      . company-select-next)
         ("C-p"      . company-select-previous)
         ;; Insert the common part of all candidates, or select the next one
         ("<tab>"    . company-complete-common-or-cycle)
         ("C-M-/"    . company-other-backend)
-        ("<escape>" . company-abort)
-        ("C-j"      . company-search-candidates)))
+        ("<escape>" . company-abort)))
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.

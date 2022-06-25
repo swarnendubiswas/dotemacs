@@ -301,6 +301,10 @@
    ("C-x C-d" . consult-dir)
    ("C-x C-j" . consult-dir-jump-file)))
 
+(use-package zoxide
+  :straight (:type git :host gitlab :repo "Vonfry/zoxide.el")
+  :commands (zoxide-find-file zoxide-open-with))
+
 (provide 'init-dired)
 
 ;;; init-dired.el ends here

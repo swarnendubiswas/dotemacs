@@ -107,6 +107,7 @@
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
   (consult-line-numbers-widen t)
+  (consult-preview-key nil)
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
@@ -192,7 +193,11 @@
   :after vertico
   :init (marginalia-mode 1)
   :custom
-  (marginalia-align 'right)
+  (marginalia-align 'left)
+  :bind
+  (("M-A" . marginalia-cycle)
+   :map minibuffer-local-map
+   ("M-A" . marginalia-cycle))
   :config
   ;; Add project-buffer annotator.
   (add-to-list 'marginalia-annotator-registry
