@@ -13,67 +13,75 @@
 
 (use-package ibuffer
   :straight (:type built-in)
-  :config
-  (defalias 'list-buffers 'ibuffer)
+  :bind ("C-x C-b" . ibuffer)
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: `major-mode', `recency'
   (ibuffer-use-header-line t)
-  :bind ("C-x C-b" . ibuffer))
+  :config
+  (defalias 'list-buffers 'ibuffer))
 
 ;; Do not show groups if there are no buffers in that group
 (use-package ibuf-ext
   :straight (:type built-in)
+  :hook
+  (ibuffer-hook . ibuffer-auto-mode)
   :custom
-  (ibuffer-show-empty-filter-groups nil)
-  :hook (ibuffer-hook . ibuffer-auto-mode))
+  (ibuffer-show-empty-filter-groups nil))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
   :after projectile
-  :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
+  :hook
+  (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
-  :if (display-graphic-p)
-  :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
-  :custom (all-the-icons-ibuffer-icon-size 0.8))
+  :when (display-graphic-p)
+  :hook
+  (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
+  :custom
+  (all-the-icons-ibuffer-icon-size 0.8))
 
 (use-package counsel-fd
-  :if (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
+  :when (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
    ;; Jump to a file below the current directory
    ("C-x f" . counsel-fd-file-jump)))
 
 (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-  :commands vlf
   :defines vlf-application
+  :commands vlf
   :init
   (setq vlf-application 'dont-ask)
   (require 'vlf-setup))
 
 (use-package immortal-scratch
-  :hook (after-init-hook . immortal-scratch-mode))
+  :hook
+  (after-init-hook . immortal-scratch-mode))
 
 ;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist
 (use-package persistent-scratch
-  :hook (after-init-hook . persistent-scratch-setup-default)
+  :hook
+  (after-init-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
-;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
-(use-package fasd
-  :defines fasd-enable-initial-prompt
-  :if (executable-find "fasd")
-  :hook (after-init-hook . global-fasd-mode)
-  :custom
-  (fasd-enable-initial-prompt nil "We can narrow down easily with Ivy/Vertico")
-  :bind* ("C-c /" . fasd-find-file))
+;; ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
+;; (use-package fasd
+;;   :when (executable-find "fasd")
+;;   :defines fasd-enable-initial-prompt
+;;   :hook
+;;   (after-init-hook . global-fasd-mode)
+;;   :bind* ("C-c /" . fasd-find-file)
+;;   :custom
+;;   (fasd-enable-initial-prompt nil "Narrow easily with Ivy/Vertico"))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 
 (use-package popwin
-  :hook (after-init-hook . popwin-mode)
+  :hook
+  (after-init-hook . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
 
@@ -120,12 +128,44 @@
 ;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 ;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
 
+;; https://github.com/malb/emacs.d/blob/master/malb.org
+;; (defvar sb/popup-windows '("\\`\\*compilation\\*\\'"
+;;                            "\\`\\*Flycheck errors\\*\\'"
+;;                            "\\`\\*Help\\*\\'"
+;;                            "\\` \\*LanguageTool Errors\\* \\'"
+;;                            "\\`\\*Edit footnote .*\\*\\'"
+;;                            "\\`\\*TeX errors*\\*\\'"
+;;                            "\\`\\*Org Export Dispatcher\\*\\'"
+;;                            "\\`\\*Backtrace\\*\\'"
+;;                            "\\`\\*Messages\\*\\'"
+;;                            "\\`\\*Calendar\\*\\'"
+;;                            "\\`\\*Async Shell Command\\*\\'"
+;;                            "\\`\\*LaTeXMK\\[.*\\]\\*"
+;;                            "\\`\\*tzc-times\\*\\'"))
+
+;; (dolist (name sb/popup-windows)
+;;   (add-to-list 'display-buffer-alist
+;;                `(,name
+;;                  (malb/frame-dispatch
+;;                   display-buffer-reuse-window
+;;                   display-buffer-in-side-window)
+;;                  (reusable-frames . visible)
+;;                  (side            . bottom)
+;;                  (window-parameters
+;;                   (no-other-window . t)
+;;                   (no-delete-other-windows . t))
+;;                  (window-height   . 0.3))) t)
+
 (use-package ace-window
-  :bind ([remap other-window] . ace-window))
+  :bind
+  (([remap other-window] . ace-window)
+   ("M-o" . ace-window))
+  :config
+  (add-to-list 'aw-ignored-buffers "*toc*"))
 
 (use-package ace-jump-buffer
   ;; The keybinding will be hidden if we use tmux
-  :bind ("C-b" . ace-jump-buffer)
+  :bind ("C-:" . ace-jump-buffer)
   :custom
   (ajb-max-window-height 30)
   (ajb-bs-configuration "files-and-scratch")

@@ -172,10 +172,10 @@
   :demand t
   :commands (company-reftex-labels company-reftex-citations))
 
-;; (use-package company-bibtex
-;;   :after tex-mode
-;;   :demand t
-;;   :commands company-bibtex)
+(use-package company-bibtex
+  :after tex-mode
+  :demand t
+  :commands company-bibtex)
 
 ;; Complete in the middle of words
 (use-package company-anywhere
@@ -265,16 +265,17 @@
 
       ;; `company-capf' is necessary if we are using a language server, it seems to be working well
       ;; with Texlab v4.1+.
-      (setq company-backends '(company-capf
-                               company-files
-                               company-math-symbols-latex
-                               company-latex-commands
-                               company-reftex-labels
-                               company-reftex-citations
-                               company-auctex-environments
-                               company-auctex-macros
-                               company-math-symbols-unicode
-                               company-auctex-symbols
+      (setq company-backends '(company-files
+                               (company-capf
+                                company-math-symbols-latex
+                                company-latex-commands
+                                company-reftex-labels
+                                company-reftex-citations
+                                company-auctex-environments
+                                company-auctex-macros
+                                company-math-symbols-unicode
+                                company-auctex-symbols
+                                company-bibtex)
 
                                ;; FIXME: Untested
                                ;; company-yasnippet
@@ -385,9 +386,10 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-files
-                               (company-capf :with company-yasnippet)
-                               (company-dabbrev-code ; Useful for variable names
-                                company-ctags)
+                               (company-capf :with
+                                             company-dabbrev-code ; Useful for variable names
+                                             company-ctags
+                                             company-yasnippet)
                                (company-ispell :with
                                                company-dabbrev
                                                company-dict))))

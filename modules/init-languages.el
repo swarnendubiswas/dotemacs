@@ -93,18 +93,6 @@
             (lambda ()
               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
 
-(use-package highlight-indentation
-  :diminish (highlight-indentation-current-column-mode highlight-indentation-mode)
-  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
-
-(use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
-  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
-  :diminish
-  :custom
-  (aggressive-indent-comments-too t)
-  ;; Never use `electric-indent-mode'
-  (aggressive-indent-dont-electric-modes t))
-
 (use-package symbol-overlay ; Highlight symbol under point
   :diminish
   :commands transient-define-prefix
@@ -115,24 +103,25 @@
   :custom
   ;; Delay highlighting to allow for transient cursor placements
   (symbol-overlay-idle-time 2)
-  :config
-  (transient-define-prefix sb/symbol-overlay-transient ()
-    "Symbol Overlay transient"
-    ["Symbol Overlay"
-     ["Overlays"
-      ("." "Add/Remove at point" symbol-overlay-put)
-      ("k" "Remove All" symbol-overlay-remove-all)
-      ]
-     ["Move to Symbol"
-      ("n" "Next" symbol-overlay-jump-next)
-      ("p" "Previous" symbol-overlay-jump-prev)
-      ]
-     ["Other"
-      ("m" "Highlight symbol-at-point" symbol-overlay-mode)
-      ]
-     ]
-    )
-  (bind-key "M-o" #'sb/symbol-overlay-transient))
+  ;; :config
+  ;; (transient-define-prefix sb/symbol-overlay-transient ()
+  ;;   "Symbol Overlay transient"
+  ;;   ["Symbol Overlay"
+  ;;    ["Overlays"
+  ;;     ("." "Add/Remove at point" symbol-overlay-put)
+  ;;     ("k" "Remove All" symbol-overlay-remove-all)
+  ;;     ]
+  ;;    ["Move to Symbol"
+  ;;     ("n" "Next" symbol-overlay-jump-next)
+  ;;     ("p" "Previous" symbol-overlay-jump-prev)
+  ;;     ]
+  ;;    ["Other"
+  ;;     ("m" "Highlight symbol-at-point" symbol-overlay-mode)
+  ;;     ]
+  ;;    ]
+  ;;   )
+  ;; (bind-key "M-o" #'sb/symbol-overlay-transient)
+  )
 
 (use-package highlight-escape-sequences
   :hook (prog-mode-hook . hes-mode))
@@ -514,7 +503,7 @@
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
   :custom
-  (py-isort-options '("-l 100"
+  (py-isort-options '("-lines=100"
                       "--up" ; Use parentheses
                       "--tc" ; Use a trailing comma on multiline imports
                       )))
@@ -523,7 +512,7 @@
   :straight (python-isort :type git :host github :repo "wyuenho/emacs-python-isort")
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :custom
-  (python-isort-arguments '("--stdout" "--atomic" "-l 100" "--up" "--tc" "-"))
+  (python-isort-arguments '("--stdout" "--atomic" "-lines=100" "--up" "--tc" "-"))
   :hook (python-mode-hook . python-isort-on-save-mode))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
@@ -759,10 +748,9 @@
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
   :hook (ssh-config-mode-hook . turn-on-font-lock))
 
-(use-package string-inflection
-  :bind
-  (:map prog-mode-map
-        ("C-c C-u" . string-inflection-all-cycle)))
+(use-package elf-mode
+  :mode (("\\.so\\'"  . elf-mode)
+         ("\\.a\\'"   . elf-mode)))
 
 (provide 'init-languages)
 

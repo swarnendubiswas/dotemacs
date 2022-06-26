@@ -121,7 +121,8 @@
    (bibtex-mode-hook . lsp-deferred))
   :custom
   (bibtex-align-at-equal-sign     t)
-  (bibtex-maintain-sorted-entries t))
+  (bibtex-maintain-sorted-entries t)
+  (bibtex-comma-after-last-field  nil))
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
@@ -203,6 +204,7 @@ Ignore if no file is found."
   (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
   ;; Make the toc display with a vertical split, since it is easy to read long lines
   (reftex-toc-split-windows-horizontally nil)
+  (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
   (reftex-use-fonts t "Use nice fonts for TOC")
   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
@@ -227,7 +229,7 @@ Ignore if no file is found."
 
     ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
     ;; but this is expensive.
-    (add-hook 'reftex-toc-mode-hook #'reftex-toc-Rescan)))
+    (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)))
 
 (use-package bib-cite
   :straight auctex

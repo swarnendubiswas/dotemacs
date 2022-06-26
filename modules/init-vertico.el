@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/minibuffer-completion)
+
 ;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
   :straight (vertico :files (:defaults "extensions/*")
@@ -34,7 +36,6 @@
     (setq read-extended-command-predicate #'command-completion-default-include-p))
   (when (display-graphic-p)
     (bind-key "<escape>" #'minibuffer-keyboard-quit vertico-map))
-
   :bind
   (("<f2>"  .  find-file)
    :map vertico-map
@@ -107,7 +108,7 @@
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
   (consult-line-numbers-widen t)
-  (consult-preview-key nil)
+  (consult-preview-key nil "Disable preview by default, enable for selected commands")
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
@@ -143,16 +144,13 @@
    ("C-c s r" . consult-ripgrep)
    ("C-c s h" . consult-isearch-history)
    ("<f4>" . consult-line)
-   ("M-s L" . consult-line-multi)
    ("M-s m" . consult-multi-occur)
    ("<f9>" . consult-recent-file)
    ([remap recentf-open-files] . consult-recent-file)
    ([remap multi-occur] . consult-multi-occur)
    ;; Isearch integration
    :map isearch-mode-map
-   ("M-s e" . consult-isearch-history)
-   ("M-s l" . consult-line)
-   ("M-s L" . consult-line-multi))
+   ("M-s e" . consult-isearch-history))
   :config
   (setq completion-in-region-function #'consult-completion-in-region)
 
@@ -160,7 +158,7 @@
 
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
-   consult-recent-file consult-buffer consult-bookmark consult-xref
+   consult-recent-file consult-buffer consult-bookmark consult-xref consult-line
    consult-ripgrep consult-git-grep consult-grep consult-yank-from-kill-ring
    :preview-key (kbd "M-.")
    consult-find

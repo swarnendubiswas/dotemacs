@@ -254,7 +254,13 @@
         languagetool-server-command (no-littering-expand-etc-file-name
                                      "languagetool/languagetool-server.jar")
         langtool-language-tool-jar (no-littering-expand-etc-file-name
-                                    "languagetool/languagetool-commandline.jar")))
+                                    "languagetool/languagetool-commandline.jar")
+        ;; langtool-disabled-rules '("WHITESPACE_RULE"
+        ;;                           "EN_QUOTES"
+        ;;                           "DASH_RULE"
+        ;;                           "OXFORD_SPELLING_ISE_VERBS"
+        ;;                           "OXFORD_SPELLING_NOUNS")
+        ))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
@@ -447,6 +453,18 @@
   :defines clang-format+-always-enable
   :hook (mlir-mode-hook . clang-format+-mode)
   :custom (clang-format+-always-enable t))
+
+(use-package highlight-indentation
+  :diminish (highlight-indentation-current-column-mode highlight-indentation-mode)
+  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
+
+(use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
+  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
+  :diminish
+  :custom
+  (aggressive-indent-comments-too t)
+  ;; Never use `electric-indent-mode'
+  (aggressive-indent-dont-electric-modes t))
 
 (provide 'init-checkers)
 

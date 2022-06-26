@@ -447,6 +447,20 @@
                         (bury-buffer buf)
                         (switch-to-prev-buffer (get-buffer-window buf) 'kill))
                       buffer)))
+
+  ;; https://github.com/malb/emacs.d/blob/master/malb.org
+  (defun sb/compilation-exit-autoclose (status code msg)
+    ;; If M-x compile exists with a 0
+    (when (and (eq status 'exit) (zerop code))
+      ;; and delete the *compilation* window
+      (let ((compilation-window (get-buffer-window (get-buffer "*compilation*"))))
+
+        (when (and (not (window-at-side-p compilation-window 'top))
+                   (window-at-side-p compilation-window 'left)
+                   (window-at-side-p compilation-window 'right))
+          (delete-window compilation-window))))
+    ;; Always return the anticipated result of compilation-exit-message-function
+    (cons msg code))
   :hook
   ((compilation-filter-hook . sanityinc/colourise-compilation-buffer)
    ;; (compilation-filter-hook . sb/colorize-compilation-buffer)
@@ -454,6 +468,7 @@
   :custom
   (compilation-always-kill t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")
+  (compilation-exit-message-function #'sb/compilation-exit-autoclose)
   ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
   ;; error.
   (compilation-scroll-output 'first-error))

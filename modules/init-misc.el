@@ -170,9 +170,9 @@
                                pdf-annot-delete pdf-annot-add-highlight-markup-annotation
                                pdf-annot-add-text-annotation)
   :mode ("\\.pdf\\'" . pdf-view-mode)
+  ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
+  ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
   :magic ("%PDF" . pdf-view-mode)
-  :hook (after-init-hook . (lambda ()
-                             (require 'pdf-tools nil t)))
   :custom
   (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
   (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
@@ -395,6 +395,11 @@
   (("M-u" . fix-word-upcase)
    ("M-l" . fix-word-downcase)
    ("M-c" . fix-word-capitalize)))
+
+(use-package string-inflection
+  :bind
+  (:map prog-mode-map
+        ("C-c C-u" . string-inflection-all-cycle)))
 
 (provide 'init-misc)
 
