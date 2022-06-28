@@ -134,21 +134,16 @@
 (setq-default bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
               bidi-paragraph-direction 'left-to-right)
 
-(dolist (exts '(".aux"
-                ".class"
-                ".dll"
-                ".elc"
+(dolist (exts '(".dll"
                 ".exe"
                 ".fdb_latexmk"
                 ".fls"
                 ".lof"
-                ".o"
                 ".pyc"
                 ".rel"
                 ".rip"
-                ".so"
                 ".synctex.gz"
-                ".toc"))
+                "TAGS"))
   (add-to-list 'completion-ignored-extensions exts))
 
 ;; Activate utf-8, these are needed (may not be all) for icons to work well in TUI

@@ -168,6 +168,7 @@ mkdir -p "${NPM_HOME}"
 cd "${NPM_HOME}" || echo "Failed: cd ${NPM_HOME}"
 
 npm init --yes
+
 # This list matches with "package.json" in $DOTFILES
 npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver pyright @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php stylelint remark-language-server
 
@@ -400,6 +401,12 @@ cd "$HOME"
 
 # Delta
 
+DELTA_VER="0.13.0"
+
+wget https://github.com/dandavison/delta/releases/download/"$DELTA_VER"/git-delta_"$DELTA_VER"_amd64.deb
+dpkg -i git-delta_"$DELTA_VER"_amd64.deb
+rm git-delta_"$DELTA_VER"_amd64.deb
+
 # Zoxide
 
 curl -sS https://webinstall.dev/zoxide | bash
@@ -416,7 +423,7 @@ BAT_VER="0.21.0"
 
 wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
 dpkg -i bat_"$BAT_VER"_amd64.deb
-rm -rf bat_"$BAT_VER"_amd64.deb
+rm bat_"$BAT_VER"_amd64.deb
 
 # FZF
 cd $GITHUB

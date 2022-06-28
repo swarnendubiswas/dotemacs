@@ -1,6 +1,6 @@
 # GNU Emacs
 
-This repository lists my preferred configuration for GNU Emacs, my primary editor. The setup should work on a GNU/Linux platform. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my preferred configuration for GNU Emacs, my primary editor. The setup should work on a GNU/Linux platform, and is not tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ## Installation
 
@@ -17,7 +17,7 @@ The Emacs version on Ubuntu is usually outdated. Use the [Emacs stable releases]
 ```shell
 sudo add-apt-repository -y ppa:kelleyk/emacs
 sudo apt update
-sudo apt install emacs28
+sudo apt install emacs28-nativecomp
 ```
 
 ## Build GNU Emacs from source
@@ -39,7 +39,7 @@ sudo make install
 
 Try the [following](https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html) if the build fails: `make bootstrap` or `rm lisp/loaddefs.el; make;`.
 
-Evaluate the following to test that both fast JSON and native compilation are working.
+Evaluate the following to test that both fast JSON (Emacs 27+) and native compilation (Emacs 28+) are working.
 
 ```emacs-lisp
 (if (and (fboundp 'native-comp-available-p)
@@ -62,13 +62,14 @@ Run the following to native compile all Elisp files under a directory.
 
 ## Directory structure
 
+- `modules` - Emacs modules divided across features
 - `extras` - third-party packages (may not be available from the package archives)
 - `snippets` - custom snippets
 - `references` - documentation and help files
 - `dir-locals-examples` - examples to show how to use directory-local variables
 - `projectile-examples` - projectile configuration files
 
-The following examples of customization options defined in [`init.el`](./init-use-package.el) that you could use to tweak the default setup. Please check [`init.el`](./init-use-package.el) for more options.
+The following are examples of a few customization options defined in [`init-config.el`](./modules/init-config.el). Please check the file for more customization options.
 
 - `sb/gui-theme` -- Set the desired GUI theme from a bunch of themes
 - `sb/tui-theme` -- Set the desired TUI theme from a bunch of themes
@@ -76,9 +77,15 @@ The following examples of customization options defined in [`init.el`](./init-us
 - `sb/fill-column` -- Column beyond which lines should not extend
 - `sb/delete-trailing-whitespace-p` -- Control whether trailing whitespace should be deleted or not
 
+## LSP
+
+We enable LSP support for all languages supported by `lsp-mode`. You may need to install the necessary language servers to complement `lsp-mode`. Use `M-x lsp-install-server` or check `setup-emacs.sh`.
+
 ## Support for Tags
 
-Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by `lsp-mode', or you cannot create a compilation database.
+Support for LSP in GNU Emacs means you will not need to create tags separately, but the following information may still be useful for languages that are not yet supported by `lsp-mode'. I do not use GNU Global, and instead prefer Universal Ctags.
+
+### GNU Global
 
 Use GNU Global with `counsel-gtags`: `gtags -cv --gtagslabel=new-ctags`
 
@@ -105,6 +112,8 @@ find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
 ```shell
 find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
 ```
+
+### Universal Ctags
 
 Use Universal Ctags with `counsel-etags`.
 
@@ -169,9 +178,9 @@ GNU Global has better database search support while Universal Ctags supports mor
 - [Tags for Emacs: Relationship between etags, ebrowse, cscope, GNU Global and exuberant ctags](https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub)
 - [GTags for Python in Emacs](https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html)
 
-## Server Support
+## Configuring Emacs Daemon
 
-Enable server support either through `init.el` or as a `systemd` service. Create a file `$HOME/.config/systemd/user/emacs.service` with the following content.
+Enable server support either through `init.el` or as a `systemd` service. I prefer the `systemd` approach. Create a file `$HOME/.config/systemd/user/emacs.service` with the following content.
 
 ```config
 [Unit]
@@ -231,7 +240,9 @@ Keywords=Text;Editor;
 
 ## Emacs in a Terminal
 
-Use the steps mentioned in the link [Spacemacs Terminal](https://github.com/syl20bnr/spacemacs/wiki/Terminal), including enabling support for 24bit colors in the terminal.
+I use LSP intensively, and LSP+Tramp is sluggish and fails often. Furthermore, it seems difficult to properly setup many language servers with Tramp support. Instead, I prefer to use Emacs in a terminal. which has much better performance. This requires setting up support for 24-bit colors and proper keybindings in the terminal. I use Alacritty which is easy to customize.
+
+Use the steps mentioned in the link [Spacemacs Terminal](https://github.com/syl20bnr/spacemacs/wiki/Terminal) to enable support for 24bit colors in the terminal.
 
 ```Bash
 export LC_ALL=en_US.UTF-8
@@ -240,7 +251,7 @@ export LANGUAGE=en_US.UTF-8
 export TERM=xterm-24bit
 ```
 
-This may lead to failures when accessing remote systems. In such cases, we can fall back to "TERM=xterm-256color ssh -X <remote-path>".
+Using `export TERM=xterm-24bit` may lead to failures when accessing remote systems. In such cases, we can fall back to `TERM=xterm-256color ssh -X <remote-path>`.
 
 ## Debugging Emacs
 
@@ -252,21 +263,6 @@ This may lead to failures when accessing remote systems. In such cases, we can f
 
 `emacs -Q -l /home/swarnendu/github/dotemacs/extras/profile-dotemacs.el -f profile-dotemacs`
 
-[Advanced Techniques for Reducing Emacs Startup Time](https://blog.d46.us/advanced-emacs-startup/)
-
 Estimate the best possible startup time: `emacs -q --eval='(message "%s" (emacs-init-time))'`
 
-## TODO
-
-- Fix "C-\`" vterm keybinding in TUI
-- Company fuzzy is not working with LaTeX files
-
-## Use `conda`
-
-```shell
-conda create --prefix /home/hangingpawns/emacs_lsp
-conda activate /home/hangingpawns/emacs_lsp
-conda install clang clangd libclang bear
-export PATH=/home/hangingpawns/emacs_lsp/bin (or wherever the bin is)
-Do the same with ld_library_path
-```
+[Advanced Techniques for Reducing Emacs Startup Time](https://blog.d46.us/advanced-emacs-startup/)

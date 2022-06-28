@@ -211,6 +211,17 @@ or the major mode is not in `sb/skippable-modes'."
   (setq sb/foo (concat "gcc " (buffer-name) " && ./a.out" ))
   (shell-command sb/foo))
 
+;; http://mbork.pl/2022-06-20_Copying_the_current_location
+(defun sb/current-location ()
+  "Show the current location and put it into the kill ring.
+Use the filename relative to the current VC root directory."
+  (interactive)
+  (let* ((file-name (file-relative-name buffer-file-name (vc-root-dir)))
+	     (line-number (line-number-at-pos nil t))
+	     (location (format "%s:%s" file-name line-number)))
+    (kill-new location)
+    (message location)))
+
 (provide 'init-functions)
 
 ;;; init-functions.el ends here

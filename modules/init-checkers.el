@@ -20,10 +20,10 @@
 ;; checks only the writing style. `textlint' includes `writegood'.
 (use-package writegood-mode
   :commands (writegood-passive-voice-turn-off)
-  :diminish
   :hook (text-mode-hook . writegood-mode)
   :config
-  (add-to-list 'writegood-weasel-words "actionable"))
+  (add-to-list 'writegood-weasel-words "actionable")
+  :diminish)
 
 (use-package flycheck
   :commands (flycheck-add-next-checker flycheck-next-checker
@@ -166,8 +166,9 @@
   ;; (add-hook 'lsp-managed-mode-hook
   ;;           (lambda ()
   ;;             (when (derived-mode-p 'python-mode)
-  ;;               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint)))))))
-  ;;             ))
+  ;;               (setq sb/flycheck-local-checkers
+  ;;                     '((lsp . ((next-checkers . (python-pylint)))))))))
+
   )
 
 ;; Showing error messages in the echo area is less intrusive.
