@@ -459,7 +459,8 @@
   :hook
   ((compilation-filter-hook . sanityinc/colourise-compilation-buffer)
    ;; (compilation-filter-hook . sb/colorize-compilation-buffer)
-   (compilation-finish-functions . sb/bury-compile-buffer-if-successful))
+   ;; (compilation-finish-functions . sb/bury-compile-buffer-if-successful)
+   )
   :custom
   (compilation-always-kill t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")

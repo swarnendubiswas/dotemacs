@@ -844,6 +844,7 @@
     ("lookign" "looking" nil :count 0)
     ("lookupts" "lookups" nil :count 1)
     ("maintenence" "maintenance" nil :count 0)
+    ("maitaining" "maintaining" nil :count 0)
     ("makeing" "making" nil :count 0)
     ("manadatory" "mandatory" nil :count 0)
     ("managment" "management" nil :count 0)

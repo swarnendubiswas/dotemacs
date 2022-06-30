@@ -192,14 +192,16 @@
         ("a"  . pdf-view-first-page)
         ("e"  . pdf-view-last-page)
         ("l"  . pdf-view-goto-page)
-        ("C-s" . isearch-forward)
-        ("C-S-s" . isearch-backward)
-        ("="  . pdf-view-fit-page-to-window)
+        ("P"  . pdf-view-fit-page-to-window)
+        ("W"  . pdf-view-fit-width-to-window)
+        ("H"  . pdf-view-fit-height-to-window)
+        ("+"  . pdf-view-enlarge)
+        ("-"  . pdf-view-shrink)
         ("r"  . pdf-view-revert-buffer)
-        ("d"   . pdf-annot-delete)
-        ("h"   . pdf-annot-add-highlight-markup-annotation)
-        ("t"   . pdf-annot-add-text-annotation)
-        ("M"   . pdf-view-midnight-minor-mode)))
+        ("d"  . pdf-annot-delete)
+        ("h"  . pdf-annot-add-highlight-markup-annotation)
+        ("t"  . pdf-annot-add-text-annotation)
+        ("M"  . pdf-view-midnight-minor-mode)))
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
 (use-package saveplace-pdf-view
@@ -387,7 +389,6 @@
          (text-mode-hook . goto-address-mode)))
 
 (use-package xclip
-  :unless (display-graphic-p)
   :init (xclip-mode 1))
 
 (use-package fix-word

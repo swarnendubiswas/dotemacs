@@ -117,16 +117,16 @@ cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 
 # TODO: There does not seem to be a good way to checkout private repositories
 
-# if [ -d "$DOTEMACS" ]; then
-#     cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
-#     echo "Pulling dotemacs repository from GitHub..."
-#     sudo -u swarnendu git pull
-# else
-#     echo "Cloning dotemacs repository from GitHub..."
-#     sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotemacs.git
-# fi
-# echo "...Done"
-# chown -R $USER:$USER $DOTEMACS
+if [ -d "$DOTEMACS" ]; then
+    cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
+    echo "Pulling dotemacs repository from GitHub..."
+    sudo -u swarnendu git pull
+else
+    echo "Cloning dotemacs repository from GitHub..."
+    sudo -u swarnendu git clone https://github.com/swarnendubiswas/dotemacs.git
+fi
+echo "...Done"
+chown -R $USER:$USER $DOTEMACS
 
 # if [ -d "$DOTFILES" ]; then
 #     cd "$DOTFILES" || echo "Failed: cd ${DOTEMACS}"
@@ -170,12 +170,12 @@ cd "${NPM_HOME}" || echo "Failed: cd ${NPM_HOME}"
 npm init --yes
 
 # This list matches with "package.json" in $DOTFILES
-npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver pyright @emacs-grammarly/keytar-cli unified-language-server prettier @prettier/plugin-php stylelint remark-language-server
+npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver pyright unified-language-server prettier @prettier/plugin-php stylelint remark-language-server
 
 npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
-# TODO: Add the following to $HOME/.bashrc
-# echo "export NODE_PATH=$HOME/tmp/node_modules" >> $HOME/.bashrc
+# Add the following to $HOME/.bashrc
+echo "export NODE_PATH=$HOME/tmp/node_modules" >>$HOME/.bashrc
 
 # Gem modules
 
@@ -397,7 +397,45 @@ rm -rf bear
 
 cd "$HOME"
 
+apt install -y socat
+
+git clone git@github.com:powerline/powerline.git
+cd powerline
+git checkout 2.8.3
+python3 -m pip install --user --editable=.
+
+wget https://github.com/powerline/powerline/raw/develop/font/PowerlineSymbols.otf
+mkdir -p ~/.local/share/fonts
+mv PowerlineSymbols.otf ~/.local/share/fonts/
+fc-cache -vf ~/.local/share/fonts/
+
+wget https://github.com/powerline/powerline/raw/develop/font/10-powerline-symbols.conf
+mkdir -p ~/.config/fontconfig/conf.d
+mv 10-powerline-symbols.conf ~/.config/fontconfig/conf.d/
+
+git clone https://github.com/powerline/fonts.git --depth=1 powerline-fonts
+cd powerline-fonts
+./install.sh
+
 # Tmux
+
+cd "$GITHUB" || echo "Failed: cd $GITHUB"
+
+if [ -d tmux ]; then
+    cd tmux || echo "Failed: cd tmux"
+    echo "Pulling tmux reposiory from GitHub..."
+    sudo -u swarnendu git pull
+else
+    echo "Cloning tmux repository from GitHub..."
+    sudo -u swarnendu git clone https://github.com/tmux/tmux
+fi
+echo "...Done"
+chown -R $USER:$USER tmux
+
+cd tmux || echo "Failed: cd tmux"
+./configure
+make
+make install
 
 # Delta
 

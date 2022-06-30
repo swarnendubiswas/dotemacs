@@ -41,7 +41,8 @@
         straight-use-package-by-default t
         ;; There is no need to download the whole Git history, and a single branch often suffices.
         ;; FIXME: However, that seems to lead to "git revision parsing" errors while using
-        ;; `straight-pull-all' and `straight-freeze-versions', which is irritating.
+        ;; `straight-pull-all' and `straight-freeze-versions', which is irritating. The error may
+        ;; also be due to renaming of `master' to `main'.
         straight-vc-git-default-clone-depth '(1 single-branch)
         straight-disable-native-compile nil)
 

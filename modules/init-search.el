@@ -23,10 +23,12 @@
   (("C-s"     . nil)
    ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
    ("C-f"     . isearch-forward-regexp)
+   ("C-r"     . isearch-backward-regexp)
    :map isearch-mode-map
    ("C-s"     . nil)
    ("C-f"     . isearch-repeat-forward)
-   ("C-c C-o" . isearch-occur)))
+   ("C-c C-o" . isearch-occur)
+   ("C-'" . avy-isearch)))
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch

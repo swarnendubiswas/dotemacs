@@ -13,7 +13,7 @@
                              ;; Another form
 
                              ;; (when (derived-mode-p 'markdown-mode)
-                             ;;   (setq sb/flycheck-local-cache
+                             ;;   (setq sb/flycheck-local-checkers
                              ;;         '((lsp . ((next-checkers
                              ;;                    . (markdown-markdownlint-cli
                              ;;                       . (grammarly))))))))
@@ -48,13 +48,13 @@
 
                              ;; Chktex can report lot of errors
 
-                             ;; (when (derived-mode-p 'latex-mode)
-                             ;;   (setq sb/flycheck-local-checkers
-                             ;;         '((lsp . ((next-checkers . (tex-chktex))))))
-                             ;;   (flycheck-add-next-checker 'tex-chktex 'grammarly))
+                             (when (derived-mode-p 'latex-mode)
+                               (setq sb/flycheck-local-checkers
+                                     '((lsp . ((next-checkers .
+                                                              (tex-textidote . (tex-chktex)))))))
+                               (flycheck-add-next-checker 'tex-chktex 'grammarly))
                              )))
          ))
-
  )
 
 ;; Local Variables:

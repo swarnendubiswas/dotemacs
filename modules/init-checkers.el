@@ -132,6 +132,30 @@
 
   (add-to-list 'flycheck-checkers 'org-lint t)
 
+  ;; Add support for textidote
+  (flycheck-define-checker tex-textidote
+    "A LaTeX grammar/spelling checker using textidote.
+
+  See https://github.com/sylvainhalle/textidote"
+    :modes (latex-mode plain-tex-mode)
+    :command ("java" "-jar" (eval (expand-file-name (no-littering-expand-etc-file-name
+                                                     "textidote.jar")))
+                                  "--read-all"
+                                  "--output" "singleline"
+                                  "--no-color"
+                                  "--check"   (eval (if ispell-current-dictionary (substring ispell-current-dictionary 0 2) "en"))
+                                  ;; Try to honor local aspell dictionary and replacements if they exist
+                                  "--dict"    (eval (expand-file-name "~/.aspell.en.pws"))
+                                  "--replace" (eval (expand-file-name "~/.aspell.en.prepl"))
+                                  ;; Using source ensures that a single temporary file in a different dir is created
+                                  ;; such that textidote won't process other files. This serves as a hacky workaround for
+                                  ;; https://github.com/sylvainhalle/textidote/issues/200.
+                                  source)
+    :error-patterns ((warning line-start (file-name)
+                              "(L" line "C" column "-" (or (seq "L" end-line "C" end-column) "?") "): "
+                              (message (one-or-more (not "\""))) (one-or-more not-newline) line-end)))
+  (add-to-list 'flycheck-checkers 'tex-textidote)
+
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
@@ -337,19 +361,21 @@
         lsp-ltex-check-frequency "save"
         lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64"
         lsp-ltex-version "15.2.0"
-        lsp-ltex-dictionary (json-parse-string "{\"en-US\": [\"microbenchmarks\"]}"))
+        lsp-ltex-dictionary (json-parse-string "{\"en-US\": [\"microbenchmarks, Tanmoy\"]}"))
   :config
-  ;; https://github.com/ggbaker/doom-emacs-config/blob/f977ee6f33ef2d19b577e38a81b32af43ced6df5/config.el
-  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words
+  ;; https://github.com/ggbaker/doom-emacs-config/blob/main/config.el
+
+  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
+  ;; Furthermore, we also use `flyspell' and `spell-fu'.
 
   ;; (setq lsp-ltex-disabled-rules
   ;;       #s(hash-table size 30 data
   ;;                     ("en-US" ["MORFOLOGIK_RULE_EN_US"])
   ;;                     ("en-US" ["WHITESPACE_RULE"])))
 
-  ;; (setq lsp-ltex-disabled-rules
-  ;;       (json-parse-string
-  ;;        "{\"en-US\": [\"WHITESPACE_RULE\", \"MORFOLOGIK_RULE_EN_US\"]}"))
+  (setq lsp-ltex-disabled-rules
+        (json-parse-string
+         "{\"en-US\": [\"MORFOLOGIK_RULE_EN_US\"]}"))
 
   ;; (defvar lsp-ltex-active-modes)
 

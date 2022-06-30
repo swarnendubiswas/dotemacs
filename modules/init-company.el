@@ -269,8 +269,8 @@
                                (company-capf
                                 company-math-symbols-latex
                                 company-latex-commands
-                                company-reftex-labels
-                                company-reftex-citations
+                                ;; company-reftex-labels
+                                ;; company-reftex-citations
                                 company-auctex-environments
                                 company-auctex-macros
                                 company-math-symbols-unicode

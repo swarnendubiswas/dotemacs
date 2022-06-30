@@ -208,8 +208,12 @@ Ignore if no file is found."
   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
   (reftex-use-fonts t "Use nice fonts for TOC")
   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
-  ;; (reftex-auto-recenter-toc t "Center on the section currently being edited")
-  ;; (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
+  (reftex-auto-recenter-toc t "Center on the section currently being edited")
+  (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
+  ;; Throw away buffers created for parsing, but keep the ones created for lookup
+  (reftex-keep-temporary-buffers 1)
+  (reftex-trust-label-prefix '("fn:" "eq:" "sec:" "fig:" "tab:"))
+  (reftex-allow-automatic-rescan nil)
   :config
   ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
@@ -231,6 +235,7 @@ Ignore if no file is found."
     ;; but this is expensive.
     (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)))
 
+;; Read document like a hypertext document, supports mouse highlighting
 (use-package bib-cite
   :straight auctex
   :diminish bib-cite-minor-mode
