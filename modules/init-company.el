@@ -72,6 +72,8 @@
                       (company-ispell :with
                                       company-dabbrev
                                       company-dict)))
+  (company-global-modes '(not dired-mode erc-mode message-mode comint-mode inferior-python-mode magit-status-mode
+                              help-mode gud-mode eshell-mode shell-mode csv-mode))
   :config
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
