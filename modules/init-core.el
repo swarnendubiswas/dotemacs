@@ -347,7 +347,6 @@
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 (use-package server
   :straight (:type built-in)
-  :disabled t
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
   :commands server-running-p
   :hook
@@ -355,7 +354,11 @@
                        ;; Only start server mode if not root
                        (unless (string-equal "root" (getenv "USER"))
                          (unless (and (fboundp 'server-running-p) (server-running-p))
-                           (server-start))))))
+                           (server-start)))))
+  :config
+  ;; Hide "When done with a buffer, type C-x 5" message
+  (when (boundp 'server-client-instructions)
+    (setq server-client-instructions nil)))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."

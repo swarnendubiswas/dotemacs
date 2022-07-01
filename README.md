@@ -164,6 +164,8 @@ dir2
 dir3
 ```
 
+`find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.cu" | ctags -e -L -`
+
 > **Parse only Python files**
 
 ```shell

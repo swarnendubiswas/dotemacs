@@ -34,6 +34,7 @@
 (require 'init-languages)
 (require 'init-lsp)
 (require 'init-vcs)
+(require 'init-tags)
 (require 'init-org)
 (require 'init-latex)
 (require 'init-completion)
