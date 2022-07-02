@@ -175,7 +175,7 @@ npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html
 npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
 # Add the following to $HOME/.bashrc
-echo "export NODE_PATH=$HOME/tmp/node_modules" >>$HOME/.bashrc
+echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
 
 # Gem modules
 
@@ -475,6 +475,11 @@ fi
 
 cd fzf
 bash ./install
+
+# echo -e $"export LC_ALL=en_US.UTF-8\nexport LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
+
+cmdline=$"export LC_ALL=en_US.UTF-8\nexport LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport TERM=xterm-24bit\n"
+printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"

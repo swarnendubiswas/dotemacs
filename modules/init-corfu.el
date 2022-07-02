@@ -147,14 +147,15 @@
   :config
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
-              (setq-local completion-at-point-functions
-                          (list (cape-super-capf #'cape-file
-                                                 #'cape-symbol
-                                                 #'cape-keyword
-                                                 #'cape-history
-                                                 #'cape-dict
-                                                 ;; #'cape-ispell
-                                                 #'cape-dabbrev)))))
+              (setq-local corfu-auto-prefix 2
+                          completion-at-point-functions (list
+                                                         (cape-super-capf #'cape-file
+                                                                          #'cape-symbol
+                                                                          #'cape-keyword
+                                                                          #'cape-history
+                                                                          #'cape-dict
+                                                                          ;; #'cape-ispell
+                                                                          #'cape-dabbrev)))))
 
   (add-hook 'prog-mode-hook
             (lambda ()

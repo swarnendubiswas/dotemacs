@@ -854,6 +854,7 @@
     ("meausre" "measure" nil :count 1)
     ("mechanim" "mechanism" nil :count 0)
     ("mechanims" "mechanism" nil :count 3)
+    ("mechansim" "mechanism" nil :count 0)
     ("memeber" "member" nil :count 0)
     ("memmory" "memory" nil :count 1)
     ("memoryies" "memories" nil :count 0)

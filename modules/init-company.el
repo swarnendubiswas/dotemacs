@@ -295,6 +295,28 @@
                        (diminish 'company-fuzzy-mode)
                        )))))
 
+;; https://emacs.stackexchange.com/questions/21171/company-mode-completion-for-org-keywords
+(with-eval-after-load "company"
+  (progn
+    (declare-function sb/company-org-mode "init-company")
+
+    (defun sb/company-org-mode ()
+      "Add backends for org-mode completion with company mode."
+
+      (setq-local company-minimum-prefix-length 3)
+      (make-local-variable 'company-backends)
+      (setq company-backends '(company-files
+                               company-capf
+                               (company-ispell :with
+                                               company-dabbrev
+                                               company-dict))))
+
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (add-hook 'completion-at-point-functions
+                          'pcomplete-completions-at-point nil t)
+                (sb/company-org-mode)))))
+
 (with-eval-after-load "company"
   (progn
     (declare-function sb/company-text-mode "init-company")
@@ -314,11 +336,12 @@
                              company-dict))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
-    (dolist (hook '(text-mode-hook))
-      (add-hook hook (lambda ()
-                       ;; We have a separate list for LaTeX-mode
-                       (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
-                         (sb/company-text-mode)))))))
+    (add-hook 'text-mode-hook
+              (lambda ()
+                (unless (or (derived-mode-p 'latex-mode)
+                            (derived-mode-p 'LaTeX-mode)
+                            (derived-mode-p 'org-mode))
+                  (sb/company-text-mode))))))
 
 ;; (with-eval-after-load "company"
 ;;   (progn

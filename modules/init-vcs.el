@@ -181,8 +181,10 @@
 
 ;; Add the "delta" config into the global "~/.gitconfig" file.
 ;; https://github.com/dandavison/delta#get-started
+;; https://github.com/dandavison/magit-delta/issues/13
 (use-package magit-delta
-  :hook (magit-mode . magit-delta-mode))
+  :if (executable-find "delta")
+  :hook (magit-mode-hook . magit-delta-mode))
 
 (provide 'init-vcs)
 
