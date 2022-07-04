@@ -66,6 +66,21 @@
             (lambda ()
               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
 
+;; https://github-wiki-see.page/m/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
+(use-package citre
+  :init
+  (require 'citre-config)
+  :bind
+  (("C-x c j" . citre-jump)
+   ("C-x c J" . citre-jump-back)
+   ("C-x c p" . citre-ace-peek)
+   ("C-x c u" . citre-update-this-tags-file))
+  :custom
+  (citre-project-root-function #'projectile-project-root)
+  (citre-use-project-root-when-creating-tags t)
+  (citre-prompt-language-for-ctags-command t)
+  (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode)))
+
 (provide 'init-tags)
 
 ;;; init-tags.el ends here

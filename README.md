@@ -115,12 +115,13 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 
 ### Universal Ctags
 
-Use Universal Ctags with `counsel-etags`.
+Use Universal Ctags (`u-ctags`) with `counsel-etags` or `company-ctags`.
 
 - `-R` -- recursively scan for files
 - `-e` -- use Emacs-compatible syntax
 - `--list-excludes` -- check which patterns are excluded from processing
 - `--list-languages` -- list supported languages
+- `--languages=Python` -- include Python files
 
 By default, Emacs expects a tag file by the name `TAGS` in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 

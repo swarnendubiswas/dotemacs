@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-vivendi
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -37,7 +37,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -111,7 +111,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)

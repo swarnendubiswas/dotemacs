@@ -50,14 +50,19 @@
 
 ;; Use "M-SPC" for space-separated completion lookups
 (use-package orderless
-  :after (:any ivy vertico)
-  :demand t
-  :defines orderless-component-separator
-  :commands orderless-escapable-split-on-space
   :preface
   (defun sb/just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
+  ;; https://github.com/oantolin/orderless/issues/91
+  (defun sb/use-orderless-in-minibuffer ()
+    (setq-local completion-styles '(substring orderless)))
+  :after (:any ivy vertico)
+  :demand t
+  :defines orderless-component-separator
+  :commands orderless-escapable-split-on-space
+  :hook
+  (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
   :custom
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
@@ -68,7 +73,9 @@
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)
-    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder))))
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+    (add-to-list 'ivy-highlight-functions-alist
+                 '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
   (with-eval-after-load "company"
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
@@ -144,11 +151,11 @@
   :custom
   (completion-styles '(orderless basic))
   ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
-  ;; completion to work. I want substring matching for file names.
+  ;; completion to work. I also want substring matching for file names.
   ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
   (completion-category-overrides '((file (styles basic substring partial-completion))
-                                   (buffer (styles basic substring flex))
-                                   (project-file (styles basic substring flex))
+                                   ;; (buffer (styles basic substring flex))
+                                   ;; (project-file (styles basic substring flex))
                                    (minibuffer (orderless basic initials))))
   ;; Serves as a default value for `completion-category-overrides'
   (completion-category-defaults nil))

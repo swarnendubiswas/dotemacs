@@ -279,6 +279,7 @@
                               recentf-save-list
                               recentf-apply-filename-handlers
                               recentf-cleanup)
+  :hook (after-init-hook . recentf-mode)
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
@@ -303,14 +304,13 @@
   (recentf-keep '(file-remote-p file-readable-p))
   ;; Larger values help in lookup but takes more time to check if the files exist
   (recentf-max-saved-items 150)
-  :config
   ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
   ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
-  (setq recentf-filename-handlers (append '(abbreviate-file-name) recentf-filename-handlers))
-
+  ;; (recentf-filename-handlers '(abbreviate-file-name))
+  :config
   ;; Use the true file name and not the symlink name
-  (dolist (exclude `(,(file-truename no-littering-etc-directory)
-                     ,(file-truename no-littering-var-directory)))
+  (dolist (exclude `(,(recentf-expand-file-name no-littering-etc-directory)
+                     ,(recentf-expand-file-name no-littering-var-directory)))
     (add-to-list 'recentf-exclude exclude))
 
   (when (bound-and-true-p sb/disable-package.el)
@@ -322,8 +322,7 @@
 
   ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
   ;; timers.
-  (run-with-idle-timer 60 t #'recentf-cleanup)
-  :hook (after-init-hook . recentf-mode))
+  (run-with-idle-timer 60 t #'recentf-cleanup))
 
 (use-package image-mode
   :straight (:type built-in)

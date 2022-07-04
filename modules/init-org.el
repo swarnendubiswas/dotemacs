@@ -7,17 +7,18 @@
 
 ;;; Code:
 
+;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
   :commands (org-indent-mode org-indent-item org-outdent-item)
-  :hook (org-mode-hook . visual-line-mode)
+  :hook (org-mode-hook . turn-on-visual-line-mode)
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-quote-and-verse-blocks t)
   (org-hide-emphasis-markers t "Hide *, ~, and / in Org text")
-  (org-hide-leading-stars nil)
+  (org-hide-leading-stars nil "Show every star as it helps identify the indentation level")
   (org-hide-leading-stars-before-indent-mode nil)
   ;; Code block fontification using the major-mode of the code
   (org-src-fontify-natively t)
@@ -26,8 +27,9 @@
   (org-src-window-setup 'current-window)
   ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
   ;; feels better with the mode disabled.
-  (org-startup-indented nil)
+  (org-startup-indented t "Indentation looks nice")
   (org-startup-truncated nil)
+  ;; https://orgmode.org/manual/Initial-visibility.html
   (org-startup-folded 'showeverything)
   (org-startup-with-inline-images t)
   (org-support-shift-select t)

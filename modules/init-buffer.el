@@ -51,6 +51,7 @@
 (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
   :defines vlf-application
   :commands vlf
+  :demand t
   :init
   (setq vlf-application 'dont-ask)
   (require 'vlf-setup))
@@ -164,8 +165,8 @@
   (add-to-list 'aw-ignored-buffers "*toc*"))
 
 (use-package ace-jump-buffer
-  ;; The keybinding will be hidden if we use tmux
-  :bind ("C-:" . ace-jump-buffer)
+  ;; The keybinding will be hidden if we use tmux, and we will need to press twice.
+  :bind ("C-b" . ace-jump-buffer)
   :custom
   (ajb-max-window-height 30)
   (ajb-bs-configuration "files-and-scratch")
