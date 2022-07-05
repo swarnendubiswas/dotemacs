@@ -1,15 +1,44 @@
+*.bat
+*.class
 *.css
+*.elc
 *.js
 *.json
+*.jsx
 *.md
+*.gif
 *.png
+*.pyc
 *.rst
 *.xml
+*.html
+*.org
+*.pbtxt
+*.pdf
+*.rst
+*.sty
+*.text
+*.txt
+*.yaml
+*.yml
 
-init-autoload.el
+LICENSE
+LICENSE.txt
+Makefile
+Cask
+docs
 
 .cache
 .git
+.svn
+.hg
+vendor
+node_modules
+__pycache__
+.vscode
+
+init-autoload.el
+projectile-examples
 
 straight/build/
 dir-locals-examples
@@ -17,3 +46,5 @@ eln-cache
 var
 snippets
 etc
+references
+company-dict

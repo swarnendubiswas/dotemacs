@@ -144,7 +144,7 @@ ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exc
 ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=doc --exclude=PTRacer-solver
 ```
 
-> LaTeX project: `find . -name "*.tex" | ctags -e -L -`
+> LaTeX project: `find . -name "*.tex" | ctags -e -quiet -L -`
 
 > Python files: `find src -name "*.py" | ctags -e -L -` > **Ignore directories and files**
 
@@ -155,7 +155,7 @@ ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/
 > **Use an ignore file**
 
 ```shell
-ctags -eR --exclude=@.ctagsignore .
+ctags -eR -quiet=yes --exclude=@.ctagsignore .
 ```
 
 ```shell

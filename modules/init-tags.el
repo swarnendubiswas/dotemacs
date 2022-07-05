@@ -66,8 +66,9 @@
             (lambda ()
               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
 
-;; https://github-wiki-see.page/m/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
+;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 (use-package citre
+  :commands (citre-create-tags-file citre-update-tags-file)
   :init
   (require 'citre-config)
   :bind

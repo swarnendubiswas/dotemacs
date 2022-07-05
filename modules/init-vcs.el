@@ -184,7 +184,8 @@
 ;; https://github.com/dandavison/magit-delta/issues/13
 (use-package magit-delta
   :if (executable-find "delta")
-  :hook (magit-mode-hook . magit-delta-mode))
+  :hook (magit-mode-hook . magit-delta-mode)
+  :diminish magit-delta-mode)
 
 (provide 'init-vcs)
 

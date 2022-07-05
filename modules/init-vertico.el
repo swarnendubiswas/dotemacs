@@ -39,8 +39,16 @@
      ((eq sb/tui-theme 'modus-vivendi)
       (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
      ((eq sb/tui-theme 'modus-operandi)
-      (set-face-attribute 'vertico-current nil :background "#70BBE6" :inherit t))
-     (t (set-face-attribute 'vertico-current nil :background "#3a3f5a" :inherit t))))
+      (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
+     (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t))))
+
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'modus-vivendi)
+      (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
+     ((eq sb/gui-theme 'modus-operandi)
+      (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
+     (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t))))
   :bind
   (("<f2>"  .  find-file)
    :map vertico-map
