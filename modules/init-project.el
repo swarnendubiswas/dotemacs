@@ -74,7 +74,6 @@
   ;; set to `alien'.
   (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
-  (projectile-switch-project-action 'projectile-commander)
   (projectile-project-root-files '("build.gradle"
                                    "setup.py"
                                    "requirements.txt"

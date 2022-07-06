@@ -476,9 +476,9 @@ fi
 cd fzf
 bash ./install
 
-# echo -e $"export LC_ALL=en_US.UTF-8\nexport LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
+# echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
 
-cmdline=$"export LC_ALL=en_US.UTF-8\nexport LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport TERM=xterm-24bit\n"
+cmdline=$"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit\n"
 printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 
 # Remove junk

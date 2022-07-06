@@ -77,9 +77,9 @@
    ("C-x c p" . citre-ace-peek)
    ("C-x c u" . citre-update-this-tags-file))
   :custom
-  (citre-project-root-function #'projectile-project-root)
   (citre-use-project-root-when-creating-tags t)
-  (citre-prompt-language-for-ctags-command t)
+  (citre-default-create-tags-file-location 'project-cache)
+  (citre-prompt-language-for-ctags-command nil)
   (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode)))
 
 (provide 'init-tags)

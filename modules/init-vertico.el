@@ -167,8 +167,6 @@
   :config
   (setq completion-in-region-function #'consult-completion-in-region)
 
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-recent-file consult-buffer consult-bookmark consult-xref consult-line
