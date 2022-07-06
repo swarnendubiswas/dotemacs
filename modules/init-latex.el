@@ -110,7 +110,7 @@
   (unbind-key "C-c ;" TeX-mode-map)
   (unbind-key "C-c C-d" TeX-mode-map)
   (bind-key "$" #'self-insert-command TeX-mode-map)
-
+  (unbind-key "`" LaTeX-math-mode-map)
   :bind
   ("C-c x q" . TeX-insert-quote))
 

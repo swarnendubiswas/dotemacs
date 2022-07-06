@@ -1,4 +1,4 @@
-personal_ws-1.1 en 396 
+personal_ws-1.1 en 397 
 AUCTeX
 Aarchie
 Aastha
@@ -193,6 +193,7 @@ centroids
 collisionless
 colocated
 combinational
+concolic
 covariance
 customizable
 customizations
