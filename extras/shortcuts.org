@@ -1,13 +1,7 @@
 #+TITLE: Emacs Notes
 #+AUTHOR: Swarnendu Biswas
-#+DATE: <21-06-2021>
 #+EMAIL: swarnendu@cse.iitk.ac.in
-#+CREATOR: Emacs 27 (Org mode 9.4.4)
-#+STARTUP: showall noindent showstars nohideblocks
-#+OPTIONS: ':t '^:{} H:4 num:3 author:nil date:nil toc:nil tags:nil TeX:t LaTeX:t timestamp:t
-#+LaTeX_CLASS_OPTIONS: [10pt]
-#+LATEX_HEADER: \usepackage{palatino}
-#+LATEX_HEADER: \usepackage[letterpaper]{geometry}
+#+STARTUP: showeverything indent num align showstars nohideblocks entitiespretty
 
 * Useful Keyboard Shortcuts
 
@@ -461,17 +455,17 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 
 *** Combining ~find~ and ~grep~
 
-The use case is to search all files in a file hierarchy for some regular expression with a ~find~/~grep~ pipeline. For example, to search the ~lisp~ directory and all of its subdirectories for file containing the ~mapcar~ function, one could use ~find ~/lisp -name "*.lisp" -exec grep -H mapcar {} \;~. In GNU Emacs, we can use ~find-grep-dired~.
+    The use case is to search all files in a file hierarchy for some regular expression with a ~find~/~grep~ pipeline. For example, to search the ~lisp~ directory and all of its sub-directories for the file containing the ~mapcar~ function, one could use ~find ~/lisp -name "*.lisp" -exec grep -H mapcar {} \;~. In GNU Emacs, we can use ~find-grep-dired~.
 
 *** Batch rename multiple files in a directory
 
   - Turn on ~wdired~ mode (~Ctrl+x Ctrl+q~ by default)
-  - Make changes to the ~dired~ listing which are reflected back to the actual files. For example, use your favorite search-and-replace method to change the target file names.
+  - Make changes to the ~dired~ listing which are reflected in the actual files. For example, use your favorite search-and-replace method to change the target file names.
   - Type ~Ctrl+c Ctrl+c~ to exit ~wdired~ mode and rename the files
 
 *** Copy file path
 
-Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This calls ~dired-copy-filename-as-kill~ with the zero-prefix argument, and will copy the file path to the clipboard.
+    Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This calls ~dired-copy-filename-as-kill~ with the zero-prefix argument, and will copy the file path to the clipboard.
 
 *** [[https://200ok.ch/posts/edit-remote-files-with-emacs.html][Edit remote files with Emacs]]
 
@@ -481,7 +475,7 @@ Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This cal
 
 *** Insert file path into buffer
 
-Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the file path in the buffer.
+    Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the file path in the buffer.
 
 *** Operate on matching lines
 
@@ -496,3 +490,8 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
   - Split the window and open the source and destination directories with ~dired~
   - Mark the desired directories/files in one ~dired~ window
   - Move the files with ~R~, the destination directory will the default prompt
+
+*** [[http://xahlee.info/emacs/emacs/emacs_string-rectangle_ascii-art.html][Delete columns of text, like in a LaTeX table]]
+
+    - Place the cursor in front of the first column in the first row, and invoke ~set-mark-command~
+    - Move the cursor to the end of the last column in the last row, and invoke ~kill-rectangle~
