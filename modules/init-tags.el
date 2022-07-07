@@ -75,12 +75,24 @@
   (("C-x c j" . citre-jump)
    ("C-x c J" . citre-jump-back)
    ("C-x c p" . citre-ace-peek)
-   ("C-x c u" . citre-update-this-tags-file))
+   ("C-x c c" . citre-create-tags-file)
+   ("C-x c u" . citre-update-this-tags-file)
+   ("C-x c e" . citre-edit-tags-file-recipe))
   :custom
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
   (citre-prompt-language-for-ctags-command nil)
-  (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode)))
+  (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode))
+  (citre-edit-cmd-buf-default-cmd "ctags
+-o
+%TAGSFILE%
+--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
+--kinds-all=*
+--fields=*
+--extras=*
+-R
+-e")
+  :diminish)
 
 (provide 'init-tags)
 

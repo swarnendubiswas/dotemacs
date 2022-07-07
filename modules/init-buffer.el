@@ -108,7 +108,7 @@
   ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
   ;;   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
   ;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-  ;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode))
+  (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
   )
 

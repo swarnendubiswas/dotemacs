@@ -37,7 +37,7 @@
 
 ;; A dark theme looks good on the TUI
 (defcustom sb/tui-theme
-  'modus-operandi
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
