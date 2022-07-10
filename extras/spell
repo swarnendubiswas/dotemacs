@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-personal_ws-1.1 en 399 
-||||||| a421b6c
-personal_ws-1.1 en 396 
-=======
-personal_ws-1.1 en 397 
->>>>>>> 807a3c2d046a5cf1d4dab5cbdc79cb652d065601
+personal_ws-1.1 en 403 
 AUCTeX
 Aarchie
 Aastha
@@ -71,6 +65,7 @@ KinectFusion
 Kolkata
 Krishanu
 Kumar
+Kundu
 LLVM
 MESI
 MPK
@@ -385,6 +380,8 @@ unmapped
 unobservable
 unoptimized
 unordered
+unsatisfiability
+unsatisfiable
 unscalable
 unserializable
 unsubmitted

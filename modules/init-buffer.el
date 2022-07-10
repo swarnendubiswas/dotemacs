@@ -172,6 +172,17 @@
   (ajb-bs-configuration "files-and-scratch")
   (ajb-sort-function 'bs--sort-by-filename))
 
+;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
+;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
+(use-package super-save
+  :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
+  :diminish
+  :hook (after-init-hook . super-save-mode)
+  :custom
+  (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
+  (super-save-triggers '(other-window windmove-up windmove-down
+                                      windmove-left windmove-right ace-window)))
+
 (provide 'init-buffer)
 
 ;;; init-buffer.el ends here

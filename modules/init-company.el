@@ -405,7 +405,8 @@
       (defvar company-minimum-prefix-length)
       (defvar company-backends)
 
-      (setq-local company-minimum-prefix-length 2)
+      ;; Typing short prefixes help with faster completion and a more responsive UI
+      (setq-local company-minimum-prefix-length 3)
 
       (make-local-variable 'company-backends)
 

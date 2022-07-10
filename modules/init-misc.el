@@ -278,18 +278,6 @@
   :commands (explain-pause-mode explain-pause-top)
   :diminish)
 
-;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
-;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
-(use-package super-save
-  :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
-  :diminish
-  :hook (after-init-hook . super-save-mode)
-  :custom
-  (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
-  :config
-  (add-to-list 'super-save-triggers 'ace-window)
-  (add-to-list 'super-save-hook-triggers 'find-file-hook))
-
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx

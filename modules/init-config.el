@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -35,9 +35,10 @@
            (const :tag "none"            none))
   :group 'sb/emacs)
 
-;; A dark theme looks good on the TUI
+;; A dark theme looks good on the TUI but I now feel `modus-operandi' has better contrast than
+;; `modus-vivendi'.
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'doom-one
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)

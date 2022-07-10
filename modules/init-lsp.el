@@ -184,7 +184,8 @@
   :after lsp-mode
   :demand t
   :custom
-  (lsp-ui-doc-enable t "Enable/disable on-hover dialogs")
+  ;; Invoke doc on demand with `lsp-ui-doc-show'
+  (lsp-ui-doc-enable nil "Disable on-hover dialogs")
   (lsp-ui-doc-include-signature t)
   (lsp-ui-imenu-auto-refresh 'after-save)
   (lsp-ui-imenu-window-width 16)
@@ -192,22 +193,19 @@
   ;; Showing code actions in the sideline enables understanding when to invoke them
   (lsp-ui-sideline-show-code-actions t)
   (lsp-ui-sideline-show-hover nil)
-  ;; Show/hide diagnostics when typing because they can be intrusive
+  ;; Hide diagnostics when typing because they can be intrusive
   (lsp-ui-sideline-show-diagnostics nil)
   (lsp-ui-doc-max-height 8)
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-  :config
-  (when (not (display-graphic-p))
-    (setq lsp-ui-doc-enable nil
-          lsp-ui-peek-enable nil))
+  (lsp-ui-peek-enable nil)
   :hook (lsp-mode-hook . lsp-ui-mode)
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
         ([remap xref-find-references]  . lsp-ui-peek-find-references)
         :map lsp-command-map
-        ("D" . lsp-ui-doc-mode)))
+        ("D" . lsp-ui-doc-show)))
 
 ;; Sync workspace folders and treemacs projects
 (use-package lsp-treemacs

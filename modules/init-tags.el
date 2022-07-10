@@ -86,6 +86,7 @@
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
 %TAGSFILE%
+# Edit the relevant programming languages to keep the tags file size reasonable
 --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
 --kinds-all=*
 --fields=*

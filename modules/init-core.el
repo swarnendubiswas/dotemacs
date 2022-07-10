@@ -123,7 +123,9 @@
               ;; electric-indent-inhibit nil
               indent-tabs-mode nil ; Spaces instead of tabs
               indicate-empty-lines nil
-              major-mode 'text-mode ; Major mode to use for files that do no specify a major mode
+              ;; Major mode to use for files that do no specify a major mode. Setting this to
+              ;; `text-mode' causes LSP to run for unrelated files.
+              ;; major-mode 'text-mode
               ;; TAB first tries to indent the current line, and if the line was already indented,
               ;; then try to complete the thing at point.
               tab-always-indent 'complete
