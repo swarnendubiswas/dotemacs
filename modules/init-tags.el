@@ -15,12 +15,16 @@
       ;; Do not ask before rereading the `TAGS' files if they have changed
       tags-revert-without-query t)
 
+;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables from Lisp packages
+;; which are loaded into the current Emacs session or are auto-loaded.
 (use-package xref
   :commands xref-etags-mode
   :custom (xref-search-program 'ripgrep)
+  :hook ((prog-mode-hook LaTeX-mode-hook) . xref-etags-mode)
   :bind
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
+   ;; Find all identifiers whose name matches pattern
    ("C-M-." . xref-find-apropos)
    ("M-,"   . xref-go-back)
    :map xref--xref-buffer-mode-map
@@ -43,6 +47,7 @@
   (xref-show-definitions-function #'ivy-xref-show-defs)
   (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
+;; By default, the output file name of `u-ctags' is `tags', and it is `TAGS' with `etags' enabled.
 (use-package counsel-etags
   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
   :commands counsel-etags-virtual-update-tags
@@ -56,10 +61,10 @@
   :config
   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-  (dolist (ignore-dirs '(".vscode" "build" ".metadata" ".recommenders" ".clangd" ".cache"))
+  (dolist (ignore-dirs '("build" ".metadata" ".recommenders" ".clangd" ".cache"))
     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
 
-  (dolist (ignore-files '(".clang-format" ".clang-tidy" "*.json" "*.html" "*.xml"))
+  (dolist (ignore-files '(".clang-tidy" "*.json" "*.html" "*.xml"))
     (add-to-list 'counsel-etags-ignore-filenames ignore-files))
 
   (add-hook 'prog-mode-hook
@@ -86,13 +91,17 @@
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
 %TAGSFILE%
-# Edit the relevant programming languages to keep the tags file size reasonable
+;; Edit the relevant programming languages to keep the tags file size reasonable
 --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
 --kinds-all=*
 --fields=*
 --extras=*
 -R
--e")
+;; -e
+--exclude=@./.ctagsignore
+;; add exclude by: --exclude=target
+;; add dirs/files to scan here, one line per dir/file"
+                                  )
   :diminish)
 
 (provide 'init-tags)

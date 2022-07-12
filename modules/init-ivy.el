@@ -35,7 +35,7 @@
   (ivy-truncate-lines nil) ; `counsel-flycheck' output gets truncated
   (ivy-wrap t)
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
-  (ivy-use-virtual-buffers t "Do not show recent files in `switch-buffer'")
+  (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
   ;; The default sorter is much too slow and the default for `ivy-sort-max-size' is way too
   ;; big (30,000). Turn it down so big repos affect project navigation less.
   (ivy-sort-max-size 10000)

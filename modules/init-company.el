@@ -72,8 +72,11 @@
                       (company-ispell :with
                                       company-dabbrev
                                       company-dict)))
-  (company-global-modes '(not dired-mode erc-mode message-mode comint-mode inferior-python-mode magit-status-mode
-                              help-mode gud-mode eshell-mode shell-mode csv-mode))
+  (company-global-modes '(not dired-mode erc-mode message-mode
+                              comint-mode inferior-python-mode
+                              magit-status-mode help-mode
+                              gud-mode eshell-mode shell-mode
+                              csv-mode))
   :config
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -83,6 +86,7 @@
         company-transformers)
   (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+  (add-to-list 'company-transformers 'delete-dups)
 
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
@@ -292,8 +296,7 @@
                        ;; `company-capf' does not pass to later backends with Texlab, so we use
                        ;; `company-fuzzy-mode' to merge results from all backends.
                        (company-fuzzy-mode 1)
-                       (diminish 'company-fuzzy-mode)
-                       )))))
+                       (diminish 'company-fuzzy-mode))))))
 
 ;; https://emacs.stackexchange.com/questions/21171/company-mode-completion-for-org-keywords
 (with-eval-after-load "company"

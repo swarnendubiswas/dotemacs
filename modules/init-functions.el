@@ -99,7 +99,7 @@ Increase line spacing by two line height."
   "Create tags file with ctags in DIR-NAME."
   (interactive "DDirectory: ")
   (shell-command
-   (format "%s -f TAGS -eR %s" sb/ctags-path (directory-file-name dir-name))))
+   (format "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s" sb/ctags-path (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)

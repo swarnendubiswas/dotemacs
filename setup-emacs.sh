@@ -192,7 +192,7 @@ echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
 
 # Install Texlab. The language server seems feature-incomplete and slow, so I still prefer AuCTeX.
 
-TEXLAB_VER="4.1.0"
+TEXLAB_VER="4.2.0"
 
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
