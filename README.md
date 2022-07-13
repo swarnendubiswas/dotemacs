@@ -146,7 +146,11 @@ ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --excl
 
 > LaTeX project: `find . -name "*.tex" | ctags -e -quiet -L -`
 
-> Python files: `find src -name "*.py" | ctags -e -L -` > **Ignore directories and files**
+> Python files: `find src -name "*.py" | ctags -e -L -`
+
+> Elisp files: `ctags -e -R --exclude=@.ctagsignore --languages=EmacsLisp .`
+
+> **Ignore directories and files**
 
 ```shell
 ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/'

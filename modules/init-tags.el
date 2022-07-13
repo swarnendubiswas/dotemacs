@@ -73,13 +73,25 @@
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 (use-package citre
+  :preface
+  (defun sb/citre-jump+ ()
+    (interactive)
+    (condition-case _
+        (citre-jump)
+      (error (let* ((xref-prompt-for-identifier nil))
+               (call-interactively #'xref-find-definitions)))))
+
+  (defun sb/push-point-to-xref-marker-stack (&rest r)
+    (xref-push-marker-stack (point-marker)))
+  :demand t
   :commands (citre-create-tags-file citre-update-tags-file)
   :init
   (require 'citre-config)
   :bind
   (("C-x c j" . citre-jump)
+   ("M-'"     . sb/citre-jump+)
    ("C-x c J" . citre-jump-back)
-   ("C-x c p" . citre-ace-peek)
+   ("C-x c p" . citre-peek)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-this-tags-file)
    ("C-x c e" . citre-edit-tags-file-recipe))
@@ -102,6 +114,24 @@
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file"
                                   )
+  :config
+  (dolist (func '(find-function
+                  counsel-imenu
+                  projectile-grep
+                  counsel-rg
+                  lsp-ivy-workspace-symbol
+                  citre-jump))
+    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
+
+  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+    (let ((fetcher (apply -fn -args))
+          (citre-fetcher
+           (let ((xref-backend-functions '(citre-xref-backend t)))
+             (apply -fn -args))))
+      (lambda ()
+        (or (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher)))))
   :diminish)
 
 (provide 'init-tags)

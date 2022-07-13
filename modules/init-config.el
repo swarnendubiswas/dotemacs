@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'doom-one
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -27,9 +27,9 @@
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            ;; Does not pair brackets
-           ;; (const :tag "nano-dark"       nano-dark)
+           (const :tag "nano-dark"       nano-dark)
            ;; Company popups cannot be distinguished
-           ;; (const :tag "lambda-dark-faded"    lambda-dark-faded)
+           (const :tag "lambda-dark-faded"    lambda-dark-faded)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
@@ -38,7 +38,7 @@
 ;; A dark theme looks good on the TUI but I now feel `modus-operandi' has better contrast than
 ;; `modus-vivendi'.
 (defcustom sb/tui-theme
-  'doom-one
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            ;; (const :tag "leuven"          leuven)
@@ -50,16 +50,16 @@
            ;; (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
-           ;; (const :tag "nano-dark"       nano-dark)
-           ;; (const :tag "lambda-dark"     lambda-dark)
-           ;; (const :tag "lambda-dark-faded"     lambda-dark-faded)
+           (const :tag "nano-dark"       nano-dark)
+           (const :tag "lambda-dark"     lambda-dark)
+           (const :tag "lambda-dark-faded"     lambda-dark-faded)
            (const :tag "customized"      sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -70,8 +70,8 @@
            ;; (const :tag "mini-modeline"   mini)
            ;; (const :tag "airline"         airline)
            ;; (const :tag "telephone-line"  telephone)
-           ;; (const :tag "nano"            nano)
-           ;; (const :tag "lambda-line"     lambda-line)
+           (const :tag "nano"            nano)
+           (const :tag "lambda-line"     lambda-line)
            ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)

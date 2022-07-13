@@ -397,6 +397,19 @@
 ;;                                 ;; (diminish 'company-fuzzy-mode)
 ;;                                 ))))
 
+(with-eval-after-load "company"
+  (defun sb/company-citre (-command &optional -arg &rest _ignored)
+    "Completion backend of Citre.  Execute COMMAND with ARG and IGNORED."
+    (interactive (list 'interactive))
+    (cl-case -command
+      (interactive (company-begin-backend 'company-citre))
+      (prefix (and (bound-and-true-p citre-mode)
+                   (or (citre-get-symbol) 'stop)))
+      (meta (citre-get-property 'signature -arg))
+      (annotation (citre-capf--get-annotation -arg))
+      (candidates (all-completions -arg (citre-capf--get-collection -arg)))
+      (ignore-case (not citre-completion-case-sensitive)))))
+
 ;; `company-clang' is slow:
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
 (with-eval-after-load "company"
@@ -415,13 +428,16 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-files
-                               (company-capf :with
-                                             company-dabbrev-code ; Useful for variable names
-                                             company-ctags
-                                             company-yasnippet)
-                               (company-ispell :with
-                                               company-dabbrev
-                                               company-dict))))
+                               (company-capf company-citre
+                                             :with company-yasnippet
+                                             :separate)
+                               ;; (company-capf :with
+                               ;;               company-dabbrev-code ; Useful for variable names
+                               ;;               company-ctags
+                               ;;               company-yasnippet)
+                               (company-dabbrev :with
+                                                company-dict
+                                                company-ispell))))
 
     (add-hook 'prog-mode-hook
               (lambda ()

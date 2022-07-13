@@ -93,7 +93,7 @@
 (use-package avy
   :commands avy-setup-default
   :custom
-  (avy-style 'pre)
+  (avy-style 'de-bruijn)
   :bind
   (("M-b"   . avy-goto-word-1)
    ("C-'"   . avy-goto-char-timer)

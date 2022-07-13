@@ -19,6 +19,7 @@
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
 ;; checks only the writing style. `textlint' includes `writegood'.
 (use-package writegood-mode
+  :disabled t
   :commands (writegood-passive-voice-turn-off)
   :hook (text-mode-hook . writegood-mode)
   :config
@@ -140,17 +141,17 @@
     :modes (latex-mode plain-tex-mode)
     :command ("java" "-jar" (eval (expand-file-name (no-littering-expand-etc-file-name
                                                      "textidote.jar")))
-                                  "--read-all"
-                                  "--output" "singleline"
-                                  "--no-color"
-                                  "--check"   (eval (if ispell-current-dictionary (substring ispell-current-dictionary 0 2) "en"))
-                                  ;; Try to honor local aspell dictionary and replacements if they exist
-                                  "--dict"    (eval (expand-file-name "~/.aspell.en.pws"))
-                                  "--replace" (eval (expand-file-name "~/.aspell.en.prepl"))
-                                  ;; Using source ensures that a single temporary file in a different dir is created
-                                  ;; such that textidote won't process other files. This serves as a hacky workaround for
-                                  ;; https://github.com/sylvainhalle/textidote/issues/200.
-                                  source)
+              "--read-all"
+              "--output" "singleline"
+              "--no-color"
+              "--check"   (eval (if ispell-current-dictionary (substring ispell-current-dictionary 0 2) "en"))
+              ;; Try to honor local aspell dictionary and replacements if they exist
+              "--dict"    (eval (expand-file-name "~/.aspell.en.pws"))
+              "--replace" (eval (expand-file-name "~/.aspell.en.prepl"))
+              ;; Using source ensures that a single temporary file in a different dir is created
+              ;; such that textidote won't process other files. This serves as a hacky workaround for
+              ;; https://github.com/sylvainhalle/textidote/issues/200.
+              source)
     :error-patterns ((warning line-start (file-name)
                               "(L" line "C" column "-" (or (seq "L" end-line "C" end-column) "?") "): "
                               (message (one-or-more (not "\""))) (one-or-more not-newline) line-end)))

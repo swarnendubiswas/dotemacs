@@ -1,4 +1,4 @@
-personal_ws-1.1 en 403 
+personal_ws-1.1 en 410
 AUCTeX
 Aarchie
 Aastha
@@ -10,7 +10,6 @@ Akash
 Alacritty
 Amey
 Amitanghsu
-Amitangshu
 Amrta
 Anupam
 Aravalli
@@ -189,6 +188,9 @@ associativity
 atomicity
 backend
 benchmarking
+bitmask
+bitvector
+bitvectors
 blackbox
 centroid
 centroids
@@ -232,9 +234,9 @@ geforce
 granularities
 haldar
 hardcoded
+haswell
 hatchling
 hooda
-hysterisis
 incrementing
 indices
 indranil
@@ -271,6 +273,7 @@ minibuffer
 misclassification
 misclassifications
 misclassify
+misprediction
 mispredictions
 modularizing
 molugu
@@ -278,6 +281,7 @@ monotonicity
 mookit
 mukul
 multicore
+multigranular
 multilayer
 multithreaded
 multithreading
@@ -402,3 +406,4 @@ whitebox
 whitespace
 whitespaces
 workspaces
+writeback

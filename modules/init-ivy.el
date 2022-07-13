@@ -164,8 +164,8 @@
              'counsel-recentf
              '(:columns
                ((all-the-icons-ivy-rich-file-icon)
-                (all-the-icons-ivy-rich-file-name (:width 0.5))
-                (all-the-icons-ivy-rich-file-id (:width 15
+                (all-the-icons-ivy-rich-file-name (:width 0.70))
+                (all-the-icons-ivy-rich-file-id (:width 10
                                                         :face all-the-icons-ivy-rich-file-owner-face
                                                         :align right))
                 (ivy-rich-file-last-modified-time (:face all-the-icons-ivy-rich-time-face)))

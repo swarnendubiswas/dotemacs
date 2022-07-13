@@ -110,7 +110,7 @@
   (unbind-key "C-c ;" TeX-mode-map)
   (unbind-key "C-c C-d" TeX-mode-map)
   (bind-key "$" #'self-insert-command TeX-mode-map)
-  (unbind-key "`" LaTeX-math-mode-map)
+  ;; (unbind-key "`" LaTeX-math-mode-map)
   :bind
   ("C-c x q" . TeX-insert-quote))
 
@@ -153,12 +153,14 @@
                                      reftex-toc-Rescan
                                      reftex-default-bibliography)
   :diminish
-  :hook ((LaTeX-mode-hook latex-mode-hook) . reftex-mode)
+  :hook ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
   :bind
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)
    ("C-c ("   . reftex-label)
-   ("C-c ="   . reftex-toc))
+   ("C-c ="   . reftex-toc)
+   ("C-c -"   . reftex-toc-recenter)
+   ("C-c &"   . reftex-view-crossref))
   :preface
   (defun sb/get-bibtex-keys (file)
     (with-current-buffer (find-file-noselect file)
@@ -197,23 +199,23 @@ Ignore if no file is found."
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list)))))
   :custom
+  (reftex-plug-into-AUCTeX t)
   (reftex-enable-partial-scans t)
   (reftex-highlight-selection 'both)
-  (reftex-plug-into-AUCTeX t)
   (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
   (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
-  ;; Make the toc display with a vertical split, since it is easy to read long lines
-  (reftex-toc-split-windows-horizontally nil)
+  (reftex-revisit-to-follow t)
+  (reftex-auto-recenter-toc t "Center on the section currently being edited")
   (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
   (reftex-use-fonts t "Use nice fonts for TOC")
   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
-  (reftex-auto-recenter-toc t "Center on the section currently being edited")
   (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
   ;; Throw away buffers created for parsing, but keep the ones created for lookup
   (reftex-keep-temporary-buffers 1)
   (reftex-trust-label-prefix '("fn:" "eq:" "sec:" "fig:" "tab:"))
   (reftex-allow-automatic-rescan nil)
+  (reftex-enable-partial-scans t)
   :config
   ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)

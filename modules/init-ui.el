@@ -115,21 +115,21 @@
   (modus-themes-tabs-accented t)
   (modus-themes-org-blocks 'tinted-background))
 
-;; (use-package nano-theme
-;;   :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
-;;   :if (or (and (display-graphic-p)
-;;                (or (eq sb/gui-theme 'nano-light)
-;;                    (eq sb/gui-theme 'nano-dark)))
-;;           (and (not (display-graphic-p)) (eq sb/tui-theme 'nano-dark)))
-;;   :init
-;;   (setq nano-fonts-use t)
-;;   (when (display-graphic-p)
-;;     (cond
-;;      ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
-;;      ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))
-;;   (unless (display-graphic-p)
-;;     (cond
-;;      ((eq sb/tui-theme 'nano-dark) (load-theme 'nano-dark t)))))
+(use-package nano-theme
+  :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'nano-light)
+                   (eq sb/gui-theme 'nano-dark)))
+          (and (not (display-graphic-p)) (eq sb/tui-theme 'nano-dark)))
+  :init
+  (setq nano-fonts-use t)
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
+     ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/tui-theme 'nano-dark) (load-theme 'nano-dark t)))))
 
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
@@ -168,7 +168,7 @@
 
   (if (or (eq sb/gui-theme 'nano-light) (eq sb/gui-theme 'nano-dark))
       (powerline-nano-theme)
-    (powerline-default-theme)))
+    (powerline-nano-theme)))
 
 (use-package doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
@@ -427,6 +427,7 @@
   :hook (after-init-hook . global-hl-line-mode))
 
 ;; https://github.com/ema2159/centaur-tabs/issues/181
+;; https://github.com/doomemacs/doomemacs/commit/8b93e8b15cc081860a8eb156b1584ef60b6bc9e4
 (use-package centaur-tabs
   :commands (;; centaur-tabs-group-by-projectile-project
              centaur-tabs-headline-match)
@@ -479,36 +480,40 @@
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
   :init (all-the-icons-completion-mode 1))
 
-;; (use-package lambda-themes
-;;   :straight (:type git :host github :repo "lambda-emacs/lambda-themes")
-;;   :if (or (and (display-graphic-p)
-;;                (or (eq sb/gui-theme 'lambda-dark)
-;;                    (eq sb/gui-theme 'lambda-dark-faded)))
-;;           (and (not (display-graphic-p))
-;;                (or (eq sb/tui-theme 'lambda-dark)
-;;                    (eq sb/tui-theme 'lambda-dark-faded))))
-;;   :custom
-;;   (lambda-themes-set-italic-comments t)
-;;   (lambda-themes-set-italic-keywords t)
-;;   (lambda-themes-set-variable-pitch t)
-;;   :init
-;;   (when (display-graphic-p)
-;;     (cond
-;;      ((eq sb/gui-theme 'lambda-dark) (load-theme 'lambda-dark t))
-;;      ((eq sb/gui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t))))
-;;   (unless (display-graphic-p)
-;;     (cond
-;;      ((eq sb/tui-theme 'lambda-dark) (load-theme 'lambda-dark t))
-;;      ((eq sb/tui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t)))))
+(use-package lambda-themes
+  :straight (:type git :host github :repo "lambda-emacs/lambda-themes")
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'lambda-dark)
+                   (eq sb/gui-theme 'lambda-dark-faded)))
+          (and (not (display-graphic-p))
+               (or (eq sb/tui-theme 'lambda-dark)
+                   (eq sb/tui-theme 'lambda-dark-faded))))
+  :custom
+  (lambda-themes-set-italic-comments t)
+  (lambda-themes-set-italic-keywords t)
+  (lambda-themes-set-variable-pitch t)
+  :custom-face
+  (company-tooltip ((t (:inherit default :background "##524f5c" :foreground "white"))))
+  (writegood-weasels-face ((t (:inherit default :background "coral"))))
+  (writegood-duplicates-face ((t (:inherit default :background "light pink"))))
+  :init
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'lambda-dark) (load-theme 'lambda-dark t))
+     ((eq sb/gui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t))))
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/tui-theme 'lambda-dark) (load-theme 'lambda-dark t))
+     ((eq sb/tui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t)))))
 
-;; (use-package lambda-line
-;;   :if (eq sb/modeline-theme 'lambda-line)
-;;   :straight (:type git :host github :repo "lambda-emacs/lambda-line")
-;;   :custom
-;;   ;; (lambda-line-abbrev t "Abbreviate major modes")
-;;   (lambda-line-space-top +0.15)
-;;   (lambda-line-space-bottom -0.15)
-;;   :hook (after-init-hook . lambda-line-mode))
+(use-package lambda-line
+  :if (eq sb/modeline-theme 'lambda-line)
+  :straight (:type git :host github :repo "lambda-emacs/lambda-line")
+  :custom
+  (lambda-line-abbrev t "Abbreviate major modes")
+  (lambda-line-space-top +0.15)
+  (lambda-line-space-bottom -0.15)
+  :hook (after-init-hook . lambda-line-mode))
 
 (provide 'init-ui)
 
