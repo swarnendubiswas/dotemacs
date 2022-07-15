@@ -16,15 +16,15 @@
 (declare-function make-lsp-client "lsp-mode")
 (declare-function f-dirname "f")
 
-;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
-;; checks only the writing style. `textlint' includes `writegood'.
-(use-package writegood-mode
-  :disabled t
-  :commands (writegood-passive-voice-turn-off)
-  :hook (text-mode-hook . writegood-mode)
-  :config
-  (add-to-list 'writegood-weasel-words "actionable")
-  :diminish)
+;; ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
+;; ;; checks only the writing style. `textlint' includes `writegood'.
+;; (use-package writegood-mode
+;;   :disabled t
+;;   :commands (writegood-passive-voice-turn-off)
+;;   :hook (text-mode-hook . writegood-mode)
+;;   :config
+;;   (add-to-list 'writegood-weasel-words "actionable")
+;;   :diminish)
 
 (use-package flycheck
   :commands (flycheck-add-next-checker flycheck-next-checker
@@ -196,35 +196,35 @@
 
   )
 
-;; Showing error messages in the echo area is less intrusive.
-(use-package flycheck-popup-tip ; Show error messages in popups
-  :disabled t
-  :unless (display-graphic-p)
-  :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
+;; ;; Showing error messages in the echo area is less intrusive.
+;; (use-package flycheck-popup-tip ; Show error messages in popups
+;;   :disabled t
+;;   :unless (display-graphic-p)
+;;   :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
 
-;; Does not display popup under TTY, check possible workarounds at
-;; https://github.com/flycheck/flycheck-popup-tip
-(use-package flycheck-pos-tip
-  :disabled t
-  :if (display-graphic-p)
-  :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
+;; ;; Does not display popup under TTY, check possible workarounds at
+;; ;; https://github.com/flycheck/flycheck-popup-tip
+;; (use-package flycheck-pos-tip
+;;   :disabled t
+;;   :if (display-graphic-p)
+;;   :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
 
-;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
-(use-package flycheck-posframe
-  :if (display-graphic-p)
-  :disabled t
-  :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
-  :hook (flycheck-mode-hook . flycheck-posframe-mode)
-  :custom
-  (flycheck-posframe-position 'point-bottom-left-corner)
-  (flycheck-posframe-border-width 1)
-  :config
-  (flycheck-posframe-configure-pretty-defaults)
-  ;; Do not display popups if company is open
-  (with-eval-after-load "company"
-    (declare-function company--active-p "company")
+;; ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
+;; (use-package flycheck-posframe
+;;   :if (display-graphic-p)
+;;   :disabled t
+;;   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
+;;   :hook (flycheck-mode-hook . flycheck-posframe-mode)
+;;   :custom
+;;   (flycheck-posframe-position 'point-bottom-left-corner)
+;;   (flycheck-posframe-border-width 1)
+;;   :config
+;;   (flycheck-posframe-configure-pretty-defaults)
+;;   ;; Do not display popups if company is open
+;;   (with-eval-after-load "company"
+;;     (declare-function company--active-p "company")
 
-    (add-hook 'flycheck-posframe-inhibit-functions #'company--active-p)))
+;;     (add-hook 'flycheck-posframe-inhibit-functions #'company--active-p)))
 
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.

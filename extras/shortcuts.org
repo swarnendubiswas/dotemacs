@@ -1,7 +1,7 @@
 #+TITLE: Emacs Notes
 #+AUTHOR: Swarnendu Biswas
 #+EMAIL: swarnendu@cse.iitk.ac.in
-#+STARTUP: showeverything indent num align showstars nohideblocks entitiespretty
+#+STARTUP: showeverything indent nonum align showstars nohideblocks entitiespretty
 
 * Useful Keyboard Shortcuts
 

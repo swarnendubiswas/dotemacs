@@ -29,10 +29,21 @@
   :custom
   (ibuffer-show-empty-filter-groups nil))
 
-(use-package ibuffer-projectile ; Group buffers by Projectile project
-  :after projectile
-  :hook
-  (ibuffer-hook . ibuffer-projectile-set-filter-groups))
+(use-package ibuffer-project
+  :after (ibuffer project)
+  :config
+  (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote"))
+  :init
+  (add-hook 'ibuffer-hook
+            (lambda ()
+              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+              (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                (ibuffer-do-sort-by-project-file-relative)))))
+
+;; (use-package ibuffer-projectile ; Group buffers by Projectile project
+;;   :after projectile
+;;   :hook
+;;   (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
   :when (display-graphic-p)
@@ -164,8 +175,8 @@
   :config
   (add-to-list 'aw-ignored-buffers "*toc*"))
 
+;; The keybinding will be hidden if we use tmux, and we will need to press twice.
 (use-package ace-jump-buffer
-  ;; The keybinding will be hidden if we use tmux, and we will need to press twice.
   :bind ("C-b" . ace-jump-buffer)
   :custom
   (ajb-max-window-height 30)

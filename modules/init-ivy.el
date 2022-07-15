@@ -49,6 +49,11 @@
              ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
+  (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
+                                (counsel-M-x       . ivy--regex-fuzzy)
+                                (counsel-find-file . ivy--regex-fuzzy)
+                                (t                 . ivy--regex-plus)))
+
   ;; Ignore `dired' buffers from `ivy-switch-buffer'
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish

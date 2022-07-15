@@ -49,40 +49,41 @@
    ([remap dabbrev-expand] . hippie-expand)))
 
 ;; Use "M-SPC" for space-separated completion lookups
-(use-package orderless
-  :preface
-  (defun sb/just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
-  ;; https://github.com/oantolin/orderless/issues/91
-  (defun sb/use-orderless-in-minibuffer ()
-    (setq-local completion-styles '(substring orderless)))
-  :after (:any ivy vertico)
-  :demand t
-  :defines orderless-component-separator
-  :commands orderless-escapable-split-on-space
-  :hook
-  (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
-  :custom
-  ;; Allow escaping space with backslash
-  (orderless-component-separator 'orderless-escapable-split-on-space)
-  (orderless-matching-styles '(orderless-literal
-                               orderless-prefixes
-                               orderless-initialism
-                               orderless-regexp))
-  :config
-  (with-eval-after-load "ivy"
-    (defvar ivy-re-builders-alist)
-    ;; https://github.com/ericdanan/counsel-projectile/issues/69
-    (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
-                                  (counsel-M-x       . ivy--regex-fuzzy)
-                                  (counsel-find-file . ivy--regex-fuzzy)
-                                  (t . orderless-ivy-re-builder)))
-    (add-to-list 'ivy-highlight-functions-alist
-                 '(orderless-ivy-re-builder . orderless-ivy-highlight)))
+;; (use-package orderless
+;;   :disabled t
+;;   :preface
+;;   (defun sb/just-one-face (fn &rest args)
+;;     (let ((orderless-match-faces [completions-common-part]))
+;;       (apply fn args)))
+;;   ;; https://github.com/oantolin/orderless/issues/91
+;;   (defun sb/use-orderless-in-minibuffer ()
+;;     (setq-local completion-styles '(substring orderless)))
+;;   :after (:any ivy vertico)
+;;   :demand t
+;;   :defines orderless-component-separator
+;;   :commands orderless-escapable-split-on-space
+;;   :hook
+;;   (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
+;;   :custom
+;;   ;; Allow escaping space with backslash
+;;   (orderless-component-separator 'orderless-escapable-split-on-space)
+;;   (orderless-matching-styles '(orderless-literal
+;;                                orderless-prefixes
+;;                                orderless-initialism
+;;                                orderless-regexp))
+;;   :config
+;;   (with-eval-after-load "ivy"
+;;     (defvar ivy-re-builders-alist)
+;;     ;; https://github.com/ericdanan/counsel-projectile/issues/69
+;;     (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
+;;                                   (counsel-M-x       . ivy--regex-fuzzy)
+;;                                   (counsel-find-file . ivy--regex-fuzzy)
+;;                                   (t . orderless-ivy-re-builder)))
+;;     (add-to-list 'ivy-highlight-functions-alist
+;;                  '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
-  (with-eval-after-load "company"
-    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
+;;   (with-eval-after-load "company"
+;;     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
@@ -91,7 +92,7 @@
 (use-package yasnippet
   :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (prog-mode-hook . yas-global-mode)
+  :hook ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-global-mode)
   :diminish yas-minor-mode
   :custom
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -160,7 +161,7 @@
   (completion-category-overrides '((file (styles basic substring partial-completion))
                                    ;; (buffer (styles basic substring flex))
                                    ;; (project-file (styles basic substring flex))
-                                   (minibuffer (orderless basic initials))))
+                                   (minibuffer (basic initials))))
   ;; Serves as a default value for `completion-category-overrides'
   (completion-category-defaults nil))
 

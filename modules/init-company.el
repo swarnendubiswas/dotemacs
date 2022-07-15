@@ -107,28 +107,28 @@
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
-(use-package company-posframe
-  :if (display-graphic-p)
-  :disabled t
-  :after company
-  :commands company-posframe-mode
-  :diminish
-  :custom
-  (company-posframe-show-metadata nil "Difficult to distinguish the help text from completions")
-  (company-posframe-show-indicator t "The display is not great")
-  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-  :init
-  (company-posframe-mode 1))
+;; (use-package company-posframe
+;;   :if (display-graphic-p)
+;;   :disabled t
+;;   :after company
+;;   :commands company-posframe-mode
+;;   :diminish
+;;   :custom
+;;   (company-posframe-show-metadata nil "Difficult to distinguish the help text from completions")
+;;   (company-posframe-show-indicator t "The display is not great")
+;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+;;   :init
+;;   (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
   :hook (prog-mode-hook . company-quickhelp-mode))
 
-(use-package company-statistics
-  :after company
-  :disabled t
-  :commands company-statistics-mode
-  :init (company-statistics-mode 1))
+;; (use-package company-statistics
+;;   :after company
+;;   :disabled t
+;;   :commands company-statistics-mode
+;;   :init (company-statistics-mode 1))
 
 ;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
 (use-package company-fuzzy
@@ -136,7 +136,6 @@
   :straight t
   :after company
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
-  :demand t
   :custom
   (company-fuzzy-sorting-backend 'flx) ; Using "flx" slows down completion significantly
   ;; (company-fuzzy-passthrough-backends '(company-capf))
@@ -145,15 +144,15 @@
   ;; Disabling the requirement may help with performance.
   (company-fuzzy-prefix-on-top t))
 
-;; FIXME: Do we need this with the bash language sever?
-(use-package company-shell
-  :disabled t
-  :after company
-  :after (:any sh-mode fish-mode)
-  :demand t
-  :defines company-shell-delete-duplictes
-  :commands (company-shell company-shell-env company-fish-shell)
-  :custom (company-shell-delete-duplictes t))
+;; ;; FIXME: Do we need this with the bash language sever?
+;; (use-package company-shell
+;;   :disabled t
+;;   :after company
+;;   :after (:any sh-mode fish-mode)
+;;   :demand t
+;;   :defines company-shell-delete-duplictes
+;;   :commands (company-shell company-shell-env company-fish-shell)
+;;   :custom (company-shell-delete-duplictes t))
 
 (use-package company-auctex
   :after (tex-mode company)
@@ -172,11 +171,11 @@
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
-;; Uses RefTeX to complete label references and citations
-(use-package company-reftex
-  :after (tex-mode company)
-  :demand t
-  :commands (company-reftex-labels company-reftex-citations))
+;; ;; Uses RefTeX to complete label references and citations
+;; (use-package company-reftex
+;;   :after (tex-mode company)
+;;   :demand t
+;;   :commands (company-reftex-labels company-reftex-citations))
 
 (use-package company-bibtex
   :after tex-mode
@@ -197,15 +196,15 @@
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil))
 
-;; You can set `company-ctags-extra-tags-files' to load extra tags files.
-(use-package company-ctags
-  :straight (:type git :host github :repo "redguardtoo/company-ctags")
-  :after company
-  :demand t
-  :custom
-  (company-ctags-quiet t)
-  (company-ctags-fuzzy-match-p nil)
-  (company-ctags-everywhere t "Offer completions in comments and strings"))
+;; ;; You can set `company-ctags-extra-tags-files' to load extra tags files.
+;; (use-package company-ctags
+;;   :straight (:type git :host github :repo "redguardtoo/company-ctags")
+;;   :after company
+;;   :demand t
+;;   :custom
+;;   (company-ctags-quiet t)
+;;   (company-ctags-fuzzy-match-p nil)
+;;   (company-ctags-everywhere t "Offer completions in comments and strings"))
 
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
@@ -281,7 +280,7 @@
                                 company-auctex-macros
                                 company-math-symbols-unicode
                                 company-auctex-symbols
-                                company-bibtex)
+                                company-bibtex :separate)
 
                                ;; FIXME: Untested
                                ;; company-yasnippet
@@ -397,23 +396,22 @@
 ;;                                 ;; (diminish 'company-fuzzy-mode)
 ;;                                 ))))
 
-(with-eval-after-load "company"
-  (defun sb/company-citre (-command &optional -arg &rest _ignored)
-    "Completion backend of Citre.  Execute COMMAND with ARG and IGNORED."
-    (interactive (list 'interactive))
-    (cl-case -command
-      (interactive (company-begin-backend 'company-citre))
-      (prefix (and (bound-and-true-p citre-mode)
-                   (or (citre-get-symbol) 'stop)))
-      (meta (citre-get-property 'signature -arg))
-      (annotation (citre-capf--get-annotation -arg))
-      (candidates (all-completions -arg (citre-capf--get-collection -arg)))
-      (ignore-case (not citre-completion-case-sensitive)))))
-
 ;; `company-clang' is slow:
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
 (with-eval-after-load "company"
   (progn
+    (defun company-citre (-command &optional -arg &rest _ignored)
+      "Completion backend of Citre.  Execute COMMAND with ARG and IGNORED."
+      (interactive (list 'interactive))
+      (cl-case -command
+        (interactive (company-begin-backend 'company-citre))
+        (prefix (and (bound-and-true-p citre-mode)
+                     (or (citre-get-symbol) 'stop)))
+        (meta (citre-get-property 'signature -arg))
+        (annotation (citre-capf--get-annotation -arg))
+        (candidates (all-completions -arg (citre-capf--get-collection -arg)))
+        (ignore-case (not citre-completion-case-sensitive))))
+
     (declare-function sb/company-prog-mode "init-company")
 
     (defun sb/company-prog-mode ()

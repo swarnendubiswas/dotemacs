@@ -48,28 +48,28 @@
   (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
 ;; By default, the output file name of `u-ctags' is `tags', and it is `TAGS' with `etags' enabled.
-(use-package counsel-etags
-  :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
-  :commands counsel-etags-virtual-update-tags
-  :if (and (symbol-value 'sb/IS-LINUX) (executable-find "ctags"))
-  :bind
-  (("M-]"     . counsel-etags-find-tag-at-point)
-   ("C-c g s" . counsel-etags-find-symbol-at-point)
-   ("C-c g f" . counsel-etags-find-tag)
-   ("C-c g l" . counsel-etags-list-tag)
-   ("C-c g c" . counsel-etags-scan-code))
-  :config
-  (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
+;; (use-package counsel-etags
+;;   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
+;;   :commands counsel-etags-virtual-update-tags
+;;   :if (and (symbol-value 'sb/IS-LINUX) (executable-find "ctags"))
+;;   :bind
+;;   (("M-]"     . counsel-etags-find-tag-at-point)
+;;    ("C-c g s" . counsel-etags-find-symbol-at-point)
+;;    ("C-c g f" . counsel-etags-find-tag)
+;;    ("C-c g l" . counsel-etags-list-tag)
+;;    ("C-c g c" . counsel-etags-scan-code))
+;;   :config
+;;   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
 
-  (dolist (ignore-dirs '("build" ".metadata" ".recommenders" ".clangd" ".cache"))
-    (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
+;;   (dolist (ignore-dirs '("build" ".metadata" ".recommenders" ".clangd" ".cache"))
+;;     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
 
-  (dolist (ignore-files '(".clang-tidy" "*.json" "*.html" "*.xml"))
-    (add-to-list 'counsel-etags-ignore-filenames ignore-files))
+;;   (dolist (ignore-files '(".clang-tidy" "*.json" "*.html" "*.xml"))
+;;     (add-to-list 'counsel-etags-ignore-filenames ignore-files))
 
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
+;;   (add-hook 'prog-mode-hook
+;;             (lambda ()
+;;               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 (use-package citre

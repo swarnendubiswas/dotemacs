@@ -42,15 +42,16 @@
 ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
 ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
 ;; to `t' in the `.dir-locals.el' file.
-(use-package whitespace-cleanup-mode
-  :defines whitespace-cleanup-mode-ignore-modes
-  :diminish
-  :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
-  :config
-  (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
-  :custom
-  (whitespace-cleanup-mode-preserve-point t)
-  (whitespace-cleanup-mode-only-if-initially-clean t))
+
+;; (use-package whitespace-cleanup-mode
+;;   :defines whitespace-cleanup-mode-ignore-modes
+;;   :diminish
+;;   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
+;;   :config
+;;   (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+;;   :custom
+;;   (whitespace-cleanup-mode-preserve-point t)
+;;   (whitespace-cleanup-mode-only-if-initially-clean t))
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
