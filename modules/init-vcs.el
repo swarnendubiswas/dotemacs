@@ -156,19 +156,19 @@
         ("M-g m"   . smerge-context-menu)
         ("M-g M"   . smerge-popup-context-menu)))
 
-;; (use-package ediff
-;;   :straight (:type built-in)
-;;   :after magit
-;;   :demand t
-;;   :defines ediff-window-setup-function
-;;   :commands (ediff-setup-windows-plain ediff-set-diff-options)
-;;   :custom
-;;   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
-;;   (ediff-window-setup-function #'ediff-setup-windows-plain)
-;;   ;; Split windows horizontally in ediff (instead of vertically)
-;;   (ediff-split-window-function #'split-window-horizontally)
-;;   :config
-;;   (ediff-set-diff-options 'ediff-diff-options "-w"))
+(use-package ediff
+  :straight (:type built-in)
+  :after magit
+  :demand t
+  :defines ediff-window-setup-function
+  :commands (ediff-setup-windows-plain ediff-set-diff-options)
+  :custom
+  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+  (ediff-window-setup-function #'ediff-setup-windows-plain)
+  ;; Split windows horizontally in ediff (instead of vertically)
+  (ediff-split-window-function #'split-window-horizontally)
+  :config
+  (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 ;; (use-package treemacs-magit
 ;;   :after (treemacs magit)

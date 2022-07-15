@@ -461,6 +461,14 @@
 ;;   (("M-<right>" . centaur-tabs-forward-tab)
 ;;    ("M-<left>"  . centaur-tabs-backward-tab)))
 
+(use-package awesome-tab
+  :straight (:type git :host github :repo "manateelazycat/awesome-tab")
+  :hook (after-init-hook . awesome-tab-mode)
+  :custom
+  (awesome-tab-label-fixed-length 14)
+  (awesome-tab-show-tab-index t)
+  )
+
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
   :if (display-mouse-p)

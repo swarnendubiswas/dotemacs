@@ -208,10 +208,10 @@
   :after (pdf-tools saveplace)
   :demand t)
 
-;; LATER: Check for continuous scroll support with `pdf-tools'
-(use-package image-roll
-  :straight (image-roll :type git :host github
-                        :repo "dalanicolai/image-roll.el"))
+;; ;; LATER: Check for continuous scroll support with `pdf-tools'
+;; (use-package image-roll
+;;   :straight (image-roll :type git :host github
+;;                         :repo "dalanicolai/image-roll.el"))
 
 (use-package logview
   :commands logview-mode)
