@@ -205,7 +205,8 @@
 (use-package autorevert ; Auto-refresh all buffers
   :straight (:type built-in)
   :diminish auto-revert-mode
-  :hook (after-init-hook . global-auto-revert-mode)
+  :hook
+  (after-init-hook . global-auto-revert-mode)
   :config
   (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
         ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
@@ -223,13 +224,15 @@
 ;; timer.
 (use-package saveplace ; Remember cursor position in files
   :straight (:type built-in)
-  :hook (after-init-hook . save-place-mode))
+  :hook
+  (after-init-hook . save-place-mode))
 
 ;; Save minibuffer history across sessions
 (use-package savehist ; Save minibuffer history across sessions
   :straight (:type built-in)
   :commands savehist-mode
-  :hook (after-init-hook . savehist-mode)
+  :hook
+  (after-init-hook . savehist-mode)
   :custom
   (savehist-additional-variables '(extended-command-history
                                    command-history
@@ -252,7 +255,8 @@
 (use-package abbrev
   :straight (:type built-in)
   :diminish
-  :hook (after-init-hook . abbrev-mode)
+  :hook
+  (after-init-hook . abbrev-mode)
   :custom
   ;; The "abbrev-defs" file is under version control
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
@@ -261,7 +265,8 @@
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
   :straight (:type built-in)
-  :hook (after-init-hook . global-so-long-mode))
+  :hook
+  (after-init-hook . global-so-long-mode))
 
 (use-package imenu
   :straight (:type built-in)
@@ -281,7 +286,8 @@
                               recentf-save-list
                               recentf-apply-filename-handlers
                               recentf-cleanup)
-  :hook (after-init-hook . recentf-mode)
+  :hook
+  (after-init-hook . recentf-mode)
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
@@ -342,7 +348,8 @@
   :custom
   ;;  Enable converting external formats (i.e., webp) to internal ones.
   (image-use-external-converter t)
-  :hook (image-mode-hook . sb/show-image-dimensions-in-mode-line))
+  :hook
+  (image-mode-hook . sb/show-image-dimensions-in-mode-line))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/

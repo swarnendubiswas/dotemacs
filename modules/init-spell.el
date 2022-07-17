@@ -201,6 +201,14 @@
                                                     font-lock-variable-name-face
                                                     hl-line))
                      (spell-fu-mode))))
+  :config
+  ;; https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/64
+  (add-to-list 'spell-fu-faces-include 'font-lock-string-face)
+  (add-to-list 'spell-fu-faces-include 'font-lock-doc-face)
+  (add-to-list 'spell-fu-faces-include 'font-lock-comment-face)
+  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:comment)
+  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:doc)
+  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
   :bind
   (("C-c f n" . spell-fu-goto-next-error)
    ("C-c f p" . spell-fu-goto-previous-error)

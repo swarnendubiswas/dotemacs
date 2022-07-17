@@ -153,7 +153,8 @@
                                      reftex-toc-Rescan
                                      reftex-default-bibliography)
   :diminish
-  :hook ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
+  :hook
+  ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
   :bind
   (("C-c ["   . reftex-citation)
    ("C-c )"   . reftex-reference)

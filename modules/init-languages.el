@@ -16,10 +16,12 @@
 (use-package subword
   :straight (:type built-in)
   :diminish
-  :hook (prog-mode-hook . subword-mode))
+  :hook
+  (prog-mode-hook . subword-mode))
 
 (use-package outline ; Edit outlines
-  :hook (prog-mode-hook . outline-minor-mode)
+  :hook
+  (prog-mode-hook . outline-minor-mode)
   :diminish outline-minor-mode)
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
@@ -37,7 +39,8 @@
 (use-package symbol-overlay ; Highlight symbol under point
   :diminish
   :commands transient-define-prefix
-  :hook (prog-mode-hook . symbol-overlay-mode)
+  :hook
+  (prog-mode-hook . symbol-overlay-mode)
   :bind
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next))
@@ -65,7 +68,8 @@
   )
 
 (use-package highlight-escape-sequences
-  :hook (prog-mode-hook . hes-mode))
+  :hook
+  (prog-mode-hook . hes-mode))
 
 (use-package ini-mode
   :commands ini-mode)
@@ -116,7 +120,8 @@
 
 (use-package css-mode
   :commands css-mode
-  :hook (css-mode-hook . lsp-deferred)
+  :hook
+  (css-mode-hook . lsp-deferred)
   :custom
   (css-indent-offset 2)
   ;; :config
@@ -140,7 +145,8 @@
                           (setq-local indent-tabs-mode t))))
 
 (use-package makefile-executor
-  :hook (makefile-mode-hook . makefile-executor-mode))
+  :hook
+  (makefile-mode-hook . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
@@ -239,7 +245,8 @@
 (use-package pandoc-mode
   :commands (pandoc-load-default-settings pandoc-mode)
   :diminish
-  :hook (markdown-mode-hook . pandoc-mode)
+  :hook
+  (markdown-mode-hook . pandoc-mode)
   :config (pandoc-load-default-settings))
 
 ;; Open preview of markdown file in a browser
@@ -249,225 +256,13 @@
 
 (use-package docstr
   :diminish
-  :hook ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
-
-(use-package cc-mode
-  :straight (:type built-in)
-  :defines (c-electric-brace c-enable-auto-newline c-set-style)
-  :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
-  :mode
-  (("\\.h\\'" . c++-mode)
-   ("\\.c\\'" . c++-mode))
-  :hook (c++-mode-hook . (lambda ()
-                           (setq-local c-set-style "cc-mode"
-                                       c-basic-offset 2)
-                           (lsp-deferred)))
-  :config
-  (defvar c-electric-indent)
-
-  ;; Disable electric indentation and on-type formatting
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (setq-local c-auto-newline nil
-                          c-electric-brace nil
-                          c-electric-flag nil
-                          c-electric-indent nil
-                          c-enable-auto-newline nil
-                          c-syntactic-indentation nil)))
-
-  (unbind-key "C-M-a" c-mode-map)
-
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "clangd")
-  ;;   :major-modes '(c-mode c++-mode)
-  ;;   :remote? t
-  ;;   :server-id 'clangd-r))
-  :bind
-  (:map c-mode-base-map
-        ("C-c c a" . c-beginning-of-defun)
-        ("C-c c e" . c-end-of-defun)
-        ("M-q"     . c-fill-paragraph)
-        ("C-c C-d" . nil)))
-
-(use-package modern-cpp-font-lock
-  :diminish modern-c++-font-lock-mode
-  :hook (c++-mode-hook . modern-c++-font-lock-mode))
-
-(use-package cuda-mode
-  :commands cuda-mode
-  :mode
-  (("\\.cu\\'"  . c++-mode)
-   ("\\.cuh\\'" . c++-mode)))
-
-(use-package opencl-mode
-  :commands opencl-mode
-  :mode "\\.cl\\'")
-
-(use-package cmake-mode
-  :if (executable-find "cmake")
-  :commands cmake-mode
-  :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
-  (cmake-mode-hook . (lambda ()
-                       (make-local-variable 'lsp-disabled-clients)
-                       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                       (spell-fu-mode -1)
-                       (flyspell-mode -1)
-                       (lsp-deferred)))
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "cmake-language-server")
-  ;;   :major-modes '(cmake-mode)
-  ;;   :remote? t
-  ;;   :server-id 'cmakels-r))
-  )
-
-(use-package cmake-font-lock
-  :hook (cmake-mode-hook . cmake-font-lock-activate))
-
-(use-package python
-  :straight (:type built-in)
-  :hook (python-mode-hook . lsp-deferred)
-  :mode
-  (("SCon\(struct\|script\)$" . python-mode)
-   ("[./]flake8\\'" . conf-mode)
-   ("/Pipfile\\'" . conf-mode))
-  :bind
-  ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
-  ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
-  ;; TODO: Bind other keys suitably
-  ;; python-nav-beginning-of-block
-  ;; python-nav-end-of-block
-  ;; python-nav-beginning-of-defun
-  ;; python-nav-end-of-defun
-  ;; python-nav-backward-defun
-  ;; python-nav-forward-defun
-  ;; python-nav-backward-statement
-  ;; python-nav-forward-statement
-  (:map python-mode-map
-        ("C-c C-d")
-        ("M-a"   . python-nav-backward-block)
-        ("M-e"   . python-nav-forward-block)
-        ("C-c <" . python-indent-shift-left)
-        ("C-c >" . python-indent-shift-right))
-  :custom
-  (python-shell-completion-native-enable nil "Disable readline based native completion")
-  (python-fill-docstring-style 'django)
-  (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
-  (python-indent-guess-indent-offset nil)
-  (python-indent-offset 4)
-  (python-shell-exec-path "python3")
-  (python-shell-interpreter "python3")
-  :config
-  (setenv "PYTHONPATH" "python3")
-
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
-
-  ;; (setq auto-mode-alist (append
-  ;;                        '(("SCon\(struct\|script\)$" . python-mode)
-  ;;                          ("SConscript\\'" . python-mode)
-  ;;                          ("[./]flake8\\'" . conf-mode)
-  ;;                          ("/Pipfile\\'" . conf-mode))
-  ;;                        auto-mode-alist))
-
-  (with-eval-after-load "lsp-mode"
-    (defvar lsp-pylsp-configuration-sources)
-    (defvar lsp-pylsp-plugins-autopep8-enable)
-    (defvar lsp-pylsp-plugins-mccabe-enabled)
-    (defvar lsp-pylsp-plugins-pycodestyle-enabled)
-    (defvar lsp-pylsp-plugins-pycodestyle-max-line-length)
-    (defvar lsp-pylsp-plugins-pydocstyle-convention)
-    (defvar lsp-pylsp-plugins-pydocstyle-enabled)
-    (defvar lsp-pylsp-plugins-pydocstyle-ignore)
-    (defvar lsp-pylsp-plugins-pyflakes-enabled)
-    (defvar lsp-pylsp-plugins-pylint-args)
-    (defvar lsp-pylsp-plugins-pylint-enabled)
-    (defvar lsp-pylsp-plugins-yapf-enabled)
-    (defvar lsp-pyright-langserver-command-args)
-    (defvar lsp-pylsp-plugins-preload-modules)
-    (defvar lsp-pylsp-plugins-flake8-enabled)
-    (defvar lsp-pylsp-plugins-jedi-use-pyenv-environment)
-
-    (when (eq sb/python-langserver 'pylsp)
-      (setq lsp-pylsp-configuration-sources ["setup.cfg"]
-            lsp-pylsp-plugins-mccabe-enabled nil
-            ;; We can also set this per-project
-            lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
-            lsp-pylsp-plugins-pycodestyle-enabled nil
-            lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
-            lsp-pylsp-plugins-pydocstyle-convention "pep257"
-            lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-            lsp-pylsp-plugins-pyflakes-enabled nil
-            lsp-pylsp-plugins-pylint-args (vconcat
-                                           (list "-j 2"
-                                                 (concat "--rcfile="
-                                                         (expand-file-name ".config/pylintrc"
-                                                                           sb/user-home-directory))))
-            lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
-            lsp-pylsp-plugins-yapf-enabled t
-            lsp-pylsp-plugins-flake8-enabled nil
-            lsp-pylsp-plugins-jedi-use-pyenv-environment t))))
-
-
-(use-package python-docstring
-  :after python-mode
-  :demand t
-  :commands (python-docstring-mode python-docstring-install)
-  :diminish
-  :config (python-docstring-install))
-
-(use-package pip-requirements
-  :commands pip-requirements-mode)
-
-(use-package pyvenv
-  :commands (pyvenv-mode pyvenv-tracking-mode)
-  :hook (python-mode-hook . pyvenv-mode)
-  :custom
-  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:"
-                                                         pyvenv-virtual-env-name "] ")))
-  (pyvenv-post-activate-hooks (list
-                               (lambda ()
-                                 (setq python-shell-interpreter
-                                       (concat pyvenv-virtual-env "bin/python")))))
-  (pyvenv-post-deactivate-hooks (list
-                                 (lambda ()
-                                   (setq python-shell-interpreter "python3")))))
-
-;; FIXME: There is an error in passing options to isort
-(use-package py-isort
-  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  :disabled t
-  :commands (py-isort-before-save py-isort-buffer py-isort-region)
-  :hook
-  (python-mode-hook . (lambda ()
-                        (add-hook 'before-save-hook #'py-isort-before-save)))
-  :custom
-  (py-isort-options '("-lines=100"
-                      "--up" ; Use parentheses
-                      "--tc" ; Use a trailing comma on multiline imports
-                      )))
-
-(use-package python-isort
-  :straight (python-isort :type git :host github :repo "wyuenho/emacs-python-isort")
-  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  :custom
-  (python-isort-arguments '("--stdout" "--atomic" "-lines=100" "--up" "--tc" "-"))
-  :hook (python-mode-hook . python-isort-on-save-mode))
-
-;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
-;; used. We do not use `lsp-format-buffer' since `pyright' does not support document formatting.
-(use-package yapfify
-  :diminish yapf-mode
-  :if (executable-find "yapf")
-  :hook (python-mode-hook . yapf-mode))
-
-(use-package pip-requirements)
+  ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
 
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
-  :hook (cperl-mode-hook . lsp-deferred)
+  :hook
+  (cperl-mode-hook . lsp-deferred)
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
@@ -509,14 +304,14 @@
   :mode
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
-  :hook (sh-mode-hook . lsp-deferred)
+  :hook
+  (sh-mode-hook . lsp-deferred)
   :custom
   (sh-basic-offset 2)
   (sh-indent-after-continuation 'always)
   (sh-indent-comment t "Indent comments as a regular line")
   :config
   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-  (flycheck-add-next-checker 'sh-bash 'sh-shellcheck)
 
   ;; (lsp-register-client
   ;;  (make-lsp-client
@@ -536,7 +331,8 @@
                       (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package shfmt
-  :hook (sh-mode-hook . shfmt-on-save-mode)
+  :hook
+  (sh-mode-hook . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
@@ -550,7 +346,8 @@
 (use-package web-mode
   :commands web-mode
   :mode "\\.html?\\'"
-  :hook (web-mode-hook . lsp-deferred)
+  :hook
+  (web-mode-hook . lsp-deferred)
   :custom
   (web-mode-enable-auto-closing              t)
   (web-mode-enable-auto-pairing              nil "Prefer `smartparens'")
@@ -576,7 +373,8 @@
 
 (use-package emmet-mode
   :defines emmet-move-cursor-between-quote
-  :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
+  :hook
+  ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
@@ -648,7 +446,8 @@
 (use-package protobuf-mode
   :commands protobuf-mode
   :mode "\\.proto$"
-  :hook (protobuf-mode-hook . flycheck-mode))
+  :hook
+  (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
   :straight nil
@@ -657,11 +456,15 @@
   :mode "\\.mlir\\'")
 
 ;; Tree-sitter provides advanced syntax highlighting features
+
+;; git clone https://github.com/ubolonton/emacs-tree-sitter/
+;; cd emacs-tree-sitter
+;; ./bin/setup; ./bin/build
 (use-package tree-sitter
   :diminish tree-sitter-mode
   :hook
   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
-   (after-init-hook . global-tree-sitter-mode))
+   (emacs-startup-hook . global-tree-sitter-mode))
   :config
   (use-package tree-sitter-langs
     :demand t))
@@ -670,13 +473,14 @@
   :mode "\\.env\\'")
 
 (use-package rainbow-delimiters
-  :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook
-                         org-src-mode-hook) . rainbow-delimiters-mode))
+  :hook
+  ((prog-mode-hook latex-mode-hook LaTeX-mode-hook
+                   org-src-mode-hook) . rainbow-delimiters-mode))
 
-;; The following section helper ensures that files are given `+x' permissions when they are saved,
-;; if they contain a valid shebang line.
+;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
 (use-package executable
-  :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
+  :hook
+  (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
 (use-package highlight-doxygen
   :commands highlight-doxygen-global-mode
@@ -687,11 +491,13 @@
 
 (use-package ssh-config-mode
   :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
-  :hook (ssh-config-mode-hook . turn-on-font-lock))
+  :hook
+  (ssh-config-mode-hook . turn-on-font-lock))
 
 (use-package elf-mode
-  :mode (("\\.so\\'"  . elf-mode)
-         ("\\.a\\'"   . elf-mode)))
+  :mode
+  (("\\.so\\'"  . elf-mode)
+   ("\\.a\\'"   . elf-mode)))
 
 (provide 'init-languages)
 

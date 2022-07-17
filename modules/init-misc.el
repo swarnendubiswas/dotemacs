@@ -69,13 +69,15 @@
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
-  :hook (after-init-hook . smart-mark-mode))
+  :hook
+  (after-init-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
   :commands (whole-line-or-region-local-mode)
   :diminish whole-line-or-region-local-mode
-  :hook (after-init-hook . whole-line-or-region-global-mode))
+  :hook
+  (after-init-hook . whole-line-or-region-global-mode))
 
 (use-package goto-last-change
   :bind ("C-x C-\\" . goto-last-change))
@@ -83,7 +85,8 @@
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
-  :hook (after-init-hook . beginend-global-mode)
+  :hook
+  (after-init-hook . beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
@@ -100,7 +103,8 @@
         undo-tree-visualizer-relative-timestamps t
         undo-tree-visualizer-timestamps          t)
   (unbind-key "C-/" undo-tree-map)
-  :hook (find-file-hook . undo-tree-mode)
+  :hook
+  (find-file-hook . undo-tree-mode)
   :bind
   (([remap undo] . undo-tree-undo)
    ([remap redo] . undo-tree-redo)
@@ -127,7 +131,8 @@
   :bind* ("C-." . iedit-mode))
 
 (use-package hl-todo
-  :hook (after-init-hook . global-hl-todo-mode)
+  :hook
+  (after-init-hook . global-hl-todo-mode)
   :config
   (setq hl-todo-highlight-punctuation ":"
         hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
@@ -140,13 +145,15 @@
                                       hl-todo-keyword-faces)))
 
 (use-package highlight-numbers
-  :hook ((prog-mode-hook yaml-mode-hook conf-mode-hook
-                         css-mode-hook html-mode-hook) . highlight-numbers-mode))
+  :hook
+  ((prog-mode-hook yaml-mode-hook conf-mode-hook
+                   css-mode-hook html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :diminish
   :commands (page-break-lines-mode)
-  :hook (after-init-hook . global-page-break-lines-mode))
+  :hook
+  (after-init-hook . global-page-break-lines-mode))
 
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
@@ -238,7 +245,8 @@
   :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
   :diminish
-  :hook (prog-mode-hook . turn-on-eldoc-mode)
+  :hook
+  (prog-mode-hook . turn-on-eldoc-mode)
   :config
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
   ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
@@ -282,7 +290,8 @@
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
   :commands execute-extended-command-for-buffer
-  :hook (after-init-hook . amx-mode)
+  :hook
+  (after-init-hook . amx-mode)
   :bind
   (("M-x"  . execute-extended-command) ; We need this if we use `vertico' and `consult'
    ("<f1>" . execute-extended-command))
@@ -318,7 +327,8 @@
   (setq bm-restore-repository-on-load t
         bm-verbosity-level 1
         bm-modeline-display-total t)
-  :hook (after-init-hook . sb/bm-setup)
+  :hook
+  (after-init-hook . sb/bm-setup)
   :config
   (setq-default bm-buffer-persistence t) ; Save bookmarks
   :bind
@@ -354,27 +364,32 @@
   :bind ("C-`" . vterm-toggle))
 
 (use-package rainbow-mode
-  :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
+  :hook
+  ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
 
 (use-package volatile-highlights
   :diminish volatile-highlights-mode
-  :hook (after-init-hook . volatile-highlights-mode))
+  :hook
+  (after-init-hook . volatile-highlights-mode))
 
 ;; Use Emacsclient as the $EDITOR of child processes
 (use-package with-editor
-  :hook (after-init-hook . shell-command-with-editor-mode))
+  :hook
+  (after-init-hook . shell-command-with-editor-mode))
 
 (use-package unfill
   :commands (unfill-region unfill-paragraph unfill-toggle))
 
 ;; Better looking info pages
 (use-package info-colors
-  :hook (Info-selection-hook . info-colors-fontify-node))
+  :hook
+  (Info-selection-hook . info-colors-fontify-node))
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
 (use-package goto-addr
-  :hook ((prog-mode-hook . goto-address-prog-mode)
-         (text-mode-hook . goto-address-mode)))
+  :hook
+  ((prog-mode-hook . goto-address-prog-mode)
+   (text-mode-hook . goto-address-mode)))
 
 (use-package xclip
   :init (xclip-mode 1))
@@ -389,6 +404,14 @@
   :bind
   (:map prog-mode-map
         ("C-c C-u" . string-inflection-all-cycle)))
+
+(use-package procress
+  :straight (:host github :repo "haji-ali/procress")
+  :commands tex-procress-mode
+  :init
+  (add-hook 'LaTeX-mode-hook 'tex-procress-mode)
+  :config
+  (procress-load-default-svg-images))
 
 (provide 'init-misc)
 

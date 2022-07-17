@@ -51,11 +51,11 @@
                                     lsp-completion--regex-fuz
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
-  :preface
-  ;; https://github.com/minad/corfu/wiki
-  (defun sb/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless)))
+  ;; :preface
+  ;; ;; https://github.com/minad/corfu/wiki
+  ;; (defun sb/lsp-mode-setup-completion ()
+  ;;   (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+  ;;         '(orderless)))
   :init
   ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
   (when (eq sb/capf 'corfu)
@@ -199,7 +199,8 @@
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil)
-  :hook (lsp-mode-hook . lsp-ui-mode)
+  :hook
+  (lsp-mode-hook . lsp-ui-mode)
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)

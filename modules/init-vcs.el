@@ -106,7 +106,8 @@
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit
   :commands git-commit-turn-on-flyspell
-  :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
+  :hook
+  (git-commit-setup-hook . git-commit-turn-on-flyspell)
   :custom
   (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
@@ -184,7 +185,8 @@
 ;; https://github.com/dandavison/magit-delta/issues/13
 (use-package magit-delta
   :if (executable-find "delta")
-  :hook (magit-mode-hook . magit-delta-mode)
+  :hook
+  (magit-mode-hook . magit-delta-mode)
   :diminish magit-delta-mode)
 
 (provide 'init-vcs)

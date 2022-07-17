@@ -18,7 +18,8 @@
   This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
-  :hook (after-init-hook . ivy-mode)
+  :hook
+  (after-init-hook . ivy-mode)
   :custom
   (ivy-count-format "(%d/%d) " "Helps identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
@@ -109,7 +110,8 @@
    ([remap load-theme]               . counsel-theme)
    ([remap load-library]             . counsel-load-library))
   :diminish
-  :hook (ivy-mode-hook . counsel-mode)
+  :hook
+  (ivy-mode-hook . counsel-mode)
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -161,7 +163,8 @@
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
 (use-package all-the-icons-ivy-rich
-  :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
+  :hook
+  (ivy-mode-hook . all-the-icons-ivy-rich-mode)
   :custom
   (all-the-icons-ivy-rich-icon-size 0.9)
   :config

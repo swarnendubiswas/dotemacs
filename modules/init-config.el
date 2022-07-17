@@ -14,16 +14,16 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-vivendi
+  'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
-           ;; (const :tag "leuven"          leuven)
-           ;; (const :tag "zenburn"         zenburn)
+           (const :tag "leuven"          leuven)
+           (const :tag "zenburn"         zenburn)
            (const :tag "doom-one"        doom-one)
            (const :tag "doom-nord"       doom-nord)
-           ;; (const :tag "doom-molokai"    doom-molokai)
-           ;; (const :tag "doom-gruvbox"    doom-gruvbox)
-           ;; (const :tag "monokai"         monokai)
+           (const :tag "doom-molokai"    doom-molokai)
+           (const :tag "doom-gruvbox"    doom-gruvbox)
+           (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            ;; Does not pair brackets
@@ -41,13 +41,13 @@
   'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
-           ;; (const :tag "leuven"          leuven)
-           ;; (const :tag "zenburn"         zenburn)
+           (const :tag "leuven"          leuven)
+           (const :tag "zenburn"         zenburn)
            (const :tag "doom-one"        doom-one)
            (const :tag "doom-nord"       doom-nord)
-           ;; (const :tag "doom-molokai"    doom-molokai)
-           ;; (const :tag "doom-gruvbox"    doom-gruvbox)
-           ;; (const :tag "monokai"         monokai)
+           (const :tag "doom-molokai"    doom-molokai)
+           (const :tag "doom-gruvbox"    doom-gruvbox)
+           (const :tag "monokai"         monokai)
            (const :tag "modus-operandi"  modus-operandi)
            (const :tag "modus-vivendi"   modus-vivendi)
            (const :tag "nano-dark"       nano-dark)
@@ -64,12 +64,12 @@
   :type  '(radio
            (const :tag "powerline"       powerline)
            (const :tag "doom-modeline"   doom-modeline)
-           ;; (const :tag "awesome-tray"    awesome-tray)
-           ;; (const :tag "spaceline"       spaceline)
-           ;; (const :tag "moody"           moody)
-           ;; (const :tag "mini-modeline"   mini)
-           ;; (const :tag "airline"         airline)
-           ;; (const :tag "telephone-line"  telephone)
+           (const :tag "awesome-tray"    awesome-tray)
+           (const :tag "spaceline"       spaceline)
+           (const :tag "moody"           moody)
+           (const :tag "mini-modeline"   mini)
+           (const :tag "airline"         airline)
+           (const :tag "telephone-line"  telephone)
            (const :tag "nano"            nano)
            (const :tag "lambda-line"     lambda-line)
            ;; No customization
@@ -155,7 +155,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 (defcustom sb/minibuffer-completion
-  'ivy
+  'vertico
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)
@@ -164,7 +164,7 @@ This location is used for temporary installations and files.")
 
 ;; Corfu seems to again not work with LSP with langservers
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)
@@ -177,6 +177,22 @@ This location is used for temporary installations and files.")
 Prefer the straight.el package manager instead."
   :type 'boolean
   :group 'dotemacs)
+
+(defcustom sb/project-handler
+  'project
+  "Choose the handler for projects."
+  :type '(radio
+          (const :tag "project.el" project)
+          (const :tag "projectile" projectile))
+  :group 'dotemacs)
+
+(defcustom sb/tab-bar-handler
+  'awesome-tab
+  "Choose the handler for tabs."
+  :type '(radio
+          (const :tag "awesome-tab" awesome-tab)
+          (const :tag "centaur-tabs" centaur-tabs)
+          (const :tag "none" nil)))
 
 (defconst sb/EMACS27    (= emacs-major-version 27)
   "Non-nil if Emacs version is 27.")

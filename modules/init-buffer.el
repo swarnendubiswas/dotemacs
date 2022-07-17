@@ -31,6 +31,7 @@
 
 (use-package ibuffer-project
   :after (ibuffer project)
+  :if (eq sb/project-handler 'project)
   :config
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote"))
   :init
@@ -40,10 +41,11 @@
               (unless (eq ibuffer-sorting-mode 'project-file-relative)
                 (ibuffer-do-sort-by-project-file-relative)))))
 
-;; (use-package ibuffer-projectile ; Group buffers by Projectile project
-;;   :after projectile
-;;   :hook
-;;   (ibuffer-hook . ibuffer-projectile-set-filter-groups))
+(use-package ibuffer-projectile ; Group buffers by Projectile project
+  :after projectile
+  :if (eq sb/project-handler 'projectile)
+  :hook
+  (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 (use-package all-the-icons-ibuffer
   :when (display-graphic-p)
@@ -188,7 +190,8 @@
 (use-package super-save
   :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
   :diminish
-  :hook (after-init-hook . super-save-mode)
+  :hook
+  (after-init-hook . super-save-mode)
   :custom
   (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
   (super-save-triggers '(other-window windmove-up windmove-down

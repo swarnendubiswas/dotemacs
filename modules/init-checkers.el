@@ -21,7 +21,8 @@
 ;; (use-package writegood-mode
 ;;   :disabled t
 ;;   :commands (writegood-passive-voice-turn-off)
-;;   :hook (text-mode-hook . writegood-mode)
+;;   :hook
+;;   (text-mode-hook . writegood-mode)
 ;;   :config
 ;;   (add-to-list 'writegood-weasel-words "actionable")
 ;;   :diminish)
@@ -41,7 +42,8 @@
                                        flycheck-manual
                                        flycheck-display-error-messages-unless-error-list
                                        flycheck-sexp-to-string)
-  :hook (after-init-hook . global-flycheck-mode)
+  :hook
+  (after-init-hook . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
@@ -200,21 +202,24 @@
 ;; (use-package flycheck-popup-tip ; Show error messages in popups
 ;;   :disabled t
 ;;   :unless (display-graphic-p)
-;;   :hook (flycheck-mode-hook . flycheck-popup-tip-mode))
+;;   :hook
+;;   (flycheck-mode-hook . flycheck-popup-tip-mode))
 
 ;; ;; Does not display popup under TTY, check possible workarounds at
 ;; ;; https://github.com/flycheck/flycheck-popup-tip
 ;; (use-package flycheck-pos-tip
 ;;   :disabled t
 ;;   :if (display-graphic-p)
-;;   :hook (flycheck-mode-hook . flycheck-pos-tip-mode))
+;;   :hook
+;;   (flycheck-mode-hook . flycheck-pos-tip-mode))
 
 ;; ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 ;; (use-package flycheck-posframe
 ;;   :if (display-graphic-p)
 ;;   :disabled t
 ;;   :commands (flycheck-posframe-mode flycheck-posframe-configure-pretty-defaults)
-;;   :hook (flycheck-mode-hook . flycheck-posframe-mode)
+;;   :hook
+;;   (flycheck-mode-hook . flycheck-posframe-mode)
 ;;   :custom
 ;;   (flycheck-posframe-position 'point-bottom-left-corner)
 ;;   (flycheck-posframe-border-width 1)
@@ -244,11 +249,12 @@
    ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook
                      markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode)))
 
-;; Enable using ".dir-locals.el" file
-(use-package editorconfig
-  :if (executable-find "editorconfig")
-  ;; :hook (prog-mode-hook . editorconfig-mode)
-  )
+;; ;; Enable using ".dir-locals.el" file
+;; (use-package editorconfig
+;;   :if (executable-find "editorconfig")
+;;   ;; :hook
+;;   ;; (prog-mode-hook . editorconfig-mode)
+;;   )
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
@@ -479,15 +485,18 @@
 (use-package clang-format+
   :if (executable-find "clang-format")
   :defines clang-format+-always-enable
-  :hook (mlir-mode-hook . clang-format+-mode)
+  :hook
+  (mlir-mode-hook . clang-format+-mode)
   :custom (clang-format+-always-enable t))
 
 (use-package highlight-indentation
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode)
-  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
+  :hook
+  ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
 
 (use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
-  :hook (emacs-lisp-mode-hook . aggressive-indent-mode)
+  :hook
+  (emacs-lisp-mode-hook . aggressive-indent-mode)
   :diminish
   :custom
   (aggressive-indent-comments-too t)

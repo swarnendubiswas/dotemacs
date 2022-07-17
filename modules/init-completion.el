@@ -49,41 +49,41 @@
    ([remap dabbrev-expand] . hippie-expand)))
 
 ;; Use "M-SPC" for space-separated completion lookups
-;; (use-package orderless
-;;   :disabled t
-;;   :preface
-;;   (defun sb/just-one-face (fn &rest args)
-;;     (let ((orderless-match-faces [completions-common-part]))
-;;       (apply fn args)))
-;;   ;; https://github.com/oantolin/orderless/issues/91
-;;   (defun sb/use-orderless-in-minibuffer ()
-;;     (setq-local completion-styles '(substring orderless)))
-;;   :after (:any ivy vertico)
-;;   :demand t
-;;   :defines orderless-component-separator
-;;   :commands orderless-escapable-split-on-space
-;;   :hook
-;;   (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
-;;   :custom
-;;   ;; Allow escaping space with backslash
-;;   (orderless-component-separator 'orderless-escapable-split-on-space)
-;;   (orderless-matching-styles '(orderless-literal
-;;                                orderless-prefixes
-;;                                orderless-initialism
-;;                                orderless-regexp))
-;;   :config
-;;   (with-eval-after-load "ivy"
-;;     (defvar ivy-re-builders-alist)
-;;     ;; https://github.com/ericdanan/counsel-projectile/issues/69
-;;     (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
-;;                                   (counsel-M-x       . ivy--regex-fuzzy)
-;;                                   (counsel-find-file . ivy--regex-fuzzy)
-;;                                   (t . orderless-ivy-re-builder)))
-;;     (add-to-list 'ivy-highlight-functions-alist
-;;                  '(orderless-ivy-re-builder . orderless-ivy-highlight)))
+(use-package orderless
+  :preface
+  (defun sb/just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
+  ;; https://github.com/oantolin/orderless/issues/91
+  (defun sb/use-orderless-in-minibuffer ()
+    (setq-local completion-styles '(substring orderless)))
+  :after vertico
+  :demand t
+  :defines orderless-component-separator
+  :commands orderless-escapable-split-on-space
+  :hook
+  (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
+  :custom
+  ;; Allow escaping space with backslash
+  (orderless-component-separator 'orderless-escapable-split-on-space)
+  (orderless-matching-styles '(orderless-literal
+                               orderless-prefixes
+                               orderless-initialism
+                               orderless-regexp))
+  :config
+  (with-eval-after-load "ivy"
+    (defvar ivy-re-builders-alist)
+    ;; https://github.com/ericdanan/counsel-projectile/issues/69
+    (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
+                                  (counsel-M-x       . ivy--regex-fuzzy)
+                                  (counsel-find-file . ivy--regex-fuzzy)
+                                  (t . orderless-ivy-re-builder)))
+    (add-to-list 'ivy-highlight-functions-alist
+                 '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
-;;   (with-eval-after-load "company"
-;;     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
+  ;;   (with-eval-after-load "company"
+  ;;     (advice-add 'company-capf--candidates :around #'sb/just-one-face))
+  )
 
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
@@ -92,7 +92,8 @@
 (use-package yasnippet
   :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-global-mode)
+  :hook
+  ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-global-mode)
   :diminish yas-minor-mode
   :custom
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -123,8 +124,10 @@
 
 (use-package prescient
   :commands prescient-persist-mode
-  :hook (after-init-hook . prescient-persist-mode)
-  :custom (prescient-sort-full-matches-first t))
+  :hook
+  (after-init-hook . prescient-persist-mode)
+  :custom
+  (prescient-sort-full-matches-first t))
 
 ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
 ;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
@@ -132,8 +135,9 @@
   :after (company prescient)
   :demand t
   :commands company-prescient-mode
+  ;; :custom
+  ;; (company-prescient-sort-length-enable nil)
   :config
-  ;; (setq company-prescient-sort-length-enable nil)
   (company-prescient-mode 1))
 
 (use-package consult-company
@@ -142,10 +146,10 @@
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
 
-;; (use-package fussy
-;;   :straight (fussy :type git :host github :repo "jojojames/fussy")
-;;   :demand t
-;;   :commands fussy-all-completions)
+(use-package fussy
+  :straight (fussy :type git :host github :repo "jojojames/fussy")
+  :demand t
+  :commands fussy-all-completions)
 
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
@@ -153,17 +157,24 @@
 ;; "/u/s/l" for "/usr/share/local"
 (use-package minibuffer
   :straight (:type built-in)
-  :custom
-  (completion-styles '(orderless basic))
-  ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
-  ;; completion to work. I also want substring matching for file names.
-  ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
-  (completion-category-overrides '((file (styles basic substring partial-completion))
-                                   ;; (buffer (styles basic substring flex))
-                                   ;; (project-file (styles basic substring flex))
-                                   (minibuffer (basic initials))))
-  ;; Serves as a default value for `completion-category-overrides'
-  (completion-category-defaults nil))
+  :config
+  (with-eval-after-load "orderless"
+    (setq completion-styles '(orderless basic fussy)
+          ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
+          ;; completion to work. I also want substring matching for file names.
+          ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
+          completion-category-overrides '((file (styles basic substring partial-completion fussy))
+                                          ;; (buffer (styles basic substring flex))
+                                          ;; (project-file (styles basic substring flex))
+                                          (minibuffer (orderless fussy basic initials))))
+
+    (unless (featurep 'orderless)
+      (setq completion-styles '(orderless basic)
+            completion-category-overrides '((file (styles basic substring partial-completion fussy))
+                                            (minibuffer (basic fussy initials)))))
+
+    ;; Serves as a default value for `completion-category-overrides'
+    (setq completion-category-defaults nil)))
 
 (provide 'init-completion)
 

@@ -291,7 +291,8 @@
   :straight async
   :after (dired async)
   :diminish
-  :hook (dired-mode-hook . dired-async-mode))
+  :hook
+  (dired-mode-hook . dired-async-mode))
 
 (use-package consult-dir
   :if (eq sb/minibuffer-completion 'vertico)
@@ -304,6 +305,12 @@
 (use-package zoxide
   :straight (:type git :host gitlab :repo "Vonfry/zoxide.el")
   :commands (zoxide-find-file zoxide-open-with))
+
+;; Let Dirvish take over Dired globally
+(use-package dirvish
+  :straight (dirvish :type git :host github :repo "alexluigit/dirvish")
+  :init
+  (dirvish-override-dired-mode))
 
 (provide 'init-dired)
 

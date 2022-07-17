@@ -13,7 +13,8 @@
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
   :commands (org-indent-mode org-indent-item org-outdent-item)
-  :hook (org-mode-hook . turn-on-visual-line-mode)
+  :hook
+  (org-mode-hook . turn-on-visual-line-mode)
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-quote-and-verse-blocks t)
@@ -79,12 +80,14 @@
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
   :disabled t
-  :hook (org-mode-hook . org-bullets-mode))
+  :hook
+  (org-mode-hook . org-bullets-mode))
 
 ;; Make invisible parts of Org elements appear visible
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (org-appear :type git :host github :repo "awth13/org-appear")
-  :hook (org-mode-hook . org-appear-mode)
+  :hook
+  (org-mode-hook . org-appear-mode)
   :custom
   (org-appear-autosubmarkers t)
   (org-appear-autoentities   t)
@@ -103,7 +106,8 @@
 
 (use-package org-modern
   :disabled t
-  :hook (org-mode-hook . org-modern-mode))
+  :hook
+  (org-mode-hook . org-modern-mode))
 
 (provide 'init-org)
 

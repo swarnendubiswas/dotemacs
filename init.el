@@ -15,14 +15,21 @@
 (dolist (dir '("modules" "extras"))
   (push (expand-file-name dir user-emacs-directory) load-path))
 
+;; Splitting the configuration across multiple files is much easier to maintain, and looks less
+;; cluttered. The downside is that more files need to be loaded during startup.
+
 (require 'init-config)
 (require 'init-packages)
+
 (require 'init-core)
 (require 'init-ui)
 (require 'init-buffer)
 (require 'init-dired)
-(require 'init-ivy)
-;; (require 'init-vertico)
+
+(if (eq sb/minibuffer-completion 'ivy)
+    (require 'init-ivy)
+  (require 'init-vertico))
+
 (require 'init-project)
 (require 'init-spell)
 (require 'init-search)
@@ -31,17 +38,26 @@
 (require 'init-tramp)
 (require 'init-misc)
 (require 'init-checkers)
+
 (require 'init-languages)
+(require 'init-cc)
+(require 'init-python)
 (require 'init-lsp)
-(require 'init-vcs)
 (require 'init-tags)
+
+(require 'init-vcs)
+
 (require 'init-org)
 (require 'init-latex)
+
 (require 'init-completion)
-(require 'init-company)
-;; (require 'init-corfu)
+(if (eq sb/capf 'corfu)
+    (require 'init-corfu)
+  (require 'init-company))
+
 (require 'init-functions)
 (require 'init-temp)
+
 (require 'init-keybindings)
 
 ;; https://blog.d46.us/advanced-emacs-startup/

@@ -65,7 +65,7 @@
 (when (eq sb/minibuffer-completion 'ivy)
   (bind-key "C-x j" #'sb/counsel-all-files-recursively))
 
-(unless (featurep 'centaur-tabs)
+(unless sb/tab-bar-handler
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
   (global-set-key [remap previous-buffer] #'sb/previous-buffer))
 
@@ -87,7 +87,8 @@
 (use-package which-key ; Show help popups for prefix keys
   :diminish
   :commands which-key-setup-side-window-right-bottom
-  :hook (after-init-hook . which-key-mode)
+  :hook
+  (after-init-hook . which-key-mode)
   :config
   (which-key-setup-side-window-right-bottom)
   :custom
@@ -97,7 +98,8 @@
 
 (use-package which-key-posframe
   :if (display-graphic-p)
-  :hook (which-key-mode-hook . which-key-posframe-mode)
+  :hook
+  (which-key-mode-hook . which-key-posframe-mode)
   :config
   ;; Modify the posframe background if it has a low contrast
   ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
@@ -592,7 +594,8 @@
 
 (use-package term-keys
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
-  :hook (after-init-hook . term-keys-mode)
+  :hook
+  (after-init-hook . term-keys-mode)
   :config
   (require 'term-keys-alacritty))
 

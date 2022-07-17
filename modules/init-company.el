@@ -122,7 +122,8 @@
 
 (use-package company-quickhelp
   :after company
-  :hook (prog-mode-hook . company-quickhelp-mode))
+  :hook
+  (prog-mode-hook . company-quickhelp-mode))
 
 ;; (use-package company-statistics
 ;;   :after company
@@ -315,6 +316,7 @@
 
     (add-hook 'org-mode-hook
               (lambda ()
+                (require 'pcomplete)
                 (add-hook 'completion-at-point-functions
                           'pcomplete-completions-at-point nil t)
                 (sb/company-org-mode)))))

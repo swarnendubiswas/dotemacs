@@ -20,7 +20,8 @@
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands (command-completion-default-include-p minibuffer-keyboard-quit)
-  :hook (after-init-hook . vertico-mode)
+  :hook
+  (after-init-hook . vertico-mode)
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
@@ -31,6 +32,7 @@
   ;; hidden in normal buffers.
   (when sb/EMACS28+
     (setq read-extended-command-predicate #'command-completion-default-include-p))
+
   (when (display-graphic-p)
     (bind-key "<escape>" #'minibuffer-keyboard-quit vertico-map))
 
@@ -63,7 +65,8 @@
   :after vertico
   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
   ;; the following fixes the path so the selected path does not have prepended junk left behind.
-  :hook (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
+  :hook
+  (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
   :bind
   (:map vertico-map
         ("RET" . vertico-directory-enter)
@@ -75,7 +78,8 @@
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-repeat))
   :after vertico
-  :hook (minibuffer-setup-hook . vertico-repeat-save)
+  :hook
+  (minibuffer-setup-hook . vertico-repeat-save)
   :bind
   (("C-c r" . vertico-repeat-last)
    ("M-r" . vertico-repeat-select)))

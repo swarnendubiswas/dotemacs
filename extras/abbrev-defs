@@ -1542,6 +1542,7 @@
     ("optimisation" "optimization" nil :count 0)
     ("randomozie" "randomize" nil :count 0)
     ("repored" "reported" nil :count 0)
+    ("tilign" "Tiling" nil :count 0)
    ))
 
 (define-abbrev-table 'python-mode-abbrev-table

@@ -15,12 +15,11 @@
       ;; Do not ask before rereading the `TAGS' files if they have changed
       tags-revert-without-query t)
 
-;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables from Lisp packages
-;; which are loaded into the current Emacs session or are auto-loaded.
+;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
+;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
 (use-package xref
-  :commands xref-etags-mode
-  :custom (xref-search-program 'ripgrep)
-  :hook ((prog-mode-hook LaTeX-mode-hook) . xref-etags-mode)
+  :hook
+  ((prog-mode-hook LaTeX-mode-hook) . xref-etags-mode)
   :bind
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
@@ -30,14 +29,18 @@
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
-   ("r"     . xref-query-replace-in-results)))
+   ("r"     . xref-query-replace-in-results))
+  :custom
+  (xref-search-program 'ripgrep))
 
 (use-package dumb-jump
   :after xref
   :demand t
   :commands dumb-jump-xref-activate
-  :custom (dumb-jump-quiet t)
-  :hook (xref-backend-functions . dumb-jump-xref-activate))
+  :hook
+  (xref-backend-functions . dumb-jump-xref-activate)
+  :custom
+  (dumb-jump-quiet t))
 
 (use-package ivy-xref
   :if (eq sb/minibuffer-completion 'ivy)
@@ -112,8 +115,7 @@
 ;; -e
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
-;; add dirs/files to scan here, one line per dir/file"
-                                  )
+;; add dirs/files to scan here, one line per dir/file")
   :config
   (dolist (func '(find-function
                   counsel-imenu

@@ -141,7 +141,8 @@
 (use-package gcmh
   :diminish
   :commands gcmh-idle-garbage-collect
-  :hook (after-init-hook . gcmh-mode))
+  :hook
+  (after-init-hook . gcmh-mode))
 
 ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists

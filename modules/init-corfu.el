@@ -28,7 +28,8 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :hook (after-init-hook . global-corfu-mode)
+  :hook
+  (after-init-hook . global-corfu-mode)
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -86,7 +87,8 @@
 
 (use-package corfu-doc
   :if (and (display-graphic-p) (eq sb/capf 'corfu))
-  :hook (corfu-mode-hook . corfu-doc-mode)
+  :hook
+  (corfu-mode-hook . corfu-doc-mode)
   :bind
   (:map corfu-map
         ("M-p" . corfu-doc-scroll-down)
@@ -107,7 +109,8 @@
   :straight (corfu-terminal :type git
                             :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
   :unless (display-graphic-p)
-  :hook (corfu-mode-hook . corfu-terminal-mode))
+  :hook
+  (corfu-mode-hook . corfu-terminal-mode))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -215,7 +218,7 @@
 ;;   :config
 ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-;; all-the-icons integration with corfu
+;; `all-the-icons' integration with `corfu'
 ;; https://github.com/lynnux/.emacs.d/blob/master/packages/corfu/corfu-icon.el
 (use-package corfu-icon
   :straight nil
