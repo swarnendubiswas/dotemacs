@@ -310,7 +310,13 @@
 (use-package dirvish
   :straight (dirvish :type git :host github :repo "alexluigit/dirvish")
   :init
-  (dirvish-override-dired-mode))
+  (dirvish-override-dired-mode)
+  :custom
+  (dirvish-hide-details t)
+  (dirvish-attributes '(vc-state subtree-state all-the-icons collapse git-msg file-size))
+  (dired-listing-switches
+   "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
+  (dirvish-default-layout '(0 0.15 0.50)))
 
 (provide 'init-dired)
 

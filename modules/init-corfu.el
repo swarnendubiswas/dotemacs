@@ -112,6 +112,12 @@
   :hook
   (corfu-mode-hook . corfu-terminal-mode))
 
+(use-package corfu-doc-terminal
+  :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
+  :unless (display-graphic-p)
+  :hook
+  (corfu-mode-hook . corfu-doc-terminal-mode))
+
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
