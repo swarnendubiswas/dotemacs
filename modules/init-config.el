@@ -17,22 +17,22 @@
   'modus-operandi
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "leuven"          leuven)
-           (const :tag "zenburn"         zenburn)
-           (const :tag "doom-one"        doom-one)
-           (const :tag "doom-nord"       doom-nord)
-           (const :tag "doom-molokai"    doom-molokai)
-           (const :tag "doom-gruvbox"    doom-gruvbox)
-           (const :tag "monokai"         monokai)
-           (const :tag "modus-operandi"  modus-operandi)
-           (const :tag "modus-vivendi"   modus-vivendi)
+           (const :tag "leuven"            leuven)
+           (const :tag "zenburn"           zenburn)
+           (const :tag "doom-one"          doom-one)
+           (const :tag "doom-nord"         doom-nord)
+           (const :tag "doom-molokai"      doom-molokai)
+           (const :tag "doom-gruvbox"      doom-gruvbox)
+           (const :tag "monokai"           monokai)
+           (const :tag "modus-operandi"    modus-operandi)
+           (const :tag "modus-vivendi"     modus-vivendi)
            ;; Does not pair brackets
-           (const :tag "nano-dark"       nano-dark)
+           (const :tag "nano-dark"         nano-dark)
            ;; Company popups cannot be distinguished
-           (const :tag "lambda-dark-faded"    lambda-dark-faded)
-           (const :tag "customized"      sb/customized) ; Customizations over the default theme
+           (const :tag "lambda-dark-faded" lambda-dark-faded)
+           (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
-           (const :tag "none"            none))
+           (const :tag "none"              none))
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI but I now feel `modus-operandi' has better contrast than
@@ -41,21 +41,21 @@
   'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "leuven"          leuven)
-           (const :tag "zenburn"         zenburn)
-           (const :tag "doom-one"        doom-one)
-           (const :tag "doom-nord"       doom-nord)
-           (const :tag "doom-molokai"    doom-molokai)
-           (const :tag "doom-gruvbox"    doom-gruvbox)
-           (const :tag "monokai"         monokai)
-           (const :tag "modus-operandi"  modus-operandi)
-           (const :tag "modus-vivendi"   modus-vivendi)
-           (const :tag "nano-dark"       nano-dark)
-           (const :tag "lambda-dark"     lambda-dark)
-           (const :tag "lambda-dark-faded"     lambda-dark-faded)
-           (const :tag "customized"      sb/customized) ; Customizations over the default theme
+           (const :tag "leuven"            leuven)
+           (const :tag "zenburn"           zenburn)
+           (const :tag "doom-one"          doom-one)
+           (const :tag "doom-nord"         doom-nord)
+           (const :tag "doom-molokai"      doom-molokai)
+           (const :tag "doom-gruvbox"      doom-gruvbox)
+           (const :tag "monokai"           monokai)
+           (const :tag "modus-operandi"    modus-operandi)
+           (const :tag "modus-vivendi"     modus-vivendi)
+           (const :tag "nano-dark"         nano-dark)
+           (const :tag "lambda-dark"       lambda-dark)
+           (const :tag "lambda-dark-faded" lambda-dark-faded)
+           (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
-           (const :tag "none"            none))
+           (const :tag "none"              none))
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
@@ -87,7 +87,8 @@ This depends on the orientation of the display."
            (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
 
-;; Large values make reading difficult when the window is split side-by-side
+;; Large values make reading difficult when the window is split side-by-side, 100 is also actually a
+;; stretch for smaller screens.
 (defcustom sb/fill-column
   100
   "Column beyond which lines should not extend."
@@ -103,8 +104,9 @@ Sometimes we do not want to unnecessarily add differences due to
   :type  'boolean
   :group 'sb/emacs)
 
-;; We can use the snap installation of "universal-ctags", but snap packages have poor performance.
-;; A better alternative is to build and install "ctags" locally.
+;; We can use the snap installation of "universal-ctags", but snap packages have poor performance. A
+;; better alternative is to build and install "ctags" locally. Check "setup-emacs.sh" for
+;; installation instructions.
 (defcustom sb/ctags-path
   "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."

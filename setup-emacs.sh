@@ -49,7 +49,7 @@ apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-
 
 # Install LLVM
 
-LLVM_VERSION="-14"
+LLVM_VERSION="14"
 
 case "${DIST_VERSION}" in
     Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
@@ -63,7 +63,7 @@ esac
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 add-apt-repository "${REPO_NAME}"
 
-apt install -y clang${LLVM_VERSION} clangd${LLVM_VERSION} clang-{format,tidy,tools}${LLVM_VERSION} clang${LLVM_VERSION}-doc clang${LLVM_VERSION}-examples llvm${LLVM_VERSION} lld${LLVM_VERSION} lldb${LLVM_VERSION} llvm${LLVM_VERSION}-runtime
+apt install -y clang-${LLVM_VER} lldb-${LLVM_VER} lld-${LLVM_VER} libllvm-${LLVM_VER}-ocaml-dev libllvm${LLVM_VER} llvm-${LLVM_VER} llvm-${LLVM_VER}-dev llvm-${LLVM_VER}-doc llvm-${LLVM_VER}-examples llvm-${LLVM_VER}-runtime clang-tools-${LLVM_VER} clang-${LLVM_VER}-doc libclang-common-${LLVM_VER}-dev libclang-${LLVM_VER}-dev libclang1-${LLVM_VER} clang-format-${LLVM_VER} python3-clang-${LLVM_VER} clangd-${LLVM_VER} clang-tidy-${LLVM_VER} libfuzzer-${LLVM_VER}-dev libc++-${LLVM_VER}-dev libc++abi-${LLVM_VER}-dev libomp-${LLVM_VER}-dev libclc-${LLVM_VER}-dev libunwind-${LLVM_VER}-dev libmlir-${LLVM_VER}-dev mlir-${LLVM_VER}-tools
 
 # Download GNU Emacs source
 
@@ -150,7 +150,7 @@ if [ -d "$EMACSD" ]; then
 fi
 
 # Install Python packages
-sudo -u swarnendu python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server pyls-memestra "python-lsp-server[all]" pyls-isort cpplint grip --user
+sudo -u swarnendu python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra cpplint grip --user
 
 # Install Nodejs
 
@@ -478,8 +478,8 @@ bash ./install
 
 # echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
 
-cmdline=$"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit\n"
-printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
+# cmdline=$"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit\n"
+# printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"

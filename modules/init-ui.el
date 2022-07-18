@@ -478,8 +478,8 @@
   (awesome-tab-label-fixed-length 14)
   (awesome-tab-cycle-scope 'groups)
   :bind*
-  (("M-<right>" . awesome-tab-forward-group)
-   ("M-<left>" . awesome-tab-backward-group)
+  (("M-<right>" . awesome-tab-forward)
+   ("M-<left>" . awesome-tab-backward)
    ("M-]" . awesome-tab-ace-jump)))
 
 ;; This package disables the mouse completely which is an extreme.
