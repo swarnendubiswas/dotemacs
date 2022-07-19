@@ -17,9 +17,7 @@ DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
 DIST_VERSION="${DISTRO}_${VERSION}"
 
-# TODO: Avoid much of the installation exercise if packages and Emacs are already set up.
-
-# Install important packages
+# Install important packages. There is nothing to do if a package is already installed.
 
 case "${DIST_VERSION}" in
     Ubuntu_18.04)
@@ -117,16 +115,16 @@ cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 
 # TODO: There does not seem to be a good way to checkout private repositories
 
-if [ -d "$DOTEMACS" ]; then
-    cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
-    echo "Pulling dotemacs repository from GitHub..."
-    sudo -u swarnendu git pull
-else
-    echo "Cloning dotemacs repository from GitHub..."
-    sudo -u swarnendu git clone https://github.com/swarnendubiswas/dotemacs.git
-fi
-echo "...Done"
-chown -R $USER:$USER $DOTEMACS
+# if [ -d "$DOTEMACS" ]; then
+#     cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
+#     echo "Pulling dotemacs repository from GitHub..."
+#     sudo -u swarnendu git pull
+# else
+#     echo "Cloning dotemacs repository from GitHub..."
+#     sudo -u swarnendu git clone https://github.com/swarnendubiswas/dotemacs.git
+# fi
+# echo "...Done"
+# chown -R $USER:$USER $DOTEMACS
 
 # if [ -d "$DOTFILES" ]; then
 #     cd "$DOTFILES" || echo "Failed: cd ${DOTEMACS}"
@@ -190,7 +188,7 @@ echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
 
 # cpanm Perl::LanguageServer
 
-# Install Texlab. The language server seems feature-incomplete and slow, so I still prefer AuCTeX.
+# Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 
 TEXLAB_VER="4.2.0"
 

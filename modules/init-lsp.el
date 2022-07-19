@@ -51,19 +51,21 @@
                                     lsp-completion--regex-fuz
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
-  ;; :preface
-  ;; ;; https://github.com/minad/corfu/wiki
-  ;; (defun sb/lsp-mode-setup-completion ()
-  ;;   (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-  ;;         '(orderless)))
+  :preface
+  ;; https://github.com/minad/corfu/wiki
+  (defun sb/lsp-mode-setup-completion ()
+    (if (featurep 'orderless)
+        (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+              '(orderless))
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(flex))))
   :init
   ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
   (when (eq sb/capf 'corfu)
     (add-hook 'text-mode-hook (lambda ()
                                 (setq-local lsp-completion-enable nil))))
   :hook
-  (;;(lsp-completion-mode-hook . sb/lsp-mode-setup-completion)
-   (lsp-mode-hook . lsp-enable-which-key-integration)
+  ((lsp-mode-hook . lsp-enable-which-key-integration)
    (lsp-mode-hook . lsp-dired-mode))
   :custom-face
   ;; Reduce the height
@@ -144,6 +146,9 @@
 
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
+
+  (when (eq sb/capf 'corfu)
+    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
   :bind-keymap ("C-c l" . lsp-command-map)
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.

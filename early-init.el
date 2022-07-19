@@ -94,16 +94,16 @@
            (not (display-graphic-p)))
   (menu-bar-mode -1))
 
-;; Set frame transparency
+;; Set a hint of transparency, works with GUI frames
 (set-frame-parameter (selected-frame) 'alpha '(99 . 99))
 (add-to-list 'default-frame-alist '(alpha . (99 . 99)))
 
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 
-;; Applied only to the initial (startup) Emacs frame
+;; Applies only to the initial (startup) Emacs frame
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-;; Applied to every Emacs frame
+;; Applies to every Emacs frame
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Maximize Emacs on startup, append to the hook instead of prepending, this means it will run after

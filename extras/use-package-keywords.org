@@ -1,0 +1,26 @@
+* Order of ~use-package~ keywords
+
+- ~:preface~
+- ~:straight~ or ~:ensure~
+- ~:if~ or ~:when~ or ~:unless~
+- ~:disabled~
+- ~:demand~
+- ~:after~ or ~:requires~
+- ~no-require~
+- ~:defer~
+- ~:load-path~
+- ~:pin~
+- ~:defines~
+- ~:functions~
+- ~:init~
+- ~:magic~
+- ~:mode~
+- ~:interpreter~
+- ~:hook~
+- ~:bind-keymap~ or ~:bind-keymap*~
+- ~:bind~ or ~:bind*~
+- ~:custom-face~
+- ~:custom~
+- ~:config~
+- ~:catch~
+- ~:diminish~ or ~:delight~

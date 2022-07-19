@@ -499,6 +499,21 @@
   (("\\.so\\'"  . elf-mode)
    ("\\.a\\'"   . elf-mode)))
 
+(use-package compile
+  :straight (:type built-in)
+  :custom
+  (compilation-always-kill t "Kill a compilation process before starting a new one")
+  (compilation-ask-about-save nil "Save all modified buffers without asking")
+  (compilation-exit-message-function #'sb/compilation-exit-autoclose)
+  ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
+  ;; error.
+  (compilation-scroll-output 'first-error))
+
+(use-package fancy-compilation
+  :straight (:type git :repo "https://codeberg.org/ideasman42/emacs-fancy-compilation")
+  :after compile
+  :init (fancy-compilation-mode 1))
+
 (provide 'init-languages)
 
 ;;; init-languages.el ends here

@@ -154,33 +154,42 @@
   (cape-dabbrev-check-other-buffers nil)
   (cape-dict-file (expand-file-name "wordlist.5" sb/extras-directory))
   :config
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (setq-local corfu-auto-prefix 2
-                          completion-at-point-functions (list
-                                                         (cape-super-capf #'cape-file
-                                                                          #'cape-symbol
-                                                                          #'cape-keyword
-                                                                          #'cape-history
-                                                                          #'cape-dict
-                                                                          ;; #'cape-ispell
-                                                                          #'cape-dabbrev)))))
+  ;; (add-hook 'emacs-lisp-mode-hook
+  ;;           (lambda ()
+  ;;             (setq-local completion-at-point-functions
+  ;;                         (list
+  ;;                          (cape-super-capf #'cape-file
+  ;;                                           #'cape-symbol
+  ;;                                           #'cape-keyword
+  ;;                                           #'cape-history
+  ;;                                           #'cape-dabbrev
+  ;;                                           #'cape-dict)))))
+
+  ;; (add-hook 'sh-mode-hook
+  ;;           (lambda ()
+  ;;             (setq-local completion-at-point-functions
+  ;;                         (list
+  ;;                          (cape-super-capf #'lsp-completion-at-point
+  ;;                                           #'citre-completion-at-point
+  ;;                                           #'sh-completion-at-point-function
+  ;;                                           #'comint-completion-at-point
+  ;;                                           #'cape-file
+  ;;                                           #'cape-keyword
+  ;;                                           #'cape-history
+  ;;                                           #'cape-dabbrev
+  ;;                                           #'cape-dict)))))
 
   (add-hook 'prog-mode-hook
             (lambda ()
-              (unless (derived-mode-p 'emacs-lisp-mode)
-                (setq-local corfu-auto-prefix 2)
-                (add-to-list 'completion-at-point-functions #'cape-file 'append)
-                (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-                (add-to-list 'completion-at-point-functions #'cape-history 'append)
-                (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-                (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-                ;; (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
-                )))
+              ;; (unless (derived-mode-p 'emacs-lisp-mode)
+              (add-to-list 'completion-at-point-functions #'cape-file 'append)
+              (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+              (add-to-list 'completion-at-point-functions #'cape-history 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+              (add-to-list 'completion-at-point-functions #'cape-dict 'append)))
 
   (add-hook 'LaTeX-mode-hook
             (lambda ()
-              (setq-local corfu-auto-prefix 3)
               ;; (rquire 'company-auctex)
               ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-bibs))
               ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-labels))
@@ -199,12 +208,10 @@
   (add-hook 'text-mode-hook
             (lambda ()
               (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
-                (setq-local corfu-auto-prefix 3
-                            completion-at-point-functions
+                (setq-local completion-at-point-functions
                             (list (cape-super-capf #'cape-file
                                                    #'cape-dabbrev
                                                    #'cape-history
-                                                   ;; #'cape-ispell
                                                    #'cape-dict)))))))
 
 ;; Provide icons for Corfu

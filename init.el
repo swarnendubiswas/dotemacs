@@ -26,9 +26,9 @@
 (require 'init-buffer)
 (require 'init-dired)
 
-(if (eq sb/minibuffer-completion 'ivy)
-    (require 'init-ivy)
-  (require 'init-vertico))
+(cond
+ ((eq sb/minibuffer-completion 'ivy) (require 'init-ivy))
+ ((eq sb/minibuffer-completion 'vertico) (require 'init-vertico)))
 
 (require 'init-project)
 (require 'init-spell)
@@ -51,9 +51,9 @@
 (require 'init-latex)
 
 (require 'init-completion)
-(if (eq sb/capf 'corfu)
-    (require 'init-corfu)
-  (require 'init-company))
+(cond
+ ((eq sb/capf 'corfu) (require 'init-corfu))
+ ((eq sb/capf 'company) (require 'init-company)))
 
 (require 'init-functions)
 (require 'init-temp)

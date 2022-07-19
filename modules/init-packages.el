@@ -120,7 +120,7 @@
             use-package-expand-minimally   nil))
   (progn
     (setq use-package-always-defer       t
-          ;; Avoid printing errors and warnings since the configuration just works
+          ;; Disable error checks during macro expansion because the configuration just works
           use-package-expand-minimally   t
           use-package-compute-statistics nil
           use-package-verbose            nil)))
