@@ -116,6 +116,7 @@
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
+  (citre-enable-capf-integration nil)
   :config
   (dolist (func '(find-function
                   counsel-imenu

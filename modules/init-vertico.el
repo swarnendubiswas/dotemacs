@@ -22,6 +22,11 @@
   :commands (command-completion-default-include-p minibuffer-keyboard-quit)
   :hook
   (after-init-hook . vertico-mode)
+  :bind
+  (("<f2>"  .  find-file)
+   :map vertico-map
+   ("C-M-j" . vertico-exit-input)
+   ("<tab>" . vertico-insert))
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
@@ -50,12 +55,7 @@
       (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
      ((eq sb/gui-theme 'modus-operandi)
       (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
-     (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t))))
-  :bind
-  (("<f2>"  .  find-file)
-   :map vertico-map
-   ("C-M-j" . vertico-exit-input)
-   ("<tab>" . vertico-insert)))
+     (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t)))))
 
 ;; More convenient directory navigation commands
 (use-package vertico-directory
@@ -74,9 +74,9 @@
         ("M-DEL" . vertico-directory-delete-word)))
 
 (use-package vertico-repeat
-  :if (eq sb/minibuffer-completion 'vertico)
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-repeat))
+  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :hook
   (minibuffer-setup-hook . vertico-repeat-save)
@@ -85,29 +85,29 @@
    ("M-r" . vertico-repeat-select)))
 
 (use-package vertico-indexed
-  :if (eq sb/minibuffer-completion 'vertico)
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-indexed))
+  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :commands vertico-indexed-mode
   :init (vertico-indexed-mode 1))
 
 ;; ;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
 ;; (use-package vertico-grid
-;;   :if  (eq sb/minibuffer-completion 'vertico)
 ;;   :straight (vertico :files (:defaults "extensions/*")
 ;;                      :includes (vertico-grid))
-;;   :after vertico
+;;   :if  (eq sb/minibuffer-completion 'vertico)
 ;;   :disabled t
+;;   :after vertico
 ;;   :commands vertico-grid-mode
 ;;   :init (vertico-grid-mode 1)
 ;;   :custom
 ;;   (vertico-grid-max-columns 4))
 
 (use-package vertico-quick
-  :if (eq sb/minibuffer-completion 'vertico)
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-quick))
+  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :bind
   (:map vertico-map
@@ -116,16 +116,9 @@
         ("C-'" . vertico-quick-jump)))
 
 (use-package consult
-  :after vertico
   :if (eq sb/minibuffer-completion 'vertico)
+  :after vertico
   :commands consult--customize-put
-  :custom
-  (consult-line-start-from-top t "Start search from the beginning")
-  ;; Use Consult to select xref locations with preview
-  (xref-show-xrefs-function #'consult-xref)
-  (xref-show-definitions-function #'consult-xref)
-  (consult-line-numbers-widen t)
-  (consult-preview-key nil "Disable preview by default, enable for selected commands")
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
@@ -168,9 +161,15 @@
    ;; Isearch integration
    :map isearch-mode-map
    ("M-s e" . consult-isearch-history))
+  :custom
+  (consult-line-start-from-top t "Start search from the beginning")
+  ;; Use Consult to select xref locations with preview
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
+  (consult-line-numbers-widen t)
+  (consult-preview-key nil "Disable preview by default, enable for selected commands")
+  (completion-in-region-function #'consult-completion-in-region)
   :config
-  (setq completion-in-region-function #'consult-completion-in-region)
-
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-recent-file consult-buffer consult-bookmark consult-xref consult-line

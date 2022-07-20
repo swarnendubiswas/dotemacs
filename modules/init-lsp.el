@@ -75,6 +75,7 @@
   (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
                                                                :weight bold :height 0.9))))
   :custom
+  (lsp-completion-enable nil)
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
   ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
   ;; and parent paths of each source file.
