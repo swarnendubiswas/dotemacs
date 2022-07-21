@@ -127,17 +127,6 @@
   (:map dired-mode-map
         ("r" . dired-efap)))
 
-(use-package all-the-icons-dired
-  :if (display-graphic-p)
-  :commands all-the-icons-dired--refresh-advice
-  :diminish
-  :hook
-  (dired-mode-hook . (lambda ()
-                       (unless (file-remote-p default-directory)
-                         (all-the-icons-dired-mode 1))))
-  :custom
-  (all-the-icons-dired-monochrome nil))
-
 ;; (use-package treemacs
 ;;   :functions treemacs-tag-follow-mode
 ;;   :commands (treemacs-current-workspace
@@ -312,11 +301,25 @@
   :init
   (dirvish-override-dired-mode)
   :custom
-  (dirvish-hide-details t)
+  (dirvish-hide-details nil)
   (dirvish-attributes '(vc-state subtree-state all-the-icons collapse git-msg file-size))
   (dired-listing-switches
    "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
-  (dirvish-default-layout '(0 0.15 0.50)))
+  (dirvish-default-layout '(0 0.15 0.50))
+  :config
+  (add-to-list 'dirvish-preview-disabled-exts "mp4")
+  (add-to-list 'dirvish-preview-disabled-exts "jpeg"))
+
+(use-package all-the-icons-dired
+  :if (and (display-graphic-p) (not (featurep 'dirvish)))
+  :commands all-the-icons-dired--refresh-advice
+  :diminish
+  :hook
+  (dired-mode-hook . (lambda ()
+                       (unless (file-remote-p default-directory)
+                         (all-the-icons-dired-mode 1))))
+  :custom
+  (all-the-icons-dired-monochrome nil))
 
 (provide 'init-dired)
 

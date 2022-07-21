@@ -480,14 +480,17 @@
   :if (executable-find "clang-format")
   :after (mlir-mode)
   :commands (clang-format clang-format-buffer clang-format-region)
-  :custom (clang-format-style "file"))
+  :custom
+  (clang-format-style "file")
+  (clang-format-style-option "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}"))
 
 (use-package clang-format+
   :if (executable-find "clang-format")
   :defines clang-format+-always-enable
   :hook
   (mlir-mode-hook . clang-format+-mode)
-  :custom (clang-format+-always-enable t))
+  :custom
+  (clang-format+-always-enable t))
 
 (use-package highlight-indentation
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode)
@@ -497,11 +500,11 @@
 (use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
   :hook
   (emacs-lisp-mode-hook . aggressive-indent-mode)
-  :diminish
   :custom
   (aggressive-indent-comments-too t)
   ;; Never use `electric-indent-mode'
-  (aggressive-indent-dont-electric-modes t))
+  (aggressive-indent-dont-electric-modes t)
+  :diminish)
 
 (provide 'init-checkers)
 

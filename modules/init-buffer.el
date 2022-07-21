@@ -175,7 +175,8 @@
   (([remap other-window] . ace-window)
    ("M-o" . ace-window))
   :config
-  (add-to-list 'aw-ignored-buffers "*toc*"))
+  (add-to-list 'aw-ignored-buffers "*toc*")
+  (ace-window-display-mode 1))
 
 ;; The keybinding will be hidden if we use tmux, and we will need to press twice.
 (use-package ace-jump-buffer

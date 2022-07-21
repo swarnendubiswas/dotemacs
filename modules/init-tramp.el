@@ -97,6 +97,11 @@
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
 
+(use-package password-cache
+  :after tramp
+  :custom
+  (password-cache-expiry nil))
+
 (provide 'init-tramp)
 
 ;;; init-tramp.el ends here

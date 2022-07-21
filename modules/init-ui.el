@@ -78,18 +78,18 @@
   :init (load-theme 'monokai t))
 
 (use-package modus-themes
-  :defines (modus-themes-completions modus-themes-fringes
-                                     modus-themes-prompts
-                                     modus-themes-lang-checkers
-                                     modus-themes-hl-line
-                                     modus-themes-org-blocks
-                                     modus-themes-mode-line)
   :if (or (and (display-graphic-p)
                (or (eq sb/gui-theme 'modus-operandi)
                    (eq sb/gui-theme 'modus-vivendi)))
           (and (not (display-graphic-p))
                (or (eq sb/tui-theme 'modus-operandi)
                    (eq sb/tui-theme 'modus-vivendi))))
+  :defines (modus-themes-completions modus-themes-fringes
+                                     modus-themes-prompts
+                                     modus-themes-lang-checkers
+                                     modus-themes-hl-line
+                                     modus-themes-org-blocks
+                                     modus-themes-mode-line)
   :init
   (when (eq sb/modeline-theme 'default)
     (setq modus-themes-mode-line 'accented-3d))
@@ -163,7 +163,7 @@
         powerline-height 20)
 
   (when (eq sb/gui-theme 'leuven)
-    (set-face-attribute 'mode-line nil :background "grey88" :foreground "black")
+    (set-face-attribute 'mode-line nil :background "grey88" :foerground "black")
     (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
                         :foreground "black" :background "gray88"))
 
@@ -237,7 +237,6 @@
   (moody-replace-vc-mode))
 
 (use-package mini-modeline
-  :diminish mini-modeline-mode
   :if (eq sb/modeline-theme 'mini)
   :hook
   (after-init-hook . mini-modeline-mode)
@@ -250,7 +249,8 @@
                                  ;; mode-line-position
                                  ;; mode-line-percent-position
                                  (:eval (string-trim (format-mode-line mode-line-modes)))
-                                 mode-line-misc-info)))
+                                 mode-line-misc-info))
+  :diminish mini-modeline-mode)
 
 ;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
 ;; takes up lot of horizontal space.
@@ -274,9 +274,9 @@
 (use-package airline-themes
   :if (eq sb/modeline-theme 'airline)
   :demand t
-  :config (load-theme 'airline-doom-one t)
   :custom
-  (airline-display-directory 'airline-directory-shortened))
+  (airline-display-directory 'airline-directory-shortened)
+  :config (load-theme 'airline-doom-one t))
 
 (use-package nano-modeline
   :straight (nano-modeline :type git :host github :repo "rougier/nano-modeline")
@@ -302,11 +302,11 @@
 ;;        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
+  (set-face-attribute 'default nil :font "MesloLGS NF" :height 130)
   (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
   (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-  (set-face-attribute 'mode-line nil :height 110)
-  (set-face-attribute 'mode-line-inactive nil :height 110))
+  (set-face-attribute 'mode-line nil :height 120)
+  (set-face-attribute 'mode-line-inactive nil :height 120))
 
 (when (string= (system-name) "dell-7506")
   (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
@@ -378,9 +378,9 @@
 ;;                   max-mini-window-height 5)))
 
 (use-package beacon
-  :diminish
   :hook
-  (after-init-hook . beacon-mode))
+  (after-init-hook . beacon-mode)
+  :diminish)
 
 (when (display-graphic-p)
   ;; Show dividers on the right of each window, more prominent than the default
@@ -437,10 +437,13 @@
 ;; https://github.com/doomemacs/doomemacs/commit/8b93e8b15cc081860a8eb156b1584ef60b6bc9e4
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
-  :commands (;; centaur-tabs-group-by-projectile-project
+  :commands (centaur-tabs-group-by-projectile-project
              centaur-tabs-headline-match)
   :hook
   (emacs-startup-hook . centaur-tabs-mode)
+  :bind*
+  (("M-<right>" . centaur-tabs-forward-tab)
+   ("M-<left>"  . centaur-tabs-backward-tab))
   :custom
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
@@ -464,45 +467,45 @@
         (setq centaur-tabs-set-icons nil))))
 
   ;; (centaur-tabs-headline-match)
-  (centaur-tabs-group-by-projectile-project)
-  :bind*
-  (("M-<right>" . centaur-tabs-forward-tab)
-   ("M-<left>"  . centaur-tabs-backward-tab)))
+  (centaur-tabs-group-by-projectile-project))
 
 (use-package awesome-tab
   :straight (:type git :host github :repo "manateelazycat/awesome-tab")
   :if (eq sb/tab-bar-handler 'awesome-tab)
   :hook
   (after-init-hook . awesome-tab-mode)
-  :custom
-  (awesome-tab-label-fixed-length 14)
-  (awesome-tab-cycle-scope 'groups)
   :bind*
   (("M-<right>" . awesome-tab-forward-tab)
    ("M-<left>" . awesome-tab-backward-tab)
-   ("M-]" . awesome-tab-ace-jump)))
+   ("M-]" . awesome-tab-ace-jump))
+  :custom-face
+  (awesome-tab-selected-face ((t (:inherit default :height 1.0))))
+  (awesome-tab-unselected-face ((t (:inherit default :height 0.8))))
+  :custom
+  (awesome-tab-label-fixed-length 14)
+  (awesome-tab-cycle-scope 'groups))
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse
   :if (display-mouse-p)
-  :diminish disable-mouse-global-mode
   :hook
-  (after-init-hook . global-disable-mouse-mode))
+  (after-init-hook . global-disable-mouse-mode)
+  :diminish disable-mouse-global-mode)
 
 ;; Move the cursor from the line of view
 (use-package avoid
   :straight (:type built-in)
-  :commands mouse-avoidance-mode
   :if (display-mouse-p)
+  :commands mouse-avoidance-mode
   :init (mouse-avoidance-mode 'banish))
 
 ;; Icons for minibuffer completion
 (use-package all-the-icons-completion
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode
+  :init (all-the-icons-completion-mode 1)
   :hook
-  (marginalia-mode-hook . all-the-icons-completion-marginalia-setup)
-  :init (all-the-icons-completion-mode 1))
+  (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
 (use-package lambda-themes
   :straight (:type git :host github :repo "lambda-emacs/lambda-themes")
@@ -512,14 +515,6 @@
           (and (not (display-graphic-p))
                (or (eq sb/tui-theme 'lambda-dark)
                    (eq sb/tui-theme 'lambda-dark-faded))))
-  :custom
-  (lambda-themes-set-italic-comments t)
-  (lambda-themes-set-italic-keywords t)
-  (lambda-themes-set-variable-pitch t)
-  :custom-face
-  (company-tooltip ((t (:inherit default :background "##524f5c" :foreground "white"))))
-  (writegood-weasels-face ((t (:inherit default :background "coral"))))
-  (writegood-duplicates-face ((t (:inherit default :background "light pink"))))
   :init
   (when (display-graphic-p)
     (cond
@@ -528,17 +523,25 @@
   (unless (display-graphic-p)
     (cond
      ((eq sb/tui-theme 'lambda-dark) (load-theme 'lambda-dark t))
-     ((eq sb/tui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t)))))
+     ((eq sb/tui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t))))
+  :custom-face
+  (company-tooltip ((t (:inherit default :background "##524f5c" :foreground "white"))))
+  (writegood-weasels-face ((t (:inherit default :background "coral"))))
+  (writegood-duplicates-face ((t (:inherit default :background "light pink"))))
+  :custom
+  (lambda-themes-set-italic-comments t)
+  (lambda-themes-set-italic-keywords t)
+  (lambda-themes-set-variable-pitch t))
 
 (use-package lambda-line
-  :if (eq sb/modeline-theme 'lambda-line)
   :straight (:type git :host github :repo "lambda-emacs/lambda-line")
+  :if (eq sb/modeline-theme 'lambda-line)
+  :hook
+  (after-init-hook . lambda-line-mode)
   :custom
   (lambda-line-abbrev t "Abbreviate major modes")
   (lambda-line-space-top +0.15)
-  (lambda-line-space-bottom -0.15)
-  :hook
-  (after-init-hook . lambda-line-mode))
+  (lambda-line-space-bottom -0.15))
 
 (provide 'init-ui)
 

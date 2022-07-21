@@ -93,7 +93,10 @@
 (use-package avy
   :commands avy-setup-default
   :custom
+  ;; Option "pre" is distracting because of all the movement while highlighting selection keys. This
+  ;; causes the eyes to lose focus.
   (avy-style 'de-bruijn)
+  (avy-background t)
   :bind
   (("M-b"   . avy-goto-word-1)
    ("C-'"   . avy-goto-char-timer)

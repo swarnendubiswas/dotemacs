@@ -308,6 +308,7 @@
   (sh-mode-hook . lsp-deferred)
   :custom
   (sh-basic-offset 2)
+  (sh-indentation 2)
   (sh-indent-after-continuation 'always)
   (sh-indent-comment t "Indent comments as a regular line")
   :config

@@ -201,6 +201,20 @@
   ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
   ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)))
 
+  (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook modes
+              (lambda ()
+                (setq-local completion-at-point-functions
+                            (list
+                             (cape-super-capf #'lsp-completion-at-point
+                                              #'citre-completion-at-point
+                                              #'TeX--completion-at-point
+                                              #'cape-file
+                                              #'cape-tex
+                                              #'cape-dabbrev
+                                              #'cape-dict
+                                              #'cape-ispell))))))
+
   ;; (add-hook 'LaTeX-mode-hook
   ;;           (lambda ()
   ;;             ;; (rquire 'company-auctex)
@@ -209,11 +223,11 @@
   ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-symbols))
   ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-environments))
   ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-macros))
-  ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-tex 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-file 'append)
+  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-tex 'append)
+  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-dict 'append)
   ;;             ))
 
   ;; (add-hook 'text-mode-hook

@@ -337,11 +337,16 @@
    ("C-<f3>" . bm-previous)))
 
 (use-package crux
+  :demand t
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
    ("C-c d s" . crux-sudo-edit)
-   ("C-a"     . crux-move-beginning-of-line)))
+   ("C-a"     . crux-move-beginning-of-line))
+  :config
+  (crux-with-region-or-buffer indent-region)
+  (crux-with-region-or-buffer untabify)
+  (crux-with-region-or-line   comment-or-uncomment-region))
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
 (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
@@ -412,6 +417,53 @@
   (add-hook 'LaTeX-mode-hook 'tex-procress-mode)
   :config
   (procress-load-default-svg-images))
+
+(use-package jgraph-mode
+  :mode ("\\.jgr\\'" . jgraph-mode))
+
+(use-package graphviz-dot-mode
+  :custom
+  (graphviz-dot-indent-width 4))
+
+(use-package gnuplot
+  :mode ("\\.gp\\'" . gnuplot-mode)
+  :interpreter ("gnuplot" . gnuplot-mode))
+
+;; (use-package sudo-edit ; Edit file with sudo
+;;   :bind ("M-s e" . sudo-edit))
+
+(use-package ignoramus ; Ignore backups, build files, et al.
+  :config
+  (dolist (ext '(".cb"
+                 ".cb2"
+                 ".dvi"
+                 ".fls"
+                 ".idx"
+                 ".o"
+                 ".out"
+                 ".pdf"
+                 "-pkg.el"
+                 ".rel"
+                 ".rip"
+                 ".toc"))
+    (add-to-list 'ignoramus-file-basename-endings ext))
+
+  (dolist (filenames '("GPATH"
+                       "GRTAGS"
+                       "GSYMS"
+                       "GTAGS"
+                       "TAGS"
+                       "__init__.py"))
+    (add-to-list 'ignoramus-file-basename-exact-names filenames))
+
+  (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
+
+  (dolist (dir '("\\`\\."
+                 "__pycache__"
+                 "auto"))
+    (add-to-list 'ignoramus-file-basename-exact-names dir))
+
+  (ignoramus-setup))
 
 (provide 'init-misc)
 

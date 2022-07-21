@@ -7,6 +7,19 @@
 
 ;;; Code:
 
+;; Available C style: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
+;; gnu: The default style for GNU projects
+;; k&r: What Kernighan and Ritchie, the authors of C used in their book
+;; bsd: What BSD developers use, aka "Allman style" after Eric Allman.
+;; whitesmith: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
+;; stroustrup: What Stroustrup, the author of C++ used in his book
+;; ellemtel: Popular C++ coding standards as defined by "Programming in C++, Rules and Recommendations," Erik Nyquist
+;;  and Mats Henricson, Ellemtel
+;; linux: What the Linux developers use for kernel development
+;; python: What Python developers use for extension modules
+;; java: The default style for java-mode (see below)
+;; user: When you want to define your own style
+
 (use-package cc-mode
   :straight (:type built-in)
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
@@ -19,6 +32,12 @@
                      (setq-local c-set-style "cc-mode"
                                  c-basic-offset 2)
                      (lsp-deferred)))
+  :bind
+  (:map c-mode-base-map
+        ("C-c c a" . c-beginning-of-defun)
+        ("C-c c e" . c-end-of-defun)
+        ("M-q"     . c-fill-paragraph)
+        ("C-c C-d" . nil))
   :config
   (defvar c-electric-indent)
 
@@ -40,12 +59,7 @@
   ;;   :major-modes '(c-mode c++-mode)
   ;;   :remote? t
   ;;   :server-id 'clangd-r))
-  :bind
-  (:map c-mode-base-map
-        ("C-c c a" . c-beginning-of-defun)
-        ("C-c c e" . c-end-of-defun)
-        ("M-q"     . c-fill-paragraph)
-        ("C-c C-d" . nil)))
+  )
 
 (use-package modern-cpp-font-lock
   :diminish modern-c++-font-lock-mode

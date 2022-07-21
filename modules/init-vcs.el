@@ -90,6 +90,10 @@
 (use-package diff-hl
   :if (boundp 'vc-handled-backends)
   :commands diff-hl-dired-mode-unless-remote
+  :hook
+  ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
+   (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
+   (after-init-hook         . global-diff-hl-mode))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -97,11 +101,7 @@
   ;; Display margin since the fringe is unavailable in TTY
   (unless (display-graphic-p)
     (diff-hl-margin-mode 1))
-  (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote)
-  :hook
-  ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
-   (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
-   (after-init-hook         . global-diff-hl-mode)))
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote))
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit
@@ -113,15 +113,6 @@
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
-  :straight (:type built-in)
-  :after hydra
-  :commands (smerge-next smerge-prev smerge-auto-leave
-                         smerge-keep-base smerge-keep-upper
-                         smerge-keep-lower smerge-keep-all
-                         smerge-diff-base-lower
-                         smerge-diff-base-upper
-                         smerge-diff-upper-lower smerge-refine
-                         smerge-combine-with-next smerge-resolve)
   :preface
   (defun sb/enable-smerge-maybe ()
     "Enable smerge automatically based on conflict markers."
@@ -137,6 +128,15 @@
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)
         (smerge-mode 1))))
+  :straight (:type built-in)
+  :after hydra
+  :commands (smerge-next smerge-prev smerge-auto-leave
+                         smerge-keep-base smerge-keep-upper
+                         smerge-keep-lower smerge-keep-all
+                         smerge-diff-base-lower
+                         smerge-diff-base-upper
+                         smerge-diff-upper-lower smerge-refine
+                         smerge-combine-with-next smerge-resolve)
   :init
   (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
   (add-hook 'magit-diff-visit-file-hook (lambda nil

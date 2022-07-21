@@ -139,10 +139,10 @@
 
 ;; Allow GC to happen after a period of idle time, initialize this package early
 (use-package gcmh
-  :diminish
   :commands gcmh-idle-garbage-collect
   :hook
-  (after-init-hook . gcmh-mode))
+  (after-init-hook . gcmh-mode)
+  :diminish)
 
 ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
@@ -154,6 +154,8 @@
 
 (use-package no-littering
   :demand t)
+
+(use-package use-package-ensure-system-package)
 
 ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
