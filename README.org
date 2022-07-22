@@ -46,13 +46,13 @@ Evaluate the following to test that both fast JSON (Emacs 27+) and native compil
 (message "Native JSON is *not* available"))
 #+end_src
 
-Run the following to native compile all Elisp files under a directory (e.g., ~~/.emacs.d~): ~(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)~
+Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=): =(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)=
 
-** Setup Emacs Config
+** Setup Emacs config
 
-Back up the contents of your ~.emacs.d~ directory if it is not empty, and then check out the source.
+back up the contents of your ~.emacs.d~ directory if it is not empty, and then check out the source.
 
-#+begin_src hell
+#+begin_src shell
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 #+end_src
 
@@ -75,7 +75,7 @@ The following are examples of a few customization options defined in [[./modules
 - ~sb/minibuffer-completion~ - Choose either ~ivy~ or ~vertico~ for narrowing and selection.
 - ~sb/tab-bar-handler~ - Choose either ~company~ or ~corfu~ for in-buffer completion at point.
 - ~sb/project-handler~ - Choose either ~project.el~ or ~projectile~ for handling projects.
-- ~sb/disable-package.el~ - Disable ~~package.el~ and prefer the ~straight.el~ package manager.
+- ~sb/disable-package.el~ - Disable ~package.el~ and prefer the ~straight.el~ package manager.
 - ~sb/python-langserver~ - Choose between ~pylsp~ and ~pyright~ as the Python language server.
 
 ** LSP
@@ -145,11 +145,23 @@ ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exc
 ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=doc --exclude=PTRacer-solver
 #+end_src
 
-**** LaTeX project: ~find . -name "*.tex" | ctags -e -quiet -L -~
+**** LaTeX projects
 
-**** Python files: ~find src -name "*.py" | ctags -e -L -~
+#+begin_src shell
+find . -name "*.tex" | ctags -e -quiet -L -
+#+end_src
 
-**** Elisp files: ~ctags -e -R --exclude=@.ctagsignore --languages=EmacsLisp .~~
+**** Python files
+
+#+begin_src shell
+find src -name "*.py" | ctags -e -L -
+#+end_src
+
+**** Elisp files
+
+#+begin_src shell
+ctags -e -R --exclude=@.ctagsignore --languages=EmacsLisp .
+#+end_src
 
 **** Ignore directories and files
 
@@ -244,15 +256,15 @@ StartupWMClass=Emacs
 Keywords=Text;Editor;
 #+end_src
 
-- [[https://tychoish.com/post/running-emacs/][Running Emacs]]
+[[https://tychoish.com/post/running-emacs/][Running Emacs]]
 
 ** Emacs in a Terminal
 
-I use LSP intensively, and LSP+Tramp is sluggish and fails often. Furthermore, it seems difficult to properly setup many language servers with Tramp support. Instead, I prefer to use Emacs in a terminal. which has much better performance. This requires setting up support for 24-bit colors and proper keybindings in the terminal. I use Alacritty which is easy to customize.
+I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It seems difficult to properly set up many language servers with Tramp support. Therefore, I prefer to use Emacs in a terminal that has much better performance. It is important to set up support for 24-bit colors and proper keybindings in the terminal for good experience. I use [[https://github.com/alacritty/alacritty][Alacritty]] which is easy to customize.
 
 Use the steps mentioned in the link [[https://github.com/syl20bnr/spacemacs/wiki/Terminal][Spacemacs Terminal]] to enable support for 24bit colors in the terminal.
 
-#+begin_src Bash
+#+begin_src bash
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
@@ -263,7 +275,7 @@ Using ~export TERM=xterm-24bit~ may lead to failures when accessing remote syste
 
 ** Debugging Emacs
 
-- ~kill -s USR2 [pid]~~
+- ~kill -s USR2 [pid]~
 - ~killall -s USR2 emacs~
 - ~pkill -USR2 emacs~
 
@@ -271,6 +283,6 @@ Using ~export TERM=xterm-24bit~ may lead to failures when accessing remote syste
 
 ~emacs -Q -l /home/swarnendu/github/dotemacs/extras/profile-dotemacs.el -f profile-dotemacs~
 
-Estimate the best possible startup time: ~emacs -q --eval='(message "%s" (emacs-init-time))'~
+Estimate the best possible startup time: =emacs -q --eval​='(message "%s" (emacs-init-time))'=
 
 [[https://blog.d46.us/advanced-emacs-startup][Advanced Techniques for Reducing Emacs Startup Time]]

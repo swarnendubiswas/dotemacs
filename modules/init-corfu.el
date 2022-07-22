@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/capf)
+
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 ;; https://github.com/minad/corfu/wiki
 (use-package corfu
@@ -140,7 +142,14 @@
              cape-symbol ; Elisp symbol
              cape-ispell ; Complete word at point with Ispell
              ;; Complete with Dabbrev at point
-             cape-dabbrev)
+             cape-dabbrev
+             cape-capf-buster
+             cape-company-to-capf
+             cape-super-capf
+             sh-completion-at-point-function
+             comint-completion-at-point
+             citre-completion-at-point
+             TeX--completion-at-point)
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)

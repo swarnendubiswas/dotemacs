@@ -13,64 +13,6 @@
 (defvar sb/user-home-directory)
 (defvar sb/python-langserver)
 
-(use-package subword
-  :straight (:type built-in)
-  :diminish
-  :hook
-  (prog-mode-hook . subword-mode))
-
-(use-package outline ; Edit outlines
-  :hook
-  (prog-mode-hook . outline-minor-mode)
-  :diminish outline-minor-mode)
-
-;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
-;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
-(use-package hideshow
-  :straight (:type built-in)
-  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-  :diminish hs-minor-mode
-  :hook
-  ;; Hideshow is not defined for `ini-mode'.
-  ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
-  :custom
-  (hs-isearch-open t "Open all folds while searching"))
-
-(use-package symbol-overlay ; Highlight symbol under point
-  :diminish
-  :commands transient-define-prefix
-  :hook
-  (prog-mode-hook . symbol-overlay-mode)
-  :bind
-  (("M-p" . symbol-overlay-jump-prev)
-   ("M-n" . symbol-overlay-jump-next))
-  :custom
-  ;; Delay highlighting to allow for transient cursor placements
-  (symbol-overlay-idle-time 2)
-  ;; :config
-  ;; (transient-define-prefix sb/symbol-overlay-transient ()
-  ;;   "Symbol Overlay transient"
-  ;;   ["Symbol Overlay"
-  ;;    ["Overlays"
-  ;;     ("." "Add/Remove at point" symbol-overlay-put)
-  ;;     ("k" "Remove All" symbol-overlay-remove-all)
-  ;;     ]
-  ;;    ["Move to Symbol"
-  ;;     ("n" "Next" symbol-overlay-jump-next)
-  ;;     ("p" "Previous" symbol-overlay-jump-prev)
-  ;;     ]
-  ;;    ["Other"
-  ;;     ("m" "Highlight symbol-at-point" symbol-overlay-mode)
-  ;;     ]
-  ;;    ]
-  ;;   )
-  ;; (bind-key "M-o" #'sb/symbol-overlay-transient)
-  )
-
-(use-package highlight-escape-sequences
-  :hook
-  (prog-mode-hook . hes-mode))
-
 (use-package ini-mode
   :commands ini-mode)
 
@@ -473,11 +415,6 @@
 (use-package dotenv-mode
   :mode "\\.env\\'")
 
-(use-package rainbow-delimiters
-  :hook
-  ((prog-mode-hook latex-mode-hook LaTeX-mode-hook
-                   org-src-mode-hook) . rainbow-delimiters-mode))
-
 ;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
 (use-package executable
   :hook
@@ -499,21 +436,6 @@
   :mode
   (("\\.so\\'"  . elf-mode)
    ("\\.a\\'"   . elf-mode)))
-
-(use-package compile
-  :straight (:type built-in)
-  :custom
-  (compilation-always-kill t "Kill a compilation process before starting a new one")
-  (compilation-ask-about-save nil "Save all modified buffers without asking")
-  (compilation-exit-message-function #'sb/compilation-exit-autoclose)
-  ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
-  ;; error.
-  (compilation-scroll-output 'first-error))
-
-(use-package fancy-compilation
-  :straight (:type git :repo "https://codeberg.org/ideasman42/emacs-fancy-compilation")
-  :after compile
-  :init (fancy-compilation-mode 1))
 
 (provide 'init-languages)
 

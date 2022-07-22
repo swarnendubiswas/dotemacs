@@ -425,11 +425,11 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 *** Search for the symbol at point
 
   - ~isearch~ - Traditional incremental forward search for regular expression with ~C-f~
-  - ~counsel-grep-or-swiper~ - Use ~swiper~ (with overview of lines) for small buffers and ~counsel-grep~ for large files
-  - ~rgrep~ - Recursively grep for ~REGEXP~ in ~FILES~ in directory tree rooted at ~DIR~
-  - ~deadgrep~ - Start a ripgrep search for ~SEARCH-TERM~
+  - ~counsel-grep-or-swiper~ - Use ~swiper~ (with an overview of lines) for small buffers and ~counsel-grep~ for large files
+  - ~rgrep~ - Recursively grep for ~REGEXP~ in ~FILES~ in the directory tree rooted at ~DIR~
+  - ~deadgrep~ - Start a ~ripgrep~ search for ~SEARCH-TERM~
   - ~counsel-rg~ - Grep for a string in the current directory using ~rg~ (~C-c s r~)
-  - ~counsel-projectile-rg~ - Perform incremental search in the current project with ~rg~
+  - ~counsel-projectile-rg~ - Perform an incremental search in the current project with ~rg~
 
 **** Isearch
 
@@ -446,7 +446,7 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 
 *** Search in the current folder
 
-  - ~<f8>~ - Search for word in the current directory (~deadgrep~)
+  - ~<f8>~ - Search for a word in the current directory (~deadgrep~)
 
 *** List all files
 
@@ -473,7 +473,7 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
   - Change to a remote directory: ~cd /ssh:swarnendu@swarnendu6.cse.iitk.ac.in:~
   - Edit files
 
-*** Insert file path into buffer
+*** Insert file path into a buffer
 
     Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the file path in the buffer.
 
@@ -489,7 +489,7 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
   - Set ~(setq dired-dwim-target t)~
   - Split the window and open the source and destination directories with ~dired~
   - Mark the desired directories/files in one ~dired~ window
-  - Move the files with ~R~, the destination directory will the default prompt
+  - Move the files with ~R~, the destination directory will be the default prompt
 
 *** [[http://xahlee.info/emacs/emacs/emacs_string-rectangle_ascii-art.html][Delete columns of text, like in a LaTeX table]]
 

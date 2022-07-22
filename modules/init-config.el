@@ -181,7 +181,7 @@ Prefer the straight.el package manager instead."
   :group 'dotemacs)
 
 (defcustom sb/project-handler
-  'project
+  'projectile
   "Choose the handler for projects."
   :type '(radio
           (const :tag "project.el" project)

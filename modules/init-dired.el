@@ -302,7 +302,7 @@
   (dirvish-override-dired-mode)
   :custom
   (dirvish-hide-details nil)
-  (dirvish-attributes '(vc-state subtree-state all-the-icons collapse git-msg file-size))
+  (dirvish-attributes '(vc-state subtree-state all-the-icons collapse file-size))
   (dired-listing-switches
    "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
   (dirvish-default-layout '(0 0.15 0.50))

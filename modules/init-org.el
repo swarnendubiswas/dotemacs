@@ -68,8 +68,12 @@
         ("M-<up>"    . nil)
         ("M-<down>"  . nil)
         ("C-'"       . nil)
-        ("C-c C-d"   . nil) ; Was bound to `org-deadline'
-        ("C-c C-j"   . nil) ; Was bound to `org-goto'
+        ;; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
+        ("C-c C-d"   . nil)
+        ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variantsvgg
+        ("C-c C-j"   . nil)
+        ;; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
+        ("M-e"       . nil)
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)
         ("M-a" . org-backward-paragraph)
@@ -108,6 +112,10 @@
   :disabled t
   :hook
   (org-mode-hook . org-modern-mode))
+
+;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
 
 (provide 'init-org)
 

@@ -9,6 +9,7 @@
 
 (defvar sb/minibuffer-completion)
 (defvar popup-menu-keymap)
+(defvar sb/tab-bar-handler)
 
 (declare-function sb/comment-line "init-functions")
 (declare-function sb/save-all-buffers "init-functions")
@@ -79,35 +80,37 @@
   :commands free-keys)
 
 (use-package keyfreq
+  :commands (keyfreq-mode keyfreq-autosave-mode)
   :hook
   (after-init-hook . (lambda ()
                        (keyfreq-mode 1)
                        (keyfreq-autosave-mode 1))))
 
 (use-package which-key ; Show help popups for prefix keys
-  :diminish
   :commands which-key-setup-side-window-right-bottom
   :hook
   (after-init-hook . which-key-mode)
-  :config
-  (which-key-setup-side-window-right-bottom)
   :custom
   ;; Allow "C-h" to trigger `which-key' before it is done automatically
   (which-key-show-early-on-C-h nil)
-  (which-key-sort-order 'which-key-key-order-alpha))
+  (which-key-sort-order 'which-key-key-order-alpha)
+  :config
+  (which-key-setup-side-window-right-bottom)
+  :diminish)
 
 (use-package which-key-posframe
   :if (display-graphic-p)
   :hook
   (which-key-mode-hook . which-key-posframe-mode)
-  :config
-  ;; Modify the posframe background if it has a low contrast
-  ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
   :custom
   ;; Thicker border makes the posframe easier to distinguish
   (which-key-posframe-border-width 4)
   ;; Positioning the frame at the top obstructs the view to a lesser degree
-  (which-key-posframe-poshandler 'posframe-poshandler-frame-top-center))
+  (which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)
+  ;; :config
+  ;; Modify the posframe background if it has a low contrast
+  ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
+  )
 
 ;; Hydras, https://github.com/abo-abo/hydra
 
@@ -144,11 +147,11 @@
 
 ;; https://github.com/WalkerGriggs/dot-emacs/blob/master/configs/hydra.el
 (defun sb/with-alltheicon (icon str &optional height v-adjust)
-  "Displays an icon from all-the-icon."
+  "Displays ICON from all-the-icon in STR."
   (s-concat (all-the-icons-alltheicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
 (defun sb/with-faicon (icon str &optional height v-adjust)
-  "Displays an icon from Font Awesome icon."
+  "Displays icon from Font Awesome icon in STR."
   (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
 (defun sb/with-fileicon (icon str &optional height v-adjust)
@@ -162,6 +165,8 @@
 (declare-function spell-fu-goto-next-error "spell-fu")
 (declare-function spell-fu-goto-previous-error "spell-fu")
 (declare-function spell-fu-word-add "spell-fu")
+(declare-function flyspell-correct-previous "flyspell")
+(declare-function flyspell-correct-next "flyspell")
 
 (pretty-hydra-define sb/hydra-spelling
   (:color amaranth :quit-key "q" :title (sb/with-faicon "magic" "Spell check" 1 -0.05)
@@ -176,6 +181,9 @@
    (("n" spell-fu-goto-next-error "next error")
     ("p" spell-fu-goto-previous-error "previous error")
     ("a" spell-fu-word-add "add word"))))
+
+(declare-function default-text-scale-decrease "default-text-scale")
+(declare-function default-text-scale-increase "default-text-scale")
 
 (pretty-hydra-define sb/hydra-text-scale-zoom
   (:color amaranth :quit-key "q" :title "Zoom action" :foreign-keys warn)
@@ -330,6 +338,12 @@
    (("C" smerge-combine-with-next "Combine")
     ("r" smerge-resolve "Resolve")
     ("k" smerge-kill-current "Kill current"))))
+
+(declare-function mc/mark-previous-like-this "multiple-cursors")
+(declare-function mc/mark-next-like-this "multiple-cursors")
+(declare-function mc/unmark-previous-like-this "multiple-cursors")
+(declare-function mc/skip-to-previous-like-this "multiple-cursors")
+(declare-function mc/edit-lines "multiple-cursors")
 
 (pretty-hydra-define sb/hydra-multiple-cursors
   (:hint nil :quit-key "q" :title "Multiple cursors" :foreign-keys warn)

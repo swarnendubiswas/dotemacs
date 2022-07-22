@@ -31,10 +31,9 @@ Backquote constructs allow you to quote a list but selectively evaluate elements
 
 ~(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))~
 
-A local variable specification takes the following form:
+A local variable specification takes the following form: ~;; -*- mode: MODENAME; VAR: VALUE; ... -*-~
 
-~;; -*- mode: MODENAME; VAR: VALUE; ... -*-~
-
+- [[https://alhassy.github.io/ElispCheatSheet/CheatSheet.pdf][Elisp Reference Sheet]]
 
 ** Useful Information
 

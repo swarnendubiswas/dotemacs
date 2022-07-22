@@ -52,7 +52,8 @@
   )
 
 (use-package consult-project-extra
-  :if (eq sb/minibuffer-completion 'vertico)
+  :if (and (eq sb/project-handler 'project)
+           (eq sb/minibuffer-completion 'vertico))
   :after (consult project)
   :commands consult-project-extra-find-other-window
   :bind
@@ -64,7 +65,6 @@
 
 (use-package projectile
   :if (eq sb/project-handler 'projectile)
-  :disabled t
   :commands (projectile-project-p projectile-project-name
                                   projectile-expand-root
                                   projectile-project-root
@@ -183,7 +183,6 @@
 (use-package consult-projectile
   :if (and (eq sb/minibuffer-completion 'vertico)
            (eq sb/project-handler 'projectile))
-  :after projectile
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)

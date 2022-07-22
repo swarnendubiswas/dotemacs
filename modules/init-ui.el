@@ -14,19 +14,19 @@
 (defvar sb/minibuffer-completion)
 
 ;; Install fonts with "M-x all-the-icons-install-fonts"
-;; https://github.com/domtronn/all-the-icons.el/issues/120
-(defun sb/font-installed-p (font-name)
-  "Check if font with FONT-NAME is available."
-  (if (find-font (font-spec :name font-name))
-      t
-    nil))
-
 (use-package all-the-icons
-  :if (display-graphic-p)
+  :preface
+  ;; https://github.com/domtronn/all-the-icons.el/issues/120
+  ;; FIXME: This seems to work only with GUI Emacs.
+  (defun sb/font-installed-p (font-name)
+    "Check if font with FONT-NAME is available."
+    (if (find-font (font-spec :name font-name))
+        t
+      nil))
   :commands all-the-icons-install-fonts
   :init
-  (unless (sb/font-installed-p "all-the-icons")
-    (all-the-icons-install-fonts t))
+  (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
+      (all-the-icons-install-fonts t))
   :custom
   (all-the-icons-scale-factor 0.9)
   (all-the-icons-faicon-scale-factor 0.9)
@@ -422,68 +422,10 @@
   (set-cursor-color "#ffffff")
   (blink-cursor-mode 1))
 
-(add-hook 'prog-mode-hook
-          (lambda ()
-            ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-            (when (display-graphic-p)
-              (display-fill-column-indicator-mode 1))))
-
 (use-package hl-line
   :commands hl-line-highlight
   :hook
   (after-init-hook . global-hl-line-mode))
-
-;; https://github.com/ema2159/centaur-tabs/issues/181
-;; https://github.com/doomemacs/doomemacs/commit/8b93e8b15cc081860a8eb156b1584ef60b6bc9e4
-(use-package centaur-tabs
-  :if (eq sb/tab-bar-handler 'centaur-tabs)
-  :commands (centaur-tabs-group-by-projectile-project
-             centaur-tabs-headline-match)
-  :hook
-  (emacs-startup-hook . centaur-tabs-mode)
-  :bind*
-  (("M-<right>" . centaur-tabs-forward-tab)
-   ("M-<left>"  . centaur-tabs-backward-tab))
-  :custom
-  (centaur-tabs-set-modified-marker t)
-  (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-  (centaur-tabs-gray-out-icons t)
-  (centaur-tabs-set-close-button nil)
-  (centaur-tabs-show-new-tab-button nil)
-  (centaur-tabs-enable-ido-completion nil)
-  ;; Other styles like "wave" is not rendered on the terminal, and also does not work well with many
-  ;; themes
-  (centaur-tabs-style "bar")
-  (centaur-tabs-set-bar 'under)
-  :config
-  ;; The icons do not blend well with all themes.
-  (let ((themes '("doom-one"
-                  "doom-nord"
-                  "doom-molokai"
-                  "doom-gruvbox")))
-    (progn
-      (if (-contains? themes (symbol-name sb/gui-theme))
-          (setq centaur-tabs-set-icons t)
-        (setq centaur-tabs-set-icons nil))))
-
-  ;; (centaur-tabs-headline-match)
-  (centaur-tabs-group-by-projectile-project))
-
-(use-package awesome-tab
-  :straight (:type git :host github :repo "manateelazycat/awesome-tab")
-  :if (eq sb/tab-bar-handler 'awesome-tab)
-  :hook
-  (after-init-hook . awesome-tab-mode)
-  :bind*
-  (("M-<right>" . awesome-tab-forward-tab)
-   ("M-<left>" . awesome-tab-backward-tab)
-   ("M-]" . awesome-tab-ace-jump))
-  :custom-face
-  (awesome-tab-selected-face ((t (:inherit default :height 1.0))))
-  (awesome-tab-unselected-face ((t (:inherit default :height 0.8))))
-  :custom
-  (awesome-tab-label-fixed-length 14)
-  (awesome-tab-cycle-scope 'groups))
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse

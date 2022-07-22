@@ -123,7 +123,7 @@
   ;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
-  )
+  (add-to-list 'popwin:special-display-config '(comint-mode :noselect t)))
 
 ;; ;; Learn about display actions, see [[info:elisp#Display Action Functions]]
 ;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window

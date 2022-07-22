@@ -184,18 +184,25 @@
    ("b" . lsp-workspace-blacklist-remove)))
 
 (use-package lsp-ui
+  :after lsp-mode
+  :demand t
   :defines lsp-ui-modeline-code-actions-enable
   :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-doc--hide-frame
                              lsp-ui-peek-find-implementation lsp-ui-imenu)
-  :after lsp-mode
-  :demand t
+  :hook
+  (lsp-mode-hook . lsp-ui-mode)
+  :bind
+  (:map lsp-ui-mode-map
+        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references]  . lsp-ui-peek-find-references)
+        :map lsp-command-map
+        ("D" . lsp-ui-doc-show))
   :custom
   ;; Invoke doc on demand with `lsp-ui-doc-show'
   (lsp-ui-doc-enable nil "Disable on-hover dialogs")
   (lsp-ui-doc-include-signature t)
   (lsp-ui-imenu-auto-refresh 'after-save)
   (lsp-ui-imenu-window-width 16)
-  (lsp-ui-sideline-enable t "Enable/disable whole sideline")
   ;; Showing code actions in the sideline enables understanding when to invoke them
   (lsp-ui-sideline-show-code-actions t)
   (lsp-ui-sideline-show-hover nil)
@@ -205,14 +212,11 @@
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil)
-  :hook
-  (lsp-mode-hook . lsp-ui-mode)
-  :bind
-  (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references]  . lsp-ui-peek-find-references)
-        :map lsp-command-map
-        ("D" . lsp-ui-doc-show)))
+  :config
+  ;; Enabling the sideline creates flickering with Corfu popon.
+  (if (and (display-graphic-p) (eq sb/capf 'corfu))
+      (setq lsp-ui-sideline-enable nil)
+    (setq lsp-ui-sideline-enable t)))
 
 ;; Sync workspace folders and treemacs projects
 (use-package lsp-treemacs

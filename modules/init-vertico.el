@@ -118,7 +118,7 @@
 (use-package consult
   :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
-  :commands consult--customize-put
+  :commands (consult--customize-put projectile-project-root)
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
@@ -169,6 +169,11 @@
   (consult-line-numbers-widen t)
   (consult-preview-key nil "Disable preview by default, enable for selected commands")
   (completion-in-region-function #'consult-completion-in-region)
+  ;; Having multiple other sources like recentf makes it difficult to switch quickly between buffers
+  (consult-buffer-sources '(consult--source-buffer
+                            ;; consult--source-hidden-buffer
+                            ;; consult--source-recent-file
+                            ))
   :config
   (consult-customize
    consult-theme :preview-key '(:debounce 0.2 any)
@@ -185,7 +190,8 @@
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 (use-package embark
   :after vertico
-  :defines vertico-map
+  :defines (vertico-map which-key-use-C-h-commands)
+  :commands embark-prefix-help-command
   :init
   ;; Replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command
@@ -203,13 +209,14 @@
 ;; Enriches the completion display with annotations, e.g., documentation strings or file information
 (use-package marginalia
   :after vertico
+  :commands marginalia-mode
   :init (marginalia-mode 1)
-  :custom
-  (marginalia-align 'left)
   :bind
   (("M-A" . marginalia-cycle)
    :map minibuffer-local-map
    ("M-A" . marginalia-cycle))
+  :custom
+  (marginalia-align 'left)
   :config
   ;; Add project-buffer annotator.
   (add-to-list 'marginalia-annotator-registry

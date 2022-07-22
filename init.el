@@ -22,7 +22,10 @@
 (require 'init-packages)
 
 (require 'init-core)
+
 (require 'init-ui)
+(require 'init-tabs)
+
 (require 'init-buffer)
 (require 'init-dired)
 
@@ -39,10 +42,13 @@
 (require 'init-misc)
 (require 'init-checkers)
 
+(require 'init-prog)
 (require 'init-languages)
+(require 'init-lsp)
+
 (require 'init-cc)
 (require 'init-python)
-(require 'init-lsp)
+
 (require 'init-tags)
 
 (require 'init-vcs)
