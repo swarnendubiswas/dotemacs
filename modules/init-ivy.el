@@ -7,10 +7,10 @@
 
 ;;; Code:
 
+(defvar recentf-list)
+(defvar sb/minibuffer-completion)
+
 (use-package ivy
-  :functions ivy-format-function-line
-  :commands (ivy-read)
-  :if (eq sb/minibuffer-completion 'ivy)
   :preface
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
   (defun sb/ignore-dired-buffers (str)
@@ -18,21 +18,27 @@
   This function is intended for use with `ivy-ignore-buffers'."
     (let ((buf (get-buffer str)))
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
+  :if (eq sb/minibuffer-completion 'ivy)
+  :functions ivy-format-function-line
+  :commands (ivy-read)
   :hook
   (after-init-hook . ivy-mode)
+  :bind
+  (("C-c r"    . ivy-resume)
+   ("<f3>"     . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("<RET>"    . ivy-alt-done) ; Continue completion
+   ("<left>"   . ivy-previous-line)
+   ("<right>"  . ivy-next-line))
   :custom
   (ivy-count-format "(%d/%d) " "Helps identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
   (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
   (ivy-height 12)
   ;; Make the height of the minibuffer proportionate to the screen
-  ;; ivy-height-alist '((t
+  ;; (ivy-height-alist '((t
   ;;                      lambda (_caller)
-  ;;                      (/ (frame-height) 2)))
-  ;; We update `ivy-re-builders-alist' after loading `orderless'
-  ;; ivy-re-builders-alist '((counsel-M-x       . ivy--regex-fuzzy)
-  ;;                         (counsel-find-file . ivy--regex-fuzzy)
-  ;;                         (t                 . ivy--regex-ignore-order))
+  ;;                      (/ (frame-height) 2))))
   (ivy-truncate-lines nil) ; `counsel-flycheck' output gets truncated
   (ivy-wrap t)
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
@@ -50,6 +56,7 @@
              ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
+  ;; Other options: ivy--regex-ignore-order
   (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
                                 (counsel-M-x       . ivy--regex-fuzzy)
                                 (counsel-find-file . ivy--regex-fuzzy)
@@ -57,17 +64,9 @@
 
   ;; Ignore `dired' buffers from `ivy-switch-buffer'
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
-  :diminish
-  :bind
-  (("C-c r"    . ivy-resume)
-   ("<f3>"     . ivy-switch-buffer)
-   :map ivy-minibuffer-map
-   ("<RET>"    . ivy-alt-done) ; Continue completion
-   ("<left>"   . ivy-previous-line)
-   ("<right>"  . ivy-next-line)))
+  :diminish)
 
 (use-package counsel
-  :if (eq sb/minibuffer-completion 'ivy)
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
   (defun sb/counsel-goto-recent-directory ()
@@ -80,6 +79,9 @@
                     (if (executable-find "fasd")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
+  :if (eq sb/minibuffer-completion 'ivy)
+  :hook
+  (ivy-mode-hook . counsel-mode)
   :bind
   (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
    ([remap execute-extended-command] . counsel-M-x)
@@ -109,9 +111,6 @@
    ("M-g o"                          . counsel-outline)
    ([remap load-theme]               . counsel-theme)
    ([remap load-library]             . counsel-load-library))
-  :diminish
-  :hook
-  (ivy-mode-hook . counsel-mode)
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -158,7 +157,8 @@
   (counsel-preselect-current-file t)
   (counsel-switch-buffer-preview-virtual-buffers nil "Removes recent files and bookmarks")
   (counsel-yank-pop-preselect-last t)
-  (counsel-yank-pop-separator "\n------------------------------------------\n"))
+  (counsel-yank-pop-separator "\n------------------------------------------\n")
+  :diminish)
 
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
@@ -223,10 +223,6 @@
        :delimiter "\t"))))
 
 (use-package ivy-rich
-  :commands (ivy-rich-mode ivy-rich-modify-column
-                           ivy-rich-set-columns ivy-rich-modify-columns
-                           ivy-format-function-line)
-  :after (ivy counsel)
   :preface
   ;; Adapted from
   ;; https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
@@ -249,6 +245,10 @@
         (let* ((user-id (file-attribute-user-id (file-attributes candidate)))
                (user-name (user-login-name user-id)))
           (format "%s" user-name)))))
+  :after (ivy counsel)
+  :commands (ivy-rich-mode ivy-rich-modify-column
+                           ivy-rich-set-columns ivy-rich-modify-columns
+                           ivy-format-function-line)
   :init (ivy-rich-mode 1)
   :config
   (setq ivy-rich-parse-remote-buffer nil)

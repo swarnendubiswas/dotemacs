@@ -1,6 +1,6 @@
 (
  (dired-mode . (
-                (dired-omit-files . "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'")
+                (dired-omit-files . "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|\\eln-cache\\'")
                 ))
 
  (emacs-lisp-mode . (

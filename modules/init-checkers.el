@@ -148,8 +148,9 @@
               "--no-color"
               "--check"   (eval (if ispell-current-dictionary (substring ispell-current-dictionary 0 2) "en"))
               ;; Try to honor local aspell dictionary and replacements if they exist
-              "--dict"    (eval (expand-file-name "~/.aspell.en.pws"))
+              "--dict"    (eval (expand-file-name ispell-personal-dictionary))
               "--replace" (eval (expand-file-name "~/.aspell.en.prepl"))
+              "--ignore" "lt:en:MORFOLOGIK_RULE_EN_US,lt:en:WORD_CONTAINS_UNDERSCORE"
               ;; Using source ensures that a single temporary file in a different dir is created
               ;; such that textidote won't process other files. This serves as a hacky workaround for
               ;; https://github.com/sylvainhalle/textidote/issues/200.
@@ -234,8 +235,6 @@
 ;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
 ;; background process but does not support Tramp and supports fewer formatters.
 (use-package format-all
-  :commands (format-all-buffer)
-  :diminish
   :preface
   (defun sb/enable-format-all ()
     "Delay enabling format-all to avoid slowing down Emacs startup."
@@ -243,18 +242,19 @@
                                     markdown-mode-hook emacs-lisp-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
-  :diminish
+  :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
    ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook
-                     markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode)))
+                     markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode))
+  :diminish)
 
-;; ;; Enable using ".dir-locals.el" file
-;; (use-package editorconfig
-;;   :if (executable-find "editorconfig")
-;;   ;; :hook
-;;   ;; (prog-mode-hook . editorconfig-mode)
-;;   )
+;; Enable using ".dir-locals.el" file
+(use-package editorconfig
+  :if (executable-find "editorconfig")
+  ;; :hook
+  ;; (prog-mode-hook . editorconfig-mode)
+  )
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
@@ -287,12 +287,13 @@
                                      "languagetool/languagetool-server.jar")
         langtool-language-tool-jar (no-littering-expand-etc-file-name
                                     "languagetool/languagetool-commandline.jar")
-        ;; langtool-disabled-rules '("WHITESPACE_RULE"
-        ;;                           "EN_QUOTES"
-        ;;                           "DASH_RULE"
-        ;;                           "OXFORD_SPELLING_ISE_VERBS"
-        ;;                           "OXFORD_SPELLING_NOUNS")
-        ))
+        langtool-disabled-rules '("MORFOLOGIK_RULE_EN_US"
+                                  ;; "WHITESPACE_RULE"
+                                  ;; "EN_QUOTES"
+                                  ;; "DASH_RULE"
+                                  ;; "OXFORD_SPELLING_ISE_VERBS"
+                                  ;; "OXFORD_SPELLING_NOUNS")
+                                  )))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
@@ -363,26 +364,28 @@
    (lambda ()
      (require 'lsp-ltex)
      (lsp-deferred)))
-  :init
-  (setq lsp-ltex-language "en-US"
-        lsp-ltex-check-frequency "save"
-        lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64"
-        lsp-ltex-version "15.2.0"
-        lsp-ltex-dictionary (json-parse-string "{\"en-US\": [\"microbenchmarks, Tanmoy\"]}"))
+  :custom
+  ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
+  (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
+  (lsp-ltex-check-frequency "save")
+  (lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64")
+  (lsp-ltex-version "15.2.0")
+  (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
   ;; https://github.com/ggbaker/doom-emacs-config/blob/main/config.el
+  ;; https://github.com/emacs-languagetool/lsp-ltex/issues/5
+  ;; https://www.reddit.com/r/emacs/comments/ril2m4/comment/hqqbxbm/
 
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
   ;; Furthermore, we also use `flyspell' and `spell-fu'.
 
-  ;; (setq lsp-ltex-disabled-rules
-  ;;       #s(hash-table size 30 data
-  ;;                     ("en-US" ["MORFOLOGIK_RULE_EN_US"])
-  ;;                     ("en-US" ["WHITESPACE_RULE"])))
-
   (setq lsp-ltex-disabled-rules
-        (json-parse-string
-         "{\"en-US\": [\"MORFOLOGIK_RULE_EN_US\"]}"))
+        #s(hash-table size 30 data
+                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
+
+  ;; (setq lsp-ltex-disabled-rules
+  ;;       (json-parse-string
+  ;;        "{\"en-US\": [\"MORFOLOGIK_RULE_EN_US\"]}"))
 
   ;; (defvar lsp-ltex-active-modes)
 
@@ -493,9 +496,9 @@
   (clang-format+-always-enable t))
 
 (use-package highlight-indentation
-  :diminish (highlight-indentation-current-column-mode highlight-indentation-mode)
   :hook
-  ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode))
+  ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
+  :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
 (use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
   :hook

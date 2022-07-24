@@ -1,6 +1,9 @@
 (
  (nil . (
-         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.dvi$\\|.fdb_latexmk$\\|.fls$\\|.lof$\\|.log$\\|.lot$\\|.out$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$")
+         (make-local-variable 'completion-ignored-extensions)
+         (eval . (add-to-list 'completion-ignored-extensions ".out"))
+         (eval . (add-to-list 'completion-ignored-extensions ".log"))
+         (counsel-find-file-ignore-regexp . "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|.dvi$\\|.fdb_latexmk$\\|.fls$\\|.lof$\\|.log$\\|.lot$\\|.out$\\|.rel$\\|.rip$\\|.synctex$\\|.synctex.gz$\\|.toc$\\|.aux$\\|.bbl$\\|.blg$")
          (projectile-project-compilation-dir . ".")
          (projectile-project-compilation-cmd . "latexmk -f paper.tex")
          (projectile-enable-caching . t)
@@ -16,21 +19,14 @@
                                ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
                                )
 
-                             ;; (when (derived-mode-p 'latex-mode)
-                             ;;   (setq sb/flycheck-local-checkers
-                             ;;         '((lsp . ((next-checkers
-                             ;;                    . (tex-chktex))))))
-                             ;;   (flycheck-add-next-checker 'tex-chktex 'grammarly))
-
-                             (when (derived-mode-p 'sh-mode)
+                             (when (derived-mode-p 'latex-mode)
                                (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers
-                                                . (sh-shellcheck)))))))
+                                     '((lsp . ((next-checkers .
+                                                              (tex-textidote . (tex-chktex))))))))
                              )))
          ))
 
- (latex-mode . (
-                ;; (flycheck-checker . tex-chktex)
+ (latex-mode . (                
                 (TeX-master . (expand-file-name "paper.tex"))
 
                 (eval . (progn

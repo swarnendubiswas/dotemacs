@@ -13,6 +13,8 @@
 (defvar sb/user-home-directory)
 (defvar sb/python-langserver)
 
+(declare-function spell-fu-mode "spell-fu")
+
 (use-package ini-mode
   :commands ini-mode)
 
@@ -56,9 +58,8 @@
   )
 
 (use-package yaml-imenu
-  :after yaml-mode
-  :demand t
-  :config (yaml-imenu-enable))
+  :hook
+  (yaml-mode-hook . yaml-imenu-enable))
 
 (use-package css-mode
   :commands css-mode
@@ -152,14 +153,18 @@
                            markdown-insert-list-item
                            markdown-insert-uri
                            markdown-insert-footnote)
+  ;; :init
+  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
+  ;; (setq-default markdown-hide-markup t)
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
   (("\\.md\\'"       . markdown-mode)
    ("\\.markdown\\'" . markdown-mode)
    ("README\\.md\\'" . gfm-mode))
-  ;; :init
-  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
-  ;; (setq-default markdown-hide-markup t)
+  :bind
+  (:map markdown-mode-map
+        ("C-c C-d" . nil)
+        ("C-c C-j" . nil))
   :custom
   (markdown-command
    "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
@@ -170,26 +175,23 @@
   (markdown-list-indent-width 2)
   (markdown-split-window-direction 'horizontal)
   ;; (markdown-make-gfm-checkboxes-buttons nil)
-  (markdown-hide-urls t)
-  :bind
-  (:map markdown-mode-map
-        ("C-c C-d" . nil)
-        ("C-c C-j" . nil)))
+  (markdown-hide-urls t))
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-  ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
-                                      markdown-toc-generate-or-refresh-toc))
+                                      markdown-toc-generate-or-refresh-toc)
+  ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
+  )
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 ;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
   :commands (pandoc-load-default-settings pandoc-mode)
-  :diminish
   :hook
   (markdown-mode-hook . pandoc-mode)
-  :config (pandoc-load-default-settings))
+  :config (pandoc-load-default-settings)
+  :diminish)
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
@@ -197,9 +199,9 @@
   :commands markdown-preview-mode)
 
 (use-package docstr
-  :diminish
   :hook
-  ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode))
+  ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode)
+  :diminish)
 
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
@@ -404,13 +406,13 @@
 ;; cd emacs-tree-sitter
 ;; ./bin/setup; ./bin/build
 (use-package tree-sitter
-  :diminish tree-sitter-mode
   :hook
   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
    (emacs-startup-hook . global-tree-sitter-mode))
   :config
   (use-package tree-sitter-langs
-    :demand t))
+    :demand t)
+  :diminish tree-sitter-mode)
 
 (use-package dotenv-mode
   :mode "\\.env\\'")

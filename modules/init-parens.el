@@ -52,16 +52,6 @@
 ;; performance issue with `latex-mode', `markdown-mode', and large JSON files.
 ;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
 (use-package smartparens
-  :commands (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
-                     sp-transpose-sexp sp-absort-sexp sp-copy-sexp
-                     sp-backward-kill-sexp sp-kill-sexp sp-change-inner
-                     sp-change-enclosing sp-convolute-sexp sp-emit-sexp
-                     sp-backward-down-sexp sp-backward-up-sexp
-                     sp-backward-slurp-sexp sp-backward-barf-sexp
-                     sp-forward-barf-sexp sp-forward-slurp-sexp sp-rewrap-sexp
-                     sp-unwrap-sexp sp-backward-unwrap-sexp sp-wrap-round
-                     sp-wrap-curly sp-wrap-square sp-split-sexp)
-  :diminish
   :preface
   ;; https://web-mode.org/
   (defun sb/sp-web-mode-is-code-context (id action context)
@@ -74,15 +64,37 @@
     (indent-according-to-mode)
     (forward-line -1)
     (indent-according-to-mode))
+  :commands (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
+                     sp-transpose-sexp sp-absort-sexp sp-copy-sexp
+                     sp-backward-kill-sexp sp-kill-sexp sp-change-inner
+                     sp-change-enclosing sp-convolute-sexp sp-emit-sexp
+                     sp-backward-down-sexp sp-backward-up-sexp
+                     sp-backward-slurp-sexp sp-backward-barf-sexp
+                     sp-forward-barf-sexp sp-forward-slurp-sexp sp-rewrap-sexp
+                     sp-unwrap-sexp sp-backward-unwrap-sexp sp-wrap-round
+                     sp-wrap-curly sp-wrap-square sp-split-sexp)
   :hook
   ((after-init-hook . (lambda ()
                         (require 'smartparens-config)
                         (smartparens-global-mode 1)
                         (show-smartparens-global-mode 1))))
+  :bind
+  (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
+   ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
+   ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
+   ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
+   ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
+   ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
+   ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
+   ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
+   ;; "(foo bar)" -> "foo bar"
+   ("C-M-k" . sp-splice-sexp))
+  :custom
+  (sp-show-pair-from-inside t)
+  (sp-autoskip-closing-pair 'always)
   :config
-  (setq sp-show-pair-from-inside t
-        sp-autoskip-closing-pair 'always)
-
   (smartparens-strict-mode -1)
 
   (sp-local-pair 'web-mode "<" nil :when '(sb/sp-web-mode-is-code-context))
@@ -100,19 +112,7 @@
   (sp-local-pair 'prog-mode "{" nil :post-handlers '((sb/indent-between-pair "RET")))
   (sp-local-pair 'prog-mode "[" nil :post-handlers '((sb/indent-between-pair "RET")))
   (sp-local-pair 'prog-mode "(" nil :post-handlers '((sb/indent-between-pair "RET")))
-  :bind
-  (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-   ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-   ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-   ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-   ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-   ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-   ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
-   ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
-   ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
-   ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
-   ;; "(foo bar)" -> "foo bar"
-   ("C-M-k" . sp-splice-sexp)))
+  :diminish)
 
 (provide 'init-parens)
 

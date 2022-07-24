@@ -412,9 +412,8 @@
 
 (use-package procress
   :straight (:host github :repo "haji-ali/procress")
-  :commands tex-procress-mode
-  :init
-  (add-hook 'LaTeX-mode-hook 'tex-procress-mode)
+  :hook
+  (LaTeX-mode-hook . procress-auctex-mode)
   :config
   (procress-load-default-svg-images))
 

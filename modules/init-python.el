@@ -95,8 +95,8 @@
   :after python-mode
   :demand t
   :commands (python-docstring-mode python-docstring-install)
-  :diminish
-  :config (python-docstring-install))
+  :config (python-docstring-install)
+  :diminish)
 
 (use-package pip-requirements
   :commands pip-requirements-mode)
@@ -145,8 +145,6 @@
   :hook
   (python-mode-hook . yapf-mode)
   :diminish yapf-mode)
-
-(use-package pip-requirements)
 
 (provide 'init-python)
 

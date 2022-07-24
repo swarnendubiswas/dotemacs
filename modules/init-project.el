@@ -11,6 +11,8 @@
 (defvar sb/minibuffer-completion)
 (defvar sb/project-handler)
 
+(declare-function consult--customize-put "consult")
+
 ;; (use-package ffap ; Find FILENAME, guessing a default from text around point
 ;;   :commands ffap)
 

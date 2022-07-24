@@ -14,10 +14,6 @@
 (use-package isearch
   :straight (:type built-in)
   :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
-  :custom
-  (search-highlight t "Highlight incremental search")
-  (isearch-lazy-highlight t)
-  (isearch-lazy-count t)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
@@ -28,7 +24,11 @@
    ("C-s"     . nil)
    ("C-f"     . isearch-repeat-forward)
    ("C-c C-o" . isearch-occur)
-   ("C-'" . avy-isearch)))
+   ("C-'" . avy-isearch))
+  :custom
+  (search-highlight t "Highlight incremental search")
+  (isearch-lazy-highlight t)
+  (isearch-lazy-count t))
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
@@ -38,7 +38,6 @@
   :bind ("C-c s p" . isearch-symbol-at-point))
 
 (use-package anzu
-  :diminish anzu-mode
   :commands global-anzu-mode
   :init
   (setq anzu-search-threshold     10000
@@ -46,7 +45,8 @@
   (global-anzu-mode 1)
   :bind
   (([remap query-replace]        . anzu-query-replace)
-   ([remap query-replace-regexp] . anzu-query-replace-regexp)))
+   ([remap query-replace-regexp] . anzu-query-replace-regexp))
+  :diminish anzu-mode)
 
 (use-package swiper
   :if (eq sb/minibuffer-completion 'ivy)
@@ -92,15 +92,15 @@
 ;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
   :commands avy-setup-default
+  :bind
+  (("M-b"   . avy-goto-word-1)
+   ("C-'"   . avy-goto-char-timer)
+   ("C-/"   . avy-goto-line))
   :custom
   ;; Option "pre" is distracting because of all the movement while highlighting selection keys. This
   ;; causes the eyes to lose focus.
   (avy-style 'de-bruijn)
-  (avy-background t)
-  :bind
-  (("M-b"   . avy-goto-word-1)
-   ("C-'"   . avy-goto-char-timer)
-   ("C-/"   . avy-goto-line)))
+  (avy-background t))
 
 (progn
   (defvar reb-re-syntax)
@@ -111,7 +111,8 @@
 ;; and replacements as you type.
 (use-package visual-regexp
   :commands (vr/replace vr/mark)
-  :bind ([remap query-replace] . vr/query-replace))
+  :bind
+  ([remap query-replace] . vr/query-replace))
 
 (provide 'init-search)
 

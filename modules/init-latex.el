@@ -146,22 +146,6 @@
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 
 (use-package reftex
-  :straight (:type built-in)
-  :commands (reftex-get-bibfile-list bibtex-parse-keys
-                                     reftex-mode
-                                     reftex-toc-rescan
-                                     reftex-toc-Rescan
-                                     reftex-default-bibliography)
-  :diminish
-  :hook
-  ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
-  :bind
-  (("C-c ["   . reftex-citation)
-   ("C-c )"   . reftex-reference)
-   ("C-c ("   . reftex-label)
-   ("C-c ="   . reftex-toc)
-   ("C-c -"   . reftex-toc-recenter)
-   ("C-c &"   . reftex-view-crossref))
   :preface
   (defun sb/get-bibtex-keys (file)
     (with-current-buffer (find-file-noselect file)
@@ -199,6 +183,21 @@ Ignore if no file is found."
       (mapc 'LaTeX-add-bibitems
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+  :straight (:type built-in)
+  :commands (reftex-get-bibfile-list bibtex-parse-keys
+                                     reftex-mode
+                                     reftex-toc-rescan
+                                     reftex-toc-Rescan
+                                     reftex-default-bibliography)
+  :hook
+  ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
+  :bind
+  (("C-c ["   . reftex-citation)
+   ("C-c )"   . reftex-reference)
+   ("C-c ("   . reftex-label)
+   ("C-c ="   . reftex-toc)
+   ("C-c -"   . reftex-toc-recenter)
+   ("C-c &"   . reftex-view-crossref))
   :custom
   (reftex-plug-into-AUCTeX t)
   (reftex-enable-partial-scans t)
@@ -236,12 +235,12 @@ Ignore if no file is found."
 
     ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
     ;; but this is expensive.
-    (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan)))
+    (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+  :diminish)
 
 ;; Read document like a hypertext document, supports mouse highlighting
 (use-package bib-cite
   :straight auctex
-  :diminish bib-cite-minor-mode
   :hook
   ((LaTeX-mode-hook latex-mode-hook) . (lambda()
                                          (bib-cite-minor-mode 1)))
@@ -255,12 +254,13 @@ Ignore if no file is found."
   ;;       ("C-c l f" . bib-find)
   ;;       ("C-c l n" . bib-find-next))
   :custom
-  (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files"))
+  (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+  :diminish bib-cite-minor-mode)
 
 ;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 (use-package auctex-latexmk
-  :after tex-mode
   :straight (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")
+  :after tex-mode
   :demand t
   :commands (auctex-latexmk-setup auctex-latexmk)
   :custom

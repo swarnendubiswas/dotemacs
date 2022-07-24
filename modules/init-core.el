@@ -173,6 +173,9 @@
       ;; Do not accelerate scrolling
       mouse-wheel-progressive-speed nil)
 
+(when (fboundp 'pixel-scroll-precision-mode)
+  (pixel-scroll-mode 1))
+
 (fset 'display-startup-echo-area-message #'ignore)
 
 (progn
@@ -204,21 +207,19 @@
 
 (use-package autorevert ; Auto-refresh all buffers
   :straight (:type built-in)
-  :diminish auto-revert-mode
   :hook
   (after-init-hook . global-auto-revert-mode)
-  :config
-  (setq auto-revert-interval 5 ; Faster (seconds) would mean less likely to use stale data
-        ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
-        ;; use Emacs. Enabling auto-revert is always safe.
-        auto-revert-remote-files t
-        auto-revert-verbose nil
-        ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
-        ;; contents of the directory changes
-        global-auto-revert-non-file-buffers t)
-
-  ;; Revert all (e.g., PDF) files without asking
-  (setq revert-without-query '("\\.*")))
+  :custom
+  (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
+  ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
+  ;; use Emacs. Enabling auto-revert is always safe.
+  (auto-revert-remote-files t)
+  (auto-revert-verbose nil)
+  ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
+  ;; contents of the directory changes
+  (global-auto-revert-non-file-buffers t)
+  (revert-without-query '("\\.*") "Revert all (e.g., PDF) files without asking")
+  :diminish auto-revert-mode)
 
 ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
 ;; timer.
@@ -254,13 +255,13 @@
 ;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
   :straight (:type built-in)
-  :diminish
   :hook
   (after-init-hook . abbrev-mode)
   :custom
   ;; The "abbrev-defs" file is under version control
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
-  (save-abbrevs 'silently))
+  (save-abbrevs 'silently)
+  :diminish)
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
@@ -333,10 +334,6 @@
   (run-with-idle-timer 60 t #'recentf-cleanup))
 
 (use-package image-mode
-  :straight (:type built-in)
-  :if (display-graphic-p)
-  :commands image-get-display-property
-  :mode "\\.svg$"
   :preface
   ;; http://emacs.stackexchange.com/a/7693/289
   (defun sb/show-image-dimensions-in-mode-line ()
@@ -345,11 +342,15 @@
            (height (cdr image-dimensions)))
       (setq mode-line-buffer-identification
             (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
-  :custom
-  ;;  Enable converting external formats (i.e., webp) to internal ones.
-  (image-use-external-converter t)
+  :straight (:type built-in)
+  :if (display-graphic-p)
+  :commands image-get-display-property
   :hook
-  (image-mode-hook . sb/show-image-dimensions-in-mode-line))
+  (image-mode-hook . sb/show-image-dimensions-in-mode-line)
+  :mode "\\.svg$"
+  :custom
+  ;; Enable converting external formats (i.e., webp) to internal ones.
+  (image-use-external-converter t))
 
 ;; Use "emacsclient -c -nw" to start a new frame.
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
@@ -390,16 +391,14 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; TODO: We use the keybindings for moving around windows in tmux
+;; NOTE: We use the "Shift+direction" keybindings for moving around windows in tmux which is okay
+;; since I do not split Emacs frames often.
 (use-package windmove ; "Shift + direction" arrows
   :straight (:type built-in)
   :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
   :custom
   (windmove-wrap-around t "Wrap around at edges"))
-
-(when (fboundp 'pixel-scroll-precision-mode)
-  (pixel-scroll-mode 1))
 
 (use-package solar
   :straight (:type built-in)
@@ -416,8 +415,8 @@
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
-;; Auto-create missing directories on a file create and save
 (defun sb/auto-create-missing-dirs ()
+  "Auto-create missing directories on a file create and save."
   (let ((target-dir (file-name-directory buffer-file-name)))
     (unless (file-exists-p target-dir)
       (make-directory target-dir t))))

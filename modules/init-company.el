@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(defvar sb/capf)
+
 ;; The module does not specify an `autoload'. So we get the following error without the following
 ;; declaration.
 ;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
@@ -22,17 +24,28 @@
 ;; regex search.
 (use-package company
   :if (eq sb/capf 'company)
-  :commands (company-abort company-files company-yasnippet
-                           company-ispell company-dabbrev
-                           company-capf company-dabbrev-code
-                           company-clang-set-prefix)
   :defines (company-dabbrev-downcase company-dabbrev-ignore-case
                                      company-dabbrev-other-buffers
                                      company-ispell-available
                                      company-ispell-dictionary
                                      company-clang-insert-arguments)
+  :commands (company-abort company-files company-yasnippet
+                           company-ispell company-dabbrev
+                           company-capf company-dabbrev-code
+                           company-clang-set-prefix)
   :hook
   (after-init-hook . global-company-mode)
+  :bind
+  (:map company-active-map
+        ;; ("C-s"      . nil) ; Was bound to `company-search-candidates'
+        ;; ("C-M-s"    . nil) ; Was bound to `company-filter-candidates'
+        ("C-j"      . company-search-candidates)
+        ("C-n"      . company-select-next)
+        ("C-p"      . company-select-previous)
+        ;; Insert the common part of all candidates, or select the next one
+        ("<tab>"    . company-complete-common-or-cycle)
+        ("C-M-/"    . company-other-backend)
+        ("<escape>" . company-abort))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -91,18 +104,7 @@
   ;; The `company-posframe' completion kind indicator is not great, but we are now using
   ;; `company-fuzzy'.
   (when (display-graphic-p)
-    (diminish 'company-mode))
-  :bind
-  (:map company-active-map
-        ;; ("C-s"      . nil) ; Was bound to `company-search-candidates'
-        ;; ("C-M-s"    . nil) ; Was bound to `company-filter-candidates'
-        ("C-j"      . company-search-candidates)
-        ("C-n"      . company-select-next)
-        ("C-p"      . company-select-previous)
-        ;; Insert the common part of all candidates, or select the next one
-        ("<tab>"    . company-complete-common-or-cycle)
-        ("C-M-/"    . company-other-backend)
-        ("<escape>" . company-abort)))
+    (diminish 'company-mode)))
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
@@ -290,6 +292,8 @@
                                                company-dabbrev
                                                company-dict))))
 
+    (declare-function company-fuzzy-mode "company-fuzzy")
+
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook hook (lambda ()
                        (sb/company-latex-mode)
@@ -402,6 +406,16 @@
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
 (with-eval-after-load "company"
   (progn
+
+    (defvar citre-completion-case-sensitive)
+
+    (declare-function citre-capf--get-annotation "citre")
+    (declare-function citre-capf--get-collection "citre")
+    (declare-function citre-get-property "citre")
+    (declare-function citre-get-symbol "citre")
+
+    (declare-function company-begin-backend "company")
+
     (defun company-citre (-command &optional -arg &rest _ignored)
       "Completion backend of Citre.  Execute COMMAND with ARG and IGNORED."
       (interactive (list 'interactive))

@@ -31,13 +31,18 @@
  ("M-<right>" . next-buffer)
  ("C-<tab>"   . next-buffer)
  ("C-c d f"   . auto-fill-mode)
- ("M-c"       . capitalize-dwim)
- ("M-u"       . upcase-dwim)
- ("M-l"       . downcase-dwim)
  ("<f7>"      . previous-error)
  ("<f8>"      . next-error)
  ;; The default keybinding "C-S-backspace" does not work with the TUI without Alacritty customizations.
  ("M-k"       . kill-whole-line))
+
+;; The dwim versions manipulate only the character under the cursor, which is not what I want most
+;; often.
+
+;; (bind-keys
+;;  ("M-c"       . capitalize-dwim)
+;;  ("M-u"       . upcase-dwim)
+;;  ("M-l"       . downcase-dwim))
 
 ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
 ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.

@@ -17,9 +17,6 @@
 (declare-function s-ends-with? "s")
 
 (use-package dired
-  :straight (:type built-in)
-  :commands (dired-next-line dired-jump)
-  :defines dired-clean-confirm-killing-deleted-buffers
   :preface
   (defun sb/dired-go-home ()
     (interactive)
@@ -34,15 +31,18 @@
     (interactive)
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
+  :straight (:type built-in)
+  :defines dired-clean-confirm-killing-deleted-buffers
+  :commands (dired-next-line dired-jump)
+  :hook
+  ;; Auto refresh dired when files change
+  (dired-mode-hook . auto-revert-mode)
   :bind
   (:map dired-mode-map
         ("M-<home>" . sb/dired-go-home)
         ("M-<up>"   . sb/dired-jump-to-top)
         ("M-<down>" . sb/dired-jump-to-bottom)
         ("i"        . find-file))
-  :hook
-  ;; Auto refresh dired when files change
-  (dired-mode-hook . auto-revert-mode)
   :custom
   (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
   ;; Guess a default target directory. When there are two dired buffers, Emacs will select another
@@ -109,23 +109,24 @@
   :init
   ;; Set before the module is loaded
   (setq diredp-bind-problematic-terminal-keys nil)
-  :custom
-  (diredp-hide-details-initially-flag nil)
-  (diredp-hide-details-propagate-flag nil)
   :hook
   (dired-mode-hook . (lambda ()
                        (when sb/EMACS27
-                         (diredp-toggle-find-file-reuse-dir 1)))))
+                         (diredp-toggle-find-file-reuse-dir 1))))
+  :custom
+  (diredp-hide-details-initially-flag nil)
+  (diredp-hide-details-propagate-flag nil))
+
 
 ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
   :after dired
   :defines dired-efap-initial-filename-selection
-  :custom (dired-efap-initial-filename-selection nil)
   :bind*
   (:map dired-mode-map
-        ("r" . dired-efap)))
+        ("r" . dired-efap))
+  :custom (dired-efap-initial-filename-selection nil))
 
 ;; (use-package treemacs
 ;;   :functions treemacs-tag-follow-mode
@@ -279,9 +280,9 @@
 (use-package dired-async
   :straight async
   :after (dired async)
-  :diminish
   :hook
-  (dired-mode-hook . dired-async-mode))
+  (dired-mode-hook . dired-async-mode)
+  :diminish)
 
 (use-package consult-dir
   :if (eq sb/minibuffer-completion 'vertico)
@@ -313,13 +314,13 @@
 (use-package all-the-icons-dired
   :if (and (display-graphic-p) (not (featurep 'dirvish)))
   :commands all-the-icons-dired--refresh-advice
-  :diminish
   :hook
   (dired-mode-hook . (lambda ()
                        (unless (file-remote-p default-directory)
                          (all-the-icons-dired-mode 1))))
   :custom
-  (all-the-icons-dired-monochrome nil))
+  (all-the-icons-dired-monochrome nil)
+  :diminish)
 
 (provide 'init-dired)
 

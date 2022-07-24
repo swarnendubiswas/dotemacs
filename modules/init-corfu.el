@@ -105,7 +105,9 @@
   :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook
-  (corfu-mode-hook . corfu-terminal-mode))
+  (corfu-mode-hook . corfu-terminal-mode)
+  :custom
+  (corfu-terminal-position-right-margin 5))
 
 (use-package corfu-doc-terminal
   :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")

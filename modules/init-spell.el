@@ -48,10 +48,6 @@
   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package flyspell
-  :straight (:type built-in)
-  :if (symbol-value 'sb/IS-LINUX)
-  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
-  :diminish
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -93,10 +89,9 @@
               (message "No more misspelled words!")
               (setq arg 0))
           (forward-word)))))
-  :custom
-  (flyspell-abbrev-p t "Add corrections to abbreviation table")
-  (flyspell-issue-message-flag nil)
-  (flyspell-issue-welcome-flag nil)
+  :straight (:type built-in)
+  :if (symbol-value 'sb/IS-LINUX)
+  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :hook
   (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
@@ -112,7 +107,12 @@
    ("C-c f b" . flyspell-buffer)
    ;; :map flyspell-mode-map
    ;; ("C-,"     . sb/flyspell-goto-previous-error)
-   ))
+   )
+  :custom
+  (flyspell-abbrev-p t "Add corrections to abbreviation table")
+  (flyspell-issue-message-flag nil)
+  (flyspell-issue-welcome-flag nil)
+  :diminish)
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -133,11 +133,9 @@
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
+  :if (executable-find "aspell")
   :defines spell-fu-directory
   :commands spell-fu-mode
-  :if (executable-find "aspell")
-  :custom
-  (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
   :init
   (add-hook 'text-mode-hook
             (lambda ()
@@ -201,6 +199,12 @@
                                                     font-lock-variable-name-face
                                                     hl-line))
                      (spell-fu-mode))))
+  :bind
+  (("C-c f n" . spell-fu-goto-next-error)
+   ("C-c f p" . spell-fu-goto-previous-error)
+   ("C-c f a" . spell-fu-word-add))
+  :custom
+  (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
   :config
   ;; https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/64
   (add-to-list 'spell-fu-faces-include 'font-lock-string-face)
@@ -208,16 +212,12 @@
   (add-to-list 'spell-fu-faces-include 'font-lock-comment-face)
   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:comment)
   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:doc)
-  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
-  :bind
-  (("C-c f n" . spell-fu-goto-next-error)
-   ("C-c f p" . spell-fu-goto-previous-error)
-   ("C-c f a" . spell-fu-word-add)))
+  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string))
 
 (use-package consult-flyspell
   :if (eq sb/minibuffer-completion 'vertico)
-  :defines consult-flyspell-select-function
   :after (consult flyspell)
+  :defines consult-flyspell-select-function
   :bind ("C-c f l" . consult-flyspell)
   :config
   (setq consult-flyspell-select-function (lambda ()

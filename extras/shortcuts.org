@@ -60,8 +60,8 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
   - ~M-e~ - Move forward to the end of the sentence (~forward-sentence~)
   - ~M-{~ - Move back to the previous paragraph beginning (~backward-paragraph~)
   - ~M-}~ - Move forward to the end of the next paragraph (~markdown-forward-paragraph~)
-  - ~C-up~ - Move forward to end of paragraph (~forward-paragraph~)
-  - ~C-down~ - Move backward to start of paragraph (~backward-paragraph~)
+  - ~C-up~ - Move forward to the end of the paragraph (~forward-paragraph~)
+  - ~C-down~ - Move backward to the start of the paragraph (~backward-paragraph~)
   - ~M-r~ - Without a prefix argument, position the cursor at the center of the window (~move-to-window-line-top-bottom~)
 
 ** Miscellaneous
@@ -71,7 +71,12 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
 ** Dired
 
+*** Global Map
   - ~C-x d~ - Show ~dired~ buffer (~dired~)
+  - ~C-x C-j~ - Open ~dired~ with the cursor right on the file you are editing (~dired-jump~)
+
+*** Dired Map
+
   - ~+~ - Create a new directory (~dired-create-directory~)
   - ~g~ - Update the entire contents (~revert-buffer~)
   - ~l~ - Update the specified files (~dired-do-redisplay~)
@@ -88,7 +93,6 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
   - ~M-<down>~ - Go the last file/directory (~dired-jump-to-bottom~)
   - ~q~ - Kill ~dired~ buffer (~quit-window~)
   - ~C-u q~ - Kill ~dired~ buffer (~universal-argument quit-window~)
-  - ~C-x C-j~ - Open ~dired~ with cursor right on the file you are editing (~dired-jump~)
 
 ** Treemacs
 
@@ -138,7 +142,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
   - ~~~ - Switch to the home directory (~self-insert-command~)
   - ~C-c C-o~ - Save the current completion session to a new read-only buffer and exits completion (~ivy-occur~)
   - ~C-m~ - Calls the default action and exits minibuffer (~ivy-done~)
-  - ~C-j~ - When completing file names, selects the current directory candidate and starts a new completion session there. Otherwise, it is the same as ~ivy-done~ (~ivy-alt-done~)
+  - ~C-j~ - When completing file names, select the current directory candidate and start a new completion session there. Otherwise, it is the same as ~ivy-done~ (~ivy-alt-done~)
   - ~C-j~ - Exits with the current input instead of the current candidate (~ivy-immediate-done~). This is useful when copying/renaming files with names that match existing files
   - ~C-'~ - Use ~avy~ to select candidates (~ivy-avy~)
   - ~C-c r~ - Resume the last ivy completion session (~ivy-resume~)

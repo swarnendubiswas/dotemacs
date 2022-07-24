@@ -12,6 +12,7 @@
          ))
 
  (c++-mode . (
+              (clang-format-style . "file")
               (flycheck-gcc-language-standard   . "c++14")
               (flycheck-clang-language-standard . "c++14")
               (flycheck-clang-tidy-build-path   . ".")

@@ -78,7 +78,7 @@ Other buffer group by `awesome-tab-get-group-name' with project name."
   (awesome-tab-unselected-face ((t (:inherit default :height 0.8))))
   :custom
   (awesome-tab-label-fixed-length 14)
-  (awesome-tab-buffer-groups-function 'sb/awesome-tab-buffer-groups)
+  (awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups)
   (awesome-tab-cycle-scope 'groups))
 
 (provide 'init-tabs)
