@@ -78,12 +78,14 @@
 
 (use-package counsel-tramp
   :if (eq sb/minibuffer-completion 'ivy)
-  :bind ("C-c d t" . counsel-tramp))
+  :bind
+  ("C-c d t" . counsel-tramp))
 
 (use-package consult-tramp
   :straight (consult-tramp :type git :host github :repo "Ladicle/consult-tramp")
   :if (eq sb/minibuffer-completion 'vertico)
-  :bind ("C-c d t" . consult-tramp))
+  :bind
+  ("C-c d t" . consult-tramp))
 
 ;; TODO: SSH into Gcloud
 ;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9

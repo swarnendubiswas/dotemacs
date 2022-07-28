@@ -124,21 +124,24 @@
 ;; blue" means exit.
 
 (use-package hydra
-  :commands (hydra-default-pre hydra-keyboard-quit defhydra
-                               hydra-show-hint hydra-set-transient-map
-                               hydra--call-interactively-remap-maybe))
+  :commands
+  (hydra-default-pre hydra-keyboard-quit defhydra hydra-show-hint
+                     hydra-set-transient-map
+                     hydra--call-interactively-remap-maybe))
 
 (use-package hydra-posframe
   :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
   :if (display-graphic-p)
   :after hydra
-  :commands hydra-posframe-mode
+  :commands
+  (hydra-posframe-mode)
   :init (hydra-posframe-mode 1))
 
 (use-package ivy-hydra ; Additional keybindings for `ivy'
   :after (ivy hydra)
   :demand t
-  :commands (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
+  :commands
+  (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
 (use-package pretty-hydra
   :after hydra

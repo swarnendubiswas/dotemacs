@@ -130,19 +130,21 @@
         (smerge-mode 1))))
   :straight (:type built-in)
   :after hydra
-  :commands (smerge-next smerge-prev smerge-auto-leave
-                         smerge-keep-base smerge-keep-upper
-                         smerge-keep-lower smerge-keep-all
-                         smerge-diff-base-lower
-                         smerge-diff-base-upper
-                         smerge-diff-upper-lower smerge-refine
-                         smerge-combine-with-next smerge-resolve)
+  :commands
+  (smerge-next smerge-prev smerge-auto-leave
+               smerge-keep-base smerge-keep-upper
+               smerge-keep-lower smerge-keep-all
+               smerge-diff-base-lower
+               smerge-diff-base-upper
+               smerge-diff-upper-lower smerge-refine
+               smerge-combine-with-next smerge-resolve)
   :init
   (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
   (add-hook 'magit-diff-visit-file-hook (lambda nil
                                           (when smerge-mode
                                             (sb/smerge-hydra/body))))
-  :bind-keymap ("C-c v" . smerge-command-prefix)
+  :bind-keymap
+  ("C-c v" . smerge-command-prefix)
   :bind
   (:map smerge-mode-map
         ("M-g n"   . smerge-next)
@@ -161,8 +163,10 @@
   :straight (:type built-in)
   :after magit
   :demand t
-  :defines ediff-window-setup-function
-  :commands (ediff-setup-windows-plain ediff-set-diff-options)
+  :defines
+  (ediff-window-setup-function)
+  :commands
+  (ediff-setup-windows-plain ediff-set-diff-options)
   :custom
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
   (ediff-window-setup-function #'ediff-setup-windows-plain)

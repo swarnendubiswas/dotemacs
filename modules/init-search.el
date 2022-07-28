@@ -13,7 +13,8 @@
 ;; `isearch' candidates.
 (use-package isearch
   :straight (:type built-in)
-  :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
+  :commands
+  (isearch-forward-regexp isearch-repeat-forward isearch-occur)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s"     . nil)
@@ -32,13 +33,16 @@
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
-  :commands (isearch-forward-symbol ; "M-s _"
-             isearch-forward-symbol-at-point ; "M-s ."
-             isearch-backward-symbol-at-point)
-  :bind ("C-c s p" . isearch-symbol-at-point))
+  :commands
+  (isearch-forward-symbol ; "M-s _"
+   isearch-forward-symbol-at-point ; "M-s ."
+   isearch-backward-symbol-at-point)
+  :bind
+  ("C-c s p" . isearch-symbol-at-point))
 
 (use-package anzu
-  :commands global-anzu-mode
+  :commands
+  (global-anzu-mode)
   :init
   (setq anzu-search-threshold     10000
         anzu-minimum-input-length 2)
@@ -50,8 +54,10 @@
 
 (use-package swiper
   :if (eq sb/minibuffer-completion 'ivy)
-  :commands (swiper swiper-isearch)
-  :custom (swiper-action-recenter t))
+  :commands
+  (swiper swiper-isearch)
+  :custom
+  (swiper-action-recenter t))
 
 (with-eval-after-load "grep"
   (defvar grep-highlight-matches)
@@ -74,13 +80,15 @@
         ("C-x C-s" . wgrep-finish-edit)
         ("C-x C-k" . wgrep-abort-changes)
         ("C-x C-q" . wgrep-exit))
-  :custom (wgrep-auto-save-buffer t))
+  :custom
+  (wgrep-auto-save-buffer t))
 
 ;; Use "S" to change the search term, "D" to change the search directory, "g" to rerun the search,
 ;; "o" to view the result in another window, "n" and "p" to move between results buttons, "M-n" and
 ;; "M-p" to move between file headers, and "C-c C-k" to stop a running search.
 (use-package deadgrep
-  :bind ("C-c s d" . deadgrep))
+  :bind
+  ("C-c s d" . deadgrep))
 
 ;; (use-package affe
 ;;   :if (eq sb/minibuffer-completion 'vertico)
@@ -110,7 +118,8 @@
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
 (use-package visual-regexp
-  :commands (vr/replace vr/mark)
+  :commands
+  (vr/replace vr/mark)
   :bind
   ([remap query-replace] . vr/query-replace))
 

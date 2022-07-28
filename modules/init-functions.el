@@ -101,6 +101,8 @@ Increase line spacing by two line height."
   (shell-command
    (format "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s" sb/ctags-path (directory-file-name dir-name))))
 
+(declare-function ivy-read "ivy")
+
 ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
 (defun sb/counsel-all-files-recursively (dir-name)
   "List all files recursively in DIR-NAME."

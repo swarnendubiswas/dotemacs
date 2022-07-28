@@ -20,7 +20,8 @@
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :if (eq sb/minibuffer-completion 'ivy)
   :functions ivy-format-function-line
-  :commands (ivy-read)
+  :commands
+  (ivy-read)
   :hook
   (after-init-hook . ivy-mode)
   :bind
@@ -246,9 +247,10 @@
                (user-name (user-login-name user-id)))
           (format "%s" user-name)))))
   :after (ivy counsel)
-  :commands (ivy-rich-mode ivy-rich-modify-column
-                           ivy-rich-set-columns ivy-rich-modify-columns
-                           ivy-format-function-line)
+  :commands
+  (ivy-rich-mode ivy-rich-modify-column
+                 ivy-rich-set-columns ivy-rich-modify-columns
+                 ivy-format-function-line)
   :init (ivy-rich-mode 1)
   :config
   (setq ivy-rich-parse-remote-buffer nil)

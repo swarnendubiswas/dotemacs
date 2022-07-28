@@ -19,7 +19,8 @@
                                 vertico-repeat))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
-  :commands (command-completion-default-include-p minibuffer-keyboard-quit)
+  :commands
+  (command-completion-default-include-p minibuffer-keyboard-quit)
   :hook
   (after-init-hook . vertico-mode)
   :bind
@@ -118,7 +119,8 @@
 (use-package consult
   :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
-  :commands (consult--customize-put projectile-project-root)
+  :commands
+  (consult--customize-put projectile-project-root)
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)

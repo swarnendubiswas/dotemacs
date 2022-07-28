@@ -13,7 +13,8 @@
 
 (use-package ibuffer
   :straight (:type built-in)
-  :bind ("C-x C-b" . ibuffer)
+  :bind
+  ("C-x C-b" . ibuffer)
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: `major-mode', `recency'
@@ -30,20 +31,19 @@
   (ibuffer-show-empty-filter-groups nil))
 
 (use-package ibuffer-project
-  :after (ibuffer project)
   :if (eq sb/project-handler 'project)
+  :hook
+  (ibuffer-hook . (lambda ()
+                    (unless (eq ibuffer-sorting-mode 'project-file-relative)
+                      (ibuffer-do-sort-by-project-file-relative))))
+  :custom
+  (ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
   :config
-  (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote"))
-  :init
-  (add-hook 'ibuffer-hook
-            (lambda ()
-              (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-              (unless (eq ibuffer-sorting-mode 'project-file-relative)
-                (ibuffer-do-sort-by-project-file-relative)))))
+  (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
-  :after projectile
   :if (eq sb/project-handler 'projectile)
+  :after projectile
   :hook
   (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
@@ -62,9 +62,9 @@
    ("C-x f" . counsel-fd-file-jump)))
 
 (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+  :demand t
   :defines vlf-application
   :commands vlf
-  :demand t
   :init
   (setq vlf-application 'dont-ask)
   (require 'vlf-setup))
@@ -142,34 +142,6 @@
 ;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
 ;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
 
-;; https://github.com/malb/emacs.d/blob/master/malb.org
-;; (defvar sb/popup-windows '("\\`\\*compilation\\*\\'"
-;;                            "\\`\\*Flycheck errors\\*\\'"
-;;                            "\\`\\*Help\\*\\'"
-;;                            "\\` \\*LanguageTool Errors\\* \\'"
-;;                            "\\`\\*Edit footnote .*\\*\\'"
-;;                            "\\`\\*TeX errors*\\*\\'"
-;;                            "\\`\\*Org Export Dispatcher\\*\\'"
-;;                            "\\`\\*Backtrace\\*\\'"
-;;                            "\\`\\*Messages\\*\\'"
-;;                            "\\`\\*Calendar\\*\\'"
-;;                            "\\`\\*Async Shell Command\\*\\'"
-;;                            "\\`\\*LaTeXMK\\[.*\\]\\*"
-;;                            "\\`\\*tzc-times\\*\\'"))
-
-;; (dolist (name sb/popup-windows)
-;;   (add-to-list 'display-buffer-alist
-;;                `(,name
-;;                  (malb/frame-dispatch
-;;                   display-buffer-reuse-window
-;;                   display-buffer-in-side-window)
-;;                  (reusable-frames . visible)
-;;                  (side            . bottom)
-;;                  (window-parameters
-;;                   (no-other-window . t)
-;;                   (no-delete-other-windows . t))
-;;                  (window-height   . 0.3))) t)
-
 (use-package ace-window
   :bind
   (([remap other-window] . ace-window)
@@ -180,23 +152,24 @@
 
 ;; The keybinding will be hidden if we use tmux, and we will need to press twice.
 (use-package ace-jump-buffer
-  :bind ("C-b" . ace-jump-buffer)
+  :bind
+  ("C-b" . ace-jump-buffer)
   :custom
-  (ajb-max-window-height 30)
   (ajb-bs-configuration "files-and-scratch")
+  (ajb-max-window-height 30)
   (ajb-sort-function 'bs--sort-by-filename))
 
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `after-save-hook' and leads to auto-formatters being invoked more frequently.
 (use-package super-save
   :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
-  :diminish
   :hook
   (after-init-hook . super-save-mode)
   :custom
   (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
   (super-save-triggers '(other-window windmove-up windmove-down
-                                      windmove-left windmove-right ace-window)))
+                                      windmove-left windmove-right ace-window))
+  :diminish)
 
 (provide 'init-buffer)
 

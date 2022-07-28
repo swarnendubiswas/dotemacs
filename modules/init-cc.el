@@ -22,8 +22,10 @@
 
 (use-package cc-mode
   :straight (:type built-in)
-  :defines (c-electric-brace c-enable-auto-newline c-set-style)
-  :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
+  :defines
+  (c-electric-brace c-enable-auto-newline c-set-style)
+  :commands
+  (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode
   (("\\.h\\'" . c++-mode)
    ("\\.c\\'" . c++-mode))
@@ -62,9 +64,9 @@
   )
 
 (use-package modern-cpp-font-lock
-  :diminish modern-c++-font-lock-mode
   :hook
-  (c++-mode-hook . modern-c++-font-lock-mode))
+  (c++-mode-hook . modern-c++-font-lock-mode)
+  :diminish modern-c++-font-lock-mode)
 
 (use-package cuda-mode
   :commands cuda-mode

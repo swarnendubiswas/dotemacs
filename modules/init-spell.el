@@ -91,7 +91,8 @@
           (forward-word)))))
   :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
-  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
+  :commands
+  (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :hook
   (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and

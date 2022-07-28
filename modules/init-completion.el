@@ -27,7 +27,8 @@
   :straight (:type built-in)
   :custom
   (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
-  :bind ("C-M-;" . dabbrev-completion))
+  :bind
+  ("C-M-;" . dabbrev-completion))
 
 ;; Replace `dabbrev-exp' with `hippie-expand'.
 (use-package hippie-exp
@@ -90,18 +91,19 @@
 ;; major-modes where you want YASnippet enabled.
 ;; https://github.com/joaotavora/yasnippet/blob/master/README.mdown
 (use-package yasnippet
-  :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
+  :commands
+  (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook
   ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-global-mode)
-  :diminish yas-minor-mode
   :custom
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   (yas-verbosity 0)
   :config
   (with-eval-after-load "hippie-expand"
     (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
-  (unbind-key "<tab>" yas-minor-mode-map))
+  (unbind-key "<tab>" yas-minor-mode-map)
+  :diminish yas-minor-mode)
 
 ;; YASnippet no longer bundles snippets directly
 (use-package yasnippet-snippets
@@ -111,12 +113,14 @@
 (use-package ivy-yasnippet
   :if (eq sb/minibuffer-completion 'ivy)
   :after ivy
-  :bind ("C-M-y" . ivy-yasnippet))
+  :bind
+  ("C-M-y" . ivy-yasnippet))
 
 (use-package consult-yasnippet
   :if (eq sb/minibuffer-completion 'vertico)
   :after consult
-  :bind ("C-M-y" . consult-yasnippet))
+  :bind
+  ("C-M-y" . consult-yasnippet))
 
 ;; Prescient uses frequency + recency for sorting. Vertico does its own sorting based on recency,
 ;; and corfu has corfu-history. Company has company-statistics. Furthermore, ivy is not well

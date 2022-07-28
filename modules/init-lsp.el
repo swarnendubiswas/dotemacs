@@ -7,10 +7,19 @@
 
 ;;; Code:
 
+(defvar sb/capf)
+
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
-  :diminish
+  :preface
+  ;; https://github.com/minad/corfu/wiki
+  (defun sb/lsp-mode-setup-completion ()
+    (if (featurep 'orderless)
+        (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+              '(orderless))
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(flex))))
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -51,14 +60,6 @@
                                     lsp-completion--regex-fuz
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
-  :preface
-  ;; https://github.com/minad/corfu/wiki
-  (defun sb/lsp-mode-setup-completion ()
-    (if (featurep 'orderless)
-        (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-              '(orderless))
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(flex))))
   :init
   ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
   (when (eq sb/capf 'corfu)
@@ -67,90 +68,8 @@
   :hook
   ((lsp-mode-hook . lsp-enable-which-key-integration)
    (lsp-mode-hook . lsp-dired-mode))
-  :custom-face
-  ;; Reduce the height
-  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
-                                               font-lock-doc-face :weight bold :height 0.9))))
-  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
-  (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
-                                                               :weight bold :height 0.9))))
-  :custom
-  (lsp-completion-enable nil)
-  ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
-  ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
-  ;; and parent paths of each source file.
-  (lsp-clients-clangd-args '("-j=4"
-                             "--all-scopes-completion"
-                             "--background-index"
-                             "--clang-tidy"
-                             "--completion-style=detailed"
-                             "--fallback-style=LLVM"
-                             "--header-insertion=never"
-                             "--header-insertion-decorators=0"
-                             "--log=error"
-                             "--malloc-trim" ;; Release memory periodically
-                             ;; Increases memory usage but can improve performance
-                             "--pch-storage=memory"
-                             "--pretty"))
-  ;; Enable integration of custom backends other than `capf'
-  (lsp-completion-provider :none)
-  (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
-  ;; (lsp-completion-show-kind nil)
-  (lsp-eldoc-enable-hover nil)
-  (lsp-enable-dap-auto-configure nil)
-  (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
-  (lsp-enable-folding nil "I do not find the feature useful")
-  (lsp-enable-text-document-color nil)
-  ;; (lsp-semantic-tokens-enable t)
-  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
-  ;; Do not customize breadcrumb faces based on errors
-  (lsp-headerline-breadcrumb-enable-diagnostics nil)
-  (lsp-html-format-wrap-line-length sb/fill-column)
-  (lsp-html-format-end-with-newline t)
-  (lsp-html-format-indent-inner-html t)
-  (lsp-imenu-sort-methods '(position))
-  ;; (lsp-keep-workspace-alive nil)
-  (lsp-lens-enable nil)
-  (lsp-log-io nil "Increases memory usage because of JSON parsing if enabled")
-  ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
-  ;; additional errors. The problem is that the modeline can get too congested.
-  (lsp-modeline-diagnostics-enable (display-graphic-p))
-  (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
-  (lsp-modeline-workspace-status-enable nil)
-  ;; Sudden changes in the height of the echo area causes the cursor to lose position,
-  ;; manually request via `lsp-signature-activate'
-  (lsp-signature-auto-activate nil)
-  ;; Disable showing function documentation with `eldoc'
-  ;; (lsp-signature-render-documentation nil)
-  ;; (lsp-signature-function 'lsp-signature-posframe)
-  ;; Avoid annoying questions, we expect a server restart to succeed more often than not
-  (lsp-restart 'auto-restart)
-  ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-  (lsp-use-plists nil)
-  (lsp-xml-logs-client nil)
-  (lsp-yaml-print-width sb/fill-column)
-  (lsp-modeline-code-actions-enable (display-graphic-p))
-  (lsp-warn-no-matched-clients nil)
-  :config
-  ;; Autocomplete parentheses
-  (when (featurep 'yasnippet)
-    (setq lsp-enable-snippet t))
-
-  (dolist (ignore-dirs '("/build\\'"
-                         "/\\.metadata\\'"
-                         "/\\.recommenders\\'"
-                         "/\\.clangd\\'"
-                         "/\\.cache\\'"
-                         "/__pycache__\\'"
-                         "/\\.log\\'"))
-    (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
-
-  (with-eval-after-load "lsp-lens"
-    (diminish 'lsp-lens-mode))
-
-  (when (eq sb/capf 'corfu)
-    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
-  :bind-keymap ("C-c l" . lsp-command-map)
+  :bind-keymap
+  ("C-c l" . lsp-command-map)
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
   ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
@@ -181,7 +100,91 @@
    ("u" . lsp-imenu-create-uncategorised-index)
    ("a" . lsp-workspace-folders-add)
    ("v" . lsp-workspace-folders-remove)
-   ("b" . lsp-workspace-blacklist-remove)))
+   ("b" . lsp-workspace-blacklist-remove))
+  :custom-face
+  ;; Reduce the height
+  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
+                                               font-lock-doc-face :weight bold :height 0.9))))
+  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
+  (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
+                                                               :weight bold :height 0.9))))
+  :custom
+  (lsp-completion-enable nil)
+  ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
+  ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
+  ;; and parent paths of each source file.
+  (lsp-clients-clangd-args '("-j=4"
+                             "--all-scopes-completion"
+                             "--background-index"
+                             "--clang-tidy"
+                             "--completion-style=detailed"
+                             "--fallback-style=LLVM"
+                             "--header-insertion=never"
+                             "--header-insertion-decorators=0"
+                             "--log=error"
+                             "--malloc-trim" ;; Release memory periodically
+                             ;; Increases memory usage but can improve performance
+                             "--pch-storage=memory"
+                             "--pretty"))
+  ;; Enable integration of custom backends other than `capf'
+  (lsp-completion-provider :none)
+  (lsp-completion-show-detail t "Disable completion metadata since they can be very long")
+  ;; (lsp-completion-show-kind nil)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
+  (lsp-enable-folding nil "I do not find the feature useful")
+  (lsp-enable-text-document-color t)
+  ;; (lsp-semantic-tokens-enable t)
+  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
+  ;; Do not customize breadcrumb faces based on errors
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
+  (lsp-html-format-wrap-line-length sb/fill-column)
+  (lsp-html-format-end-with-newline t)
+  (lsp-html-format-indent-inner-html t)
+  (lsp-imenu-sort-methods '(position))
+  ;; (lsp-keep-workspace-alive nil)
+  (lsp-lens-enable nil)
+  (lsp-log-io nil "Increases memory usage because of JSON parsing if enabled")
+  ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
+  ;; additional errors. The problem is that the modeline can get too congested.
+  (lsp-modeline-diagnostics-enable (display-graphic-p))
+  (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
+  (lsp-modeline-code-actions-enable (display-graphic-p))
+  (lsp-modeline-workspace-status-enable nil)
+  ;; Sudden changes in the height of the echo area causes the cursor to lose position,
+  ;; manually request via `lsp-signature-activate'
+  (lsp-signature-auto-activate nil)
+  ;; Disable showing function documentation with `eldoc'
+  ;; (lsp-signature-render-documentation nil)
+  ;; (lsp-signature-function 'lsp-signature-posframe)
+  ;; Avoid annoying questions, we expect a server restart to succeed more often than not
+  (lsp-restart 'auto-restart)
+  ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+  (lsp-use-plists nil)
+  (lsp-xml-logs-client nil)
+  (lsp-yaml-print-width sb/fill-column)
+  (lsp-warn-no-matched-clients nil)
+  :config
+  ;; Autocomplete parentheses
+  (when (featurep 'yasnippet)
+    (setq lsp-enable-snippet t))
+
+  (dolist (ignore-dirs '("/build\\'"
+                         "/\\.metadata\\'"
+                         "/\\.recommenders\\'"
+                         "/\\.clangd\\'"
+                         "/\\.cache\\'"
+                         "/__pycache__\\'"
+                         "/\\.log\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
+
+  (with-eval-after-load "lsp-lens"
+    (diminish 'lsp-lens-mode))
+
+  (when (eq sb/capf 'corfu)
+    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
+  :diminish)
 
 (use-package lsp-ui
   :after lsp-mode
@@ -321,8 +324,10 @@
 (use-package consult-lsp
   :if (eq sb/minibuffer-completion 'vertico)
   :after (consult lsp)
-  :commands (consult-lsp-diagnostics consult-lsp-symbols
-                                     consult-lsp-file-symbols consult-lsp-marginalia-mode)
+  :commands
+  (consult-lsp-diagnostics consult-lsp-symbols
+                           consult-lsp-file-symbols
+                           consult-lsp-marginalia-mode)
   :init (consult-lsp-marginalia-mode 1)
   :bind
   (:map lsp-mode-map

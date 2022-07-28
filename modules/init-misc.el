@@ -35,18 +35,20 @@
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
-  :diminish
   :hook
   ((minibuffer-setup-hook . (lambda ()
                               (hungry-delete-mode -1)))
-   (after-init-hook . global-hungry-delete-mode)))
+   (after-init-hook . global-hungry-delete-mode))
+  :diminish)
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
-  :commands (move-text-up move-text-down move-text-default-bindings)
+  :commands
+  (move-text-up move-text-down move-text-default-bindings)
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
-  :bind ("C-c C-d" . duplicate-thing))
+  :bind
+  ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
@@ -56,7 +58,8 @@
 
 ;; Manage minor-mode on the dedicated interface buffer
 (use-package manage-minor-mode
-  :commands manage-minor-mode)
+  :commands
+  (manage-minor-mode))
 
 (use-package expand-region ; Expand region by semantic units
   :bind
@@ -64,8 +67,9 @@
    ("C-M-=" . er/contract-region)))
 
 (use-package expand-line
-  :diminish
-  :bind ("M-i" . turn-on-expand-line-mode))
+  :bind
+  ("M-i" . turn-on-expand-line-mode)
+  :diminish)
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
@@ -74,13 +78,15 @@
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :commands (whole-line-or-region-local-mode)
-  :diminish whole-line-or-region-local-mode
+  :commands
+  (whole-line-or-region-local-mode)
   :hook
-  (after-init-hook . whole-line-or-region-global-mode))
+  (after-init-hook . whole-line-or-region-global-mode)
+  :diminish whole-line-or-region-local-mode)
 
 (use-package goto-last-change
-  :bind ("C-x C-\\" . goto-last-change))
+  :bind
+  ("C-x C-\\" . goto-last-change))
 
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
@@ -93,27 +99,28 @@
 
 ;; The package has many bugs, and it has never worked well for me. I am trying out `vundo'.
 (use-package undo-tree
-  :defines undo-tree-map
-  :commands (global-undo-tree-mode undo-tree-redo)
-  :diminish
   :disabled t
-  :config
-  (setq undo-tree-auto-save-history              t
-        undo-tree-visualizer-diff                t
-        undo-tree-visualizer-relative-timestamps t
-        undo-tree-visualizer-timestamps          t)
-  (unbind-key "C-/" undo-tree-map)
+  :defines undo-tree-map
+  :commands
+  (global-undo-tree-mode undo-tree-redo)
   :hook
   (find-file-hook . undo-tree-mode)
   :bind
   (([remap undo] . undo-tree-undo)
    ([remap redo] . undo-tree-redo)
    ("C-z"   . undo-tree-undo)
-   ("C-x u" . undo-tree-visualize)))
+   ("C-x u" . undo-tree-visualize))
+  :config
+  (setq undo-tree-auto-save-history              t
+        undo-tree-visualizer-diff                t
+        undo-tree-visualizer-relative-timestamps t
+        undo-tree-visualizer-timestamps          t)
+  (unbind-key "C-/" undo-tree-map)
+  :diminish)
 
 (use-package vundo
-  :if sb/EMACS28+
   :straight (vundo :type git :host github :repo "casouri/vundo")
+  :if sb/EMACS28+
   :bind
   (([remap undo] . vundo)
    ("C-z" . vundo)
@@ -128,7 +135,8 @@
    ("C-p" . vundo-previous)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
-  :bind* ("C-." . iedit-mode))
+  :bind*
+  ("C-." . iedit-mode))
 
 (use-package hl-todo
   :hook
@@ -150,10 +158,11 @@
                    css-mode-hook html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
-  :diminish
-  :commands (page-break-lines-mode)
+  :commands
+  (page-break-lines-mode)
   :hook
-  (after-init-hook . global-page-break-lines-mode))
+  (after-init-hook . global-page-break-lines-mode)
+  :diminish)
 
 ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
 ;; an active region that spans multiple lines.
@@ -173,23 +182,15 @@
 (use-package pdf-tools
   :if (display-graphic-p)
   :defines pdf-annot-activate-created-annotations
-  :commands (pdf-tools-install pdf-loader-install pdf-view-mode
-                               pdf-annot-delete pdf-annot-add-highlight-markup-annotation
-                               pdf-annot-add-text-annotation)
+  :commands
+  (pdf-tools-install pdf-loader-install pdf-view-mode
+                     pdf-annot-delete
+                     pdf-annot-add-highlight-markup-annotation
+                     pdf-annot-add-text-annotation)
   :mode ("\\.pdf\\'" . pdf-view-mode)
   ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
   ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
   :magic ("%PDF" . pdf-view-mode)
-  :custom
-  (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
-  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
-  :config
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
-
-  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
-
-  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes)
   :bind
   (:map pdf-view-mode-map
         ("j"  . pdf-view-next-line-or-next-page)
@@ -208,7 +209,17 @@
         ("d"  . pdf-annot-delete)
         ("h"  . pdf-annot-add-highlight-markup-annotation)
         ("t"  . pdf-annot-add-text-annotation)
-        ("M"  . pdf-view-midnight-minor-mode)))
+        ("M"  . pdf-view-midnight-minor-mode))
+  :custom
+  (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
+  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
+  :config
+  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
+
+  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+
+  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
+  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
 (use-package saveplace-pdf-view
@@ -221,19 +232,23 @@
 ;;                         :repo "dalanicolai/image-roll.el"))
 
 (use-package logview
-  :commands logview-mode)
+  :commands
+  (logview-mode))
 
 (use-package wc-mode
-  :commands wc-mode)
+  :commands
+  (wc-mode))
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
-  :commands (define-word define-word-at-point))
+  :commands
+  (define-word define-word-at-point))
 
 (use-package number-separator
   :straight (number-separator :type git :host github
                               :repo "legalnonsense/number-separator.el")
-  :commands number-separator-mode
+  :commands
+  (number-separator-mode)
   :custom
   (number-separator ",")
   (number-separator-interval 3)
@@ -244,7 +259,6 @@
 (use-package eldoc
   :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)
-  :diminish
   :hook
   (prog-mode-hook . turn-on-eldoc-mode)
   :config
@@ -259,7 +273,8 @@
     (eldoc-add-command 'company-complete-selection
                        'company-complete-common
                        'company-capf
-                       'company-abort)))
+                       'company-abort))
+  :diminish)
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 
@@ -272,24 +287,28 @@
 ;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package esup
-  :commands esup
-  :if (bound-and-true-p sb/debug-init-file))
+  :if (bound-and-true-p sb/debug-init-file)
+  :commands
+  (esup))
 
 (use-package bug-hunter
   :if (bound-and-true-p sb/debug-init-file)
-  :commands (bug-hunter-init-file bug-hunter-file))
+  :commands
+  (bug-hunter-init-file bug-hunter-file))
 
 (use-package explain-pause-mode
   :straight (explain-pause-mode :type git :host github
                                 :repo "lastquestion/explain-pause-mode")
   :if (bound-and-true-p sb/debug-init-file)
-  :commands (explain-pause-mode explain-pause-top)
+  :commands
+  (explain-pause-mode explain-pause-top)
   :diminish)
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
 (use-package amx
-  :commands execute-extended-command-for-buffer
+  :commands
+  (execute-extended-command-for-buffer)
   :hook
   (after-init-hook . amx-mode)
   :bind
@@ -307,8 +326,6 @@
         ("C-'"   . ivy-avy)))
 
 (use-package bm
-  :commands (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
-                                bm-repository-load bm-buffer-save bm-buffer-restore)
   :preface
   (defun sb/bm-setup ()
     "Wrapper function to help call with a timer."
@@ -322,6 +339,9 @@
     (add-hook 'after-revert-hook      #'bm-buffer-restore)
     (add-hook 'find-file-hook         #'bm-buffer-restore)
     (add-hook 'after-init-hook        #'bm-repository-load))
+  :commands
+  (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
+                      bm-repository-load bm-buffer-save bm-buffer-restore)
   :init
   ;; Must be set before `bm' is loaded
   (setq bm-restore-repository-on-load t
@@ -329,12 +349,14 @@
         bm-modeline-display-total t)
   :hook
   (after-init-hook . sb/bm-setup)
-  :config
-  (setq-default bm-buffer-persistence t) ; Save bookmarks
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)
-   ("C-<f3>" . bm-previous)))
+   ("C-<f3>" . bm-previous))
+  :config
+  ;; Save bookmarks
+  (setq-default bm-buffer-persistence t))
+
 
 (use-package crux
   :demand t
@@ -366,16 +388,17 @@
               (buffer-face-mode t))))
 
 (use-package vterm-toggle
-  :bind ("C-`" . vterm-toggle))
+  :bind
+  ("C-`" . vterm-toggle))
 
 (use-package rainbow-mode
   :hook
   ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
 
 (use-package volatile-highlights
-  :diminish volatile-highlights-mode
   :hook
-  (after-init-hook . volatile-highlights-mode))
+  (after-init-hook . volatile-highlights-mode)
+  :diminish volatile-highlights-mode)
 
 ;; Use Emacsclient as the $EDITOR of child processes
 (use-package with-editor
@@ -383,7 +406,8 @@
   (after-init-hook . shell-command-with-editor-mode))
 
 (use-package unfill
-  :commands (unfill-region unfill-paragraph unfill-toggle))
+  :commands
+  (unfill-region unfill-paragraph unfill-toggle))
 
 ;; Better looking info pages
 (use-package info-colors
@@ -432,6 +456,7 @@
 ;;   :bind ("M-s e" . sudo-edit))
 
 (use-package ignoramus ; Ignore backups, build files, et al.
+  :demand t
   :config
   (dolist (ext '(".cb"
                  ".cb2"

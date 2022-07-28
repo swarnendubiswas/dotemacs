@@ -94,15 +94,19 @@
 (use-package python-docstring
   :after python-mode
   :demand t
-  :commands (python-docstring-mode python-docstring-install)
-  :config (python-docstring-install)
+  :commands
+  (python-docstring-mode python-docstring-install)
+  :config
+  (python-docstring-install)
   :diminish)
 
 (use-package pip-requirements
-  :commands pip-requirements-mode)
+  :commands
+  (pip-requirements-mode))
 
 (use-package pyvenv
-  :commands (pyvenv-mode pyvenv-tracking-mode)
+  :commands
+  (pyvenv-mode pyvenv-tracking-mode)
   :hook
   (python-mode-hook . pyvenv-mode)
   :custom
@@ -120,7 +124,8 @@
 (use-package py-isort
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :disabled t
-  :commands (py-isort-before-save py-isort-buffer py-isort-region)
+  :commands
+  (py-isort-before-save py-isort-buffer py-isort-region)
   :hook
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))

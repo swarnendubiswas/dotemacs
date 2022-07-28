@@ -164,7 +164,6 @@ This location is used for temporary installations and files.")
           (const :tag "ivy" ivy))
   :group 'dotemacs)
 
-;; Corfu seems to again not work with LSP with langservers
 (defcustom sb/capf
   'corfu
   "Choose the framework to use for completion at point."
@@ -194,7 +193,8 @@ Prefer the straight.el package manager instead."
   :type '(radio
           (const :tag "awesome-tab" awesome-tab)
           (const :tag "centaur-tabs" centaur-tabs)
-          (const :tag "none" nil)))
+          (const :tag "none" nil))
+  :group 'dotemacs)
 
 (defconst sb/EMACS27    (= emacs-major-version 27)
   "Non-nil if Emacs version is 27.")

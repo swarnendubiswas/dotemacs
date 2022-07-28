@@ -11,8 +11,9 @@
 ;; https://github.com/doomemacs/doomemacs/commit/8b93e8b15cc081860a8eb156b1584ef60b6bc9e4
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
-  :commands (centaur-tabs-group-by-projectile-project
-             centaur-tabs-headline-match)
+  :commands
+  (centaur-tabs-group-by-projectile-project
+   centaur-tabs-headline-match)
   :hook
   (emacs-startup-hook . centaur-tabs-mode)
   :bind*

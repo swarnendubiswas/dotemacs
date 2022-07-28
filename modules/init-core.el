@@ -9,8 +9,6 @@
 
 (defvar apropos-do-all)
 (defvar bookmark-save-flag)
-(defvar compilation-always-kill)
-(defvar compilation-scroll-output)
 (defvar sort-fold-case)
 (defvar help-enable-symbol-autoload)
 (defvar sb/fill-column)
@@ -205,6 +203,8 @@
   (when (fboundp mode)
     (funcall mode 1)))
 
+(diminish 'visual-line-mode)
+
 (use-package autorevert ; Auto-refresh all buffers
   :straight (:type built-in)
   :hook
@@ -283,10 +283,11 @@
 
 (use-package recentf
   :straight (:type built-in)
-  :commands (recentf-add-file recentf-save-file
-                              recentf-save-list
-                              recentf-apply-filename-handlers
-                              recentf-cleanup)
+  :commands
+  (recentf-add-file recentf-save-file
+                    recentf-save-list
+                    recentf-apply-filename-handlers
+                    recentf-cleanup)
   :hook
   (after-init-hook . recentf-mode)
   :custom
@@ -413,6 +414,9 @@
 ;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
 ;; wrapped around automatically.
 ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+
+;; Not a library/file, so `eval-after-load' does not work
+(diminish 'auto-fill-function)
 
 ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
 (defun sb/auto-create-missing-dirs ()

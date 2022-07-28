@@ -21,16 +21,18 @@
 
 (use-package project
   :if (eq sb/project-handler 'project)
-  :commands (project-switch-project project-current
-                                    project-find-file project-execute-extended-command
-                                    project-known-project-roots
-                                    project-remove-known-project
-                                    project-remember-project
-                                    project-kill-buffers
-                                    project-switch-to-buffer
-                                    project-search
-                                    project-compile)
-  :bind-keymap ("C-x p" . project-prefix-map)
+  :commands
+  (project-switch-project project-current
+                          project-find-file project-execute-extended-command
+                          project-known-project-roots
+                          project-remove-known-project
+                          project-remember-project
+                          project-kill-buffers
+                          project-switch-to-buffer
+                          project-search
+                          project-compile)
+  :bind-keymap
+  ("C-x p" . project-prefix-map)
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
@@ -67,15 +69,17 @@
 
 (use-package projectile
   :if (eq sb/project-handler 'projectile)
-  :commands (projectile-project-p projectile-project-name
-                                  projectile-expand-root
-                                  projectile-project-root
-                                  projectile-mode
-                                  projectile-compile
-                                  projectile-compile-project)
+  :commands
+  (projectile-project-p projectile-project-name
+                        projectile-expand-root
+                        projectile-project-root
+                        projectile-mode
+                        projectile-compile
+                        projectile-compile-project)
   ;; We can open a project file without enabling projectile via bind-keys
   :hook (after-init-hook . projectile-mode)
-  :bind-keymap ("C-c p" . projectile-command-map)
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
   :bind
   (:map projectile-command-map
         ("A"    . projectile-add-known-project))

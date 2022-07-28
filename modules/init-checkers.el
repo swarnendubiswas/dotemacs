@@ -28,20 +28,21 @@
 ;;   :diminish)
 
 (use-package flycheck
-  :commands (flycheck-add-next-checker flycheck-next-checker
-                                       flycheck-mode
-                                       flycheck-previous-error
-                                       flycheck-describe-checker
-                                       flycheck-buffer
-                                       flycheck-list-errors
-                                       flycheck-select-checker
-                                       flycheck-verify-setup
-                                       flycheck-next-error
-                                       flycheck-disable-checker
-                                       flycheck-add-mode
-                                       flycheck-manual
-                                       flycheck-display-error-messages-unless-error-list
-                                       flycheck-sexp-to-string)
+  :commands
+  (flycheck-add-next-checker flycheck-next-checker
+                             flycheck-mode
+                             flycheck-previous-error
+                             flycheck-describe-checker
+                             flycheck-buffer
+                             flycheck-list-errors
+                             flycheck-select-checker
+                             flycheck-verify-setup
+                             flycheck-next-error
+                             flycheck-disable-checker
+                             flycheck-add-mode
+                             flycheck-manual
+                             flycheck-display-error-messages-unless-error-list
+                             flycheck-sexp-to-string)
   :hook
   (after-init-hook . global-flycheck-mode)
   :custom
@@ -232,8 +233,11 @@
 
 ;;     (add-hook 'flycheck-posframe-inhibit-functions #'company--active-p)))
 
-;; Use for major modes which do not provide a formatter. `aphelia' allows for formatting via a
-;; background process but does not support Tramp and supports fewer formatters.
+
+;; `aphelia' allows for formatting via a background process, supports Tramp, and does not move the
+;; point after formatting.
+
+;; Use for major modes which do not provide a formatter.
 (use-package format-all
   :preface
   (defun sb/enable-format-all ()
@@ -242,11 +246,21 @@
                                     markdown-mode-hook emacs-lisp-mode-hook))
       (add-hook hook #'format-all-mode))
     (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
-  :commands (format-all-buffer)
+  :commands
+  (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
    ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook
                      markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode))
+  :custom
+  (format-all-formatters '(("YAML" prettier)
+                           ("Emacs Lisp" emacs-lisp)
+                           ("C++" clang-format)
+                           ("C" clang-format)
+                           ("Python" (yapf "--style" "file"))
+                           ("LaTeX" latexindent)
+                           ("Markdown" prettier)
+                           ("Shell script" shfmt)))
   :diminish)
 
 ;; Enable using ".dir-locals.el" file
@@ -273,11 +287,11 @@
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
 (use-package langtool
-  :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
-  :commands (langtool-check
-             langtool-check-done
-             langtool-show-message-at-point
-             langtool-correct-buffer)
+  :defines
+  (languagetool-java-arguments languagetool-console-command languagetool-server-command)
+  :commands
+  (langtool-check langtool-check-done
+                  langtool-show-message-at-point langtool-correct-buffer)
   :init
   (setq langtool-default-language "en-US"
         languagetool-java-arguments '("-Dfile.encoding=UTF-8")
@@ -314,11 +328,15 @@
 ;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
 ;; keytar-install".
 (use-package lsp-grammarly
-  :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
-  :commands (lsp-grammarly--server-command lsp-grammarly--init
-                                           lsp-grammarly--get-credentials lsp-grammarly--get-token
-                                           lsp-grammarly--store-token lsp-grammarly--show-error
-                                           lsp-grammarly--update-document-state)
+  :defines
+  (lsp-grammarly-active-modes lsp-grammarly-user-words)
+  :commands
+  (lsp-grammarly--server-command lsp-grammarly--init
+                                 lsp-grammarly--get-credentials
+                                 lsp-grammarly--get-token
+                                 lsp-grammarly--store-token
+                                 lsp-grammarly--show-error
+                                 lsp-grammarly--update-document-state)
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
    (lambda ()
@@ -358,7 +376,8 @@
 
 (use-package lsp-ltex
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
-  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
+  :commands
+  (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
    (lambda ()
@@ -482,7 +501,8 @@
 (use-package clang-format
   :if (executable-find "clang-format")
   :after (mlir-mode)
-  :commands (clang-format clang-format-buffer clang-format-region)
+  :commands
+  (clang-format clang-format-buffer clang-format-region)
   :custom
   (clang-format-style "file")
   (clang-format-style-option "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}"))

@@ -231,7 +231,8 @@
 
 (use-package moody
   :if (eq sb/modeline-theme 'moody)
-  :commands (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
+  :commands
+  (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
   :init
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
@@ -404,12 +405,6 @@
 (when nil
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
-
-;; Not a library/file, so `eval-after-load' does not work
-(diminish 'auto-fill-function)
-
-(with-eval-after-load "simple"
-  (diminish 'visual-line-mode))
 
 ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems pointless.
 (when (display-graphic-p)

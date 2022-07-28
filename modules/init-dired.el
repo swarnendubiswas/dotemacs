@@ -32,8 +32,10 @@
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
   :straight (:type built-in)
-  :defines dired-clean-confirm-killing-deleted-buffers
-  :commands (dired-next-line dired-jump)
+  :defines
+  (dired-clean-confirm-killing-deleted-buffers)
+  :commands
+  (dired-next-line dired-jump)
   :hook
   ;; Auto refresh dired when files change
   (dired-mode-hook . auto-revert-mode)
@@ -67,7 +69,8 @@
   (dired-mode-hook . (lambda ()
                        (require 'dired-x)
                        (dired-omit-mode)))
-  :bind ("C-x C-j"  . dired-jump)
+  :bind
+  ("C-x C-j"  . dired-jump)
   :custom
   (dired-cleanup-buffers-too t)
   (dired-omit-verbose nil "Do not show messages when omitting files")
@@ -117,7 +120,6 @@
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil))
 
-
 ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
@@ -126,7 +128,8 @@
   :bind*
   (:map dired-mode-map
         ("r" . dired-efap))
-  :custom (dired-efap-initial-filename-selection nil))
+  :custom
+  (dired-efap-initial-filename-selection nil))
 
 ;; (use-package treemacs
 ;;   :functions treemacs-tag-follow-mode
@@ -294,12 +297,13 @@
 
 (use-package zoxide
   :straight (:type git :host gitlab :repo "Vonfry/zoxide.el")
-  :commands (zoxide-find-file zoxide-open-with))
+  :commands
+  (zoxide-find-file zoxide-open-with))
 
-;; Let Dirvish take over Dired globally
 (use-package dirvish
   :straight (dirvish :type git :host github :repo "alexluigit/dirvish")
   :init
+  ;; Let Dirvish take over Dired globally
   (dirvish-override-dired-mode)
   :custom
   (dirvish-hide-details nil)
@@ -313,7 +317,8 @@
 
 (use-package all-the-icons-dired
   :if (and (display-graphic-p) (not (featurep 'dirvish)))
-  :commands all-the-icons-dired--refresh-advice
+  :commands
+  (all-the-icons-dired--refresh-advice)
   :hook
   (dired-mode-hook . (lambda ()
                        (unless (file-remote-p default-directory)

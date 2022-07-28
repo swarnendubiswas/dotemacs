@@ -12,7 +12,8 @@
   :defines (org-hide-leading-stars-before-indent-mode
             org-src-strip-leading-and-trailing-blank-lines
             org-src-tabs-acts-natively)
-  :commands (org-indent-mode org-indent-item org-outdent-item)
+  :commands
+  (org-indent-mode org-indent-item org-outdent-item)
   :hook
   (org-mode-hook . turn-on-visual-line-mode)
   :custom
@@ -60,7 +61,8 @@
   :config
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
-  :bind-keymap ("C-c o" . org-mode-map)
+  :bind-keymap
+  ("C-c o" . org-mode-map)
   :bind
   (:map org-mode-map
         ("M-<left>"  . nil)

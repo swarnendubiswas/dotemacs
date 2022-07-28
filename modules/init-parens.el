@@ -64,15 +64,16 @@
     (indent-according-to-mode)
     (forward-line -1)
     (indent-according-to-mode))
-  :commands (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
-                     sp-transpose-sexp sp-absort-sexp sp-copy-sexp
-                     sp-backward-kill-sexp sp-kill-sexp sp-change-inner
-                     sp-change-enclosing sp-convolute-sexp sp-emit-sexp
-                     sp-backward-down-sexp sp-backward-up-sexp
-                     sp-backward-slurp-sexp sp-backward-barf-sexp
-                     sp-forward-barf-sexp sp-forward-slurp-sexp sp-rewrap-sexp
-                     sp-unwrap-sexp sp-backward-unwrap-sexp sp-wrap-round
-                     sp-wrap-curly sp-wrap-square sp-split-sexp)
+  :commands
+  (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
+           sp-transpose-sexp sp-absort-sexp sp-copy-sexp
+           sp-backward-kill-sexp sp-kill-sexp sp-change-inner
+           sp-change-enclosing sp-convolute-sexp sp-emit-sexp
+           sp-backward-down-sexp sp-backward-up-sexp
+           sp-backward-slurp-sexp sp-backward-barf-sexp
+           sp-forward-barf-sexp sp-forward-slurp-sexp sp-rewrap-sexp
+           sp-unwrap-sexp sp-backward-unwrap-sexp sp-wrap-round
+           sp-wrap-curly sp-wrap-square sp-split-sexp)
   :hook
   ((after-init-hook . (lambda ()
                         (require 'smartparens-config)

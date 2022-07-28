@@ -105,9 +105,7 @@
   :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook
-  (corfu-mode-hook . corfu-terminal-mode)
-  :custom
-  (corfu-terminal-position-right-margin 5))
+  (corfu-mode-hook . corfu-terminal-mode))
 
 (use-package corfu-doc-terminal
   :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
@@ -134,24 +132,25 @@
     (add-to-list 'completion-at-point-functions #'cape-dabbrev t))
   :after corfu
   :demand t
-  :commands (cape-history ; Complete from Eshell, Comint or minibuffer history
-             cape-file
-             cape-keyword ; Complete programming language keyword
-             cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
-             cape-abbrev ; Complete abbreviation at point
-             cape-dict ; Complete word from dictionary at point
-             cape-line ; Complete current line from other lines in buffer
-             cape-symbol ; Elisp symbol
-             cape-ispell ; Complete word at point with Ispell
-             ;; Complete with Dabbrev at point
-             cape-dabbrev
-             cape-capf-buster
-             cape-company-to-capf
-             cape-super-capf
-             sh-completion-at-point-function
-             comint-completion-at-point
-             citre-completion-at-point
-             TeX--completion-at-point)
+  :commands
+  (cape-history ; Complete from Eshell, Comint or minibuffer history
+   cape-file
+   cape-keyword ; Complete programming language keyword
+   cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
+   cape-abbrev ; Complete abbreviation at point
+   cape-dict ; Complete word from dictionary at point
+   cape-line ; Complete current line from other lines in buffer
+   cape-symbol ; Elisp symbol
+   cape-ispell ; Complete word at point with Ispell
+   ;; Complete with Dabbrev at point
+   cape-dabbrev
+   cape-capf-buster
+   cape-company-to-capf
+   cape-super-capf
+   sh-completion-at-point-function
+   comint-completion-at-point
+   citre-completion-at-point
+   TeX--completion-at-point)
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
@@ -180,28 +179,32 @@
 
   (add-hook 'sh-mode-hook
             (lambda ()
-              (setq-local completion-at-point-functions
-                          (list
-                           (cape-super-capf #'lsp-completion-at-point
-                                            #'citre-completion-at-point
-                                            #'sh-completion-at-point-function
-                                            #'comint-completion-at-point
-                                            #'cape-file
-                                            #'cape-dabbrev
-                                            #'cape-dict)))))
+              (add-hook 'lsp-managed-mode-hook
+                        (lambda ()
+                          (setq-local completion-at-point-functions
+                                      (list
+                                       (cape-super-capf #'lsp-completion-at-point
+                                                        #'citre-completion-at-point
+                                                        #'sh-completion-at-point-function
+                                                        #'comint-completion-at-point
+                                                        #'cape-file
+                                                        #'cape-dabbrev
+                                                        #'cape-dict)))))))
 
   (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
     (add-hook lsp-prog-modes
               (lambda ()
-                (setq-local completion-at-point-functions
-                            (list
-                             (cape-super-capf #'lsp-completion-at-point
-                                              #'citre-completion-at-point
-                                              #'tags-completion-at-point-function
-                                              #'cape-file
-                                              #'cape-keyword
-                                              #'cape-dabbrev
-                                              #'cape-dict))))))
+                (add-hook 'lsp-managed-mode-hook
+                          (lambda()
+                            (setq-local completion-at-point-functions
+                                        (list
+                                         (cape-super-capf #'lsp-completion-at-point
+                                                          #'citre-completion-at-point
+                                                          #'tags-completion-at-point-function
+                                                          #'cape-file
+                                                          #'cape-keyword
+                                                          #'cape-dabbrev
+                                                          #'cape-dict))))))))
 
   ;; (add-hook 'prog-mode-hook
   ;;           (lambda ()
@@ -215,16 +218,18 @@
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
     (add-hook modes
               (lambda ()
-                (setq-local completion-at-point-functions
-                            (list
-                             (cape-super-capf #'lsp-completion-at-point
-                                              #'citre-completion-at-point
-                                              #'TeX--completion-at-point
-                                              #'cape-file
-                                              #'cape-tex
-                                              #'cape-dabbrev
-                                              #'cape-dict
-                                              #'cape-ispell))))))
+                (add-hook 'lsp-managed-mode-hook
+                          (lambda()
+                            (setq-local completion-at-point-functions
+                                        (list
+                                         (cape-super-capf #'lsp-completion-at-point
+                                                          #'citre-completion-at-point
+                                                          #'TeX--completion-at-point
+                                                          #'cape-file
+                                                          #'cape-tex
+                                                          #'cape-dabbrev
+                                                          #'cape-dict
+                                                          #'cape-ispell))))))))
 
   ;; (add-hook 'LaTeX-mode-hook
   ;;           (lambda ()

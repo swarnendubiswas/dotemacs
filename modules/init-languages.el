@@ -16,7 +16,8 @@
 (declare-function spell-fu-mode "spell-fu")
 
 (use-package ini-mode
-  :commands ini-mode)
+  :commands
+  (ini-mode))
 
 (use-package conf-mode
   :straight (:type built-in)
@@ -34,8 +35,10 @@
        (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
 
 (use-package yaml-mode
-  :defines lsp-ltex-enabled lsp-disabled-clients
-  :commands yaml-mode
+  :defines
+  (lsp-ltex-enabled lsp-disabled-clients)
+  :commands
+  (yaml-mode)
   :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy" ".clangd")
   :hook
   (yaml-mode-hook .
@@ -93,8 +96,10 @@
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
-  :defines lsp-disabled-clients
-  :commands csv-mode
+  :defines
+  (lsp-disabled-clients)
+  :commands
+  (csv-mode)
   :hook
   (csv-mode-hook . (lambda ()
                      (make-local-variable 'lsp-disabled-clients)
@@ -117,42 +122,41 @@
   ;;                      :files "llvm/utils/emacs/llvm-mode.el")
   :straight nil
   :load-path "extras"
-  :commands llvm-mode
+  :commands
+  (llvm-mode)
   :mode "\\.ll\\'")
 
 (use-package tablegen-mode
   :straight nil
   :load-path "extras"
-  :commands tablegen-mode
+  :commands
+  (tablegen-mode)
   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
-  :commands autodisass-llvm-bitcode
+  :commands
+  (autodisass-llvm-bitcode)
   :mode "\\.bc\\'")
 
 ;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
 ;; more shortcuts.
 ;; https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  :commands (markdown-mode gfm-mode markdown-insert-bold
-                           markdown-insert-italic
-                           markdown-insert-blockquote
-                           markdown-insert-pre
-                           markdown-insert-code markdown-move-up
-                           markdown-insert-link
-                           markdown-insert-wiki-link
-                           markdown-demote
-                           markdown-move-down
-                           markdown-insert-header-dwim
-                           markdown-insert-reference-link-dwim
-                           markdown-insert-header-atx-1
-                           markdown-insert-header-atx-2
-                           markdown-insert-header-atx-3
-                           markdown-insert-header-atx-4
-                           markdown-promote
-                           markdown-insert-list-item
-                           markdown-insert-uri
-                           markdown-insert-footnote)
+  :commands
+  (markdown-mode gfm-mode markdown-insert-bold
+                 markdown-insert-italic
+                 markdown-insert-blockquote markdown-insert-pre
+                 markdown-insert-code markdown-move-up
+                 markdown-insert-link markdown-insert-wiki-link
+                 markdown-demote markdown-move-down
+                 markdown-insert-header-dwim
+                 markdown-insert-reference-link-dwim
+                 markdown-insert-header-atx-1
+                 markdown-insert-header-atx-2
+                 markdown-insert-header-atx-3
+                 markdown-insert-header-atx-4 markdown-promote
+                 markdown-insert-list-item markdown-insert-uri
+                 markdown-insert-footnote)
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
@@ -179,15 +183,17 @@
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-  :commands (markdown-toc-refresh-toc markdown-toc-generate-toc
-                                      markdown-toc-generate-or-refresh-toc)
+  :commands
+  (markdown-toc-refresh-toc markdown-toc-generate-toc
+                            markdown-toc-generate-or-refresh-toc)
   ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
   )
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
 ;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
-  :commands (pandoc-load-default-settings pandoc-mode)
+  :commands
+  (pandoc-load-default-settings pandoc-mode)
   :hook
   (markdown-mode-hook . pandoc-mode)
   :config (pandoc-load-default-settings)
@@ -196,7 +202,8 @@
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
   :disabled t
-  :commands markdown-preview-mode)
+  :commands
+  markdown-preview-mode)
 
 (use-package docstr
   :hook
@@ -232,19 +239,23 @@
   )
 
 (use-package ant
-  :commands (ant ant-clean ant-compile ant-test))
+  :commands
+  (ant ant-clean ant-compile ant-test))
 
 (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
-  :commands autodisass-java-bytecode
+  :commands
+  (autodisass-java-bytecode)
   :mode "\\.class\\'")
 
 (use-package groovy-mode ; Syntax highlighting for Gradle files
-  :commands groovy-mode
+  :commands
+  (groovy-mode)
   :mode "\\.gradle\\'")
 
 (use-package sh-script ; Shell script mode
   :straight (:type built-in)
-  :commands flycheck-add-next-checker
+  :commands
+  (flycheck-add-next-checker)
   :mode
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
@@ -270,7 +281,8 @@
 (use-package fish-mode
   :mode "\\.fish\\'"
   :interpreter "fish"
-  :commands (fish-mode fish_indent-before-save)
+  :commands
+  (fish-mode fish_indent-before-save)
   :hook
   (fish-mode-hook . (lambda ()
                       (add-hook 'before-save-hook #'fish_indent-before-save))))
@@ -289,7 +301,8 @@
    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
-  :commands web-mode
+  :commands
+  (web-mode)
   :mode "\\.html?\\'"
   :hook
   (web-mode-hook . lsp-deferred)
@@ -317,14 +330,16 @@
   )
 
 (use-package emmet-mode
-  :defines emmet-move-cursor-between-quote
+  :defines
+  (emmet-move-cursor-between-quote)
   :hook
   ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
   :straight (:type built-in)
-  :commands nxml-mode
+  :commands
+  (nxml-mode)
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode-hook . (lambda ()
@@ -351,7 +366,8 @@
   )
 
 (use-package json-mode
-  :commands (json-mode jsonc-mode json-mode-beautify)
+  :commands
+  (json-mode jsonc-mode json-mode-beautify)
   :mode
   (("\\.json\\'"                  . json-mode)
    ("pyrightconfig.json"          . jsonc-mode)
@@ -382,21 +398,24 @@
 
 (use-package bazel
   :if (executable-find "bazel")
-  :commands (bazel-mode bazelrc-mode bazel-buildifier)
+  :commands
+  (bazel-mode bazelrc-mode bazel-buildifier)
   :hook
   ((bazel-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'bazel-buildifier nil t)))
    (bazel-mode-hook . flycheck-mode)))
 
 (use-package protobuf-mode
-  :commands protobuf-mode
+  :commands
+  (protobuf-mode)
   :mode "\\.proto$"
   :hook
   (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
   :straight nil
-  :commands mlir-mode
+  :commands
+  (mlir-mode)
   :load-path "extras"
   :mode "\\.mlir\\'")
 
@@ -423,14 +442,16 @@
   (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
 (use-package highlight-doxygen
-  :commands highlight-doxygen-global-mode
+  :commands
+  (highlight-doxygen-global-mode)
   :init (highlight-doxygen-global-mode))
 
 (use-package apt-sources-list
   :commands apt-sources-list-mode)
 
 (use-package ssh-config-mode
-  :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
+  :commands
+  (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
   :hook
   (ssh-config-mode-hook . turn-on-font-lock))
 

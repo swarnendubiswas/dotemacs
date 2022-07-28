@@ -12,9 +12,10 @@
 (add-hook 'write-file-functions #'delete-trailing-whitespace)
 
 (use-package whitespace
-  :commands (global-whitespace-mode whitespace-buffer
-                                    whitespace-cleanup
-                                    whitespace-turn-off)
+  :commands
+  (global-whitespace-mode whitespace-buffer
+                          whitespace-cleanup
+                          whitespace-turn-off)
   :hook
   (markdown-mode-hook
    . (lambda ()
@@ -46,7 +47,8 @@
 
 (use-package whitespace-cleanup-mode
   :defines whitespace-cleanup-mode-ignore-modes
-  :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
+  :commands
+  (global-whitespace-cleanup-mode whitespace-cleanup-mode)
   :custom
   (whitespace-cleanup-mode-preserve-point t)
   (whitespace-cleanup-mode-only-if-initially-clean t)

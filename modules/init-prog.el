@@ -28,7 +28,8 @@
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 (use-package hideshow
   :straight (:type built-in)
-  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+  :commands
+  (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
   :hook
   ;; Hideshow is not defined for `ini-mode'.
   ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
@@ -37,8 +38,8 @@
   :diminish hs-minor-mode)
 
 (use-package symbol-overlay ; Highlight symbol under point
-  :diminish
-  :commands transient-define-prefix
+  :commands
+  (transient-define-prefix)
   :hook
   (prog-mode-hook . symbol-overlay-mode)
   :bind
@@ -65,7 +66,7 @@
   ;;    ]
   ;;   )
   ;; (bind-key "M-o" #'sb/symbol-overlay-transient)
-  )
+  :diminish)
 
 (use-package highlight-escape-sequences
   :hook
@@ -73,6 +74,8 @@
 
 (use-package compile
   :straight (:type built-in)
+  :bind
+  ("<f11>" . recompile)
   :custom
   (compilation-always-kill t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")

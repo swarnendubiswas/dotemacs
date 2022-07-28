@@ -150,7 +150,8 @@
 ;; modes.
 (use-package bind-key
   :functions bind-key--remove
-  :bind ("C-c d k" . describe-personal-keybindings))
+  :bind
+  ("C-c d k" . describe-personal-keybindings))
 
 (use-package no-littering
   :demand t)

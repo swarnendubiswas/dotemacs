@@ -53,22 +53,25 @@
 (use-package tex
   :straight auctex
   :mode ("\\.tex\\'" . LaTeX-mode)
-  :defines (tex-fontify-script font-latex-fontify-script
-                               font-latex-fontify-sectioning
-                               TeX-syntactic-comment
-                               TeX-save-query LaTeX-item-indent
-                               LaTeX-syntactic-comments
-                               LaTeX-fill-break-at-separators)
-  :functions (TeX-active-process)
-  :commands (TeX-active-process TeX-save-document tex-site
-                                LaTeX-mode LaTeX-math-mode
-                                TeX-PDF-mode
-                                TeX-source-correlate-mode
-                                TeX-active-process
-                                TeX-command-menu
-                                TeX-revert-document-buffer
-                                TeX-master-file
-                                TeX-next-error)
+  :defines
+  (tex-fontify-script font-latex-fontify-script
+                      font-latex-fontify-sectioning
+                      TeX-syntactic-comment
+                      TeX-save-query LaTeX-item-indent
+                      LaTeX-syntactic-comments
+                      LaTeX-fill-break-at-separators)
+  :functions
+  (TeX-active-process)
+  :commands
+  (TeX-active-process TeX-save-document tex-site
+                      LaTeX-mode LaTeX-math-mode
+                      TeX-PDF-mode
+                      TeX-source-correlate-mode
+                      TeX-active-process
+                      TeX-command-menu
+                      TeX-revert-document-buffer
+                      TeX-master-file
+                      TeX-next-error)
   :hook
   (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
    ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
@@ -130,8 +133,10 @@
             bibtex-completion-cite-default-as-initial-input
             bibtex-completion-cite-prompt-for-optional-arguments
             bibtex-completion-display-formats)
-  :bind ("C-c x b" . ivy-bibtex)
-  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+  :bind
+  ("C-c x b" . ivy-bibtex)
+  :custom
+  (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
   :config
   (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
@@ -184,11 +189,12 @@ Ignore if no file is found."
             (apply 'append
                    (mapcar 'sb/get-bibtex-keys bibfile-list)))))
   :straight (:type built-in)
-  :commands (reftex-get-bibfile-list bibtex-parse-keys
-                                     reftex-mode
-                                     reftex-toc-rescan
-                                     reftex-toc-Rescan
-                                     reftex-default-bibliography)
+  :commands
+  (reftex-get-bibfile-list bibtex-parse-keys
+                           reftex-mode
+                           reftex-toc-rescan
+                           reftex-toc-Rescan
+                           reftex-default-bibliography)
   :hook
   ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
   :bind
@@ -262,7 +268,8 @@ Ignore if no file is found."
   :straight (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")
   :after tex-mode
   :demand t
-  :commands (auctex-latexmk-setup auctex-latexmk)
+  :commands
+  (auctex-latexmk-setup auctex-latexmk)
   :custom
   (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
   (TeX-command-default "LatexMk")
@@ -334,7 +341,8 @@ after a successful compilation."
 ;; in "$PATH".
 (use-package math-preview
   :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
-  :commands (math-preview-all math-preview-at-point math-preview-region)
+  :commands
+  (math-preview-all math-preview-at-point math-preview-region)
   :custom
   (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
                                           sb/user-tmp-directory)))
