@@ -84,13 +84,18 @@ install_gcc() {
     apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-10-multilib g++-10-multilib gcc-9 g++-9
 }
 
+install_fish() {
+    apt-add-repository ppa:fish-shell/release-3
+    apt install fish
+}
+
 # Install LLVM
 install_llvm() {
-    LLVM_VERSION="14"
+    LLVM_VER="14"
 
     case "${DIST_VERSION}" in
-        Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic${LLVM_VERSION}  main" ;;
-        Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal${LLVM_VERSION}   main" ;;
+        Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic-${LLVM_VER}  main" ;;
+        Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal-${LLVM_VER}   main" ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
             exit 2
@@ -519,28 +524,29 @@ cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 apt autoremove
 apt autoclean
 
-install_ubuntu_packages
-install_gcc
-install_llvm
+# install_ubuntu_packages
+# install_gcc
+# install_llvm
+# install_fish
 # install_emacs
-install_python
-install_node
-install_texlab
+# install_python
+# install_node
+# install_texlab
 create_symlinks
-install_shellcheck
-install_shfmt
-install_ripgrep
-install_cppcheck
-install_ctags
-install_global
-install_alacritty
-install_bear
+# install_shellcheck
+# install_shfmt
+# install_ripgrep
+# install_cppcheck
+# install_ctags
+# install_global
+# install_alacritty
+# install_bear
 # install_powerline
-install_tmux
-install_delta
-install_zoxide
-install_bat
-install_fd
-install_fzf
+# install_tmux
+# install_delta
+# install_zoxide
+# install_bat
+# install_fd
+# install_fzf
 
 set +eux
