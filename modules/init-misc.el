@@ -393,7 +393,8 @@
 
 (use-package rainbow-mode
   :hook
-  ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode))
+  ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode)
+  :diminish)
 
 (use-package volatile-highlights
   :hook
@@ -421,6 +422,7 @@
    (text-mode-hook . goto-address-mode)))
 
 (use-package xclip
+  :if (or (executable-find "xclip") (executable-find "xsel"))
   :init (xclip-mode 1))
 
 (use-package fix-word

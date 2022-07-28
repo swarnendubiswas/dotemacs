@@ -37,7 +37,7 @@ install_emacs() {
     # Build the source
 
     cd "${EMACS_SOURCE}" || echo "Failed: cd ${EMACS_SOURCE}"
-    export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+    export CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10
     make distclean
     ./autogen.sh
     # We do not need POP3 support
