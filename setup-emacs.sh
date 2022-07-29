@@ -10,6 +10,7 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+# We do not use $HOME since it will point to "/root"
 USER="swarnendu"
 USER_HOME="/home/$USER"
 
@@ -19,7 +20,6 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 
 install_emacs() {
     # Download GNU Emacs source
-
     EMACS_VERSION="28.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -49,8 +49,13 @@ install_emacs() {
     rm "${EMACS_FILENAME}" || true
 
     # Setup Emacs at the correct path
-    echo "export EMACS_PATH=${EMACS_SOURCE}/src" >>"$USER_HOME/.bashrc"
-    echo "PATH=\${EMACS_PATH}:$PATH" >>"$USER_HOME/.bashrc"
+    # echo "\n\nexport EMACS_PATH=${EMACS_SOURCE}/src" >>"$USER_HOME/.bashrc"
+    # echo "PATH=\${EMACS_PATH}:\$PATH" >>"$USER_HOME/.bashrc"
+
+    cmdline=$"\n\nexport EMACS_PATH=${EMACS_SOURCE}/src\n"
+    printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
+    cmdline=$"PATH=\${EMACS_PATH}:\$PATH"
+    printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
 # Install important packages. There is nothing to do if a package is already installed.
@@ -85,8 +90,8 @@ install_gcc() {
 }
 
 install_fish() {
-    apt-add-repository ppa:fish-shell/release-3
-    apt install fish
+    apt-add-repository -y ppa:fish-shell/release-3
+    apt install -y fish
 }
 
 # Install LLVM
@@ -187,7 +192,10 @@ install_node() {
     npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
     # Add the following to $HOME/.bashrc
-    echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
+    # echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
+
+    cmdline=$"\n\nexport NODE_PATH=\$HOME/tmp/node_modules\n"
+    printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
 # Gem modules
@@ -231,10 +239,10 @@ create_symlinks() {
 
     if [ -f ".prettierrc" ]; then
         echo "Overwriting symlink for .prettierrc..."
-        ln -nsf "$DOTFILES/dotprettierrc" "$HOME/.prettierrc"
+        ln -nsf "$DOTFILES/dotprettierrc" "$USER_HOME/.prettierrc"
     else
         echo "Creating symlink for .prettierrc..."
-        ln -s "$DOTFILES/dotprettierrc" "$HOME/.prettierrc"
+        ln -s "$DOTFILES/dotprettierrc" "$USER_HOME/.prettierrc"
     fi
     echo "...Done"
 
@@ -532,7 +540,7 @@ apt autoclean
 # install_python
 # install_node
 # install_texlab
-create_symlinks
+# create_symlinks
 # install_shellcheck
 # install_shfmt
 # install_ripgrep
