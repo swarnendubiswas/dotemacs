@@ -156,8 +156,6 @@
 (use-package no-littering
   :demand t)
 
-(use-package use-package-ensure-system-package)
-
 ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
 ;; command.

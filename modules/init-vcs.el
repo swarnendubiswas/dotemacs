@@ -56,10 +56,6 @@
 
   (require 'magit-diff)
 
-  (defvar magit-diff-refine-hunk)
-  (defvar magit-diff-paint-whitespace)
-  (defvar magit-diff-highlight-trailing)
-
   (setq magit-diff-refine-hunk t
         magit-diff-highlight-trailing nil
         magit-diff-paint-whitespace nil))

@@ -306,6 +306,8 @@
   :mode "\\.html?\\'"
   :hook
   (web-mode-hook . lsp-deferred)
+  :bind
+  ("C-c C-d" . nil)
   :custom
   (web-mode-enable-auto-closing              t)
   (web-mode-enable-auto-pairing              nil "Prefer `smartparens'")

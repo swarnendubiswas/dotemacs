@@ -20,16 +20,12 @@
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
 (use-package helpful
   :bind
-  (([remap describe-function] . helpful-callable)
-   ([remap describe-variable] . helpful-variable)
-   ([remap describe-symbol]   . helpful-symbol)
-   ([remap describe-key]      . helpful-key)
-   ;; ("C-h v" . helpful-variable)
-   ;; ("C-h k" . helpful-key)
-   ;; ("C-h f" . helpful-callable)
-   ("C-h c" . helpful-command)
-   ("C-h p" . helpful-at-point)
-   ;; ("C-h o" . helpful-symbol)
+  (([remap describe-function] . helpful-callable) ; "C-h f"
+   ([remap describe-variable] . helpful-variable) ; "C-h v"
+   ([remap describe-symbol]   . helpful-symbol) ; "C-h o"
+   ([remap describe-key]      . helpful-key) ; "C-h k"
+   ("C-h c"                   . helpful-command)
+   ("C-h p"                   . helpful-at-point)
    :map helpful-mode-map
    ("q"     . helpful-kill-buffers)))
 
@@ -47,7 +43,7 @@
   :init (move-text-default-bindings))
 
 (use-package duplicate-thing
-  :bind
+  :bind*
   ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
@@ -490,6 +486,10 @@
     (add-to-list 'ignoramus-file-basename-exact-names dir))
 
   (ignoramus-setup))
+
+(use-package centeredpoint
+  :straight (centered-point-mode :type git :host github :repo "jmercouris/emacs-centered-point")
+  :hook (after-init-hook . centered-point-mode))
 
 (provide 'init-misc)
 

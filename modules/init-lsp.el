@@ -17,7 +17,7 @@
   (defun sb/lsp-mode-setup-completion ()
     (if (featurep 'orderless)
         (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-              '(orderless))
+              '(orderless flex))
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
             '(flex))))
   :defines (lsp-perl-language-server-path
@@ -66,8 +66,7 @@
     (add-hook 'text-mode-hook (lambda ()
                                 (setq-local lsp-completion-enable nil))))
   :hook
-  ((lsp-mode-hook . lsp-enable-which-key-integration)
-   (lsp-mode-hook . lsp-dired-mode))
+  (lsp-mode-hook . lsp-dired-mode)
   :bind-keymap
   ("C-c l" . lsp-command-map)
   :bind
@@ -165,6 +164,7 @@
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
   (lsp-warn-no-matched-clients nil)
+  (lsp-enable-which-key-integration t)
   :config
   ;; Autocomplete parentheses
   (when (featurep 'yasnippet)
@@ -281,45 +281,6 @@
   (lsp-java-format-settings-url (expand-file-name
                                  "github/dotfiles/java/eclipse-format-swarnendu.xml"
                                  sb/user-home-directory)))
-
-;; "pyright --createstub pandas"
-(use-package lsp-pyright
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
-  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-  :hook
-  (python-mode-hook . (lambda ()
-                        (require 'lsp-pyright)))
-  :custom
-  (lsp-pyright-python-executable-cmd "python3")
-  (lsp-pyright-typechecking-mode "basic")
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    (lambda ()
-  ;;                      (cons "pyright-langserver"
-  ;;                            lsp-pyright-langserver-command-args)))
-  ;;   :major-modes '(python-mode)
-  ;;   :remote? t
-  ;;   :server-id 'pyright-r
-  ;;   :multi-root lsp-pyright-multi-root
-  ;;   :priority 3
-  ;;   :initialization-options (lambda ()
-  ;;                             (ht-merge (lsp-configuration-section "pyright")
-  ;;                                       (lsp-configuration-section "python")))
-  ;;   :initialized-fn (lambda (workspace)
-  ;;                     (with-lsp-workspace workspace
-  ;;                       (lsp--set-configuration
-  ;;                        (ht-merge (lsp-configuration-section "pyright")
-  ;;                                  (lsp-configuration-section "python")))))
-  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                         (lsp-package-ensure 'pyright callback error-callback))
-  ;;   :notification-handlers
-  ;;   (lsp-ht
-  ;;    ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
-  ;;    ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-  ;;    ("pyright/endProgress"    'lsp-pyright--end-progress-callback))))
-  )
 
 (use-package consult-lsp
   :if (eq sb/minibuffer-completion 'vertico)

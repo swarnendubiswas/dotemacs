@@ -452,6 +452,10 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 
   - ~<f8>~ - Search for a word in the current directory (~deadgrep~)
 
+*** Search for a word with exact beginning characters
+
+Use ~\_<PREFIX_\~ to search for a string with ~PREFIX~ as the exact beginning characters.
+
 *** List all files
 
   - ~C-x j~ - List all files in given directory (~sb/counsel-all-files-recursively~)

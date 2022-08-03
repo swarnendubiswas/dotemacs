@@ -151,6 +151,48 @@
   (python-mode-hook . yapf-mode)
   :diminish yapf-mode)
 
+;; "pyright --createstub pandas"
+(use-package lsp-pyright
+  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
+  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
+  :hook
+  (python-mode-hook . (lambda ()
+                        (require 'lsp-pyright)))
+  :custom
+  (lsp-pyright-python-executable-cmd "python3")
+  (lsp-pyright-typechecking-mode "basic")
+  (lsp-pyright-auto-import-completions t)
+  (lsp-pyright-auto-search-paths t)
+
+  ;; :config
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-tramp-connection
+  ;;                    (lambda ()
+  ;;                      (cons "pyright-langserver"
+  ;;                            lsp-pyright-langserver-command-args)))
+  ;;   :major-modes '(python-mode)
+  ;;   :remote? t
+  ;;   :server-id 'pyright-r
+  ;;   :multi-root lsp-pyright-multi-root
+  ;;   :priority 3
+  ;;   :initialization-options (lambda ()
+  ;;                             (ht-merge (lsp-configuration-section "pyright")
+  ;;                                       (lsp-configuration-section "python")))
+  ;;   :initialized-fn (lambda (workspace)
+  ;;                     (with-lsp-workspace workspace
+  ;;                       (lsp--set-configuration
+  ;;                        (ht-merge (lsp-configuration-section "pyright")
+  ;;                                  (lsp-configuration-section "python")))))
+  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
+  ;;                         (lsp-package-ensure 'pyright callback error-callback))
+  ;;   :notification-handlers
+  ;;   (lsp-ht
+  ;;    ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
+  ;;    ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+  ;;    ("pyright/endProgress"    'lsp-pyright--end-progress-callback))))
+  )
+
 (provide 'init-python)
 
 ;;; init-python.el ends here

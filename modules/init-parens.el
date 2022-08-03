@@ -90,8 +90,9 @@
    ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
    ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
    ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
-   ;; "(foo bar)" -> "foo bar"
-   ("C-M-k" . sp-splice-sexp))
+   ("C-M-k" . sp-splice-sexp) ; "(foo bar)" -> "foo bar"
+   ;; foo(2,3) -> foo[2,3]
+   ("C-M-r" . sp-rewrap-sexp))
   :custom
   (sp-show-pair-from-inside t)
   (sp-autoskip-closing-pair 'always)

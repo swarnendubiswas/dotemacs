@@ -1,4 +1,4 @@
-personal_ws-1.1 en 419 
+personal_ws-1.1 en 425
 AUCTeX
 Aarchie
 Aastha
@@ -58,6 +58,7 @@ Jayesh
 Jikes
 KMeans
 Kalyanpur
+Kavitha
 Keshav
 Kharagpur
 KinectFusion
@@ -69,6 +70,7 @@ LLVM
 MESI
 MPK
 MTech
+Madhu
 Maharaja
 Mainak
 Maiti
@@ -329,11 +331,13 @@ prefetcher
 prefetching
 preprocessing
 preprocessor
+prevalidated
 privatizable
 probabilistically
 profiler
 programmability
 programmatically
+prospar
 pseudocode
 quantization
 quantized
@@ -352,7 +356,8 @@ reimplementation
 reimplemented
 reimplementing
 reorderings
-reproducability
+repeatability
+reproducibility
 requestor
 requestors
 resubmission
@@ -407,6 +412,7 @@ unutilized
 vectorization
 vectorize
 vectorized
+vectorizing
 verifier
 vertices
 virtualize

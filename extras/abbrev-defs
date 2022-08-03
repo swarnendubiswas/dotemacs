@@ -1497,6 +1497,7 @@
     ("initital" "initial" nil :count 0)
     ("ipmpact" "impact" nil :count 0)
     ("maintainance" "Maintenance" nil :count 0)
+    ("occassions" "occasions" nil :count 0)
     ("occuring" "occurring" nil :count 0)
     ("organisation" "Organization" nil :count 0)
     ("pattersn" "Pattern" nil :count 0)

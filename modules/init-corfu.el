@@ -11,6 +11,8 @@
 
 ;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
 ;; https://github.com/minad/corfu/wiki
+
+;; Corfu is not a completion framework, it is just a front-end for completion at point.
 (use-package corfu
   :preface
   (defun sb/corfu-beginning-of-prompt ()
@@ -24,35 +26,30 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :straight (corfu :files (:defaults "extensions/*")
-                   :includes (corfu-indexed
-                              corfu-quick
-                              corfu-history))
+  :straight
+  (corfu :files (:defaults "extensions/*") :includes (corfu-indexed
+                                                      corfu-quick
+                                                      corfu-history))
   :if (eq sb/capf 'corfu)
   :commands corfu--goto
   :hook
   (after-init-hook . global-corfu-mode)
   :bind
   (:map corfu-map
-        ("[tab]" . corfu-next)
-        ("C-n" . corfu-next)
-        ("[backtab]" . corfu-previous)
-        ("C-p" . corfu-previous)
+        ;; ("[tab]" . corfu-next)
+        ;; ("[backtab]" . corfu-previous)
         ("<escape>" . corfu-quit)
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
         ([remap move-end-of-line] . sb/corfu-end-of-prompt))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
-  (corfu-auto-prefix 3)
-  :config
-  (unless (featurep 'corfu-doc)
-    (setq corfu-echo-documentation t)))
+  (corfu-auto-delay 0.2 "Recommended to not use zero for performance reasons")
+  (corfu-echo-documentation t))
 
 (use-package corfu-info
-  :straight (corfu :files (:defaults "extensions/*")
-                   :includes (corfu-info))
+  :straight
+  (corfu :files (:defaults "extensions/*") :includes (corfu-info))
   :after corfu
   :bind
   (:map corfu-map
@@ -61,23 +58,26 @@
 
 ;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
-  :straight (corfu :files (:defaults "extensions/*")
-                   :includes (corfu-indexed))
+  :straight
+  (corfu :files (:defaults "extensions/*")
+         :includes (corfu-indexed))
   :after corfu
   :commands corfu-indexed-mode
   :init (corfu-indexed-mode 1))
 
 (use-package corfu-quick
-  :straight (corfu :files (:defaults "extensions/*")
-                   :includes (corfu-quick))
+  :straight
+  (corfu :files (:defaults "extensions/*")
+         :includes (corfu-quick))
   :after corfu
   :bind
   (:map corfu-map
         ("C-'" . corfu-quick-insert)))
 
 (use-package corfu-history
-  :straight (corfu :files (:defaults "extensions/*")
-                   :includes (corfu-history))
+  :straight
+  (corfu :files (:defaults "extensions/*")
+         :includes (corfu-history))
   :after (corfu savehist)
   :commands corfu-history-mode
   :init
@@ -98,7 +98,8 @@
   (corfu-echo-documentation nil))
 
 (use-package popon
-  :straight (:type git :repo "https://codeberg.org/akib/emacs-popon.git")
+  :straight
+  (:type git :repo "https://codeberg.org/akib/emacs-popon.git")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p))))
 
 (use-package corfu-terminal
