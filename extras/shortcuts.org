@@ -68,6 +68,8 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
   - ~M-n~ - Puts the next element of the minibuffer history in the minibuffer (~next-history-element~)
   - ~M-p~ - Puts the previous element of the minibuffer history in the minibuffer (~previous-history-element~)
+  - ~C-x C-e~ - Evaluate the last s-expression (~eval-last-sexp~)
+  - ~C-M-x~ - Evaluate the top-level form containing point, or after point (~eval-defun~)
 
 ** Dired
 

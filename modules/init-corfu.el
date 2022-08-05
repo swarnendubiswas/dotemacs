@@ -256,31 +256,33 @@
   ;;                                                  #'cape-dict))))))
   )
 
-;; Provide icons for Corfu
+;; Provide icons for Corfu via either "kind-all-the-icons" or "kind-icon"
 
-;; (use-package kind-icon
-;;   :after corfu
-;;   :demand t
-;;   :commands kind-icon-margin-formatter
-;;   :if (display-graphic-p)
-;;   :custom
-;;   (kind-icon-face 'corfu-default)
-;;   (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
-;;   ;; Prefer smaller icons and a more compact popup
-;;   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
-;;   (kind-icon-blend-background nil)
-;;   (kind-icon-blend-frac 0.08)
-;;   :config
-;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
-;; `all-the-icons' integration with `corfu'
-;; https://github.com/lynnux/.emacs.d/blob/master/packages/corfu/corfu-icon.el
-(use-package corfu-icon
-  :straight nil
-  :if (display-graphic-p)
+(use-package kind-icon
+  :if (and (eq sb/corfu-icons 'kind-icon)
+           (display-graphic-p))
   :after corfu
   :demand t
-  :load-path "extras")
+  :commands kind-icon-margin-formatter
+  :custom
+  (kind-icon-face 'corfu-default)
+  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
+  ;; Prefer smaller icons and a more compact popup
+  (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+  (kind-icon-blend-background nil)
+  (kind-icon-blend-frac 0.08)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+(use-package kind-all-the-icons
+  :straight (kind-all-the-icons :type git :host github
+                                :repo "Hirozy/kind-all-the-icons")
+  :if (and (eq sb/corfu-icons 'kind-all-the-icons)
+           (display-graphic-p))
+  :after corfu
+  :demand t
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
 (provide 'init-corfu)
 

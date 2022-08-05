@@ -327,6 +327,11 @@
   (all-the-icons-dired-monochrome nil)
   :diminish)
 
+(use-package dired-rsync
+  :bind
+  (:map dired-mode-map
+        ("C-c C-r" . dired-rsync)))
+
 (provide 'init-dired)
 
 ;;; init-dired.el ends here

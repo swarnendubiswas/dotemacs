@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Helper script to install GNU Emacs if not already present. It also sets up packages related to my
 # setup.

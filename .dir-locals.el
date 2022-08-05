@@ -17,9 +17,7 @@
                            (lambda ()
                              (when (derived-mode-p 'markdown-mode)
                                (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers . (markdown-markdownlint-cli))))))
-                               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly)
-                               )
+                                     '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
 
                              (when (derived-mode-p 'sh-mode)
                                (setq sb/flycheck-local-checkers
@@ -72,7 +70,13 @@
  (jsonc-mode . (
                 (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
                 ))
+
+ ;; Does not support formatting
+ (yaml-mode . (
+               ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+               ))
  )
+
 
 ;; Local Variables:
 ;; eval: (flycheck-mode -1)

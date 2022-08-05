@@ -161,7 +161,8 @@ This location is used for temporary installations and files.")
   "Choose the framework to use for narrowing and selection."
   :type '(radio
           (const :tag "vertico" vertico)
-          (const :tag "ivy" ivy))
+          (const :tag "ivy" ivy)
+          (const :tag "none" none))
   :group 'dotemacs)
 
 (defcustom sb/capf
@@ -169,7 +170,8 @@ This location is used for temporary installations and files.")
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)
-          (const :tag "company" company))
+          (const :tag "company" company)
+          (const :tag "none" none))
   :group 'dotemacs)
 
 (defcustom sb/disable-package.el
@@ -195,6 +197,14 @@ Prefer the straight.el package manager instead."
           (const :tag "centaur-tabs" centaur-tabs)
           (const :tag "none" nil))
   :group 'dotemacs)
+
+(defcustom sb/corfu-icons
+  'kind-icon
+  "Choose the provider for Corfu icons."
+  :type '(radio
+          (const :tag "kind-icon" kind-icon)
+          (const :tag "kind-all-the-icons" kind-all-the-icons)
+          (const :tag "none" none)))
 
 (defconst sb/EMACS27    (= emacs-major-version 27)
   "Non-nil if Emacs version is 27.")

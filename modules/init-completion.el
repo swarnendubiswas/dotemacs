@@ -163,14 +163,14 @@
   :straight (:type built-in)
   :config
   (with-eval-after-load "orderless"
-    (setq completion-styles '(orderless basic fussy)
+    (setq completion-styles '(fussy orderless basic)
           ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
           ;; completion to work. I also want substring matching for file names.
           ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
           completion-category-overrides '((file (styles basic substring partial-completion fussy))
                                           ;; (buffer (styles basic substring flex))
                                           ;; (project-file (styles basic substring flex))
-                                          (minibuffer (orderless fussy basic initials))))
+                                          (minibuffer (fussy orderless basic initials))))
 
     (unless (featurep 'orderless)
       (setq completion-styles '(orderless basic)
