@@ -1,5 +1,5 @@
 ;;; init-project.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
-;;; no-byte-compile: nil; fill-column: 100 -*-
+;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -12,9 +12,6 @@
 (defvar sb/project-handler)
 
 (declare-function consult--customize-put "consult")
-
-;; (use-package ffap ; Find FILENAME, guessing a default from text around point
-;;   :commands ffap)
 
 ;; Projectile is unable to remember remote projects which is also not supported by the current
 ;; version of `project'.

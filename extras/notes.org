@@ -35,6 +35,23 @@ A local variable specification takes the following form: ~;; -*- mode: MODENAME;
 
 - [[https://alhassy.github.io/ElispCheatSheet/CheatSheet.pdf][Elisp Reference Sheet]]
 
+
+*** Difference between ~fboundp~ and ~functionp~
+
+~functionp~ tells you if its argument is a function value; ~fboundp~ tells you if a symbol has a function value bound to it.
+
+#+begin_src elisp
+> (functionp 'car)
+t
+> (fboundp 'car)
+t
+> (functionp (lambda ()))
+t
+> (fboundp (lambda ()))
+​*** Eval error ***  Wrong type argument: symbolp, (closure (t) nil)
+#+end_src
+
+
 ** Useful Information
 
 *** Avoid activating certain packages with package initialize

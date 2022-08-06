@@ -1,5 +1,5 @@
 ;;; init-config.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
-;;; no-byte-compile: nil; fill-column: 100 -*-
+;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -107,6 +107,7 @@ Sometimes we do not want to unnecessarily add differences due to
 ;; We can use the snap installation of "universal-ctags", but snap packages have poor performance. A
 ;; better alternative is to build and install "ctags" locally. Check "setup-emacs.sh" for
 ;; installation instructions.
+
 (defcustom sb/ctags-path
   "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
@@ -147,6 +148,7 @@ This location is used for temporary installations and files.")
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow.
 ;; Furthermore, candidate `pylsp' versions depend on the OS version, and capf sometimes does not
 ;; work consistently.
+
 (defcustom sb/python-langserver
   'pylsp
   "Choose the Python Language Server implementation."

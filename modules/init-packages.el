@@ -1,5 +1,5 @@
 ;;; init-packages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
-;;; no-byte-compile: nil; fill-column: 100 -*-
+;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -14,9 +14,10 @@
 (defvar use-package-hook-name-suffix)
 
 ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
-;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions'
-;; to persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
+;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
+;; persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
 ;; packages to their locked versions, making the config totally reproducible across environments.
+
 (when (bound-and-true-p sb/disable-package.el)
   (defvar bootstrap-version)
   (defvar straight-build-dir)
@@ -64,30 +65,30 @@
 
   (straight-use-package 'use-package))
 
-;; (unless (bound-and-true-p sb/disable-package.el)
-;;   (with-eval-after-load 'package
-;;     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
-;;     (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-;;     (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+(unless (bound-and-true-p sb/disable-package.el)
+  (with-eval-after-load 'package
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+    (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+    (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
 
-;;   ;; Initialise the package management system. Another option is to construct the `load-path'
-;;   ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-;;   (package-initialize)
+  ;; Initialise the package management system. Another option is to construct the `load-path'
+  ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+  (package-initialize)
 
-;;   (unless (package-installed-p 'use-package)
-;;     (package-refresh-contents)
-;;     (package-install 'use-package))
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
 
-;;   (defvar use-package-always-ensure)
+  (defvar use-package-always-ensure)
 
-;;   ;; Avoid manual installations whenever I modify package installations
-;;   (setq use-package-always-ensure t
-;;         ;; These variables need to best before loading `use-package'
-;;         use-package-enable-imenu-support t
-;;         use-package-hook-name-suffix nil)
+  ;; Avoid manual installations whenever I modify package installations
+  (setq use-package-always-ensure t
+        ;; These variables need to best before loading `use-package'
+        use-package-enable-imenu-support t
+        use-package-hook-name-suffix nil)
 
-;;   (eval-when-compile
-;;     (require 'use-package)))
+  (eval-when-compile
+    (require 'use-package)))
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
@@ -97,7 +98,8 @@
 ;; alternate ways of loading the package.
 ;; https://github.com/jwiegley/use-package#notes-about-lazy-loading
 
-;; Hooks in the `:hook' section run in reverse order. Example:
+;; Hooks in the `:hook' section run in reverse order.
+
 ;; (use-package package-name
 ;;   :hook
 ;;   ((x-mode-hook . last)
@@ -148,6 +150,7 @@
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
 ;; all the bindings available in a buffer, "C-h m" shows the keybindings for the major and the minor
 ;; modes.
+
 (use-package bind-key
   :functions bind-key--remove
   :bind
@@ -159,6 +162,7 @@
 ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
 ;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
 ;; command.
+
 (with-eval-after-load "no-littering"
   (when (not (bound-and-true-p sb/disable-package.el))
     (when (boundp 'package-quickstart)
@@ -193,6 +197,7 @@
 ;; These are alternative ways to manipulate the `exec-path'.
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
+
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize

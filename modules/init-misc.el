@@ -1,5 +1,5 @@
 ;;; init-misc.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
-;;; no-byte-compile: nil; fill-column: 100 -*-
+;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -490,6 +490,14 @@
 (use-package centeredpoint
   :straight (centered-point-mode :type git :host github :repo "jmercouris/emacs-centered-point")
   :hook (after-init-hook . centered-point-mode))
+
+(use-package lp-transient
+  :straight (lp-transient :type git :host github :repo "haji-ali/lp-transient")
+  :bind
+  (:map dired-mode-map
+        ("C-c C-p" . lp-transient-menu)
+        :map pdf-misc-minor-mode-map
+        ("C-c C-p" . lp-transient-menu)))
 
 (provide 'init-misc)
 
