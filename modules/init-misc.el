@@ -115,7 +115,8 @@
   :diminish)
 
 (use-package vundo
-  :straight (vundo :type git :host github :repo "casouri/vundo")
+  :straight
+  (vundo :type git :host github :repo "casouri/vundo")
   :if sb/EMACS28+
   :bind
   (([remap undo] . vundo)
@@ -487,17 +488,16 @@
 
   (ignoramus-setup))
 
-(use-package centeredpoint
-  :straight (centered-point-mode :type git :host github :repo "jmercouris/emacs-centered-point")
-  :hook (after-init-hook . centered-point-mode))
-
 (use-package lp-transient
-  :straight (lp-transient :type git :host github :repo "haji-ali/lp-transient")
-  :bind
-  (:map dired-mode-map
-        ("C-c C-p" . lp-transient-menu)
-        :map pdf-misc-minor-mode-map
-        ("C-c C-p" . lp-transient-menu)))
+  :straight
+  (lp-transient :type git :host github :repo "haji-ali/lp-transient")
+  :demand t
+  :config
+  (with-eval-after-load "dired"
+    (bind-key "C-c C-p" #'lp-transient-menu dired-mode-map))
+  (with-eval-after-load "pdf-tools"
+    ()
+    (bind-key "C-c C-p" #'lp-transient-menu pdf-misc-minor-mode-map)))
 
 (provide 'init-misc)
 

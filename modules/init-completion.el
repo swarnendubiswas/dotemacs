@@ -151,7 +151,8 @@
         ([remap completion-at-point] . consult-company)))
 
 (use-package fussy
-  :straight (fussy :type git :host github :repo "jojojames/fussy")
+  :straight
+  (fussy :type git :host github :repo "jojojames/fussy")
   :demand t
   :commands fussy-all-completions)
 

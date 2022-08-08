@@ -9,6 +9,7 @@
 
 ;; https://github.com/ema2159/centaur-tabs/issues/181
 ;; https://github.com/doomemacs/doomemacs/commit/8b93e8b15cc081860a8eb156b1584ef60b6bc9e4
+
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :commands
@@ -48,7 +49,6 @@
   :preface
   (defun sb/awesome-tab-buffer-groups ()
     "`awesome-tab-buffer-groups' control buffers' group rules.
-
 Group awesome-tab with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
 All buffer name start with * will group to \"Emacs\".
 Other buffer group by `awesome-tab-get-group-name' with project name."

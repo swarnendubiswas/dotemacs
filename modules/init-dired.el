@@ -107,7 +107,8 @@
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :straight (dired+ :type git :host github :repo "emacsmirror/dired-plus")
+  :straight
+  (dired+ :type git :host github :repo "emacsmirror/dired-plus")
   :commands diredp-toggle-find-file-reuse-dir
   :init
   ;; Set before the module is loaded
@@ -301,7 +302,8 @@
   (zoxide-find-file zoxide-open-with))
 
 (use-package dirvish
-  :straight (dirvish :type git :host github :repo "alexluigit/dirvish")
+  :straight
+  (dirvish :type git :host github :repo "alexluigit/dirvish")
   :init
   ;; Let Dirvish take over Dired globally
   (dirvish-override-dired-mode)

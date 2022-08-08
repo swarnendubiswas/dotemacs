@@ -106,6 +106,8 @@
 ;;    (x-mode-hook . second)
 ;;    (x-mode-hook . first)))
 
+;; Check "use-package-keywords.org" for a suggested order of `use-package' keywords.
+
 (defvar use-package-compute-statistics)
 (defvar use-package-verbose)
 (defvar use-package-expand-minimally)
@@ -126,9 +128,6 @@
           use-package-expand-minimally   t
           use-package-compute-statistics nil
           use-package-verbose            nil)))
-
-;; One suggested order of `use-package' keywords:
-;; https://github.com/radian-software/radian/blob/develop/emacs/use-package-keywords.md
 
 ;; Feature `straight-x' from package `straight' provides experimental/unstable extensions to
 ;; straight.el which are not yet ready for official inclusion.
@@ -159,18 +158,19 @@
 (use-package no-littering
   :demand t)
 
-;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
-;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
-;; command.
-
 (with-eval-after-load "no-littering"
-  (when (not (bound-and-true-p sb/disable-package.el))
+  ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
+  (unless (bound-and-true-p sb/disable-package.el)
     (when (boundp 'package-quickstart)
-      (setq package-quickstart t)))
+      (setq package-quickstart t))
 
-  (bind-keys :package package
-             ("C-c d p" . package-quickstart-refresh)
-             ("C-c d l" . package-list-packages)))
+    ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
+    ;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
+    ;; command.
+
+    (bind-keys :package package
+               ("C-c d p" . package-quickstart-refresh)
+               ("C-c d l" . package-list-packages))))
 
 (defcustom sb/custom-file
   (no-littering-expand-var-file-name "custom.el")
@@ -204,10 +204,11 @@
   :if (or (daemonp) (not (display-graphic-p)))
   :init
   ;; "-i" is expensive but Tramp is unable to find executables without the option. Furthermore,
-  ;; other executables like "prettier" from $PATH are also not found.
-  (setq exec-path-from-shell-arguments '("-l" "-i")
+  ;; other executables like "prettier" from $PATH are also not found. But I am no longer using
+  ;; Tramp, and instead, I am using terminal Emacs over SSH.
+  (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LANG" "LC_CTYPE" "LC_ALL" "TERM"))
+        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM"))
   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)

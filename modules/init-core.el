@@ -377,7 +377,7 @@
 ;; Hide the "Wrote to recentf" message
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
 ;; Hide the "Cleaning up the recentf list...done" message
-(advice-add 'recentf-cleanup   :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'recentf-cleanup :around #'sb/inhibit-message-call-orig-fun)
 ;; Hide the "Wrote ..." message
 (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
 
@@ -426,7 +426,8 @@
 
 (add-to-list 'find-file-not-found-functions #'sb/auto-create-missing-dirs)
 
-;; Enable commands that are disabled by default
+;; Enable commands that are disabled by default. I prefer upcase and downcase to work on the first
+;; characters in a word instead of the character at point.
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 

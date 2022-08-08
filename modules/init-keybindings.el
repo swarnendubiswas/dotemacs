@@ -131,7 +131,8 @@
                      hydra--call-interactively-remap-maybe))
 
 (use-package hydra-posframe
-  :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
+  :straight
+  (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
   :if (display-graphic-p)
   :after hydra
   :commands

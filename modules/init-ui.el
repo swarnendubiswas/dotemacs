@@ -117,7 +117,8 @@
   (modus-themes-org-blocks 'tinted-background))
 
 (use-package nano-theme
-  :straight (nano-theme :type git :host github :repo "rougier/nano-theme")
+  :straight
+  (nano-theme :type git :host github :repo "rougier/nano-theme")
   :if (or (and (display-graphic-p)
                (or (eq sb/gui-theme 'nano-light)
                    (eq sb/gui-theme 'nano-dark)))
@@ -320,46 +321,11 @@
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
   (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
   (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
   (set-face-attribute 'mode-line nil :height 110)
   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "vindhya")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "himalaya")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "aravalli")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "satpura")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "nilgiri")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "sivalik")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
-
-;; (when (string= (system-name) "garwhal")
-;;   (set-face-attribute 'default nil :height 160)
-;;   (set-face-attribute 'mode-line nil :height 110)
-;;   (set-face-attribute 'mode-line-inactive nil :height 110))
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -388,7 +354,17 @@
   (add-hook 'after-init-hook #'window-divider-mode)
   ;; (display-battery-mode 1)
   ;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
-  (global-display-line-numbers-mode 1))
+  (global-display-line-numbers-mode 1)
+
+  ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems pointless.
+  (fringe-mode '(10 . 0))
+
+  ;; Use a blinking bar for the cursor style to help identify it easily. This does not work on the TUI
+  ;; Emacs because the cursor style then is controlled by the terminal application.
+  (setq-default cursor-type 'box)
+  ;; Set cursor color to white
+  (set-cursor-color "#ffffff")
+  (blink-cursor-mode 1))
 
 ;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
 ;; the other.
@@ -405,17 +381,6 @@
 (when nil
   (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (split-window-right)))
-
-;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems pointless.
-(when (display-graphic-p)
-  (fringe-mode '(10 . 0))
-
-  ;; Use a blinking bar for the cursor style to help identify it easily. This does not work on the TUI
-  ;; Emacs because the cursor style then is controlled by the terminal application.
-  (setq-default cursor-type 'box)
-  ;; Set cursor color to white
-  (set-cursor-color "#ffffff")
-  (blink-cursor-mode 1))
 
 (use-package hl-line
   :commands hl-line-highlight
