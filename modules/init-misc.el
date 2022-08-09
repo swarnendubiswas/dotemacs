@@ -496,7 +496,6 @@
   (with-eval-after-load "dired"
     (bind-key "C-c C-p" #'lp-transient-menu dired-mode-map))
   (with-eval-after-load "pdf-tools"
-    ()
     (bind-key "C-c C-p" #'lp-transient-menu pdf-misc-minor-mode-map)))
 
 (provide 'init-misc)

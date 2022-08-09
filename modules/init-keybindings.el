@@ -26,10 +26,6 @@
  ("C-z"       . undo)
  ("C-<f11>"   . delete-other-windows)
  ("C-x k"     . kill-this-buffer)
- ("M-<left>"  . previous-buffer)
- ("C-S-<iso-lefttab>" . previous-buffer)
- ("M-<right>" . next-buffer)
- ("C-<tab>"   . next-buffer)
  ("C-c d f"   . auto-fill-mode)
  ("<f7>"      . previous-error)
  ("<f8>"      . next-error)
@@ -73,7 +69,13 @@
 
 (unless sb/tab-bar-handler
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
-  (global-set-key [remap previous-buffer] #'sb/previous-buffer))
+  (global-set-key [remap previous-buffer] #'sb/previous-buffer)
+
+  (bind-keys
+   ("M-<left>"  . sb/previous-buffer)
+   ("C-S-<iso-lefttab>" . sb/previous-buffer)
+   ("M-<right>" . sb/next-buffer)
+   ("C-<tab>"   . sb/next-buffer)))
 
 (use-package default-text-scale
   :if (display-graphic-p)

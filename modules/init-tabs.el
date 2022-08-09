@@ -49,9 +49,11 @@
   :preface
   (defun sb/awesome-tab-buffer-groups ()
     "`awesome-tab-buffer-groups' control buffers' group rules.
-Group awesome-tab with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-All buffer name start with * will group to \"Emacs\".
-Other buffer group by `awesome-tab-get-group-name' with project name."
+  Group awesome-tab with mode if buffer is derived from
+  `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode'
+  `magit-mode'. All buffer name start with * will group to
+  \"Emacs\". Other buffer group by `awesome-tab-get-group-name'
+  with project name."
     (list
      (cond
       ((or (string-equal "*" (substring (buffer-name) 0 1))
@@ -66,11 +68,11 @@ Other buffer group by `awesome-tab-get-group-name' with project name."
        "Emacs")
       (t
        (awesome-tab-get-group-name (current-buffer))))))
-  :straight (:type git :host github :repo "manateelazycat/awesome-tab")
+  :straight
+  (:type git :host github :repo "manateelazycat/awesome-tab")
   :if (eq sb/tab-bar-handler 'awesome-tab)
-  :hook
-  (after-init-hook . awesome-tab-mode)
-  :bind*
+  :hook (after-init-hook . awesome-tab-mode)
+  :bind
   (("M-<right>" . awesome-tab-forward-tab)
    ("M-<left>" . awesome-tab-backward-tab)
    ("M-]" . awesome-tab-ace-jump))
@@ -79,8 +81,10 @@ Other buffer group by `awesome-tab-get-group-name' with project name."
   (awesome-tab-unselected-face ((t (:inherit default :height 0.8))))
   :custom
   (awesome-tab-label-fixed-length 14)
-  (awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups)
-  (awesome-tab-cycle-scope 'groups))
+  (awesome-tab-cycle-scope 'tabs)
+  :config
+  ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
+  (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
 (provide 'init-tabs)
 
