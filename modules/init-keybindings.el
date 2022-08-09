@@ -31,7 +31,6 @@
  ("M-<right>" . next-buffer)
  ("C-<tab>"   . next-buffer)
  ("C-c d f"   . auto-fill-mode)
- ("<f2>"      . ffap) ; Find FILENAME, guessing a default from text around point
  ("<f7>"      . previous-error)
  ("<f8>"      . next-error)
  ;; The default keybinding "C-S-backspace" does not work with the TUI without Alacritty customizations.

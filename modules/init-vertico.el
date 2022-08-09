@@ -24,11 +24,9 @@
   :hook
   (after-init-hook . vertico-mode)
   :bind
-  (;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'
-   ;; ("<f2>"  .  find-file)
-   :map vertico-map
-   ("C-M-j" . vertico-exit-input)
-   ("<tab>" . vertico-insert))
+  (:map vertico-map
+        ("C-M-j" . vertico-exit-input)
+        ("<tab>" . vertico-insert))
   :custom
   (vertico-cycle t)
   (vertico-resize nil)

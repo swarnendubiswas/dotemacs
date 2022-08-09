@@ -431,6 +431,19 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
+;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
+;; prefix argument is given. Then it will find file at point.
+(use-package ffap
+  :straight (:type built-in)
+  :demand t
+  :custom
+  (ffap-require-prefix t)
+  :config
+  (ffap-bindings)
+  ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
+  (when (eq sb/minibuffer-completion 'vertico)
+    (bind-key "<f2>" #'ffap)))
+
 (provide 'init-core)
 
 ;;; init-core.el ends here
