@@ -436,8 +436,6 @@
 (use-package ffap
   :straight (:type built-in)
   :demand t
-  :custom
-  (ffap-require-prefix t)
   :config
   (ffap-bindings)
   ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
