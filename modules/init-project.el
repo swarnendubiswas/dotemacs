@@ -159,30 +159,6 @@
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))
 
-;; `counsel-projectile' has poor performance with large projects, unlike `projectile'. Furthermore,
-;; I am unsure how does this package advances `projectile' in terms of usability.
-;; https://github.com/ericdanan/counsel-projectile/issues/179
-
-;; (use-package counsel-projectile
-;;   :disabled t
-;;   :if (eq sb/minibuffer-completion 'ivy)
-;;   :defines counsel-projectile-default-file
-;;   :commands (counsel-projectile-switch-project-by-name counsel-projectile-mode)
-;;   :custom
-;;   ;; Setting these to `t' can be slow for large projects
-;;   (counsel-projectile-remove-current-buffer t)
-;;   (counsel-projectile-sort-directories nil)
-;;   (counsel-projectile-find-file-more-chars 0)
-;;   (counsel-projectile-sort-buffers nil)
-;;   (counsel-projectile-sort-projects nil)
-;;   (counsel-projectile-sort-files nil)
-;;   :config
-;;   (counsel-projectile-mode 1)
-;;   :bind
-;;   ;; The `counsel' actions seem to be slower than base `projectile'
-;;   (("<f5>" . counsel-projectile-switch-project)
-;;    ("<f6>" . counsel-projectile-find-file)))
-
 (use-package consult-projectile
   :if (and (eq sb/minibuffer-completion 'vertico)
            (eq sb/project-handler 'projectile))
@@ -192,12 +168,6 @@
    ("<f6>" . consult-projectile))
   :config
   (consult-customize consult-projectile :preview-key nil))
-
-;; Allows to quickly add projectile projects to the treemacs workspace
-;; (use-package treemacs-projectile
-;;   :after (treemacs projectile)
-;;   :commands treemacs-projectile
-;;   :demand t)
 
 (provide 'init-project)
 

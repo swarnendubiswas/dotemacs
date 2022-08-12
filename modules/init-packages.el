@@ -187,7 +187,8 @@
 
 ;; Asynchronously byte compile packages installed with `package.el'
 (use-package async
-  :straight (async :type git :host github :repo "jwiegley/emacs-async")
+  :straight
+  (async :type git :host github :repo "jwiegley/emacs-async")
   :commands async-bytecomp-package-mode
   :init (async-bytecomp-package-mode 1))
 

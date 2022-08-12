@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-operandi
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"            leuven)
@@ -26,7 +26,7 @@
            (const :tag "monokai"           monokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
-           ;; Does not pair brackets
+           ;; Does not pair brackets, `diff-hl' highlights have poor contrast and do not look good
            (const :tag "nano-dark"         nano-dark)
            ;; Company popups cannot be distinguished
            (const :tag "lambda-dark-faded" lambda-dark-faded)
@@ -59,7 +59,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)

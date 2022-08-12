@@ -207,7 +207,9 @@
 (use-package embark-consult
   :after (embark consult))
 
-;; Enriches the completion display with annotations, e.g., documentation strings or file information
+;; Enriches the completion display with annotations, e.g., documentation strings or file information.
+;; FIXME: Align marginalia columns correctly.
+
 (use-package marginalia
   :after vertico
   :commands marginalia-mode

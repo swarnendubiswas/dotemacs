@@ -1547,6 +1547,7 @@
 
 (define-abbrev-table 'org-mode-abbrev-table
   '(
+    ("complation" "compilation" nil :count 0)
     ("discssion" "discussion" nil :count 0)
     ("optimisation" "optimization" nil :count 0)
     ("randomozie" "randomize" nil :count 0)

@@ -12,6 +12,7 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
+;; Use "M-$" for `ispell-word'.
 (use-package ispell
   :straight (:type built-in)
   :if (symbol-value 'sb/IS-LINUX)

@@ -42,6 +42,7 @@
   (move-text-up move-text-down move-text-default-bindings)
   :init (move-text-default-bindings))
 
+;; https://github.com/jwiegley/use-package/issues/991
 (use-package duplicate-thing
   :bind*
   ("C-c C-d" . duplicate-thing))
@@ -294,8 +295,9 @@
   (bug-hunter-init-file bug-hunter-file))
 
 (use-package explain-pause-mode
-  :straight (explain-pause-mode :type git :host github
-                                :repo "lastquestion/explain-pause-mode")
+  :straight
+  (explain-pause-mode :type git :host github
+                      :repo "lastquestion/explain-pause-mode")
   :if (bound-and-true-p sb/debug-init-file)
   :commands
   (explain-pause-mode explain-pause-top)
@@ -434,7 +436,8 @@
         ("C-c C-u" . string-inflection-all-cycle)))
 
 (use-package procress
-  :straight (:host github :repo "haji-ali/procress")
+  :straight
+  (:host github :repo "haji-ali/procress")
   :hook
   (LaTeX-mode-hook . procress-auctex-mode)
   :config
@@ -454,49 +457,50 @@
 ;; (use-package sudo-edit ; Edit file with sudo
 ;;   :bind ("M-s e" . sudo-edit))
 
-(use-package ignoramus ; Ignore backups, build files, et al.
-  :demand t
-  :config
-  (dolist (ext '(".cb"
-                 ".cb2"
-                 ".dvi"
-                 ".fls"
-                 ".idx"
-                 ".o"
-                 ".out"
-                 ".pdf"
-                 "-pkg.el"
-                 ".rel"
-                 ".rip"
-                 ".toc"))
-    (add-to-list 'ignoramus-file-basename-endings ext))
+;; (use-package ignoramus ; Ignore backups, build files, et al.
+;;   :demand t
+;;   :config
+;;   (dolist (ext '(".cb"
+;;                  ".cb2"
+;;                  ".dvi"
+;;                  ".fls"
+;;                  ".idx"
+;;                  ".o"
+;;                  ".out"
+;;                  ".pdf"
+;;                  "-pkg.el"
+;;                  ".rel"
+;;                  ".rip"
+;;                  ".toc"))
+;;     (add-to-list 'ignoramus-file-basename-endings ext))
 
-  (dolist (filenames '("GPATH"
-                       "GRTAGS"
-                       "GSYMS"
-                       "GTAGS"
-                       "TAGS"
-                       "__init__.py"))
-    (add-to-list 'ignoramus-file-basename-exact-names filenames))
+;;   (dolist (filenames '("GPATH"
+;;                        "GRTAGS"
+;;                        "GSYMS"
+;;                        "GTAGS"
+;;                        "TAGS"
+;;                        "__init__.py"))
+;;     (add-to-list 'ignoramus-file-basename-exact-names filenames))
 
-  (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
+;;   (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
 
-  (dolist (dir '("\\`\\."
-                 "__pycache__"
-                 "auto"))
-    (add-to-list 'ignoramus-file-basename-exact-names dir))
+;;   (dolist (dir '("\\`\\."
+;;                  "__pycache__"
+;;                  "auto"))
+;;     (add-to-list 'ignoramus-file-basename-exact-names dir))
 
-  (ignoramus-setup))
+;;   (ignoramus-setup))
 
-(use-package lp-transient
+(use-package transient-extras
   :straight
-  (lp-transient :type git :host github :repo "haji-ali/lp-transient")
+  (:host github :repo "haji-ali/transient-extras")
   :demand t
   :config
+  (require 'transient-extras-lp)
   (with-eval-after-load "dired"
-    (bind-key "C-c C-p" #'lp-transient-menu dired-mode-map))
+    (bind-key "C-c C-p" #'transient-extras-lp-menu dired-mode-map))
   (with-eval-after-load "pdf-tools"
-    (bind-key "C-c C-p" #'lp-transient-menu pdf-misc-minor-mode-map)))
+    (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map)))
 
 (provide 'init-misc)
 

@@ -33,7 +33,7 @@
       ;; it runs all the save-related hooks.
       auto-save-visited-interval 30
       backup-inhibited t ; Disable backup for a per-file basis
-      blink-matching-paren t ; Distracting
+      blink-matching-paren t
       bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
       case-fold-search t ; Searches and matches should ignore case
       comment-auto-fill-only-comments t

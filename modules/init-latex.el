@@ -265,7 +265,8 @@ Ignore if no file is found."
 
 ;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 (use-package auctex-latexmk
-  :straight (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")
+  :straight
+  (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")
   :after tex-mode
   :demand t
   :commands

@@ -24,6 +24,8 @@
 (require 'init-core)
 
 (require 'init-ui)
+(require 'init-theme)
+(require 'init-modeline)
 (require 'init-tabs)
 
 (require 'init-buffer)

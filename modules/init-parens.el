@@ -58,6 +58,7 @@
     (and (eq action 'insert)
          (not (or (get-text-property (point) 'part-side)
                   (get-text-property (point) 'block-side)))))
+
   ;; https://xenodium.com/emacs-smartparens-auto-indent/
   (defun sb/indent-between-pair (&rest _ignored)
     (newline)
@@ -91,7 +92,7 @@
    ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
    ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
    ("C-M-k" . sp-splice-sexp) ; "(foo bar)" -> "foo bar"
-   ;; foo(2,3) -> foo[2,3]
+   ;; "foo(2,3)" -> "foo[2,3]"
    ("C-M-r" . sp-rewrap-sexp))
   :custom
   (sp-show-pair-from-inside t)

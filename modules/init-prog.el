@@ -20,8 +20,8 @@
   :diminish)
 
 (use-package outline ; Edit outlines
-  :hook
-  (prog-mode-hook . outline-minor-mode)
+  ;; :hook
+  ;; (prog-mode-hook . outline-minor-mode)
   :diminish outline-minor-mode)
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
@@ -30,9 +30,9 @@
   :straight (:type built-in)
   :commands
   (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-  :hook
-  ;; Hideshow is not defined for `ini-mode'.
-  ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
+  ;; :hook
+  ;; ;; Hideshow is not defined for `ini-mode'.
+  ;; ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
   :custom
   (hs-isearch-open t "Open all folds while searching")
   :diminish hs-minor-mode)
@@ -91,8 +91,7 @@
 
 (use-package rainbow-delimiters
   :hook
-  ((prog-mode-hook latex-mode-hook LaTeX-mode-hook
-                   org-src-mode-hook) . rainbow-delimiters-mode))
+  ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
 (provide 'init-prog)
 

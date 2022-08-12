@@ -39,7 +39,7 @@ Evaluate the following to test that both fast JSON (Emacs 27+) and native compil
 (if (and (fboundp 'native-comp-available-p)
        (native-comp-available-p))
   (message "Native compilation is available")
-(message "Native complation is *not* available"))
+(message "Native compilation is *not* available"))
 
 (if (functionp 'json-serialize)
   (message "Native JSON is available")
@@ -50,7 +50,7 @@ Run the following to native compile all Elisp files under a directory (e.g., =~/
 
 ** Setup Emacs config
 
-back up the contents of your ~.emacs.d~ directory if it is not empty, and then check out the source.
+Back up the contents of your ~.emacs.d~ directory if it is not empty, and then check out the source.
 
 #+begin_src shell
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
