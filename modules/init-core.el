@@ -400,12 +400,12 @@
   :custom
   (windmove-wrap-around t "Wrap around at edges"))
 
-(use-package solar
-  :straight (:type built-in)
-  :custom
-  (calendar-latitude 26.50)
-  (calendar-location-name "Kanpur, UP, India")
-  (calendar-longitude 80.23))
+;; (use-package solar
+;;   :straight (:type built-in)
+;;   :custom
+;;   (calendar-latitude 26.50)
+;;   (calendar-location-name "Kanpur, UP, India")
+;;   (calendar-longitude 80.23))
 
 ;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
 ;; also get run for all modes derived from a basic mode such as `text-mode'.
@@ -441,6 +441,11 @@
   ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
   (when (eq sb/minibuffer-completion 'vertico)
     (bind-key "<f2>" #'ffap)))
+
+;; (use-package doc-view
+;;   :custom
+;;   (doc-view-continuous t)
+;;   (doc-view-resolution 120))
 
 (provide 'init-core)
 

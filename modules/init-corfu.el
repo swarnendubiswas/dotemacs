@@ -275,8 +275,9 @@
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package kind-all-the-icons
-  :straight (kind-all-the-icons :type git :host github
-                                :repo "Hirozy/kind-all-the-icons")
+  :straight
+  (kind-all-the-icons :type git :host github
+                      :repo "Hirozy/kind-all-the-icons")
   :if (and (eq sb/corfu-icons 'kind-all-the-icons)
            (display-graphic-p))
   :after corfu

@@ -580,8 +580,19 @@
     ("L" magit-log-current "commit log (project)")
     ("s" magit-status "status"))))
 
+(pretty-hydra-define sb/hydra-dumb-jump
+  (:color blue :foreign-keys warn)
+  ("Dumb Jump"
+   (("j" dumb-jump-go "Go")
+    ("o" dumb-jump-go-other-window "Other window")
+    ("e" dumb-jump-go-prefer-external "Go external")
+    ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
+    ("i" dumb-jump-go-prompt "Prompt")
+    ("l" dumb-jump-quick-look "Quick look")
+    ("b" dumb-jump-back "Back"))))
+
 (bind-key "C-c h a" #'sb/hydra-avy/body)
-(bind-key "C-c h d" #'sb/hydra-markdown-mode/body)
+(bind-key "C-c h k" #'sb/hydra-markdown-mode/body)
 (bind-key "C-c h e" #'sb/hydra-error/body)
 (bind-key "C-c h f" #'sb/hydra-flycheck/body)
 (bind-key "C-c h g" #'sb/hydra-smerge/body)
@@ -595,6 +606,7 @@
 (bind-key "C-c h i" #'sb/hydra-straight/body)
 (bind-key "C-c h v" #'sb/hydra-magit/body)
 (bind-key "C-c h y" #'sb/hydra-python-indent/body)
+(bind-key "C-c h d" #'sb/hydra-dumb-jump)
 
 (pretty-hydra-define sb/hydra-help
   (:color teal :title "Hydra Overview" :foreign-keys warn)

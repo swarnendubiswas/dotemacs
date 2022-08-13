@@ -187,7 +187,8 @@
 
 ;; Complete in the middle of words
 (use-package company-anywhere
-  :straight (company-anywhere :type git :host github :repo "zk-phi/company-anywhere")
+  :straight
+  (company-anywhere :type git :host github :repo "zk-phi/company-anywhere")
   :after company
   :demand t)
 

@@ -122,16 +122,23 @@
   :bind
   ("C-M-y" . consult-yasnippet))
 
-;; Prescient uses frequency + recency for sorting. Vertico does its own sorting based on recency,
-;; and corfu has corfu-history. Company has company-statistics. Furthermore, ivy is not well
-;; supported with prescient. So, I do not see a reason to use prescient.
+;; Prescient uses frecency (frequency + recency) for sorting. Vertico does its own sorting based on
+;; recency, and Corfu has corfu-history. Company has company-statistics. Furthermore, Ivy is not
+;; well supported with prescient.
 
 (use-package prescient
   :commands prescient-persist-mode
   :hook
   (after-init-hook . prescient-persist-mode)
   :custom
-  (prescient-sort-full-matches-first t))
+  (prescient-sort-full-matches-first t)
+  :config
+  ;; https://github.com/minad/vertico/wiki#using-prescientel
+  (with-eval-after-load "vertico"
+    (setq vertico-sort-function #'prescient-sort)
+    (advice-add #'vertico-insert :after
+                (lambda ()
+                  (prescient-remember (vertico--candidate))))))
 
 ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
 ;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.

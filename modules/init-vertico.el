@@ -170,7 +170,7 @@
   (consult-line-numbers-widen t)
   (consult-preview-key nil "Disable preview by default, enable for selected commands")
   (completion-in-region-function #'consult-completion-in-region)
-  ;; Having multiple other sources like recentf makes it difficult to switch quickly between buffers
+  ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly between only buffers
   (consult-buffer-sources '(consult--source-buffer
                             ;; consult--source-hidden-buffer
                             ;; consult--source-recent-file

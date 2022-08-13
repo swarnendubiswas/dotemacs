@@ -61,13 +61,13 @@
    ;; Jump to a file below the current directory
    ("C-x f" . counsel-fd-file-jump)))
 
-(use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-  :demand t
-  :defines vlf-application
-  :commands vlf
-  :init
-  (setq vlf-application 'dont-ask)
-  (require 'vlf-setup))
+;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+;;   :demand t
+;;   :defines vlf-application
+;;   :commands vlf
+;;   :init
+;;   (setq vlf-application 'dont-ask)
+;;   (require 'vlf-setup))
 
 (use-package immortal-scratch
   :hook

@@ -103,7 +103,8 @@
 
 ;; Minimal modeline information
 (use-package awesome-tray ; Minimal modeline information
-  :straight (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
+  :straight
+  (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
   :if (eq sb/modeline-theme 'awesome-tray)
   :hook
   (after-init-hook . awesome-tray-mode)
@@ -174,14 +175,16 @@
   :config (load-theme 'airline-doom-one t))
 
 (use-package nano-modeline
-  :straight (nano-modeline :type git :host github :repo "rougier/nano-modeline")
+  :straight
+  (nano-modeline :type git :host github :repo "rougier/nano-modeline")
   :if (eq sb/modeline-theme 'nano)
   :init
   (when (eq sb/modeline-theme 'nano)
     (nano-modeline-mode 1)))
 
 (use-package lambda-line
-  :straight (:type git :host github :repo "lambda-emacs/lambda-line")
+  :straight
+  (:type git :host github :repo "lambda-emacs/lambda-line")
   :if (eq sb/modeline-theme 'lambda-line)
   :hook
   (after-init-hook . lambda-line-mode)

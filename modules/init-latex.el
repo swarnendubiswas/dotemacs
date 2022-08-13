@@ -14,37 +14,37 @@
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 
-(use-package lsp-latex
-  :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
-                                       lsp-latex-bibtex-formatter-line-length
-                                       lsp-latex-chktex-on-open-and-save
-                                       lsp-latex-build-on-save
-                                       lsp-latex-build-is-continuous
-                                       lsp-latex-build-args
-                                       lsp-latex-diagnostics-delay)
-  :hook
-  (latex-mode-hook . (lambda()
-                       (require 'lsp-latex)
-                       (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter             "latexindent")
-  (lsp-latex-latex-formatter              "latexindent")
-  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-  (lsp-latex-chktex-on-open-and-save      t)
-  (lsp-latex-build-is-continuous          t)
-  ;; Delay time in milliseconds before reporting diagnostics
-  (lsp-latex-diagnostics-delay            2000)
-  :config
-  (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc")
+;; (use-package lsp-latex
+;;   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
+;;                                        lsp-latex-bibtex-formatter-line-length
+;;                                        lsp-latex-chktex-on-open-and-save
+;;                                        lsp-latex-build-on-save
+;;                                        lsp-latex-build-is-continuous
+;;                                        lsp-latex-build-args
+;;                                        lsp-latex-diagnostics-delay)
+;;   :hook
+;;   (latex-mode-hook . (lambda()
+;;                        (require 'lsp-latex)
+;;                        (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter             "latexindent")
+;;   (lsp-latex-latex-formatter              "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+;;   (lsp-latex-chktex-on-open-and-save      t)
+;;   (lsp-latex-build-is-continuous          t)
+;;   ;; Delay time in milliseconds before reporting diagnostics
+;;   (lsp-latex-diagnostics-delay            2000)
+;;   :config
+;;   (add-to-list 'lsp-latex-build-args "-c")
+;;   (add-to-list 'lsp-latex-build-args "-pvc")
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection "texlab")
-  ;;   :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-  ;;   :remote? t
-  ;;   :server-id 'texlab-r))
-  )
+;;   ;; (lsp-register-client
+;;   ;;  (make-lsp-client
+;;   ;;   :new-connection (lsp-tramp-connection "texlab")
+;;   ;;   :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+;;   ;;   :remote? t
+;;   ;;   :server-id 'texlab-r))
+;;   )
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
@@ -245,23 +245,24 @@ Ignore if no file is found."
   :diminish)
 
 ;; Read document like a hypertext document, supports mouse highlighting
-(use-package bib-cite
-  :straight auctex
-  :hook
-  ((LaTeX-mode-hook latex-mode-hook) . (lambda()
-                                         (bib-cite-minor-mode 1)))
-  ;; :bind
-  ;; (:map bib-cite-minor-mode-map
-  ;;       ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
-  ;;       ("C-c l a" . bib-apropos)
-  ;;       ("C-c l b" . bib-make-bibliography)
-  ;;       ("C-c l d" . bib-display)
-  ;;       ("C-c l t" . bib-etags)
-  ;;       ("C-c l f" . bib-find)
-  ;;       ("C-c l n" . bib-find-next))
-  :custom
-  (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
-  :diminish bib-cite-minor-mode)
+
+;; (use-package bib-cite
+;;   :straight auctex
+;;   :hook
+;;   ((LaTeX-mode-hook latex-mode-hook) . (lambda()
+;;                                          (bib-cite-minor-mode 1)))
+;;   ;; :bind
+;;   ;; (:map bib-cite-minor-mode-map
+;;   ;;       ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+;;   ;;       ("C-c l a" . bib-apropos)
+;;   ;;       ("C-c l b" . bib-make-bibliography)
+;;   ;;       ("C-c l d" . bib-display)
+;;   ;;       ("C-c l t" . bib-etags)
+;;   ;;       ("C-c l f" . bib-find)
+;;   ;;       ("C-c l n" . bib-find-next))
+;;   :custom
+;;   (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+;;   :diminish bib-cite-minor-mode)
 
 ;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 (use-package auctex-latexmk
@@ -341,7 +342,8 @@ after a successful compilation."
 ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
 ;; in "$PATH".
 (use-package math-preview
-  :straight (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
+  :straight
+  (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
   :commands
   (math-preview-all math-preview-at-point math-preview-region)
   :custom

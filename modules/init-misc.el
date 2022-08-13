@@ -170,11 +170,6 @@
    ("C->"     . mc/mark-next-like-this)
    ("C-c C-<" . mc/mark-all-like-this)))
 
-(use-package doc-view
-  :custom
-  (doc-view-continuous t)
-  (doc-view-resolution 120))
-
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
 (use-package pdf-tools
@@ -375,20 +370,21 @@
 ;; `vterm' provides better performance than `eshell', `shell', and `(ansi-)term'. The advantage of
 ;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
 ;; Check https://github.com/akermu/emacs-libvterm.
-(use-package vterm
-  :custom
-  (vterm-always-compile-module t)
-  (vterm-max-scrollback 5000)
-  (vterm-term-environment-variable "xterm-24bit")
-  :config
-  (add-hook 'vterm-mode-hook
-            (lambda ()
-              (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
-              (buffer-face-mode t))))
 
-(use-package vterm-toggle
-  :bind
-  ("C-`" . vterm-toggle))
+;; (use-package vterm
+;;   :custom
+;;   (vterm-always-compile-module t)
+;;   (vterm-max-scrollback 5000)
+;;   (vterm-term-environment-variable "xterm-24bit")
+;;   :config
+;;   (add-hook 'vterm-mode-hook
+;;             (lambda ()
+;;               (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+;;               (buffer-face-mode t))))
+
+;; (use-package vterm-toggle
+;;   :bind
+;;   ("C-`" . vterm-toggle))
 
 (use-package rainbow-mode
   :hook
@@ -443,16 +439,16 @@
   :config
   (procress-load-default-svg-images))
 
-(use-package jgraph-mode
-  :mode ("\\.jgr\\'" . jgraph-mode))
+;; (use-package jgraph-mode
+;;   :mode ("\\.jgr\\'" . jgraph-mode))
 
-(use-package graphviz-dot-mode
-  :custom
-  (graphviz-dot-indent-width 4))
+;; (use-package graphviz-dot-mode
+;;   :custom
+;;   (graphviz-dot-indent-width 4))
 
-(use-package gnuplot
-  :mode ("\\.gp\\'" . gnuplot-mode)
-  :interpreter ("gnuplot" . gnuplot-mode))
+;; (use-package gnuplot
+;;   :mode ("\\.gp\\'" . gnuplot-mode)
+;;   :interpreter ("gnuplot" . gnuplot-mode))
 
 ;; (use-package sudo-edit ; Edit file with sudo
 ;;   :bind ("M-s e" . sudo-edit))

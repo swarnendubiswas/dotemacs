@@ -31,7 +31,8 @@
    ("<tab>" . xref-quit-and-goto-xref)
    ("r"     . xref-query-replace-in-results))
   :custom
-  (xref-search-program 'ripgrep))
+  (xref-search-program 'ripgrep)
+  (xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 (use-package dumb-jump
   :after xref
