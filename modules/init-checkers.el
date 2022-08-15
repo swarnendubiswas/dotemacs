@@ -16,16 +16,27 @@
 (declare-function make-lsp-client "lsp-mode")
 (declare-function f-dirname "f")
 
-;; ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
-;; ;; checks only the writing style. `textlint' includes `writegood'.
-;; (use-package writegood-mode
-;;   :disabled t
-;;   :commands (writegood-passive-voice-turn-off)
-;;   :hook
-;;   (text-mode-hook . writegood-mode)
-;;   :config
-;;   (add-to-list 'writegood-weasel-words "actionable")
-;;   :diminish)
+;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
+;; checks only the writing style. `textlint' includes `writegood'.
+
+(use-package writegood-mode
+  :commands
+  (writegood-passive-voice-turn-off
+   writegood-passive-voice-turn-on
+   writegood-weasels-turn-on
+   writegood-weasels-turn-off
+   writegood-duplicates-turn-on
+   writegood-duplicates-turn-off)
+  :hook
+  (text-mode-hook . writegood-mode)
+  :config
+  ;; https://emacs.stackexchange.com/questions/32644/how-to-concatenate-two-lists
+  ;; https://emacs.stackexchange.com/questions/20465/append-lists-smartly
+  (let ((sb/weasel-words '("actionable" "actually" "basically" "clearly" "easily" "easy" "it turns out that"
+                           "In this regard" "In this sense" "With this in mind" "With the above in mind"
+                           "may have" "often" "simple" "probably" "simply" "specifically")))
+    (cl-union writegood-weasel-words sb/weasel-words))
+  :diminish)
 
 (use-package flycheck
   :commands
@@ -257,7 +268,11 @@
                            ("Emacs Lisp" emacs-lisp)
                            ("C++" clang-format)
                            ("C" clang-format)
-                           ("Python" (yapf "--style" "file"))
+                           ("Cuda" clang-format)
+                           ("Perl" perltidy)
+                           ("HTML" tidy)
+                           ("BibTeX" Emacs)
+                           ("Python" (yapf "--style" "file") isort)
                            ("LaTeX" latexindent)
                            ("Markdown" prettier)
                            ("Shell script" shfmt)))
@@ -266,9 +281,15 @@
 ;; Enable using ".dir-locals.el" file
 (use-package editorconfig
   :if (executable-find "editorconfig")
+  :init
+  (setq editorconfig-trim-whitespaces-mode 'ws-butler-mode)
   ;; :hook
   ;; (prog-mode-hook . editorconfig-mode)
-  )
+  :config
+  (add-to-list 'editorconfig-indentation-alist
+               '(json-mode js-indent-level json-reformat:indent-width))
+  (add-to-list 'editorconfig-indentation-alist
+               '(nxml-mode nxml-child-indent nxml-attribute-indent)))
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
@@ -318,8 +339,7 @@
   :init
   (setq flycheck-languagetool-server-jar (no-littering-expand-etc-file-name
                                           "languagetool/languagetool-server.jar")
-        flycheck-checkers (delete 'languagetool flycheck-checkers)
-        flycheck-languagetool-check-time 3)
+        flycheck-checkers (delete 'languagetool flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
@@ -327,6 +347,7 @@
 ;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
 ;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
 ;; keytar-install".
+
 (use-package lsp-grammarly
   :defines
   (lsp-grammarly-active-modes lsp-grammarly-user-words)
@@ -338,10 +359,7 @@
                                  lsp-grammarly--show-error
                                  lsp-grammarly--update-document-state)
   :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
-   (lambda ()
-     (require 'lsp-grammarly)
-     (lsp-deferred)))
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
   :custom
   (lsp-grammarly-suggestions-oxford-comma t)
   (lsp-grammarly-suggestions-passive-voice t)
@@ -379,10 +397,7 @@
   :commands
   (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) .
-   (lambda ()
-     (require 'lsp-ltex)
-     (lsp-deferred)))
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
   :custom
   ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
   (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
@@ -448,6 +463,7 @@
 ;; support. We need to enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
 
 ;; org -> grammarly -> languagetool
+
 ;; (add-hook 'org-mode-hook
 ;;           (lambda ()
 ;;             (flycheck-select-checker 'org-lint)
@@ -473,6 +489,7 @@
 
 ;; `markdown-mode' is derived from `text-mode'
 ;; markdown-markdownlint-cli -> grammarly -> languagetool
+
 ;; (add-hook 'markdown-mode-hook
 ;;           (lambda()
 ;;             (flycheck-select-checker 'markdown-markdownlint-cli)
@@ -498,36 +515,39 @@
 ;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
 ;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
 
-(use-package clang-format
-  :if (executable-find "clang-format")
-  :after (mlir-mode)
-  :commands
-  (clang-format clang-format-buffer clang-format-region)
-  :custom
-  (clang-format-style "file")
-  (clang-format-style-option "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}"))
+;; (use-package clang-format
+;;   :if (executable-find "clang-format")
+;;   :after (mlir-mode)
+;;   :commands
+;;   (clang-format clang-format-buffer clang-format-region)
+;;   :custom
+;;   (clang-format-style "file")
+;;   (clang-format-style-option "{BasedOnStyle: LLVM, IndentWidth: 2, ColumnLimit: 100}"))
 
-(use-package clang-format+
-  :if (executable-find "clang-format")
-  :defines clang-format+-always-enable
-  :hook
-  (mlir-mode-hook . clang-format+-mode)
-  :custom
-  (clang-format+-always-enable t))
+;; (use-package clang-format+
+;;   :if (executable-find "clang-format")
+;;   :defines clang-format+-always-enable
+;;   :hook
+;;   (mlir-mode-hook . clang-format+-mode)
+;;   :custom
+;;   (clang-format+-always-enable t))
 
 (use-package highlight-indentation
   :hook
   ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
-(use-package aggressive-indent ; Claims to be better than `electric-indent-mode'
-  :hook
-  (emacs-lisp-mode-hook . aggressive-indent-mode)
-  :custom
-  (aggressive-indent-comments-too t)
-  ;; Never use `electric-indent-mode'
-  (aggressive-indent-dont-electric-modes t)
-  :diminish)
+
+;; Claims to be better than `electric-indent-mode'. But we are now using `format-all'.
+
+;; (use-package aggressive-indent
+;;   :hook
+;;   (emacs-lisp-mode-hook . aggressive-indent-mode)
+;;   :custom
+;;   (aggressive-indent-comments-too t)
+;;   ;; Never use `electric-indent-mode'
+;;   (aggressive-indent-dont-electric-modes t)
+;;   :diminish)
 
 (provide 'init-checkers)
 

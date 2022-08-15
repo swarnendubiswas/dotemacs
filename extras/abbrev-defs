@@ -1489,6 +1489,7 @@
     ("concurreny" "Concurrency" nil :count 0)
     ("distinguih" "Distinguish" nil :count 0)
     ("expeiments" "experiments" nil :count 0)
+    ("fron" "front" nil :count 0)
     ("fulfilment" "fulfillment" nil :count 0)
     ("funtional" "Functional" nil :count 0)
     ("heterogenous" "Heterogeneous" nil :count 0)

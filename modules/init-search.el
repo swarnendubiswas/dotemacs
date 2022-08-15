@@ -107,7 +107,7 @@
   :custom
   ;; Option "pre" is distracting because of all the movement while highlighting selection keys. This
   ;; causes the eyes to lose focus.
-  (avy-style 'de-bruijn)
+  ;; (avy-style 'de-bruijn)
   (avy-background t))
 
 (progn

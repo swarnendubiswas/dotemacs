@@ -150,6 +150,7 @@
 ;; all the bindings available in a buffer, "C-h m" shows the keybindings for the major and the minor
 ;; modes.
 
+;; https://github.com/jwiegley/use-package/pull/993/files
 (use-package bind-key
   :functions bind-key--remove
   :bind

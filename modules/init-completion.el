@@ -142,6 +142,7 @@
 
 ;; We want `capf' sort for programming modes, not with recency. This breaks support for the
 ;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
+
 (use-package company-prescient
   :after (company prescient)
   :demand t

@@ -61,6 +61,7 @@
   ;;   :server-id 'clangd-r))
   )
 
+;; Better highlight for modern C++
 (use-package modern-cpp-font-lock
   :hook
   (c++-mode-hook . modern-c++-font-lock-mode)
@@ -82,6 +83,7 @@
   :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
   (cmake-mode-hook . (lambda ()
+                       ;; Disable text checkers
                        (make-local-variable 'lsp-disabled-clients)
                        (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                        (spell-fu-mode -1)
@@ -96,6 +98,7 @@
   ;;   :server-id 'cmakels-r))
   )
 
+;; Advanced syntax coloring support for CMake scripts.
 (use-package cmake-font-lock
   :hook
   (cmake-mode-hook . cmake-font-lock-activate))

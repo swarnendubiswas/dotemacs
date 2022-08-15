@@ -115,7 +115,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -184,7 +184,7 @@ Prefer the straight.el package manager instead."
   :group 'dotemacs)
 
 (defcustom sb/project-handler
-  'projectile
+  'project
   "Choose the handler for projects."
   :type '(radio
           (const :tag "project.el" project)

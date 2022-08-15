@@ -70,6 +70,8 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
   - ~M-p~ - Puts the previous element of the minibuffer history in the minibuffer (~previous-history-element~)
   - ~C-x C-e~ - Evaluate the last s-expression (~eval-last-sexp~)
   - ~C-M-x~ - Evaluate the top-level form containing point, or after point (~eval-defun~)
+  - ~C-SPC C-SPC~ - Set the mark ring but do not activate it (~set-mark-command~)
+  - ~C-u C-SPC~ - Moves point to where the mark was and deactivates the mark if it was active (~set-mark-command~)
 
 ** Dired
 

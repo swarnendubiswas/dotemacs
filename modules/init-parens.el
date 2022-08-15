@@ -108,9 +108,11 @@
   (sp-pair "("  nil :unless '(sp-point-before-word-p))
   (sp-pair "["  nil :unless '(sp-point-before-word-p))
   (sp-pair "{"  nil :unless '(sp-point-before-word-p))
+
   (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
-  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p))
+  ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
+  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
   (sp-local-pair 'prog-mode "{" nil :post-handlers '((sb/indent-between-pair "RET")))
   (sp-local-pair 'prog-mode "[" nil :post-handlers '((sb/indent-between-pair "RET")))

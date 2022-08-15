@@ -256,11 +256,11 @@ StartupWMClass=Emacs
 Keywords=Text;Editor;
 #+end_src
 
-[[https://tychoish.com/post/running-emacs/][Running Emacs]]
+- [[https://tychoish.com/post/running-emacs/][Running Emacs]]
 
 ** Emacs in a Terminal
 
-I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It seems difficult to properly set up many language servers with Tramp support. Therefore, I prefer to use Emacs in a terminal that has much better performance. It is important to set up support for 24-bit colors and proper keybindings in the terminal for good experience. I use [[https://github.com/alacritty/alacritty][Alacritty]] which is easy to customize.
+I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It seems difficult to properly set up language servers with Tramp support. Therefore, I prefer to use Emacs in a terminal that has much better performance. It is important to set up support for 24-bit colors and proper keybindings in the terminal for a good experience. I use [[https://github.com/alacritty/alacritty][Alacritty]] which is easy to customize.
 
 Use the steps mentioned in the link [[https://github.com/syl20bnr/spacemacs/wiki/Terminal][Spacemacs Terminal]] to enable support for 24bit colors in the terminal.
 
@@ -272,6 +272,21 @@ export TERM=xterm-24bit
 #+end_src
 
 Using ~export TERM=xterm-24bit~ may lead to failures when accessing remote systems. In such cases, we can fall back to ~TERM=xterm-256color ssh -X <remote-path>~.
+
+
+** Emacsclient
+
+To run Emacsclient with a GUI, use ~emacsclient -c -a ​""~~, where ~~-a ""~~ starts Emacs daemon and reattaches, and ~-t~ starts the client in the terminal. To run Emacsclient in a terminal, use ~emacsclient -nw -q~ or ~emacsclient -t -q~.
+
+To use Emacsclient as your editor, add the following to your ~.bashrc~.
+
+#+begin_src bash
+export ALTERNATE_EDITOR=""
+export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
+export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
+#+end_src
+
+- [[https://www.emacswiki.org/emacs/EmacsClient][Emacs Client]]
 
 ** Debugging Emacs
 
