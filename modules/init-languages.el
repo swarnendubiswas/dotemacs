@@ -294,11 +294,11 @@
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
-(use-package bat-mode
-  :straight (:type built-in)
-  :mode
-  (("\\.bat\\'" . bat-mode)
-   ("\\.cmd\\'" . bat-mode)))
+;; (use-package bat-mode
+;;   :straight (:type built-in)
+;;   :mode
+;;   (("\\.bat\\'" . bat-mode)
+;;    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
   :commands
@@ -398,21 +398,21 @@
   (json-reformat:indent-width 2)
   (js-indent-level 2))
 
-(use-package bazel
-  :if (executable-find "bazel")
-  :commands
-  (bazel-mode bazelrc-mode bazel-buildifier)
-  :hook
-  ((bazel-mode-hook . (lambda ()
-                        (add-hook 'before-save-hook #'bazel-buildifier nil t)))
-   (bazel-mode-hook . flycheck-mode)))
+;; (use-package bazel
+;;   :if (executable-find "bazel")
+;;   :commands
+;;   (bazel-mode bazelrc-mode bazel-buildifier)
+;;   :hook
+;;   ((bazel-mode-hook . (lambda ()
+;;                         (add-hook 'before-save-hook #'bazel-buildifier nil t)))
+;;    (bazel-mode-hook . flycheck-mode)))
 
-(use-package protobuf-mode
-  :commands
-  (protobuf-mode)
-  :mode "\\.proto$"
-  :hook
-  (protobuf-mode-hook . flycheck-mode))
+;; (use-package protobuf-mode
+;;   :commands
+;;   (protobuf-mode)
+;;   :mode "\\.proto$"
+;;   :hook
+;;   (protobuf-mode-hook . flycheck-mode))
 
 (use-package mlir-mode
   :straight nil

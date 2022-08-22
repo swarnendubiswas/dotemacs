@@ -367,8 +367,8 @@
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
   (lsp-grammarly-user-words '(Swarnendu
                               Biswas))
-  :config
-  (defvar lsp-grammarly-active-modes)
+  ;; :config
+  ;; (defvar lsp-grammarly-active-modes)
 
   ;; SB: I prefer using Terminal Emacs over Tramp for editing remote files, which obviates the need
   ;; for a remote langsever.

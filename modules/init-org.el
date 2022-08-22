@@ -19,7 +19,7 @@
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-quote-and-verse-blocks t)
-  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text")
+  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
   (org-hide-leading-stars nil "Show every star as it helps identify the indentation level")
   (org-hide-leading-stars-before-indent-mode nil)
   ;; Code block fontification using the major-mode of the code
@@ -47,7 +47,7 @@
   ;; Automatically sorted and renumbered whenever I insert a new one
   (org-footnote-auto-adjust t)
   (org-return-follows-link t)
-  (org-adapt-indentation t)
+  (org-adapt-indentation nil)
   (org-odd-levels-only t "Use odd levels to add more indentation")
   (org-export-with-smart-quotes t "#+OPTIONS ':t")
   (org-export-with-section-numbers nil "#+OPTIONS num:nil")
@@ -58,6 +58,7 @@
   ;; nil just aborts the export process with an error message "Unable to resolve link: nil". This
   ;; doesn't give any hint on which line the broken link actually is.
   (org-export-with-broken-links 'mark)
+  (org-indent-indentation-per-level 1)
   :config
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
