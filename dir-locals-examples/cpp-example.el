@@ -16,7 +16,9 @@
               (flycheck-gcc-language-standard   . "c++14")
               (flycheck-clang-language-standard . "c++14")
               (flycheck-clang-tidy-build-path   . ".")
+              (flycheck-gcc-openmp . t)
 
+              ;; https://stackoverflow.com/questions/33063008/define-new-variable-in-dir-locals-el
               (eval . (progn
                         (let (
                               (clang-args (list
@@ -26,7 +28,7 @@
                                            "-I./src"
                                            ))
                               (include-path (list
-                                             "src"
+                                             "./src"
                                              )))
                           (setq-local company-clang-arguments        clang-args
                                       flycheck-clang-args            clang-args

@@ -25,7 +25,8 @@
                                           ))
                                 )
                                )
-                           (setq lsp-pyright-extra-paths paths)
+                           (setq lsp-pyright-extra-paths paths
+                                 lsp-pyright-venv-path paths)
                            ))
 
                  (eval . (lsp-deferred))
