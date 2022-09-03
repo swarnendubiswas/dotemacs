@@ -83,6 +83,7 @@
 
   (setq dired-omit-files
         (concat dired-omit-files
+                "\\|^\\..*$" ; Hide all dotfiles
                 "\\|^.DS_Store\\'"
                 "\\|^.project\\(?:ile\\)?\\'"
                 "\\|^.\\(svn\\|git\\)\\'"

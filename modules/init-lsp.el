@@ -17,7 +17,7 @@
   (defun sb/lsp-mode-setup-completion ()
     (if (featurep 'orderless)
         (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-              '(orderless flex))
+              '(orderless))
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
             '(flex))))
   :defines (lsp-perl-language-server-path
@@ -127,8 +127,8 @@
                              "--pretty"))
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
-  (lsp-completion-show-detail t "Disable completion metadata since they can be very long")
-  ;; (lsp-completion-show-kind nil)
+  (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
+  (lsp-completion-show-kind nil "Disable completion kind to shorten popup width")
   (lsp-eldoc-enable-hover nil)
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")

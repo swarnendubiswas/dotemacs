@@ -84,8 +84,6 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
-  :straight
-  (:type git :repo "https://codeberg.org/ideasman42/emacs-fancy-compilation")
   :after compile
   :init (fancy-compilation-mode 1))
 

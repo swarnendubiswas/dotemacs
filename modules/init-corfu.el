@@ -26,6 +26,12 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
+
+  ;; https://github.com/minad/corfu/wiki
+  (defun sb/corfu-prescient-remember (&rest _)
+    "Advice for `corfu--insert.'"
+    (when (>= corfu--index 0)
+      (prescient-remember (nth corfu--index corfu--candidates))))
   :straight
   (corfu :files (:defaults "extensions/*") :includes (corfu-indexed
                                                       corfu-quick
@@ -45,7 +51,13 @@
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.2 "Recommended to not use zero for performance reasons")
-  (corfu-echo-documentation t))
+  (corfu-echo-documentation t)
+  (corfu-max-width 30)
+  :config
+  (with-eval-after-load "prescient"
+    (setq corfu-sort-function #'prescient-sort
+          corfu-sort-override-function #'prescient-sort)
+    (advice-add #'corfu--insert :before #'sb/corfu-prescient-remember)))
 
 (use-package corfu-info
   :straight
@@ -199,13 +211,13 @@
                           (lambda()
                             (setq-local completion-at-point-functions
                                         (list
-                                         (cape-super-capf #'lsp-completion-at-point
-                                                          #'citre-completion-at-point
-                                                          #'tags-completion-at-point-function
-                                                          #'cape-file
-                                                          #'cape-keyword
-                                                          #'cape-dabbrev
-                                                          #'cape-dict))))))))
+                                         #'lsp-completion-at-point
+                                         #'citre-completion-at-point
+                                         #'tags-completion-at-point-function
+                                         #'cape-file
+                                         #'cape-keyword
+                                         #'cape-dabbrev
+                                         #'cape-dict)))))))
 
   ;; (add-hook 'prog-mode-hook
   ;;           (lambda ()

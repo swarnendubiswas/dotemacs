@@ -1591,6 +1591,7 @@
     ("jioned" "joined" nil :count 0)
     ("matchng" "Matching" nil :count 0)
     ("meagre" "meager" nil :count 0)
+    ("medcines" "medicines" nil :count 0)
     ("nterest" "interest" nil :count 0)
     ("paediatrician" "pediatrician" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)

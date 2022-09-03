@@ -1,3 +1,10 @@
 init-autoload.el
 extras
 company-dict
+snippets
+references
+var
+etc
+eln-cache
+.vscode
+.tags
