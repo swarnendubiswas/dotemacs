@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-vivendi
+  'catppuccin
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"            leuven)
@@ -30,6 +30,7 @@
            (const :tag "nano-dark"         nano-dark)
            ;; Company popups cannot be distinguished
            (const :tag "lambda-dark-faded" lambda-dark-faded)
+           (const :tag "catppuccin"        catppuccin)
            (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"              none))
@@ -38,7 +39,7 @@
 ;; A dark theme looks good on the TUI but I now feel `modus-operandi' has better contrast than
 ;; `modus-vivendi'.
 (defcustom sb/tui-theme
-  'modus-vivendi
+  'catppuccin
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"            leuven)
@@ -53,6 +54,7 @@
            (const :tag "nano-dark"         nano-dark)
            (const :tag "lambda-dark"       lambda-dark)
            (const :tag "lambda-dark-faded" lambda-dark-faded)
+           (const :tag "catppuccin"        catppuccin)
            (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"              none))

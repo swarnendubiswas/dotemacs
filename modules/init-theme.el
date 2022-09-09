@@ -143,6 +143,11 @@
   (lambda-themes-set-italic-keywords t)
   (lambda-themes-set-variable-pitch t))
 
+(use-package catppuccin-theme
+  :if (or (eq sb/gui-theme 'catppuccin)
+          (eq sb/tui-theme 'catppuccin))
+  :init (load-theme 'catppuccin))
+
 (provide 'init-theme)
 
 ;;; init-theme.el ends here
