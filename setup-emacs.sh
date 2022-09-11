@@ -37,7 +37,7 @@ install_emacs() {
     # Build the source
 
     cd "${EMACS_SOURCE}" || echo "Failed: cd ${EMACS_SOURCE}"
-    export CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10
+    export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
     make distclean
     ./autogen.sh
     # We do not need POP3 support
@@ -67,6 +67,9 @@ install_ubuntu_packages() {
         Ubuntu_20.04)
             apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev
             ;;
+        Ubuntu_22.04)
+            apt install -y aspell libxml2-utils chktex ruby-dev tidy python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libx11-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev
+            ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
             exit 2
@@ -79,14 +82,14 @@ install_gcc() {
     case "${DIST_VERSION}" in
         Ubuntu_18.04 | Ubuntu_20.04)
             add-apt-repository ppa:ubuntu-toolchain-r/test -y
+            apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-10-multilib g++-10-multilib gcc-9 g++-9
             ;;
+        Ubuntu_22.04) ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
             exit 2
             ;;
     esac
-
-    apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev gcc-10-multilib g++-10-multilib gcc-9 g++-9
 }
 
 install_fish() {
@@ -101,6 +104,7 @@ install_llvm() {
     case "${DIST_VERSION}" in
         Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic-${LLVM_VER}  main" ;;
         Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal-${LLVM_VER}   main" ;;
+        Ubuntu_22.04) ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
             exit 2
@@ -198,22 +202,9 @@ install_node() {
     printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
-# Gem modules
-
-# gem install scss_lint
-# gem update
-
-# Composer modules
-
-# composer require jetbrains/phpstorm-stubs:dev-master
-# composer require felixfbecker/language-server
-# composer update
-
-# cpanm Perl::LanguageServer
-
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="4.2.0"
+    TEXLAB_VER="4.2.2"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -335,7 +326,7 @@ install_cppcheck() {
     fi
 
     cd cppcheck || echo "Failed: cd cppcheck"
-    git checkout 2.8
+    git checkout 2.9
     mkdir -p build
     cd build || echo "Failed: cd build"
     cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
@@ -475,7 +466,7 @@ install_tmux() {
 }
 
 install_delta() {
-    DELTA_VER="0.13.0"
+    DELTA_VER="0.14.0"
 
     wget https://github.com/dandavison/delta/releases/download/"$DELTA_VER"/git-delta_"$DELTA_VER"_amd64.deb
     dpkg -i git-delta_"$DELTA_VER"_amd64.deb
@@ -556,5 +547,18 @@ apt autoclean
 # install_bat
 # install_fd
 # install_fzf
+
+# Gem modules
+
+# gem install scss_lint
+# gem update
+
+# Composer modules
+
+# composer require jetbrains/phpstorm-stubs:dev-master
+# composer require felixfbecker/language-server
+# composer update
+
+# cpanm Perl::LanguageServer
 
 set +eux

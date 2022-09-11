@@ -167,9 +167,9 @@
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-  (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-  (add-to-list 'completion-at-point-functions #'cape-ispell 'append)
+  (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev
+                                                               #'cape-dict
+                                                               #'cape-ispell) 'append)
   :custom
   (cape-dabbrev-min-length 3)
   ;; Checking all other buffers for completetion ignoring the major mode seems to be expensive

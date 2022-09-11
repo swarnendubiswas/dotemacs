@@ -60,7 +60,7 @@
 ;;        (setq default-frame-alist '((font . "Monaco-12")))))
 
 (when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "MesloLGS NF" :height 130)
+  (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
   (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
   (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
   (set-face-attribute 'mode-line nil :height 120)
@@ -112,11 +112,12 @@
   ;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
   (global-display-line-numbers-mode 1)
 
-  ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems pointless.
+  ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
+  ;; pointless.
   (fringe-mode '(10 . 0))
 
-  ;; Use a blinking bar for the cursor style to help identify it easily. This does not work on the TUI
-  ;; Emacs because the cursor style then is controlled by the terminal application.
+  ;; Use a blinking bar for the cursor style to help identify it easily. This does not work on the
+  ;; TUI Emacs because the cursor style then is controlled by the terminal application.
   (setq-default cursor-type 'box)
   ;; Set cursor color to white
   (set-cursor-color "#ffffff")
