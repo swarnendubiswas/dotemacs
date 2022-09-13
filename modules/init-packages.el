@@ -205,10 +205,10 @@
   :commands exec-path-from-shell-initialize
   :if (or (daemonp) (not (display-graphic-p)))
   :init
-  ;; "-i" is expensive but Tramp is unable to find executables without the option. Furthermore,
-  ;; other executables like "prettier" from $PATH are also not found. But I am no longer using
-  ;; Tramp, and instead, I am using terminal Emacs over SSH.
-  (setq exec-path-from-shell-arguments '("-l")
+  ;; "-i" is expensive but Tramp is unable to find executables without the option. I am no longer
+  ;; using Tramp, and instead, I am using terminal Emacs over SSH. However, other executables like
+  ;; "prettier" from $PATH are also not found without the interactive flag.
+  (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM"))
   (exec-path-from-shell-initialize))

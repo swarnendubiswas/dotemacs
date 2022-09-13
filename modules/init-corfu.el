@@ -216,8 +216,9 @@
                                          #'tags-completion-at-point-function
                                          #'cape-file
                                          #'cape-keyword
-                                         #'cape-dabbrev
-                                         #'cape-dict)))))))
+                                         (cape-super-capf #'cape-dabbrev
+                                                          #'cape-dict
+                                                          #'cape-ispell))))))))
 
   ;; (add-hook 'prog-mode-hook
   ;;           (lambda ()

@@ -77,7 +77,7 @@
   (set-face-attribute 'mode-line-inactive nil :height 110))
 
 (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 130)
+  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
   (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
   (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
   (set-face-attribute 'mode-line nil :height 110)
