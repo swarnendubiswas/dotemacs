@@ -239,8 +239,8 @@
                                          (cape-super-capf #'lsp-completion-at-point
                                                           #'citre-completion-at-point
                                                           #'TeX--completion-at-point
-                                                          #'cape-file
                                                           #'cape-tex
+                                                          #'cape-file
                                                           #'cape-dabbrev
                                                           #'cape-dict
                                                           #'cape-ispell))))))))

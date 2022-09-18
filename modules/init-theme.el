@@ -148,6 +148,12 @@
           (eq sb/tui-theme 'catppuccin))
   :init (load-theme 'catppuccin))
 
+(use-package ef-themes
+  :if (or (eq sb/gui-theme 'ef-dark)
+          (eq sb/tui-theme 'ef-dark))
+  :init
+  (load-theme 'ef-dark t))
+
 (provide 'init-theme)
 
 ;;; init-theme.el ends here

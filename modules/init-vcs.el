@@ -185,6 +185,7 @@
 ;; https://github.com/dandavison/magit-delta/issues/13
 (use-package magit-delta
   :if (executable-find "delta")
+  :disabled t ; The color combinations for magit-delta are not great with many themes.
   :hook
   (magit-mode-hook . magit-delta-mode)
   :diminish magit-delta-mode)

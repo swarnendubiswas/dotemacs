@@ -28,7 +28,7 @@
    writegood-duplicates-turn-on
    writegood-duplicates-turn-off)
   :hook
-  (text-mode-hook . writegood-mode)
+  (text-mode-hook . writegood-duplicates-turn-on)
   :config
   ;; https://emacs.stackexchange.com/questions/32644/how-to-concatenate-two-lists
   ;; https://emacs.stackexchange.com/questions/20465/append-lists-smartly
@@ -261,7 +261,7 @@
   (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook web-mode-hook
                      markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters '(("YAML" prettier)

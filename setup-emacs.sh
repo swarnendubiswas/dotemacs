@@ -20,7 +20,7 @@ DIST_VERSION="${DISTRO}_${VERSION}"
 
 install_emacs() {
     # Download GNU Emacs source
-    EMACS_VERSION="28.1"
+    EMACS_VERSION="28.2"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     EMACS_NAME="emacs-${EMACS_VERSION}"
@@ -413,6 +413,7 @@ install_bear() {
     fi
 
     cd bear || echo "Failed: cd bear"
+    git checkout 3.0.20
     mkdir -p build && cd build || echo "Failed: cd bear/build"
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all
@@ -484,7 +485,7 @@ install_zoxide() {
 }
 
 install_bat() {
-    BAT_VER="0.21.0"
+    BAT_VER="0.22.1"
 
     wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
     dpkg -i bat_"$BAT_VER"_amd64.deb

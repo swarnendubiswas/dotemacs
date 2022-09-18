@@ -125,6 +125,7 @@
 ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
 (use-package dired-efap
+  :disabled t ; Recent themes do not seem to support in-place rename with efap well.
   :after dired
   :defines dired-efap-initial-filename-selection
   :bind*

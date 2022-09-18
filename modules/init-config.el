@@ -14,7 +14,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'catppuccin
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"            leuven)
@@ -31,6 +31,7 @@
            ;; Company popups cannot be distinguished
            (const :tag "lambda-dark-faded" lambda-dark-faded)
            (const :tag "catppuccin"        catppuccin)
+           (const :tag "ef-dark"           ef-dark)
            (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"              none))
@@ -54,7 +55,9 @@
            (const :tag "nano-dark"         nano-dark)
            (const :tag "lambda-dark"       lambda-dark)
            (const :tag "lambda-dark-faded" lambda-dark-faded)
+           ;; Brackets are not emphasized, write-good mode does not work well
            (const :tag "catppuccin"        catppuccin)
+           (const :tag "ef-dark"           ef-dark)
            (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"              none))
@@ -194,7 +197,7 @@ Prefer the straight.el package manager instead."
   :group 'dotemacs)
 
 (defcustom sb/tab-bar-handler
-  'awesome-tab
+  'centaur-tabs
   "Choose the handler for tabs."
   :type '(radio
           (const :tag "awesome-tab" awesome-tab)
