@@ -412,7 +412,7 @@
 
 ;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
 ;; wrapped around automatically.
-;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)

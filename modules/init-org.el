@@ -18,7 +18,7 @@
   (org-mode-hook . turn-on-visual-line-mode)
   :custom
   (org-fontify-whole-heading-line nil)
-  (org-fontify-emphasized-text nil)
+  (org-fontify-emphasized-text t)
   (org-fontify-quote-and-verse-blocks t)
   (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
   (org-hide-leading-stars nil "Show every star as it helps identify the indentation level")
