@@ -149,10 +149,24 @@
   :init (load-theme 'catppuccin))
 
 (use-package ef-themes
-  :if (or (eq sb/gui-theme 'ef-dark)
-          (eq sb/tui-theme 'ef-dark))
+  :if (or (and (display-graphic-p)
+               (or (eq sb/gui-theme 'ef-dark) (eq sb/gui-theme 'ef-trio-dark)
+                   (eq sb/gui-theme 'ef-bio)))
+          (and (not (display-graphic-p))
+               (or (eq sb/tui-theme 'ef-dark) (eq sb/tui-theme 'ef-trio-dark)
+                   (eq sb/tui-theme 'ef-bio))))
   :init
-  (load-theme 'ef-dark t))
+  (when (display-graphic-p)
+    (cond
+     ((eq sb/gui-theme 'ef-dark) (load-theme 'ef-dark t))
+     ((eq sb/gui-theme 'ef-trio-dark) (load-theme 'ef-trio-dark t))
+     ((eq sb/gui-theme 'ef-bio) (load-theme 'ef-bio t))))
+
+  (unless (display-graphic-p)
+    (cond
+     ((eq sb/tui-theme 'ef-dark) (load-theme 'ef-dark t))
+     ((eq sb/tui-theme 'ef-trio-dark) (load-theme 'ef-trio-dark t))
+     ((eq sb/tui-theme 'ef-bio) (load-theme 'ef-bio t)))))
 
 (provide 'init-theme)
 

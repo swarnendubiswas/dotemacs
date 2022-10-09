@@ -36,6 +36,7 @@
       blink-matching-paren t
       bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
       case-fold-search t ; Searches and matches should ignore case
+      ;; Useful in `prog-mode'
       comment-auto-fill-only-comments t
       completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       completion-ignore-case t ; Ignore case when completing

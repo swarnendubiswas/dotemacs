@@ -3,12 +3,13 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary:
+;;; Commentary: This file contains configurations related to `prog-mode'.
 
 ;;; Code:
 
 (add-hook 'prog-mode-hook
           (lambda ()
+            (auto-fill-mode 1) ; Autofill comments
             ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
             (when (display-graphic-p)
               (display-fill-column-indicator-mode 1))))
@@ -90,6 +91,25 @@
 (use-package rainbow-delimiters
   :hook
   ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
+
+(use-package docstr
+  :hook
+  ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode)
+  :diminish)
+
+;; Tree-sitter provides advanced syntax highlighting features
+
+;; git clone https://github.com/ubolonton/emacs-tree-sitter/
+;; cd emacs-tree-sitter
+;; ./bin/setup; ./bin/build
+(use-package tree-sitter
+  :hook
+  ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
+   (prog-mode-hook . global-tree-sitter-mode))
+  :config
+  (use-package tree-sitter-langs
+    :demand t)
+  :diminish tree-sitter-mode)
 
 (provide 'init-prog)
 

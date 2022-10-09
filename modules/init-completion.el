@@ -140,24 +140,6 @@
                 (lambda ()
                   (prescient-remember (vertico--candidate))))))
 
-;; We want `capf' sort for programming modes, not with recency. This breaks support for the
-;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
-
-(use-package company-prescient
-  :after (company prescient)
-  :demand t
-  :commands company-prescient-mode
-  ;; :custom
-  ;; (company-prescient-sort-length-enable nil)
-  :config
-  (company-prescient-mode 1))
-
-(use-package consult-company
-  :if (eq sb/minibuffer-completion 'vertico)
-  :bind
-  (:map company-mode-map
-        ([remap completion-at-point] . consult-company)))
-
 (use-package fussy
   :straight
   (fussy :type git :host github :repo "jojojames/fussy")
@@ -167,12 +149,13 @@
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
 ;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
-;; "/u/s/l" for "/usr/share/local"
+;; "/u/s/l" for "/usr/share/local".
+
 (use-package minibuffer
   :straight (:type built-in)
   :config
   (with-eval-after-load "orderless"
-    (setq completion-styles '(fussy orderless basic)
+    (setq completion-styles '(basic orderless fussy)
           ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
           ;; completion to work. I also want substring matching for file names.
           ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
@@ -182,7 +165,7 @@
                                           (minibuffer (fussy orderless basic initials))))
 
     (unless (featurep 'orderless)
-      (setq completion-styles '(orderless basic)
+      (setq completion-styles '(basic orderless)
             completion-category-overrides '((file (styles basic substring partial-completion fussy))
                                             (minibuffer (basic fussy initials)))))
 

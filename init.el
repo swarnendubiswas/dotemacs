@@ -9,20 +9,24 @@
 
 (defgroup sb/emacs
   nil
-  "Personal configuration for dotemacs."
+  "Personal configuration for GNU Emacs."
   :group 'local)
 
 (dolist (dir '("modules" "extras"))
   (push (expand-file-name dir user-emacs-directory) load-path))
 
 ;; Splitting the configuration across multiple files is much easier to maintain, and looks less
-;; cluttered. The downside is that more files need to be loaded during startup.
+;; cluttered. The downside is that more files need to be loaded during startup, possibly affecting
+;; performance.
 
 (require 'init-config)
+
 (require 'init-packages)
 
+;; Configure existing features
 (require 'init-core)
 
+;; Appearance
 (require 'init-ui)
 (require 'init-theme)
 (require 'init-modeline)

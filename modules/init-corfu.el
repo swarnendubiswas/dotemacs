@@ -50,9 +50,9 @@
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0.2 "Recommended to not use zero for performance reasons")
+  (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
   (corfu-echo-documentation t)
-  (corfu-max-width 30)
+  (corfu-max-width 60)
   :config
   (with-eval-after-load "prescient"
     (setq corfu-sort-function #'prescient-sort
@@ -86,10 +86,12 @@
   (:map corfu-map
         ("C-'" . corfu-quick-insert)))
 
+;; We do not need this if we use prescient-based sorting.
 (use-package corfu-history
   :straight
   (corfu :files (:defaults "extensions/*")
          :includes (corfu-history))
+  :disabled t
   :after (corfu savehist)
   :commands corfu-history-mode
   :init

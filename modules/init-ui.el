@@ -59,6 +59,9 @@
 ;;        (set-face-attribute 'default nil :font "Monaco" :height 120)
 ;;        (setq default-frame-alist '((font . "Monaco-12")))))
 
+;; These font preferences will be ignored when we use TUI Emacs. Then, the terminal font setting
+;; will be used.
+
 (when (string= (system-name) "inspiron-7572")
   (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
   (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
@@ -165,6 +168,17 @@
   :init (all-the-icons-completion-mode 1)
   :hook
   (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
+
+(use-package nerd-fonts
+  :straight (nerd-fonts :type git :host github :repo "twlz0ne/nerd-fonts.el")
+  :demand t)
+
+(use-package all-the-icons-nerd-fonts
+  :straight (all-the-icons-nerd-fonts :host github :repo "mohkale/all-the-icons-nerd-fonts")
+  :after all-the-icons
+  :demand t
+  :config
+  (all-the-icons-nerd-fonts-prefer))
 
 (provide 'init-ui)
 

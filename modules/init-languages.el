@@ -3,7 +3,7 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary:
+;;; Commentary: This file contains configurations related to individual language modes.
 
 ;;; Code:
 
@@ -204,11 +204,6 @@
   :disabled t
   :commands
   markdown-preview-mode)
-
-(use-package docstr
-  :hook
-  ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode)
-  :diminish)
 
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
@@ -420,20 +415,6 @@
   (mlir-mode)
   :load-path "extras"
   :mode "\\.mlir\\'")
-
-;; Tree-sitter provides advanced syntax highlighting features
-
-;; git clone https://github.com/ubolonton/emacs-tree-sitter/
-;; cd emacs-tree-sitter
-;; ./bin/setup; ./bin/build
-(use-package tree-sitter
-  :hook
-  ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
-   (emacs-startup-hook . global-tree-sitter-mode))
-  :config
-  (use-package tree-sitter-langs
-    :demand t)
-  :diminish tree-sitter-mode)
 
 (use-package dotenv-mode
   :mode "\\.env\\'")

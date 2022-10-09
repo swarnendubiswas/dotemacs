@@ -3,7 +3,7 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary:
+;;; Commentary: Helper file to "configure" my GNU Emacs configuration.
 
 ;;; Code:
 
@@ -14,7 +14,32 @@
   :group 'sb/emacs)
 
 (defcustom sb/gui-theme
-  'modus-vivendi
+  'ef-dark
+  "Specify which Emacs theme to use."
+  :type  '(radio
+           (const :tag "leuven"            leuven)
+           (const :tag "zenburn"           zenburn)
+           (const :tag "doom-one"          doom-one)
+           (const :tag "doom-nord"         doom-nord)
+           (const :tag "doom-molokai"      doom-molokai)
+           (const :tag "doom-gruvbox"      doom-gruvbox)
+           (const :tag "monokai"           monokai)
+           (const :tag "modus-operandi"    modus-operandi)
+           (const :tag "modus-vivendi"     modus-vivendi)
+           (const :tag "nano-dark"         nano-dark)
+           (const :tag "lambda-dark-faded" lambda-dark-faded)
+           (const :tag "catppuccin"        catppuccin)
+           (const :tag "ef-dark"           ef-dark)
+           (const :tag "ef-trio-dark"      ef-trio-dark)
+           (const :tag "ef-bio"            ef-bio)
+           (const :tag "customized"        sb/customized) ; Customizations over the default theme
+           ;; No customization
+           (const :tag "none"              none))
+  :group 'sb/emacs)
+
+;; A dark theme looks good on the TUI.
+(defcustom sb/tui-theme
+  'ef-dark
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "leuven"            leuven)
@@ -28,37 +53,17 @@
            (const :tag "modus-vivendi"     modus-vivendi)
            ;; Does not pair brackets, `diff-hl' highlights have poor contrast and do not look good
            (const :tag "nano-dark"         nano-dark)
-           ;; Company popups cannot be distinguished
-           (const :tag "lambda-dark-faded" lambda-dark-faded)
-           (const :tag "catppuccin"        catppuccin)
-           (const :tag "ef-dark"           ef-dark)
-           (const :tag "customized"        sb/customized) ; Customizations over the default theme
-           ;; No customization
-           (const :tag "none"              none))
-  :group 'sb/emacs)
-
-;; A dark theme looks good on the TUI but I now feel `modus-operandi' has better contrast than
-;; `modus-vivendi'.
-(defcustom sb/tui-theme
-  'catppuccin
-  "Specify which Emacs theme to use."
-  :type  '(radio
-           (const :tag "leuven"            leuven)
-           (const :tag "zenburn"           zenburn)
-           (const :tag "doom-one"          doom-one)
-           (const :tag "doom-nord"         doom-nord)
-           (const :tag "doom-molokai"      doom-molokai)
-           (const :tag "doom-gruvbox"      doom-gruvbox)
-           (const :tag "monokai"           monokai)
-           (const :tag "modus-operandi"    modus-operandi)
-           (const :tag "modus-vivendi"     modus-vivendi)
-           (const :tag "nano-dark"         nano-dark)
            (const :tag "lambda-dark"       lambda-dark)
+           ;; Company popups cannot be distinguished
            (const :tag "lambda-dark-faded" lambda-dark-faded)
            ;; Brackets are not emphasized, write-good mode does not work well
            (const :tag "catppuccin"        catppuccin)
            (const :tag "ef-dark"           ef-dark)
-           (const :tag "customized"        sb/customized) ; Customizations over the default theme
+           (const :tag "ef-trio-dark"      ef-trio-dark)
+           ;; Greenish tinge
+           (const :tag "ef-bio"            ef-bio)
+           ;; Customizations over the default theme
+           (const :tag "customized"        sb/customized)
            ;; No customization
            (const :tag "none"              none))
   :group 'sb/emacs)
@@ -172,8 +177,14 @@ This location is used for temporary installations and files.")
           (const :tag "none" none))
   :group 'dotemacs)
 
+;; Corfu is easy to configure, but I am facing a few quirks with Corfu. I prefer to use TUI Emacs,
+;; and `corfu-terminal-mode' has a rendering problem for the completion popup at the right edges.
+;; Furthermore, `company-ispell' is configurable and we have `company-dict'. Company also has more
+;; extensive LaTeX support. On the other hand, Corfu integrates nicely with `orderless' and provides
+;; better completion for elisp symbols.
+
 (defcustom sb/capf
-  'corfu
+  'company
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)
@@ -181,6 +192,8 @@ This location is used for temporary installations and files.")
           (const :tag "none" none))
   :group 'dotemacs)
 
+;; Prefer "straight.el" over "package.el". A big advantage is to install packages from arbitrary
+;; sources like GitHub.
 (defcustom sb/disable-package.el
   t
   "Disable package.el.
@@ -188,8 +201,9 @@ Prefer the straight.el package manager instead."
   :type 'boolean
   :group 'dotemacs)
 
+;; I do not find any difference in terms of features. However, more packages support `projectile'.
 (defcustom sb/project-handler
-  'project
+  'projectile
   "Choose the handler for projects."
   :type '(radio
           (const :tag "project.el" project)
@@ -212,6 +226,8 @@ Prefer the straight.el package manager instead."
           (const :tag "kind-icon" kind-icon)
           (const :tag "kind-all-the-icons" kind-all-the-icons)
           (const :tag "none" none)))
+
+;; Helper const variables
 
 (defconst sb/EMACS27    (= emacs-major-version 27)
   "Non-nil if Emacs version is 27.")

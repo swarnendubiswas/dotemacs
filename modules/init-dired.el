@@ -306,6 +306,7 @@
 (use-package dirvish
   :straight
   (dirvish :type git :host github :repo "alexluigit/dirvish")
+  :disabled t ; I do not seem to gain much from the package
   :init
   ;; Let Dirvish take over Dired globally
   (dirvish-override-dired-mode)

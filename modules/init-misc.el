@@ -94,26 +94,26 @@
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
 
-;; The package has many bugs, and it has never worked well for me. I am trying out `vundo'.
-(use-package undo-tree
-  :disabled t
-  :defines undo-tree-map
-  :commands
-  (global-undo-tree-mode undo-tree-redo)
-  :hook
-  (find-file-hook . undo-tree-mode)
-  :bind
-  (([remap undo] . undo-tree-undo)
-   ([remap redo] . undo-tree-redo)
-   ("C-z"   . undo-tree-undo)
-   ("C-x u" . undo-tree-visualize))
-  :config
-  (setq undo-tree-auto-save-history              t
-        undo-tree-visualizer-diff                t
-        undo-tree-visualizer-relative-timestamps t
-        undo-tree-visualizer-timestamps          t)
-  (unbind-key "C-/" undo-tree-map)
-  :diminish)
+;; ;; The package has many bugs, and it has never worked well for me. Instead, I use `vundo'.
+;; (use-package undo-tree
+;;   :disabled t
+;;   :defines undo-tree-map
+;;   :commands
+;;   (global-undo-tree-mode undo-tree-redo)
+;;   :hook
+;;   (find-file-hook . undo-tree-mode)
+;;   :bind
+;;   (([remap undo] . undo-tree-undo)
+;;    ([remap redo] . undo-tree-redo)
+;;    ("C-z"   . undo-tree-undo)
+;;    ("C-x u" . undo-tree-visualize))
+;;   :config
+;;   (setq undo-tree-auto-save-history              t
+;;         undo-tree-visualizer-diff                t
+;;         undo-tree-visualizer-relative-timestamps t
+;;         undo-tree-visualizer-timestamps          t)
+;;   (unbind-key "C-/" undo-tree-map)
+;;   :diminish)
 
 (use-package vundo
   :straight
@@ -162,13 +162,13 @@
   (after-init-hook . global-page-break-lines-mode)
   :diminish)
 
-;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
-;; an active region that spans multiple lines.
-(use-package multiple-cursors
-  :bind
-  (("C-<"     . mc/mark-previous-like-this)
-   ("C->"     . mc/mark-next-like-this)
-   ("C-c C-<" . mc/mark-all-like-this)))
+;; ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
+;; ;; an active region that spans multiple lines.
+;; (use-package multiple-cursors
+;;   :bind
+;;   (("C-<"     . mc/mark-previous-like-this)
+;;    ("C->"     . mc/mark-next-like-this)
+;;    ("C-c C-<" . mc/mark-all-like-this)))
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
@@ -237,17 +237,17 @@
   :commands
   (define-word define-word-at-point))
 
-(use-package number-separator
-  :straight (number-separator :type git :host github
-                              :repo "legalnonsense/number-separator.el")
-  :commands
-  (number-separator-mode)
-  :custom
-  (number-separator ",")
-  (number-separator-interval 3)
-  (number-separator-ignore-threshold 4)
-  (number-separator-decimal-char ".")
-  :diminish)
+;; (use-package number-separator
+;;   :straight (number-separator :type git :host github
+;;                               :repo "legalnonsense/number-separator.el")
+;;   :commands
+;;   (number-separator-mode)
+;;   :custom
+;;   (number-separator ",")
+;;   (number-separator-interval 3)
+;;   (number-separator-ignore-threshold 4)
+;;   (number-separator-decimal-char ".")
+;;   :diminish)
 
 (use-package eldoc
   :straight (:type built-in)
@@ -284,19 +284,19 @@
   :commands
   (esup))
 
-(use-package bug-hunter
-  :if (bound-and-true-p sb/debug-init-file)
-  :commands
-  (bug-hunter-init-file bug-hunter-file))
+;; (use-package bug-hunter
+;;   :if (bound-and-true-p sb/debug-init-file)
+;;   :commands
+;;   (bug-hunter-init-file bug-hunter-file))
 
-(use-package explain-pause-mode
-  :straight
-  (explain-pause-mode :type git :host github
-                      :repo "lastquestion/explain-pause-mode")
-  :if (bound-and-true-p sb/debug-init-file)
-  :commands
-  (explain-pause-mode explain-pause-top)
-  :diminish)
+;; (use-package explain-pause-mode
+;;   :straight
+;;   (explain-pause-mode :type git :host github
+;;                       :repo "lastquestion/explain-pause-mode")
+;;   :if (bound-and-true-p sb/debug-init-file)
+;;   :commands
+;;   (explain-pause-mode explain-pause-top)
+;;   :diminish)
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
@@ -318,6 +318,10 @@
   :bind
   (:map ivy-minibuffer-map
         ("C-'"   . ivy-avy)))
+
+;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
+;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
+;; `bookmark-bmenu-mode' with `R'.
 
 (use-package bm
   :preface
@@ -350,7 +354,6 @@
   :config
   ;; Save bookmarks
   (setq-default bm-buffer-persistence t))
-
 
 (use-package crux
   :demand t

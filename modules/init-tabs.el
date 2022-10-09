@@ -7,9 +7,6 @@
 
 ;;; Code:
 
-;; https://github.com/ema2159/centaur-tabs/issues/181
-;; https://github.com/doomemacs/doomemacs/commit/8b93e8b15cc081860a8eb156b1584ef60b6bc9e4
-
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :commands
@@ -31,16 +28,17 @@
   ;; themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
+  (centaur-tabs-show-count t)
   :config
-  ;; Unlike `awesome-tab', the icons do not blend well with all themes.
-  (let ((themes '("doom-one"
-                  "doom-nord"
-                  "doom-molokai"
-                  "doom-gruvbox")))
-    (progn
-      (if (-contains? themes (symbol-name sb/gui-theme))
-          (setq centaur-tabs-set-icons t)
-        (setq centaur-tabs-set-icons nil))))
+  ;; ;; Unlike `awesome-tab', the icons do not blend well with all themes.
+  ;; (let ((themes '("doom-one"
+  ;;                 "doom-nord"
+  ;;                 "doom-molokai"
+  ;;                 "doom-gruvbox")))
+  ;;   (progn
+  ;;     (if (-contains? themes (symbol-name sb/gui-theme))
+  ;;         (setq centaur-tabs-set-icons t)
+  ;;       (setq centaur-tabs-set-icons nil))))
 
   ;; (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project))

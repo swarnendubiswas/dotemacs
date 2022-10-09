@@ -9,36 +9,28 @@
 
 (defvar sb/capf)
 
-;; The module does not specify an `autoload'. So we get the following error without the following
-;; declaration.
-;; "Company backend ’company-capf’ could not be initialized: Autoloading file failed to define
-;; function company-capf"
-
-;; (use-package company-capf
-;;   :straight company
-;;   :if (eq sb/capf 'company)
-;;   :commands company-capf)
-
-;; Use "M-x company-diag" or the modeline status to see the backend used. Try "M-x
-;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
-;; regex search.
+;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used. Try
+;; "M-x company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol'
+;; with regex search.
 (use-package company
   :if (eq sb/capf 'company)
-  :defines (company-dabbrev-downcase company-dabbrev-ignore-case
-                                     company-dabbrev-other-buffers
-                                     company-ispell-available
-                                     company-ispell-dictionary
-                                     company-clang-insert-arguments)
-  :commands (company-abort company-files company-yasnippet
-                           company-ispell company-dabbrev
-                           company-capf company-dabbrev-code
-                           company-clang-set-prefix)
+  :defines
+  (company-dabbrev-downcase company-dabbrev-ignore-case
+                            company-dabbrev-other-buffers
+                            company-ispell-available
+                            company-ispell-dictionary
+                            company-clang-insert-arguments)
+  :commands
+  (company-abort company-files company-yasnippet
+                 company-ispell company-dabbrev
+                 company-capf company-dabbrev-code
+                 company-clang-set-prefix)
   :hook
   (after-init-hook . global-company-mode)
   :bind
+  ;; `company-search-candidates' is bound to "C-s" and `company-filter-candidates' is bound to
+  ;; "C-M-s"
   (:map company-active-map
-        ;; ("C-s"      . nil) ; Was bound to `company-search-candidates'
-        ;; ("C-M-s"    . nil) ; Was bound to `company-filter-candidates'
         ("C-j"      . company-search-candidates)
         ("C-n"      . company-select-next)
         ("C-p"      . company-select-previous)
@@ -64,10 +56,9 @@
   ;; Align additional metadata, like type signatures, to the right-hand side
   (company-tooltip-align-annotations t)
   (company-tooltip-limit 15)
-  (company-clang-insert-arguments nil "Disable insertion of arguments")
   (company-frontends '(;; Always show candidates in overlay tooltip
                        company-pseudo-tooltip-frontend
-                       ;; Show popup unless there is only candidate
+                       ;; Show popup unless there is only one candidate
                        ;; company-pseudo-tooltip-unless-just-one-frontend
                        ;; Show in-place preview, which is too instrusive
                        ;; company-preview-frontend
@@ -76,7 +67,7 @@
                        ;; Show selected candidate docs in echo area
                        ;; company-echo-metadata-frontend
                        ))
-  ;; We override `company-backends', so it is not important to delete individual backends
+  ;; We override `company-backends', so it is not important to delete individual backends.
   (company-backends '(company-files
                       company-capf
                       company-dabbrev-code
@@ -91,6 +82,10 @@
                               gud-mode eshell-mode shell-mode
                               csv-mode))
   :config
+  ;; FIXME: This is supposed to give better icons in TUI Emacs, but it does not work for me.
+  (unless (display-graphic-p)
+    (setq company-format-margin-function #'company-text-icons-margin))
+
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
@@ -140,7 +135,7 @@
   :after company
   :commands (global-company-fuzzy-mode company-fuzzy-mode)
   :custom
-  (company-fuzzy-sorting-backend 'flx) ; Using "flx" slows down completion significantly
+  (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
   ;; (company-fuzzy-passthrough-backends '(company-capf))
   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
@@ -160,9 +155,10 @@
 (use-package company-auctex
   :after (tex-mode company)
   :demand t
-  :commands (company-auctex-init company-auctex-labels
-                                 company-auctex-bibs company-auctex-macros
-                                 company-auctex-symbols company-auctex-environments))
+  :commands
+  (company-auctex-init company-auctex-labels
+                       company-auctex-bibs company-auctex-macros
+                       company-auctex-symbols company-auctex-environments))
 
 ;; Required by `ac-math' and `company-math'
 (use-package math-symbols
@@ -200,15 +196,41 @@
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil))
 
-;; ;; You can set `company-ctags-extra-tags-files' to load extra tags files.
-;; (use-package company-ctags
-;;   :straight (:type git :host github :repo "redguardtoo/company-ctags")
-;;   :after company
-;;   :demand t
-;;   :custom
-;;   (company-ctags-quiet t)
-;;   (company-ctags-fuzzy-match-p nil)
-;;   (company-ctags-everywhere t "Offer completions in comments and strings"))
+;; TODO: `company-citre' possibly makes this package obsolete.
+
+;; You can set `company-ctags-extra-tags-files' to load extra tags files. Check "../README.org" to
+;; see example of invocation.
+(use-package company-ctags
+  :straight (:type git :host github :repo "redguardtoo/company-ctags")
+  :after company
+  :demand t
+  :custom
+  (company-ctags-quiet t)
+  (company-ctags-fuzzy-match-p nil)
+  (company-ctags-everywhere t "Offer completions in comments and strings"))
+
+(use-package company-dirfiles ; Better replacement for `company-files'
+  :straight (:type git :host github :repo "cwfoo/company-dirfiles")
+  :after company
+  :demand t)
+
+;; We want `capf' sort for programming modes, not with recency. This breaks support for the
+;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
+
+(use-package company-prescient
+  :after (company prescient)
+  :demand t
+  :commands company-prescient-mode
+  ;; :custom
+  ;; (company-prescient-sort-length-enable nil)
+  :config
+  (company-prescient-mode 1))
+
+(use-package consult-company
+  :if (eq sb/minibuffer-completion 'vertico)
+  :bind
+  (:map company-mode-map
+        ([remap completion-at-point] . consult-company)))
 
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
@@ -221,7 +243,8 @@
 ;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
 ;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
 ;; `:separate', the candidates that come from different backends are sorted separately in the
-;; combined list.
+;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
+;; the order of completions just like the backends returned them.
 
 ;; Try completion backends in order untill there is a non-empty completion list.
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -274,9 +297,9 @@
 
       ;; `company-capf' is necessary if we are using a language server, it seems to be working well
       ;; with Texlab v4.1+.
-      (setq company-backends '(company-files
-                               (company-capf
-                                company-math-symbols-latex
+      (setq company-backends '(company-dirfiles
+                               company-capf
+                               (company-math-symbols-latex
                                 company-latex-commands
                                 ;; company-reftex-labels
                                 ;; company-reftex-citations
@@ -313,7 +336,7 @@
 
       (setq-local company-minimum-prefix-length 3)
       (make-local-variable 'company-backends)
-      (setq company-backends '(company-files
+      (setq company-backends '(company-dirfiles
                                company-capf
                                (company-ispell :with
                                                company-dabbrev
@@ -324,7 +347,9 @@
                 (require 'pcomplete)
                 (add-hook 'completion-at-point-functions
                           'pcomplete-completions-at-point nil t)
-                (sb/company-org-mode)))))
+                (sb/company-org-mode)
+                (company-fuzzy-mode 1)
+                (diminish 'company-fuzzy-mode)))))
 
 (with-eval-after-load "company"
   (progn
@@ -339,7 +364,7 @@
       (setq-local company-minimum-prefix-length 3)
 
       (set (make-local-variable 'company-backends)
-           '(company-files
+           '(company-dirfiles
              (company-ispell :with
                              company-dabbrev
                              company-dict))))
@@ -350,7 +375,9 @@
                 (unless (or (derived-mode-p 'latex-mode)
                             (derived-mode-p 'LaTeX-mode)
                             (derived-mode-p 'org-mode))
-                  (sb/company-text-mode))))))
+                  (sb/company-text-mode)
+                  (company-fuzzy-mode 1)
+                  (diminish 'company-fuzzy-mode))))))
 
 ;; (with-eval-after-load "company"
 ;;   (progn
@@ -442,8 +469,9 @@
       (make-local-variable 'company-backends)
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-      (setq company-backends '(company-files
+      (setq company-backends '(company-dirfiles
                                (company-capf company-citre
+                                             company-ctags
                                              :with company-yasnippet
                                              :separate)
                                ;; (company-capf :with
@@ -457,7 +485,9 @@
     (add-hook 'prog-mode-hook
               (lambda ()
                 ;; (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
-                (sb/company-prog-mode)))))
+                (sb/company-prog-mode)
+                (company-fuzzy-mode 1)
+                (diminish 'company-fuzzy-mode)))))
 
 (provide 'init-company)
 

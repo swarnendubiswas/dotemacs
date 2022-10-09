@@ -25,3 +25,5 @@
 - ~:config~
 - ~:catch~
 - ~:diminish~ or ~:delight~
+
+  Put the keyword on a separate line if the following clause spans multiple lines.

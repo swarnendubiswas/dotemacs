@@ -3,14 +3,13 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary:
+;;; Commentary: Configure tramp for accessing remote systems over SSH.
 
 ;;; Code:
 
-;; Edit remote file: "/method:user@host#port:filename". Shortcut "/ssh::" will connect to default
-;; "user@host#port".
-;; Edit local file with sudo: "C-x C-f /sudo::/etc/hosts".
-;; Open a remote file with ssh + sudo: "C-x C-f /ssh:host|sudo:root:/etc/passwd".
+;; To edit remote files, use "/method:user@host#port:filename". The shortcut "/ssh::" will connect
+;; to default "user@host#port". To edit a local file with sudo, use "C-x C-f /sudo::/etc/hosts". To
+;; open a remote file with ssh + sudo, use "C-x C-f /ssh:host|sudo:root:/etc/passwd".
 
 ;; Multihop syntax: "C-x C-f /ssh:bird@bastion|ssh:you@remotehost:/path"
 ;; Multihop with sudo: "C-x C-f /ssh:you@remotehost|sudo:remotehost:/path/to/file"
