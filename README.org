@@ -27,7 +27,7 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 make distclean
 ./autogen.sh
 ./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
-make -j 4 NATIVE_FULL_AOT=1
+make -j 8 NATIVE_FULL_AOT=1
 sudo make install
 #+end_src
 
@@ -45,6 +45,8 @@ Evaluate the following to test that both fast JSON (Emacs 27+) and native compil
   (message "Native JSON is available")
 (message "Native JSON is *not* available"))
 #+end_src
+
+You can also check the value of the `system-configuration-features` variable, look for "NATIVE​_COMP".
 
 Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=): =(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)=
 
@@ -260,7 +262,7 @@ Keywords=Text;Editor;
 
 ** Emacs in a Terminal
 
-I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It seems difficult to properly set up language servers with Tramp support. Therefore, I prefer to use Emacs in a terminal that has much better performance. It is important to set up support for 24-bit colors and proper keybindings in the terminal for a good experience. I use [[https://github.com/alacritty/alacritty][Alacritty]] which is easy to customize.
+I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It seems difficult to properly set up language servers with Tramp support. Therefore, I prefer to use Emacs in a terminal that has a much better performance. It is important to set up support for 24-bit colors and proper keybindings in the terminal for a good experience. I use [[https://github.com/alacritty/alacritty][Alacritty]] which is easy to customize.
 
 Use the steps mentioned in the link [[https://github.com/syl20bnr/spacemacs/wiki/Terminal][Spacemacs Terminal]] to enable support for 24bit colors in the terminal.
 
@@ -278,7 +280,7 @@ Using ~export TERM=xterm-24bit~ may lead to failures when accessing remote syste
 
 To run Emacsclient with a GUI, use ~emacsclient -c -a ​""~~, where ~~-a ""~~ starts Emacs daemon and reattaches, and ~-t~ starts the client in the terminal. To run Emacsclient in a terminal, use ~emacsclient -nw -q~ or ~emacsclient -t -q~.
 
-To use Emacsclient as your editor, add the following to your ~.bashrc~.
+   Add the following to your ~.bashrc~ to use Emacsclient as your editor.
 
 #+begin_src bash
 export ALTERNATE_EDITOR=""
@@ -300,4 +302,4 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 
 Estimate the best possible startup time: =emacs -q --eval​='(message "%s" (emacs-init-time))'=
 
-[[https://blog.d46.us/advanced-emacs-startup][Advanced Techniques for Reducing Emacs Startup Time]]
+- [[https://blog.d46.us/advanced-emacs-startup][Advanced Techniques for Reducing Emacs Startup Time]]

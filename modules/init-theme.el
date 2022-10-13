@@ -149,6 +149,7 @@
   :init (load-theme 'catppuccin))
 
 (use-package ef-themes
+  :straight (:type git :host github :repo "protesilaos/ef-themes")
   :if (or (and (display-graphic-p)
                (or (eq sb/gui-theme 'ef-dark) (eq sb/gui-theme 'ef-trio-dark)
                    (eq sb/gui-theme 'ef-bio)))

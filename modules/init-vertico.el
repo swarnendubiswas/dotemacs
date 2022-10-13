@@ -177,8 +177,8 @@
                             ))
   :config
   (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)
-   consult-recent-file consult-buffer consult-bookmark consult-xref consult-line
+   consult-theme consult-line :preview-key '(:debounce 0.2 any)
+   consult-recent-file consult-buffer consult-bookmark consult-xref
    consult-ripgrep consult-git-grep consult-grep consult-yank-from-kill-ring
    :preview-key (kbd "M-.")
    consult-find

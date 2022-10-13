@@ -50,42 +50,6 @@
   :hook
   (after-init-hook . auto-dim-other-buffers-mode))
 
-;; Value is in 1/10pt, so 100 will give you 10pt
-;; (set-frame-font "DejaVu Sans Mono" nil t)
-
-;; (cond ((member "Inconsolata" (font-family-list))
-;;        (set-face-attribute 'default nil :font "Inconsolata-18"))
-;;       ((member "Monaco" (font-family-list))
-;;        (set-face-attribute 'default nil :font "Monaco" :height 120)
-;;        (setq default-frame-alist '((font . "Monaco-12")))))
-
-;; These font preferences will be ignored when we use TUI Emacs. Then, the terminal font setting
-;; will be used.
-
-(when (string= (system-name) "inspiron-7572")
-  (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
-  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
-  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-  (set-face-attribute 'mode-line nil :height 120)
-  (set-face-attribute 'mode-line-inactive nil :height 120))
-
-(when (string= (system-name) "dell-7506")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
-  (set-face-attribute 'mode-line nil :height 120)
-  (set-face-attribute 'mode-line-inactive nil :height 120))
-
-(when (string= (system-name) "swarnendu-Dell-XPS-L502X")
-  (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
-  (set-face-attribute 'mode-line nil :height 110)
-  (set-face-attribute 'mode-line-inactive nil :height 110))
-
-(when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-  (set-face-attribute 'default nil :font "JetBrains Mono" :height 140)
-  (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
-  (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
-  (set-face-attribute 'mode-line nil :height 110)
-  (set-face-attribute 'mode-line-inactive nil :height 110))
-
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
@@ -179,6 +143,47 @@
   :demand t
   :config
   (all-the-icons-nerd-fonts-prefer))
+
+;; Value is in 1/10pt, so 100 will give you 10pt
+;; (set-frame-font "DejaVu Sans Mono" nil t)
+
+;; (cond ((member "Inconsolata" (font-family-list))
+;;        (set-face-attribute 'default nil :font "Inconsolata-18"))
+;;       ((member "Monaco" (font-family-list))
+;;        (set-face-attribute 'default nil :font "Monaco" :height 120)
+;;        (setq default-frame-alist '((font . "Monaco-12")))))
+
+;; These font preferences will be ignored when we use TUI Emacs. Then, the terminal font setting
+;; will be used.
+
+(when (display-graphic-p)
+  (cond ((string= (system-name) "inspiron-7572")
+         (progn
+           (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
+           (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
+           (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
+           (set-face-attribute 'mode-line nil :height 120)
+           (set-face-attribute 'mode-line-inactive nil :height 120)))
+
+        ((string= (system-name) "dell-7506")
+         (progn
+           (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+           (set-face-attribute 'mode-line nil :height 120)
+           (set-face-attribute 'mode-line-inactive nil :height 120)))
+
+        ((string= (system-name) "swarnendu-Dell-XPS-L502X")
+         (progn
+           (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+           (set-face-attribute 'mode-line nil :height 110)
+           (set-face-attribute 'mode-line-inactive nil :height 110)))
+
+        ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+         (progn
+           (set-face-attribute 'default nil :font "JetBrains Mono" :height 150)
+           (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
+           (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
+           (set-face-attribute 'mode-line nil :height 110)
+           (set-face-attribute 'mode-line-inactive nil :height 110)))))
 
 (provide 'init-ui)
 

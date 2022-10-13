@@ -14,6 +14,12 @@
 ;; with regex search.
 (use-package company
   :if (eq sb/capf 'company)
+  :preface
+  ;; https://stackoverflow.com/questions/56382840/is-there-a-way-to-automatically-add-a-whitespace-upon-completion-in-company-mode
+  (defun sb/company-after-completion-hook (&rest _ignored)
+    ;; This would be called with the completion candidate, so you could modify it to insert spaces
+    ;; based on the candidate
+    (just-one-space))
   :defines
   (company-dabbrev-downcase company-dabbrev-ignore-case
                             company-dabbrev-other-buffers
@@ -119,8 +125,15 @@
 
 (use-package company-quickhelp
   :after company
+  :if (display-graphic-p)
   :hook
   (prog-mode-hook . company-quickhelp-mode))
+
+(use-package company-quickhelp-terminal
+  :after company
+  :unless (display-graphic-p)
+  :hook
+  (prog-mode-hook . company-quickhelp-terminal-mode))
 
 ;; (use-package company-statistics
 ;;   :after company
@@ -170,11 +183,16 @@
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
-;; ;; Uses RefTeX to complete label references and citations
-;; (use-package company-reftex
-;;   :after (tex-mode company)
-;;   :demand t
-;;   :commands (company-reftex-labels company-reftex-citations))
+;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
+;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
+;; citations across documents.
+(use-package company-reftex
+  :after (tex-mode company)
+  :demand t
+  :commands (company-reftex-labels company-reftex-citations)
+  :custom
+  ;; https://github.com/TheBB/company-reftex/pull/13
+  (company-reftex-labels-parse-all nil))
 
 (use-package company-bibtex
   :after tex-mode
@@ -231,6 +249,10 @@
   :bind
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
+
+(use-package company-wordfreq
+  :straight (:type git :host github :repo "johannes-mueller/company-wordfreq.el")
+  :commands company-wordfreq)
 
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
@@ -295,16 +317,23 @@
       ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
       ;; `company-auctex-bibs'
 
+      ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
+      ;; ((:separate company-reftex-labels company-reftex-citations)
+      ;; (:separate company-auctex-symbols company-auctex-environments company-capf company-auctex-macros)
+      ;; (company-semantic company-dabbrev-code company-gtags company-etags company-keywords)
+      ;; company-files company-dabbrev)
+
       ;; `company-capf' is necessary if we are using a language server, it seems to be working well
       ;; with Texlab v4.1+.
       (setq company-backends '(company-dirfiles
                                company-capf
-                               (company-math-symbols-latex
+                               (company-math-symbols-latex ; math latex tags
                                 company-latex-commands
-                                ;; company-reftex-labels
-                                ;; company-reftex-citations
+                                company-reftex-labels
+                                company-reftex-citations
                                 company-auctex-environments
                                 company-auctex-macros
+                                ;; math unicode symbols and sub(super)scripts
                                 company-math-symbols-unicode
                                 company-auctex-symbols
                                 company-bibtex :separate)
@@ -365,9 +394,10 @@
 
       (set (make-local-variable 'company-backends)
            '(company-dirfiles
-             (company-ispell :with
-                             company-dabbrev
-                             company-dict))))
+             (company-wordfreq :with
+                               company-ispell
+                               company-dabbrev
+                               company-dict))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook 'text-mode-hook
@@ -376,6 +406,7 @@
                             (derived-mode-p 'LaTeX-mode)
                             (derived-mode-p 'org-mode))
                   (sb/company-text-mode)
+                  (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
                   (company-fuzzy-mode 1)
                   (diminish 'company-fuzzy-mode))))))
 

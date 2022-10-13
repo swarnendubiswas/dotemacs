@@ -65,6 +65,10 @@
 ;; the dependencies by `ibuffer-projectile' and `centaur-tabs'.
 
 (use-package projectile
+  :preface
+  (defun sb/projectile-dont-visit-tags-table ()
+    "Do not visit the tags table."
+    nil)
   :if (eq sb/project-handler 'projectile)
   :commands
   (projectile-project-p projectile-project-name
@@ -117,6 +121,9 @@
       ;;         projectile-mode-line-prefix
       ;;         (or project-name "-"))
       (format " [%s]" (or project-name "-"))))
+
+  (advice-add 'projectile-visit-project-tags-table :override
+              #'sb/projectile-dont-visit-tags-table)
 
   ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
   ;; projects is disabled for faster startup.
