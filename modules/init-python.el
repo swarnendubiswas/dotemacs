@@ -130,7 +130,7 @@
   (python-mode-hook . (lambda ()
                         (add-hook 'before-save-hook #'py-isort-before-save)))
   :custom
-  (py-isort-options '("-lines=100"
+  (py-isort-options '("-l 100"
                       "--up" ; Use parentheses
                       "--tc" ; Use a trailing comma on multiline imports
                       )))
@@ -142,7 +142,7 @@
   :hook
   (python-mode-hook . python-isort-on-save-mode)
   :custom
-  (python-isort-arguments '("--stdout" "--atomic" "-lines=100" "--up" "--tc" "-")))
+  (python-isort-arguments '("--stdout" "--atomic" "-l 100" "--up" "--tc" "-")))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used. We do not use `lsp-format-buffer' since `pyright' does not support document formatting.
@@ -152,7 +152,8 @@
   (python-mode-hook . yapf-mode)
   :diminish yapf-mode)
 
-;; "pyright --createstub pandas"
+;; Install with "python3 -m pip install -U pyright --user". Create stubs with "pyright --createstub
+;; pandas".
 (use-package lsp-pyright
   :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)

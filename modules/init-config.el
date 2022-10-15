@@ -160,10 +160,10 @@ This location is used for temporary installations and files.")
 ;; work consistently.
 
 (defcustom sb/python-langserver
-  'pylsp
+  'pyright
   "Choose the Python Language Server implementation."
   :type  '(radio
-           (const :tag "pylsp"   pylsp)
+           (const :tag "pylsp"   pylsp) ; FIXME: PYLSP is not working with company.
            (const :tag "pyright" pyright)
            (const :tag "none"    none))
   :group 'sb/emacs)

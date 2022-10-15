@@ -1,12 +1,10 @@
 init-autoload.el
 TAGS
 .projectile
-*.cpp
-*.sh
 
 .cache
 projectile-examples
-straight/build/
+straight/build
 dir-locals-examples
 eln-cache
 var

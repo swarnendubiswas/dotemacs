@@ -108,7 +108,6 @@
   (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
                                                                :weight bold :height 0.9))))
   :custom
-  (lsp-completion-enable nil)
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
   ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
   ;; and parent paths of each source file.
@@ -182,8 +181,12 @@
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
 
-  (when (eq sb/capf 'corfu)
-    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
+  (cond ((eq sb/capf 'corfu)
+         (progn
+           (setq lsp-completion-enable nil)
+           (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion)))
+        ((eq sb/capf 'company) (setq lsp-completion-enable t)))
+
   :diminish)
 
 (use-package lsp-ui

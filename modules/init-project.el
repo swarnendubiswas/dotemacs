@@ -83,7 +83,7 @@
   ("C-c p" . projectile-command-map)
   :bind
   (:map projectile-command-map
-        ("A"    . projectile-add-known-project))
+        ("A" . projectile-add-known-project))
   :custom
   (projectile-enable-caching nil "Caching will not watch for file system changes")
   (projectile-file-exists-remote-cache-expire nil)
