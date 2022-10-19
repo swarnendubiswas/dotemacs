@@ -1510,6 +1510,7 @@
     ("organisation" "Organization" nil :count 0)
     ("paraggraph" "paragraph" nil :count 0)
     ("paralell" "parallel" nil :count 0)
+    ("paralllel" "parallel" nil :count 1)
     ("pattersn" "Pattern" nil :count 0)
     ("prodcuer" "producer" nil :count 0)
     ("progrms" "programs" nil :count 0)

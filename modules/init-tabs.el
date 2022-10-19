@@ -28,7 +28,7 @@
   ;; themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
-  (centaur-tabs-show-count t)
+  (centaur-tabs-show-count nil) ; The feature is not useful.
   :config
   ;; ;; Unlike `awesome-tab', the icons do not blend well with all themes.
   ;; (let ((themes '("doom-one"

@@ -30,7 +30,6 @@
   :bind
   ("C-M-;" . dabbrev-completion))
 
-;; Replace `dabbrev-exp' with `hippie-expand'.
 (use-package hippie-exp
   :straight (:type built-in)
   :custom
@@ -46,10 +45,10 @@
                                       try-complete-lisp-symbol))
   (hippie-expand-verbose nil)
   :bind
-  (("M-/"   . hippie-expand)
+  (("M-/" . hippie-expand)
    ([remap dabbrev-expand] . hippie-expand)))
 
-;; Use "M-SPC" for space-separated completion lookups
+;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
 (use-package orderless
   :preface
   (defun sb/just-one-face (fn &rest args)
@@ -62,8 +61,8 @@
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
-  :hook
-  (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
+  ;; :hook
+  ;; (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
   :custom
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
@@ -82,9 +81,8 @@
     (add-to-list 'ivy-highlight-functions-alist
                  '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
-  ;;   (with-eval-after-load "company"
-  ;;     (advice-add 'company-capf--candidates :around #'sb/just-one-face))
-  )
+  (with-eval-after-load "company"
+    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
@@ -126,19 +124,19 @@
 ;; recency, and Corfu has corfu-history. Company has company-statistics. Furthermore, Ivy is not
 ;; well supported with prescient.
 
-(use-package prescient
-  :commands prescient-persist-mode
-  :hook
-  (after-init-hook . prescient-persist-mode)
-  :custom
-  (prescient-sort-full-matches-first t)
-  :config
-  ;; https://github.com/minad/vertico/wiki#using-prescientel
-  (with-eval-after-load "vertico"
-    (setq vertico-sort-function #'prescient-sort)
-    (advice-add #'vertico-insert :after
-                (lambda ()
-                  (prescient-remember (vertico--candidate))))))
+;; (use-package prescient
+;;   :commands prescient-persist-mode
+;;   :hook
+;;   (after-init-hook . prescient-persist-mode)
+;;   :custom
+;;   (prescient-sort-full-matches-first t)
+;;   :config
+;;   ;; https://github.com/minad/vertico/wiki#using-prescientel
+;;   (with-eval-after-load "vertico"
+;;     (setq vertico-sort-function #'prescient-sort)
+;;     (advice-add #'vertico-insert :after
+;;                 (lambda ()
+;;                   (prescient-remember (vertico--candidate))))))
 
 (use-package fussy
   :straight
@@ -151,26 +149,28 @@
 ;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
 ;; "/u/s/l" for "/usr/share/local".
 
+;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
+
 (use-package minibuffer
   :straight (:type built-in)
   :config
+  ;; Serves as a default value for `completion-category-overrides'
+  (setq completion-category-defaults nil)
+
   (with-eval-after-load "orderless"
-    (setq completion-styles '(basic orderless fussy)
+    (setq completion-styles '(orderless basic)
           ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
           ;; completion to work. I also want substring matching for file names.
           ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
           completion-category-overrides '((file (styles basic substring partial-completion fussy))
                                           ;; (buffer (styles basic substring flex))
                                           ;; (project-file (styles basic substring flex))
-                                          (minibuffer (fussy orderless basic initials))))
+                                          (minibuffer (orderless flex)))))
 
-    (unless (featurep 'orderless)
-      (setq completion-styles '(basic orderless)
-            completion-category-overrides '((file (styles basic substring partial-completion fussy))
-                                            (minibuffer (basic fussy initials)))))
-
-    ;; Serves as a default value for `completion-category-overrides'
-    (setq completion-category-defaults nil)))
+  (unless (featurep 'orderless)
+    (setq completion-styles '(basic fussy)
+          completion-category-overrides '((file (styles basic substring partial-completion fussy))
+                                          (minibuffer (basic fussy initials))))))
 
 (provide 'init-completion)
 

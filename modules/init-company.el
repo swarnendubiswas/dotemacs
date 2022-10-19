@@ -73,7 +73,8 @@
                        ;; Show selected candidate docs in echo area
                        ;; company-echo-metadata-frontend
                        ))
-  ;; We override `company-backends', so it is not important to delete individual backends.
+  ;; We override `company-backends', so it is not important to delete individual backends. This is
+  ;; the default for unhandled major modes.
   (company-backends '(company-files
                       company-capf
                       company-dabbrev-code
@@ -102,26 +103,23 @@
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
   (add-to-list 'company-transformers 'delete-dups)
 
-  ;; The `company-posframe' completion kind indicator is not great, but we are now using
-  ;; `company-fuzzy'.
-  (when (display-graphic-p)
-    (diminish 'company-mode)))
+  :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
-;; (use-package company-posframe
-;;   :if (display-graphic-p)
-;;   :disabled t
-;;   :after company
-;;   :commands company-posframe-mode
-;;   :diminish
-;;   :custom
-;;   (company-posframe-show-metadata nil "Difficult to distinguish the help text from completions")
-;;   (company-posframe-show-indicator t "The display is not great")
-;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-;;   :init
-;;   (company-posframe-mode 1))
+
+(use-package company-posframe
+  :if (display-graphic-p)
+  :after company
+  :commands company-posframe-mode
+  :diminish
+  :custom
+  (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
+  (company-posframe-show-indicator nil "The display is not great")
+  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+  :init
+  (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
@@ -135,13 +133,25 @@
   :hook
   (prog-mode-hook . company-quickhelp-terminal-mode))
 
-;; (use-package company-statistics
-;;   :after company
-;;   :disabled t
-;;   :commands company-statistics-mode
-;;   :init (company-statistics-mode 1))
+(use-package company-statistics
+  :after company
+  :commands company-statistics-mode
+  :init (company-statistics-mode 1))
 
-;; Nice but slows completions. We should invoke this only at the very end of configuring `company'.
+;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
+;; support for the `:separate' keyword in `company'.
+
+;; (use-package company-prescient
+;;   :after (company prescient)
+;;   :demand t
+;;   :commands company-prescient-mode
+;;   ;; :custom
+;;   ;; (company-prescient-sort-length-enable nil)
+;;   :config
+;;   (company-prescient-mode 1))
+
+;; Nice feature but slows completions. We should invoke this only at the very end of configuring
+;; `company'.
 (use-package company-fuzzy
   :straight flx
   :straight t
@@ -199,8 +209,7 @@
   :demand t
   :commands company-bibtex)
 
-;; Complete in the middle of words
-(use-package company-anywhere
+(use-package company-anywhere ; Complete in the middle of words
   :straight
   (company-anywhere :type git :host github :repo "zk-phi/company-anywhere")
   :after company
@@ -218,31 +227,20 @@
 
 ;; You can set `company-ctags-extra-tags-files' to load extra tags files. Check "../README.org" to
 ;; see example of invocation.
-(use-package company-ctags
-  :straight (:type git :host github :repo "redguardtoo/company-ctags")
-  :after company
-  :demand t
-  :custom
-  (company-ctags-quiet t)
-  (company-ctags-fuzzy-match-p nil)
-  (company-ctags-everywhere t "Offer completions in comments and strings"))
+
+;; (use-package company-ctags
+;;   :straight (:type git :host github :repo "redguardtoo/company-ctags")
+;;   :after company
+;;   :demand t
+;;   :custom
+;;   (company-ctags-quiet t)
+;;   (company-ctags-fuzzy-match-p nil)
+;;   (company-ctags-everywhere t "Offer completions in comments and strings"))
 
 (use-package company-dirfiles ; Better replacement for `company-files'
   :straight (:type git :host github :repo "cwfoo/company-dirfiles")
   :after company
   :demand t)
-
-;; We want `capf' sort for programming modes, not with recency. This breaks support for the
-;; `:separate' keyword in `company'. We are using `company-fuzzy' for sorting completion candidates.
-
-(use-package company-prescient
-  :after (company prescient)
-  :demand t
-  :commands company-prescient-mode
-  ;; :custom
-  ;; (company-prescient-sort-length-enable nil)
-  :config
-  (company-prescient-mode 1))
 
 (use-package consult-company
   :if (eq sb/minibuffer-completion 'vertico)
@@ -323,27 +321,27 @@
       ;; (company-semantic company-dabbrev-code company-gtags company-etags company-keywords)
       ;; company-files company-dabbrev)
 
-      ;; `company-capf' is necessary if we are using a language server, it seems to be working well
-      ;; with Texlab v4.1+.
       (setq company-backends '(company-dirfiles
-                               company-capf
-                               (company-math-symbols-latex ; math latex tags
+                               (:separate
+                                company-math-symbols-latex ; math latex tags
                                 company-latex-commands
                                 company-reftex-labels
                                 company-reftex-citations
                                 company-auctex-environments
                                 company-auctex-macros
-                                ;; math unicode symbols and sub(super)scripts
+                                ;; Math unicode symbols and sub(super)scripts
                                 company-math-symbols-unicode
                                 company-auctex-symbols
-                                company-bibtex :separate)
+                                company-bibtex)
 
                                ;; FIXME: Untested
                                ;; company-yasnippet
 
-                               (company-ispell :with
-                                               company-dabbrev
-                                               company-dict))))
+                               (company-dabbrev :with
+                                                company-wordfreq
+                                                company-ispell
+                                                company-dict)
+                               company-capf)))
 
     (declare-function company-fuzzy-mode "company-fuzzy")
 
@@ -352,8 +350,9 @@
                        (sb/company-latex-mode)
                        ;; `company-capf' does not pass to later backends with Texlab, so we use
                        ;; `company-fuzzy-mode' to merge results from all backends.
-                       (company-fuzzy-mode 1)
-                       (diminish 'company-fuzzy-mode))))))
+                       ;; (company-fuzzy-mode 1)
+                       ;; (diminish 'company-fuzzy-mode)
+                       )))))
 
 ;; https://emacs.stackexchange.com/questions/21171/company-mode-completion-for-org-keywords
 (with-eval-after-load "company"
@@ -395,8 +394,8 @@
       (set (make-local-variable 'company-backends)
            '(company-dirfiles
              (company-wordfreq :with
-                               company-ispell
                                company-dabbrev
+                               company-ispell
                                company-dict))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
@@ -407,8 +406,9 @@
                             (derived-mode-p 'org-mode))
                   (sb/company-text-mode)
                   (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
-                  (company-fuzzy-mode 1)
-                  (diminish 'company-fuzzy-mode))))))
+                  ;; (company-fuzzy-mode 1)
+                  ;; (diminish 'company-fuzzy-mode)
+                  )))))
 
 ;; (with-eval-after-load "company"
 ;;   (progn
@@ -501,24 +501,28 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-dirfiles
-                               (company-capf company-citre
-                                             company-ctags
-                                             :with company-yasnippet
-                                             :separate)
+                               (:separate
+                                company-capf
+                                company-citre
+                                company-dabbrev-code
+                                :with company-yasnippet
+                                )
                                ;; (company-capf :with
                                ;;               company-dabbrev-code ; Useful for variable names
                                ;;               company-ctags
                                ;;               company-yasnippet)
-                               (company-dabbrev :with
-                                                company-dict
-                                                company-ispell))))
+                               (company-wordfreq :with
+                                                 company-dabbrev
+                                                 company-dict
+                                                 company-ispell))))
 
     (add-hook 'prog-mode-hook
               (lambda ()
                 ;; (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
                 (sb/company-prog-mode)
-                (company-fuzzy-mode 1)
-                (diminish 'company-fuzzy-mode)))))
+                ;; (company-fuzzy-mode 1)
+                ;; (diminish 'company-fuzzy-mode)
+                ))))
 
 (provide 'init-company)
 

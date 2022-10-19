@@ -125,7 +125,7 @@
   :commands mouse-avoidance-mode
   :init (mouse-avoidance-mode 'banish))
 
-;; Icons for minibuffer completion
+;; Icons for minibuffer completion (e.g., `find-file-at-point')
 (use-package all-the-icons-completion
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode
@@ -179,7 +179,7 @@
 
         ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
          (progn
-           (set-face-attribute 'default nil :font "JetBrains Mono" :height 150)
+           (set-face-attribute 'default nil :font "MesloLGS Nerd Font Mono" :height 160)
            (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
            (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
            (set-face-attribute 'mode-line nil :height 110)
