@@ -94,27 +94,6 @@
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
 
-;; ;; The package has many bugs, and it has never worked well for me. Instead, I use `vundo'.
-;; (use-package undo-tree
-;;   :disabled t
-;;   :defines undo-tree-map
-;;   :commands
-;;   (global-undo-tree-mode undo-tree-redo)
-;;   :hook
-;;   (find-file-hook . undo-tree-mode)
-;;   :bind
-;;   (([remap undo] . undo-tree-undo)
-;;    ([remap redo] . undo-tree-redo)
-;;    ("C-z"   . undo-tree-undo)
-;;    ("C-x u" . undo-tree-visualize))
-;;   :config
-;;   (setq undo-tree-auto-save-history              t
-;;         undo-tree-visualizer-diff                t
-;;         undo-tree-visualizer-relative-timestamps t
-;;         undo-tree-visualizer-timestamps          t)
-;;   (unbind-key "C-/" undo-tree-map)
-;;   :diminish)
-
 (use-package vundo
   :straight
   (vundo :type git :host github :repo "casouri/vundo")
@@ -152,8 +131,8 @@
 
 (use-package highlight-numbers
   :hook
-  ((prog-mode-hook yaml-mode-hook conf-mode-hook
-                   css-mode-hook html-mode-hook) . highlight-numbers-mode))
+  ((prog-mode-hook yaml-mode-hook conf-mode-hook css-mode-hook
+                   html-mode-hook) . highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :commands
@@ -162,8 +141,9 @@
   (after-init-hook . global-page-break-lines-mode)
   :diminish)
 
-;; ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line in
-;; ;; an active region that spans multiple lines.
+;; ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line
+;; ;; in an active region that spans multiple lines.
+
 ;; (use-package multiple-cursors
 ;;   :bind
 ;;   (("C-<"     . mc/mark-previous-like-this)
@@ -186,23 +166,23 @@
   :magic ("%PDF" . pdf-view-mode)
   :bind
   (:map pdf-view-mode-map
-        ("j"  . pdf-view-next-line-or-next-page)
-        ("k"  . pdf-view-previous-line-or-previous-page)
-        ("n"  . pdf-view-next-page-command)
-        ("p"  . pdf-view-previous-page-command)
-        ("a"  . pdf-view-first-page)
-        ("e"  . pdf-view-last-page)
-        ("l"  . pdf-view-goto-page)
-        ("P"  . pdf-view-fit-page-to-window)
-        ("W"  . pdf-view-fit-width-to-window)
-        ("H"  . pdf-view-fit-height-to-window)
-        ("+"  . pdf-view-enlarge)
-        ("-"  . pdf-view-shrink)
-        ("r"  . pdf-view-revert-buffer)
-        ("d"  . pdf-annot-delete)
-        ("h"  . pdf-annot-add-highlight-markup-annotation)
-        ("t"  . pdf-annot-add-text-annotation)
-        ("M"  . pdf-view-midnight-minor-mode))
+        ("j" . pdf-view-next-line-or-next-page)
+        ("k" . pdf-view-previous-line-or-previous-page)
+        ("n" . pdf-view-next-page-command)
+        ("p" . pdf-view-previous-page-command)
+        ("a" . pdf-view-first-page)
+        ("e" . pdf-view-last-page)
+        ("l" . pdf-view-goto-page)
+        ("P" . pdf-view-fit-page-to-window)
+        ("W" . pdf-view-fit-width-to-window)
+        ("H" . pdf-view-fit-height-to-window)
+        ("+" . pdf-view-enlarge)
+        ("-" . pdf-view-shrink)
+        ("r" . pdf-view-revert-buffer)
+        ("d" . pdf-annot-delete)
+        ("h" . pdf-annot-add-highlight-markup-annotation)
+        ("t" . pdf-annot-add-text-annotation)
+        ("M" . pdf-view-midnight-minor-mode))
   :custom
   (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
   (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")

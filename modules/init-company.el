@@ -12,6 +12,7 @@
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used. Try
 ;; "M-x company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol'
 ;; with regex search.
+
 (use-package company
   :if (eq sb/capf 'company)
   :preface
@@ -405,7 +406,7 @@
                             (derived-mode-p 'LaTeX-mode)
                             (derived-mode-p 'org-mode))
                   (sb/company-text-mode)
-                  (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
+                  ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
                   ;; (company-fuzzy-mode 1)
                   ;; (diminish 'company-fuzzy-mode)
                   )))))

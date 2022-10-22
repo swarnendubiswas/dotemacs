@@ -3,7 +3,7 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary:
+;;; Commentary: Configure UI and visual elements like icons and font size.
 
 ;;; Code:
 
@@ -53,11 +53,11 @@
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
-  (defun sb/minibuffer-font-setup ()
+  (defun sb/decrease-minibuffer-font ()
     "Customize minibuffer font."
     (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
 
-  (add-hook 'minibuffer-setup-hook #'sb/minibuffer-font-setup))
+  (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information.
@@ -67,7 +67,7 @@
 ;;             (setq resize-mini-windows nil
 ;;                   max-mini-window-height 5)))
 
-(use-package beacon
+(use-package beacon ; Highlight the cursor position when the window scrolls
   :hook
   (after-init-hook . beacon-mode)
   :diminish)
@@ -75,28 +75,30 @@
 (when (display-graphic-p)
   ;; Show dividers on the right of each window, more prominent than the default
   (add-hook 'after-init-hook #'window-divider-mode)
-  ;; (display-battery-mode 1)
-  ;; Copying text from the TUI includes the line numbers, which is an additional nuisance.
+
+  ;; Copying text from the TUI includes the line numbers, which is a nuisance.
   (global-display-line-numbers-mode 1)
 
   ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
   ;; pointless.
   (fringe-mode '(10 . 0))
 
-  ;; Use a blinking bar for the cursor style to help identify it easily. This does not work on the
-  ;; TUI Emacs because the cursor style then is controlled by the terminal application.
+  ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
+  ;; the terminal application.
+
   (setq-default cursor-type 'box)
-  ;; Set cursor color to white
-  (set-cursor-color "#ffffff")
+  (set-cursor-color "#ffffff") ; Set cursor color to white
+  ;; Use a blinking bar for the cursor style to help identify it easily.
   (blink-cursor-mode 1))
 
-;; horizontal - Split the selected window into two windows (e.g., `split-window-below'), one above
-;; the other.
+;; vertical - Split the selected window into two windows (e.g., `split-window-below'), one above the
+;; other.
 (when (eq sb/window-split 'vertical)
   (setq split-width-threshold nil
         split-height-threshold 0))
 
-;; vertical - Split the selected window into two side-by-side windows (e.g., `split-window-right').
+;; horizontal - Split the selected window into two side-by-side windows (e.g.,
+;; `split-window-right').
 (when (eq sb/window-split 'horizontal)
   (setq split-height-threshold nil
         split-width-threshold 0))
@@ -158,12 +160,20 @@
 
 (when (display-graphic-p)
   (cond ((string= (system-name) "inspiron-7572")
-         (progn
-           (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
-           (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
-           (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-           (set-face-attribute 'mode-line nil :height 120)
-           (set-face-attribute 'mode-line-inactive nil :height 120)))
+         (if (and (eq (display-pixel-width) 1920)
+                  (eq (display-pixel-height) 1080)) ; HiDPI
+             (progn
+               (set-face-attribute 'default nil :font "MesloLGS NF" :height 170)
+               (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
+               (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
+               (set-face-attribute 'mode-line nil :height 120)
+               (set-face-attribute 'mode-line-inactive nil :height 120))
+           (progn
+             (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
+             (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
+             (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
+             (set-face-attribute 'mode-line nil :height 120)
+             (set-face-attribute 'mode-line-inactive nil :height 120))))
 
         ((string= (system-name) "dell-7506")
          (progn
