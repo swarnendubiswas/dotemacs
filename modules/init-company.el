@@ -62,7 +62,6 @@
   (company-show-quick-access t "Speed up completion")
   ;; Align additional metadata, like type signatures, to the right-hand side
   (company-tooltip-align-annotations t)
-  (company-tooltip-limit 15)
   (company-frontends '(;; Always show candidates in overlay tooltip
                        company-pseudo-tooltip-frontend
                        ;; Show popup unless there is only one candidate
@@ -74,16 +73,6 @@
                        ;; Show selected candidate docs in echo area
                        ;; company-echo-metadata-frontend
                        ))
-  ;; We override `company-backends', so it is not important to delete individual backends. This is
-  ;; the default for unhandled major modes.
-  (company-backends '(company-files
-                      company-capf
-                      company-dabbrev-code
-                      ;; If we have `company-dabbrev' first, then other matches from
-                      ;; `company-ispell' will be ignored.
-                      (company-ispell :with
-                                      company-dabbrev
-                                      company-dict)))
   (company-global-modes '(not dired-mode erc-mode message-mode
                               comint-mode inferior-python-mode
                               magit-status-mode help-mode
@@ -153,18 +142,19 @@
 
 ;; Nice feature but slows completions. We should invoke this only at the very end of configuring
 ;; `company'.
-(use-package company-fuzzy
-  :straight flx
-  :straight t
-  :after company
-  :commands (global-company-fuzzy-mode company-fuzzy-mode)
-  :custom
-  (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
-  ;; (company-fuzzy-passthrough-backends '(company-capf))
-  (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-  ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
-  ;; Disabling the requirement may help with performance.
-  (company-fuzzy-prefix-on-top t))
+
+;; (use-package company-fuzzy
+;;   :straight flx
+;;   :straight t
+;;   :after company
+;;   :commands (global-company-fuzzy-mode company-fuzzy-mode)
+;;   :custom
+;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
+;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
+;;   ;; Disabling the requirement may help with performance.
+;;   (company-fuzzy-prefix-on-top t))
 
 ;; ;; FIXME: Do we need this with the bash language sever?
 ;; (use-package company-shell
@@ -299,6 +289,18 @@
 ;;                                    delete-dups))
 
 (with-eval-after-load "company"
+  ;; We override `company-backends', so it is not important to delete individual backends. This is
+  ;; the default for unhandled major modes.
+  (setq company-backends '(company-dirfiles
+                           company-capf
+                           company-dabbrev-code
+                           ;; If we have `company-dabbrev' first, then other matches from
+                           ;; `company-ispell' will be ignored.
+                           (company-ispell :with
+                                           company-dabbrev
+                                           company-dict))))
+
+(with-eval-after-load "company"
   (progn
     (declare-function sb/company-latex-mode "init-company")
 
@@ -344,7 +346,7 @@
                                                 company-dict)
                                company-capf)))
 
-    (declare-function company-fuzzy-mode "company-fuzzy")
+    ;; (declare-function company-fuzzy-mode "company-fuzzy")
 
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook hook (lambda ()
@@ -467,26 +469,26 @@
 (with-eval-after-load "company"
   (progn
 
-    (defvar citre-completion-case-sensitive)
+    ;; (defvar citre-completion-case-sensitive)
 
-    (declare-function citre-capf--get-annotation "citre")
-    (declare-function citre-capf--get-collection "citre")
-    (declare-function citre-get-property "citre")
-    (declare-function citre-get-symbol "citre")
+    ;; (declare-function citre-capf--get-annotation "citre")
+    ;; (declare-function citre-capf--get-collection "citre")
+    ;; (declare-function citre-get-property "citre")
+    ;; (declare-function citre-get-symbol "citre")
 
-    (declare-function company-begin-backend "company")
+    ;; (declare-function company-begin-backend "company")
 
-    (defun company-citre (-command &optional -arg &rest _ignored)
-      "Completion backend of Citre.  Execute COMMAND with ARG and IGNORED."
-      (interactive (list 'interactive))
-      (cl-case -command
-        (interactive (company-begin-backend 'company-citre))
-        (prefix (and (bound-and-true-p citre-mode)
-                     (or (citre-get-symbol) 'stop)))
-        (meta (citre-get-property 'signature -arg))
-        (annotation (citre-capf--get-annotation -arg))
-        (candidates (all-completions -arg (citre-capf--get-collection -arg)))
-        (ignore-case (not citre-completion-case-sensitive))))
+    ;; (defun company-citre (-command &optional -arg &rest _ignored)
+    ;;   "Completion backend of Citre.  Execute COMMAND with ARG and IGNORED."
+    ;;   (interactive (list 'interactive))
+    ;;   (cl-case -command
+    ;;     (interactive (company-begin-backend 'company-citre))
+    ;;     (prefix (and (bound-and-true-p citre-mode)
+    ;;                  (or (citre-get-symbol) 'stop)))
+    ;;     (meta (citre-get-property 'signature -arg))
+    ;;     (annotation (citre-capf--get-annotation -arg))
+    ;;     (candidates (all-completions -arg (citre-capf--get-collection -arg)))
+    ;;     (ignore-case (not citre-completion-case-sensitive))))
 
     (declare-function sb/company-prog-mode "init-company")
 
@@ -504,8 +506,8 @@
       (setq company-backends '(company-dirfiles
                                (:separate
                                 company-capf
-                                company-citre
-                                company-dabbrev-code
+                                ;; company-citre
+                                company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet
                                 )
                                ;; (company-capf :with

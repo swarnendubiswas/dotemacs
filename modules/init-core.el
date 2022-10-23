@@ -80,6 +80,7 @@
       read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
       read-file-name-completion-ignore-case t ; Ignore case when reading a file name
       read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
+      remote-file-name-inhibit-locks t
       require-final-newline t ; Always end a file with a newline
       ring-bell-function 'ignore ; Disable beeping sound
       ;; If you have something on the system clipboard, and then kill something in Emacs, then by

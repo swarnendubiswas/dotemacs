@@ -160,20 +160,11 @@
 
 (when (display-graphic-p)
   (cond ((string= (system-name) "inspiron-7572")
-         (if (and (eq (display-pixel-width) 1920)
-                  (eq (display-pixel-height) 1080)) ; HiDPI
-             (progn
-               (set-face-attribute 'default nil :font "MesloLGS NF" :height 170)
-               (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
-               (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-               (set-face-attribute 'mode-line nil :height 120)
-               (set-face-attribute 'mode-line-inactive nil :height 120))
-           (progn
-             (set-face-attribute 'default nil :font "MesloLGS NF" :height 140)
-             (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
-             (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-             (set-face-attribute 'mode-line nil :height 120)
-             (set-face-attribute 'mode-line-inactive nil :height 120))))
+         (set-face-attribute 'default nil :font "MesloLGS NF" :height 170)
+         (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
+         (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
+         (set-face-attribute 'mode-line nil :height 120)
+         (set-face-attribute 'mode-line-inactive nil :height 120))
 
         ((string= (system-name) "dell-7506")
          (progn

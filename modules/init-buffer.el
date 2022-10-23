@@ -29,6 +29,7 @@
 ;; Provides ibuffer filtering and sorting functions to group buffers by function or regexp applied
 ;; to `default-directory'. By default buffers are grouped by `project-current' or by
 ;; `default-directory'.
+
 (use-package ibuffer-project
   :if (eq sb/project-handler 'project)
   :hook
@@ -48,7 +49,7 @@
   :hook
   (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
-;; Display icons for all buffers in ibuffer.
+;; Display icons for all buffers in ibuffer
 (use-package all-the-icons-ibuffer
   :when (display-graphic-p)
   :hook

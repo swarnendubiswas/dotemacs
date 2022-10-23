@@ -1,5 +1,5 @@
-;;; init-tags.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding:utf-8; no-byte-compile: t; fill-column: 100 -*-
+;;; init-tags.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -118,7 +118,7 @@
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  (citre-enable-capf-integration nil)
+  (citre-enable-capf-integration t)
   :config
   (dolist (func '(find-function
                   counsel-imenu

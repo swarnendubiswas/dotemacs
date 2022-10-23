@@ -89,63 +89,65 @@
                 flycheck-pylintrc '("setup.cfg" "pylintrc")
                 flycheck-python-pylint-executable "python3"
                 flycheck-shellcheck-follow-sources nil
-                flycheck-textlint-config (expand-file-name "textlintrc.json" sb/textlint-directory)
-                flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                                                               sb/textlint-directory))
+                ;; flycheck-textlint-config (expand-file-name "textlintrc.json"
+                ;;                                            sb/textlint-directory)
+                ;; flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
+                ;;                                                sb/textlint-directory)
+                )
 
-  (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
-  (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
+  ;; (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
+  ;; (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
 
-  ;; Add support for `org-lint' as a checker
-  (defconst flycheck-org-lint-form
-    (flycheck-prepare-emacs-lisp-form
-      (require 'org)
-      (require 'org-attach)
-      (let ((source (car command-line-args-left))
-            (process-default-directory default-directory))
-        (with-temp-buffer
-          (insert-file-contents source 'visit)
-          (setq buffer-file-name source)
-          (setq default-directory process-default-directory)
-          (delay-mode-hooks (org-mode))
-          (setq delayed-mode-hooks nil)
-          (dolist (err (org-lint))
-            (let ((inf (cl-second err)))
-              (princ (elt inf 0))
-              (princ ": ")
-              (princ (elt inf 2))
-              (terpri)))))))
+  ;; ;; Add support for `org-lint' as a checker
+  ;; (defconst flycheck-org-lint-form
+  ;;   (flycheck-prepare-emacs-lisp-form
+  ;;     (require 'org)
+  ;;     (require 'org-attach)
+  ;;     (let ((source (car command-line-args-left))
+  ;;           (process-default-directory default-directory))
+  ;;       (with-temp-buffer
+  ;;         (insert-file-contents source 'visit)
+  ;;         (setq buffer-file-name source)
+  ;;         (setq default-directory process-default-directory)
+  ;;         (delay-mode-hooks (org-mode))
+  ;;         (setq delayed-mode-hooks nil)
+  ;;         (dolist (err (org-lint))
+  ;;           (let ((inf (cl-second err)))
+  ;;             (princ (elt inf 0))
+  ;;             (princ ": ")
+  ;;             (princ (elt inf 2))
+  ;;             (terpri)))))))
 
-  (defconst flycheck-org-lint-variables
-    '(org-directory
-      org-id-locations
-      org-id-locations-file
-      org-attach-id-dir
-      org-attach-use-inheritance
-      org-attach-id-to-path-function-list)
-    "Variables inherited by the `org-lint' subprocess.")
+  ;; (defconst flycheck-org-lint-variables
+  ;;   '(org-directory
+  ;;     org-id-locations
+  ;;     org-id-locations-file
+  ;;     org-attach-id-dir
+  ;;     org-attach-use-inheritance
+  ;;     org-attach-id-to-path-function-list)
+  ;;   "Variables inherited by the `org-lint' subprocess.")
 
-  (defun flycheck-org-lint-variables-form ()
-    (require 'org-attach)  ; Needed to make variables available
-    `(progn
-       ,@(seq-map (lambda (opt) `(setq-default ,opt ',(symbol-value opt)))
-                  (seq-filter #'boundp flycheck-org-lint-variables))))
+  ;; (defun flycheck-org-lint-variables-form ()
+  ;;   (require 'org-attach)  ; Needed to make variables available
+  ;;   `(progn
+  ;;      ,@(seq-map (lambda (opt) `(setq-default ,opt ',(symbol-value opt)))
+  ;;                 (seq-filter #'boundp flycheck-org-lint-variables))))
 
-  (flycheck-define-checker org-lint
-    "Org buffer checker using `org-lint'."
-    :command ("emacs" (eval flycheck-emacs-args)
-              "--eval" (eval (concat "(add-to-list 'load-path \""
-                                     (file-name-directory (locate-library "org"))
-                                     "\")"))
-              "--eval" (eval (flycheck-sexp-to-string
-                              (flycheck-org-lint-variables-form)))
-              "--eval" (eval flycheck-org-lint-form)
-              "--" source)
-    :error-patterns
-    ((error line-start line ": " (message) line-end))
-    :modes (org-mode))
+  ;; (flycheck-define-checker org-lint
+  ;;   "Org buffer checker using `org-lint'."
+  ;;   :command ("emacs" (eval flycheck-emacs-args)
+  ;;             "--eval" (eval (concat "(add-to-list 'load-path \""
+  ;;                                    (file-name-directory (locate-library "org"))
+  ;;                                    "\")"))
+  ;;             "--eval" (eval (flycheck-sexp-to-string
+  ;;                             (flycheck-org-lint-variables-form)))
+  ;;             "--eval" (eval flycheck-org-lint-form)
+  ;;             "--" source)
+  ;;   :error-patterns
+  ;;   ((error line-start line ": " (message) line-end))
+  ;;   :modes (org-mode))
 
-  (add-to-list 'flycheck-checkers 'org-lint t)
+  ;; (add-to-list 'flycheck-checkers 'org-lint t)
 
   ;; Add support for textidote
   (flycheck-define-checker tex-textidote
@@ -179,7 +181,7 @@
   ;; https://github.com/flycheck/flycheck/issues/1745
 
   (defvar sb/excluded-directory-regexps
-    '(".git/" "elpa/" ".cache" ".clangd"))
+    '(".git" "elpa" ".cache" ".clangd"))
 
   (defun sb/flycheck-may-check-automatically (&rest _conditions)
     (or (null buffer-file-name)
@@ -190,7 +192,8 @@
   (advice-add 'flycheck-may-check-automatically
               :after-while #'sb/flycheck-may-check-automatically)
 
-  ;; Chain flycheck checkers with lsp-mode.
+  ;; Chain flycheck checkers with lsp-mode. We prefer to use per-project directory local variables
+  ;; instead of defining here.
   ;; https://github.com/flycheck/flycheck/issues/1762
 
   (defvar-local sb/flycheck-local-checkers nil)
@@ -201,8 +204,6 @@
 
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
-  ;; We prefer to use per-project directory local variables.
-
   ;; (add-hook 'lsp-managed-mode-hook
   ;;           (lambda ()
   ;;             (when (derived-mode-p 'python-mode)
@@ -211,22 +212,24 @@
 
   )
 
-;; ;; Showing error messages in the echo area is less intrusive.
+;; Showing error messages in the echo area is less intrusive, so the following packages are
+;; disabled.
+
 ;; (use-package flycheck-popup-tip ; Show error messages in popups
 ;;   :disabled t
 ;;   :unless (display-graphic-p)
 ;;   :hook
 ;;   (flycheck-mode-hook . flycheck-popup-tip-mode))
 
-;; ;; Does not display popup under TTY, check possible workarounds at
-;; ;; https://github.com/flycheck/flycheck-popup-tip
+;; Does not display popup under TTY, check possible workarounds at
+;; https://github.com/flycheck/flycheck-popup-tip
 ;; (use-package flycheck-pos-tip
 ;;   :disabled t
 ;;   :if (display-graphic-p)
 ;;   :hook
 ;;   (flycheck-mode-hook . flycheck-pos-tip-mode))
 
-;; ;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
+;; Showing errors/warnings in a posframe seems more intrusive than showing errors in the minibuffer
 ;; (use-package flycheck-posframe
 ;;   :if (display-graphic-p)
 ;;   :disabled t
@@ -264,18 +267,18 @@
    ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook web-mode-hook
                      markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode))
   :custom
-  (format-all-formatters '(("YAML" prettier)
-                           ("Emacs Lisp" emacs-lisp)
-                           ("C++" clang-format)
+  (format-all-formatters '(("BibTeX" Emacs)
                            ("C" clang-format)
+                           ("C++" clang-format)
                            ("Cuda" clang-format)
-                           ("Perl" perltidy)
+                           ("Emacs Lisp" emacs-lisp)
                            ("HTML" tidy)
-                           ("BibTeX" Emacs)
-                           ("Python" (yapf "--style" "file") isort)
                            ("LaTeX" latexindent)
                            ("Markdown" prettier)
-                           ("Shell script" shfmt)))
+                           ("Perl" perltidy)
+                           ("Python" (yapf "--style" "file") isort)
+                           ("Shell script" shfmt)
+                           ("YAML" prettier)))
   :diminish)
 
 ;; Enable using ".dir-locals.el" file

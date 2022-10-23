@@ -42,9 +42,9 @@
   (magit-repository-directories '(("/home/swarnendu/books" . 0)
                                   ("/home/swarnendu/bitbucket" . 1)
                                   ("/home/swarnendu/github" . 1)
-                                  ("/home/swarnendu/prospar-workspace")
+                                  ("/home/swarnendu/iss-workspace")
                                   ("/home/swarnendu/plass-workspace")
-                                  ("/home/swarnendu/iss-workspace")))
+                                  ("/home/swarnendu/prospar-workspace")))
   :config
   ;; These give a performance boost to Magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
@@ -94,9 +94,11 @@
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
   (diff-hl-flydiff-mode 1)
+
   ;; Display margin since the fringe is unavailable in TTY
   (unless (display-graphic-p)
     (diff-hl-margin-mode 1))
+
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote))
 
 ;; Use "M-p/n" to cycle between older commit messages.

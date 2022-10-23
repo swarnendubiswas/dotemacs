@@ -57,7 +57,6 @@
   ;; https://github.com/oantolin/orderless/issues/91
   (defun sb/use-orderless-in-minibuffer ()
     (setq-local completion-styles '(substring orderless)))
-  :after vertico
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
@@ -138,11 +137,11 @@
 ;;                 (lambda ()
 ;;                   (prescient-remember (vertico--candidate))))))
 
-(use-package fussy
-  :straight
-  (fussy :type git :host github :repo "jojojames/fussy")
-  :demand t
-  :commands fussy-all-completions)
+;; (use-package fussy
+;;   :straight
+;;   (fussy :type git :host github :repo "jojojames/fussy")
+;;   :demand t
+;;   :commands fussy-all-completions)
 
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
@@ -162,15 +161,16 @@
           ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
           ;; completion to work. I also want substring matching for file names.
           ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
-          completion-category-overrides '((file (styles basic substring partial-completion fussy))
+          completion-category-overrides '((file (styles basic substring partial-completion))
                                           ;; (buffer (styles basic substring flex))
                                           ;; (project-file (styles basic substring flex))
                                           (minibuffer (orderless flex)))))
 
-  (unless (featurep 'orderless)
-    (setq completion-styles '(basic fussy)
-          completion-category-overrides '((file (styles basic substring partial-completion fussy))
-                                          (minibuffer (basic fussy initials))))))
+  ;; (unless (featurep 'orderless)
+  ;;   (setq completion-styles '(basic fussy)
+  ;;         completion-category-overrides '((file (styles basic substring partial-completion fussy))
+  ;;                                         (minibuffer (basic fussy initials)))))
+  )
 
 (provide 'init-completion)
 

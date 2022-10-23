@@ -225,8 +225,7 @@
 
 (use-package ivy-rich
   :preface
-  ;; Adapted from
-  ;; https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
+  ;; Adapted from https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
   (defun sb/ivy-rich-file-size (candidate)
     "Displays the file size of the candidate for ivy-rich."
     (let ((candidate (expand-file-name candidate ivy--directory)))

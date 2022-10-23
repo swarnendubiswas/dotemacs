@@ -122,17 +122,17 @@
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil))
 
-;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
-;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
-(use-package dired-efap
-  :disabled t ; Recent themes do not seem to support in-place rename with efap well.
-  :after dired
-  :defines dired-efap-initial-filename-selection
-  :bind*
-  (:map dired-mode-map
-        ("r" . dired-efap))
-  :custom
-  (dired-efap-initial-filename-selection nil))
+;; ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
+;; ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
+;; (use-package dired-efap
+;;   :disabled t ; Recent themes do not seem to support in-place rename with efap well.
+;;   :after dired
+;;   :defines dired-efap-initial-filename-selection
+;;   :bind*
+;;   (:map dired-mode-map
+;;         ("r" . dired-efap))
+;;   :custom
+;;   (dired-efap-initial-filename-selection nil))
 
 ;; (use-package treemacs
 ;;   :functions treemacs-tag-follow-mode
@@ -303,22 +303,22 @@
   :commands
   (zoxide-find-file zoxide-open-with))
 
-(use-package dirvish
-  :straight
-  (dirvish :type git :host github :repo "alexluigit/dirvish")
-  :disabled t ; I do not seem to gain much from the package
-  :init
-  ;; Let Dirvish take over Dired globally
-  (dirvish-override-dired-mode)
-  :custom
-  (dirvish-hide-details nil)
-  (dirvish-attributes '(vc-state subtree-state all-the-icons collapse file-size))
-  (dired-listing-switches
-   "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
-  (dirvish-default-layout '(0 0.15 0.50))
-  :config
-  (add-to-list 'dirvish-preview-disabled-exts "mp4")
-  (add-to-list 'dirvish-preview-disabled-exts "jpeg"))
+;; (use-package dirvish
+;;   :straight
+;;   (dirvish :type git :host github :repo "alexluigit/dirvish")
+;;   :disabled t ; I do not seem to gain much from the package
+;;   :init
+;;   ;; Let Dirvish take over Dired globally
+;;   (dirvish-override-dired-mode)
+;;   :custom
+;;   (dirvish-hide-details nil)
+;;   (dirvish-attributes '(vc-state subtree-state all-the-icons collapse file-size))
+;;   (dired-listing-switches
+;;    "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
+;;   (dirvish-default-layout '(0 0.15 0.50))
+;;   :config
+;;   (add-to-list 'dirvish-preview-disabled-exts "mp4")
+;;   (add-to-list 'dirvish-preview-disabled-exts "jpeg"))
 
 (use-package all-the-icons-dired
   :if (and (display-graphic-p) (not (featurep 'dirvish)))
