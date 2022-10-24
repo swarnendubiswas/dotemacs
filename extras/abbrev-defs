@@ -1576,6 +1576,7 @@
 
 (define-abbrev-table 'text-mode-abbrev-table
   '(
+    ("abritrary" "arbitrary" nil :count 0)
     ("anwer" "ANSWER" nil :count 0)
     ("apir" "pair" nil :count 0)
     ("atend" "Attend" nil :count 0)

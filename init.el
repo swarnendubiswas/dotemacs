@@ -50,7 +50,9 @@
 
 (require 'init-prog)
 (require 'init-languages)
-(require 'init-lsp)
+(cond
+ ((eq sb/lsp-provider 'lsp-mode) (require 'init-lsp))
+ ((eq sb/lsp-provider 'eglot) (require 'init-eglot)))
 
 (require 'init-cc)
 (require 'init-python)

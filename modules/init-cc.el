@@ -34,7 +34,8 @@
   (c++-mode-hook . (lambda ()
                      (setq-local c-set-style "cc-mode"
                                  c-basic-offset 2)
-                     (lsp-deferred)))
+                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :bind
   (:map c-mode-base-map
         ("C-c c a" . c-beginning-of-defun)
@@ -89,7 +90,8 @@
                        (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                        (spell-fu-mode -1)
                        (flyspell-mode -1)
-                       (lsp-deferred)))
+                       (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                             ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   ;; :config
   ;; (lsp-register-client
   ;;  (make-lsp-client

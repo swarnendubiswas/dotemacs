@@ -160,7 +160,7 @@
 
 (when (display-graphic-p)
   (cond ((string= (system-name) "inspiron-7572")
-         (set-face-attribute 'default nil :font "MesloLGS NF" :height 170)
+         (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
          (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
          (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
          (set-face-attribute 'mode-line nil :height 120)

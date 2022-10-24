@@ -352,6 +352,7 @@
 ;; keytar-install".
 
 (use-package lsp-grammarly
+  :if (eq sb/lsp-provider 'lsp-mode)
   :defines
   (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands
@@ -396,6 +397,7 @@
   )
 
 (use-package lsp-ltex
+  :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :commands
   (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
@@ -539,7 +541,6 @@
   :hook
   ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
-
 
 ;; Claims to be better than `electric-indent-mode'. But we are now using `format-all'.
 

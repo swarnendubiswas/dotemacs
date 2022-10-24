@@ -49,7 +49,8 @@
                     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                     (spell-fu-mode -1)
                     (flyspell-mode -1)
-                    (lsp-deferred)))
+                    (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                          ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   ;; :config
   ;; (lsp-register-client
   ;;  (make-lsp-client
@@ -67,7 +68,9 @@
 (use-package css-mode
   :commands css-mode
   :hook
-  (css-mode-hook . lsp-deferred)
+  (css-mode-hook . (lambda()
+                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :custom
   (css-indent-offset 2)
   ;; :config
@@ -208,7 +211,9 @@
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
   :hook
-  (cperl-mode-hook . lsp-deferred)
+  (cperl-mode-hook . (lambda ()
+                       (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                             ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
@@ -255,7 +260,10 @@
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
   :hook
-  (sh-mode-hook . lsp-deferred)
+  (sh-mode-hook .
+                (lambda ()
+                  (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                        ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :custom
   (sh-basic-offset 2)
   (sh-indentation 2)
@@ -300,7 +308,9 @@
   (web-mode)
   :mode "\\.html?\\'"
   :hook
-  (web-mode-hook . lsp-deferred)
+  (web-mode-hook . (lambda ()
+                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :bind
   ("C-c C-d" . nil)
   :custom
@@ -346,7 +356,8 @@
                       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                       (spell-fu-mode -1)
                       (flyspell-mode -1)
-                      (lsp-deferred)))
+                      (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                            ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -375,7 +386,8 @@
   ((json-mode-hook jsonc-mode-hook) . (lambda ()
                                         (make-local-variable 'js-indent-level)
                                         (setq js-indent-level 2)
-                                        (lsp-deferred)))
+                                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                                              ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   ;; :config
   ;; (lsp-register-client
   ;;  (make-lsp-client

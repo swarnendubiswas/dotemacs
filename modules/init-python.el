@@ -14,7 +14,9 @@
    ("[./]flake8\\'" . conf-mode)
    ("/Pipfile\\'" . conf-mode))
   :hook
-  (python-mode-hook . lsp-deferred)
+  (python-mode-hook . (lambda ()
+                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                              ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :bind
   ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
   ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c

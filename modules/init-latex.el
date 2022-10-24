@@ -76,7 +76,10 @@
   (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
    ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
    ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
-   (LaTeX-mode-hook . turn-on-auto-fill))
+   ((latex-mode-hook LaTeX-mode-hook) . turn-on-auto-fill)
+   ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
+                                          (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                                                ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred))))))
   :config
   (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
         TeX-auto-untabify t ; Remove all tabs before saving
@@ -121,7 +124,9 @@
   :straight (:type built-in)
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
-   (bibtex-mode-hook . lsp-deferred))
+   (bibtex-mode-hook . (lambda ()
+                         (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                               ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred))))))
   :custom
   (bibtex-align-at-equal-sign     t)
   (bibtex-maintain-sorted-entries t)

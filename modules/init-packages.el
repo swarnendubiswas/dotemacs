@@ -203,7 +203,6 @@
 (use-package exec-path-from-shell
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
-  :if (or (daemonp) (not (display-graphic-p)))
   :init
   ;; "-i" is expensive but Tramp is unable to find executables without the option. I am no longer
   ;; using Tramp, and instead, I am using terminal Emacs over SSH. However, other executables like

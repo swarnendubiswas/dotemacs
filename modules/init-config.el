@@ -125,7 +125,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -227,6 +227,16 @@ Prefer the straight.el package manager instead."
   :type '(radio
           (const :tag "kind-icon" kind-icon)
           (const :tag "kind-all-the-icons" kind-all-the-icons)
+          (const :tag "none" none)))
+
+;; Eglot does not allow multiple servers to connect to a major mode, which is a useful feature to
+;; use both `grammarly' and `lsp-ltex' together.
+(defcustom sb/lsp-provider
+  'eglot
+  "Choose between Lsp-mode and Eglot."
+  :type '(radio
+          (const :tag "lsp-mode" lsp-mode)
+          (const :tag "eglot" eglot)
           (const :tag "none" none)))
 
 ;; Helper const variables

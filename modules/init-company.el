@@ -379,8 +379,9 @@
                 (add-hook 'completion-at-point-functions
                           'pcomplete-completions-at-point nil t)
                 (sb/company-org-mode)
-                (company-fuzzy-mode 1)
-                (diminish 'company-fuzzy-mode)))))
+                ;; (company-fuzzy-mode 1)
+                ;; (diminish 'company-fuzzy-mode)
+                ))))
 
 (with-eval-after-load "company"
   (progn

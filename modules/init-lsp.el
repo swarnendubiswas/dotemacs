@@ -1,4 +1,4 @@
-;;; init-languages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
+;;; init-lsp.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
 ;;; coding:utf-8; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -20,6 +20,7 @@
               '(orderless))
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
             '(flex))))
+  :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
             lsp-perl-language-server-client-version
@@ -226,6 +227,7 @@
 
 ;; Sync workspace folders and treemacs projects
 (use-package lsp-treemacs
+  :if (eq sb/lsp-provider 'lsp-mode)
   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
   :config (lsp-treemacs-sync-mode 1)
   :bind
@@ -245,6 +247,7 @@
         ("W" . lsp-ivy-workspace-symbol)))
 
 (use-package dap-mode
+  :if (eq sb/lsp-provider 'lsp-mode)
   :commands (dap-debug dap-hydra)
   :hook
   ((lsp-mode-hook . dap-mode)
@@ -252,6 +255,7 @@
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
+  :if (eq sb/lsp-provider 'lsp-mode)
   :commands (lsp-java-organize-imports lsp-java-build-project
                                        lsp-java-update-project-configuration
                                        lsp-java-actionable-notifications
@@ -274,7 +278,8 @@
   (java-mode-hook . (lambda ()
                       (setq-local c-basic-offset 4
                                   c-set-style "java")
-                      (lsp-deferred)))
+                      (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                            ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :custom
   (lsp-java-inhibit-message t)
   ;; Requires Java 11+, Java 11 is the LTS
