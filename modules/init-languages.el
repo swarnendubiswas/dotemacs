@@ -208,6 +208,20 @@
   :commands
   markdown-preview-mode)
 
+;; Requires support for xwidget
+(use-package markdown-xwidget
+  :straight (markdown-xwidget :type git :host github
+                              :repo "cfclrk/markdown-xwidget" :files (:defaults "resources"))
+  :after markdown-mode
+  :bind
+  (:map markdown-mode-command-map ; Use "C-c C-c x"
+        ("x" . markdown-xwidget-preview-mode))
+  :custom
+  (markdown-xwidget-command "pandoc")
+  (markdown-xwidget-github-theme "light")
+  (markdown-xwidget-mermaid-theme "default")
+  (markdown-xwidget-code-block-theme "default"))
+
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
   :hook

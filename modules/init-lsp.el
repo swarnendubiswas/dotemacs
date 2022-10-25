@@ -66,8 +66,8 @@
   (when (eq sb/capf 'corfu)
     (add-hook 'text-mode-hook (lambda ()
                                 (setq-local lsp-completion-enable nil))))
-  :hook
-  (lsp-mode-hook . lsp-dired-mode)
+  ;; :hook
+  ;; (lsp-mode-hook . lsp-dired-mode)
   :bind-keymap
   ("C-c l" . lsp-command-map)
   :bind

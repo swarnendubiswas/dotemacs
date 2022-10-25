@@ -116,7 +116,7 @@
 
 (if (bound-and-true-p sb/debug-init-file)
     (progn
-      (setq debug-on-error                 t
+      (setq debug-on-error                 nil
             debug-on-event                 'sigusr2
             use-package-compute-statistics t ; Use "M-x use-package-report" to see results
             use-package-verbose            t

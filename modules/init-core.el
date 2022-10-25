@@ -437,12 +437,12 @@
 ;; prefix argument is given. Then it will find file at point.
 (use-package ffap
   :straight (:type built-in)
+  :if (eq sb/minibuffer-completion 'vertico)
   :demand t
   :config
   (ffap-bindings)
   ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
-  (when (eq sb/minibuffer-completion 'vertico)
-    (bind-key "<f2>" #'ffap)))
+  (bind-key "<f2>" #'ffap))
 
 ;; (use-package doc-view
 ;;   :custom

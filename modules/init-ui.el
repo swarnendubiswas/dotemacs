@@ -129,22 +129,23 @@
 
 ;; Icons for minibuffer completion (e.g., `find-file-at-point')
 (use-package all-the-icons-completion
+  :straight (:type git :host github :repo "MintSoup/all-the-icons-completion")
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode
   :init (all-the-icons-completion-mode 1)
   :hook
   (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
-(use-package nerd-fonts
-  :straight (nerd-fonts :type git :host github :repo "twlz0ne/nerd-fonts.el")
-  :demand t)
+;; (use-package nerd-fonts
+;;   :straight (nerd-fonts :type git :host github :repo "twlz0ne/nerd-fonts.el")
+;;   :demand t)
 
-(use-package all-the-icons-nerd-fonts
-  :straight (all-the-icons-nerd-fonts :host github :repo "mohkale/all-the-icons-nerd-fonts")
-  :after all-the-icons
-  :demand t
-  :config
-  (all-the-icons-nerd-fonts-prefer))
+;; (use-package all-the-icons-nerd-fonts
+;;   :straight (all-the-icons-nerd-fonts :host github :repo "mohkale/all-the-icons-nerd-fonts")
+;;   :after all-the-icons
+;;   :demand t
+;;   :config
+;;   (all-the-icons-nerd-fonts-prefer))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)

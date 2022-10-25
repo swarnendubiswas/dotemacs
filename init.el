@@ -48,6 +48,9 @@
 (require 'init-misc)
 (require 'init-checkers)
 
+;; It is recommended to load `yasnippet' before `eglot'
+(require 'init-completion)
+
 (require 'init-prog)
 (require 'init-languages)
 (cond
@@ -64,7 +67,6 @@
 (require 'init-org)
 (require 'init-latex)
 
-(require 'init-completion)
 (cond
  ((eq sb/capf 'corfu) (require 'init-corfu))
  ((eq sb/capf 'company) (require 'init-company)))
