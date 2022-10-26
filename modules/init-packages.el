@@ -129,12 +129,6 @@
           use-package-compute-statistics nil
           use-package-verbose            nil)))
 
-;; Feature `straight-x' from package `straight' provides experimental/unstable extensions to
-;; straight.el which are not yet ready for official inclusion.
-(use-package straight-x
-  :straight nil
-  :commands straight-x-fetch-all)
-
 (use-package diminish
   :demand t)
 
@@ -159,19 +153,15 @@
 (use-package no-littering
   :demand t)
 
-(with-eval-after-load "no-littering"
+(use-package package
+  :unless (bound-and-true-p sb/disable-package.el)
+  :after no-littering
+  :bind
+  (("C-c d p" . package-quickstart-refresh)
+   ("C-c d l" . package-list-packages))
+  :custom
   ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
-  (unless (bound-and-true-p sb/disable-package.el)
-    (when (boundp 'package-quickstart)
-      (setq package-quickstart t))
-
-    ;; We can do `package-list-packages', then press `u' and `x'. The only thing missing from "paradox"
-    ;; is `paradox-upgrade-packages' as a single command. Emacs 29 should have a `package-update-all'
-    ;; command.
-
-    (bind-keys :package package
-               ("C-c d p" . package-quickstart-refresh)
-               ("C-c d l" . package-list-packages))))
+  (package-quickstart t))
 
 (defcustom sb/custom-file
   (no-littering-expand-var-file-name "custom.el")
@@ -190,6 +180,7 @@
 (use-package async
   :straight
   (async :type git :host github :repo "jwiegley/emacs-async")
+  :unless (bound-and-true-p sb/disable-package.el)
   :commands async-bytecomp-package-mode
   :init (async-bytecomp-package-mode 1))
 
@@ -204,8 +195,8 @@
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
   :init
-  ;; "-i" is expensive but Tramp is unable to find executables without the option. I am no longer
-  ;; using Tramp, and instead, I am using terminal Emacs over SSH. However, other executables like
+  ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
+  ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
   ;; "prettier" from $PATH are also not found without the interactive flag.
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil

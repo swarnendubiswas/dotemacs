@@ -157,7 +157,8 @@
 ;; Install with "python3 -m pip install -U pyright --user". Create stubs with "pyright --createstub
 ;; pandas".
 (use-package lsp-pyright
-  :if (and (eq sb/python-langserver 'pyright) (executable-find "pyright"))
+  :if (and (eq sb/lsp-provider 'lsp-mode) (eq sb/python-langserver 'pyright)
+           (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
   :hook
   (python-mode-hook . (lambda ()

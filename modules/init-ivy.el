@@ -49,19 +49,19 @@
   (ivy-sort-max-size 10000)
   :config
   (dolist (buffer
-           '("TAGS" "magit-process" "*emacs*" "*xref*"
+           '("TAGS" "magit-process" "*emacs*" "*xref*" "^\\*.+Completions\\*$"
              ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
-             ;; "^\\*Compile-Log\\*$" "^\\*.+Completions\\*$" "^\\*Backtrace\\*$"
+             ;; "^\\*Compile-Log\\*$"  "^\\*Backtrace\\*$"
              ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
              ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
              ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
-  ;; Other options: ivy--regex-ignore-order
-  (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
-                                (counsel-M-x       . ivy--regex-fuzzy)
-                                (counsel-find-file . ivy--regex-fuzzy)
-                                (t                 . ivy--regex-plus)))
+  ;; ;; Other options: ivy--regex-ignore-order
+  ;; (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
+  ;;                               (counsel-M-x       . ivy--regex-fuzzy)
+  ;;                               (counsel-find-file . ivy--regex-fuzzy)
+  ;;                               (t                 . ivy--regex-plus)))
 
   ;; Ignore `dired' buffers from `ivy-switch-buffer'
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
@@ -87,7 +87,7 @@
   (;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
    ([remap execute-extended-command] . counsel-M-x)
    ("<f1>"                           . counsel-M-x)
-   ([remap completion-at-point]      . counsel-company)
+   ;; ([remap completion-at-point]      . counsel-company)
    ("C-M-i"                          . counsel-company)
    ([remap find-file]                . counsel-find-file)
    ("<f2>"                           . counsel-find-file)
@@ -96,14 +96,13 @@
    ("C-c d m"                        . counsel-minor)
    ("C-c s g"                        . counsel-git)
    ("C-c s G"                        . counsel-git-grep)
-   ("C-c s r"                        . counsel-rg)
+   ("C-c s r"                        . counsel-rg) ; `counsel-rg' fails with `orderless'
    ("<f4>"                           . counsel-grep-or-swiper)
    ([remap locate]                   . counsel-locate)
    ("C-c s l"                        . counsel-locate)
    ([remap yank-pop]                 . counsel-yank-pop)
    ("M-y"                            . counsel-yank-pop)
    ("C-c C-m"                        . counsel-mark-ring)
-   ;; Enabling preview can make switching over remote buffers slow
    ("S-<f3>"                         . counsel-switch-buffer)
    ([remap imenu]                    . counsel-imenu)
    ("C-c C-j"                        . counsel-imenu)
@@ -156,7 +155,8 @@
                                     "\\|__pycache__"))
   (counsel-mode-override-describe-bindings t)
   (counsel-preselect-current-file t)
-  (counsel-switch-buffer-preview-virtual-buffers nil "Removes recent files and bookmarks")
+  ;; Enabling preview can make switching over remote buffers slow
+  (counsel-switch-buffer-preview-virtual-buffers nil)
   (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n------------------------------------------\n")
   :diminish)

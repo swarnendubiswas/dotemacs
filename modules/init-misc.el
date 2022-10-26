@@ -234,6 +234,8 @@
   :if (symbol-value 'sb/IS-LINUX)
   :hook
   (prog-mode-hook . turn-on-eldoc-mode)
+  ;; :custom
+  ;; (eldoc-area-prefer-doc-buffer to t)
   :config
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
   ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when

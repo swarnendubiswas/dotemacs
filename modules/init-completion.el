@@ -72,11 +72,8 @@
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)
-    ;; https://github.com/ericdanan/counsel-projectile/issues/69
-    (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
-                                  (counsel-M-x       . ivy--regex-fuzzy)
-                                  (counsel-find-file . ivy--regex-fuzzy)
-                                  (t . orderless-ivy-re-builder)))
+    (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+    ;; `counsel-rg' fails with `orderless'
     (add-to-list 'ivy-highlight-functions-alist
                  '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 

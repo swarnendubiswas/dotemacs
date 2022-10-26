@@ -8,22 +8,39 @@
 ;;; Code:
 
 (use-package eglot
-  :after flycheck
   :commands
   (eglot eglot-ensure eglot-server-programs eglot-rename eglot-code-actions eglot-format
          eglot-find-declaration eglot-find-implementation eglot-find-typeDefinition)
+  ;; :hook
+  ;; (eglot-managed-mode-hook . (lambda ()
+  ;;                              (eldoc-mode -1)))
   :bind
-  (("M-." . eglot-find-implementation)
+  (("M-."     . xref-find-definitions)
    ("C-c l q" . eglot-shutdown)
    ("C-c l Q" . eglot-shutdown-all)
    ("C-c l d" . eglot-find-declaration)
    ("C-c l i" . eglot-find-implementation)
-   ("C-c l I" . lsp-goto-implementation)
    ("C-c l t" . eglot-find-typeDefinition)
    ("C-c l r" . eglot-rename)
-   ("C-c l f" . eglot-format)
+   ("C-c l f" . eglot-format-buffer)
    ("C-c l x" . eglot-code-actions))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-stay-out-of '(flymake))
   :config
+  ;; FIXME: Use hooks
+  ;; https://github.com/joaotavora/eglot/discussions/875
+  (setq-default eglot-workspace-configuration '((pylsp
+                                                 (plugins
+                                                  (jedi_completion
+                                                   (include_params . t)
+                                                   (fuzzy . t))
+                                                  (pycodestyle (enabled . nil))
+                                                  (pyflakes (enabled . nil))
+                                                  (flake8 (enabled . nil))
+                                                  (pydocstyle (enabled . t))
+                                                  (pylint (enabled . t))))))
+
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) .
                                         ("clangd" "-j=4" "--all-scopes-completion"
                                          "--background-index"
@@ -33,11 +50,13 @@
                                          "--header-insertion=never"
                                          "--header-insertion-decorators=0"
                                          "--log=error"
-                                         "--malloc-trim" ;; Release memory periodically
+                                         "--malloc-trim" ; Release memory periodically
                                          ;; Increases memory usage but can improve performance
                                          "--pch-storage=memory"
                                          "--pretty")))
+
   ;; (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode) "texlab"))
+
   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
 
 (use-package consult-eglot
@@ -49,7 +68,11 @@
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook). (lambda ()
                                                         (require 'eglot-grammarly)
-                                                        (eglot-ensure))))
+                                                        (eglot-ensure)))
+  ;; :config
+  ;; (add-to-list eglot-workspace-configuration ((@emacs-grammarly/grammarly-languageserver
+  ;;      . ((audience . "knowledgeable")))))
+  )
 
 ;; (use-package eglot-ltex
 ;;   :ensure t
