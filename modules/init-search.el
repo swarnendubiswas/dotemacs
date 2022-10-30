@@ -83,20 +83,11 @@
   :custom
   (wgrep-auto-save-buffer t))
 
-;; Use "S" to change the search term, "D" to change the search directory, "g" to rerun the search,
-;; "o" to view the result in another window, "n" and "p" to move between results buttons, "M-n" and
-;; "M-p" to move between file headers, and "C-c C-k" to stop a running search.
 (use-package deadgrep
   :bind
   ("C-c s d" . deadgrep))
 
-;; (use-package affe
-;;   :if (eq sb/minibuffer-completion 'vertico)
-;;   :commands (affe-grep affe-find consult--customize-put)
-;;   :config
-;;   (consult-customize affe-grep :preview-key (kbd "M-.")))
-
-;; `avy-setup-default' will bind `avy-isearch' to `C-'' in `isearch-mode-map', so that you can
+;; `avy-setup-default' will bind `avy-isearch' to "C-'" in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
   :commands avy-setup-default
@@ -105,10 +96,7 @@
    ("C-'"   . avy-goto-char-timer)
    ("C-/"   . avy-goto-line))
   :custom
-  ;; Option "pre" is distracting because of all the movement while highlighting selection keys. This
-  ;; causes the eyes to lose focus.
-  ;; (avy-style 'de-bruijn)
-  (avy-background t))
+  (avy-background t "Provides better contrast"))
 
 (progn
   (defvar reb-re-syntax)
@@ -119,7 +107,7 @@
 ;; and replacements as you type.
 (use-package visual-regexp
   :commands
-  (vr/replace vr/mark)
+  (vr/replace vr/mark vr/mc-mark)
   :bind
   ([remap query-replace] . vr/query-replace))
 

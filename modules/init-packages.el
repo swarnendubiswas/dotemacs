@@ -59,7 +59,7 @@
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
-  ;; These variables need to best before loading `use-package'.
+  ;; These variables need to be set before loading `use-package'.
   (setq use-package-enable-imenu-support t
         use-package-hook-name-suffix     nil)
 

@@ -21,7 +21,7 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
-;; Use "C-M-/" for `dabbrev-completion' which finds all expansions in the current buffer and
+;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
 (use-package dabbrev
   :straight (:type built-in)
@@ -65,10 +65,10 @@
   :custom
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
-  (orderless-matching-styles '(orderless-literal
-                               orderless-prefixes
-                               orderless-initialism
-                               orderless-regexp))
+  ;; (orderless-matching-styles '(orderless-literal
+  ;;                              orderless-prefixes
+  ;;                              orderless-initialism
+  ;;                              orderless-regexp))
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)

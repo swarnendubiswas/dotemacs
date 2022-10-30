@@ -66,7 +66,7 @@
 
 (use-package projectile
   :preface
-  (defun sb/projectile-dont-visit-tags-table ()
+  (defun sb/projectile-do-not-visit-tags-table ()
     "Do not visit the tags table."
     nil)
   :if (eq sb/project-handler 'projectile)
@@ -77,8 +77,9 @@
                         projectile-mode
                         projectile-compile
                         projectile-compile-project)
+  :hook
   ;; We can open a project file without enabling projectile via bind-keys
-  :hook (after-init-hook . projectile-mode)
+  (after-init-hook . projectile-mode)
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :bind
@@ -123,7 +124,7 @@
       (format " [%s]" (or project-name "-"))))
 
   (advice-add 'projectile-visit-project-tags-table :override
-              #'sb/projectile-dont-visit-tags-table)
+              #'sb/projectile-do-not-visit-tags-table)
 
   ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
   ;; projects is disabled for faster startup.

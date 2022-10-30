@@ -18,7 +18,7 @@
                         (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
                               ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :bind
-  ;; Assigning a keybinding such as "C-[" is involved, `[' is treated as `meta'
+  ;; Assigning a keybinding such as "C-[" is involved, "[" is treated as `meta'
   ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
   ;; TODO: Bind other keys suitably
   ;; python-nav-beginning-of-block

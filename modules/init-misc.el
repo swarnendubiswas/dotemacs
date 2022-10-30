@@ -480,8 +480,9 @@
   (require 'transient-extras-lp)
   (with-eval-after-load "dired"
     (bind-key "C-c C-p" #'transient-extras-lp-menu dired-mode-map))
-  (with-eval-after-load "pdf-tools"
-    (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map)))
+  ;; (with-eval-after-load "pdf-tools"
+  ;;   (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map))
+  )
 
 (provide 'init-misc)
 

@@ -69,7 +69,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'powerline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -194,8 +194,8 @@ This location is used for temporary installations and files.")
           (const :tag "none" none))
   :group 'dotemacs)
 
-;; Prefer "straight.el" over "package.el". A big advantage is to install packages from arbitrary
-;; sources like GitHub.
+;; Prefer "straight.el" over "package.el". A big advantage with "straight.el" is it is easy to
+;; install packages from arbitrary sources like GitHub.
 (defcustom sb/disable-package.el
   t
   "Disable package.el.
@@ -203,7 +203,7 @@ Prefer the straight.el package manager instead."
   :type 'boolean
   :group 'dotemacs)
 
-;; I do not find any difference in terms of features. However, more packages support `projectile'.
+;; I do not find any difference in terms of features. More packages support `projectile'.
 (defcustom sb/project-handler
   'projectile
   "Choose the handler for projects."
@@ -212,6 +212,7 @@ Prefer the straight.el package manager instead."
           (const :tag "projectile" projectile))
   :group 'dotemacs)
 
+;; `centaur-tabs' works more reliably for me.
 (defcustom sb/tab-bar-handler
   'centaur-tabs
   "Choose the handler for tabs."
@@ -229,8 +230,10 @@ Prefer the straight.el package manager instead."
           (const :tag "kind-all-the-icons" kind-all-the-icons)
           (const :tag "none" none)))
 
-;; Eglot does not allow multiple servers to connect to a major mode, which is a useful feature to
-;; use both `grammarly' and `lsp-ltex' together.
+;; Eglot does not allow multiple servers to connect to a major mode. which is a useful feature. For
+;; example, I can use `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. However,
+;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
+;; Emacs core.
 (defcustom sb/lsp-provider
   'eglot
   "Choose between Lsp-mode and Eglot."
@@ -243,13 +246,16 @@ Prefer the straight.el package manager instead."
 
 (defconst sb/EMACS27    (= emacs-major-version 27)
   "Non-nil if Emacs version is 27.")
+
 (defconst sb/EMACS27+   (> emacs-major-version 26)
   "Non-nil if Emacs version is 27 and above.")
+
 (defconst sb/EMACS28+   (> emacs-major-version 27)
   "Non-nil if Emacs version is 28 and above.")
 
 (defconst sb/IS-LINUX   (eq system-type 'gnu/linux)
   "Non-nil if the OS is GNU/Linux.")
+
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
 

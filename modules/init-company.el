@@ -37,14 +37,14 @@
   :bind
   ;; `company-search-candidates' is bound to "C-s" and `company-filter-candidates' is bound to
   ;; "C-M-s"
-  (:map company-active-map
-        ("C-j"      . company-search-candidates)
-        ("C-n"      . company-select-next)
-        ("C-p"      . company-select-previous)
-        ;; Insert the common part of all candidates, or select the next one
-        ("<tab>"    . company-complete-common-or-cycle)
-        ("C-M-/"    . company-other-backend)
-        ("<escape>" . company-abort))
+  (("C-M-/"    . company-other-backend)
+   :map company-active-map
+   ("C-j"      . company-search-candidates)
+   ("C-n"      . company-select-next)
+   ("C-p"      . company-select-previous)
+   ;; Insert the common part of all candidates, or select the next one
+   ("<tab>"    . company-complete-common-or-cycle)
+   ("<escape>" . company-abort))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -93,7 +93,8 @@
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
   (add-to-list 'company-transformers 'delete-dups)
 
-  :diminish)
+  ;; :diminish
+  )
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.

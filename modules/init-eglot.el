@@ -26,8 +26,8 @@
    ("C-c l x" . eglot-code-actions))
   :custom
   (eglot-autoshutdown t)
-  (eglot-stay-out-of '(flymake))
   :config
+  (setq eglot-stay-out-of '(flymake company))
   ;; FIXME: Use hooks
   ;; https://github.com/joaotavora/eglot/discussions/875
   (setq-default eglot-workspace-configuration '((pylsp

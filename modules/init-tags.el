@@ -11,8 +11,8 @@
 
 (setq large-file-warning-threshold (* 500 1024 1024) ; MB
       tags-add-tables nil
-      tags-case-fold-search nil ; t=case-insensitive, nil=case-sensitive
-      ;; Do not ask before rereading the `TAGS' files if they have changed
+      tags-case-fold-search nil ; "t"=case-insensitive, "nil"=case-sensitive
+      ;; Do not ask before rereading the "TAGS" files if they have changed
       tags-revert-without-query t)
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
@@ -23,8 +23,7 @@
   :bind
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
-   ;; Find all identifiers whose name matches pattern
-   ("C-M-." . xref-find-apropos)
+   ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
    ("M-,"   . xref-go-back)
    :map xref--xref-buffer-mode-map
    ("C-o"   . xref-show-location-at-point)

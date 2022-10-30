@@ -94,6 +94,8 @@
                 "\\|\\(?:\\.js\\)?\\.meta\\'"
                 "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
+  ;; We can also configure dired-omit-extensions
+
   ;; ":diminish dired-omit-mode" does not work
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
