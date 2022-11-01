@@ -86,11 +86,11 @@
 
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
-  :demand t
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
-  :init
-  (require 'citre-config)
+  :hook
+  (prog-mode-hook . (lambda()
+                      (require 'citre-config)))
   :bind
   (("C-x c j" . citre-jump)
    ("M-'"     . sb/citre-jump+)

@@ -30,7 +30,6 @@
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
-  (vertico-count 12)
   (vertico-scroll-margin 2)
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are

@@ -53,6 +53,11 @@
 
 (require 'init-prog)
 (require 'init-languages)
+
+;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
+;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
+;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
+;; nice to have TexLab and Grammarly with LaTeX files.
 (cond
  ((eq sb/lsp-provider 'lsp-mode) (require 'init-lsp))
  ((eq sb/lsp-provider 'eglot) (require 'init-eglot)))

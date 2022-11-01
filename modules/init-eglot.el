@@ -27,17 +27,22 @@
   :custom
   (eglot-autoshutdown t)
   :config
-  (setq eglot-stay-out-of '(flymake company))
+  ;; Eglot overwrites `company-backends' to only include `company-capf'
+  (setq eglot-stay-out-of '(company))
   ;; FIXME: Use hooks
   ;; https://github.com/joaotavora/eglot/discussions/875
   (setq-default eglot-workspace-configuration '((pylsp
+                                                 (configurationSources . ["setup.cfg"])
                                                  (plugins
                                                   (jedi_completion
                                                    (include_params . t)
                                                    (fuzzy . t))
                                                   (pycodestyle (enabled . nil))
+                                                  (mccabe (enabled . nil))
                                                   (pyflakes (enabled . nil))
                                                   (flake8 (enabled . nil))
+                                                  (blake (enabled . nil))
+                                                  (yapf (enabled . t))
                                                   (pydocstyle (enabled . t))
                                                   (pylint (enabled . t))))))
 
@@ -62,6 +67,8 @@
 (use-package consult-eglot
   :if (eq sb/minibuffer-completion 'vertico)
   :after eglot)
+
+;; Eglot does not support multiple servers simultaneously per major mode.
 
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")

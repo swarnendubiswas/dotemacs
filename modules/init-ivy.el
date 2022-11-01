@@ -80,6 +80,16 @@
                     (if (executable-find "fasd")
                         (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
       (ivy-read "Directories:" collection :action 'dired)))
+
+  ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
+  (defun sb/counsel-all-files-recursively (dir-name)
+    "List all files recursively in DIR-NAME."
+    (interactive "DDirectory: ")
+    (let* ((cands (split-string
+                   (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
+      (ivy-read "File: " cands
+                :action #'find-file
+                :caller 'sb/counsel-all-files-recursively)))
   :if (eq sb/minibuffer-completion 'ivy)
   :hook
   (ivy-mode-hook . counsel-mode)
@@ -110,7 +120,8 @@
    ([remap apropos]                  . counsel-apropos)
    ("M-g o"                          . counsel-outline)
    ([remap load-theme]               . counsel-theme)
-   ([remap load-library]             . counsel-load-library))
+   ([remap load-library]             . counsel-load-library)
+   ("C-x j"                          . sb/counsel-all-files-recursively))
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)

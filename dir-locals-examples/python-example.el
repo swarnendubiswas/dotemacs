@@ -40,6 +40,27 @@
 
                  ;; (eval . (require 'dap-python))
                  ;; (eval . (dap-register-debug-template <...>))
+
+                 (eglot-workspace-configuration .
+                                                ((:python
+                                                  :venvPath ,(expand-absolute-name "~/.local/share/conda/envs"))
+                                                 :analysis (:diagnosticMode
+                                                            "openFilesOnly"
+                                                            :stubPath
+                                                            ,(expand-absolute-name "~/.local/lib/python-type-stubs"))
+                                                 (:pylsp .
+                                                         (:plugins
+                                                          (:jedi_completion
+                                                           (:fuzzy t)
+                                                           (:include_params t)
+                                                           :pydocstyle (:enabled nil)
+                                                           :pycodestyle (:enabled nil)
+                                                           :mccabe (:enabled nil)
+                                                           :pyflakes (:enabled nil)
+                                                           :flake8 (:enabled t)
+                                                           :black (:enabled t)
+                                                           :pylint (:enabled t))
+                                                          :configurationSources ["flake8"]))))
                  ))
  )
 

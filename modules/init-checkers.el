@@ -281,18 +281,18 @@
                            ("YAML" prettier)))
   :diminish)
 
-;; Enable using ".dir-locals.el" file
-(use-package editorconfig
-  :if (executable-find "editorconfig")
-  :init
-  (setq editorconfig-trim-whitespaces-mode 'ws-butler-mode)
-  ;; :hook
-  ;; (prog-mode-hook . editorconfig-mode)
-  :config
-  (add-to-list 'editorconfig-indentation-alist
-               '(json-mode js-indent-level json-reformat:indent-width))
-  (add-to-list 'editorconfig-indentation-alist
-               '(nxml-mode nxml-child-indent nxml-attribute-indent)))
+;; ;; Enable using ".dir-locals.el" file
+;; (use-package editorconfig
+;;   :if (executable-find "editorconfig")
+;;   :init
+;;   (setq editorconfig-trim-whitespaces-mode 'ws-butler-mode)
+;;   ;; :hook
+;;   ;; (prog-mode-hook . editorconfig-mode)
+;;   :config
+;;   (add-to-list 'editorconfig-indentation-alist
+;;                '(json-mode js-indent-level json-reformat:indent-width))
+;;   (add-to-list 'editorconfig-indentation-alist
+;;                '(nxml-mode nxml-child-indent nxml-attribute-indent)))
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly

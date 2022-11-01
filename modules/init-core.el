@@ -449,6 +449,13 @@
 ;;   (doc-view-continuous t)
 ;;   (doc-view-resolution 120))
 
+;; Highlight and allow to open http links in strings and comments in buffers.
+(use-package goto-addr
+  :straight (:type built-in)
+  :hook
+  ((prog-mode-hook . goto-address-prog-mode)
+   (text-mode-hook . goto-address-mode)))
+
 (provide 'init-core)
 
 ;;; init-core.el ends here

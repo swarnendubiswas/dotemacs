@@ -1388,6 +1388,7 @@
     ("varaint" "variant" nil :count 0)
     ("vecotrization" "vectorization" nil :count 0)
     ("vehical" "vehicle" nil :count 0)
+    ("veiw" "view" nil :count 0)
     ("versios" "versions" nil :count 1)
     ("veyr" "very" nil :count 0)
     ("viration" "variation" nil :count 1)
@@ -1481,6 +1482,8 @@
 (define-abbrev-table 'latex-mode-abbrev-table
   '(
     ("acccesses" "accesses" nil :count 0)
+    ("acess" "access" nil :count 0)
+    ("acknowledgement" "Acknowledgment" nil :count 0)
     ("additionaly" "Additionally" nil :count 0)
     ("alloted" "allotted" nil :count 0)
     ("analaysis" "Analysis" nil :count 0)
@@ -1491,6 +1494,7 @@
     ("chosing" "Choosing" nil :count 0)
     ("concurreny" "Concurrency" nil :count 0)
     ("dealth" "dealt" nil :count 0)
+    ("dimesnion" "dimension" nil :count 0)
     ("distinguih" "Distinguish" nil :count 0)
     ("executio" "execution" nil :count 0)
     ("expeiments" "experiments" nil :count 0)
@@ -1504,6 +1508,8 @@
     ("initital" "initial" nil :count 0)
     ("ipmpact" "impact" nil :count 0)
     ("maintainance" "Maintenance" nil :count 0)
+    ("makign" "making" nil :count 0)
+    ("matix" "matrix" nil :count 0)
     ("mmeory" "Memory" nil :count 0)
     ("occassions" "occasions" nil :count 0)
     ("occuring" "occurring" nil :count 0)
@@ -1560,6 +1566,7 @@
 
 (define-abbrev-table 'org-mode-abbrev-table
   '(
+    ("ansewr" "answer" nil :count 0)
     ("complation" "compilation" nil :count 0)
     ("discssion" "discussion" nil :count 0)
     ("optimisation" "optimization" nil :count 0)
@@ -1607,6 +1614,7 @@
     ("matchng" "Matching" nil :count 0)
     ("meagre" "meager" nil :count 0)
     ("medcines" "medicines" nil :count 0)
+    ("metnion" "mention" nil :count 0)
     ("montly" "monthly" nil :count 0)
     ("nterest" "interest" nil :count 0)
     ("octber" "October" nil :count 0)

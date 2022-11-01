@@ -27,12 +27,10 @@
  ("C-<f11>"   . delete-other-windows)
  ("C-x k"     . kill-this-buffer)
  ("C-c d f"   . auto-fill-mode)
- ;; "M-g p" is the default keybinding.
- ("<f7>"      . previous-error)
- ;; "M-g n" is the default keybinding.
- ("<f8>"      . next-error)
+ ("<f7>"      . previous-error) ; "M-g p" is the default keybinding
+ ("<f8>"      . next-error) ; "M-g n" is the default keybinding
  ;; The default keybinding "C-S-backspace" does not work with the TUI. We make it work with
- ;; Alacritty with `term-keys-mode'.
+ ;; Alacritty with `term-keys-mode'. So, this is an alternative.
  ("M-k"       . kill-whole-line)
 
  ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
@@ -62,18 +60,15 @@
 (with-eval-after-load "popup"
   (bind-key "[escape]" #'keyboard-quit popup-menu-keymap))
 
-(when (eq sb/minibuffer-completion 'ivy)
-  (bind-key "C-x j" #'sb/counsel-all-files-recursively))
-
 (unless sb/tab-bar-handler
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
   (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
   (bind-keys
-   ("M-<left>"  . sb/previous-buffer)
+   ("M-<left>"          . sb/previous-buffer)
    ("C-S-<iso-lefttab>" . sb/previous-buffer)
-   ("M-<right>" . sb/next-buffer)
-   ("C-<tab>"   . sb/next-buffer)))
+   ("M-<right>"         . sb/next-buffer)
+   ("C-<tab>"           . sb/next-buffer)))
 
 (use-package default-text-scale
   :if (display-graphic-p)
@@ -84,12 +79,12 @@
 (use-package free-keys
   :commands free-keys)
 
-(use-package keyfreq
-  :commands (keyfreq-mode keyfreq-autosave-mode)
-  :hook
-  (after-init-hook . (lambda ()
-                       (keyfreq-mode 1)
-                       (keyfreq-autosave-mode 1))))
+;; (use-package keyfreq
+;;   :commands (keyfreq-mode keyfreq-autosave-mode)
+;;   :hook
+;;   (after-init-hook . (lambda ()
+;;                        (keyfreq-mode 1)
+;;                        (keyfreq-autosave-mode 1))))
 
 (use-package which-key ; Show help popups for prefix keys
   :commands which-key-setup-side-window-right-bottom
@@ -109,13 +104,7 @@
   (which-key-mode-hook . which-key-posframe-mode)
   :custom
   ;; Thicker border makes the posframe easier to distinguish
-  (which-key-posframe-border-width 4)
-  ;; Positioning the frame at the top obstructs the view to a lesser degree
-  (which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)
-  ;; :config
-  ;; Modify the posframe background if it has a low contrast
-  ;; (set-face-attribute 'which-key-posframe nil :background "floralwhite" :foreground "black")
-  )
+  (which-key-posframe-border-width 2))
 
 ;; Hydras, https://github.com/abo-abo/hydra
 

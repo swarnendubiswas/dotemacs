@@ -41,7 +41,7 @@ install_emacs() {
     make distclean
     ./autogen.sh
     # We do not need POP3 support
-    ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+    ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --with-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
     # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the Emacs distribution instead of after startup
     make -j"$(nproc)" NATIVE_FULL_AOT=1
 
@@ -97,9 +97,8 @@ install_fish() {
     apt install -y fish
 }
 
-# Install LLVM
 install_llvm() {
-    LLVM_VER="14"
+    LLVM_VER="15"
 
     case "${DIST_VERSION}" in
         Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic-${LLVM_VER}  main" ;;
@@ -168,12 +167,10 @@ cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 #     fi
 # fi
 
-# Install Python packages
 install_python() {
-    sudo -u swarnendu python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra cpplint grip --user
+    sudo -u swarnendu python3 -m pip install --upgrade pip pygments isort yapf jedi pylint importmagic pydocstyle setuptools yamllint cmake-language-server "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra cpplint grip konsave --user
 }
 
-# Install Nodejs
 install_node() {
     NODEJS_VER="18"
 
@@ -191,7 +188,7 @@ install_node() {
     npm init --yes
 
     # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver pyright unified-language-server prettier @prettier/plugin-php stylelint remark-language-server
+    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier @prettier/plugin-php @prettier/plugin-lua stylelint remark-language-server marksman vscode-langservers-extracted
 
     npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
@@ -204,7 +201,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="4.3.0"
+    TEXLAB_VER="4.3.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -237,7 +234,22 @@ create_symlinks() {
     fi
     echo "...Done"
 
+    if [ -d ".ctags.d" ]; then
+        if [ ! -L ".ctags.d" ]; then
+            echo "${CONFIG_DIR}/.ctags.d present and is not a symlink!"
+        else
+            echo "Overwriting symlink for .ctags.d..."
+            ln -nsf "$DOTFILES/ctags/dotctags.d" .
+        fi
+    else
+        echo "Creating symlink for .ctags.d..."
+        ln -s "$DOTFILES/ctags/dotctags.d" .
+    fi
+    echo "...Done"
+
     # CONFIG Directory
+
+    # FIXME: Avoid duplication by replacing with a function call
 
     CONFIG_DIR="${USER_HOME}/.config"
     if [ ! -d "${CONFIG_DIR}" ]; then
@@ -276,12 +288,23 @@ create_symlinks() {
             ln -nsf "$DOTFILES/yamllint" .
         fi
     else
-        echo "Creating symlink for yapf..."
+        echo "Creating symlink for yamllint..."
         ln -s "$DOTFILES/yamllint" .
     fi
     echo "...Done"
 
-    # FIXME: Add .ctags.d
+    if [ -d "alacritty" ]; then
+        if [ ! -L "alacritty" ]; then
+            echo "${CONFIG_DIR}/alacritty present and is not a symlink!"
+        else
+            echo "Overwriting symlink for alacritty..."
+            ln -nsf "$DOTFILES/alacritty" .
+        fi
+    else
+        echo "Creating symlink for alacritty..."
+        ln -s "$DOTFILES/alacritty" .
+    fi
+    echo "...Done"
 }
 
 # Shellcheck
@@ -372,7 +395,7 @@ install_global() {
 }
 
 install_alacritty() {
-    # ALACRITTY_VER="0.10.1"
+    # ALACRITTY_VER="0.11.0"
     # cd "$GITHUB"
     # wget https://github.com/alacritty/alacritty/archive/refs/tags/v"${ALACRITTY_VER}".tar.gz
     # tar xz alacritty-"${ALACRITTY_VER}".tar.gz
@@ -461,6 +484,7 @@ install_tmux() {
     chown -R $USER:$USER tmux
 
     cd tmux || echo "Failed: cd tmux"
+    git checkout 3.3a
     ./configure
     make
     make install
@@ -511,6 +535,7 @@ install_fzf() {
     fi
 
     cd fzf
+    git checkout 0.34.0
     bash ./install
 }
 

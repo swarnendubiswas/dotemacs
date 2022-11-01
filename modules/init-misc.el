@@ -53,10 +53,10 @@
   (("C-h C-m" . discover-my-major)
    ("C-h M-m" . discover-my-mode)))
 
-;; Manage minor-mode on the dedicated interface buffer
-(use-package manage-minor-mode
-  :commands
-  (manage-minor-mode))
+;; ;; Manage minor-mode on the dedicated interface buffer
+;; (use-package manage-minor-mode
+;;   :commands
+;;   (manage-minor-mode))
 
 (use-package expand-region ; Expand region by semantic units
   :bind
@@ -73,13 +73,13 @@
   :hook
   (after-init-hook . smart-mark-mode))
 
-;; Operate on the current line if no region is active
-(use-package whole-line-or-region
-  :commands
-  (whole-line-or-region-local-mode)
-  :hook
-  (after-init-hook . whole-line-or-region-global-mode)
-  :diminish whole-line-or-region-local-mode)
+;; ;; Operate on the current line if no region is active
+;; (use-package whole-line-or-region
+;;   :commands
+;;   (whole-line-or-region-local-mode)
+;;   :hook
+;;   (after-init-hook . whole-line-or-region-global-mode)
+;;   :diminish whole-line-or-region-local-mode)
 
 (use-package goto-last-change
   :bind
@@ -150,63 +150,63 @@
 ;;    ("C->"     . mc/mark-next-like-this)
 ;;    ("C-c C-<" . mc/mark-all-like-this)))
 
-;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
-;; Use `isearch', `swiper' will not work
-(use-package pdf-tools
-  :if (display-graphic-p)
-  :defines pdf-annot-activate-created-annotations
-  :commands
-  (pdf-tools-install pdf-loader-install pdf-view-mode
-                     pdf-annot-delete
-                     pdf-annot-add-highlight-markup-annotation
-                     pdf-annot-add-text-annotation)
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
-  ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
-  :magic ("%PDF" . pdf-view-mode)
-  :bind
-  (:map pdf-view-mode-map
-        ("j" . pdf-view-next-line-or-next-page)
-        ("k" . pdf-view-previous-line-or-previous-page)
-        ("n" . pdf-view-next-page-command)
-        ("p" . pdf-view-previous-page-command)
-        ("a" . pdf-view-first-page)
-        ("e" . pdf-view-last-page)
-        ("l" . pdf-view-goto-page)
-        ("P" . pdf-view-fit-page-to-window)
-        ("W" . pdf-view-fit-width-to-window)
-        ("H" . pdf-view-fit-height-to-window)
-        ("+" . pdf-view-enlarge)
-        ("-" . pdf-view-shrink)
-        ("r" . pdf-view-revert-buffer)
-        ("d" . pdf-annot-delete)
-        ("h" . pdf-annot-add-highlight-markup-annotation)
-        ("t" . pdf-annot-add-text-annotation)
-        ("M" . pdf-view-midnight-minor-mode))
-  :custom
-  (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
-  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
-  :config
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
+;; ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
+;; ;; Use `isearch', `swiper' will not work
+;; (use-package pdf-tools
+;;   :if (display-graphic-p)
+;;   :defines pdf-annot-activate-created-annotations
+;;   :commands
+;;   (pdf-tools-install pdf-loader-install pdf-view-mode
+;;                      pdf-annot-delete
+;;                      pdf-annot-add-highlight-markup-annotation
+;;                      pdf-annot-add-text-annotation)
+;;   :mode ("\\.pdf\\'" . pdf-view-mode)
+;;   ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
+;;   ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
+;;   :magic ("%PDF" . pdf-view-mode)
+;;   :bind
+;;   (:map pdf-view-mode-map
+;;         ("j" . pdf-view-next-line-or-next-page)
+;;         ("k" . pdf-view-previous-line-or-previous-page)
+;;         ("n" . pdf-view-next-page-command)
+;;         ("p" . pdf-view-previous-page-command)
+;;         ("a" . pdf-view-first-page)
+;;         ("e" . pdf-view-last-page)
+;;         ("l" . pdf-view-goto-page)
+;;         ("P" . pdf-view-fit-page-to-window)
+;;         ("W" . pdf-view-fit-width-to-window)
+;;         ("H" . pdf-view-fit-height-to-window)
+;;         ("+" . pdf-view-enlarge)
+;;         ("-" . pdf-view-shrink)
+;;         ("r" . pdf-view-revert-buffer)
+;;         ("d" . pdf-annot-delete)
+;;         ("h" . pdf-annot-add-highlight-markup-annotation)
+;;         ("t" . pdf-annot-add-text-annotation)
+;;         ("M" . pdf-view-midnight-minor-mode))
+;;   :custom
+;;   (pdf-annot-activate-created-annotations t  "Automatically annotate highlights")
+;;   (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
+;;   :config
+;;   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
-  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+;;   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
 
-  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
+;;   ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
+;;   (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
 
-;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
-(use-package saveplace-pdf-view
-  :after (pdf-tools saveplace)
-  :demand t)
+;; ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
+;; (use-package saveplace-pdf-view
+;;   :after (pdf-tools saveplace)
+;;   :demand t)
 
 ;; ;; LATER: Check for continuous scroll support with `pdf-tools'
 ;; (use-package image-roll
 ;;   :straight (image-roll :type git :host github
 ;;                         :repo "dalanicolai/image-roll.el"))
 
-(use-package logview
-  :commands
-  (logview-mode))
+;; (use-package logview
+;;   :commands
+;;   (logview-mode))
 
 (use-package wc-mode
   :commands
@@ -253,13 +253,13 @@
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 
-;; (use-package eldoc-box
-;;   :commands (eldoc-box-hover-at-point-mode)
-;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
-;;   :custom
-;;   (eldoc-box-clear-with-C-g t)
-;;   (eldoc-box-fringe-use-same-bg nil)
-;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+(use-package eldoc-box
+  :commands (eldoc-box-hover-at-point-mode)
+  :hook (eldoc-mode-hook . eldoc-box-hover-mode)
+  :custom
+  (eldoc-box-clear-with-C-g t)
+  (eldoc-box-fringe-use-same-bg nil)
+  :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package esup
   :if (bound-and-true-p sb/debug-init-file)
@@ -381,10 +381,10 @@
   (after-init-hook . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
 
-;; Use Emacsclient as the $EDITOR of child processes
-(use-package with-editor
-  :hook
-  (after-init-hook . shell-command-with-editor-mode))
+;; ;; Use Emacsclient as the $EDITOR of child processes
+;; (use-package with-editor
+;;   :hook
+;;   (after-init-hook . shell-command-with-editor-mode))
 
 (use-package unfill
   :commands
@@ -394,12 +394,6 @@
 (use-package info-colors
   :hook
   (Info-selection-hook . info-colors-fontify-node))
-
-;; Highlight and allow to open http links in strings and comments in buffers.
-(use-package goto-addr
-  :hook
-  ((prog-mode-hook . goto-address-prog-mode)
-   (text-mode-hook . goto-address-mode)))
 
 (use-package xclip
   :if (or (executable-find "xclip") (executable-find "xsel"))

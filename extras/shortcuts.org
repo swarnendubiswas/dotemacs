@@ -196,6 +196,25 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
   - ~C-c p E~ - Opens the root ~dir-locals-file~ of the project
   - ~C-c p C-h~ - Show all projectile keybindings ()
 
+** Deadgrep
+
+- ~C-c s d~ - Launch ~deadgrep~ (~deadgrep~)
+- ~RET~ - Visit the result, file or push button at point
+- ~o~ - Visit the result in another window
+- ~n~ and ~p~ - Move between results or buttons
+- ~N~ and ~P~ - Move between search hits
+- ~M-n~ and ~M-p~ - Move between file headers
+- ~S~ - Change the search term
+- ~T~ - Cycle through available search types: string, words, regexp
+- ~C~ - Cycle through case sensitivity types: smart, sensitive, ignore
+- ~I~ - Switch to incremental search, re-running on every keystroke
+- ~D~ - Change the search directory
+- ~^~ - Re-run the search in the parent directory
+- ~g~ - Re-run the search
+- ~TAB~ - Expand/collapse results for a file
+- ~C-c C-k~ - Stop a running search
+- ~C-u~ - A prefix argument prevents search commands from starting automatically
+
 ** LaTeX/AUCTeX
 
   - ~C-c @ C-n~ - Move to next heading (at any level) (~outline-next-visible-heading~)
