@@ -14,37 +14,37 @@
 ;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
 ;; performance is very poor, so I continue to prefer `auctex'.
 
-;; (use-package lsp-latex
-;;   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
-;;                                        lsp-latex-bibtex-formatter-line-length
-;;                                        lsp-latex-chktex-on-open-and-save
-;;                                        lsp-latex-build-on-save
-;;                                        lsp-latex-build-is-continuous
-;;                                        lsp-latex-build-args
-;;                                        lsp-latex-diagnostics-delay)
-;;   :hook
-;;   (latex-mode-hook . (lambda()
-;;                        (require 'lsp-latex)
-;;                        (lsp-deferred)))
-;;   :custom
-;;   (lsp-latex-bibtex-formatter             "latexindent")
-;;   (lsp-latex-latex-formatter              "latexindent")
-;;   (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-;;   (lsp-latex-chktex-on-open-and-save      t)
-;;   (lsp-latex-build-is-continuous          t)
-;;   ;; Delay time in milliseconds before reporting diagnostics
-;;   (lsp-latex-diagnostics-delay            2000)
-;;   :config
-;;   (add-to-list 'lsp-latex-build-args "-c")
-;;   (add-to-list 'lsp-latex-build-args "-pvc")
+(use-package lsp-latex
+  :if (eq sb/lsp-provider 'lsp-mode)
+  :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
+                                       lsp-latex-bibtex-formatter-line-length
+                                       lsp-latex-chktex-on-open-and-save
+                                       lsp-latex-build-on-save
+                                       lsp-latex-build-is-continuous
+                                       lsp-latex-build-args
+                                       lsp-latex-diagnostics-delay)
+  :hook
+  (latex-mode-hook . (lambda()
+                       (require 'lsp-latex)
+                       (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter             "latexindent")
+  (lsp-latex-latex-formatter              "latexindent")
+  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+  (lsp-latex-chktex-on-open-and-save      t)
+  (lsp-latex-build-is-continuous          t)
+  ;; Delay time in milliseconds before reporting diagnostics
+  (lsp-latex-diagnostics-delay            2000)
+  :config
+  (add-to-list 'lsp-latex-build-args "-c")
+  (add-to-list 'lsp-latex-build-args "-pvc")
 
-;;   ;; (lsp-register-client
-;;   ;;  (make-lsp-client
-;;   ;;   :new-connection (lsp-tramp-connection "texlab")
-;;   ;;   :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-;;   ;;   :remote? t
-;;   ;;   :server-id 'texlab-r))
-;;   )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection "texlab")
+    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+    :remote? t
+    :server-id 'texlab-r)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides

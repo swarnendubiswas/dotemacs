@@ -51,15 +51,14 @@
                     (flyspell-mode -1)
                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("yaml-language-server" "--stdio"))
-  ;;   :major-modes '(yaml-mode)
-  ;;   :remote? t
-  ;;   :server-id 'yamlls-r))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("yaml-language-server" "--stdio"))
+    :major-modes '(yaml-mode)
+    :remote? t
+    :server-id 'yamlls-r)))
 
 (use-package yaml-imenu
   :hook
@@ -73,15 +72,14 @@
                            ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :custom
   (css-indent-offset 2)
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("css-languageserver" "--stdio"))
-  ;;   :major-modes '(css-mode)
-  ;;   :remote? t
-  ;;   :server-id 'cssls-r))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("css-languageserver" "--stdio"))
+    :major-modes '(css-mode)
+    :remote? t
+    :server-id 'cssls-r)))
 
 (use-package make-mode
   :straight (:type built-in)
@@ -232,25 +230,24 @@
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    (lambda ()
-  ;;                      (list lsp-perl-language-server-path
-  ;;                            "-MPerl::LanguageServer" "-e"
-  ;;                            "Perl::LanguageServer::run" "--"
-  ;;                            (format "--port %d --version %s"
-  ;;                                    lsp-perl-language-server-port
-  ;;                                    lsp-perl-language-server-client-version))))
-  ;;   :major-modes '(perl-mode cperl-mode)
-  ;;   :remote? t
-  ;;   :initialized-fn (lambda (workspace)
-  ;;                     (with-lsp-workspace workspace
-  ;;                       (lsp--set-configuration
-  ;;                        (lsp-configuration-section "perl"))))
-  ;;   :priority -1
-  ;;   :server-id 'perlls-r))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (list lsp-perl-language-server-path
+                             "-MPerl::LanguageServer" "-e"
+                             "Perl::LanguageServer::run" "--"
+                             (format "--port %d --version %s"
+                                     lsp-perl-language-server-port
+                                     lsp-perl-language-server-client-version))))
+    :major-modes '(perl-mode cperl-mode)
+    :remote? t
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                        (lsp--set-configuration
+                         (lsp-configuration-section "perl"))))
+    :priority -1
+    :server-id 'perlls-r)))
 
 (use-package ant
   :commands
@@ -286,14 +283,13 @@
   :config
   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("bash-language-server" "start"))
-  ;;   :major-modes '(sh-mode)
-  ;;   :remote? t
-  ;;   :server-id 'bashls-r))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("bash-language-server" "start"))
+    :major-modes '(sh-mode)
+    :remote? t
+    :server-id 'bashls-r)))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -340,15 +336,14 @@
   (web-mode-code-indent-offset               2) ; Script
   (web-mode-style-padding                    2) ; For `<style>' tag
   (web-mode-script-padding                   2) ; For `<script>' tag
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("html-languageserver" "--stdio"))
-  ;;   :major-modes '(html-mode web-mode mhtml-mode)
-  ;;   :remote? t
-  ;;   :server-id 'htmlls-r))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("html-languageserver" "--stdio"))
+    :major-modes '(html-mode web-mode mhtml-mode)
+    :remote? t
+    :server-id 'htmlls-r)))
 
 (use-package emmet-mode
   :defines
@@ -378,14 +373,13 @@
   :config
   (fset 'xml-mode 'nxml-mode)
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("java" "-jar" lsp-xml-jar-file))
-  ;;   :major-modes '(xml-mode nxml-mode)
-  ;;   :remote? t
-  ;;   :server-id 'xmlls-r))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("java" "-jar" lsp-xml-jar-file))
+    :major-modes '(xml-mode nxml-mode)
+    :remote? t
+    :server-id 'xmlls-r)))
 
 (use-package json-mode
   :commands
@@ -402,15 +396,14 @@
                                         (setq js-indent-level 2)
                                         (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
                                               ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
-  ;; :config
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    '("vscode-json-languageserver" "--stdio"))
-  ;;   :major-modes '(json-mode jsonc-mode)
-  ;;   :remote? t
-  ;;   :server-id 'jsonls-r))
-  )
+  :config
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     '("vscode-json-languageserver" "--stdio"))
+    :major-modes '(json-mode jsonc-mode)
+    :remote? t
+    :server-id 'jsonls-r)))
 
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)

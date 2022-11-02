@@ -10,6 +10,14 @@
 (defvar sb/custom-file)
 (defvar sb/private-file)
 
+(setq custom-file sb/custom-file)
+
+(let ((gc-cons-threshold most-positive-fixnum))
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror 'nomessage))
+  (when (file-exists-p sb/private-file)
+    (load sb/private-file 'noerror 'nomessage)))
+
 ;; Mark safe variables
 
 ;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
@@ -29,14 +37,6 @@
 ;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
 ;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
 ;; (put 'tags-table-list                         'safe-local-variable #'listp)
-
-(setq custom-file sb/custom-file)
-
-(let ((gc-cons-threshold most-positive-fixnum))
-  (when (file-exists-p custom-file)
-    (load custom-file 'noerror 'nomessage))
-  (when (file-exists-p sb/private-file)
-    (load sb/private-file 'noerror 'nomessage)))
 
 ;; (defun sb/open-local-file-projectile (directory)
 ;;   "Open projectile file within DIRECTORY.

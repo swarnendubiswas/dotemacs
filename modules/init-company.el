@@ -9,9 +9,10 @@
 
 (defvar sb/capf)
 
-;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used. Try
-;; "M-x company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol'
-;; with regex search.
+;; Do not diminish company to see the backend used on the modeline with GUI Emacs. Otherwise, use
+;; "M-x company-diag" or the modeline status (without diminish) to see the backend used. Try "M-x
+;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
+;; regex search.
 
 (use-package company
   :if (eq sb/capf 'company)
@@ -39,7 +40,6 @@
   ;; "C-M-s"
   (("C-M-/"    . company-other-backend)
    :map company-active-map
-   ("C-j"      . company-search-candidates)
    ("C-n"      . company-select-next)
    ("C-p"      . company-select-previous)
    ;; Insert the common part of all candidates, or select the next one
@@ -53,7 +53,6 @@
   ;; Search in other buffers with the same major mode. This can cause performance overhead if
   ;; there are lots of open buffers.
   (company-dabbrev-other-buffers t)
-  (company-etags-ignore-case t)
   (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
@@ -62,27 +61,18 @@
   (company-show-quick-access t "Speed up completion")
   ;; Align additional metadata, like type signatures, to the right-hand side
   (company-tooltip-align-annotations t)
-  (company-frontends '(;; Always show candidates in overlay tooltip
-                       company-pseudo-tooltip-frontend
-                       ;; Show popup unless there is only one candidate
-                       ;; company-pseudo-tooltip-unless-just-one-frontend
-                       ;; Show in-place preview, which is too instrusive
-                       ;; company-preview-frontend
-                       ;; Show in-place preview if there is only choice
-                       ;; company-preview-if-just-one-frontend
-                       ;; Show selected candidate docs in echo area
-                       ;; company-echo-metadata-frontend
-                       ))
+  ;; Other choices are: "company-pseudo-tooltip-unless-just-one-frontend" which shows popup unless
+  ;; there is only one candidate, "company-preview-frontend" which shows the preview in-place which
+  ;; is too instrusive, "company-preview-if-just-one-frontend" shows in-place preview if there is
+  ;; only choice, and "company-echo-metadata-frontend" which shows selected candidate docs in echo
+  ;; area.
+  (company-frontends '(company-pseudo-tooltip-frontend)) ; Always show candidates in overlay tooltip
   (company-global-modes '(not dired-mode erc-mode message-mode
                               comint-mode inferior-python-mode
                               magit-status-mode help-mode
                               gud-mode eshell-mode shell-mode
                               csv-mode))
   :config
-  ;; FIXME: This is supposed to give better icons in TUI Emacs, but it does not work for me.
-  (unless (display-graphic-p)
-    (setq company-format-margin-function #'company-text-icons-margin))
-
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
@@ -91,10 +81,7 @@
         company-transformers)
   (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-  (add-to-list 'company-transformers 'delete-dups)
-
-  ;; :diminish
-  )
+  (add-to-list 'company-transformers 'delete-dups))
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.

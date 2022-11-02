@@ -371,30 +371,29 @@
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
   (lsp-grammarly-user-words '(Swarnendu
                               Biswas))
-  ;; :config
-  ;; (defvar lsp-grammarly-active-modes)
+  :config
+  (defvar lsp-grammarly-active-modes)
 
-  ;; SB: I prefer using Terminal Emacs over Tramp for editing remote files, which obviates the need
-  ;; for a remote langsever.
+  ;; Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote
+  ;; langsever.
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-  ;;   :priority -1
-  ;;   :remote? t
-  ;;   :add-on? t
-  ;;   :server-id 'grammarly-r
-  ;;   :download-server-fn (lambda (_client callback error-callback _update?)
-  ;;                         (lsp-package-ensure 'grammarly-ls callback error-callback))
-  ;;   :after-open-fn #'lsp-grammarly--init
-  ;;   :async-request-handlers
-  ;;   (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
-  ;;       ("$/getToken" #'lsp-grammarly--get-token)
-  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
-  ;;       ("$/showError" #'lsp-grammarly--show-error)
-  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+    :priority -1
+    :remote? t
+    :add-on? t
+    :server-id 'grammarly-r
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'grammarly-ls callback error-callback))
+    :after-open-fn #'lsp-grammarly--init
+    :async-request-handlers
+    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+        ("$/getToken" #'lsp-grammarly--get-token)
+        ("$/storeToken" #'lsp-grammarly--store-token)
+        ("$/showError" #'lsp-grammarly--show-error)
+        ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
 (use-package lsp-ltex
   :if (eq sb/lsp-provider 'lsp-mode)
@@ -428,29 +427,28 @@
 
   ;; (defvar lsp-ltex-active-modes)
 
-  ;; SB: I prefer using Terminal Emacs over Tramp for editing remote files, which obviates the need
-  ;; for a remote langsever.
+  ;; Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote
+  ;; langsever.
 
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection (lsp-tramp-connection
-  ;;                    "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
-  ;;   :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-  ;;   :priority -2
-  ;;   :add-on? t
-  ;;   :remote? t
-  ;;   :server-id 'ltex-r
-  ;;   :download-server-fn
-  ;;   (lambda (_client _callback error-callback _update?)
-  ;;     (lsp-package-ensure
-  ;;      'ltex-ls
-  ;;      (lambda ()
-  ;;        (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-  ;;          (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-  ;;                                     "-C" dest)
-  ;;            (error "Error during the unzip process: tar"))))
-  ;;      error-callback))))
-  )
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+    :priority -2
+    :add-on? t
+    :remote? t
+    :server-id 'ltex-r
+    :download-server-fn
+    (lambda (_client _callback error-callback _update?)
+      (lsp-package-ensure
+       'ltex-ls
+       (lambda ()
+         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
+                                      "-C" dest)
+             (error "Error during the unzip process: tar"))))
+       error-callback)))))
 
 (use-package consult-flycheck
   :if (eq sb/minibuffer-completion 'vertico)

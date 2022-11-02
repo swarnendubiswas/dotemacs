@@ -89,6 +89,10 @@
 ;;   :init
 ;;   (setq eglot-languagetool-server-path ""))
 
+(use-package eglot-java
+  :hook
+  (java-mode-hook . eglot-java-init))
+
 (provide 'init-eglot)
 
 ;;; init-eglot.el ends here
