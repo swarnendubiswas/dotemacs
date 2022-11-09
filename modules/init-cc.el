@@ -55,12 +55,13 @@
 
   (unbind-key "C-M-a" c-mode-map)
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "clangd")
-    :major-modes '(c-mode c++-mode)
-    :remote? t
-    :server-id 'clangd-r)))
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection "clangd")
+      :major-modes '(c-mode c++-mode)
+      :remote? t
+      :server-id 'clangd-r))))
 
 ;; Better highlight for modern C++
 (use-package modern-cpp-font-lock
@@ -92,12 +93,13 @@
                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
                              ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :config
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "cmake-language-server")
-    :major-modes '(cmake-mode)
-    :remote? t
-    :server-id 'cmakels-r)))
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-tramp-connection "cmake-language-server")
+      :major-modes '(cmake-mode)
+      :remote? t
+      :server-id 'cmakels-r))))
 
 ;; Advanced syntax coloring support for CMake scripts.
 (use-package cmake-font-lock

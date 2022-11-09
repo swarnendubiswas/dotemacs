@@ -358,6 +358,8 @@
 ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
 (use-package server
   :straight (:type built-in)
+  ;; There is no use keeping this enabled if I am not using the daemon.
+  :disabled t
   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
   :commands server-running-p
   :hook

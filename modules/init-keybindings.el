@@ -41,16 +41,16 @@
 
  ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
  ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
- ("C-c n" . comment-region)
- ("C-c m" . uncomment-region)
- ("C-c ;" . sb/comment-line)
- ("C-c b" . comment-box)
+ ("C-c n"     . comment-region)
+ ("C-c m"     . uncomment-region)
+ ("C-c ;"     . sb/comment-line)
+ ("C-c b"     . comment-box)
 
- ("C-s"   . save-buffer)
- ("C-S-s" . sb/save-all-buffers)
+ ("C-s"       . save-buffer)
+ ("C-S-s"     . sb/save-all-buffers)
 
- ("M-\\" . delete-horizontal-space)
- ("M-#"  . cycle-spacing))
+ ("M-\\"      . delete-horizontal-space)
+ ("M-#"       . cycle-spacing))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 

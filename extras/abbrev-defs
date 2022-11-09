@@ -1485,6 +1485,7 @@
     ("acess" "access" nil :count 0)
     ("acknowledgement" "Acknowledgment" nil :count 0)
     ("additionaly" "Additionally" nil :count 0)
+    ("adress" "address" nil :count 0)
     ("alloted" "allotted" nil :count 0)
     ("analaysis" "Analysis" nil :count 0)
     ("analyse" "analyze" nil :count 0)

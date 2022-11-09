@@ -280,8 +280,8 @@
 ;;   (explain-pause-mode explain-pause-top)
 ;;   :diminish)
 
-;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode
-;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings
+;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
+;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
 (use-package amx
   :commands
   (execute-extended-command-for-buffer)
@@ -410,13 +410,13 @@
   (:map prog-mode-map
         ("C-c C-u" . string-inflection-all-cycle)))
 
-(use-package procress
-  :straight
-  (:host github :repo "haji-ali/procress")
-  :hook
-  (LaTeX-mode-hook . procress-auctex-mode)
-  :config
-  (procress-load-default-svg-images))
+;; (use-package procress
+;;   :straight
+;;   (:host github :repo "haji-ali/procress")
+;;   :hook
+;;   (LaTeX-mode-hook . procress-auctex-mode)
+;;   :config
+;;   (procress-load-default-svg-images))
 
 ;; (use-package jgraph-mode
 ;;   :mode ("\\.jgr\\'" . jgraph-mode))
@@ -466,17 +466,17 @@
 
 ;;   (ignoramus-setup))
 
-(use-package transient-extras
-  :straight
-  (:host github :repo "haji-ali/transient-extras")
-  :demand t
-  :config
-  (require 'transient-extras-lp)
-  (with-eval-after-load "dired"
-    (bind-key "C-c C-p" #'transient-extras-lp-menu dired-mode-map))
-  ;; (with-eval-after-load "pdf-tools"
-  ;;   (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map))
-  )
+;; (use-package transient-extras
+;;   :straight
+;;   (:host github :repo "haji-ali/transient-extras")
+;;   :demand t
+;;   :config
+;;   (require 'transient-extras-lp)
+;;   (with-eval-after-load "dired"
+;;     (bind-key "C-c C-p" #'transient-extras-lp-menu dired-mode-map))
+;;   ;; (with-eval-after-load "pdf-tools"
+;;   ;;   (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map))
+;;   )
 
 (provide 'init-misc)
 

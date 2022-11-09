@@ -53,11 +53,9 @@
   ;; Search in other buffers with the same major mode. This can cause performance overhead if
   ;; there are lots of open buffers.
   (company-dabbrev-other-buffers t)
-  (company-ispell-available t)
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
-  (company-selection-wrap-around t)
   (company-show-quick-access t "Speed up completion")
   ;; Align additional metadata, like type signatures, to the right-hand side
   (company-tooltip-align-annotations t)
@@ -73,6 +71,7 @@
                               gud-mode eshell-mode shell-mode
                               csv-mode))
   :config
+  (add-to-list 'company-transformers 'delete-dups)
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
@@ -80,8 +79,7 @@
                            (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
   (add-to-list 'company-transformers 'company-sort-by-backend-importance)
-  (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-  (add-to-list 'company-transformers 'delete-dups))
+  (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix))
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, the width of the frame popup is often not enough and the right side gets cut off.
@@ -487,7 +485,7 @@
       (defvar company-backends)
 
       ;; Typing short prefixes help with faster completion and a more responsive UI
-      (setq-local company-minimum-prefix-length 3)
+      (setq-local company-minimum-prefix-length 2)
 
       (make-local-variable 'company-backends)
 
@@ -495,10 +493,9 @@
       (setq company-backends '(company-dirfiles
                                (:separate
                                 company-capf
-                                ;; company-citre
+                                company-citre
                                 company-dabbrev-code ; Useful for variable names
-                                :with company-yasnippet
-                                )
+                                :with company-yasnippet)
                                ;; (company-capf :with
                                ;;               company-dabbrev-code ; Useful for variable names
                                ;;               company-ctags
