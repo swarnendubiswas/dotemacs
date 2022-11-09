@@ -5,7 +5,7 @@
 
 * Notes
 
-** Notes about Emacs
+** GNU Emacs
 
 Emacs searches for the initiation files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
@@ -15,7 +15,9 @@ To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current 
 The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~ since they cause eager loading and
 are expensive. A cheaper alternative is to use ~autoload~.
 
-** Notes about Elisp
+** Elisp
+
+*** Lambda functions
 
 Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
 all equivalent.
@@ -23,42 +25,29 @@ all equivalent.
 - ~(function (lambda (x) (* x x)))~
 - ~#'(lambda (x) (* x x))~
 
-- https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
-
-- https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
+*** Backquotes
 
 Backquote constructs allow you to quote a list but selectively evaluate elements of that list.
 
 ~(1 2 (3 ,(+ 4 5))) => (1 2 (3 9))~
 
+- https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
+- https://emacs.stackexchange.com/questions/27007/backward-quote-what-does-it-mean-in-elisp
+
+*** Local variables
+
 A local variable specification takes the following form: ~;; -*- mode: MODENAME; VAR: VALUE; ... -*-~
 
-- [[https://alhassy.github.io/ElispCheatSheet/CheatSheet.pdf][Elisp Reference Sheet]]
-
-
-*** Difference between ~fboundp~ and ~functionp~
-
-~functionp~ tells you if its argument is a function value; ~fboundp~ tells you if a symbol has a function value bound to it.
+*** Appending to an alist
 
 #+begin_src elisp
-> (functionp 'car)
-t
-> (fboundp 'car)
-t
-> (functionp (lambda ()))
-t
-> (fboundp (lambda ()))
-​*** Eval error ***  Wrong type argument: symbolp, (closure (t) nil)
+   (setq auto-mode-alist (append
+                          '(("SCon\(struct\|script\)$" . python-mode)
+                            ("SConscript\\'" . python-mode)
+                            ("[./]flake8\\'" . conf-mode)
+                            ("/Pipfile\\'" . conf-mode))
+                          auto-mode-alist))
 #+end_src
-
-
-** Useful Information
-
-*** Avoid activating certain packages with package initialize
-
-Set ~(setq package-load-list '((org-journal nil) all))~ before invoking ~package-initialize~
-
-https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-manager-from-loading-a-single-package-on-startu
 
 *** Check if a variable/function/feature is defined or loaded
 
@@ -82,6 +71,42 @@ The equivalent version with ~with-eval-after-load~ would be:
   (setq foo 42)
   (setq bar 17))
 #+END_SRC
+
+- [[https://alhassy.github.io/ElispCheatSheet/CheatSheet.pdf][Elisp Reference Sheet]]
+
+*** Difference between ~fboundp~ and ~functionp~
+
+~functionp~ tells you if its argument is a function value; ~fboundp~ tells you if a symbol has a function value bound to it.
+
+#+begin_src elisp
+> (functionp 'car)
+t
+> (fboundp 'car)
+t
+> (functionp (lambda ()))
+t
+> (fboundp (lambda ()))
+​*** Eval error ***  Wrong type argument: symbolp, (closure (t) nil)
+#+end_src
+
+*** [[https://occasionallycogent.com/emacs_advice/index.html][Using Emacs advice]]
+
+*** Difference between ~setq~ and ~custom~
+
+https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variables/
+
+*** Difference between ~push~ and ~add-to-list~
+
+~add-to-list~ adds elements to the front of a list. ~add-to-list~ is almost always preferable to ~push~ because ~push~ adds an element to a list even if it is already in the list, whereas ~add-to-list~ will not.
+
+
+** Useful Information
+
+*** Avoid activating certain packages with package initialize
+
+Set ~(setq package-load-list '((org-journal nil) all))~ before invoking ~package-initialize~
+
+https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-manager-from-loading-a-single-package-on-startu
 
 *** Enable major mode per project via directory-local variables
 
@@ -107,16 +132,6 @@ The equivalent version with ~with-eval-after-load~ would be:
                  (prettier-mode)))
             nil t))
 #+END_SRC
-
-*** [[https://occasionallycogent.com/emacs_advice/index.html][Using Emacs advice]]
-
-*** Difference between ~setq~ and ~custom~
-
-https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variables/
-
-*** Difference between ~push~ and ~add-to-list~
-
-~add-to-list~ adds elements to the front of a list. ~add-to-list~ is almost always preferable to ~push~ because ~push~ adds an element to a list even if it is already in the list, whereas ~add-to-list~ will not.
 
 ** Reference Configurations
 

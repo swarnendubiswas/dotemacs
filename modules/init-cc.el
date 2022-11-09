@@ -85,13 +85,15 @@
   :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
   (cmake-mode-hook . (lambda ()
-                       ;; Disable text checkers
-                       (make-local-variable 'lsp-disabled-clients)
-                       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                        (spell-fu-mode -1)
                        (flyspell-mode -1)
                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                             ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+                             ((eq sb/lsp-provider 'lsp-mode)
+                              (progn
+                                ;; Disable text checkers
+                                (make-local-variable 'lsp-disabled-clients)
+                                (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                                (lsp-deferred))))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client

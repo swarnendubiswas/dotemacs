@@ -46,15 +46,6 @@
   :config
   (setenv "PYTHONPATH" "python3")
 
-  ;; (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (python-pylint))))))
-
-  ;; (setq auto-mode-alist (append
-  ;;                        '(("SCon\(struct\|script\)$" . python-mode)
-  ;;                          ("SConscript\\'" . python-mode)
-  ;;                          ("[./]flake8\\'" . conf-mode)
-  ;;                          ("/Pipfile\\'" . conf-mode))
-  ;;                        auto-mode-alist))
-
   (with-eval-after-load "lsp-mode"
     (defvar lsp-pylsp-configuration-sources)
     (defvar lsp-pylsp-plugins-autopep8-enable)
@@ -147,15 +138,16 @@
   (python-isort-arguments '("--stdout" "--atomic" "-l 100" "--up" "--tc" "-")))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
-;; used. We do not use `lsp-format-buffer' since `pyright' does not support document formatting.
+;; used. We do not use `lsp-format-buffer' or `eglot-format-buffer' since `pyright' does not support
+;; document formatting.
 (use-package yapfify
   :if (executable-find "yapf")
   :hook
   (python-mode-hook . yapf-mode)
   :diminish yapf-mode)
 
-;; Install with "python3 -m pip install -U pyright --user". Create stubs with "pyright --createstub
-;; pandas".
+;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
+;; --createstub pandas".
 (use-package lsp-pyright
   :if (and (eq sb/lsp-provider 'lsp-mode) (eq sb/python-langserver 'pyright)
            (executable-find "pyright"))
@@ -168,35 +160,33 @@
   (lsp-pyright-typechecking-mode "basic")
   (lsp-pyright-auto-import-completions t)
   (lsp-pyright-auto-search-paths t)
-
   :config
-  (when (eq sb/lsp-provider 'lsp-mode)
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       (lambda ()
-                         (cons "pyright-langserver"
-                               lsp-pyright-langserver-command-args)))
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'pyright-r
-      :multi-root lsp-pyright-multi-root
-      :priority 3
-      :initialization-options (lambda ()
-                                (ht-merge (lsp-configuration-section "pyright")
-                                          (lsp-configuration-section "python")))
-      :initialized-fn (lambda (workspace)
-                        (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (ht-merge (lsp-configuration-section "pyright")
-                                                       (lsp-configuration-section "python")))))
-      :download-server-fn (lambda (_client callback error-callback _update?)
-                            (lsp-package-ensure 'pyright callback error-callback))
-      :notification-handlers
-      (lsp-ht
-       ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
-       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-       ("pyright/endProgress"    'lsp-pyright--end-progress-callback))))))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-tramp-connection
+                     (lambda ()
+                       (cons "pyright-langserver"
+                             lsp-pyright-langserver-command-args)))
+    :major-modes '(python-mode)
+    :remote? t
+    :server-id 'pyright-r
+    :multi-root lsp-pyright-multi-root
+    :priority 3
+    :initialization-options (lambda ()
+                              (ht-merge (lsp-configuration-section "pyright")
+                                        (lsp-configuration-section "python")))
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
+    :download-server-fn (lambda (_client callback error-callback _update?)
+                          (lsp-package-ensure 'pyright callback error-callback))
+    :notification-handlers
+    (lsp-ht
+     ("pyright/beginProgress"  'lsp-pyright--begin-progress-callback)
+     ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+     ("pyright/endProgress"    'lsp-pyright--end-progress-callback)))))
 
 (provide 'init-python)
 
