@@ -75,6 +75,7 @@
 ;;               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
+
 (use-package citre
   :preface
   (defun sb/citre-jump+ ()

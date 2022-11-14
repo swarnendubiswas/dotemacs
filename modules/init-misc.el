@@ -253,13 +253,13 @@
 
 ;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 
-(use-package eldoc-box
-  :commands (eldoc-box-hover-at-point-mode)
-  :hook (eldoc-mode-hook . eldoc-box-hover-mode)
-  :custom
-  (eldoc-box-clear-with-C-g t)
-  (eldoc-box-fringe-use-same-bg nil)
-  :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+;; (use-package eldoc-box
+;;   :commands (eldoc-box-hover-at-point-mode)
+;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
+;;   :custom
+;;   (eldoc-box-clear-with-C-g t)
+;;   (eldoc-box-fringe-use-same-bg nil)
+;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
 (use-package esup
   :if (bound-and-true-p sb/debug-init-file)

@@ -196,12 +196,12 @@ or the major mode is not in `sb/skippable-modes'."
         (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
-(defun sb/compile-and-run-c-program ()
-  "Run C programs directly from within Emacs."
-  (interactive)
-  (defvar sb/foo)
-  (setq sb/foo (concat "gcc " (buffer-name) " && ./a.out" ))
-  (shell-command sb/foo))
+;; (defun sb/compile-and-run-c-program ()
+;;   "Run C programs directly from within Emacs."
+;;   (interactive)
+;;   (defvar sb/foo)
+;;   (setq sb/foo (concat "gcc " (buffer-name) " && ./a.out" ))
+;;   (shell-command sb/foo))
 
 ;; http://mbork.pl/2022-06-20_Copying_the_current_location
 (defun sb/current-location ()

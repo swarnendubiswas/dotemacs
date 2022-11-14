@@ -28,7 +28,7 @@
   (eglot-autoshutdown t)
   :config
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq eglot-stay-out-of '(flymake company))
+  (setq eglot-stay-out-of '(flymake company eldoc))
   ;; FIXME: Use hooks
   ;; https://github.com/joaotavora/eglot/discussions/875
   (setq-default eglot-workspace-configuration '((pylsp
