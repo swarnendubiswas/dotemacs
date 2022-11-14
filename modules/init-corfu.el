@@ -54,6 +54,9 @@
   (corfu-echo-documentation t)
   (corfu-max-width 60)
   :config
+  (add-hook 'prog-mode-hook (lambda ()
+                              (setq-local corfu-auto-prefix 2)))
+
   (with-eval-after-load "prescient"
     (setq corfu-sort-function #'prescient-sort
           corfu-sort-override-function #'prescient-sort)
@@ -91,7 +94,6 @@
   :straight
   (corfu :files (:defaults "extensions/*")
          :includes (corfu-history))
-  :disabled t
   :after (corfu savehist)
   :commands corfu-history-mode
   :init
@@ -192,60 +194,61 @@
                                             #'cape-dabbrev
                                             #'cape-dict)))))
 
-  (add-hook 'sh-mode-hook
-            (lambda ()
-              (add-hook 'lsp-managed-mode-hook
-                        (lambda ()
-                          (setq-local completion-at-point-functions
-                                      (list
-                                       (cape-super-capf #'lsp-completion-at-point
-                                                        #'citre-completion-at-point
-                                                        #'sh-completion-at-point-function
-                                                        #'comint-completion-at-point
-                                                        #'cape-file
-                                                        #'cape-dabbrev
-                                                        #'cape-dict)))))))
-
-  (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
-    (add-hook lsp-prog-modes
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (add-hook 'sh-mode-hook
               (lambda ()
                 (add-hook 'lsp-managed-mode-hook
-                          (lambda()
-                            (setq-local completion-at-point-functions
-                                        (list
-                                         #'lsp-completion-at-point
-                                         #'citre-completion-at-point
-                                         #'tags-completion-at-point-function
-                                         #'cape-file
-                                         #'cape-keyword
-                                         (cape-super-capf #'cape-dabbrev
-                                                          #'cape-dict
-                                                          #'cape-ispell))))))))
-
-  ;; (add-hook 'prog-mode-hook
-  ;;           (lambda ()
-  ;;             ;; (unless (derived-mode-p 'emacs-lisp-mode)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-  ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)))
-
-  (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook modes
-              (lambda ()
-                (add-hook 'lsp-managed-mode-hook
-                          (lambda()
+                          (lambda ()
                             (setq-local completion-at-point-functions
                                         (list
                                          (cape-super-capf #'lsp-completion-at-point
                                                           #'citre-completion-at-point
-                                                          #'TeX--completion-at-point
-                                                          #'cape-tex
+                                                          #'sh-completion-at-point-function
+                                                          #'comint-completion-at-point
                                                           #'cape-file
                                                           #'cape-dabbrev
-                                                          #'cape-dict
-                                                          #'cape-ispell))))))))
+                                                          #'cape-dict)))))))
+
+    (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
+      (add-hook lsp-prog-modes
+                (lambda ()
+                  (add-hook 'lsp-managed-mode-hook
+                            (lambda()
+                              (setq-local completion-at-point-functions
+                                          (list
+                                           #'lsp-completion-at-point
+                                           #'citre-completion-at-point
+                                           #'tags-completion-at-point-function
+                                           #'cape-file
+                                           #'cape-keyword
+                                           (cape-super-capf #'cape-dabbrev
+                                                            #'cape-dict
+                                                            #'cape-ispell))))))))
+
+    ;; (add-hook 'prog-mode-hook
+    ;;           (lambda ()
+    ;;             ;; (unless (derived-mode-p 'emacs-lisp-mode)
+    ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
+    ;;             (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+    ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
+    ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
+    ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)))
+
+    (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
+      (add-hook modes
+                (lambda ()
+                  (add-hook 'lsp-managed-mode-hook
+                            (lambda()
+                              (setq-local completion-at-point-functions
+                                          (list
+                                           (cape-super-capf #'lsp-completion-at-point
+                                                            #'citre-completion-at-point
+                                                            #'TeX--completion-at-point
+                                                            #'cape-tex
+                                                            #'cape-file
+                                                            #'cape-dabbrev
+                                                            #'cape-dict
+                                                            #'cape-ispell)))))))))
 
   ;; (add-hook 'LaTeX-mode-hook
   ;;           (lambda ()
@@ -280,12 +283,10 @@
   :demand t
   :commands kind-icon-margin-formatter
   :custom
-  (kind-icon-face 'corfu-default)
   (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
   ;; Prefer smaller icons and a more compact popup
   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
   (kind-icon-blend-background nil)
-  (kind-icon-blend-frac 0.08)
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 

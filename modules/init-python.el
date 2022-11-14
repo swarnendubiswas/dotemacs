@@ -113,20 +113,20 @@
                                  (lambda ()
                                    (setq python-shell-interpreter "python3")))))
 
-;; FIXME: There is an error in passing options to isort
-(use-package py-isort
-  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  :disabled t
-  :commands
-  (py-isort-before-save py-isort-buffer py-isort-region)
-  :hook
-  (python-mode-hook . (lambda ()
-                        (add-hook 'before-save-hook #'py-isort-before-save)))
-  :custom
-  (py-isort-options '("-l 100"
-                      "--up" ; Use parentheses
-                      "--tc" ; Use a trailing comma on multiline imports
-                      )))
+;; ;; FIXME: There is an error in passing options to isort
+;; (use-package py-isort
+;;   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
+;;   :disabled t
+;;   :commands
+;;   (py-isort-before-save py-isort-buffer py-isort-region)
+;;   :hook
+;;   (python-mode-hook . (lambda ()
+;;                         (add-hook 'before-save-hook #'py-isort-before-save)))
+;;   :custom
+;;   (py-isort-options '("-l 100"
+;;                       "--up" ; Use parentheses
+;;                       "--tc" ; Use a trailing comma on multiline imports
+;;                       )))
 
 (use-package python-isort
   :straight

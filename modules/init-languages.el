@@ -45,12 +45,14 @@
                   (lambda ()
                     ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
                     ;; checking.
-                    (make-local-variable 'lsp-disabled-clients)
-                    (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                     (spell-fu-mode -1)
                     (flyspell-mode -1)
                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                          ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+                          ((eq sb/lsp-provider 'lsp-mode)
+                           (progn
+                             (make-local-variable 'lsp-disabled-clients)
+                             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                             (lsp-deferred))))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
@@ -129,12 +131,12 @@
   (llvm-mode)
   :mode "\\.ll\\'")
 
-(use-package tablegen-mode
-  :straight nil
-  :load-path "extras"
-  :commands
-  (tablegen-mode)
-  :mode "\\.td\\'")
+;; (use-package tablegen-mode
+;;   :straight nil
+;;   :load-path "extras"
+;;   :commands
+;;   (tablegen-mode)
+;;   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
   :commands
@@ -208,19 +210,19 @@
   :commands
   markdown-preview-mode)
 
-;; Requires support for xwidget
-(use-package markdown-xwidget
-  :straight (markdown-xwidget :type git :host github
-                              :repo "cfclrk/markdown-xwidget" :files (:defaults "resources"))
-  :after markdown-mode
-  :bind
-  (:map markdown-mode-command-map ; Use "C-c C-c x"
-        ("x" . markdown-xwidget-preview-mode))
-  :custom
-  (markdown-xwidget-command "pandoc")
-  (markdown-xwidget-github-theme "light")
-  (markdown-xwidget-mermaid-theme "default")
-  (markdown-xwidget-code-block-theme "default"))
+;; ;; Requires support for xwidget
+;; (use-package markdown-xwidget
+;;   :straight (markdown-xwidget :type git :host github
+;;                               :repo "cfclrk/markdown-xwidget" :files (:defaults "resources"))
+;;   :after markdown-mode
+;;   :bind
+;;   (:map markdown-mode-command-map ; Use "C-c C-c x"
+;;         ("x" . markdown-xwidget-preview-mode))
+;;   :custom
+;;   (markdown-xwidget-command "pandoc")
+;;   (markdown-xwidget-github-theme "light")
+;;   (markdown-xwidget-mermaid-theme "default")
+;;   (markdown-xwidget-code-block-theme "default"))
 
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
@@ -261,10 +263,10 @@
   (autodisass-java-bytecode)
   :mode "\\.class\\'")
 
-(use-package groovy-mode ; Syntax highlighting for Gradle files
-  :commands
-  (groovy-mode)
-  :mode "\\.gradle\\'")
+;; (use-package groovy-mode ; Syntax highlighting for Gradle files
+;;   :commands
+;;   (groovy-mode)
+;;   :mode "\\.gradle\\'")
 
 (use-package sh-script ; Shell script mode
   :straight (:type built-in)
@@ -366,12 +368,14 @@
   (nxml-mode-hook . (lambda ()
                       ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
                       ;; checking.
-                      (make-local-variable 'lsp-disabled-clients)
-                      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
                       (spell-fu-mode -1)
                       (flyspell-mode -1)
                       (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                            ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+                            ((eq sb/lsp-provider 'lsp-mode)
+                             (progn
+                               (make-local-variable 'lsp-disabled-clients)
+                               (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+                               (lsp-deferred))))))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -400,8 +404,8 @@
   ((json-mode-hook jsonc-mode-hook) . (lambda ()
                                         (make-local-variable 'js-indent-level)
                                         (setq js-indent-level 2)
-                                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                                              ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+                                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure)))
+                                        ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
@@ -435,12 +439,12 @@
 ;;   :hook
 ;;   (protobuf-mode-hook . flycheck-mode))
 
-(use-package mlir-mode
-  :straight nil
-  :commands
-  (mlir-mode)
-  :load-path "extras"
-  :mode "\\.mlir\\'")
+;; (use-package mlir-mode
+;;   :straight nil
+;;   :commands
+;;   (mlir-mode)
+;;   :load-path "extras"
+;;   :mode "\\.mlir\\'")
 
 (use-package dotenv-mode
   :mode "\\.env\\'")
@@ -464,10 +468,10 @@
   :hook
   (ssh-config-mode-hook . turn-on-font-lock))
 
-(use-package elf-mode
-  :mode
-  (("\\.so\\'"  . elf-mode)
-   ("\\.a\\'"   . elf-mode)))
+;; (use-package elf-mode
+;;   :mode
+;;   (("\\.so\\'"  . elf-mode)
+;;    ("\\.a\\'"   . elf-mode)))
 
 (provide 'init-languages)
 

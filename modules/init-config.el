@@ -69,7 +69,7 @@
   :group 'sb/emacs)
 
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -186,7 +186,7 @@ This location is used for temporary installations and files.")
 ;; configurable and we also have `company-dict'.
 
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)
@@ -223,7 +223,7 @@ Prefer the straight.el package manager instead."
   :group 'dotemacs)
 
 (defcustom sb/corfu-icons
-  'kind-icon
+  'kind-all-the-icons
   "Choose the provider for Corfu icons."
   :type '(radio
           (const :tag "kind-icon" kind-icon)
