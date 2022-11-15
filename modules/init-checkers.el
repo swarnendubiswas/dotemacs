@@ -12,8 +12,6 @@
 (defvar sb/textlint-directory)
 (defvar sb/minibuffer-completion)
 
-(declare-function lsp-register-client "lsp-mode")
-(declare-function make-lsp-client "lsp-mode")
 (declare-function f-dirname "f")
 
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
@@ -345,110 +343,6 @@
         flycheck-checkers (delete 'languagetool flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'languagetool t))
-
-;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
-;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
-;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
-;; keytar-install".
-
-(use-package lsp-grammarly
-  :if (eq sb/lsp-provider 'lsp-mode)
-  :defines
-  (lsp-grammarly-active-modes lsp-grammarly-user-words)
-  :commands
-  (lsp-grammarly--server-command lsp-grammarly--init
-                                 lsp-grammarly--get-credentials
-                                 lsp-grammarly--get-token
-                                 lsp-grammarly--store-token
-                                 lsp-grammarly--show-error
-                                 lsp-grammarly--update-document-state)
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
-  :custom
-  (lsp-grammarly-suggestions-oxford-comma t)
-  (lsp-grammarly-suggestions-passive-voice t)
-  (lsp-grammarly-suggestions-informal-pronouns-academic t)
-  (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
-  (lsp-grammarly-user-words '(Swarnendu
-                              Biswas))
-  :config
-  (defvar lsp-grammarly-active-modes)
-
-  ;; Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote
-  ;; langsever.
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-    :priority -1
-    :remote? t
-    :add-on? t
-    :server-id 'grammarly-r
-    :download-server-fn (lambda (_client callback error-callback _update?)
-                          (lsp-package-ensure 'grammarly-ls callback error-callback))
-    :after-open-fn #'lsp-grammarly--init
-    :async-request-handlers
-    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
-        ("$/getToken" #'lsp-grammarly--get-token)
-        ("$/storeToken" #'lsp-grammarly--store-token)
-        ("$/showError" #'lsp-grammarly--show-error)
-        ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
-
-(use-package lsp-ltex
-  :if (eq sb/lsp-provider 'lsp-mode)
-  :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
-  :commands
-  (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
-  :custom
-  ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
-  (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
-  (lsp-ltex-check-frequency "save")
-  (lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64")
-  (lsp-ltex-version "15.2.0")
-  (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
-  :config
-  ;; https://github.com/ggbaker/doom-emacs-config/blob/main/config.el
-  ;; https://github.com/emacs-languagetool/lsp-ltex/issues/5
-  ;; https://www.reddit.com/r/emacs/comments/ril2m4/comment/hqqbxbm/
-
-  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
-  ;; Furthermore, we also use `flyspell' and `spell-fu'.
-
-  (setq lsp-ltex-disabled-rules
-        #s(hash-table size 30 data
-                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
-
-  ;; (setq lsp-ltex-disabled-rules
-  ;;       (json-parse-string
-  ;;        "{\"en-US\": [\"MORFOLOGIK_RULE_EN_US\"]}"))
-
-  ;; (defvar lsp-ltex-active-modes)
-
-  ;; Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote
-  ;; langsever.
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-    :priority -2
-    :add-on? t
-    :remote? t
-    :server-id 'ltex-r
-    :download-server-fn
-    (lambda (_client _callback error-callback _update?)
-      (lsp-package-ensure
-       'ltex-ls
-       (lambda ()
-         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-                                      "-C" dest)
-             (error "Error during the unzip process: tar"))))
-       error-callback)))))
 
 (use-package consult-flycheck
   :if (eq sb/minibuffer-completion 'vertico)
