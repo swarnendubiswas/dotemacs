@@ -20,23 +20,24 @@
   (prog-mode-hook . subword-mode)
   :diminish)
 
-(use-package outline ; Edit outlines
-  ;; :hook
-  ;; (prog-mode-hook . outline-minor-mode)
-  :diminish outline-minor-mode)
+;; (use-package outline ; Edit outlines
+;;   ;; :hook
+;;   ;; (prog-mode-hook . outline-minor-mode)
+;;   :diminish outline-minor-mode)
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
-(use-package hideshow
-  :straight (:type built-in)
-  :commands
-  (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-  ;; :hook
-  ;; ;; Hideshow is not defined for `ini-mode'.
-  ;; ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
-  :custom
-  (hs-isearch-open t "Open all folds while searching")
-  :diminish hs-minor-mode)
+
+;; (use-package hideshow
+;;   :straight (:type built-in)
+;;   :commands
+;;   (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+;;   ;; :hook
+;;   ;; ;; Hideshow is not defined for `ini-mode'.
+;;   ;; ((python-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook) . hs-minor-mode)
+;;   :custom
+;;   (hs-isearch-open t "Open all folds while searching")
+;;   :diminish hs-minor-mode)
 
 (use-package symbol-overlay ; Highlight symbol under point
   :commands

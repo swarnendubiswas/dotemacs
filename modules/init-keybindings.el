@@ -18,7 +18,7 @@
 (declare-function sb/switch-to-scratch "init-functions")
 (declare-function sb/counsel-all-files-recursively "init-functions")
 
-;; "<f10" and "<f11>" conflict with Gnome window manager keybindings
+;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)
@@ -92,8 +92,8 @@
   :hook
   (after-init-hook . which-key-mode)
   :custom
-  ;; Allow "C-h" to trigger `which-key' before it is done automatically
-  (which-key-show-early-on-C-h nil)
+  ;; ;; Allow "C-h" to trigger `which-key' before it is done automatically
+  ;; (which-key-show-early-on-C-h nil)
   (which-key-sort-order 'which-key-key-order-alpha)
   :config
   (which-key-setup-side-window-right-bottom)
@@ -103,9 +103,10 @@
   :if (display-graphic-p)
   :hook
   (which-key-mode-hook . which-key-posframe-mode)
-  :custom
+  ;; :custom
   ;; Thicker border makes the posframe easier to distinguish
-  (which-key-posframe-border-width 2))
+  ;; (which-key-posframe-border-width 2)
+  )
 
 ;; ;; Hydras, https://github.com/abo-abo/hydra
 

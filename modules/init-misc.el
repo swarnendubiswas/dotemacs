@@ -338,16 +338,18 @@
   (setq-default bm-buffer-persistence t))
 
 (use-package crux
-  :demand t
+  ;; :demand t
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
    ("C-c d s" . crux-sudo-edit)
-   ("C-a"     . crux-move-beginning-of-line))
-  :config
-  (crux-with-region-or-buffer indent-region)
-  (crux-with-region-or-buffer untabify)
-  (crux-with-region-or-line   comment-or-uncomment-region))
+   ;; ("C-a"     . crux-move-beginning-of-line)
+   )
+  ;; :config
+  ;; (crux-with-region-or-buffer indent-region)
+  ;; (crux-with-region-or-buffer untabify)
+  ;; (crux-with-region-or-line   comment-or-uncomment-region)
+  )
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
 (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash

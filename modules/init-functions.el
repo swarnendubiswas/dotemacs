@@ -107,15 +107,13 @@ Increase line spacing by two line height."
 ;; You need to check for either major modes or buffer names, since a few major modes are commonly
 ;; used.
 (defcustom sb/skippable-buffers
-  '(
-    "TAGS" "*Messages*" "*Backtrace*" "*scratch*"
-    ;; "*company-documentation*" ; Major mode is `python-mode'
-    ;; "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*" "*Compile-Log* *lsp-log*"
-    ;; "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*" "*perl-language-server*"
-    ;; "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*"
-    ;; "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*"
-    ;; "*clangd::stderr*" "*shfmt errors*"
-    )
+  '("TAGS" "*Messages*" "*Backtrace*" "*scratch*"
+    "*company-documentation*" ; Major mode is `python-mode'
+    "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*" "*Compile-Log* *lsp-log*"
+    "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*" "*perl-language-server*"
+    "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*"
+    "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*"
+    "*clangd::stderr*" "*shfmt errors*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
   :type  '(repeat string)
   :group 'sb/emacs)
