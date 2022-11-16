@@ -290,6 +290,14 @@
   ;;                         (ivy-rich-candidate (:width 0.75))))
   )
 
+(use-package counsel-fd ; Counsel interface for fd
+  :when
+  (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
+  :bind
+  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
+   ;; Jump to a file below the current directory
+   ("C-x f" . counsel-fd-file-jump)))
+
 (provide 'init-ivy)
 
 ;;; init-ivy.el ends here

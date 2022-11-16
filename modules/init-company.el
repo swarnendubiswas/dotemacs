@@ -493,7 +493,7 @@
       (setq company-backends '(company-dirfiles
                                (:separate
                                 company-capf
-                                company-citre
+                                ;; company-citre
                                 company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet)
                                ;; (company-capf :with

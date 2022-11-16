@@ -45,7 +45,6 @@
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
   :if (eq sb/project-handler 'projectile)
-  :after projectile
   :hook
   (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
@@ -56,14 +55,6 @@
   (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
   :custom
   (all-the-icons-ibuffer-icon-size 0.8))
-
-(use-package counsel-fd ; Counsel interface for fd
-  :when
-  (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
-  :bind
-  (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
-   ;; Jump to a file below the current directory
-   ("C-x f" . counsel-fd-file-jump)))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t
@@ -130,23 +121,6 @@
   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t)))
 
-;; ;; Learn about display actions, see [[info:elisp#Display Action Functions]]
-;; ;; https://emacs.stackexchange.com/questions/22499/how-can-i-tell-emacs-to-always-open-help-buffers-in-the-current-window
-;; (add-to-list 'display-buffer-alist '("*Faces*"                  display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*Flycheck checkers*"      display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*Flycheck errors*"        display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*Help*"                   display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*Bufler*"                 display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*manage-minor-mode*"      display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*use-package statistics*" display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("^\\*deadgrep*"            display-buffer-same-window))
-;; ;; Open shell in same window.
-;; (add-to-list 'display-buffer-alist `(,(regexp-quote "*shell")   display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("^\\*Compile-Log\\*"       display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("^\\*Warnings\\*"          display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("^\\*Backtrace\\*"         display-buffer-same-window))
-;; (add-to-list 'display-buffer-alist '("*Async Shell Command*"    display-buffer-no-window))
-
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
   :bind
@@ -158,7 +132,8 @@
   (add-to-list 'aw-ignored-buffers "*toc*")
   (ace-window-display-mode 1))
 
-;; The keybinding will be hidden if we use tmux, and we will need to press twice.
+;; The keybinding will be hidden if we use tmux with its default prefix key, and we will need to
+;; press twice.
 (use-package ace-jump-buffer
   :bind
   ("C-b" . ace-jump-buffer)
@@ -177,8 +152,8 @@
   (after-init-hook . super-save-mode)
   :custom
   (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
-  (super-save-triggers '(other-window windmove-up windmove-down
-                                      windmove-left windmove-right ace-window))
+  :config
+  (add-to-list 'super-save-triggers 'ace-window)
   :diminish)
 
 (provide 'init-buffer)
