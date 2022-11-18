@@ -64,25 +64,24 @@
     (defvar lsp-pylsp-plugins-flake8-enabled)
     (defvar lsp-pylsp-plugins-jedi-use-pyenv-environment)
 
-    (when (eq sb/python-langserver 'pylsp)
-      (setq lsp-pylsp-configuration-sources ["setup.cfg"]
-            lsp-pylsp-plugins-mccabe-enabled nil
-            ;; We can also set this per-project
-            lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
-            lsp-pylsp-plugins-pycodestyle-enabled nil
-            lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
-            lsp-pylsp-plugins-pydocstyle-convention "pep257"
-            lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-            lsp-pylsp-plugins-pyflakes-enabled nil
-            lsp-pylsp-plugins-pylint-args (vconcat
-                                           (list "-j 2"
-                                                 (concat "--rcfile="
-                                                         (expand-file-name ".config/pylintrc"
-                                                                           sb/user-home-directory))))
-            lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
-            lsp-pylsp-plugins-yapf-enabled t
-            lsp-pylsp-plugins-flake8-enabled nil
-            lsp-pylsp-plugins-jedi-use-pyenv-environment t))))
+    (setq lsp-pylsp-configuration-sources ["setup.cfg"]
+          lsp-pylsp-plugins-mccabe-enabled nil
+          ;; We can also set this per-project
+          lsp-pylsp-plugins-preload-modules ["numpy", "csv", "pandas", "statistics", "json"]
+          lsp-pylsp-plugins-pycodestyle-enabled nil
+          lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
+          lsp-pylsp-plugins-pydocstyle-convention "pep257"
+          lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
+          lsp-pylsp-plugins-pyflakes-enabled nil
+          lsp-pylsp-plugins-pylint-args (vconcat
+                                         (list "-j 2"
+                                               (concat "--rcfile="
+                                                       (expand-file-name ".config/pylintrc"
+                                                                         sb/user-home-directory))))
+          lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
+          lsp-pylsp-plugins-yapf-enabled t
+          lsp-pylsp-plugins-flake8-enabled nil
+          lsp-pylsp-plugins-jedi-use-pyenv-environment t)))
 
 (use-package python-docstring
   :after python-mode
@@ -177,9 +176,9 @@
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                                          (lsp--set-configuration
-                                           (ht-merge (lsp-configuration-section "pyright")
-                                                     (lsp-configuration-section "python")))))
+                        (lsp--set-configuration
+                         (ht-merge (lsp-configuration-section "pyright")
+                                   (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers

@@ -298,6 +298,13 @@
    ;; Jump to a file below the current directory
    ("C-x f" . counsel-fd-file-jump)))
 
+;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
+(use-package ivy-avy
+  :after ivy
+  :bind
+  (:map ivy-minibuffer-map
+        ("C-'"   . ivy-avy)))
+
 (provide 'init-ivy)
 
 ;;; init-ivy.el ends here

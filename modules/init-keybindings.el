@@ -34,11 +34,11 @@
  ;; Alacritty with `term-keys-mode'. So, this is an alternative.
  ;; ("M-k"       . kill-whole-line)
 
- ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
- ;; manipulate the first character of the word.
- ("M-c"       . capitalize-dwim)
- ("M-u"       . upcase-dwim)
- ("M-l"       . downcase-dwim)
+ ;; ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
+ ;; ;; manipulate the first character of the word.
+ ;; ("M-c"       . capitalize-dwim)
+ ;; ("M-u"       . upcase-dwim)
+ ;; ("M-l"       . downcase-dwim)
 
  ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
  ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.

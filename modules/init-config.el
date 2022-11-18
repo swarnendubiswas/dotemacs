@@ -17,8 +17,6 @@
   'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "leuven"            leuven)
-           (const :tag "zenburn"           zenburn)
            (const :tag "doom-one"          doom-one)
            (const :tag "doom-nord"         doom-nord)
            (const :tag "doom-molokai"      doom-molokai)
@@ -26,8 +24,6 @@
            (const :tag "monokai"           monokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
-           (const :tag "nano-dark"         nano-dark)
-           (const :tag "lambda-dark-faded" lambda-dark-faded)
            (const :tag "catppuccin"        catppuccin)
            (const :tag "ef-dark"           ef-dark)
            (const :tag "ef-trio-dark"      ef-trio-dark)
@@ -42,8 +38,6 @@
   'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
-           (const :tag "leuven"            leuven)
-           (const :tag "zenburn"           zenburn)
            (const :tag "doom-one"          doom-one)
            (const :tag "doom-nord"         doom-nord)
            (const :tag "doom-molokai"      doom-molokai)
@@ -51,11 +45,6 @@
            (const :tag "monokai"           monokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
-           ;; Does not pair brackets, `diff-hl' highlights have poor contrast and do not look good
-           (const :tag "nano-dark"         nano-dark)
-           (const :tag "lambda-dark"       lambda-dark)
-           ;; Company popups cannot be distinguished
-           (const :tag "lambda-dark-faded" lambda-dark-faded)
            ;; Brackets are not emphasized, write-good mode does not work well
            (const :tag "catppuccin"        catppuccin)
            (const :tag "ef-dark"           ef-dark)
@@ -80,8 +69,6 @@
            (const :tag "mini-modeline"   mini)
            (const :tag "airline"         airline)
            (const :tag "telephone-line"  telephone)
-           (const :tag "nano"            nano)
-           (const :tag "lambda-line"     lambda-line)
            ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
@@ -125,7 +112,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  t
+  nil
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)

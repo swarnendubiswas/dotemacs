@@ -112,6 +112,38 @@
     :demand t)
   :diminish tree-sitter-mode)
 
+(use-package eldoc
+  :straight (:type built-in)
+  :if (symbol-value 'sb/IS-LINUX)
+  :hook
+  (prog-mode-hook . turn-on-eldoc-mode)
+  ;; :custom
+  ;; (eldoc-area-prefer-doc-buffer to t)
+  :config
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
+  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
+  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
+  ;; useful information.
+  ;; (setq eldoc-echo-area-use-multiline-p nil)
+
+  ;; Allow eldoc to trigger after completions
+  (with-eval-after-load "company"
+    (eldoc-add-command 'company-complete-selection
+                       'company-complete-common
+                       'company-capf
+                       'company-abort))
+  :diminish)
+
+;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
+
+;; (use-package eldoc-box
+;;   :commands (eldoc-box-hover-at-point-mode)
+;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
+;;   :custom
+;;   (eldoc-box-clear-with-C-g t)
+;;   (eldoc-box-fringe-use-same-bg nil)
+;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
+
 (provide 'init-prog)
 
 ;;; init-prog.el ends here

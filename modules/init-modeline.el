@@ -49,19 +49,10 @@
   :commands powerline-default-theme
   :init
   (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
-        ;; powerline-default-separator 'box
         powerline-display-buffer-size nil
         powerline-display-mule-info nil ; File encoding information is not useful
         powerline-gui-use-vcs-glyph t
         powerline-height 20)
-
-  (when (eq sb/gui-theme 'leuven)
-    (set-face-attribute 'mode-line nil :background "grey88" :foerground "black")
-    (set-face-attribute 'mode-line-buffer-id nil :weight 'bold
-                        :foreground "black" :background "gray88"))
-
-  (when (or (eq sb/gui-theme 'nano-light) (eq sb/gui-theme 'nano-dark))
-    (powerline-nano-theme))
 
   (sb/powerline-sb-theme))
 
@@ -173,25 +164,6 @@
   :custom
   (airline-display-directory 'airline-directory-shortened)
   :config (load-theme 'airline-doom-one t))
-
-(use-package nano-modeline
-  :straight
-  (nano-modeline :type git :host github :repo "rougier/nano-modeline")
-  :if (eq sb/modeline-theme 'nano)
-  :init
-  (when (eq sb/modeline-theme 'nano)
-    (nano-modeline-mode 1)))
-
-(use-package lambda-line
-  :straight
-  (:type git :host github :repo "lambda-emacs/lambda-line")
-  :if (eq sb/modeline-theme 'lambda-line)
-  :hook
-  (after-init-hook . lambda-line-mode)
-  :custom
-  (lambda-line-abbrev t "Abbreviate major modes")
-  (lambda-line-space-top +0.15)
-  (lambda-line-space-bottom -0.15))
 
 (provide 'init-modeline)
 

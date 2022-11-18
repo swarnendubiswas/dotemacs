@@ -10,16 +10,6 @@
 (defvar sb/gui-theme)
 (defvar sb/tui-theme)
 
-(use-package leuven-theme
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'leuven))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'leuven)))
-  :init (load-theme 'leuven t))
-
-(use-package zenburn-theme
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'zenburn))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'zenburn)))
-  :init (load-theme 'zenburn t))
-
 (use-package doom-themes
   :if (or (eq sb/gui-theme 'doom-molokai)
           (eq sb/gui-theme 'doom-one)
@@ -83,23 +73,6 @@
   (modus-themes-tabs-accented t)
   (modus-themes-org-blocks 'tinted-background))
 
-(use-package nano-theme
-  :straight
-  (nano-theme :type git :host github :repo "rougier/nano-theme")
-  :if (or (and (display-graphic-p)
-               (or (eq sb/gui-theme 'nano-light)
-                   (eq sb/gui-theme 'nano-dark)))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'nano-dark)))
-  :init
-  (setq nano-fonts-use t)
-  (when (display-graphic-p)
-    (cond
-     ((eq sb/gui-theme 'nano-light) (load-theme 'nano-light t))
-     ((eq sb/gui-theme 'nano-dark) (load-theme 'nano-dark t))))
-  (unless (display-graphic-p)
-    (cond
-     ((eq sb/tui-theme 'nano-dark) (load-theme 'nano-dark t)))))
-
 (when (and (eq sb/gui-theme 'sb/customized)
            (display-graphic-p))
   (progn
@@ -116,32 +89,6 @@
 ;;   (circadian-themes '((:sunrise . nano-light)
 ;;                       (:sunset  . modus-vivendi)))
 ;;   :hook (after-init-hook . circadian-setup))
-
-(use-package lambda-themes
-  :straight (:type git :host github :repo "lambda-emacs/lambda-themes")
-  :if (or (and (display-graphic-p)
-               (or (eq sb/gui-theme 'lambda-dark)
-                   (eq sb/gui-theme 'lambda-dark-faded)))
-          (and (not (display-graphic-p))
-               (or (eq sb/tui-theme 'lambda-dark)
-                   (eq sb/tui-theme 'lambda-dark-faded))))
-  :init
-  (when (display-graphic-p)
-    (cond
-     ((eq sb/gui-theme 'lambda-dark) (load-theme 'lambda-dark t))
-     ((eq sb/gui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t))))
-  (unless (display-graphic-p)
-    (cond
-     ((eq sb/tui-theme 'lambda-dark) (load-theme 'lambda-dark t))
-     ((eq sb/tui-theme 'lambda-dark-faded) (load-theme 'lambda-dark-faded t))))
-  :custom-face
-  (company-tooltip ((t (:inherit default :background "##524f5c" :foreground "white"))))
-  (writegood-weasels-face ((t (:inherit default :background "coral"))))
-  (writegood-duplicates-face ((t (:inherit default :background "light pink"))))
-  :custom
-  (lambda-themes-set-italic-comments t)
-  (lambda-themes-set-italic-keywords t)
-  (lambda-themes-set-variable-pitch t))
 
 (use-package catppuccin-theme
   :if (or (eq sb/gui-theme 'catppuccin)

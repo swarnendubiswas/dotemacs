@@ -96,7 +96,6 @@
    ("C-M-r" . sp-rewrap-sexp))
   :custom
   (sp-show-pair-from-inside t)
-  ;; (sp-autoskip-closing-pair 'always)
   :config
   (smartparens-strict-mode -1)
 

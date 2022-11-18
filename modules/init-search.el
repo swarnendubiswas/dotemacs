@@ -17,8 +17,8 @@
   (isearch-forward-regexp isearch-repeat-forward isearch-occur)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
-  (("C-s"     . nil)
-   ("C-M-f"   . nil) ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
+  (("C-s")
+   ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
    ("C-f"     . isearch-forward-regexp)
    ("C-r"     . isearch-backward-regexp)
    :map isearch-mode-map

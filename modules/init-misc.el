@@ -11,7 +11,7 @@
 (defvar which-key-use-C-h-commands)
 
 (use-package transient
-  :demand t
+  ;; :demand t
   :config
   ;; Allow using `q' to quit out of popups, in addition to `C-g'
   (transient-bind-q-to-quit))
@@ -38,9 +38,9 @@
   :diminish)
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
-  :commands
-  (move-text-up move-text-down move-text-default-bindings)
-  :init (move-text-default-bindings))
+  :bind
+  (("M-<down>" . move-text-down)
+   ("M-<up>" . move-text-up)))
 
 ;; https://github.com/jwiegley/use-package/issues/991
 (use-package duplicate-thing
@@ -71,7 +71,7 @@
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :hook
-  (after-init-hook . smart-mark-mode))
+  (emacs-startup-hook . smart-mark-mode))
 
 ;; ;; Operate on the current line if no region is active
 ;; (use-package whole-line-or-region
@@ -95,8 +95,7 @@
     (diminish mode)))
 
 (use-package vundo
-  :straight
-  (vundo :type git :host github :repo "casouri/vundo")
+  :straight (vundo :type git :host github :repo "casouri/vundo")
   :if sb/EMACS28+
   :bind
   (([remap undo] . vundo)
@@ -117,7 +116,7 @@
 
 (use-package hl-todo
   :hook
-  (after-init-hook . global-hl-todo-mode)
+  (emacs-startup-hook . global-hl-todo-mode)
   :config
   (setq hl-todo-highlight-punctuation ":"
         hl-todo-keyword-faces (append '(("LATER"    . "#d0bf8f")
@@ -138,7 +137,7 @@
   :commands
   (page-break-lines-mode)
   :hook
-  (after-init-hook . global-page-break-lines-mode)
+  (emacs-startup-hook . global-page-break-lines-mode)
   :diminish)
 
 ;; ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line
@@ -229,38 +228,6 @@
 ;;   (number-separator-decimal-char ".")
 ;;   :diminish)
 
-(use-package eldoc
-  :straight (:type built-in)
-  :if (symbol-value 'sb/IS-LINUX)
-  :hook
-  (prog-mode-hook . turn-on-eldoc-mode)
-  ;; :custom
-  ;; (eldoc-area-prefer-doc-buffer to t)
-  :config
-  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
-  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
-  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
-  ;; useful information.
-  ;; (setq eldoc-echo-area-use-multiline-p nil)
-
-  ;; Allow eldoc to trigger after completions
-  (with-eval-after-load "company"
-    (eldoc-add-command 'company-complete-selection
-                       'company-complete-common
-                       'company-capf
-                       'company-abort))
-  :diminish)
-
-;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
-
-;; (use-package eldoc-box
-;;   :commands (eldoc-box-hover-at-point-mode)
-;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
-;;   :custom
-;;   (eldoc-box-clear-with-C-g t)
-;;   (eldoc-box-fringe-use-same-bg nil)
-;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
-
 (use-package esup
   :if (bound-and-true-p sb/debug-init-file)
   :commands
@@ -288,18 +255,8 @@
   :hook
   (after-init-hook . amx-mode)
   :bind
-  (("M-x"  . execute-extended-command) ; We need this if we use `vertico' and `consult'
-   ("<f1>" . execute-extended-command))
-  :custom
-  (amx-auto-update-interval 10 "Update the command list every n minutes")
-  (amx-history-length 15))
-
-;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
-(use-package ivy-avy
-  :after ivy
-  :bind
-  (:map ivy-minibuffer-map
-        ("C-'"   . ivy-avy)))
+  (("M-x"  . amx) ; We need this if we use `vertico' and `consult'
+   ("<f1>" . amx)))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
@@ -320,15 +277,22 @@
     (add-hook 'find-file-hook         #'bm-buffer-restore)
     (add-hook 'after-init-hook        #'bm-repository-load))
   :commands
-  (bm-buffer-save-all bm-repository-save bm-toggle bm-next bm-previous
-                      bm-repository-load bm-buffer-save bm-buffer-restore)
+  (bm-buffer-save-all bm-repository-save)
   :init
   ;; Must be set before `bm' is loaded
   (setq bm-restore-repository-on-load t
         bm-verbosity-level 1
         bm-modeline-display-total t)
   :hook
-  (after-init-hook . sb/bm-setup)
+  ((kill-emacs-hook . (lambda ()
+                        (bm-buffer-save-all)
+                        (bm-repository-save)))
+   (after-save-hook . bm-buffer-save)
+   (kill-buffer-hook . bm-buffer-save)
+   (vc-before-checkin-hook . bm-buffer-save)
+   (after-revert-hook . bm-buffer-restore)
+   (find-file-hook . bm-buffer-restore)
+   (after-init-hook . bm-repository-load))
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)
@@ -380,7 +344,7 @@
 
 (use-package volatile-highlights
   :hook
-  (after-init-hook . volatile-highlights-mode)
+  (emacs-startup-hook . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
 
 ;; ;; Use Emacsclient as the $EDITOR of child processes
@@ -399,7 +363,7 @@
 
 (use-package xclip
   :if (or (executable-find "xclip") (executable-find "xsel"))
-  :init (xclip-mode 1))
+  :hook (emacs-startup-hook . xclip-mode))
 
 (use-package fix-word
   :bind

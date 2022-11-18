@@ -38,18 +38,18 @@
                            ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :bind
   (:map c-mode-base-map
-        ("C-c c a" . c-beginning-of-defun)
-        ("C-c c e" . c-end-of-defun)
+        ("C-M-a"   . c-beginning-of-defun)
+        ("C-M-e"   . c-end-of-defun)
         ("M-q"     . c-fill-paragraph)
-        ("C-c C-d" . nil))
+        ("C-c C-d"))
   :config
   ;; Disable electric indentation and on-type formatting
   (add-hook 'c++-mode-hook
             (lambda ()
               (setq-local c-auto-newline nil
-                          c-electric-brace nil
+                          ;; c-electric-brace nil
                           c-electric-flag nil
-                          c-electric-indent nil
+                          ;; c-electric-indent nil
                           c-enable-auto-newline nil
                           c-syntactic-indentation nil)))
 
