@@ -264,6 +264,10 @@ Keywords=Text;Editor;
 
 I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It seems difficult to properly set up language servers with Tramp support. Therefore, I prefer to use Emacs in a terminal that has a much better performance. It is important to set up support for 24-bit colors and proper keybindings in the terminal for a good experience. I use [[https://github.com/alacritty/alacritty][Alacritty]] which is easy to customize.
 
+Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote langsever.
+
+
+
 Use the steps mentioned in the link [[https://github.com/syl20bnr/spacemacs/wiki/Terminal][Spacemacs Terminal]] to enable support for 24bit colors in the terminal.
 
 #+begin_src bash

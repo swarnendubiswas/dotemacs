@@ -65,10 +65,6 @@
   :custom
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
-  ;; (orderless-matching-styles '(orderless-literal
-  ;;                              orderless-prefixes
-  ;;                              orderless-initialism
-  ;;                              orderless-regexp))
   :config
   (with-eval-after-load "ivy"
     (defvar ivy-re-builders-alist)
@@ -89,9 +85,8 @@
   (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook
-  ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-global-mode)
+  ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
   :custom
-  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   (yas-verbosity 0)
   :config
   (with-eval-after-load "hippie-expand"

@@ -16,6 +16,7 @@
 ;; Projectile is unable to remember remote projects which is also not supported by the current
 ;; version of `project'.
 
+;; Emacs 29 will possibly have "project.el" built-in.
 (use-package project
   :if (eq sb/project-handler 'project)
   :commands
@@ -61,13 +62,11 @@
   (:map project-prefix-map
         ("z" . consult-project-extra-find)))
 
-;; Emacs 29 will possibly have "project.el" built-in. We cannot ignore `projectile' now because of
-;; the dependencies by `ibuffer-projectile' and `centaur-tabs'.
-
+;; Many useful packages like `ibuffer-projectile' and `centaur-tabs' depend on `projectile'.
 (use-package projectile
   :preface
   (defun sb/projectile-do-not-visit-tags-table ()
-    "Do not visit the tags table."
+    "Do not visit the tags table automatically even if it is present."
     nil)
   :if (eq sb/project-handler 'projectile)
   :commands
@@ -79,7 +78,7 @@
                         projectile-compile-project)
   :hook
   ;; We can open a project file without enabling projectile via bind-keys
-  (after-init-hook . projectile-mode)
+  (emacs-startup-hook . projectile-mode)
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :bind
@@ -96,11 +95,9 @@
   ;; set to `alien'.
   (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
-  (projectile-project-root-files '("build.gradle"
-                                   "setup.py"
+  (projectile-project-root-files '("setup.py"
                                    "requirements.txt"
                                    "package.json"
-                                   "composer.json"
                                    "CMakeLists.txt"
                                    "Makefile"
                                    "WORKSPACE"
@@ -108,6 +105,7 @@
                                    "SConstruct"
                                    "configure.ac"
                                    "configure.in"))
+  (projectile-auto-discover nil "Disable auto-search for projects for faster startup")
   :config
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and (symbol-value 'sb/IS-WINDOWS)
@@ -118,27 +116,10 @@
   (defun projectile-default-mode-line ()
     "Report project name and type in the modeline."
     (let ((project-name (projectile-project-name)))
-      ;; (format " [%s: %s]"
-      ;;         projectile-mode-line-prefix
-      ;;         (or project-name "-"))
       (format " [%s]" (or project-name "-"))))
 
   (advice-add 'projectile-visit-project-tags-table :override
               #'sb/projectile-do-not-visit-tags-table)
-
-  ;; Set search path for finding projects when `projectile-mode' is enabled, however auto-search for
-  ;; projects is disabled for faster startup.
-  (setq projectile-auto-discover nil
-        projectile-project-search-path
-        (list
-         (concat `,(getenv "HOME") "/bitbucket")
-         (expand-file-name "github"            sb/user-home-directory)
-         (expand-file-name "iitk-workspace"    sb/user-home-directory)
-         (expand-file-name "iitkgp-workspace"  sb/user-home-directory)
-         (expand-file-name "iss-workspace"     sb/user-home-directory)
-         (expand-file-name "plass-workspace"   sb/user-home-directory)
-         (expand-file-name "prospar-workspace" sb/user-home-directory)
-         ))
 
   (dolist (prjs (list
                  (expand-file-name sb/user-home-directory) ; Do not consider $HOME as a project
@@ -162,7 +143,6 @@
              ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
-  ;; Set in case `counsel-projectile' is disabled. For `vertico', we use `consult-projectile'.
   (when (eq sb/minibuffer-completion 'ivy)
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))

@@ -33,8 +33,7 @@
   ;; ;; Unlike `awesome-tab', the icons do not blend well with all themes.
   ;; (let ((themes '("doom-one"
   ;;                 "doom-nord"
-  ;;                 "doom-molokai"
-  ;;                 "doom-gruvbox")))
+  ;;                 "doom-molokai")))
   ;;   (progn
   ;;     (if (-contains? themes (symbol-name sb/gui-theme))
   ;;         (setq centaur-tabs-set-icons t)

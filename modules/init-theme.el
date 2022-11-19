@@ -13,26 +13,18 @@
 (use-package doom-themes
   :if (or (eq sb/gui-theme 'doom-molokai)
           (eq sb/gui-theme 'doom-one)
-          (eq sb/gui-theme 'doom-nord)
-          (eq sb/gui-theme 'doom-gruvbox))
+          (eq sb/gui-theme 'doom-nord))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (if (display-graphic-p)
       (cond
        ((eq sb/gui-theme 'doom-molokai) (load-theme 'doom-molokai t))
        ((eq sb/gui-theme 'doom-one) (load-theme 'doom-one t))
-       ((eq sb/gui-theme 'doom-nord) (load-theme 'doom-nord t))
-       ((eq sb/gui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))
+       ((eq sb/gui-theme 'doom-nord) (load-theme 'doom-nord t)))
     (cond
      ((eq sb/tui-theme 'doom-molokai) (load-theme 'doom-molokai t))
      ((eq sb/tui-theme 'doom-one) (load-theme 'doom-one t))
-     ((eq sb/tui-theme 'doom-nord) (load-theme 'doom-nord t))
-     ((eq sb/tui-theme 'doom-gruvbox) (load-theme 'doom-gruvbox t)))))
-
-(use-package monokai-theme
-  :if (or (and (display-graphic-p) (eq sb/gui-theme 'monokai))
-          (and (not (display-graphic-p)) (eq sb/tui-theme 'monokai)))
-  :init (load-theme 'monokai t))
+     ((eq sb/tui-theme 'doom-nord) (load-theme 'doom-nord t)))))
 
 (use-package modus-themes
   :if (or (and (display-graphic-p)

@@ -20,8 +20,6 @@
            (const :tag "doom-one"          doom-one)
            (const :tag "doom-nord"         doom-nord)
            (const :tag "doom-molokai"      doom-molokai)
-           (const :tag "doom-gruvbox"      doom-gruvbox)
-           (const :tag "monokai"           monokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
            (const :tag "catppuccin"        catppuccin)
@@ -41,8 +39,6 @@
            (const :tag "doom-one"          doom-one)
            (const :tag "doom-nord"         doom-nord)
            (const :tag "doom-molokai"      doom-molokai)
-           (const :tag "doom-gruvbox"      doom-gruvbox)
-           (const :tag "monokai"           monokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
            ;; Brackets are not emphasized, write-good mode does not work well
@@ -67,7 +63,6 @@
            (const :tag "spaceline"       spaceline)
            (const :tag "moody"           moody)
            (const :tag "mini-modeline"   mini)
-           (const :tag "airline"         airline)
            (const :tag "telephone-line"  telephone)
            ;; No customization
            (const :tag "none"            none))

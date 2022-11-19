@@ -102,6 +102,10 @@ https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variabl
 
 ** Useful Information
 
+*** Read environment variables
+
+Use the following to get strings from environment variables: ~(concat `,(getenv "HOME") "/bitbucket")~.
+
 *** Avoid activating certain packages with package initialize
 
 Set ~(setq package-load-list '((org-journal nil) all))~ before invoking ~package-initialize~

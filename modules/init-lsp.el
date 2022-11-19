@@ -249,12 +249,12 @@
         ("G" . lsp-ivy-global-workspace-symbol)
         ("W" . lsp-ivy-workspace-symbol)))
 
-(use-package dap-mode
-  :if (eq sb/lsp-provider 'lsp-mode)
-  :commands (dap-debug dap-hydra)
-  :hook
-  ((lsp-mode-hook . dap-mode)
-   (lsp-mode-hook . dap-ui-mode)))
+;; (use-package dap-mode
+;;   :if (eq sb/lsp-provider 'lsp-mode)
+;;   :commands (dap-debug dap-hydra)
+;;   :hook
+;;   ((lsp-mode-hook . dap-mode)
+;;    (lsp-mode-hook . dap-ui-mode)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -284,9 +284,6 @@
                       (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
                             ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :custom
-  (lsp-java-inhibit-message t)
-  ;; Requires Java 11+, Java 11 is the LTS
-  (lsp-java-java-path "/usr/lib/jvm/java-11-openjdk-amd64/bin/java")
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url (expand-file-name
@@ -297,18 +294,14 @@
   :if (eq sb/minibuffer-completion 'vertico)
   :after (consult lsp)
   :commands
-  (consult-lsp-diagnostics consult-lsp-symbols
-                           consult-lsp-file-symbols
-                           consult-lsp-marginalia-mode)
-  :init (consult-lsp-marginalia-mode 1)
+  (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
   :bind
   (:map lsp-mode-map
         ([remap xref-find-apropos] . consult-lsp-symbols)))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
-;; temporary text files. However, `lsp-grammarly' supports PRO Grammarly accounts. If there are
-;; failures, then try logging out of Grammarly and logging in again. Make sure to run "M-x
-;; keytar-install".
+;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
+;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 
 (use-package lsp-grammarly
   :if (eq sb/lsp-provider 'lsp-mode)
@@ -328,13 +321,11 @@
   (lsp-grammarly-suggestions-passive-voice t)
   (lsp-grammarly-suggestions-informal-pronouns-academic t)
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
+  (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t)
   (lsp-grammarly-user-words '(Swarnendu
                               Biswas))
   :config
   (defvar lsp-grammarly-active-modes)
-
-  ;; Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote
-  ;; langsever.
 
   (lsp-register-client
    (make-lsp-client
@@ -386,13 +377,11 @@
 
   ;; (defvar lsp-ltex-active-modes)
 
-  ;; Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote
-  ;; langsever.
-
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-tramp-connection
-                     "/home/swarnendu/.emacs.d/var/lsp/server/ltex-ls/latest/bin/ltex-ls")
+                     (expand-file-name "lsp/server/ltex-ls/latest/bin/ltex-ls"
+                                       no-littering-var-directory))
     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
     :priority -2
     :add-on? t

@@ -18,7 +18,6 @@
 (declare-function sb/switch-to-scratch "init-functions")
 (declare-function sb/counsel-all-files-recursively "init-functions")
 
-;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)

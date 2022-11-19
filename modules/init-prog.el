@@ -76,8 +76,10 @@
 
 (use-package compile
   :straight (:type built-in)
+  ;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
   :bind
-  ("<f11>" . recompile)
+  (("<f10>" . compile)
+   ("<f11>" . recompile))
   :custom
   (compilation-always-kill t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")
@@ -95,14 +97,10 @@
 
 (use-package docstr
   :hook
-  ((c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode)
+  ((c-mode-hook c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode)
   :diminish)
 
 ;; Tree-sitter provides advanced syntax highlighting features
-
-;; git clone https://github.com/ubolonton/emacs-tree-sitter/
-;; cd emacs-tree-sitter
-;; ./bin/setup; ./bin/build
 (use-package tree-sitter
   :hook
   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
@@ -117,15 +115,13 @@
   :if (symbol-value 'sb/IS-LINUX)
   :hook
   (prog-mode-hook . turn-on-eldoc-mode)
-  ;; :custom
-  ;; (eldoc-area-prefer-doc-buffer to t)
-  :config
+  :custom
+  (eldoc-area-prefer-doc-buffer t)
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
-  ;; ElDoc messages to one line. This prevents the echo area from resizing itself unexpectedly when
-  ;; point is on a variable with a multiline docstring, which is distracting, but then it cuts of
-  ;; useful information.
-  ;; (setq eldoc-echo-area-use-multiline-p nil)
-
+  ;; ElDoc messages to one line which prevents the echo area from resizing itself unexpectedly when
+  ;; point is on a variable with a multiline docstring, but then it cuts of useful information.
+  ;; (eldoc-echo-area-use-multiline-p nil)
+  :config
   ;; Allow eldoc to trigger after completions
   (with-eval-after-load "company"
     (eldoc-add-command 'company-complete-selection
@@ -134,10 +130,9 @@
                        'company-abort))
   :diminish)
 
-;; `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
-
 ;; (use-package eldoc-box
 ;;   :commands (eldoc-box-hover-at-point-mode)
+;;   `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
 ;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
 ;;   :custom
 ;;   (eldoc-box-clear-with-C-g t)

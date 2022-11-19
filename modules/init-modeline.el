@@ -157,14 +157,6 @@
         telephone-line-height 24)
   (telephone-line-mode 1))
 
-;; https://github.com/AnthonyDiGirolamo/airline-themes/issues/28
-(use-package airline-themes
-  :if (eq sb/modeline-theme 'airline)
-  :demand t
-  :custom
-  (airline-display-directory 'airline-directory-shortened)
-  :config (load-theme 'airline-doom-one t))
-
 (provide 'init-modeline)
 
 ;;; init-modeline.el ends here
