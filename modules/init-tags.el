@@ -50,30 +50,6 @@
   (xref-show-definitions-function #'ivy-xref-show-defs)
   (xref-show-xrefs-function       #'ivy-xref-show-xrefs))
 
-;; By default, the output file name of `u-ctags' is `tags', and it is `TAGS' with `etags' enabled.
-;; (use-package counsel-etags
-;;   :defines (counsel-etags-ignore-directories counsel-etags-ignore-filenames)
-;;   :commands counsel-etags-virtual-update-tags
-;;   :if (and (symbol-value 'sb/IS-LINUX) (executable-find "ctags"))
-;;   :bind
-;;   (("M-]"     . counsel-etags-find-tag-at-point)
-;;    ("C-c g s" . counsel-etags-find-symbol-at-point)
-;;    ("C-c g f" . counsel-etags-find-tag)
-;;    ("C-c g l" . counsel-etags-list-tag)
-;;    ("C-c g c" . counsel-etags-scan-code))
-;;   :config
-;;   (defalias 'list-tags 'counsel-etags-list-tag-in-current-file)
-
-;;   (dolist (ignore-dirs '("build" ".metadata" ".recommenders" ".clangd" ".cache"))
-;;     (add-to-list 'counsel-etags-ignore-directories ignore-dirs))
-
-;;   (dolist (ignore-files '(".clang-tidy" "*.json" "*.html" "*.xml"))
-;;     (add-to-list 'counsel-etags-ignore-filenames ignore-files))
-
-;;   (add-hook 'prog-mode-hook
-;;             (lambda ()
-;;               (add-hook 'after-save-hook #'counsel-etags-virtual-update-tags 'append 'local))))
-
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 
 (use-package citre
@@ -87,11 +63,27 @@
 
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
+
+  (defun sb/lsp-citre-capf-function ()
+    "A capf backend that tries lsp first, then Citre."
+    (let ((lsp-result (lsp-completion-at-point)))
+      (if (and lsp-result
+               (try-completion
+                (buffer-substring (nth 0 lsp-result)
+                                  (nth 1 lsp-result))
+                (nth 2 lsp-result)))
+          lsp-result
+        (citre-completion-at-point))))
+
+  (defun sb/enable-lsp-citre-capf-backend ()
+    "Enable the lsp + Citre capf backend in current buffer."
+    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
   :hook
-  (prog-mode-hook . (lambda()
-                      (require 'citre-config)))
+  ((citre-mode-hook . sb/enable-lsp-citre-capf-backend)
+   (prog-mode-hook . (lambda()
+                       (require 'citre-config))))
   :bind
   (("C-x c j" . citre-jump)
    ("M-'"     . sb/citre-jump+)
@@ -103,7 +95,6 @@
   :custom
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
-  (citre-prompt-language-for-ctags-command nil)
   (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode))
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
@@ -118,7 +109,6 @@
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  (citre-enable-capf-integration t)
   (citre-completion-backends '(tags))
   (citre-find-definition-backends '(tags))
   (citre-find-reference-backends '(tags))
@@ -141,6 +131,36 @@
         (or (with-demoted-errors "%s, fallback to citre"
               (funcall fetcher))
             (funcall citre-fetcher)))))
+
+  (defmacro citre-backend-to-company-backend (backend)
+    "Create a company backend from Citre completion backend BACKEND.
+The result is a company backend called
+`company-citre-<backend>' (like `company-citre-tags') and can be
+used in `company-backends'."
+    (let ((backend-name (intern (concat "company-citre-" (symbol-name backend))))
+          (docstring (concat "`company-mode' backend from the `"
+                             (symbol-name backend)
+                             "' Citre backend.\n"
+                             "`citre-mode' needs to be enabled to use this.")))
+      `(defun ,backend-name (command &optional arg &rest ignored)
+         ,docstring
+         (pcase command
+           ('interactive (company-begin-backend ',backend-name))
+           ('prefix (and (bound-and-true-p citre-mode)
+                         (citre-backend-usable-p ',backend)
+                         ;; We shouldn't use this as it's defined for getting
+                         ;; definitions/references.  But the Citre completion
+                         ;; backend design is not fully compliant with company's
+                         ;; design so there's no simple "right" solution, and this
+                         ;; works for tags/global backends.
+                         (or (citre-get-symbol-at-point-for-backend ',backend)
+                             'stop)))
+           ('meta (citre-get-property 'signature arg))
+           ('annotation (citre-get-property 'annotation arg))
+           ('candidates (let ((citre-completion-backends '(,backend)))
+                          (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+
+  (citre-backend-to-company-backend tags)
   :diminish)
 
 (provide 'init-tags)

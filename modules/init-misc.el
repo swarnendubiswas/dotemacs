@@ -444,12 +444,6 @@
 ;;   ;;   (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map))
 ;;   )
 
-(use-package olivetti
-  :hook
-  ((text-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook) . olivetti-mode)
-  :custom
-  (olivetti-body-width 120))
-
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

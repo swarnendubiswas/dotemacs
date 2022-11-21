@@ -187,6 +187,12 @@
            (set-face-attribute 'mode-line nil :height 110)
            (set-face-attribute 'mode-line-inactive nil :height 110)))))
 
+(use-package olivetti
+  :hook
+  ((text-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook) . olivetti-mode)
+  :custom
+  (olivetti-body-width 110))
+
 (provide 'init-ui)
 
 ;;; init-ui.el ends here

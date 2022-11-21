@@ -98,12 +98,12 @@
   (add-to-list 'savehist-additional-variables 'corfu-history)
   (corfu-history-mode 1))
 
-;; (use-package corfu-echo
-;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo))
-;;   :after corfu
-;;   :commands corfu-echo-mode
-;;   :init
-;;   (corfu-echo-mode 1))
+(use-package corfu-echo
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo))
+  :after corfu
+  :commands corfu-echo-mode
+  :init
+  (corfu-echo-mode 1))
 
 ;; (use-package corfu-popupinfo
 ;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-popupinfo))

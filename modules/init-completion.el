@@ -54,6 +54,7 @@
   (defun sb/just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
+
   ;; https://github.com/oantolin/orderless/issues/91
   (defun sb/use-orderless-in-minibuffer ()
     (setq-local completion-styles '(substring orderless)))
@@ -129,12 +130,6 @@
 ;;                 (lambda ()
 ;;                   (prescient-remember (vertico--candidate))))))
 
-;; (use-package fussy
-;;   :straight
-;;   (fussy :type git :host github :repo "jojojames/fussy")
-;;   :demand t
-;;   :commands fussy-all-completions)
-
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
 ;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
@@ -150,19 +145,13 @@
 
   (with-eval-after-load "orderless"
     (setq completion-styles '(orderless basic)
-          ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP hostname
-          ;; completion to work. I also want substring matching for file names.
+          ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP
+          ;; hostname completion to work. I also want substring matching for file names.
           ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
           completion-category-overrides '((file (styles basic substring partial-completion))
                                           ;; (buffer (styles basic substring flex))
                                           ;; (project-file (styles basic substring flex))
-                                          (minibuffer (orderless flex)))))
-
-  ;; (unless (featurep 'orderless)
-  ;;   (setq completion-styles '(basic fussy)
-  ;;         completion-category-overrides '((file (styles basic substring partial-completion fussy))
-  ;;                                         (minibuffer (basic fussy initials)))))
-  )
+                                          (minibuffer (orderless flex))))))
 
 (provide 'init-completion)
 

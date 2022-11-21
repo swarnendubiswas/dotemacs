@@ -30,9 +30,10 @@
   :config
   ;; https://emacs.stackexchange.com/questions/32644/how-to-concatenate-two-lists
   ;; https://emacs.stackexchange.com/questions/20465/append-lists-smartly
-  (let ((sb/weasel-words '("actionable" "actually" "basically" "clearly" "easily" "easy" "it turns out that"
-                           "In this regard" "In this sense" "With this in mind" "With the above in mind"
-                           "may have" "often" "simple" "probably" "simply" "specifically")))
+  (let ((sb/weasel-words '("actionable" "actually" "basically" "clearly" "easily" "easy"
+                           "it turns out that" "In this regard" "In this sense" "With this in mind"
+                           "With the above in mind" "may have" "often" "simple" "probably" "simply"
+                           "specifically")))
     (cl-union writegood-weasel-words sb/weasel-words))
   :diminish)
 
@@ -61,8 +62,6 @@
   (flycheck-checker-error-threshold 1500)
   (flycheck-idle-buffer-switch-delay 2 "Increase the time (s) to allow for quick transitions")
   (flycheck-idle-change-delay 2 "Increase the time (s) to allow for transient edits")
-  ;; Show error messages only if the error list is not already visible
-  ;; (flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)
   (flycheck-emacs-lisp-load-path 'inherit)
   ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
   ;; derived from `text-mode'.
@@ -86,66 +85,7 @@
                 flycheck-chktexrc "chktexrc"
                 flycheck-pylintrc '("setup.cfg" "pylintrc")
                 flycheck-python-pylint-executable "python3"
-                flycheck-shellcheck-follow-sources nil
-                ;; flycheck-textlint-config (expand-file-name "textlintrc.json"
-                ;;                                            sb/textlint-directory)
-                ;; flycheck-textlint-executable (expand-file-name "node_modules/.bin/textlint"
-                ;;                                                sb/textlint-directory)
-                )
-
-  ;; (add-to-list 'flycheck-textlint-plugin-alist '(tex-mode . "latex"))
-  ;; (add-to-list 'flycheck-textlint-plugin-alist '(rst-mode . "rst"))
-
-  ;; ;; Add support for `org-lint' as a checker
-  ;; (defconst flycheck-org-lint-form
-  ;;   (flycheck-prepare-emacs-lisp-form
-  ;;     (require 'org)
-  ;;     (require 'org-attach)
-  ;;     (let ((source (car command-line-args-left))
-  ;;           (process-default-directory default-directory))
-  ;;       (with-temp-buffer
-  ;;         (insert-file-contents source 'visit)
-  ;;         (setq buffer-file-name source)
-  ;;         (setq default-directory process-default-directory)
-  ;;         (delay-mode-hooks (org-mode))
-  ;;         (setq delayed-mode-hooks nil)
-  ;;         (dolist (err (org-lint))
-  ;;           (let ((inf (cl-second err)))
-  ;;             (princ (elt inf 0))
-  ;;             (princ ": ")
-  ;;             (princ (elt inf 2))
-  ;;             (terpri)))))))
-
-  ;; (defconst flycheck-org-lint-variables
-  ;;   '(org-directory
-  ;;     org-id-locations
-  ;;     org-id-locations-file
-  ;;     org-attach-id-dir
-  ;;     org-attach-use-inheritance
-  ;;     org-attach-id-to-path-function-list)
-  ;;   "Variables inherited by the `org-lint' subprocess.")
-
-  ;; (defun flycheck-org-lint-variables-form ()
-  ;;   (require 'org-attach)  ; Needed to make variables available
-  ;;   `(progn
-  ;;      ,@(seq-map (lambda (opt) `(setq-default ,opt ',(symbol-value opt)))
-  ;;                 (seq-filter #'boundp flycheck-org-lint-variables))))
-
-  ;; (flycheck-define-checker org-lint
-  ;;   "Org buffer checker using `org-lint'."
-  ;;   :command ("emacs" (eval flycheck-emacs-args)
-  ;;             "--eval" (eval (concat "(add-to-list 'load-path \""
-  ;;                                    (file-name-directory (locate-library "org"))
-  ;;                                    "\")"))
-  ;;             "--eval" (eval (flycheck-sexp-to-string
-  ;;                             (flycheck-org-lint-variables-form)))
-  ;;             "--eval" (eval flycheck-org-lint-form)
-  ;;             "--" source)
-  ;;   :error-patterns
-  ;;   ((error line-start line ": " (message) line-end))
-  ;;   :modes (org-mode))
-
-  ;; (add-to-list 'flycheck-checkers 'org-lint t)
+                flycheck-shellcheck-follow-sources nil)
 
   ;; Add support for textidote
   (flycheck-define-checker tex-textidote
@@ -153,23 +93,24 @@
 
   See https://github.com/sylvainhalle/textidote"
     :modes (latex-mode plain-tex-mode)
-    :command ("java" "-jar" (eval (expand-file-name (no-littering-expand-etc-file-name
-                                                     "textidote.jar")))
-              "--read-all"
-              "--output" "singleline"
-              "--no-color"
-              "--check"   (eval (if ispell-current-dictionary (substring ispell-current-dictionary 0 2) "en"))
-              ;; Try to honor local aspell dictionary and replacements if they exist
-              "--dict"    (eval (expand-file-name ispell-personal-dictionary))
-              "--replace" (eval (expand-file-name "~/.aspell.en.prepl"))
-              "--ignore" "lt:en:MORFOLOGIK_RULE_EN_US,lt:en:WORD_CONTAINS_UNDERSCORE"
-              ;; Using source ensures that a single temporary file in a different dir is created
-              ;; such that textidote won't process other files. This serves as a hacky workaround for
-              ;; https://github.com/sylvainhalle/textidote/issues/200.
-              source)
-    :error-patterns ((warning line-start (file-name)
-                              "(L" line "C" column "-" (or (seq "L" end-line "C" end-column) "?") "): "
-                              (message (one-or-more (not "\""))) (one-or-more not-newline) line-end)))
+    :command
+    ("java" "-jar" (eval (expand-file-name (no-littering-expand-etc-file-name "textidote.jar")))
+     "--read-all"
+     "--output" "singleline"
+     "--no-color"
+     "--check" (eval (if ispell-current-dictionary (substring ispell-current-dictionary 0 2) "en"))
+     ;; Try to honor local aspell dictionary and replacements if they exist
+     "--dict" (eval (expand-file-name ispell-personal-dictionary))
+     "--replace" (eval (expand-file-name "~/.aspell.en.prepl"))
+     "--ignore" "lt:en:MORFOLOGIK_RULE_EN_US,lt:en:WORD_CONTAINS_UNDERSCORE"
+     ;; Using source ensures that a single temporary file in a different dir is created
+     ;; such that textidote won't process other files. This serves as a hacky workaround for
+     ;; https://github.com/sylvainhalle/textidote/issues/200.
+     source)
+    :error-patterns
+    ((warning line-start (file-name)
+              "(L" line "C" column "-" (or (seq "L" end-line "C" end-column) "?") "): "
+              (message (one-or-more (not "\""))) (one-or-more not-newline) line-end)))
   (add-to-list 'flycheck-checkers 'tex-textidote)
 
   ;; https://github.com/flycheck/flycheck/issues/1833

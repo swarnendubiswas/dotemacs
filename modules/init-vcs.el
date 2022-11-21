@@ -69,6 +69,7 @@
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
 (use-package git-gutter
+  :disabled t
   ;; :if (unless (boundp 'vc-handled-backends))
   :commands global-git-gutter-mode
   :diminish
@@ -81,14 +82,12 @@
   (git-gutter:deleted-sign " ")
   (git-gutter:modified-sign " ")
   (git-gutter:update-interval 1)
-  :config
   ;; https://github.com/syl20bnr/spacemacs/issues/10555
   ;; https://github.com/syohex/emacs-git-gutter/issues/24
   (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
 
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
-  :disabled t
   :if (boundp 'vc-handled-backends)
   :commands diff-hl-dired-mode-unless-remote
   :hook
