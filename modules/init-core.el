@@ -441,6 +441,8 @@
   :straight (:type built-in)
   :if (eq sb/minibuffer-completion 'vertico)
   :demand t
+  :custom
+  (ffap-machine-p-known 'reject "Do not ping things that look like domain names")
   :config
   (ffap-bindings)
   ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.

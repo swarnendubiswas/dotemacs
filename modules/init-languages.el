@@ -172,8 +172,8 @@
    ("README\\.md\\'" . gfm-mode))
   :bind
   (:map markdown-mode-map
-        ("C-c C-d" . nil)
-        ("C-c C-j" . nil))
+        ("C-c C-d")
+        ("C-c C-j"))
   :custom
   (markdown-command
    "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
@@ -194,8 +194,8 @@
   ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
   )
 
-;; Use `pandoc-convert-to-pdf' to export markdown file to pdf
-;; Convert `markdown' to `org': "pandoc -f markdown -t org -o output-file.org input-file.md"
+;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
+;; -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
   :commands
   (pandoc-load-default-settings pandoc-mode)
@@ -209,20 +209,6 @@
   :disabled t
   :commands
   markdown-preview-mode)
-
-;; ;; Requires support for xwidget
-;; (use-package markdown-xwidget
-;;   :straight (markdown-xwidget :type git :host github
-;;                               :repo "cfclrk/markdown-xwidget" :files (:defaults "resources"))
-;;   :after markdown-mode
-;;   :bind
-;;   (:map markdown-mode-command-map ; Use "C-c C-c x"
-;;         ("x" . markdown-xwidget-preview-mode))
-;;   :custom
-;;   (markdown-xwidget-command "pandoc")
-;;   (markdown-xwidget-github-theme "light")
-;;   (markdown-xwidget-mermaid-theme "default")
-;;   (markdown-xwidget-code-block-theme "default"))
 
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
@@ -249,8 +235,8 @@
       :remote? t
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (lsp-configuration-section "perl"))))
+                          (lsp--set-configuration
+                           (lsp-configuration-section "perl"))))
       :priority -1
       :server-id 'perlls-r))))
 
@@ -270,8 +256,6 @@
 
 (use-package sh-script ; Shell script mode
   :straight (:type built-in)
-  :commands
-  (flycheck-add-next-checker)
   :mode
   (("\\.zsh\\'"   . sh-mode)
    ("\\bashrc\\'" . sh-mode))
@@ -404,8 +388,8 @@
   ((json-mode-hook jsonc-mode-hook) . (lambda ()
                                         (make-local-variable 'js-indent-level)
                                         (setq js-indent-level 2)
-                                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure)))
-                                        ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred))))
+                                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
+                                              ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client

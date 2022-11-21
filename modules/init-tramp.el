@@ -65,16 +65,6 @@
 (declare-function tramp-cleanup-connection "tramp")
 (bind-key "C-S-q" #'tramp-cleanup-connection)
 
-;; (declare-function sb/sshlist "private")
-
-;; (progn
-;;   (defun sb/ivy-tramp ()
-;;     "Invoke remote hosts with ivy and tramp."
-;;     (interactive)
-;;     (counsel-find-file (ivy-read "Remote Tramp targets: " (sb/sshlist))))
-
-;;   (bind-key "C-c d t" #'sb/ivy-tramp))
-
 (use-package counsel-tramp
   :if (eq sb/minibuffer-completion 'ivy)
   :bind

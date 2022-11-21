@@ -18,11 +18,11 @@
   :preface
   ;; https://github.com/minad/corfu/wiki
   (defun sb/lsp-mode-setup-completion ()
-    (if (featurep 'orderless)
-        (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-              '(orderless))
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(flex))
+    (with-eval-after-load "orderless"
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(flex))))
+            '(orderless))))
   :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-perl-language-server-path
             lsp-perl-language-server-port
@@ -66,11 +66,11 @@
                                     lsp-find-type-definition)
   :init
   ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
-  (when (eq sb/capf 'corfu)
-    (add-hook 'text-mode-hook (lambda ()
-                                (setq-local lsp-completion-enable nil))))
-  ;; :hook
-  ;; (lsp-mode-hook . lsp-dired-mode)
+
+  ;; (when (eq sb/capf 'corfu)
+  ;;   (add-hook 'text-mode-hook (lambda ()
+  ;;                               (setq-local lsp-completion-enable nil))))
+
   :bind-keymap
   ("C-c l" . lsp-command-map)
   :bind
@@ -78,12 +78,12 @@
   ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
   (("M-." . lsp-find-definition)
    :map lsp-command-map
-   ("=" . nil)
-   ("w" . nil)
-   ("g" . nil)
-   ("G" . nil)
-   ("a" . nil)
-   ("F" . nil)
+   ("=")
+   ("w")
+   ("g")
+   ("G")
+   ("a")
+   ("F")
    ("L" . lsp)
    ("q" . lsp-disconnect)
    ("Q" . lsp-workspace-shutdown)
@@ -104,13 +104,15 @@
    ("a" . lsp-workspace-folders-add)
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
-  :custom-face
-  ;; Reduce the height
-  (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
-                                               font-lock-doc-face :weight bold :height 0.9))))
-  (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
-  (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
-                                                               :weight bold :height 0.9))))
+
+  ;; :custom-face
+  ;; ;; Reduce the height
+  ;; (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
+  ;;                                              font-lock-doc-face :weight bold :height 0.9))))
+  ;; (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
+  ;; (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
+  ;;                                                              :weight bold :height 0.9))))
+
   :custom
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
   ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
@@ -132,11 +134,10 @@
   (lsp-completion-provider :none)
   (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
   (lsp-completion-show-kind nil "Disable completion kind to shorten popup width")
-  (lsp-eldoc-enable-hover nil)
+  (lsp-eldoc-enable-hover t)
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
-  (lsp-enable-text-document-color t)
   ;; (lsp-semantic-tokens-enable t)
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
   ;; Do not customize breadcrumb faces based on errors
@@ -159,20 +160,12 @@
   (lsp-signature-auto-activate nil)
   ;; Disable showing function documentation with `eldoc'
   ;; (lsp-signature-render-documentation nil)
-  ;; (lsp-signature-function 'lsp-signature-posframe)
   ;; Avoid annoying questions, we expect a server restart to succeed more often than not
   (lsp-restart 'auto-restart)
-  ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-  (lsp-use-plists nil)
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
   (lsp-warn-no-matched-clients nil)
-  (lsp-enable-which-key-integration t)
   :config
-  ;; Autocomplete parentheses
-  (when (featurep 'yasnippet)
-    (setq lsp-enable-snippet t))
-
   (dolist (ignore-dirs '("/build\\'"
                          "/\\.metadata\\'"
                          "/\\.recommenders\\'"
@@ -187,7 +180,8 @@
 
   (cond ((eq sb/capf 'corfu)
          (progn
-           (setq lsp-completion-enable nil)
+           (add-hook 'text-mode-hook (lambda ()
+                                       (setq-local lsp-completion-enable nil)))
            (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion)))
         ((eq sb/capf 'company) (setq lsp-completion-enable t)))
 
@@ -209,16 +203,14 @@
         ("D" . lsp-ui-doc-show))
   :custom
   ;; Invoke doc on demand with `lsp-ui-doc-show'
-  (lsp-ui-doc-enable nil "Disable on-hover dialogs")
+  ;; (lsp-ui-doc-enable nil "Disable on-hover dialogs")
   (lsp-ui-doc-include-signature t)
   (lsp-ui-imenu-auto-refresh 'after-save)
-  (lsp-ui-imenu-window-width 16)
   ;; Showing code actions in the sideline enables understanding when to invoke them
   (lsp-ui-sideline-show-code-actions t)
-  (lsp-ui-sideline-show-hover nil)
   ;; Hide diagnostics when typing because they can be intrusive
   (lsp-ui-sideline-show-diagnostics nil)
-  (lsp-ui-doc-max-height 8)
+  ;; (lsp-ui-doc-max-height 8)
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil)

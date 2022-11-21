@@ -115,48 +115,6 @@
   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
-(use-package moody
-  :if (eq sb/modeline-theme 'moody)
-  :commands
-  (moody-replace-vc-mode moody-replace-mode-line-buffer-identification)
-  :init
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
-
-(use-package mini-modeline
-  :if (eq sb/modeline-theme 'mini)
-  :hook
-  (after-init-hook . mini-modeline-mode)
-  :config
-  (setq mini-modeline-r-format '("%e" mode-line-front-space
-                                 mode-line-client
-                                 mode-line-modified
-                                 mode-line-remote
-                                 " " mode-line-buffer-identification " "
-                                 ;; mode-line-position
-                                 ;; mode-line-percent-position
-                                 (:eval (string-trim (format-mode-line mode-line-modes)))
-                                 mode-line-misc-info))
-  :diminish mini-modeline-mode)
-
-;; Display a minor-mode menu in the mode line. This is enabled if the full LSP state is shown, which
-;; takes up lot of horizontal space.
-(use-package minions
-  :unless (bound-and-true-p doom-modeline-lsp)
-  :hook
-  (doom-modeline-mode-hook . minions-mode))
-
-;; https://github.com/dbordak/telephone-line/blob/master/examples.org
-(use-package telephone-line
-  :if (eq sb/modeline-theme 'telephone)
-  :init
-  (setq telephone-line-primary-left-separator 'telephone-line-gradient
-        telephone-line-secondary-left-separator 'telephone-line-nil
-        telephone-line-primary-right-separator 'telephone-line-gradient
-        telephone-line-secondary-right-separator 'telephone-line-nil
-        telephone-line-height 24)
-  (telephone-line-mode 1))
-
 (provide 'init-modeline)
 
 ;;; init-modeline.el ends here

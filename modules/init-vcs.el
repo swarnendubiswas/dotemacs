@@ -17,11 +17,13 @@
   ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
   ;; information on the modeline.
   (vc-handled-backends '(Git))
-  :config
+  ;; :config
   ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-  (if (boundp 'vc-handled-backends)
-      (add-hook 'find-file-hook #'vc-refresh-state)
-    (remove-hook 'find-file-hook #'vc-refresh-state)))
+
+  ;; (if (boundp 'vc-handled-backends)
+  ;;     (add-hook 'find-file-hook #'vc-refresh-state)
+  ;;   (remove-hook 'find-file-hook #'vc-refresh-state))
+  )
 
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1
@@ -38,13 +40,15 @@
   (magit-section-initial-visibility-alist '((stashes   . show)
                                             (untracked . show)
                                             (unpushed  . show)
+
                                             (unpulled  . show)))
-  (magit-repository-directories '(("/home/swarnendu/books" . 0)
-                                  ("/home/swarnendu/bitbucket" . 1)
-                                  ("/home/swarnendu/github" . 1)
-                                  ("/home/swarnendu/iss-workspace")
-                                  ("/home/swarnendu/plass-workspace")
-                                  ("/home/swarnendu/prospar-workspace")))
+  ;; (magit-repository-directories '(("/home/swarnendu/books" . 0)
+  ;;                                 ("/home/swarnendu/bitbucket" . 1)
+  ;;                                 ("/home/swarnendu/github" . 1)
+  ;;                                 ("/home/swarnendu/iss-workspace")
+  ;;                                 ("/home/swarnendu/plass-workspace")
+  ;;                                 ("/home/swarnendu/prospar-workspace")))
+  (magit-commit-show-diff nil)
   :config
   ;; These give a performance boost to Magit
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
@@ -58,32 +62,33 @@
 
   (setq magit-diff-refine-hunk t
         magit-diff-highlight-trailing nil
-        magit-diff-paint-whitespace nil))
+        ;; magit-diff-paint-whitespace nil
+        ))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
-;; (use-package git-gutter
-;;   :if (unless (boundp 'vc-handled-backends))
-;;   :disabled t
-;;   :commands global-git-gutter-mode
-;;   :diminish
-;;   :bind
-;;   (("C-x p" . git-gutter:previous-hunk)
-;;    ("C-x n" . git-gutter:next-hunk))
-;;   :hook (after-init-hook . global-git-gutter-mode)
-;;   :custom
-;;   (git-gutter:added-sign " ")
-;;   (git-gutter:deleted-sign " ")
-;;   (git-gutter:modified-sign " ")
-;;   (git-gutter:update-interval 1)
-;;   :config
-;;   ;; https://github.com/syl20bnr/spacemacs/issues/10555
-;;   ;; https://github.com/syohex/emacs-git-gutter/issues/24
-;;   (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
+(use-package git-gutter
+  ;; :if (unless (boundp 'vc-handled-backends))
+  :commands global-git-gutter-mode
+  :diminish
+  :bind
+  (("C-x p" . git-gutter:previous-hunk)
+   ("C-x n" . git-gutter:next-hunk))
+  :hook (after-init-hook . global-git-gutter-mode)
+  :custom
+  (git-gutter:added-sign " ")
+  (git-gutter:deleted-sign " ")
+  (git-gutter:modified-sign " ")
+  (git-gutter:update-interval 1)
+  :config
+  ;; https://github.com/syl20bnr/spacemacs/issues/10555
+  ;; https://github.com/syohex/emacs-git-gutter/issues/24
+  (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
 
 ;; Diff-hl looks nicer than git-gutter, based on `vc'
 (use-package diff-hl
+  :disabled t
   :if (boundp 'vc-handled-backends)
   :commands diff-hl-dired-mode-unless-remote
   :hook
@@ -92,6 +97,7 @@
    (after-init-hook         . global-diff-hl-mode))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
+  (diff-hl-disable-on-remote t)
   :config
   (diff-hl-flydiff-mode 1)
 
@@ -127,7 +133,6 @@
       (when (re-search-forward "^<<<<<<< " nil t)
         (smerge-mode 1))))
   :straight (:type built-in)
-  :after hydra
   :commands
   (smerge-next smerge-prev smerge-auto-leave
                smerge-keep-base smerge-keep-upper
@@ -172,15 +177,6 @@
   (ediff-split-window-function #'split-window-horizontally)
   :config
   (ediff-set-diff-options 'ediff-diff-options "-w"))
-
-;; (use-package treemacs-magit
-;;   :after (treemacs magit)
-;;   :demand t)
-
-;; (use-package consult-ls-git
-;;   :bind
-;;   (("C-c g f" . consult-ls-git)
-;;    ("C-c g F" . consult-ls-git-other-window)))
 
 ;; Add the "delta" config into the global "~/.gitconfig" file.
 ;; https://github.com/dandavison/delta#get-started

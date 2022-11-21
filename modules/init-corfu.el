@@ -27,15 +27,19 @@
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
 
-  ;; https://github.com/minad/corfu/wiki
   (defun sb/corfu-prescient-remember (&rest _)
     "Advice for `corfu--insert.'"
     (when (>= corfu--index 0)
       (prescient-remember (nth corfu--index corfu--candidates))))
   :straight
-  (corfu :files (:defaults "extensions/*") :includes (corfu-indexed
-                                                      corfu-quick
-                                                      corfu-history))
+  (corfu :files (:defaults "extensions/*")
+         ;; :includes (corfu-indexed
+         ;;                                              corfu-quick
+         ;;                                              corfu-history
+         ;;                                              corfu-echo
+         ;;                                              corfu-info
+         ;;                                              corfu-popupinfo)
+         )
   :if (eq sb/capf 'corfu)
   :commands corfu--goto
   :hook
@@ -48,23 +52,23 @@
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
         ([remap move-end-of-line] . sb/corfu-end-of-prompt))
   :custom
-  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  ;; (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
-  (corfu-echo-documentation t)
-  (corfu-max-width 60)
+  ;; (corfu-echo-documentation t)
+  ;; (corfu-max-width 60)
   :config
   (add-hook 'prog-mode-hook (lambda ()
                               (setq-local corfu-auto-prefix 2)))
 
-  (with-eval-after-load "prescient"
-    (setq corfu-sort-function #'prescient-sort
-          corfu-sort-override-function #'prescient-sort)
-    (advice-add #'corfu--insert :before #'sb/corfu-prescient-remember)))
+  ;; (with-eval-after-load "prescient"
+  ;;   (setq corfu-sort-function #'prescient-sort
+  ;;         corfu-sort-override-function #'prescient-sort)
+  ;;   (advice-add #'corfu--insert :before #'sb/corfu-prescient-remember))
+  )
 
 (use-package corfu-info
-  :straight
-  (corfu :files (:defaults "extensions/*") :includes (corfu-info))
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-info))
   :after corfu
   :bind
   (:map corfu-map
@@ -73,17 +77,13 @@
 
 ;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
-  :straight
-  (corfu :files (:defaults "extensions/*")
-         :includes (corfu-indexed))
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-indexed))
   :after corfu
   :commands corfu-indexed-mode
   :init (corfu-indexed-mode 1))
 
 (use-package corfu-quick
-  :straight
-  (corfu :files (:defaults "extensions/*")
-         :includes (corfu-quick))
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-quick))
   :after corfu
   :bind
   (:map corfu-map
@@ -91,27 +91,39 @@
 
 ;; We do not need this if we use prescient-based sorting.
 (use-package corfu-history
-  :straight
-  (corfu :files (:defaults "extensions/*")
-         :includes (corfu-history))
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-history))
   :after (corfu savehist)
   :commands corfu-history-mode
   :init
   (add-to-list 'savehist-additional-variables 'corfu-history)
   (corfu-history-mode 1))
 
-(use-package corfu-doc
-  :if (and (display-graphic-p) (eq sb/capf 'corfu))
-  :hook
-  (corfu-mode-hook . corfu-doc-mode)
-  :bind
-  (:map corfu-map
-        ("M-p" . corfu-doc-scroll-down)
-        ("M-n" . corfu-doc-scroll-up)
-        ([remap corfu-info-documentation] . corfu-doc-toggle))
-  :custom
-  ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
-  (corfu-echo-documentation nil))
+;; (use-package corfu-echo
+;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo))
+;;   :after corfu
+;;   :commands corfu-echo-mode
+;;   :init
+;;   (corfu-echo-mode 1))
+
+;; (use-package corfu-popupinfo
+;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-popupinfo))
+;;   :after corfu
+;;   :commands corfu-popupinfo-mode
+;;   :init
+;;   (corfu-popupinfo-mode 1))
+
+;; (use-package corfu-doc
+;;   :if (and (display-graphic-p) (eq sb/capf 'corfu))
+;;   :hook
+;;   (corfu-mode-hook . corfu-doc-mode)
+;;   :bind
+;;   (:map corfu-map
+;;         ("M-p" . corfu-doc-scroll-down)
+;;         ("M-n" . corfu-doc-scroll-up)
+;;         ([remap corfu-info-documentation] . corfu-doc-toggle))
+;;   :custom
+;;   ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
+;;   (corfu-echo-documentation nil))
 
 (use-package popon
   :straight
@@ -124,11 +136,11 @@
   :hook
   (corfu-mode-hook . corfu-terminal-mode))
 
-(use-package corfu-doc-terminal
-  :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
-  :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
-  :hook
-  (corfu-mode-hook . corfu-doc-terminal-mode))
+;; (use-package corfu-doc-terminal
+;;   :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
+;;   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
+;;   :hook
+;;   (corfu-mode-hook . corfu-doc-terminal-mode))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -203,8 +215,8 @@
                                         (list
                                          (cape-super-capf #'lsp-completion-at-point
                                                           #'citre-completion-at-point
-                                                          #'sh-completion-at-point-function
-                                                          #'comint-completion-at-point
+                                                          ;; #'sh-completion-at-point-function
+                                                          ;; #'comint-completion-at-point
                                                           #'cape-file
                                                           #'cape-dabbrev
                                                           #'cape-dict)))))))
@@ -218,7 +230,7 @@
                                           (list
                                            #'lsp-completion-at-point
                                            #'citre-completion-at-point
-                                           #'tags-completion-at-point-function
+                                           ;; #'tags-completion-at-point-function
                                            #'cape-file
                                            #'cape-keyword
                                            (cape-super-capf #'cape-dabbrev
@@ -243,7 +255,7 @@
                                           (list
                                            (cape-super-capf #'lsp-completion-at-point
                                                             #'citre-completion-at-point
-                                                            #'TeX--completion-at-point
+                                                            ;; #'TeX--completion-at-point
                                                             #'cape-tex
                                                             #'cape-file
                                                             #'cape-dabbrev

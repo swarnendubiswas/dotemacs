@@ -61,9 +61,6 @@
            (const :tag "doom-modeline"   doom-modeline)
            (const :tag "awesome-tray"    awesome-tray)
            (const :tag "spaceline"       spaceline)
-           (const :tag "moody"           moody)
-           (const :tag "mini-modeline"   mini)
-           (const :tag "telephone-line"  telephone)
            ;; No customization
            (const :tag "none"            none))
   :group 'sb/emacs)
@@ -168,7 +165,7 @@ This location is used for temporary installations and files.")
 ;; configurable and we also have `company-dict'.
 
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)

@@ -85,7 +85,7 @@
   (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook
-  ((prog-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
+  ((prog-mode-hook org-mode-hook  LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
   :custom
   (yas-verbosity 0)
   :config
