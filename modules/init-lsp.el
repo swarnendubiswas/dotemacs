@@ -64,13 +64,6 @@
                                     lsp-completion--regex-fuz
                                     lsp-describe-thing-at-point
                                     lsp-find-type-definition)
-  :init
-  ;;https://github.com/emacs-lsp/lsp-mode/issues/3550
-
-  ;; (when (eq sb/capf 'corfu)
-  ;;   (add-hook 'text-mode-hook (lambda ()
-  ;;                               (setq-local lsp-completion-enable nil))))
-
   :bind-keymap
   ("C-c l" . lsp-command-map)
   :bind
@@ -104,15 +97,6 @@
    ("a" . lsp-workspace-folders-add)
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
-
-  ;; :custom-face
-  ;; ;; Reduce the height
-  ;; (lsp-headerline-breadcrumb-symbols-face ((t (:inherit
-  ;;                                              font-lock-doc-face :weight bold :height 0.9))))
-  ;; (lsp-headerline-breadcrumb-prefix-face ((t (:inherit font-lock-string-face :height 0.9))))
-  ;; (lsp-headerline-breadcrumb-project-prefix-face ((t (:inherit font-lock-string-face
-  ;;                                                              :weight bold :height 0.9))))
-
   :custom
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
   ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
@@ -210,7 +194,6 @@
   (lsp-ui-sideline-show-code-actions t)
   ;; Hide diagnostics when typing because they can be intrusive
   (lsp-ui-sideline-show-diagnostics nil)
-  ;; (lsp-ui-doc-max-height 8)
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil)

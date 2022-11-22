@@ -112,21 +112,6 @@
                                  (lambda ()
                                    (setq python-shell-interpreter "python3")))))
 
-;; ;; FIXME: There is an error in passing options to isort
-;; (use-package py-isort
-;;   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-;;   :disabled t
-;;   :commands
-;;   (py-isort-before-save py-isort-buffer py-isort-region)
-;;   :hook
-;;   (python-mode-hook . (lambda ()
-;;                         (add-hook 'before-save-hook #'py-isort-before-save)))
-;;   :custom
-;;   (py-isort-options '("-l 100"
-;;                       "--up" ; Use parentheses
-;;                       "--tc" ; Use a trailing comma on multiline imports
-;;                       )))
-
 (use-package python-isort
   :straight
   (python-isort :type git :host github :repo "wyuenho/emacs-python-isort")
@@ -134,7 +119,10 @@
   :hook
   (python-mode-hook . python-isort-on-save-mode)
   :custom
-  (python-isort-arguments '("--stdout" "--atomic" "-l 100" "--up" "--tc" "-")))
+  (python-isort-arguments '("--stdout" "--atomic" "-l 100"
+                            "--up" ; Use parentheses
+                            "--tc" ; Use a trailing comma on multiline imports
+                            "-")))
 
 ;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
 ;; used. We do not use `lsp-format-buffer' or `eglot-format-buffer' since `pyright' does not support
