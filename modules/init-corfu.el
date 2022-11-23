@@ -105,12 +105,12 @@
   :init
   (corfu-echo-mode 1))
 
-;; (use-package corfu-popupinfo
-;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-popupinfo))
-;;   :after corfu
-;;   :commands corfu-popupinfo-mode
-;;   :init
-;;   (corfu-popupinfo-mode 1))
+(use-package corfu-popupinfo
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-popupinfo))
+  :after corfu
+  :commands corfu-popupinfo-mode
+  :init
+  (corfu-popupinfo-mode 1))
 
 ;; (use-package corfu-doc
 ;;   :if (and (display-graphic-p) (eq sb/capf 'corfu))

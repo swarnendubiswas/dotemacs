@@ -173,7 +173,6 @@
 
 (use-package lsp-ui
   :after lsp-mode
-  :demand t
   :defines lsp-ui-modeline-code-actions-enable
   :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-doc--hide-frame
                              lsp-ui-peek-find-implementation lsp-ui-imenu)

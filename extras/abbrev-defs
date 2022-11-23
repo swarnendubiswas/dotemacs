@@ -1603,6 +1603,7 @@
     ("deferent" "different" nil :count 0)
     ("dta" "data" nil :count 0)
     ("durig" "during" nil :count 0)
+    ("executio" "execution" nil :count 0)
     ("experiements" "experiments" nil :count 0)
     ("explainiation" "explanation" nil :count 0)
     ("expsoing" "Exposing" nil :count 0)

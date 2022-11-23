@@ -82,8 +82,9 @@
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
   :hook
   ((citre-mode-hook . sb/enable-lsp-citre-capf-backend)
-   (prog-mode-hook . (lambda()
-                       (require 'citre-config))))
+   ;; Using `(require citre-config)' will enable `citre-mode' for all files as long as it finds a
+   ;; tags backend, which is not desired for plain text files.
+   ((prog-mode-hook LaTeX-mode-hook) . citre-mode))
   :bind
   (("C-x c j" . citre-jump)
    ("M-'"     . sb/citre-jump+)

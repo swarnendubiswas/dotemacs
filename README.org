@@ -1,6 +1,8 @@
+#+OPTIONS: ':t
+
 * GNU Emacs
 
-This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform, and is not tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform, and are not tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ** Install GNU Emacs
 
@@ -14,20 +16,30 @@ sudo apt update
 sudo apt install emacs28-nativecomp
 #+end_src
 
-*** Build GNU Emacs from source
+*** Build GNU Emacs
+
+Add the following repository if you are using Ubuntu 20.04.
 
 #+begin_src shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 # Install gcc-10 packages with required support for libgccjit
 sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
+#+end_src
 
-wget https://ftp.gnu.org/gnu/emacs/emacs-28.1.tar.xz
-tar -xf emacs-28.1.tar.xz
-export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+Use the following instructions to configure and build GNU Emacs from the source.
+
+#+begin_src shell
+wget https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz
+tar -xf emacs-28.2.tar.xz
+
+# Use GCC 10 if you are on Ubuntu 20.04
+export CC=/usr/bin/gcc-11 CXX=/usr/bin/gcc-11
 make distclean
+
 ./autogen.sh
 ./configure --with-cairo --with-modules --with-x-toolkit=lucid --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --with-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
-make -j 8 NATIVE_FULL_AOT=1
+
+make -j"$(nproc)" NATIVE_FULL_AOT=1
 sudo make install
 #+end_src
 
@@ -46,7 +58,7 @@ Evaluate the following to test that both fast JSON (Emacs 27+) and native compil
 (message "Native JSON is *not* available"))
 #+end_src
 
-You can also check the value of the `system-configuration-features` variable, look for "NATIVE​_COMP".
+You can also check the value of the ~system-configuration-features~ variable, look for "NATIVE__COMP".
 
 Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=): =(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)=
 
@@ -266,8 +278,6 @@ I use LSP over Tramp intensively, and LSP+Tramp is sluggish and fails often. It 
 
 Using Terminal Emacs over Tramp for editing remote files obviates the need for a remote langsever.
 
-
-
 Use the steps mentioned in the link [[https://github.com/syl20bnr/spacemacs/wiki/Terminal][Spacemacs Terminal]] to enable support for 24bit colors in the terminal.
 
 #+begin_src bash
@@ -279,12 +289,11 @@ export TERM=xterm-24bit
 
 Using ~export TERM=xterm-24bit~ may lead to failures when accessing remote systems. In such cases, we can fall back to ~TERM=xterm-256color ssh -X <remote-path>~.
 
-
 ** Emacsclient
 
-To run Emacsclient with a GUI, use ~emacsclient -c -a ​""~~, where ~~-a ""~~ starts Emacs daemon and reattaches, and ~-t~ starts the client in the terminal. To run Emacsclient in a terminal, use ~emacsclient -nw -q~ or ~emacsclient -t -q~.
+Start the Emacs daemon with ~emacs --daemon~. To run Emacsclient with a GUI, use =emacsclient -c -a ""=, where =-a ""= starts Emacs daemon and reattaches, and ~-t~ starts the client in the terminal. To run Emacsclient in a terminal, use ~emacsclient -nw -q~ or ~emacsclient -t -q~.
 
-   Add the following to your ~.bashrc~ to use Emacsclient as your editor.
+Add the following to your ~.bashrc~ to use Emacsclient as your editor.
 
 #+begin_src bash
 export ALTERNATE_EDITOR=""
