@@ -11,6 +11,11 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
+(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
+  "Hide messages appearing in ORIG-FUN, forward ARGS."
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
+
 (use-package ibuffer
   :straight (:type built-in)
   :hook
@@ -69,22 +74,12 @@
   :hook
   (after-init-hook . immortal-scratch-mode))
 
-;; I use the "*scratch*" buffer for taking notes, this package helps to make the data persist.
+;; Helps to make the data in the "*scratch*" buffer persist.
 (use-package persistent-scratch
   :hook
   (after-init-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
-
-;; ;; Hooks into to `find-file-hook' to add all visited files and directories to `fasd'
-;; (use-package fasd
-;;   :when (executable-find "fasd")
-;;   :defines fasd-enable-initial-prompt
-;;   :hook
-;;   (after-init-hook . global-fasd-mode)
-;;   :bind* ("C-c /" . fasd-find-file)
-;;   :custom
-;;   (fasd-enable-initial-prompt nil "Narrow easily with Ivy/Vertico"))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
@@ -126,8 +121,6 @@
   :bind
   (([remap other-window] . ace-window)
    ("M-o" . ace-window))
-  :custom
-  (aw-minibuffer-flag t "Display ace-window is active in the minibuffer")
   :config
   (add-to-list 'aw-ignored-buffers "*toc*")
   (ace-window-display-mode 1))
@@ -149,7 +142,7 @@
   :defines
   (super-save-remote-files super-save-triggers super-save-hook-triggers)
   :hook
-  (after-init-hook . super-save-mode)
+  (emacs-startup-hook . super-save-mode)
   :custom
   (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
   :config

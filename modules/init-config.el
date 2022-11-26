@@ -47,8 +47,7 @@
            (const :tag "ef-trio-dark"      ef-trio-dark)
            ;; Greenish tinge
            (const :tag "ef-bio"            ef-bio)
-           ;; Customizations over the default theme
-           (const :tag "customized"        sb/customized)
+           (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"              none))
   :group 'sb/emacs)
@@ -93,16 +92,6 @@ Sometimes we do not want to unnecessarily add differences due to
   :type  'boolean
   :group 'sb/emacs)
 
-;; We can use the snap installation of "universal-ctags", but snap packages have poor performance. A
-;; better alternative is to build and install "ctags" locally. Check "setup-emacs.sh" for
-;; installation instructions.
-
-(defcustom sb/ctags-path
-  "/usr/local/bin/ctags"
-  "Absolute path to Universal Ctags executable."
-  :type  'string
-  :group 'sb/emacs)
-
 (defcustom sb/debug-init-file
   nil
   "Enable features to debug errors and performance bottlenecks."
@@ -118,21 +107,10 @@ Sometimes we do not want to unnecessarily add differences due to
       (expand-file-name ".config" sb/user-home-directory))
   "Path to user's local config store.")
 
-(defconst sb/user-cache-directory
-  (or (getenv "XDG_CACHE_HOME")
-      (expand-file-name ".cache" sb/user-home-directory))
-  "Path to user's local cache store.")
-
 (defconst sb/user-tmp-directory
   (expand-file-name "tmp" sb/user-home-directory)
   "User temp directory.
 This location is used for temporary installations and files.")
-
-(defcustom sb/textlint-directory
-  (expand-file-name "textlint-workspace" sb/user-tmp-directory)
-  "Absolute path to textlint workspace."
-  :type  'string
-  :group 'sb/emacs)
 
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow.
 ;; Furthermore, candidate `pylsp' versions depend on the OS version, and capf sometimes does not
@@ -173,6 +151,14 @@ This location is used for temporary installations and files.")
           (const :tag "none" none))
   :group 'dotemacs)
 
+(defcustom sb/corfu-icons
+  'kind-all-the-icons
+  "Choose the provider for Corfu icons."
+  :type '(radio
+          (const :tag "kind-icon" kind-icon)
+          (const :tag "kind-all-the-icons" kind-all-the-icons)
+          (const :tag "none" none)))
+
 ;; Prefer "straight.el" over "package.el". A big advantage with "straight.el" is it is easy to
 ;; install packages from arbitrary sources like GitHub.
 (defcustom sb/disable-package.el
@@ -200,14 +186,6 @@ Prefer the straight.el package manager instead."
           (const :tag "centaur-tabs" centaur-tabs)
           (const :tag "none" nil))
   :group 'dotemacs)
-
-(defcustom sb/corfu-icons
-  'kind-all-the-icons
-  "Choose the provider for Corfu icons."
-  :type '(radio
-          (const :tag "kind-icon" kind-icon)
-          (const :tag "kind-all-the-icons" kind-all-the-icons)
-          (const :tag "none" none)))
 
 ;; Eglot does not allow multiple servers to connect to a major mode. which is a useful feature. For
 ;; example, I can use `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. However,

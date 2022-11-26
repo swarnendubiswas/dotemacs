@@ -9,7 +9,6 @@
 
 (defvar sb/modeline-theme)
 (defvar sb/user-home-directory)
-(defvar sb/textlint-directory)
 (defvar sb/minibuffer-completion)
 
 (declare-function f-dirname "f")

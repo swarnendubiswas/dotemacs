@@ -201,7 +201,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="4.3.1"
+    TEXLAB_VER="4.3.2"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -424,7 +424,6 @@ install_alacritty() {
     /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
 }
 
-# Build bear
 install_bear() {
     apt install libssl-dev
     if [ ! -d bear ]; then
@@ -535,7 +534,7 @@ install_fzf() {
     fi
 
     cd fzf
-    git checkout 0.34.0
+    git checkout 0.35.1
     bash ./install
 }
 

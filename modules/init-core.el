@@ -210,7 +210,7 @@
 (use-package autorevert ; Auto-refresh all buffers
   :straight (:type built-in)
   :hook
-  (after-init-hook . global-auto-revert-mode)
+  (emacs-startup-hook . global-auto-revert-mode)
   :custom
   (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
   ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
@@ -228,13 +228,13 @@
 (use-package saveplace ; Remember cursor position in files
   :straight (:type built-in)
   :hook
-  (after-init-hook . save-place-mode))
+  (emacs-startup-hook . save-place-mode))
 
 (use-package savehist ; Save minibuffer history across sessions
   :straight (:type built-in)
   :commands savehist-mode
   :hook
-  (after-init-hook . savehist-mode)
+  (emacs-startup-hook . savehist-mode)
   :custom
   (savehist-additional-variables '(extended-command-history
                                    command-history
@@ -253,13 +253,11 @@
         uniquify-separator           "/"
         uniquify-strip-common-suffix t))
 
-;; We open the "*scratch*" buffer in `text-mode', so enabling `abbrev-mode' early is useful
 (use-package abbrev
   :straight (:type built-in)
   :hook
-  (after-init-hook . abbrev-mode)
+  (emacs-startup-hook . abbrev-mode)
   :custom
-  ;; The "abbrev-defs" file is under version control
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
   (save-abbrevs 'silently)
   :diminish)
@@ -268,11 +266,11 @@
 (use-package so-long
   :straight (:type built-in)
   :hook
-  (after-init-hook . global-so-long-mode))
+  (emacs-startup-hook . global-so-long-mode))
 
 (use-package imenu
   :straight (:type built-in)
-  :after (:any markdown-mode yaml-mode prog-mode)
+  :after (:any markdown-mode org-mode yaml-mode prog-mode)
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 1000)
@@ -329,54 +327,49 @@
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
   ;; after idling for 30 seconds.
-  (run-with-idle-timer 30 t #'recentf-save-list)
+  (run-with-idle-timer 20 t #'recentf-save-list)
 
   ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
   ;; timers.
-  (run-with-idle-timer 60 t #'recentf-cleanup))
+  (run-with-idle-timer 30 t #'recentf-cleanup))
 
-(use-package image-mode
-  :preface
-  ;; http://emacs.stackexchange.com/a/7693/289
-  (defun sb/show-image-dimensions-in-mode-line ()
-    (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
-           (width (car image-dimensions))
-           (height (cdr image-dimensions)))
-      (setq mode-line-buffer-identification
-            (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
-  :straight (:type built-in)
-  :if (display-graphic-p)
-  :commands image-get-display-property
-  :hook
-  (image-mode-hook . sb/show-image-dimensions-in-mode-line)
-  :mode "\\.svg$"
-  :custom
-  ;; Enable converting external formats (i.e., webp) to internal ones.
-  (image-use-external-converter t))
+;; (use-package image-mode
+;;   :preface
+;;   ;; http://emacs.stackexchange.com/a/7693/289
+;;   (defun sb/show-image-dimensions-in-mode-line ()
+;;     (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
+;;            (width (car image-dimensions))
+;;            (height (cdr image-dimensions)))
+;;       (setq mode-line-buffer-identification
+;;             (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
+;;   :straight (:type built-in)
+;;   :if (display-graphic-p)
+;;   :commands image-get-display-property
+;;   :hook
+;;   (image-mode-hook . sb/show-image-dimensions-in-mode-line)
+;;   :mode "\\.svg$"
+;;   :custom
+;;   ;; Enable converting external formats (i.e., webp) to internal ones.
+;;   (image-use-external-converter t))
 
-;; Use "emacsclient -c -nw" to start a new frame.
-;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
-(use-package server
-  :straight (:type built-in)
-  ;; There is no use keeping this enabled if I am not using the daemon.
-  :disabled t
-  :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
-  :commands server-running-p
-  :hook
-  (after-init-hook . (lambda ()
-                       ;; Only start server mode if not root
-                       (unless (string-equal "root" (getenv "USER"))
-                         (unless (and (fboundp 'server-running-p) (server-running-p))
-                           (server-start)))))
-  :config
-  ;; Hide "When done with a buffer, type C-x 5" message
-  (when (boundp 'server-client-instructions)
-    (setq server-client-instructions nil)))
-
-(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
-  "Hide messages appearing in ORIG-FUN, forward ARGS."
-  (let ((inhibit-message t))
-    (apply orig-fun args)))
+;; ;; Use "emacsclient -c -nw" to start a new frame.
+;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
+;; (use-package server
+;;   :straight (:type built-in)
+;;   ;; There is no use keeping this enabled if I am not using the daemon.
+;;   :disabled t
+;;   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
+;;   :commands server-running-p
+;;   :hook
+;;   (after-init-hook . (lambda ()
+;;                        ;; Only start server mode if not root
+;;                        (unless (string-equal "root" (getenv "USER"))
+;;                          (unless (and (fboundp 'server-running-p) (server-running-p))
+;;                            (server-start)))))
+;;   :config
+;;   ;; Hide "When done with a buffer, type C-x 5" message
+;;   (when (boundp 'server-client-instructions)
+;;     (setq server-client-instructions nil)))
 
 ;; Hide the "Wrote to recentf" message
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
@@ -411,29 +404,22 @@
 ;;   (calendar-location-name "Kanpur, UP, India")
 ;;   (calendar-longitude 80.23))
 
-;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined will
-;; also get run for all modes derived from a basic mode such as `text-mode'.
+;; NOTE: `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined
+;; will also get run for all modes derived from a basic mode such as `text-mode'.
 
 ;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
 ;; wrapped around automatically.
-(add-hook 'text-mode-hook #'turn-on-auto-fill)
+
+;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)
 
-;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
-(defun sb/auto-create-missing-dirs ()
-  "Auto-create missing directories on a file create and save."
-  (let ((target-dir (file-name-directory buffer-file-name)))
-    (unless (file-exists-p target-dir)
-      (make-directory target-dir t))))
-
-(add-to-list 'find-file-not-found-functions #'sb/auto-create-missing-dirs)
-
 ;; Enable commands that are disabled by default. I prefer upcase and downcase to work on the first
 ;; characters in a word instead of the character at point.
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
+
+;; (put 'downcase-region 'disabled nil)
+;; (put 'upcase-region 'disabled nil)
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
 ;; prefix argument is given. Then it will find file at point.

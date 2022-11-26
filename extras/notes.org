@@ -99,6 +99,11 @@ https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variabl
 
 ~add-to-list~ adds elements to the front of a list. ~add-to-list~ is almost always preferable to ~push~ because ~push~ adds an element to a list even if it is already in the list, whereas ~add-to-list~ will not.
 
+** Using Hooks
+
+~emacs-startup-hook~ runs later than the ~after-init-hook~, it is the last recommended hook to
+load customizations. ~window-setup-hook~ runs after loading init files and handling the command line similar to ~emacs-startup-hook~. The only difference is that ~window-setup-hook~ hook runs after frame parameters have been set up in response to any settings from the init file.
+
 
 ** Useful Information
 

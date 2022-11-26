@@ -41,9 +41,6 @@
         straight-check-for-modifications '(check-on-save find-when-checking)
         straight-use-package-by-default t
         ;; There is no need to download the whole Git history, and a single branch often suffices.
-        ;; FIXME: However, that seems to lead to "git revision parsing" errors while using
-        ;; `straight-pull-all' and `straight-freeze-versions', which is irritating. The error may
-        ;; also be due to renaming of `master' to `main'.
         straight-vc-git-default-clone-depth '(1 single-branch)
         straight-disable-native-compile nil)
 
@@ -131,13 +128,6 @@
 
 (use-package diminish
   :demand t)
-
-;; Allow GC to happen after a period of idle time, initialize this package early
-(use-package gcmh
-  :commands gcmh-idle-garbage-collect
-  :hook
-  (after-init-hook . gcmh-mode)
-  :diminish)
 
 ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists

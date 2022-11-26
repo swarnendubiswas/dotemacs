@@ -49,11 +49,6 @@
   "Restore garbage collection."
   (setq gc-cons-threshold sb/emacs-4MB))
 
-;; `emacs-startup-hook' runs later than the `after-init-hook', it is the last recommended hook to
-;; load customizations. `window-setup-hook' runs after loading init files and handling the command
-;; line similar to `emacs-startup-hook'. The only difference is that `window-setup-hook' hook runs
-;; after frame parameters have been set up in response to any settings from the init file.
-
 (add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
 (add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
 (add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
@@ -89,17 +84,10 @@
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p' since `window-system'
 ;; is deprecated.
-
-(when (fboundp 'tool-bar-mode) ; (when (featurep 'tool-bar)
-  (tool-bar-mode -1))
-
-(when (fboundp 'scroll-bar-mode) ; (when (featurep 'scroll-bar)
-  (scroll-bar-mode -1))
-
-;; The menu bar is useful to identify different capabilities available and their shortcuts.
-(when (and (fboundp 'menu-bar-mode)
-           (not (display-graphic-p)))
-  (menu-bar-mode -1))
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+;; The menu bar can be useful to identify different capabilities available and their shortcuts.
+(menu-bar-mode -1)
 
 ;; Set a hint of transparency, works with GUI frames
 (set-frame-parameter (selected-frame) 'alpha '(98 . 98))

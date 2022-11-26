@@ -444,6 +444,13 @@
 ;;   ;;   (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map))
 ;;   )
 
+;; Allow GC to happen after a period of idle time
+(use-package gcmh
+  :commands gcmh-idle-garbage-collect
+  :hook
+  (emacs-startup-hook . gcmh-mode)
+  :diminish)
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

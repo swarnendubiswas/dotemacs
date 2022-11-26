@@ -94,6 +94,16 @@ Increase line spacing by two line height."
                (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
+;; We can use the snap installation of "universal-ctags", but snap packages have poor performance. A
+;; better alternative is to build and install "ctags" locally. Check "setup-emacs.sh" for
+;; installation instructions.
+
+(defcustom sb/ctags-path
+  "/usr/local/bin/ctags"
+  "Absolute path to Universal Ctags executable."
+  :type  'string
+  :group 'sb/emacs)
+
 ;; https://www.emacswiki.org/emacs/BuildTags
 (defun sb/create-ctags (dir-name)
   "Create tags file with ctags in DIR-NAME."
@@ -211,6 +221,15 @@ Use the filename relative to the current VC root directory."
 	     (location (format "%s:%s" file-name line-number)))
     (kill-new location)
     (message location)))
+
+;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
+(defun sb/auto-create-missing-dirs ()
+  "Auto-create missing directories on a file create and save."
+  (let ((target-dir (file-name-directory buffer-file-name)))
+    (unless (file-exists-p target-dir)
+      (make-directory target-dir t))))
+
+;; (add-to-list 'find-file-not-found-functions #'sb/auto-create-missing-dirs)
 
 (provide 'init-functions)
 
