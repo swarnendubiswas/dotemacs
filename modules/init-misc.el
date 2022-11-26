@@ -34,7 +34,7 @@
   :hook
   ((minibuffer-setup-hook . (lambda ()
                               (hungry-delete-mode -1)))
-   (after-init-hook . global-hungry-delete-mode))
+   (emacs-startup-hook . global-hungry-delete-mode))
   :diminish)
 
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
@@ -78,7 +78,7 @@
 ;;   :commands
 ;;   (whole-line-or-region-local-mode)
 ;;   :hook
-;;   (after-init-hook . whole-line-or-region-global-mode)
+;;   (emacs-startup-hook . whole-line-or-region-global-mode)
 ;;   :diminish whole-line-or-region-local-mode)
 
 (use-package goto-last-change
@@ -89,7 +89,7 @@
 ;; pressing the keys "M-<" and "M->" keys again.
 (use-package beginend
   :hook
-  (after-init-hook . beginend-global-mode)
+  (emacs-startup-hook . beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
@@ -253,7 +253,7 @@
   :commands
   (execute-extended-command-for-buffer)
   :hook
-  (after-init-hook . amx-mode)
+  (emacs-startup-hook . amx-mode)
   :bind
   (("M-x"  . amx) ; We need this if we use `vertico' and `consult'
    ("<f1>" . amx)))
@@ -275,7 +275,7 @@
     (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
     (add-hook 'after-revert-hook      #'bm-buffer-restore)
     (add-hook 'find-file-hook         #'bm-buffer-restore)
-    (add-hook 'after-init-hook        #'bm-repository-load))
+    (add-hook 'emacs-startup-hook     #'bm-repository-load))
   :commands
   (bm-buffer-save-all bm-repository-save)
   :init
@@ -292,7 +292,7 @@
    (vc-before-checkin-hook . bm-buffer-save)
    (after-revert-hook . bm-buffer-restore)
    (find-file-hook . bm-buffer-restore)
-   (after-init-hook . bm-repository-load))
+   (emacs-startup-hook . bm-repository-load))
   :bind
   (("C-<f1>" . bm-toggle)
    ("C-<f2>" . bm-next)

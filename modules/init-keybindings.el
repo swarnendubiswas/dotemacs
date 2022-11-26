@@ -89,7 +89,7 @@
 (use-package which-key ; Show help popups for prefix keys
   :commands which-key-setup-side-window-right-bottom
   :hook
-  (after-init-hook . which-key-mode)
+  (emacs-startup-hook . which-key-mode)
   :custom
   ;; ;; Allow "C-h" to trigger `which-key' before it is done automatically
   ;; (which-key-show-early-on-C-h nil)
@@ -620,7 +620,7 @@
 (use-package term-keys
   :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
   :hook
-  (after-init-hook . term-keys-mode)
+  (emacs-startup-hook . term-keys-mode)
   :config
   ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
   (require 'term-keys-alacritty))

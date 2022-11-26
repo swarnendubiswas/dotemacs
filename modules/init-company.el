@@ -34,7 +34,7 @@
                  company-capf company-dabbrev-code
                  company-clang-set-prefix)
   :hook
-  (after-init-hook . global-company-mode)
+  (emacs-startup-hook . global-company-mode)
   :bind
   ;; `company-search-candidates' is bound to "C-s" and `company-filter-candidates' is bound to
   ;; "C-M-s"

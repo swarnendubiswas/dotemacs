@@ -67,7 +67,7 @@
         doom-modeline-buffer-file-name-style 'truncate-with-project ; Reduce space on the modeline
         doom-modeline-unicode-fallback t)
   :hook
-  (after-init-hook . doom-modeline-mode))
+  (emacs-startup-hook . doom-modeline-mode))
 
 (use-package spaceline
   :defines (spaceline-hud-p spaceline-selection-info-p
@@ -98,7 +98,7 @@
   (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
   :if (eq sb/modeline-theme 'awesome-tray)
   :hook
-  (after-init-hook . awesome-tray-mode)
+  (emacs-startup-hook . awesome-tray-mode)
   :custom
   (awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
   (awesome-tray-git-update-duration 30 "Seconds")

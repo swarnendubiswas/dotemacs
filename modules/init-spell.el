@@ -100,9 +100,9 @@
    ;; language-specific words. Furthermore, it is supposedly slow.
    ;; (prog-mode-hook . flyspell-prog-mode)
    ;; `find-file-hook' will not work for buffers with no associated files
-   (after-init-hook . (lambda ()
-                        (when (string= (buffer-name) "*scratch*")
-                          (flyspell-mode 1))))
+   (emacs-startup-hook . (lambda ()
+                           (when (string= (buffer-name) "*scratch*")
+                             (flyspell-mode 1))))
    (text-mode-hook . flyspell-mode))
   :bind
   (("C-c f f" . flyspell-mode)

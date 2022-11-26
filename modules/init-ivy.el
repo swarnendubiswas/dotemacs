@@ -23,7 +23,7 @@
   :commands
   (ivy-read)
   :hook
-  (after-init-hook . ivy-mode)
+  (emacs-startup-hook . ivy-mode)
   :bind
   (("C-c r"    . ivy-resume)
    ("<f3>"     . ivy-switch-buffer)

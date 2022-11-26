@@ -41,14 +41,14 @@
   :if (and (eq sb/minibuffer-completion 'ivy) (display-graphic-p))
   :after ivy
   :hook
-  (after-init-hook . all-the-icons-ivy-setup))
+  (emacs-startup-hook . all-the-icons-ivy-setup))
 
 ;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
 ;; line.
 (use-package auto-dim-other-buffers
   :commands adob--rescan-windows
   :hook
-  (after-init-hook . auto-dim-other-buffers-mode))
+  (emacs-startup-hook . auto-dim-other-buffers-mode))
 
 ;; Decrease minibuffer font
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -69,12 +69,12 @@
 
 (use-package beacon ; Highlight the cursor position when the window scrolls
   :hook
-  (after-init-hook . beacon-mode)
+  (emacs-startup-hook . beacon-mode)
   :diminish)
 
 (when (display-graphic-p)
   ;; Show dividers on the right of each window, more prominent than the default
-  (add-hook 'after-init-hook #'window-divider-mode)
+  (add-hook 'emacs-startup-hook #'window-divider-mode)
 
   ;; Copying text from the TUI includes the line numbers, which is a nuisance.
   (global-display-line-numbers-mode 1)
@@ -111,7 +111,7 @@
 (use-package hl-line
   :commands hl-line-highlight
   :hook
-  (after-init-hook . global-hl-line-mode))
+  (emacs-startup-hook . global-hl-line-mode))
 
 ;; This package disables the mouse completely which is an extreme.
 (use-package disable-mouse

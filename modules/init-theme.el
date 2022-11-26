@@ -80,7 +80,7 @@
 ;;   :custom
 ;;   (circadian-themes '((:sunrise . nano-light)
 ;;                       (:sunset  . modus-vivendi)))
-;;   :hook (after-init-hook . circadian-setup))
+;;   :hook (emacs-startup-hook . circadian-setup))
 
 (use-package catppuccin-theme
   :if (or (eq sb/gui-theme 'catppuccin)

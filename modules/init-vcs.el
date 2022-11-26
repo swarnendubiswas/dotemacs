@@ -93,7 +93,7 @@
   :hook
   ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
    (magit-pre-refresh-hook  . diff-hl-magit-pre-refresh)
-   (after-init-hook         . global-diff-hl-mode))
+   (emacs-startup-hook      . global-diff-hl-mode))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   (diff-hl-disable-on-remote t)

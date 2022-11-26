@@ -288,7 +288,7 @@
                     recentf-apply-filename-handlers
                     recentf-cleanup)
   :hook
-  (after-init-hook . recentf-mode)
+  (emacs-startup-hook . recentf-mode)
   :custom
   (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
@@ -361,7 +361,7 @@
 ;;   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
 ;;   :commands server-running-p
 ;;   :hook
-;;   (after-init-hook . (lambda ()
+;;   (emacs-startup-hook . (lambda ()
 ;;                        ;; Only start server mode if not root
 ;;                        (unless (string-equal "root" (getenv "USER"))
 ;;                          (unless (and (fboundp 'server-running-p) (server-running-p))

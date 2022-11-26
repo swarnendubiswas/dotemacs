@@ -54,15 +54,9 @@
   (defun sb/just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
       (apply fn args)))
-
-  ;; https://github.com/oantolin/orderless/issues/91
-  (defun sb/use-orderless-in-minibuffer ()
-    (setq-local completion-styles '(substring orderless)))
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
-  ;; :hook
-  ;; (minibuffer-setup-hook . sb/use-orderless-in-minibuffer)
   :custom
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
@@ -80,13 +74,12 @@
 ;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
 ;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
 ;; major-modes where you want YASnippet enabled.
-;; https://github.com/joaotavora/yasnippet/blob/master/README.mdown
 (use-package yasnippet
   :commands
   (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook
-  ((prog-mode-hook org-mode-hook  LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
+  ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
   :custom
   (yas-verbosity 0)
   :config
@@ -119,7 +112,7 @@
 ;; (use-package prescient
 ;;   :commands prescient-persist-mode
 ;;   :hook
-;;   (after-init-hook . prescient-persist-mode)
+;;   (emacs-startup-hook . prescient-persist-mode)
 ;;   :custom
 ;;   (prescient-sort-full-matches-first t)
 ;;   :config
@@ -136,19 +129,16 @@
 ;; "/u/s/l" for "/usr/share/local".
 
 ;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
+;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
 
 (use-package minibuffer
   :straight (:type built-in)
   :config
-  ;; Serves as a default value for `completion-category-overrides'
-  (setq completion-category-defaults nil)
-
   (with-eval-after-load "orderless"
     (setq completion-styles '(orderless basic)
-          ;; The "basic" completion style needs to be tried first (not as a fallback) for TRAMP
-          ;; hostname completion to work. I also want substring matching for file names.
-          ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
-          completion-category-overrides '((file (styles basic substring partial-completion))
+          ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+          ;; work. I also want substring matching for file names.
+          completion-category-overrides '((file (styles basic substring))
                                           ;; (buffer (styles basic substring flex))
                                           ;; (project-file (styles basic substring flex))
                                           (minibuffer (orderless flex))))))

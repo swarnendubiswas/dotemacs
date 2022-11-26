@@ -43,7 +43,7 @@
   :if (eq sb/capf 'corfu)
   :commands corfu--goto
   :hook
-  (after-init-hook . global-corfu-mode)
+  (emacs-startup-hook . global-corfu-mode)
   :bind
   (:map corfu-map
         ;; ("[tab]" . corfu-next)
@@ -80,7 +80,28 @@
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-indexed))
   :after corfu
   :commands corfu-indexed-mode
-  :init (corfu-indexed-mode 1))
+  :init (corfu-indexed-mode 1)
+  :config
+  ;; Bind "C-num" and "M-num" for convenience.
+  ;; https://github.com/minad/corfu/issues/231
+  (use-package loopy
+    :straight (loopy :type git :host github :repo "okamsn/loopy")
+    :demand t
+    :config
+    (require 'loopy-iter))
+
+  (loopy-iter
+   (with (map corfu-map))
+   (numbering i :from 1 :to 9)
+   (let ((idx i))
+     (define-key map (kbd (format "M-%d" i))
+       (lambda () (interactive)
+         (let ((current-prefix-arg idx))
+           (call-interactively #'corfu-insert))))
+     (define-key map (kbd (format "C-%d" i))
+       (lambda () (interactive)
+         (let ((current-prefix-arg idx))
+           (call-interactively #'corfu-complete)))))))
 
 (use-package corfu-quick
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-quick))

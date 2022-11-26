@@ -10,7 +10,7 @@
 (use-package paren
   :straight (:type built-in)
   :hook
-  (after-init-hook . show-paren-mode)
+  (emacs-startup-hook . show-paren-mode)
   :custom
   (show-paren-style 'parenthesis); `mixed' may lead to performance problems
   (show-paren-when-point-inside-paren t)
@@ -21,7 +21,7 @@
 ;; (use-package elec-pair
 ;;   :straight (:type built-in)
 ;;   :disabled t
-;;   :hook (after-init-hook . electric-pair-mode)
+;;   :hook (emacs-startup-hook . electric-pair-mode)
 ;;   :config
 ;;   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode
 ;;   (defvar sb/markdown-pairs '((?` . ?`)) "Electric pairs for `markdown-mode'.")
@@ -76,10 +76,10 @@
            sp-unwrap-sexp sp-backward-unwrap-sexp sp-wrap-round
            sp-wrap-curly sp-wrap-square sp-split-sexp)
   :hook
-  ((after-init-hook . (lambda ()
-                        (require 'smartparens-config)
-                        ;; (smartparens-global-mode 1)
-                        (show-smartparens-global-mode 1))))
+  ((emacs-startup-hook . (lambda ()
+                           (require 'smartparens-config)
+                           (smartparens-global-mode 1)
+                           (show-smartparens-global-mode 1))))
   :bind
   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
    ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"

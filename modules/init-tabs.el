@@ -68,7 +68,8 @@
   :straight
   (:type git :host github :repo "manateelazycat/awesome-tab")
   :if (eq sb/tab-bar-handler 'awesome-tab)
-  :hook (after-init-hook . awesome-tab-mode)
+  :hook
+  (emacs-startup-hook . awesome-tab-mode)
   :bind
   (("M-<right>" . awesome-tab-forward-tab)
    ("M-<left>" . awesome-tab-backward-tab)

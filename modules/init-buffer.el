@@ -72,12 +72,12 @@
 ;; When the *scratch* buffer is killed, immediately respawn it.
 (use-package immortal-scratch
   :hook
-  (after-init-hook . immortal-scratch-mode))
+  (emacs-startup-hook . immortal-scratch-mode))
 
 ;; Helps to make the data in the "*scratch*" buffer persist.
 (use-package persistent-scratch
   :hook
-  (after-init-hook . persistent-scratch-setup-default)
+  (emacs-startup-hook . persistent-scratch-setup-default)
   :config
   (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
@@ -86,7 +86,7 @@
 
 (use-package popwin
   :hook
-  (after-init-hook . popwin-mode)
+  (emacs-startup-hook . popwin-mode)
   :config
   (defvar popwin:special-display-config-backup popwin:special-display-config)
 

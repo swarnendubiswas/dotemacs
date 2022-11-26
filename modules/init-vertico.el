@@ -22,7 +22,7 @@
   :commands
   (command-completion-default-include-p minibuffer-keyboard-quit)
   :hook
-  (after-init-hook . vertico-mode)
+  (emacs-startup-hook . vertico-mode)
   :bind
   (:map vertico-map
         ("C-M-j" . vertico-exit-input)
