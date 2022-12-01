@@ -110,10 +110,6 @@
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  (citre-completion-backends '(tags))
-  (citre-find-definition-backends '(tags))
-  (citre-find-reference-backends '(tags))
-  (citre-tags-in-buffer-backends '(tags))
   :config
   (dolist (func '(find-function
                   counsel-imenu

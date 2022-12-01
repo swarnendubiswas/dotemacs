@@ -7,8 +7,6 @@
 
 ;;; Code:
 
-(defvar sb/gui-theme)
-(defvar sb/tui-theme)
 (defvar sb/modeline-theme)
 (defvar sb/window-split)
 (defvar sb/minibuffer-completion)

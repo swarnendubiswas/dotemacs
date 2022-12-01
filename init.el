@@ -48,6 +48,9 @@
 (require 'init-misc)
 (require 'init-checkers)
 
+(cond
+ ((eq sb/capf 'corfu) (require 'init-corfu))
+ ((eq sb/capf 'company) (require 'init-company)))
 ;; It is recommended to load `yasnippet' before `eglot'
 (require 'init-completion)
 
@@ -71,10 +74,6 @@
 
 (require 'init-org)
 (require 'init-latex)
-
-(cond
- ((eq sb/capf 'corfu) (require 'init-corfu))
- ((eq sb/capf 'company) (require 'init-company)))
 
 (require 'init-functions)
 (require 'init-temp)

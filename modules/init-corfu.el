@@ -9,10 +9,7 @@
 
 (defvar sb/capf)
 
-;; https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/
-;; https://github.com/minad/corfu/wiki
-
-;; Corfu is not a completion framework, it is just a front-end for completion at point.
+;; Corfu is not a completion framework, it is just a front-end for `completion-at-point'.
 (use-package corfu
   :preface
   (defun sb/corfu-beginning-of-prompt ()
@@ -26,11 +23,6 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-
-  (defun sb/corfu-prescient-remember (&rest _)
-    "Advice for `corfu--insert.'"
-    (when (>= corfu--index 0)
-      (prescient-remember (nth corfu--index corfu--candidates))))
   :straight
   (corfu :files (:defaults "extensions/*")
          ;; :includes (corfu-indexed
@@ -55,17 +47,10 @@
   ;; (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
-  ;; (corfu-echo-documentation t)
   ;; (corfu-max-width 60)
   :config
   (add-hook 'prog-mode-hook (lambda ()
-                              (setq-local corfu-auto-prefix 2)))
-
-  ;; (with-eval-after-load "prescient"
-  ;;   (setq corfu-sort-function #'prescient-sort
-  ;;         corfu-sort-override-function #'prescient-sort)
-  ;;   (advice-add #'corfu--insert :before #'sb/corfu-prescient-remember))
-  )
+                              (setq-local corfu-auto-prefix 2))))
 
 (use-package corfu-info
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-info))
@@ -84,11 +69,9 @@
   :config
   ;; Bind "C-num" and "M-num" for convenience.
   ;; https://github.com/minad/corfu/issues/231
-  (use-package loopy
+  (use-package loopy-iter
     :straight (loopy :type git :host github :repo "okamsn/loopy")
-    :demand t
-    :config
-    (require 'loopy-iter))
+    :demand t)
 
   (loopy-iter
    (with (map corfu-map))
@@ -111,13 +94,14 @@
         ("C-'" . corfu-quick-insert)))
 
 ;; We do not need this if we use prescient-based sorting.
-(use-package corfu-history
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-history))
-  :after (corfu savehist)
-  :commands corfu-history-mode
-  :init
-  (add-to-list 'savehist-additional-variables 'corfu-history)
-  (corfu-history-mode 1))
+
+;; (use-package corfu-history
+;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-history))
+;;   :after (corfu savehist)
+;;   :commands corfu-history-mode
+;;   :init
+;;   (add-to-list 'savehist-additional-variables 'corfu-history)
+;;   (corfu-history-mode 1))
 
 (use-package corfu-echo
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo))
@@ -306,8 +290,6 @@
   ;;                                                  #'cape-dabbrev
   ;;                                                  #'cape-dict))))))
   )
-
-;; Provide icons for Corfu via either "kind-all-the-icons" or "kind-icon"
 
 (use-package kind-icon
   :if (and (eq sb/corfu-icons 'kind-icon)

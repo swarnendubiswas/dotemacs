@@ -7,8 +7,7 @@
 
 ;;; Code:
 
-(defvar sb/gui-theme)
-(defvar sb/tui-theme)
+(defvar sb/theme)
 
 ;; The Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.

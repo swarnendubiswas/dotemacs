@@ -11,11 +11,6 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
-(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
-  "Hide messages appearing in ORIG-FUN, forward ARGS."
-  (let ((inhibit-message t))
-    (apply orig-fun args)))
-
 (use-package ibuffer
   :straight (:type built-in)
   :hook

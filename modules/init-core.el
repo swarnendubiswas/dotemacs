@@ -312,7 +312,7 @@
   ;; Keep remote file without testing if they still exist
   (recentf-keep '(file-remote-p file-readable-p))
   ;; Larger values help in lookup but takes more time to check if the files exist
-  (recentf-max-saved-items 150)
+  (recentf-max-saved-items 250)
   ;; Abbreviate the file name to make it easy to read the actual file name. Specifically,
   ;; `abbreviate-file-name' abbreviates the home directory to "~/" in the file list.
   ;; (recentf-filename-handlers '(abbreviate-file-name))
@@ -370,6 +370,11 @@
 ;;   ;; Hide "When done with a buffer, type C-x 5" message
 ;;   (when (boundp 'server-client-instructions)
 ;;     (setq server-client-instructions nil)))
+
+(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
+  "Hide messages appearing in ORIG-FUN, forward ARGS."
+  (let ((inhibit-message t))
+    (apply orig-fun args)))
 
 ;; Hide the "Wrote to recentf" message
 (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)

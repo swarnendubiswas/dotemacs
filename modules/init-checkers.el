@@ -89,8 +89,7 @@
   ;; Add support for textidote
   (flycheck-define-checker tex-textidote
     "A LaTeX grammar/spelling checker using textidote.
-
-  See https://github.com/sylvainhalle/textidote"
+  See https://github.com/sylvainhalle/textidote."
     :modes (latex-mode plain-tex-mode)
     :command
     ("java" "-jar" (eval (expand-file-name (no-littering-expand-etc-file-name "textidote.jar")))
@@ -110,6 +109,7 @@
     ((warning line-start (file-name)
               "(L" line "C" column "-" (or (seq "L" end-line "C" end-column) "?") "): "
               (message (one-or-more (not "\""))) (one-or-more not-newline) line-end)))
+
   (add-to-list 'flycheck-checkers 'tex-textidote)
 
   ;; https://github.com/flycheck/flycheck/issues/1833
@@ -127,8 +127,7 @@
           (not (seq-some (lambda (re) (string-match-p re bufname))
                          sb/excluded-directory-regexps)))))
 
-  (advice-add 'flycheck-may-check-automatically
-              :after-while #'sb/flycheck-may-check-automatically)
+  (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
 
   ;; Chain flycheck checkers with lsp-mode. We prefer to use per-project directory local variables
   ;; instead of defining here.
@@ -184,7 +183,6 @@
 ;;     (declare-function company--active-p "company")
 
 ;;     (add-hook 'flycheck-posframe-inhibit-functions #'company--active-p)))
-
 
 ;; `aphelia' allows for formatting via a background process, supports Tramp, and does not move the
 ;; point after formatting.

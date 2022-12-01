@@ -5,7 +5,16 @@
 
 ;;; Commentary:
 
-;;; Code:
+;;; Code
+
+;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
+;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
+;; There are two easy options: (i) press "C-c C-l" (`org-insert-link') while your point is within a
+;; link and you will be prompted to edit its URL in the minibuffer. You can use the same command to
+;; create new links (when your point is not on an existing link). (ii) You can convert the
+;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
+;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
+
 
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org

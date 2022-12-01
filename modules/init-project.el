@@ -153,7 +153,15 @@
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
-   ("<f6>" . consult-projectile))
+   ("<f6>" . consult-projectile)
+   ([remap projectile-ripgrep] . consult-ripgrep)
+   ([remap projectile-grep] . consult-grep)
+   ([remap projectile-recentf] . consult-projectile-recentf)
+   ([remap projectile-switch-to-buffer] . consult-projectile-switch-to-buffer)
+   ([remap projectile-find-file] . consult-projectile-find-file)
+   ([remap projectile-find-dir] . consult-projectile-find-dir)
+   ([remap projectile-switch-project] . consult-projectile-switch-project)
+   )
   :config
   (consult-customize consult-projectile :preview-key nil))
 

@@ -10,7 +10,6 @@
 (defvar sb/EMACS27)
 (defvar sb/EMACS28+)
 (defvar sb/user-home-directory)
-(defvar sb/gui-theme)
 (defvar sb/minibuffer-completion)
 
 (declare-function s-starts-with? "s")
@@ -262,11 +261,6 @@
 ;;   (set-face-attribute 'treemacs-git-untracked-face       nil :height 0.7)
 ;;   (set-face-attribute 'treemacs-git-modified-face        nil :height 0.7)
 ;;   (set-face-attribute 'treemacs-git-unmodified-face      nil :height 0.7)
-
-;;   (when (or (eq sb/gui-theme 'sb/customized)
-;;             (eq sb/gui-theme 'none))
-;;     (set-face-attribute 'treemacs-git-modified-face   nil :height 0.8)
-;;     (set-face-attribute 'treemacs-git-unmodified-face nil :height 1.0))
 
 ;;   (when (display-graphic-p)
 ;;     (treemacs-resize-icons 16))

@@ -114,18 +114,6 @@
   :commands company-statistics-mode
   :init (company-statistics-mode 1))
 
-;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
-;; support for the `:separate' keyword in `company'.
-
-;; (use-package company-prescient
-;;   :after (company prescient)
-;;   :demand t
-;;   :commands company-prescient-mode
-;;   ;; :custom
-;;   ;; (company-prescient-sort-length-enable nil)
-;;   :config
-;;   (company-prescient-mode 1))
-
 ;; Nice feature but slows completions. We should invoke this only at the very end of configuring
 ;; `company'.
 

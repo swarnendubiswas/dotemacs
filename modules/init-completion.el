@@ -71,9 +71,6 @@
   (with-eval-after-load "company"
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
-;; To use YASnippet as a non-global minor mode, do not call `yas-global-mode'; instead call
-;; `yas-reload-all' to load the snippet tables and then call `yas-minor-mode' from the hooks of
-;; major-modes where you want YASnippet enabled.
 (use-package yasnippet
   :commands
   (snippet-mode yas-hippie-try-expand yas-reload-all)
@@ -109,21 +106,31 @@
 ;; recency, and Corfu has corfu-history. Company has company-statistics. Furthermore, Ivy is not
 ;; well supported with prescient.
 
-;; (use-package prescient
-;;   :commands prescient-persist-mode
-;;   :hook
-;;   (emacs-startup-hook . prescient-persist-mode)
-;;   :custom
-;;   (prescient-sort-full-matches-first t)
-;;   :config
-;;   ;; https://github.com/minad/vertico/wiki#using-prescientel
-;;   (with-eval-after-load "vertico"
-;;     (setq vertico-sort-function #'prescient-sort)
-;;     (advice-add #'vertico-insert :after
-;;                 (lambda ()
-;;                   (prescient-remember (vertico--candidate))))))
+(use-package prescient
+  :commands prescient-persist-mode
+  :hook
+  (emacs-startup-hook . prescient-persist-mode)
+  :custom
+  (prescient-sort-full-matches-first t))
 
-;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
+(use-package corfu-prescient
+  :if (eq sb/capf 'corfu)
+  :after (corfu prescient)
+  :init (corfu-prescient-mode 1))
+
+(use-package vertico-prescient
+  :if (eq sb/minibuffer-completion 'vertico)
+  :after (vertico prescient)
+  :init (vertico-prescient-mode 1))
+
+;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
+;; support for the `:separate' keyword in `company'.
+(use-package company-prescient
+  :if (eq sb/capf 'company)
+  :after (company prescient)
+  :init (company-prescient-mode 1))
+
+;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
 ;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
 ;; "/u/s/l" for "/usr/share/local".
@@ -131,17 +138,17 @@
 ;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
 ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
 
-(use-package minibuffer
-  :straight (:type built-in)
-  :config
-  (with-eval-after-load "orderless"
-    (setq completion-styles '(orderless basic)
-          ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-          ;; work. I also want substring matching for file names.
-          completion-category-overrides '((file (styles basic substring))
-                                          ;; (buffer (styles basic substring flex))
-                                          ;; (project-file (styles basic substring flex))
-                                          (minibuffer (orderless flex))))))
+;; (use-package minibuffer
+;;   :straight (:type built-in)
+;;   :config
+;;   (with-eval-after-load "orderless"
+;;     (setq completion-styles '(orderless basic)
+;;           ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+;;           ;; work. I also want substring matching for file names.
+;;           completion-category-overrides '((file (styles basic substring))
+;;                                           ;; (buffer (styles basic substring flex))
+;;                                           ;; (project-file (styles basic substring flex))
+;;                                           (minibuffer (orderless flex))))))
 
 (provide 'init-completion)
 

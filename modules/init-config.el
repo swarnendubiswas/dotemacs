@@ -13,27 +13,9 @@
   :type  'string
   :group 'sb/emacs)
 
-(defcustom sb/gui-theme
-  'modus-vivendi
-  "Specify which Emacs theme to use."
-  :type  '(radio
-           (const :tag "doom-one"          doom-one)
-           (const :tag "doom-nord"         doom-nord)
-           (const :tag "doom-molokai"      doom-molokai)
-           (const :tag "modus-operandi"    modus-operandi)
-           (const :tag "modus-vivendi"     modus-vivendi)
-           (const :tag "catppuccin"        catppuccin)
-           (const :tag "ef-dark"           ef-dark)
-           (const :tag "ef-trio-dark"      ef-trio-dark)
-           (const :tag "ef-bio"            ef-bio)
-           (const :tag "customized"        sb/customized) ; Customizations over the default theme
-           ;; No customization
-           (const :tag "none"              none))
-  :group 'sb/emacs)
-
 ;; A dark theme looks good on the TUI.
-(defcustom sb/tui-theme
-  'modus-vivendi
+(defcustom sb/theme
+  'standard-dark
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "doom-one"          doom-one)
@@ -47,6 +29,9 @@
            (const :tag "ef-trio-dark"      ef-trio-dark)
            ;; Greenish tinge
            (const :tag "ef-bio"            ef-bio)
+           ;; Tries to mirror the default Emacs colors
+           (const :tag "standard-light"    standard-light)
+           (const :tag "standard-dark"     standard-dark)
            (const :tag "customized"        sb/customized) ; Customizations over the default theme
            ;; No customization
            (const :tag "none"              none))
