@@ -16,7 +16,6 @@
 ;; Projectile is unable to remember remote projects which is also not supported by the current
 ;; version of `project'.
 
-;; Emacs 29 will possibly have "project.el" built-in.
 (use-package project
   :if (eq sb/project-handler 'project)
   :commands
@@ -68,6 +67,9 @@
   (defun sb/projectile-do-not-visit-tags-table ()
     "Do not visit the tags table automatically even if it is present."
     nil)
+  :straight ripgrep
+  :straight rg
+  :straight t
   :if (eq sb/project-handler 'projectile)
   :commands
   (projectile-project-p projectile-project-name
@@ -143,6 +145,10 @@
              ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
+  (with-eval-after-load "vertico"
+    (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
+    (bind-key [remap projectile-grep] #'consult-grep))
+
   (when (eq sb/minibuffer-completion 'ivy)
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))
@@ -154,14 +160,11 @@
   :bind
   (("<f5>" . consult-projectile-switch-project)
    ("<f6>" . consult-projectile)
-   ([remap projectile-ripgrep] . consult-ripgrep)
-   ([remap projectile-grep] . consult-grep)
    ([remap projectile-recentf] . consult-projectile-recentf)
    ([remap projectile-switch-to-buffer] . consult-projectile-switch-to-buffer)
    ([remap projectile-find-file] . consult-projectile-find-file)
    ([remap projectile-find-dir] . consult-projectile-find-dir)
-   ([remap projectile-switch-project] . consult-projectile-switch-project)
-   )
+   ([remap projectile-switch-project] . consult-projectile-switch-project))
   :config
   (consult-customize consult-projectile :preview-key nil))
 
