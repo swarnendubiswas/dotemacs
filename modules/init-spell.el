@@ -18,11 +18,10 @@
   :if (symbol-value 'sb/IS-LINUX)
   :custom
   (ispell-dictionary "en_US")
-  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-local-dictionary "en_US")
+  (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  ;; Save a new word to personal dictionary without asking
-  (ispell-silently-savep t)
+  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   :config
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
@@ -36,9 +35,7 @@
   (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
   ;; Footnotes in org that have http links that are line breaked should not be ispelled
   (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
-
   (add-to-list 'ispell-skip-region-alist '("`" "`"))
-
   ;; Skip some math environments
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
@@ -98,7 +95,7 @@
   (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
    ;; language-specific words. Furthermore, it is supposedly slow.
-   ;; (prog-mode-hook . flyspell-prog-mode)
+   (prog-mode-hook . flyspell-prog-mode)
    ;; `find-file-hook' will not work for buffers with no associated files
    (emacs-startup-hook . (lambda ()
                            (when (string= (buffer-name) "*scratch*")
@@ -107,9 +104,8 @@
   :bind
   (("C-c f f" . flyspell-mode)
    ("C-c f b" . flyspell-buffer)
-   ;; :map flyspell-mode-map
-   ;; ("C-,"     . sb/flyspell-goto-previous-error)
-   )
+   :map flyspell-mode-map
+   ("C-,"     . sb/flyspell-goto-previous-error))
   :custom
   (flyspell-abbrev-p t "Add corrections to abbreviation table")
   (flyspell-issue-message-flag nil)
@@ -172,6 +168,7 @@
                                              org-todo-keyword-todo
                                              org-todo-keyword-wait
                                              org-verbatim
+                                             org-modern-tag
                                              hl-line))
               (spell-fu-mode)))
 
@@ -214,7 +211,11 @@
   (add-to-list 'spell-fu-faces-include 'font-lock-comment-face)
   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:comment)
   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:doc)
-  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string))
+  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
+
+  ;; Ignore read-only buffers
+  (setq global-spell-fu-ignore-buffer (lambda (buf)
+                                        (buffer-local-value 'buffer-read-only buf))))
 
 (use-package consult-flyspell
   :if (eq sb/minibuffer-completion 'vertico)

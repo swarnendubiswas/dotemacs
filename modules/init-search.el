@@ -9,8 +9,6 @@
 
 (defvar sb/minibuffer-completion)
 
-;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
-;; `isearch' candidates.
 (use-package isearch
   :straight (:type built-in)
   :commands
@@ -24,8 +22,7 @@
    :map isearch-mode-map
    ("C-s"     . nil)
    ("C-f"     . isearch-repeat-forward)
-   ("C-c C-o" . isearch-occur)
-   ("C-'" . avy-isearch))
+   ("C-c C-o" . isearch-occur))
   :custom
   (search-highlight t "Highlight incremental search")
   (isearch-lazy-highlight t)
@@ -94,7 +91,11 @@
   :bind
   (("M-b"   . avy-goto-word-1)
    ("C-'"   . avy-goto-char-timer)
-   ("C-/"   . avy-goto-line))
+   ("C-/"   . avy-goto-line)
+   ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
+   ;; `isearch' candidates.
+   :map isearch-mode-map
+   ("C-'"     . avy-isearch))
   :custom
   (avy-background t "Provides better contrast"))
 

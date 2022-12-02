@@ -50,24 +50,6 @@
   :custom
   ;; Delay highlighting to allow for transient cursor placements
   (symbol-overlay-idle-time 2)
-  ;; :config
-  ;; (transient-define-prefix sb/symbol-overlay-transient ()
-  ;;   "Symbol Overlay transient"
-  ;;   ["Symbol Overlay"
-  ;;    ["Overlays"
-  ;;     ("." "Add/Remove at point" symbol-overlay-put)
-  ;;     ("k" "Remove All" symbol-overlay-remove-all)
-  ;;     ]
-  ;;    ["Move to Symbol"
-  ;;     ("n" "Next" symbol-overlay-jump-next)
-  ;;     ("p" "Previous" symbol-overlay-jump-prev)
-  ;;     ]
-  ;;    ["Other"
-  ;;     ("m" "Highlight symbol-at-point" symbol-overlay-mode)
-  ;;     ]
-  ;;    ]
-  ;;   )
-  ;; (bind-key "M-o" #'sb/symbol-overlay-transient)
   :diminish)
 
 (use-package highlight-escape-sequences
@@ -76,8 +58,8 @@
 
 (use-package compile
   :straight (:type built-in)
-  ;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
   :bind
+  ;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
   (("<f10>" . compile)
    ("<f11>" . recompile))
   :custom
@@ -117,9 +99,9 @@
   (prog-mode-hook . turn-on-eldoc-mode)
   :custom
   (eldoc-area-prefer-doc-buffer t)
-  ;; The variable-height minibuffer and extra eldoc buffers are distracting. This variable limits
-  ;; ElDoc messages to one line which prevents the echo area from resizing itself unexpectedly when
-  ;; point is on a variable with a multiline docstring, but then it cuts of useful information.
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
+  ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
+  ;; is on a variable with a multiline docstring, but then it cuts of useful information.
   ;; (eldoc-echo-area-use-multiline-p nil)
   :config
   ;; Allow eldoc to trigger after completions

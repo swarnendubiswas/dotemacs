@@ -145,7 +145,7 @@
              ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
-  (with-eval-after-load "vertico"
+  (with-eval-after-load "consult"
     (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
     (bind-key [remap projectile-grep] #'consult-grep))
 

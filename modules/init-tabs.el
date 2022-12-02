@@ -10,8 +10,7 @@
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :commands
-  (centaur-tabs-group-by-projectile-project
-   centaur-tabs-headline-match)
+  (centaur-tabs-group-by-projectile-project centaur-tabs-headline-match)
   :hook
   (emacs-startup-hook . centaur-tabs-mode)
   :bind*
@@ -20,7 +19,6 @@
   :custom
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-  (centaur-tabs-gray-out-icons t)
   (centaur-tabs-set-close-button nil)
   (centaur-tabs-show-new-tab-button nil)
   (centaur-tabs-enable-ido-completion nil)
@@ -28,18 +26,19 @@
   ;; themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
-  (centaur-tabs-show-count nil) ; The feature is not useful.
+  (centaur-tabs-show-count nil "The feature is not useful")
+  (centaur-tabs-set-icons t)
   :config
-  ;; ;; Unlike `awesome-tab', the icons do not blend well with all themes.
+  ;; Unlike `awesome-tab', the icons do not blend well with all themes.
+
   ;; (let ((themes '("doom-one"
   ;;                 "doom-nord"
   ;;                 "doom-molokai")))
   ;;   (progn
-  ;;     (if (-contains? themes (symbol-name sb/gui-theme))
+  ;;     (if (-contains? themes (symbol-name sb/theme))
   ;;         (setq centaur-tabs-set-icons t)
   ;;       (setq centaur-tabs-set-icons nil))))
 
-  ;; (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project))
 
 (use-package awesome-tab
@@ -60,8 +59,7 @@
                               magit-log-mode
                               magit-file-mode
                               magit-blob-mode
-                              magit-blame-mode
-                              )))
+                              magit-blame-mode)))
        "Emacs")
       (t
        (awesome-tab-get-group-name (current-buffer))))))
