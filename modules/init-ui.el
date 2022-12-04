@@ -154,7 +154,7 @@
 
         ((string= (system-name) "dell-7506")
          (progn
-           (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
+           (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
            (set-face-attribute 'mode-line nil :height 120)
            (set-face-attribute 'mode-line-inactive nil :height 120)))
 

@@ -107,6 +107,10 @@
 ;; well supported with prescient.
 
 (use-package prescient
+  :straight (:host github :repo "radian-software/prescient.el"
+                   :files (:defaults
+                           "vertico-prescient.el"
+                           "corfu-prescient.el"))
   :commands prescient-persist-mode
   :hook
   (emacs-startup-hook . prescient-persist-mode)
@@ -114,12 +118,10 @@
   (prescient-sort-full-matches-first t))
 
 (use-package corfu-prescient
-  :if (eq sb/capf 'corfu)
   :after (corfu prescient)
   :init (corfu-prescient-mode 1))
 
 (use-package vertico-prescient
-  :if (eq sb/minibuffer-completion 'vertico)
   :after (vertico prescient)
   :init (vertico-prescient-mode 1))
 

@@ -188,7 +188,7 @@ install_node() {
     npm init --yes
 
     # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier @prettier/plugin-php @prettier/plugin-lua stylelint remark-language-server marksman vscode-langservers-extracted npm-check-updates
+    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier @prettier/plugin-php @prettier/plugin-lua prettier-plugin-solidity prettier-plugin-svelte prettier-plugin-toml stylelint remark-language-server marksman vscode-langservers-extracted npm-check-updates jshint
 
     npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
@@ -490,7 +490,7 @@ install_tmux() {
 }
 
 install_delta() {
-    DELTA_VER="0.14.0"
+    DELTA_VER="0.15.1"
 
     wget https://github.com/dandavison/delta/releases/download/"$DELTA_VER"/git-delta_"$DELTA_VER"_amd64.deb
     dpkg -i git-delta_"$DELTA_VER"_amd64.deb
