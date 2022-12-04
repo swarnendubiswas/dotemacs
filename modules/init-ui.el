@@ -60,10 +60,8 @@
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information.
 
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (setq resize-mini-windows nil
-;;                   max-mini-window-height 5)))
+;; (setq resize-mini-windows nil
+;;       max-mini-window-height 5)
 
 (use-package beacon ; Highlight the cursor position when the window scrolls
   :hook
@@ -102,9 +100,9 @@
         split-width-threshold 0))
 
 ;; Start with a window split to make use of wider screens
-(when nil
-  (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-    (split-window-right)))
+
+;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+;;   (split-window-right))
 
 (use-package hl-line
   :commands hl-line-highlight
@@ -134,17 +132,6 @@
   :hook
   (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
-;; (use-package nerd-fonts
-;;   :straight (nerd-fonts :type git :host github :repo "twlz0ne/nerd-fonts.el")
-;;   :demand t)
-
-;; (use-package all-the-icons-nerd-fonts
-;;   :straight (all-the-icons-nerd-fonts :host github :repo "mohkale/all-the-icons-nerd-fonts")
-;;   :after all-the-icons
-;;   :demand t
-;;   :config
-;;   (all-the-icons-nerd-fonts-prefer))
-
 ;; Value is in 1/10pt, so 100 will give you 10pt
 ;; (set-frame-font "DejaVu Sans Mono" nil t)
 
@@ -167,19 +154,19 @@
 
         ((string= (system-name) "dell-7506")
          (progn
-           (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+           (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
            (set-face-attribute 'mode-line nil :height 120)
            (set-face-attribute 'mode-line-inactive nil :height 120)))
 
         ((string= (system-name) "swarnendu-Dell-XPS-L502X")
          (progn
-           (set-face-attribute 'default nil :font "Cascadia Code" :height 150)
+           (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
            (set-face-attribute 'mode-line nil :height 110)
            (set-face-attribute 'mode-line-inactive nil :height 110)))
 
         ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
          (progn
-           (set-face-attribute 'default nil :font "MesloLGS Nerd Font Mono" :height 160)
+           (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
            (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
            (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
            (set-face-attribute 'mode-line nil :height 110)
@@ -187,7 +174,7 @@
 
 (use-package olivetti
   :hook
-  ((text-mode-hook prog-mode-hook org-mode-hook markdown-mode-hook) . olivetti-mode)
+  ((text-mode-hook prog-mode-hook) . olivetti-mode)
   :custom
   (olivetti-body-width 110))
 

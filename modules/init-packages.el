@@ -7,11 +7,11 @@
 
 ;;; Code:
 
-;; Bootstrap `straight.el'
-
 (defvar sb/EMACS27+)
 (defvar use-package-enable-imenu-support)
 (defvar use-package-hook-name-suffix)
+
+;; Bootstrap `straight.el'
 
 ;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
 ;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
@@ -46,11 +46,11 @@
 
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-        (bootstrap-version 5))
+        (bootstrap-version 6))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
           (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
            'silent 'inhibit-cookies)
         (goto-char (point-max))
         (eval-print-last-sexp)))

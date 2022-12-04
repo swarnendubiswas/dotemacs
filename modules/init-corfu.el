@@ -152,7 +152,6 @@
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
 ;; (add-hook 'completion-at-point-functions #'cape-path)
 
-;; https://kristofferbalintona.me/posts/cape/
 (use-package cape
   :preface
   ;; https://kristofferbalintona.me/posts/202203130102/
@@ -205,13 +204,14 @@
               (setq-local completion-at-point-functions
                           (list
                            (cape-super-capf #'citre-completion-at-point
-                                            #'elisp-completion-at-point
+                                            ;; #'elisp-completion-at-point
                                             #'cape-file
                                             #'cape-symbol ; Elisp symbols
                                             #'cape-dabbrev
-                                            #'cape-dict)))))
+                                            #'cape-dict
+                                            #'cape-ispell)))))
 
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (add-hook 'sh-mode-hook
               (lambda ()
                 (add-hook 'lsp-managed-mode-hook
@@ -224,7 +224,8 @@
                                                           ;; #'comint-completion-at-point
                                                           #'cape-file
                                                           #'cape-dabbrev
-                                                          #'cape-dict)))))))
+                                                          #'cape-dict
+                                                          #'cape-ispell)))))))
 
     (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
       (add-hook lsp-prog-modes
@@ -233,12 +234,12 @@
                             (lambda()
                               (setq-local completion-at-point-functions
                                           (list
-                                           #'lsp-completion-at-point
-                                           #'citre-completion-at-point
-                                           ;; #'tags-completion-at-point-function
-                                           #'cape-file
-                                           #'cape-keyword
-                                           (cape-super-capf #'cape-dabbrev
+                                           (cape-super-capf #'lsp-completion-at-point
+                                                            #'citre-completion-at-point
+                                                            ;; #'tags-completion-at-point-function
+                                                            #'cape-file
+                                                            #'cape-keyword
+                                                            #'cape-dabbrev
                                                             #'cape-dict
                                                             #'cape-ispell))))))))
 
