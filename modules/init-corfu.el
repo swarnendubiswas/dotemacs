@@ -131,18 +131,17 @@
 ;;   (corfu-echo-documentation nil))
 
 (use-package popon
-  :straight
-  (:type git :repo "https://codeberg.org/akib/emacs-popon.git")
+  :straight (:host codeberg :repo "akib/emacs-popon")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p))))
 
 (use-package corfu-terminal
-  :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook
   (corfu-mode-hook . corfu-terminal-mode))
 
 ;; (use-package corfu-doc-terminal
-;;   :straight (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
+;;   :straight (:host codeberg :repo "akib/emacs-corfu-doc-terminal")
 ;;   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
 ;;   :hook
 ;;   (corfu-mode-hook . corfu-doc-terminal-mode))

@@ -15,7 +15,7 @@
 
 ;; A dark theme looks good on the TUI.
 (defcustom sb/theme
-  'standard-dark
+  'modus-vivendi
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "doom-one"          doom-one)

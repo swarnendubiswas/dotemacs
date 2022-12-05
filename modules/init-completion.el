@@ -118,17 +118,25 @@
   (prescient-sort-full-matches-first t))
 
 (use-package corfu-prescient
+  :straight (:host github :repo "radian-software/prescient.el"
+                   :files (:defaults
+                           "corfu-prescient.el"))
   :after (corfu prescient)
   :init (corfu-prescient-mode 1))
 
 (use-package vertico-prescient
+  :straight (:host github :repo "radian-software/prescient.el"
+                   :files (:defaults
+                           "vertico-prescient.el"))
   :after (vertico prescient)
   :init (vertico-prescient-mode 1))
 
 ;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
 ;; support for the `:separate' keyword in `company'.
 (use-package company-prescient
-  :if (eq sb/capf 'company)
+  :straight (:host github :repo "radian-software/prescient.el"
+                   :files (:defaults
+                           "company-prescient.el"))
   :after (company prescient)
   :init (company-prescient-mode 1))
 

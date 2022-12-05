@@ -103,15 +103,16 @@
 
   ;; (sp-local-pair 'markdown-mode "<" ">")
 
-  ;; ;; Do not insert a parenthesis pair when the point is at the beginning of a word
-  ;; (sp-pair "("  nil :unless '(sp-point-before-word-p))
-  ;; (sp-pair "["  nil :unless '(sp-point-before-word-p))
-  ;; (sp-pair "{"  nil :unless '(sp-point-before-word-p))
+  ;; Do not insert a parenthesis pair when the point is at the beginning of a word
+  (sp-pair "("  nil :unless '(sp-point-before-word-p))
+  (sp-pair "["  nil :unless '(sp-point-before-word-p))
+  (sp-pair "{"  nil :unless '(sp-point-before-word-p))
 
-  ;; (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
+  ;; Do not pair quotes unless they are free
+  (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
-  ;; ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
-  ;; (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
+  ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
+  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
   ;; (sp-local-pair 'prog-mode "{" nil :post-handlers '((sb/indent-between-pair "RET")))
   ;; (sp-local-pair 'prog-mode "[" nil :post-handlers '((sb/indent-between-pair "RET")))

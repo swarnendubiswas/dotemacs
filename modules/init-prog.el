@@ -70,18 +70,13 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
-  :straight (:type git :repo "https://codeberg.org/ideasman42/emacs-fancy-compilation")
+  :straight (fancy-compilation :host codeberg :repo "ideasman42/emacs-fancy-compilation")
   :after compile
   :init (fancy-compilation-mode 1))
 
 (use-package rainbow-delimiters
   :hook
   ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
-
-(use-package docstr
-  :hook
-  ((c-mode-hook c++-mode-hook python-mode-hook java-mode-hook) . docstr-mode)
-  :diminish)
 
 ;; Tree-sitter provides advanced syntax highlighting features
 (use-package tree-sitter
