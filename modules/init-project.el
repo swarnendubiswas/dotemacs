@@ -53,8 +53,6 @@
   )
 
 (use-package consult-project-extra
-  :if (and (eq sb/project-handler 'project)
-           (eq sb/minibuffer-completion 'vertico))
   :after (consult project)
   :commands consult-project-extra-find-other-window
   :bind

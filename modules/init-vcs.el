@@ -11,19 +11,11 @@
 
 (use-package vc-hooks
   :straight (:type built-in)
-  :demand t
   :custom
   (vc-follow-symlinks t "No need to ask")
   ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
   ;; information on the modeline.
-  (vc-handled-backends '(Git))
-  ;; :config
-  ;; Remove `vc-refresh-state' if we are not using `vc', i.e., `vc-handled-backends' is nil
-
-  ;; (if (boundp 'vc-handled-backends)
-  ;;     (add-hook 'find-file-hook #'vc-refresh-state)
-  ;;   (remove-hook 'find-file-hook #'vc-refresh-state))
-  )
+  (vc-handled-backends '(Git)))
 
 (use-package magit
   :commands magit-display-buffer-fullframe-status-v1
@@ -40,53 +32,34 @@
   (magit-section-initial-visibility-alist '((stashes   . show)
                                             (untracked . show)
                                             (unpushed  . show)
-
                                             (unpulled  . show)))
-  ;; (magit-repository-directories '(("/home/swarnendu/books" . 0)
-  ;;                                 ("/home/swarnendu/bitbucket" . 1)
-  ;;                                 ("/home/swarnendu/github" . 1)
-  ;;                                 ("/home/swarnendu/iss-workspace")
-  ;;                                 ("/home/swarnendu/plass-workspace")
-  ;;                                 ("/home/swarnendu/prospar-workspace")))
   (magit-commit-show-diff nil)
   :config
-  ;; These give a performance boost to Magit
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-pushremote)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
-  ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
-
   (require 'magit-diff)
-
   (setq magit-diff-refine-hunk t
-        magit-diff-highlight-trailing nil
-        ;; magit-diff-paint-whitespace nil
-        ))
+        magit-diff-highlight-trailing nil))
 
 (use-package git-modes
   :commands gitignore-mode gitattributes-mode gitconfig-mode)
 
-(use-package git-gutter
-  :disabled t
-  ;; :if (unless (boundp 'vc-handled-backends))
-  :commands global-git-gutter-mode
-  :diminish
-  :bind
-  (("C-x p" . git-gutter:previous-hunk)
-   ("C-x n" . git-gutter:next-hunk))
-  :hook (after-init-hook . global-git-gutter-mode)
-  :custom
-  (git-gutter:added-sign " ")
-  (git-gutter:deleted-sign " ")
-  (git-gutter:modified-sign " ")
-  (git-gutter:update-interval 1)
-  ;; https://github.com/syl20bnr/spacemacs/issues/10555
-  ;; https://github.com/syohex/emacs-git-gutter/issues/24
-  (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
+;; (use-package git-gutter
+;;   :unless (boundp 'vc-handled-backends)
+;;   :commands global-git-gutter-mode
+;;   :diminish
+;;   :bind
+;;   (("C-x p" . git-gutter:previous-hunk)
+;;    ("C-x n" . git-gutter:next-hunk))
+;;   :hook (after-init-hook . global-git-gutter-mode)
+;;   :custom
+;;   (git-gutter:added-sign " ")
+;;   (git-gutter:deleted-sign " ")
+;;   (git-gutter:modified-sign " ")
+;;   (git-gutter:update-interval 1)
+;;   ;; https://github.com/syl20bnr/spacemacs/issues/10555
+;;   ;; https://github.com/syohex/emacs-git-gutter/issues/24
+;;   (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
 
-;; Diff-hl looks nicer than git-gutter, based on `vc'
+;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
   :if (boundp 'vc-handled-backends)
   :commands diff-hl-dired-mode-unless-remote
@@ -117,16 +90,16 @@
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
 (use-package smerge-mode
   :preface
-  (defun sb/enable-smerge-maybe ()
-    "Enable smerge automatically based on conflict markers."
+  (defun sb/enable-smerge-maybe-with-vc ()
+    "Enable `smerge-mode' automatically based on conflict markers."
     (when (and buffer-file-name (vc-backend buffer-file-name))
       (save-excursion
         (goto-char (point-min))
         (when (re-search-forward "^<<<<<<< " nil t)
           (smerge-mode 1)))))
 
-  (defun sb/enable-smerge-maybe2 ()
-    "Enable `smerge-mode' automatically."
+  (defun sb/enable-smerge-maybe-without-vc ()
+    "Enable `smerge-mode' automatically based on conflict markers."
     (save-excursion
       (goto-char (point-min))
       (when (re-search-forward "^<<<<<<< " nil t)
@@ -141,8 +114,8 @@
                smerge-diff-upper-lower smerge-refine
                smerge-combine-with-next smerge-resolve)
   :init
-  (add-hook 'find-file-hook #'sb/enable-smerge-maybe2 :append)
-  (add-hook 'magit-diff-visit-file-hook (lambda nil
+  (add-hook 'find-file-hook #'sb/enable-smerge-maybe-without-vc :append)
+  (add-hook 'magit-diff-visit-file-hook (lambda ()
                                           (when smerge-mode
                                             (sb/smerge-hydra/body))))
   :bind-keymap

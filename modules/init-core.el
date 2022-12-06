@@ -47,7 +47,7 @@
       custom-safe-themes t
       delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
       ;; enable-local-variables :all ; Avoid "defvar" warnings
-      echo-keystrokes 0.5 ; Show current key-sequence in minibuffer
+      echo-keystrokes 0.1 ; Show current key-sequence in minibuffer
       ;; Allow doing a command that requires candidate-selection when you are already in the middle
       ;; of candidate-selection. But keeping track of the minibuffer nesting is difficult.
       enable-recursive-minibuffers t

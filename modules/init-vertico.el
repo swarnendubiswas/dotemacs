@@ -53,7 +53,6 @@
 (use-package vertico-directory
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-directory))
-  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
   ;; the following fixes the path so the selected path does not have prepended junk left behind.
@@ -68,7 +67,6 @@
 (use-package vertico-repeat
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-repeat))
-  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :hook
   (minibuffer-setup-hook . vertico-repeat-save)
@@ -79,7 +77,6 @@
 (use-package vertico-indexed
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-indexed))
-  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :commands vertico-indexed-mode
   :init (vertico-indexed-mode 1))
@@ -88,8 +85,6 @@
 ;; (use-package vertico-grid
 ;;   :straight (vertico :files (:defaults "extensions/*")
 ;;                      :includes (vertico-grid))
-;;   :if  (eq sb/minibuffer-completion 'vertico)
-;;   :disabled t
 ;;   :after vertico
 ;;   :commands vertico-grid-mode
 ;;   :init (vertico-grid-mode 1)
@@ -99,7 +94,6 @@
 (use-package vertico-quick
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-quick))
-  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :bind
   (:map vertico-map
@@ -108,7 +102,6 @@
         ("C-'" . vertico-quick-jump)))
 
 (use-package consult
-  :if (eq sb/minibuffer-completion 'vertico)
   :after vertico
   :commands
   (consult--customize-put projectile-project-root)

@@ -218,7 +218,6 @@
                                         (buffer-local-value 'buffer-read-only buf))))
 
 (use-package consult-flyspell
-  :if (eq sb/minibuffer-completion 'vertico)
   :after (consult flyspell)
   :defines consult-flyspell-select-function
   :bind ("C-c f l" . consult-flyspell)

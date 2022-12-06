@@ -97,7 +97,6 @@
   ("C-M-y" . ivy-yasnippet))
 
 (use-package consult-yasnippet
-  :if (eq sb/minibuffer-completion 'vertico)
   :after consult
   :bind
   ("C-M-y" . consult-yasnippet))
@@ -107,10 +106,7 @@
 ;; well supported with prescient.
 
 (use-package prescient
-  :straight (:host github :repo "radian-software/prescient.el"
-                   :files (:defaults
-                           "vertico-prescient.el"
-                           "corfu-prescient.el"))
+  :straight (:host github :repo "radian-software/prescient.el")
   :commands prescient-persist-mode
   :hook
   (emacs-startup-hook . prescient-persist-mode)
@@ -119,15 +115,13 @@
 
 (use-package corfu-prescient
   :straight (:host github :repo "radian-software/prescient.el"
-                   :files (:defaults
-                           "corfu-prescient.el"))
+                   :files ("corfu-prescient.el"))
   :after (corfu prescient)
   :init (corfu-prescient-mode 1))
 
 (use-package vertico-prescient
   :straight (:host github :repo "radian-software/prescient.el"
-                   :files (:defaults
-                           "vertico-prescient.el"))
+                   :files ("vertico-prescient.el"))
   :after (vertico prescient)
   :init (vertico-prescient-mode 1))
 
@@ -135,8 +129,7 @@
 ;; support for the `:separate' keyword in `company'.
 (use-package company-prescient
   :straight (:host github :repo "radian-software/prescient.el"
-                   :files (:defaults
-                           "company-prescient.el"))
+                   :files ("company-prescient.el"))
   :after (company prescient)
   :init (company-prescient-mode 1))
 
