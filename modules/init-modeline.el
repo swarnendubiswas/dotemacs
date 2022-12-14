@@ -1,5 +1,5 @@
-;;; init-modeline.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
-;;; no-byte-compile: t; fill-column: 100 -*-
+;;; init-modeline.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:
+;;; utf-8; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -47,7 +47,7 @@
   :if (eq sb/modeline-theme 'powerline)
   :commands powerline-default-theme
   :init
-  (setq powerline-display-hud nil ; Visualization of the position in the buffer is not useful
+  (setq powerline-display-hud nil ; Visualization of the buffer position is not useful
         powerline-display-buffer-size nil
         powerline-display-mule-info nil ; File encoding information is not useful
         powerline-gui-use-vcs-glyph t

@@ -1,5 +1,5 @@
-;;; init-languages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding:utf-8; no-byte-compile: t; fill-column: 100 -*-
+;;; init-languages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:
+;;; utf-8; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -25,14 +25,14 @@
 
 (use-package elisp-mode
   :straight (:type built-in)
-  :mode ("\\.el\\'"  . emacs-lisp-mode)
+  :mode ("\\.el\\'"    . emacs-lisp-mode)
   :mode (".dir-locals" . emacs-lisp-mode)
   :hook
-  ((lisp-mode-hook emacs-lisp-mode-hook) .
-   (lambda ()
-     (when buffer-file-name
-       (add-hook 'after-save-hook #'check-parens nil t)
-       (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
+  (emacs-lisp-mode-hook . (lambda ()
+                            (when buffer-file-name
+                              (add-hook 'after-save-hook #'check-parens nil t)
+                              (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc
+                                                         'append)))))
 
 (use-package yaml-mode
   :defines
@@ -92,7 +92,7 @@
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-gmake-mode))
   :hook
-  (makefile-mode-hook . (lambda()
+  (makefile-mode-hook . (lambda ()
                           (setq-local indent-tabs-mode t))))
 
 (use-package makefile-executor
@@ -119,7 +119,7 @@
   :mode "\\.g4\\'")
 
 (use-package bison-mode
-  :mode ("\\.bison\\'"))
+  :mode "\\.bison\\'")
 
 (use-package llvm-mode
   ;; :straight (llvm-mode :type git :host github
@@ -235,8 +235,8 @@
       :remote? t
       :initialized-fn (lambda (workspace)
                         (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                           (lsp-configuration-section "perl"))))
+                                            (lsp--set-configuration
+                                             (lsp-configuration-section "perl"))))
       :priority -1
       :server-id 'perlls-r))))
 
@@ -451,11 +451,6 @@
   (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
   :hook
   (ssh-config-mode-hook . turn-on-font-lock))
-
-;; (use-package elf-mode
-;;   :mode
-;;   (("\\.so\\'"  . elf-mode)
-;;    ("\\.a\\'"   . elf-mode)))
 
 (provide 'init-languages)
 

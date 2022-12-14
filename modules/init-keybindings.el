@@ -1,5 +1,5 @@
-;;; init-keybindings.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding:utf-8; no-byte-compile: t; fill-column: 100 -*-
+;;; init-keybindings.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:
+;;; utf-8; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -48,6 +48,9 @@
 
  ("C-s"       . save-buffer)
  ("C-S-s"     . sb/save-all-buffers)
+
+ ("C-<left>"  . backward-word)
+ ("C-<right>" . forward-word)
 
  ("M-\\"      . delete-horizontal-space)
  ("M-#"       . cycle-spacing))

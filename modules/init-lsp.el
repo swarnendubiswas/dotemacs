@@ -1,5 +1,5 @@
-;;; init-lsp.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding:utf-8; no-byte-compile: t; fill-column: 100 -*-
+;;; init-lsp.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
+;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
 
@@ -118,6 +118,7 @@
   (lsp-completion-provider :none)
   (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
   (lsp-completion-show-kind nil "Disable completion kind to shorten popup width")
+  (lsp-completion-show-label-description nil "Disable description of completion candidates")
   (lsp-eldoc-enable-hover t)
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")

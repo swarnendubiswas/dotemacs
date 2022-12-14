@@ -1,4 +1,4 @@
-;;; init-cc.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-cc.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas

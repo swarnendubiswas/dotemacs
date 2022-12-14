@@ -1,4 +1,4 @@
-;;; init-config.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-config.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -177,7 +177,7 @@ Prefer the straight.el package manager instead."
 ;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
 ;; Emacs core.
 (defcustom sb/lsp-provider
-  'lsp-mode
+  'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio
           (const :tag "lsp-mode" lsp-mode)

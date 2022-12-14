@@ -1,4 +1,4 @@
-;;; init-vertico.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-vertico.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -13,7 +13,6 @@
 (use-package vertico
   :straight
   (vertico :files (:defaults "extensions/*") :includes (vertico-directory
-                                                        vertico-grid
                                                         vertico-indexed
                                                         vertico-quick
                                                         vertico-repeat))
@@ -30,7 +29,6 @@
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
-  (vertico-scroll-margin 2)
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
@@ -51,28 +49,26 @@
 
 ;; More convenient directory navigation commands
 (use-package vertico-directory
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-directory))
+  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory))
   :after vertico
+  :hook
   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
   ;; the following fixes the path so the selected path does not have prepended junk left behind.
-  :hook
   (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
   :bind
   (:map vertico-map
-        ("RET" . vertico-directory-enter)
-        ("DEL" . vertico-directory-delete-char)
+        ("RET"   . vertico-directory-enter)
+        ("DEL"   . vertico-directory-delete-char)
         ("M-DEL" . vertico-directory-delete-word)))
 
 (use-package vertico-repeat
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-repeat))
+  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-repeat))
   :after vertico
   :hook
   (minibuffer-setup-hook . vertico-repeat-save)
   :bind
   (("C-c r" . vertico-repeat-last)
-   ("M-r" . vertico-repeat-select)))
+   ("M-r"   . vertico-repeat-select)))
 
 (use-package vertico-indexed
   :straight (vertico :files (:defaults "extensions/*")
@@ -81,24 +77,13 @@
   :commands vertico-indexed-mode
   :init (vertico-indexed-mode 1))
 
-;; ;; Scanning a grid takes time. Furthermore, it hides marginalia annotations.
-;; (use-package vertico-grid
-;;   :straight (vertico :files (:defaults "extensions/*")
-;;                      :includes (vertico-grid))
-;;   :after vertico
-;;   :commands vertico-grid-mode
-;;   :init (vertico-grid-mode 1)
-;;   :custom
-;;   (vertico-grid-max-columns 4))
-
 (use-package vertico-quick
   :straight (vertico :files (:defaults "extensions/*")
                      :includes (vertico-quick))
   :after vertico
   :bind
   (:map vertico-map
-        ;; ("C-c q" . vertico-quick-insert)
-        ;; ("C-'" . vertico-quick-exit)
+        ("C-c q" . vertico-quick-insert)
         ("C-'" . vertico-quick-jump)))
 
 (use-package consult
@@ -155,11 +140,9 @@
   (consult-line-numbers-widen t)
   (consult-preview-key nil "Disable preview by default, enable for selected commands")
   (completion-in-region-function #'consult-completion-in-region)
-  ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly between only buffers
-  (consult-buffer-sources '(consult--source-buffer
-                            ;; consult--source-hidden-buffer
-                            ;; consult--source-recent-file
-                            ))
+  ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly
+  ;; between only buffers
+  (consult-buffer-sources '(consult--source-buffer))
   :config
   (consult-customize
    consult-theme consult-line consult-ripgrep consult-git-grep consult-grep
@@ -169,7 +152,7 @@
    consult-find
    :sort t)
 
-  (when (featurep 'projectile)
+  (with-eval-after-load "projectile"
     (setq consult-project-function #'projectile-project-root)))
 
 ;; Provide context-dependent actions similar to a content menu
@@ -178,23 +161,21 @@
   :after vertico
   :defines (vertico-map which-key-use-C-h-commands)
   :commands embark-prefix-help-command
-  :init
-  ;; Replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command
-        which-key-use-C-h-commands nil)
   :bind
   (([remap describe-bindings] . embark-bindings)
    :map vertico-map
-   ("C-l" . embark-act)
-   ("C-," . embark-dwim)
-   ("C-c C-l" . embark-export)))
+   ("C-l"     . embark-act)
+   ("C-,"     . embark-dwim)
+   ("C-c C-l" . embark-export))
+  :custom
+  ;; Replace the key help with a completing-read interface"
+  (prefix-help-command #'embark-prefix-help-command))
 
 (use-package embark-consult
   :after (embark consult))
 
-;; Enriches the completion display with annotations, e.g., documentation strings or file information.
-;; FIXME: Align marginalia columns correctly.
-
+;; Enriches the completion display with annotations, e.g., documentation strings or file
+;; information.
 (use-package marginalia
   :after vertico
   :commands marginalia-mode
@@ -203,12 +184,11 @@
   (("M-A" . marginalia-cycle)
    :map minibuffer-local-map
    ("M-A" . marginalia-cycle))
-  :custom
-  (marginalia-align 'left)
   :config
   ;; Add project-buffer annotator.
   (add-to-list 'marginalia-annotator-registry
                '(project-buffer marginalia-annotate-project-buffer))
+
   (with-eval-after-load "projectile"
     (add-to-list 'marginalia-command-categories
                  '(projectile-switch-project . file))

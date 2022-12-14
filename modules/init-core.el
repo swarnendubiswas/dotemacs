@@ -1,4 +1,4 @@
-;;; init-core.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-core.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -17,8 +17,6 @@
 (defvar sb/extras-directory)
 (defvar no-littering-etc-directory)
 (defvar no-littering-var-directory)
-
-(declare-function straight--emacs-dir "straight")
 
 (setq ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
       apropos-do-all t ; Make `apropos' search more extensively
@@ -282,6 +280,7 @@
 
 (use-package recentf
   :straight (:type built-in)
+  :functions straight--emacs-dir
   :commands
   (recentf-add-file recentf-save-file
                     recentf-save-list

@@ -14,6 +14,10 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
   - ~C-x C-+~ - Increase font size by one step (~text-scale-adjust~)
   - ~C-x C--~ - Decrease font size by one step (~text-scale-adjust~)
   - ~C-x +~ - Make all visible windows approximately equal height (~balance-windows~)
+  - ~C-x 0~ - Close the current window (~delete-window~)
+  - ~C-x 1~ - Close all other windows (~delete-other-windows~)
+  - ~C-x 2~ - Split window horizontally, one above the other (~split-window-below~)
+  - ~C-x 3~ - Split window vertically, side-by-side (~split-window-right~)
 
 ** Text Manipulation
 

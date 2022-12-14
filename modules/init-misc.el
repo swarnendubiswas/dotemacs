@@ -1,4 +1,4 @@
-;;; init-misc.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-misc.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -11,7 +11,6 @@
 (defvar which-key-use-C-h-commands)
 
 (use-package transient
-  ;; :demand t
   :config
   ;; Allow using `q' to quit out of popups, in addition to `C-g'
   (transient-bind-q-to-quit))
@@ -27,7 +26,7 @@
    ("C-h c"                   . helpful-command)
    ("C-h p"                   . helpful-at-point)
    :map helpful-mode-map
-   ("q"     . helpful-kill-buffers)))
+   ("q"                       . helpful-kill-buffers)))
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
@@ -40,23 +39,17 @@
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
   :bind
   (("M-<down>" . move-text-down)
-   ("M-<up>" . move-text-up)))
+   ("M-<up>"   . move-text-up)))
 
-;; https://github.com/jwiegley/use-package/issues/991
-(use-package duplicate-thing
-  :bind*
-  ("C-c C-d" . duplicate-thing))
+;; (use-package duplicate-thing
+;;   :bind*
+;;   ("C-c C-d" . duplicate-thing))
 
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
   :bind
   (("C-h C-m" . discover-my-major)
    ("C-h M-m" . discover-my-mode)))
-
-;; ;; Manage minor-mode on the dedicated interface buffer
-;; (use-package manage-minor-mode
-;;   :commands
-;;   (manage-minor-mode))
 
 (use-package expand-region ; Expand region by semantic units
   :bind
@@ -99,16 +92,16 @@
   :if sb/EMACS28+
   :bind
   (([remap undo] . vundo)
-   ("C-z" . vundo)
+   ("C-z"        . vundo)
    :map vundo-mode-map
-   ("C-a" . vundo-stem-root)
-   ("C-e" . vundo-stem-end)
+   ("C-a"        . vundo-stem-root)
+   ("C-e"        . vundo-stem-end)
    ;; These are for horizontal movements.
-   ("C-f" . vundo-forward)
-   ("C-b" . vundo-backward)
+   ("C-f"        . vundo-forward)
+   ("C-b"        . vundo-backward)
    ;; These are for vertical movements.
-   ("C-n" . vundo-next)
-   ("C-p" . vundo-previous)))
+   ("C-n"        . vundo-next)
+   ("C-p"        . vundo-previous)))
 
 (use-package iedit ; Edit multiple regions in the same way simultaneously
   :bind*
@@ -139,15 +132,6 @@
   :hook
   (emacs-startup-hook . global-page-break-lines-mode)
   :diminish)
-
-;; ;; First mark the word, then add more cursors. Use `mc/edit-lines' to add a cursor to each line
-;; ;; in an active region that spans multiple lines.
-
-;; (use-package multiple-cursors
-;;   :bind
-;;   (("C-<"     . mc/mark-previous-like-this)
-;;    ("C->"     . mc/mark-next-like-this)
-;;    ("C-c C-<" . mc/mark-all-like-this)))
 
 ;; ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; ;; Use `isearch', `swiper' will not work
@@ -216,18 +200,6 @@
   :commands
   (define-word define-word-at-point))
 
-;; (use-package number-separator
-;;   :straight (number-separator :type git :host github
-;;                               :repo "legalnonsense/number-separator.el")
-;;   :commands
-;;   (number-separator-mode)
-;;   :custom
-;;   (number-separator ",")
-;;   (number-separator-interval 3)
-;;   (number-separator-ignore-threshold 4)
-;;   (number-separator-decimal-char ".")
-;;   :diminish)
-
 (use-package esup
   :if (bound-and-true-p sb/debug-init-file)
   :commands
@@ -237,15 +209,6 @@
 ;;   :if (bound-and-true-p sb/debug-init-file)
 ;;   :commands
 ;;   (bug-hunter-init-file bug-hunter-file))
-
-;; (use-package explain-pause-mode
-;;   :straight
-;;   (explain-pause-mode :type git :host github
-;;                       :repo "lastquestion/explain-pause-mode")
-;;   :if (bound-and-true-p sb/debug-init-file)
-;;   :commands
-;;   (explain-pause-mode explain-pause-top)
-;;   :diminish)
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
@@ -302,40 +265,14 @@
   (setq-default bm-buffer-persistence t))
 
 (use-package crux
-  ;; :demand t
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
    ("C-c d s" . crux-sudo-edit)
-   ;; ("C-a"     . crux-move-beginning-of-line)
-   )
-  ;; :config
-  ;; (crux-with-region-or-buffer indent-region)
-  ;; (crux-with-region-or-buffer untabify)
-  ;; (crux-with-region-or-line   comment-or-uncomment-region)
-  )
+   ("C-c C-d" . crux-duplicate-current-line-or-region)))
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
 (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-
-;; `vterm' provides better performance than `eshell', `shell', and `(ansi-)term'. The advantage of
-;; the later modules are they are built-in to Emacs. The package requires shell-side configuration.
-;; Check https://github.com/akermu/emacs-libvterm.
-
-;; (use-package vterm
-;;   :custom
-;;   (vterm-always-compile-module t)
-;;   (vterm-max-scrollback 5000)
-;;   (vterm-term-environment-variable "xterm-24bit")
-;;   :config
-;;   (add-hook 'vterm-mode-hook
-;;             (lambda ()
-;;               (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
-;;               (buffer-face-mode t))))
-
-;; (use-package vterm-toggle
-;;   :bind
-;;   ("C-`" . vterm-toggle))
 
 (use-package rainbow-mode
   :hook
@@ -356,8 +293,7 @@
   :commands
   (unfill-region unfill-paragraph unfill-toggle))
 
-;; Better looking info pages
-(use-package info-colors
+(use-package info-colors ; Better looking info pages
   :hook
   (Info-selection-hook . info-colors-fontify-node))
 
@@ -376,80 +312,17 @@
   (:map prog-mode-map
         ("C-c C-u" . string-inflection-all-cycle)))
 
-;; (use-package procress
-;;   :straight
-;;   (:host github :repo "haji-ali/procress")
-;;   :hook
-;;   (LaTeX-mode-hook . procress-auctex-mode)
-;;   :config
-;;   (procress-load-default-svg-images))
-
-;; (use-package jgraph-mode
-;;   :mode ("\\.jgr\\'" . jgraph-mode))
-
-;; (use-package graphviz-dot-mode
-;;   :custom
-;;   (graphviz-dot-indent-width 4))
-
-;; (use-package gnuplot
-;;   :mode ("\\.gp\\'" . gnuplot-mode)
-;;   :interpreter ("gnuplot" . gnuplot-mode))
-
-;; (use-package sudo-edit ; Edit file with sudo
-;;   :bind ("M-s e" . sudo-edit))
-
-;; (use-package ignoramus ; Ignore backups, build files, et al.
-;;   :demand t
-;;   :config
-;;   (dolist (ext '(".cb"
-;;                  ".cb2"
-;;                  ".dvi"
-;;                  ".fls"
-;;                  ".idx"
-;;                  ".o"
-;;                  ".out"
-;;                  ".pdf"
-;;                  "-pkg.el"
-;;                  ".rel"
-;;                  ".rip"
-;;                  ".toc"))
-;;     (add-to-list 'ignoramus-file-basename-endings ext))
-
-;;   (dolist (filenames '("GPATH"
-;;                        "GRTAGS"
-;;                        "GSYMS"
-;;                        "GTAGS"
-;;                        "TAGS"
-;;                        "__init__.py"))
-;;     (add-to-list 'ignoramus-file-basename-exact-names filenames))
-
-;;   (add-to-list 'ignoramus-file-basename-regexps "\\`\\.")
-
-;;   (dolist (dir '("\\`\\."
-;;                  "__pycache__"
-;;                  "auto"))
-;;     (add-to-list 'ignoramus-file-basename-exact-names dir))
-
-;;   (ignoramus-setup))
-
-;; (use-package transient-extras
-;;   :straight
-;;   (:host github :repo "haji-ali/transient-extras")
-;;   :demand t
-;;   :config
-;;   (require 'transient-extras-lp)
-;;   (with-eval-after-load "dired"
-;;     (bind-key "C-c C-p" #'transient-extras-lp-menu dired-mode-map))
-;;   ;; (with-eval-after-load "pdf-tools"
-;;   ;;   (bind-key "C-c C-p" #'transient-extras-lp-menu pdf-misc-minor-mode-map))
-;;   )
-
-;; Allow GC to happen after a period of idle time
-(use-package gcmh
+(use-package gcmh ; Allow GC to happen after a period of idle time
   :commands gcmh-idle-garbage-collect
   :hook
   (emacs-startup-hook . gcmh-mode)
   :diminish)
+
+(use-package kill-file-path
+  :straight (:host github :repo "chyla/kill-file-path")
+  :commands
+  (kill-file-path-basename kill-file-path-basename-without-extension kill-file-path-dirname
+                           kill-file-path))
 
 (provide 'init-misc)
 

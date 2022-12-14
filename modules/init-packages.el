@@ -1,4 +1,4 @@
-;;; init-packages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-packages.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -190,7 +190,7 @@
   ;; "prettier" from $PATH are also not found without the interactive flag.
   (setq exec-path-from-shell-arguments '("-l" "-i")
         exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM"))
+        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)

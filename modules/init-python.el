@@ -1,4 +1,4 @@
-;;; init-python.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; init-python.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -164,9 +164,9 @@
                                         (lsp-configuration-section "python")))
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (ht-merge (lsp-configuration-section "pyright")
-                                   (lsp-configuration-section "python")))))
+                                          (lsp--set-configuration
+                                           (ht-merge (lsp-configuration-section "pyright")
+                                                     (lsp-configuration-section "python")))))
     :download-server-fn (lambda (_client callback error-callback _update?)
                           (lsp-package-ensure 'pyright callback error-callback))
     :notification-handlers
