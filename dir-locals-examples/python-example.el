@@ -2,7 +2,7 @@
  (python-mode . (
                  (fill-column . 100)
 
-                 (projectile-project-run-cmd . "python -m src")
+                 (projectile-project-run-cmd . "python3 -m src")
                  ;; Do not prompt for command on `projectile-run-project'
                  (compilation-read-command . nil)
 
@@ -41,26 +41,30 @@
                  ;; (eval . (require 'dap-python))
                  ;; (eval . (dap-register-debug-template <...>))
 
-                 (eglot-workspace-configuration .
-                                                ((:python
-                                                  :venvPath ,(expand-absolute-name "~/.local/share/conda/envs"))
-                                                 :analysis (:diagnosticMode
-                                                            "openFilesOnly"
-                                                            :stubPath
-                                                            ,(expand-absolute-name "~/.local/lib/python-type-stubs"))
-                                                 (:pylsp .
-                                                         (:plugins
-                                                          (:jedi_completion
-                                                           (:fuzzy t)
-                                                           (:include_params t)
-                                                           :pydocstyle (:enabled nil)
-                                                           :pycodestyle (:enabled nil)
-                                                           :mccabe (:enabled nil)
-                                                           :pyflakes (:enabled nil)
-                                                           :flake8 (:enabled t)
-                                                           :black (:enabled t)
-                                                           :pylint (:enabled t))
-                                                          :configurationSources ["flake8"]))))
+                 (eglot-workspace-configuration
+                  .
+                  ((:python .
+                            (:pythonPath ".venv/bin/python")
+                            (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+                            (:analysis (:diagnosticMode
+                                        "openFilesOnly"
+                                        :stubPath
+                                        (expand-absolute-name "~/.local/lib/python-type-stubs")))
+                            (:pylsp .
+                                    (:plugins
+                                     (:jedi_completion
+                                      (:fuzzy t)
+                                      (:include_params t)
+                                      :pylsp_isort (:enabled t)
+                                      :pylsp_mypy (:enabled t)
+                                      :pydocstyle (:enabled nil)
+                                      :pycodestyle (:enabled nil)
+                                      :mccabe (:enabled nil)
+                                      :pyflakes (:enabled nil)
+                                      :flake8 (:enabled t)
+                                      :black (:enabled t)
+                                      :pylint (:enabled t))
+                                     :configurationSources ["setup.cfg"])))))
                  ))
  )
 

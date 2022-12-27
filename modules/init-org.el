@@ -76,31 +76,28 @@
   ("C-c o" . org-mode-map)
   :bind
   (:map org-mode-map
-        ("M-<left>"  . nil)
-        ("M-<right>" . nil)
-        ("M-<up>"    . nil)
-        ("M-<down>"  . nil)
-        ("C-'"       . nil)
-        ;; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
-        ("C-c C-d"   . nil)
-        ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variantsvgg
-        ("C-c C-j"   . nil)
+        ("M-<left>")
+        ("M-<right>")
+        ("M-<up>")
+        ("M-<down>")
+        ("C-'")
+        ("C-c C-d") ; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
+        ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
+        ("C-c C-j")
         ;; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
-        ("M-e"       . nil)
+        ("M-e")
         ("<tab>"     . org-indent-item)
         ("<backtab>" . org-outdent-item)
-        ("M-a" . org-backward-paragraph)
-        ("M-e" . org-forward-paragraph)
-        ("M-{" . org-backward-element)
-        ("M-}" . org-forward-element)))
+        ("M-a"       . org-backward-paragraph)
+        ("M-e"       . org-forward-paragraph)
+        ("M-{"       . org-backward-element)
+        ("M-}"       . org-forward-element)))
 
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
-  :disabled t
   :hook
   (org-mode-hook . org-bullets-mode))
 
-;; Make invisible parts of Org elements appear visible
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (org-appear :type git :host github :repo "awth13/org-appear")
   :hook
@@ -122,7 +119,6 @@
              org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern
-  :disabled t
   :hook
   (org-mode-hook . org-modern-mode))
 

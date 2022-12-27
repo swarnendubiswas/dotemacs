@@ -268,8 +268,8 @@
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>"   . crux-kill-other-buffers)
-   ("C-c d s" . crux-sudo-edit)
-   ("C-c C-d" . crux-duplicate-current-line-or-region)))
+   ("C-c d s" . crux-sudo-edit))
+  :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
 (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash

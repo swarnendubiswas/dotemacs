@@ -63,19 +63,22 @@
                                          "--pch-storage=memory"
                                          "--pretty")))
 
-  ;; (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode) "texlab"))
+  ;; It is more useful to use Grammarly to check these files.
 
-  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
+  ;; (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode) "texlab"))
+  ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
+  )
 
 (use-package consult-eglot
-  :if (eq sb/minibuffer-completion 'vertico)
-  :after eglot)
+  :after (consult eglot))
 
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
+  :after eglot
   :hook
   ((text-mode-hook markdown-mode-hook org-mode-hook) . (lambda ()
                                                          (unless (derived-mode-p 'yaml-mode)
+                                                           (require 'eglot-grammarly)
                                                            (eglot-ensure))))
   :config
   (add-to-list eglot-workspace-configuration
@@ -83,7 +86,6 @@
                  . ((audience . "knowledgeable"))))))
 
 ;; (use-package eglot-ltex
-;;   :ensure t
 ;;   :hook (text-mode . (lambda ()
 ;;                        (require 'eglot-ltex)
 ;;                        (call-interactively #'eglot)))
@@ -91,6 +93,7 @@
 ;;   (setq eglot-languagetool-server-path ""))
 
 (use-package eglot-java
+  :after eglot
   :hook
   (java-mode-hook . eglot-java-init))
 

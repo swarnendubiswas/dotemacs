@@ -31,16 +31,19 @@
 
  ;; The default keybinding "C-S-backspace" does not work with the TUI. We make it work with
  ;; Alacritty with `term-keys-mode'. So, this is an alternative.
+
  ;; ("M-k"       . kill-whole-line)
 
- ;; ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
- ;; ;; manipulate the first character of the word.
+ ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
+ ;; manipulate the first character of the word.
+
  ;; ("M-c"       . capitalize-dwim)
  ;; ("M-u"       . upcase-dwim)
  ;; ("M-l"       . downcase-dwim)
 
  ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
  ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
+
  ("C-c n"     . comment-region)
  ("C-c m"     . uncomment-region)
  ("C-c ;"     . sb/comment-line)
@@ -59,9 +62,6 @@
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key   "C-x s" #'sb/switch-to-scratch)
-
-;; (with-eval-after-load "popup"
-;;   (bind-key "[escape]" #'keyboard-quit popup-menu-keymap))
 
 (unless sb/tab-bar-handler
   (global-set-key [remap next-buffer]     #'sb/next-buffer)
@@ -82,20 +82,11 @@
 (use-package free-keys
   :commands free-keys)
 
-;; (use-package keyfreq
-;;   :commands (keyfreq-mode keyfreq-autosave-mode)
-;;   :hook
-;;   (after-init-hook . (lambda ()
-;;                        (keyfreq-mode 1)
-;;                        (keyfreq-autosave-mode 1))))
-
 (use-package which-key ; Show help popups for prefix keys
   :commands which-key-setup-side-window-right-bottom
   :hook
   (emacs-startup-hook . which-key-mode)
   :custom
-  ;; ;; Allow "C-h" to trigger `which-key' before it is done automatically
-  ;; (which-key-show-early-on-C-h nil)
   (which-key-sort-order 'which-key-key-order-alpha)
   :config
   (which-key-setup-side-window-right-bottom)
@@ -104,17 +95,13 @@
 (use-package which-key-posframe
   :if (display-graphic-p)
   :hook
-  (which-key-mode-hook . which-key-posframe-mode)
-  ;; :custom
-  ;; Thicker border makes the posframe easier to distinguish
-  ;; (which-key-posframe-border-width 2)
-  )
+  (which-key-mode-hook . which-key-posframe-mode))
 
-;; ;; Hydras, https://github.com/abo-abo/hydra
+;; Hydras, https://github.com/abo-abo/hydra
 
-;; ;; ":exit nil" means the hydra state will continue, ":exit t" will quit the hydra. ":color red"
-;; ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
-;; ;; blue" means exit.
+;; ":exit nil" means the hydra state will continue, ":exit t" will quit the hydra. ":color red"
+;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
+;; blue" means exit.
 
 ;; (use-package hydra
 ;;   :commands

@@ -36,14 +36,14 @@
 (use-package dumb-jump
   :after xref
   :demand t
-  :commands dumb-jump-xref-activate
   :hook
   (xref-backend-functions . dumb-jump-xref-activate)
   :custom
+  (dumb-jump-prefer-searcher 'rg)
+  (dumb-jump-selector 'completing-read)
   (dumb-jump-quiet t))
 
 (use-package ivy-xref
-  :if (eq sb/minibuffer-completion 'ivy)
   :after (ivy xref)
   :demand t
   :custom
@@ -81,10 +81,9 @@
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
   :hook
-  ((citre-mode-hook . sb/enable-lsp-citre-capf-backend)
-   ;; Using `(require citre-config)' will enable `citre-mode' for all files as long as it finds a
-   ;; tags backend, which is not desired for plain text files.
-   ((prog-mode-hook LaTeX-mode-hook) . citre-mode))
+  ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
+  ;; tags backend, which is not desired for plain text files.
+  ((prog-mode-hook LaTeX-mode-hook) . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
    ("M-'"     . sb/citre-jump+)
@@ -111,6 +110,9 @@
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
   :config
+  (with-eval-after-load "lsp-mode"
+    (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
+
   (dolist (func '(find-function
                   counsel-imenu
                   projectile-grep
@@ -129,35 +131,35 @@
               (funcall fetcher))
             (funcall citre-fetcher)))))
 
-  (defmacro citre-backend-to-company-backend (backend)
-    "Create a company backend from Citre completion backend BACKEND.
+  (with-eval-after-load "company"
+    (defmacro citre-backend-to-company-backend (backend)
+      "Create a company backend from Citre completion backend BACKEND.
 The result is a company backend called
 `company-citre-<backend>' (like `company-citre-tags') and can be
 used in `company-backends'."
-    (let ((backend-name (intern (concat "company-citre-" (symbol-name backend))))
-          (docstring (concat "`company-mode' backend from the `"
-                             (symbol-name backend)
-                             "' Citre backend.\n"
-                             "`citre-mode' needs to be enabled to use this.")))
-      `(defun ,backend-name (command &optional arg &rest ignored)
-         ,docstring
-         (pcase command
-           ('interactive (company-begin-backend ',backend-name))
-           ('prefix (and (bound-and-true-p citre-mode)
-                         (citre-backend-usable-p ',backend)
-                         ;; We shouldn't use this as it's defined for getting
-                         ;; definitions/references.  But the Citre completion
-                         ;; backend design is not fully compliant with company's
-                         ;; design so there's no simple "right" solution, and this
-                         ;; works for tags/global backends.
-                         (or (citre-get-symbol-at-point-for-backend ',backend)
-                             'stop)))
-           ('meta (citre-get-property 'signature arg))
-           ('annotation (citre-get-property 'annotation arg))
-           ('candidates (let ((citre-completion-backends '(,backend)))
-                          (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+      (let ((backend-name (intern (concat "company-citre-" (symbol-name backend))))
+            (docstring (concat "`company-mode' backend from the `"
+                               (symbol-name backend)
+                               "' Citre backend.\n"
+                               "`citre-mode' needs to be enabled to use this.")))
+        `(defun ,backend-name (command &optional arg &rest ignored)
+           ,docstring
+           (pcase command
+             ('interactive (company-begin-backend ',backend-name))
+             ('prefix (and (bound-and-true-p citre-mode)
+                           (citre-backend-usable-p ',backend)
+                           ;; We shouldn't use this as it's defined for getting
+                           ;; definitions/references. But the Citre completion backend design is not
+                           ;; fully compliant with company's design so there's no simple "right"
+                           ;; solution, and this works for tags/global backends.
+                           (or (citre-get-symbol-at-point-for-backend ',backend)
+                               'stop)))
+             ('meta (citre-get-property 'signature arg))
+             ('annotation (citre-get-property 'annotation arg))
+             ('candidates (let ((citre-completion-backends '(,backend)))
+                            (all-completions arg (nth 2 (citre-completion-at-point)))))))))
 
-  (citre-backend-to-company-backend tags)
+    (citre-backend-to-company-backend tags))
   :diminish)
 
 (provide 'init-tags)

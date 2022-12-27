@@ -106,7 +106,6 @@
    ([remap yank-pop] . consult-yank-pop)
    ("M-y" . consult-yank-pop)
    ([remap apropos] . consult-apropos)
-   ;; M-g bindings (goto-map)
    ("M-g e" . consult-compile-error)
    ([remap goto-line] . consult-goto-line)
    ("M-g o" . consult-outline)
@@ -153,7 +152,9 @@
    :sort t)
 
   (with-eval-after-load "projectile"
-    (setq consult-project-function #'projectile-project-root)))
+    (setq consult-project-function #'projectile-project-root)
+    (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
+    (bind-key [remap projectile-grep] #'consult-grep)))
 
 ;; Provide context-dependent actions similar to a content menu
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
@@ -180,28 +181,10 @@
   :after vertico
   :commands marginalia-mode
   :init (marginalia-mode 1)
-  :bind
-  (("M-A" . marginalia-cycle)
-   :map minibuffer-local-map
-   ("M-A" . marginalia-cycle))
   :config
   ;; Add project-buffer annotator.
   (add-to-list 'marginalia-annotator-registry
-               '(project-buffer marginalia-annotate-project-buffer))
-
-  (with-eval-after-load "projectile"
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-switch-project . file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-switch-open-project . file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-find-file . project-file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-recentf . project-file))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-display-buffer . project-buffer))
-    (add-to-list 'marginalia-command-categories
-                 '(projectile-switch-to-buffer . project-buffer))))
+               '(project-buffer marginalia-annotate-project-buffer)))
 
 (provide 'init-vertico)
 

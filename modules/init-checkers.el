@@ -147,7 +147,8 @@
   ;;               (setq sb/flycheck-local-checkers
   ;;                     '((lsp . ((next-checkers . (python-pylint)))))))))
 
-  )
+  (with-eval-after-load "counsel"
+    (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map)))
 
 ;; Showing error messages in the echo area is less intrusive, so the following packages are
 ;; disabled.
@@ -289,28 +290,9 @@
   (:map flycheck-command-map
         ("!" . consult-flycheck)))
 
-(when (eq sb/minibuffer-completion 'ivy)
-  (with-eval-after-load "counsel"
-    (with-eval-after-load "flycheck"
-      (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map))))
-
-;; Most likely, `org', `markdown', and `latex' files will be in directories that can use LSP
-;; support. We need to enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
-
-;; org -> grammarly -> languagetool
-
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (flycheck-select-checker 'org-lint)
-;;             (when (featurep 'flycheck-grammarly)
-;;               (flycheck-add-next-checker 'org-lint 'grammarly))
-;;             (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-;;               (flycheck-add-next-checker 'grammarly 'languagetool))
-;;             (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-;;               (flycheck-add-next-checker 'org-lint 'languagetool))))
-
-;; We only limit to "*scratch*" buffer since we can use `lsp-grammarly' and `lsp-ltex' for files in
-;; directories.
+;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
+;; support via `lsp-grammarly' and `lsp-ltex'. We need to enable `flycheck' support for the
+;; "*scratch*" buffer which is in `text-mode'.
 (add-hook 'text-mode-hook
           (lambda ()
             (when (string= (buffer-name) "*scratch*")
@@ -321,34 +303,6 @@
                       (flycheck-add-next-checker 'grammarly 'languagetool)))
                 (when (featurep 'flycheck-languagetool)
                   (flycheck-select-checker 'languagetool))))))
-
-;; `markdown-mode' is derived from `text-mode'
-;; markdown-markdownlint-cli -> grammarly -> languagetool
-
-;; (add-hook 'markdown-mode-hook
-;;           (lambda()
-;;             (flycheck-select-checker 'markdown-markdownlint-cli)
-;;             (when (featurep 'flycheck-grammarly)
-;;               ;; (make-local-variable 'flycheck-error-list-minimum-level)
-;;               ;; (setq flycheck-error-list-minimum-level 'warning
-;;               ;;       flycheck-navigation-minimum-level 'warning)
-;;               ;; (flycheck-add-next-checker 'markdown-markdownlint-cli '(warning . grammarly) 'append)
-;;               (flycheck-add-next-checker 'markdown-markdownlint-cli 'grammarly))
-;;             ;; (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-;;             ;;   (flycheck-add-next-checker 'grammarly 'languagetool))
-;;             ;; (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-;;             ;;   (flycheck-add-next-checker 'markdown-markdownlint-cli 'languagetool))
-;;             ))
-
-;; (dolist (hook '(LaTex-mode-hook latex-mode-hook))
-;;   (add-hook hook (lambda ()
-;;                    (flycheck-select-checker 'tex-chktex)
-;;                    (when (featurep 'flycheck-grammarly)
-;;                      (flycheck-add-next-checker 'tex-chktex 'grammarly))
-;;                    (when (and (featurep 'flycheck-grammarly) (featurep 'flycheck-languagetool))
-;;                      (flycheck-add-next-checker 'grammarly 'languagetool))
-;;                    (when (and (not (featurep 'flycheck-grammarly)) (featurep 'flycheck-languagetool))
-;;                      (flycheck-add-next-checker 'tex-chktex 'languagetool)))))
 
 ;; (use-package clang-format
 ;;   :if (executable-find "clang-format")

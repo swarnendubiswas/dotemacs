@@ -89,13 +89,13 @@
 (use-package avy
   :commands avy-setup-default
   :bind
-  (("M-b"   . avy-goto-word-1)
-   ("C-'"   . avy-goto-char-timer)
-   ("C-/"   . avy-goto-line)
+  (("M-b" . avy-goto-word-1)
+   ("C-'" . avy-goto-char-timer)
+   ("C-/" . avy-goto-line)
+   :map isearch-mode-map
    ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
    ;; `isearch' candidates.
-   :map isearch-mode-map
-   ("C-'"     . avy-isearch))
+   ("C-'" . avy-isearch))
   :custom
   (avy-background t "Provides better contrast"))
 
@@ -108,7 +108,7 @@
 ;; and replacements as you type.
 (use-package visual-regexp
   :commands
-  (vr/replace vr/mark vr/mc-mark)
+  (vr/replace vr/mark)
   :bind
   ([remap query-replace] . vr/query-replace))
 

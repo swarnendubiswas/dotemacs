@@ -1634,6 +1634,7 @@
     ("quanitfy" "quantify" nil :count 0)
     ("realizty" "reality" nil :count 0)
     ("reatain" "Retain" nil :count 0)
+    ("recived" "received" nil :count 0)
     ("reproducibility" "reproducability" nil :count 0)
     ("revisig" "revising" nil :count 0)
     ("schedulign" "scheduling" nil :count 0)

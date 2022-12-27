@@ -143,10 +143,6 @@
              ".ppt" ".pptx" ".pt" ".pyc" ".rel" ".rip" ".rpm" ".so" "swp" ".xls" ".xlsx" "~$"))
     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
-  (with-eval-after-load "consult"
-    (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
-    (bind-key [remap projectile-grep] #'consult-grep))
-
   (when (eq sb/minibuffer-completion 'ivy)
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))

@@ -30,21 +30,17 @@
                                      modus-themes-org-blocks
                                      modus-themes-mode-line)
   :init
-  (when (eq sb/modeline-theme 'default)
-    (setq modus-themes-mode-line 'accented-3d))
-
   (cond
    ((eq sb/theme 'modus-operandi) (load-theme 'modus-operandi t))
    ((eq sb/theme 'modus-vivendi) (load-theme 'modus-vivendi t)))
   :custom
-  (modus-themes-hl-line '(accented intense))
-  (modus-themes-subtle-line-numbers t)
-  (modus-themes-paren-match '(intense bold))
-  (modus-themes-lang-checkers '(intense))
-  (modus-themes-prompts '(intense bold gray background))
-  (modus-themes-fringes 'intense)
-  (modus-themes-tabs-accented t)
-  (modus-themes-org-blocks 'tinted-background))
+  (modus-themes-paren-match '(bold))
+  ;; (modus-themes-lang-checkers '(intense))
+  ;; (modus-themes-prompts '(intense bold gray background))
+  ;; (modus-themes-fringes 'intense)
+  ;; (modus-themes-org-blocks 'tinted-background)
+  ;; (org-fontify-whole-block-delimiter-line nil)
+  )
 
 (when (and (eq sb/theme 'sb/customized)
            (display-graphic-p))
@@ -56,16 +52,11 @@
 
 ;; ;; Set `sb/theme' to `none' if you use this package
 ;; (use-package circadian
-;;   :commands circadian-setup
 ;;   :disabled t
 ;;   :custom
 ;;   (circadian-themes '((:sunrise . nano-light)
 ;;                       (:sunset  . modus-vivendi)))
 ;;   :hook (emacs-startup-hook . circadian-setup))
-
-(use-package catppuccin-theme
-  :if (eq sb/theme 'catppuccin)
-  :init (load-theme 'catppuccin))
 
 (use-package ef-themes
   :straight (:type git :host github :repo "protesilaos/ef-themes")

@@ -23,8 +23,6 @@
            (const :tag "doom-molokai"      doom-molokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
-           ;; Brackets are not emphasized, write-good mode does not work well
-           (const :tag "catppuccin"        catppuccin)
            (const :tag "ef-dark"           ef-dark)
            (const :tag "ef-trio-dark"      ef-trio-dark)
            ;; Greenish tinge
@@ -137,7 +135,7 @@ This location is used for temporary installations and files.")
   :group 'dotemacs)
 
 (defcustom sb/corfu-icons
-  'kind-all-the-icons
+  'kind-icons
   "Choose the provider for Corfu icons."
   :type '(radio
           (const :tag "kind-icon" kind-icon)
