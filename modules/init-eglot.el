@@ -67,7 +67,8 @@
 
   ;; (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode) "texlab"))
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
-  )
+
+  (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio"))))
 
 (use-package consult-eglot
   :after (consult eglot))
@@ -81,9 +82,10 @@
                                                            (require 'eglot-grammarly)
                                                            (eglot-ensure))))
   :config
-  (add-to-list eglot-workspace-configuration
-               ((@emacs-grammarly/grammarly-languageserver
-                 . ((audience . "knowledgeable"))))))
+  ;; (add-to-list eglot-workspace-configuration
+  ;;              ((@emacs-grammarly/grammarly-languageserver
+  ;;                . ((audience . "knowledgeable")))))
+  )
 
 ;; (use-package eglot-ltex
 ;;   :hook (text-mode . (lambda ()

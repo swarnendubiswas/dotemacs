@@ -23,14 +23,14 @@
   ;; TODO: Bind other keys suitably
   ;; python-nav-beginning-of-block
   ;; python-nav-end-of-block
-  ;; python-nav-beginning-of-defun
-  ;; python-nav-end-of-defun
   ;; python-nav-backward-defun
   ;; python-nav-forward-defun
   ;; python-nav-backward-statement
   ;; python-nav-forward-statement
   (:map python-mode-map
         ("C-c C-d")
+        ("C-M-a" . python-nav-beginning-of-defun)
+        ("C-M-e" . python-nav-end-of-defun)
         ("M-a"   . python-nav-backward-block)
         ("M-e"   . python-nav-forward-block)
         ("C-c <" . python-indent-shift-left)
@@ -78,9 +78,10 @@
                                                (concat "--rcfile="
                                                        (expand-file-name ".config/pylintrc"
                                                                          sb/user-home-directory))))
-          lsp-pylsp-plugins-pylint-enabled t ; Pylint can be expensive
+          lsp-pylsp-plugins-pylint-enabled t
           lsp-pylsp-plugins-yapf-enabled t
           lsp-pylsp-plugins-flake8-enabled nil
+          lsp-pylsp-plugins-black-enabled nil
           lsp-pylsp-plugins-jedi-use-pyenv-environment t)))
 
 (use-package python-docstring

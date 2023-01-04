@@ -31,7 +31,7 @@
 ;; `default-directory'.
 
 (use-package ibuffer-project
-  :if (eq sb/project-handler 'project)
+  :after project
   :hook
   (ibuffer-hook . (lambda ()
                     (unless (eq ibuffer-sorting-mode 'project-file-relative)
@@ -44,7 +44,7 @@
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
-  :if (eq sb/project-handler 'projectile)
+  :after projectile
   :hook
   (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 

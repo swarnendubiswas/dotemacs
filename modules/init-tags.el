@@ -80,10 +80,10 @@
     (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
-  :hook
-  ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
-  ;; tags backend, which is not desired for plain text files.
-  ((prog-mode-hook LaTeX-mode-hook) . citre-mode)
+  ;; :hook
+  ;; ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
+  ;; ;; tags backend, which is not desired for plain text files.
+  ;; ((prog-mode-hook LaTeX-mode-hook) . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
    ("M-'"     . sb/citre-jump+)
@@ -110,8 +110,8 @@
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
   :config
-  (with-eval-after-load "lsp-mode"
-    (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
 
   (dolist (func '(find-function
                   counsel-imenu

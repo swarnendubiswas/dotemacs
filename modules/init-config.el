@@ -153,7 +153,7 @@ Prefer the straight.el package manager instead."
 
 ;; I do not find any difference in terms of features. More packages support `projectile'.
 (defcustom sb/project-handler
-  'projectile
+  'project
   "Choose the handler for projects."
   :type '(radio
           (const :tag "project.el" project)

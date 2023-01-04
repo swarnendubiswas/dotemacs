@@ -190,19 +190,11 @@
 
 ;; Use for major modes which do not provide a formatter.
 (use-package format-all
-  :preface
-  (defun sb/enable-format-all ()
-    "Delay enabling format-all to avoid slowing down Emacs startup."
-    (dolist (hook '(bazel-mode-hook LaTeX-mode-hook web-mode-hook
-                                    markdown-mode-hook emacs-lisp-mode-hook))
-      (add-hook hook #'format-all-mode))
-    (add-hook 'format-all-mode-hook #'format-all-ensure-formatter))
   :commands
   (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook lisp-data-mode-hook web-mode-hook
-                     markdown-mode-hook emacs-lisp-mode-hook) . format-all-mode))
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook emacs-lisp-mode-hook markdown-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters '(("BibTeX" Emacs)
                            ("C" clang-format)
@@ -328,6 +320,7 @@
 
 ;; Claims to be better than `electric-indent-mode'. But we are now using `format-all'.
 
+;; Only indents and does not reformat the whole file.
 ;; (use-package aggressive-indent
 ;;   :hook
 ;;   (emacs-lisp-mode-hook . aggressive-indent-mode)

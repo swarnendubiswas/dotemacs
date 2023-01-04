@@ -148,8 +148,7 @@
     (bind-key "<f6>" #'projectile-find-file)))
 
 (use-package consult-projectile
-  :if (and (eq sb/minibuffer-completion 'vertico)
-           (eq sb/project-handler 'projectile))
+  :after (consult projectile)
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)

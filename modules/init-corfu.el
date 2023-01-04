@@ -117,19 +117,6 @@
   :init
   (corfu-popupinfo-mode 1))
 
-;; (use-package corfu-doc
-;;   :if (and (display-graphic-p) (eq sb/capf 'corfu))
-;;   :hook
-;;   (corfu-mode-hook . corfu-doc-mode)
-;;   :bind
-;;   (:map corfu-map
-;;         ("M-p" . corfu-doc-scroll-down)
-;;         ("M-n" . corfu-doc-scroll-up)
-;;         ([remap corfu-info-documentation] . corfu-doc-toggle))
-;;   :custom
-;;   ;; Do not show documentation shown in both the echo area and in the `corfu-doc' popup
-;;   (corfu-echo-documentation nil))
-
 (use-package popon
   :straight (:host codeberg :repo "akib/emacs-popon")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p))))
@@ -139,12 +126,6 @@
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook
   (corfu-mode-hook . corfu-terminal-mode))
-
-;; (use-package corfu-doc-terminal
-;;   :straight (:host codeberg :repo "akib/emacs-corfu-doc-terminal")
-;;   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
-;;   :hook
-;;   (corfu-mode-hook . corfu-doc-terminal-mode))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -210,6 +191,8 @@
                                             #'cape-dict
                                             #'cape-ispell)))))
 
+  ;; FIXME: How can we simplify the following mess?
+
   (with-eval-after-load "lsp-mode"
     (add-hook 'sh-mode-hook
               (lambda ()
@@ -220,7 +203,6 @@
                                          (cape-super-capf #'lsp-completion-at-point
                                                           #'citre-completion-at-point
                                                           ;; #'sh-completion-at-point-function
-                                                          ;; #'comint-completion-at-point
                                                           #'cape-file
                                                           #'cape-dabbrev
                                                           #'cape-dict
@@ -259,6 +241,53 @@
                               (setq-local completion-at-point-functions
                                           (list
                                            (cape-super-capf #'lsp-completion-at-point
+                                                            #'citre-completion-at-point
+                                                            ;; #'TeX--completion-at-point
+                                                            #'cape-tex
+                                                            #'cape-file
+                                                            #'cape-dabbrev
+                                                            #'cape-dict
+                                                            #'cape-ispell)))))))))
+
+  (with-eval-after-load "eglot"
+    (add-hook 'sh-mode-hook
+              (lambda ()
+                (add-hook 'eglot-managed-mode-hook
+                          (lambda ()
+                            (setq-local completion-at-point-functions
+                                        (list
+                                         (cape-super-capf #'eglot-completion-at-point
+                                                          #'citre-completion-at-point
+                                                          ;; #'sh-completion-at-point-function
+                                                          #'cape-file
+                                                          #'cape-dabbrev
+                                                          #'cape-dict
+                                                          #'cape-ispell)))))))
+
+    (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
+      (add-hook lsp-prog-modes
+                (lambda ()
+                  (add-hook 'eglot-managed-mode-hook
+                            (lambda()
+                              (setq-local completion-at-point-functions
+                                          (list
+                                           (cape-super-capf #'eglot-completion-at-point
+                                                            #'citre-completion-at-point
+                                                            ;; #'tags-completion-at-point-function
+                                                            #'cape-file
+                                                            #'cape-keyword
+                                                            #'cape-dabbrev
+                                                            #'cape-dict
+                                                            #'cape-ispell))))))))
+
+    (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
+      (add-hook modes
+                (lambda ()
+                  (add-hook 'eglot-managed-mode-hook
+                            (lambda()
+                              (setq-local completion-at-point-functions
+                                          (list
+                                           (cape-super-capf #'eglot-completion-at-point
                                                             #'citre-completion-at-point
                                                             ;; #'TeX--completion-at-point
                                                             #'cape-tex

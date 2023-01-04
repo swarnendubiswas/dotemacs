@@ -29,6 +29,7 @@
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
+  (vertico-preselect 'first)
   :config
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.

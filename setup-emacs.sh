@@ -40,17 +40,16 @@ install_emacs() {
     export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
     make distclean
     ./autogen.sh
-    # We do not need POP3 support
+
     ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
-    # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the Emacs distribution instead of after startup
+
+    # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the
+    # Emacs distribution instead of after startup
     make -j"$(nproc)" NATIVE_FULL_AOT=1
+    make install
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     rm "${EMACS_FILENAME}" || true
-
-    # Setup Emacs at the correct path
-    # echo "\n\nexport EMACS_PATH=${EMACS_SOURCE}/src" >>"$USER_HOME/.bashrc"
-    # echo "PATH=\${EMACS_PATH}:\$PATH" >>"$USER_HOME/.bashrc"
 
     cmdline=$"\n\nexport EMACS_PATH=${EMACS_SOURCE}/src\n"
     printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
@@ -307,7 +306,6 @@ create_symlinks() {
     echo "...Done"
 }
 
-# Shellcheck
 install_shellcheck() {
     SHELLCHECK_VER="0.8.0"
 
@@ -321,7 +319,6 @@ install_shellcheck() {
     rm -rf "${SHELLCHECK_FILENAME}.tar.xz*"
 }
 
-# shfmt
 install_shfmt() {
     SHFMT_VER="3.5.1"
 

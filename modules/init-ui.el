@@ -36,7 +36,7 @@
   (all-the-icons-color-icons t))
 
 (use-package all-the-icons-ivy
-  :if (and (eq sb/minibuffer-completion 'ivy) (display-graphic-p))
+  :if (display-graphic-p)
   :after ivy
   :hook
   (emacs-startup-hook . all-the-icons-ivy-setup))
