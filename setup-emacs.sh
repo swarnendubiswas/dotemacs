@@ -200,7 +200,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="4.3.2"
+    TEXLAB_VER="5.0.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -230,6 +230,15 @@ create_symlinks() {
     else
         echo "Creating symlink for .prettierrc..."
         ln -s "$DOTFILES/dotprettierrc" "$USER_HOME/.prettierrc"
+    fi
+    echo "...Done"
+
+    if [ -f ".tidyrc" ]; then
+        echo "Overwriting symlink for .tidyrc..."
+        ln -nsf "$DOTFILES/tidyrc" "$USER_HOME/.tidyrc"
+    else
+        echo "Creating symlink for .prettierrc..."
+        ln -s "$DOTFILES/tidyrc" "$USER_HOME/.tidyrc"
     fi
     echo "...Done"
 
@@ -307,7 +316,7 @@ create_symlinks() {
 }
 
 install_shellcheck() {
-    SHELLCHECK_VER="0.8.0"
+    SHELLCHECK_VER="0.9.0"
 
     SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
 
@@ -320,7 +329,7 @@ install_shellcheck() {
 }
 
 install_shfmt() {
-    SHFMT_VER="3.5.1"
+    SHFMT_VER="3.6.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
@@ -346,7 +355,7 @@ install_cppcheck() {
     fi
 
     cd cppcheck || echo "Failed: cd cppcheck"
-    git checkout 2.9
+    git checkout 2.9.3
     mkdir -p build
     cd build || echo "Failed: cd build"
     cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
@@ -432,7 +441,7 @@ install_bear() {
     fi
 
     cd bear || echo "Failed: cd bear"
-    git checkout 3.0.20
+    git checkout 3.0.21
     mkdir -p build && cd build || echo "Failed: cd bear/build"
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all
@@ -513,7 +522,7 @@ install_bat() {
 }
 
 install_fd() {
-    FD_VER="8.5.1"
+    FD_VER="8.6.0"
     wget https://github.com/sharkdp/fd/releases/download/v"$FD_VER"/fd_"$FD_VER"_amd64.deb
     dpkg -i fd_"$FD_VER"_amd64.deb
     rm fd_"$FD_VER"_amd64.deb

@@ -141,7 +141,10 @@
   ("C-c d k" . describe-personal-keybindings))
 
 (use-package no-littering
-  :demand t)
+  :demand t
+  :config
+  (setq auto-save-file-name-transforms
+        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
 (use-package package
   :unless (bound-and-true-p sb/disable-package.el)

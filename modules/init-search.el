@@ -65,8 +65,14 @@
         grep-highlight-matches t
         grep-scroll-output     t)
 
+  (when (executable-find "rg")
+    (setq grep-program "rg"))
+
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
+
+(when (executable-find "fd")
+  (setq find-program "fd"))
 
 ;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
@@ -82,7 +88,9 @@
 
 (use-package deadgrep
   :bind
-  ("C-c s d" . deadgrep))
+  ("C-c s d" . deadgrep)
+  :custom
+  (deadgrep-max-buffers 1))
 
 ;; `avy-setup-default' will bind `avy-isearch' to "C-'" in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.

@@ -324,6 +324,9 @@
   (kill-file-path-basename kill-file-path-basename-without-extension kill-file-path-dirname
                            kill-file-path))
 
+(use-package change-inner
+  :commands (change-inner change-outer yank-inner yank-outer))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

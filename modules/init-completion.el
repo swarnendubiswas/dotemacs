@@ -136,7 +136,8 @@
 ;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
 ;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
-;; "/u/s/l" for "/usr/share/local".
+;; "/u/s/l" for "/usr/share/local". While "partial-completion" matches search terms must match in
+;; order, "orderless" can match search terms in any order.
 
 ;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
 ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/

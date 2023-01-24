@@ -40,7 +40,8 @@
   ;; (modus-themes-fringes 'intense)
   ;; (modus-themes-org-blocks 'tinted-background)
   ;; (org-fontify-whole-block-delimiter-line nil)
-  )
+  (modus-themes-italic-constructs t)
+  (modus-themes-bold-constructs t))
 
 (when (and (eq sb/theme 'sb/customized)
            (display-graphic-p))

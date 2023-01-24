@@ -194,7 +194,7 @@
   (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook emacs-lisp-mode-hook markdown-mode-hook) . format-all-mode))
+   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters '(("BibTeX" Emacs)
                            ("C" clang-format)
@@ -329,6 +329,11 @@
 ;;   ;; Never use `electric-indent-mode'
 ;;   (aggressive-indent-dont-electric-modes t)
 ;;   :diminish)
+
+;; format-all-the-code just runs Emacs' built-in `indent-region' for `emacs-lisp'.
+(use-package elisp-autofmt
+  :commands (elisp-autofmt-mode elisp-autofmt-buffer)
+  :hook (emacs-lisp-mode-hook . elisp-autofmt-mode))
 
 (provide 'init-checkers)
 

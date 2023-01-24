@@ -23,8 +23,6 @@
             org-src-tabs-acts-natively)
   :commands
   (org-indent-mode org-indent-item org-outdent-item)
-  :hook
-  (org-mode-hook . turn-on-visual-line-mode)
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-emphasized-text t)

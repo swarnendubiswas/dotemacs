@@ -20,6 +20,8 @@
 
 ;; Mark safe variables
 
+(put 'compilation-read-command 'safe-local-variable #'stringp)
+
 ;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
 ;; (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
 ;; (put 'company-clang-arguments                 'safe-local-variable #'listp)

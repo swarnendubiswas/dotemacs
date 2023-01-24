@@ -1611,6 +1611,7 @@
     ("genomic" "genomics" nil :count 0)
     ("hueristically" "heuristically" nil :count 0)
     ("informatino" "information" nil :count 0)
+    ("initital" "initial" nil :count 0)
     ("inititation" "initiation" nil :count 0)
     ("intereseting" "interesting" nil :count 0)
     ("jioned" "joined" nil :count 0)

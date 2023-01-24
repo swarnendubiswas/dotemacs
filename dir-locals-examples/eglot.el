@@ -1,6 +1,6 @@
 (
- (python-mode . (
-                 (eglot-workspace-configuration
+ (python-mode .
+              ((eglot-workspace-configuration
                   .
                   ((:python .
                             (:pythonPath ".venv/bin/python")
@@ -11,32 +11,34 @@
                                         (expand-absolute-name "~/.local/lib/python-type-stubs"))))
                    (:pylsp .
                            (:plugins
-                            (:jedi_completion
-                             (:fuzzy t)
-                             (:include_params t)
+                            (:jedi_completion (:fuzzy t) (:include_params t)
                              :pylsp_isort (:enabled t)
                              :pylsp_mypy (:enabled t)
                              :pydocstyle (:enabled nil)
-                             :pycodestyle (:enabled nil)
+                             :pycodestyle (:enabled :json-false)
                              :mccabe (:enabled nil)
                              :pyflakes (:enabled nil)
-                             :flake8 (:enabled t)
-                             :black (:enabled t)
-                             :pylint (:enabled t))
+                             :flake8 (:enabled nil)
+                             :black (:enabled nil)
+                             :pylint (:enabled t)
+                             :mypy (:enabled nil))
                             :configurationSources ["setup.cfg"]))
                    ))))
+
  (org-mode . (
               (eglot-workspace-configuration
                .
                ((:ltex-ls .
                           (:language . "en")))
                )))
+
  (markdown-mode . (
                    (eglot-workspace-configuration
                     .
                     ((:@emacs-grammarly/grammarly-languageserver .
                                                                  (:audience . "knowledgeable")))
                     )))
+
  (java-mode .
             (eglot-workspace-configuration
              .

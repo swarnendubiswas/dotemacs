@@ -326,12 +326,10 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 
 ** Programming
 
-  - ~C-M-a~ - Jump backward to the beginning of the current function (~c-beginning-of-defun~)
-  - ~C-M-e~ - Jump forward to the end of the current function (~c-end-of-defun~)
-  - ~C-M-h~ - Mark the current function (~c-mark-function~)
-  - ~C-M-k~ - Jump to a tag in the current file (~moo-jump-local~)
-  - ~C-M-j~ - Select a tag to jump to from tags defined in the current directory (~moo-jump-directory~)
-  - ~C-M-i~ - Complete symbol at point (~complete-symbol~)
+- ~C-M-h~ - Mark the current function (~c-mark-function~)
+- ~C-M-k~ - Jump to a tag in the current file (~moo-jump-local~)
+- ~C-M-j~ - Select a tag to jump to from tags defined in the current directory (~moo-jump-directory~)
+- ~C-M-i~ - Complete symbol at point (~complete-symbol~)
 
 ** LSP
 

@@ -50,8 +50,8 @@
       ;; of candidate-selection. But keeping track of the minibuffer nesting is difficult.
       enable-recursive-minibuffers t
       ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
-      ;; variables, but I edit files over Tramp a lot.
-      enable-remote-dir-locals t
+      ;; variables. I edit remote files mostly via TUI+SSH instead of Tramp.
+      enable-remote-dir-locals nil
       ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
       ;; information
       eval-expression-print-length 500

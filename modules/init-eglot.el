@@ -77,22 +77,32 @@
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
   :after eglot
   :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook) . (lambda ()
-                                                         (unless (derived-mode-p 'yaml-mode)
-                                                           (require 'eglot-grammarly)
-                                                           (eglot-ensure))))
-  :config
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
+   . (lambda ()
+       (unless (derived-mode-p 'yaml-mode)
+         (require 'eglot-grammarly)
+         (eglot-ensure))))
+  ;; :config
   ;; (add-to-list eglot-workspace-configuration
   ;;              ((@emacs-grammarly/grammarly-languageserver
   ;;                . ((audience . "knowledgeable")))))
   )
 
-;; (use-package eglot-ltex
-;;   :hook (text-mode . (lambda ()
-;;                        (require 'eglot-ltex)
-;;                        (call-interactively #'eglot)))
-;;   :init
-;;   (setq eglot-languagetool-server-path ""))
+(use-package eglot-ltex
+  :hook
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
+   . (lambda ()
+       (unless (derived-mode-p 'yaml-mode)
+         (require 'eglot-ltex)
+         (eglot-ensure))))
+  :init
+  (setq eglot-languagetool-server-path "")
+  ;; :config
+  ;; ((nil (eglot-workspace-configuration
+  ;;        . ((ltex . ((language . "fr")
+  ;;                    (disabledRules . ((fr . ["FRENCH_WHITESPACE"])))
+  ;;                    (additionalRules . ((languageModel . "/usr/share/ngrams/")))))))))
+  )
 
 (use-package eglot-java
   :after eglot
