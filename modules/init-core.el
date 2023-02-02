@@ -325,12 +325,12 @@
     (add-to-list 'recentf-exclude `,(recentf-expand-file-name (straight--emacs-dir "straight"))))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
-  ;; after idling for 30 seconds.
-  (run-with-idle-timer 20 t #'recentf-save-list)
+  ;; after idling for a few seconds.
+  (run-with-idle-timer 30 t #'recentf-save-list)
 
   ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
   ;; timers.
-  (run-with-idle-timer 30 t #'recentf-cleanup))
+  (run-with-idle-timer 60 t #'recentf-cleanup))
 
 ;; (use-package image-mode
 ;;   :preface
@@ -449,6 +449,9 @@
   :hook
   ((prog-mode-hook . goto-address-prog-mode)
    (text-mode-hook . goto-address-mode)))
+
+;; https://emacs.stackexchange.com/questions/10983/remember-permission-to-execute-risky-local-variables/44604#44604
+(advice-add 'risky-local-variable-p :override #'ignore)
 
 (provide 'init-core)
 

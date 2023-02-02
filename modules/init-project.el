@@ -46,11 +46,9 @@
    ("r"    . project-query-replace-regexp)
    ("m"    . magit-project-status)
    ("C"    . recompile))
-  :custom
-  (project-switch-commands 'project-find-file)
-  ;; :config
-  ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
-  )
+  :config
+  (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+  (add-to-list 'project-switch-commands '(project-compile "Compile") t))
 
 (use-package consult-project-extra
   :after (consult project)

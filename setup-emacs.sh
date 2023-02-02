@@ -446,8 +446,6 @@ install_bear() {
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all
     make install
-    cd ../..
-    rm -rf bear
 }
 
 cd "$HOME"
@@ -523,6 +521,7 @@ install_bat() {
 
 install_fd() {
     FD_VER="8.6.0"
+
     wget https://github.com/sharkdp/fd/releases/download/v"$FD_VER"/fd_"$FD_VER"_amd64.deb
     dpkg -i fd_"$FD_VER"_amd64.deb
     rm fd_"$FD_VER"_amd64.deb

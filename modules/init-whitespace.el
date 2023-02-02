@@ -9,7 +9,12 @@
 
 (setq delete-trailing-lines t)
 
-(add-hook 'write-file-functions #'delete-trailing-whitespace)
+;; "M-x delete-trailing-whitespace" deletes trailing lines. This is different from
+;; `whitespace-cleanup-mode' since this is unconditional
+
+(when (bound-and-true-p sb/delete-trailing-whitespace-p)
+  (add-hook 'write-file-functions #'delete-trailing-whitespace)
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (use-package whitespace
   :commands
@@ -61,12 +66,6 @@
   :hook
   (prog-mode-hook . ws-butler-mode)
   :diminish)
-
-;; "M-x delete-trailing-whitespace" deletes trailing lines. This is different from
-;; `whitespace-cleanup-mode' since this is unconditional
-
-(when (bound-and-true-p sb/delete-trailing-whitespace-p)
-  (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (provide 'init-whitespace)
 

@@ -331,9 +331,10 @@
 ;;   :diminish)
 
 ;; format-all-the-code just runs Emacs' built-in `indent-region' for `emacs-lisp'.
-(use-package elisp-autofmt
-  :commands (elisp-autofmt-mode elisp-autofmt-buffer)
-  :hook (emacs-lisp-mode-hook . elisp-autofmt-mode))
+
+;; (use-package elisp-autofmt
+;;   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
+;;   :hook (emacs-lisp-mode-hook . elisp-autofmt-mode))
 
 (provide 'init-checkers)
 

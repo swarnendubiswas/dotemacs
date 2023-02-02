@@ -63,9 +63,9 @@
                                          "--pch-storage=memory"
                                          "--pretty")))
 
-  ;; It is more useful to use Grammarly to check these files.
-
-  ;; (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode) "texlab"))
+  ;; It may be more useful to use Grammarly to check these files.
+  (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode texinfo-mode
+                                                   context-mode) "texlab"))
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
 
   (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio"))))
@@ -88,21 +88,22 @@
   ;;                . ((audience . "knowledgeable")))))
   )
 
-(use-package eglot-ltex
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
-   . (lambda ()
-       (unless (derived-mode-p 'yaml-mode)
-         (require 'eglot-ltex)
-         (eglot-ensure))))
-  :init
-  (setq eglot-languagetool-server-path "")
-  ;; :config
-  ;; ((nil (eglot-workspace-configuration
-  ;;        . ((ltex . ((language . "fr")
-  ;;                    (disabledRules . ((fr . ["FRENCH_WHITESPACE"])))
-  ;;                    (additionalRules . ((languageModel . "/usr/share/ngrams/")))))))))
-  )
+;; (use-package eglot-ltex
+;;   :disabled t
+;;   :hook
+;;   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
+;;    . (lambda ()
+;;        (unless (derived-mode-p 'yaml-mode)
+;;          (require 'eglot-ltex)
+;;          (eglot-ensure))))
+;;   :init
+;;   (setq eglot-languagetool-server-path "")
+;;   ;; :config
+;;   ;; ((nil (eglot-workspace-configuration
+;;   ;;        . ((ltex . ((language . "fr")
+;;   ;;                    (disabledRules . ((fr . ["FRENCH_WHITESPACE"])))
+;;   ;;                    (additionalRules . ((languageModel . "/usr/share/ngrams/")))))))))
+;;   )
 
 (use-package eglot-java
   :after eglot

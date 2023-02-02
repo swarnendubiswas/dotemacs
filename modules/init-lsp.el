@@ -163,14 +163,9 @@
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
 
-  ;; (cond ((eq sb/capf 'corfu)
-  ;;        (progn
-  ;;          (add-hook 'text-mode-hook (lambda ()
-  ;;                                      (setq-local lsp-completion-enable nil)))
-  ;;          (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion)))
-  ;;       ((eq sb/capf 'company) (setq lsp-completion-enable t)))
-
   (with-eval-after-load "corfu"
+    (add-hook 'text-mode-hook (lambda ()
+                                (setq-local lsp-completion-enable nil)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
   :diminish)
 
