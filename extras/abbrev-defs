@@ -58,6 +58,11 @@
     ("sepcial" "special" nil :count 0)
    ))
 
+(define-abbrev-table 'flex-mode-abbrev-table
+  '(
+    ("identfieid" "identified" nil :count 0)
+   ))
+
 (define-abbrev-table 'gfm-mode-abbrev-table
   '(
     ("benchamrks" "Benchmarks" nil :count 0)

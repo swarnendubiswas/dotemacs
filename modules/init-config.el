@@ -115,7 +115,7 @@ This location is used for temporary installations and files.")
           (const :tag "vertico" vertico)
           (const :tag "ivy" ivy)
           (const :tag "none" none))
-  :group 'dotemacs)
+  :group 'sb/emacs)
 
 ;; Corfu is easy to configure, but I am facing a few quirks with Corfu. I prefer to use TUI Emacs,
 ;; and `corfu-terminal-mode' has a rendering problem for the completion popup at the right edges.
@@ -132,7 +132,7 @@ This location is used for temporary installations and files.")
           (const :tag "corfu" corfu)
           (const :tag "company" company)
           (const :tag "none" none))
-  :group 'dotemacs)
+  :group 'sb/emacs)
 
 (defcustom sb/corfu-icons
   'kind-icons
@@ -140,7 +140,8 @@ This location is used for temporary installations and files.")
   :type '(radio
           (const :tag "kind-icon" kind-icon)
           (const :tag "kind-all-the-icons" kind-all-the-icons)
-          (const :tag "none" none)))
+          (const :tag "none" none))
+  :group 'sb/emacs)
 
 ;; Prefer "straight.el" over "package.el". A big advantage with "straight.el" is it is easy to
 ;; install packages from arbitrary sources like GitHub.
@@ -149,7 +150,7 @@ This location is used for temporary installations and files.")
   "Disable package.el.
 Prefer the straight.el package manager instead."
   :type 'boolean
-  :group 'dotemacs)
+  :group 'sb/emacs)
 
 ;; I do not find any difference in terms of features. More packages support `projectile'.
 (defcustom sb/project-handler
@@ -158,7 +159,7 @@ Prefer the straight.el package manager instead."
   :type '(radio
           (const :tag "project.el" project)
           (const :tag "projectile" projectile))
-  :group 'dotemacs)
+  :group 'sb/emacs)
 
 ;; `centaur-tabs' works more reliably for me.
 (defcustom sb/tab-bar-handler
@@ -168,7 +169,7 @@ Prefer the straight.el package manager instead."
           (const :tag "awesome-tab" awesome-tab)
           (const :tag "centaur-tabs" centaur-tabs)
           (const :tag "none" nil))
-  :group 'dotemacs)
+  :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode. which is a useful feature. For
 ;; example, I can use `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. However,
@@ -180,7 +181,8 @@ Prefer the straight.el package manager instead."
   :type '(radio
           (const :tag "lsp-mode" lsp-mode)
           (const :tag "eglot" eglot)
-          (const :tag "none" none)))
+          (const :tag "none" none))
+  :group 'sb/emacs)
 
 ;; Helper const variables
 

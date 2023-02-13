@@ -94,6 +94,7 @@
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
+   ("<f2>" . find-file)
    ;; Press SPC to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by files,
    ;; "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list will be
    ;; shown again.
@@ -146,9 +147,8 @@
   :config
   (consult-customize
    consult-theme consult-line consult-ripgrep consult-git-grep consult-grep
-   :preview-key '(:debounce 0.2 any)
    consult-recent-file consult-buffer consult-bookmark consult-xref consult-yank-from-kill-ring
-   :preview-key (kbd "M-.")
+   :preview-key '(:debounce 0.5 any)
    consult-find
    :sort t)
 
@@ -165,9 +165,9 @@
   :commands embark-prefix-help-command
   :bind
   (([remap describe-bindings] . embark-bindings)
+   ("C-`"     . embark-dwim)
    :map vertico-map
    ("C-l"     . embark-act)
-   ("C-,"     . embark-dwim)
    ("C-c C-l" . embark-export))
   :custom
   ;; Replace the key help with a completing-read interface"

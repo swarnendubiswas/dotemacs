@@ -188,8 +188,10 @@
                                             #'cape-file
                                             #'cape-symbol ; Elisp symbols
                                             #'cape-dabbrev
-                                            #'cape-dict
-                                            #'cape-ispell)))))
+                                            (cape-capf-inside-string #'cape-dict)
+                                            (cape-capf-inside-comment #'cape-dict)
+                                            (cape-capf-inside-string #'cape-ispell)
+                                            (cape-capf-inside-comment #'cape-ispell))))))
 
   ;; FIXME: How can we simplify the following mess?
 
@@ -205,8 +207,10 @@
                                                           ;; #'sh-completion-at-point-function
                                                           #'cape-file
                                                           #'cape-dabbrev
-                                                          #'cape-dict
-                                                          #'cape-ispell)))))))
+                                                          (cape-capf-inside-string #'cape-dict)
+                                                          (cape-capf-inside-comment #'cape-dict)
+                                                          (cape-capf-inside-string #'cape-ispell)
+                                                          (cape-capf-inside-comment #'cape-ispell))))))))
 
     (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
       (add-hook lsp-prog-modes
@@ -221,8 +225,10 @@
                                                             #'cape-file
                                                             #'cape-keyword
                                                             #'cape-dabbrev
-                                                            #'cape-dict
-                                                            #'cape-ispell))))))))
+                                                            (cape-capf-inside-string #'cape-dict)
+                                                            (cape-capf-inside-comment #'cape-dict)
+                                                            (cape-capf-inside-string #'cape-ispell)
+                                                            (cape-capf-inside-comment #'cape-ispell)))))))))
 
     ;; (add-hook 'prog-mode-hook
     ;;           (lambda ()
@@ -261,8 +267,10 @@
                                                           ;; #'sh-completion-at-point-function
                                                           #'cape-file
                                                           #'cape-dabbrev
-                                                          #'cape-dict
-                                                          #'cape-ispell)))))))
+                                                          (cape-capf-inside-string #'cape-dict)
+                                                          (cape-capf-inside-comment #'cape-dict)
+                                                          (cape-capf-inside-string #'cape-ispell)
+                                                          (cape-capf-inside-comment #'cape-ispell))))))))
 
     (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
       (add-hook lsp-prog-modes
@@ -277,8 +285,10 @@
                                                             #'cape-file
                                                             #'cape-keyword
                                                             #'cape-dabbrev
-                                                            #'cape-dict
-                                                            #'cape-ispell))))))))
+                                                            (cape-capf-inside-string #'cape-dict)
+                                                            (cape-capf-inside-comment #'cape-dict)
+                                                            (cape-capf-inside-string #'cape-ispell)
+                                                            (cape-capf-inside-comment #'cape-ispell)))))))))
 
     (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
       (add-hook modes

@@ -49,13 +49,18 @@
   ;; Guess a default target directory. When there are two dired buffers, Emacs will select another
   ;; buffer as the target (e.g., target for copying files).
   (dired-dwim-target t)
-  ;; Check "ls" for additional options
-  (dired-listing-switches "-ABhl --si --group-directories-first")
+  ;; "A" is to avoid listing "." and "..", "B" is to avoid listing backup entries ending with "~",
+  ;; "F" appends indicator to entries, "g" omits the owner, "h" is to print human-readable sizes,
+  ;; "N" prints entry names without quoting, "si" is to use powers of 1000 not 1024, "o" does not
+  ;; print group information, "p" is to append "/" indicator to directories, "v" uses natural sort
+  ;; of (version) numbers within text. Check "ls" for additional options.
+  (dired-listing-switches "-ABFghlNopv --group-directories-first --time-style=locale")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
   ;; Do not ask whether to kill buffers visiting deleted files
   (dired-clean-confirm-killing-deleted-buffers nil)
+  (dired-hide-details-hide-symlink-targets nil)
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))

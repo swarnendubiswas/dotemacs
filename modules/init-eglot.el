@@ -63,6 +63,8 @@
                                          "--pch-storage=memory"
                                          "--pretty")))
 
+  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
+
   ;; It may be more useful to use Grammarly to check these files.
   (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode texinfo-mode
                                                    context-mode) "texlab"))

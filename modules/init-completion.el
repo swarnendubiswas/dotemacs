@@ -142,17 +142,20 @@
 ;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
 ;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
 
-;; (use-package minibuffer
-;;   :straight (:type built-in)
-;;   :config
-;;   (with-eval-after-load "orderless"
-;;     (setq completion-styles '(orderless basic)
-;;           ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-;;           ;; work. I also want substring matching for file names.
-;;           completion-category-overrides '((file (styles basic substring))
-;;                                           ;; (buffer (styles basic substring flex))
-;;                                           ;; (project-file (styles basic substring flex))
-;;                                           (minibuffer (orderless flex))))))
+(use-package minibuffer
+  :straight (:type built-in)
+  :custom
+  (completions-format 'vertical)
+  ;; :config
+  ;; (with-eval-after-load "orderless"
+  ;;   (setq completion-styles '(orderless basic)
+  ;;         ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+  ;;         ;; work. I also want substring matching for file names.
+  ;;         completion-category-overrides '((file (styles basic substring))
+  ;;                                         ;; (buffer (styles basic substring flex))
+  ;;                                         ;; (project-file (styles basic substring flex))
+  ;;                                         (minibuffer (orderless flex)))))
+  )
 
 (provide 'init-completion)
 

@@ -39,9 +39,9 @@
                              ;;   (setq sb/flycheck-local-checkers
                              ;;         '((lsp . ((next-checkers . (tex-chktex)))))))
 
-                             (when (derived-mode-p 'org-mode)
-                               (setq sb/flycheck-local-checkers
-                                     '((lsp . ((next-checkers . (org-lint)))))))
+                             ;; (when (derived-mode-p 'org-mode)
+                             ;;   (setq sb/flycheck-local-checkers
+                             ;;         '((lsp . ((next-checkers . (org-lint)))))))
                              ))
                )))
 
@@ -53,16 +53,16 @@
                      (no-byte-compile . t)
                      (eval . (progn
                                (format-all-mode 1)
-                              (add-hook 'before-save-hook 'delete-trailing-whitespace nil t)))
+                               (add-hook 'before-save-hook 'delete-trailing-whitespace nil t)))
                      ;; The special `subdirs' element is not a variable, but a special keyword which
                      ;; indicates that the mode settings are only to be applied in the current
                      ;; directory, not in any subdirectories.
                      (subdirs . nil)
                      ))
 
+ ;; Bash language server does not format files
  (sh-mode . (
              (eval . (add-hook 'before-save-hook 'delete-trailing-whitespace nil t))
-             ;; Bash language server does not format files
              ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
              (subdirs . nil)
              ))

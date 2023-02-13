@@ -70,7 +70,6 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
-  :straight (fancy-compilation :host codeberg :repo "ideasman42/emacs-fancy-compilation")
   :after compile
   :init (fancy-compilation-mode 1))
 

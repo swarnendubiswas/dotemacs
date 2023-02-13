@@ -61,13 +61,13 @@ install_emacs() {
 install_ubuntu_packages() {
     case "${DIST_VERSION}" in
         Ubuntu_18.04)
-            apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev
+            apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg
             ;;
         Ubuntu_20.04)
-            apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev
+            apt install -y aspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg
             ;;
         Ubuntu_22.04)
-            apt install -y aspell libxml2-utils chktex ruby-dev tidy python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev
+            apt install -y aspell libxml2-utils chktex ruby-dev tidy python3-pip composer imagemagick lua5.3 liblua5.3-dev luarocks cargo pandoc fonts-powerline fasd pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev bear libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg
             ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
@@ -96,13 +96,32 @@ install_fish() {
     apt install -y fish
 }
 
+install_cmake() {
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+
+    case "${DIST_VERSION}" in
+        Ubuntu_18.04) echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null ;;
+        Ubuntu_20.04) echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null ;;
+        Ubuntu_22.04) echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ bionic main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null ;;
+        *)
+            echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
+            exit 2
+            ;;
+    esac
+
+    rm /usr/share/keyrings/kitware-archive-keyring.gpg
+    apt install -y kitware-archive-keyring
+
+    apt install cmake
+}
+
 install_llvm() {
     LLVM_VER="15"
 
     case "${DIST_VERSION}" in
         Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic-${LLVM_VER}  main" ;;
         Ubuntu_20.04) REPO_NAME="deb http://apt.llvm.org/focal/    llvm-toolchain-focal-${LLVM_VER}   main" ;;
-        Ubuntu_22.04) ;;
+        Ubuntu_22.04) REPO_NAME="deb http://apt.llvm.org/jammy/    llvm-toolchain-jammy-${LLVM_VER}   main" ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
             exit 2
@@ -110,7 +129,7 @@ install_llvm() {
     esac
 
     wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-    add-apt-repository "${REPO_NAME}"
+    add-apt-repository -y "${REPO_NAME}"
 
     apt install -y clang-"${LLVM_VER}" lldb-"${LLVM_VER}" lld-"${LLVM_VER}" libllvm-"${LLVM_VER}"-ocaml-dev libllvm"${LLVM_VER}" llvm-"${LLVM_VER}" llvm-"${LLVM_VER}"-dev llvm-"${LLVM_VER}"-doc llvm-"${LLVM_VER}"-examples llvm-"${LLVM_VER}"-runtime clang-tools-"${LLVM_VER}" clang-"${LLVM_VER}"-doc libclang-common-"${LLVM_VER}"-dev libclang-"${LLVM_VER}"-dev libclang1-"${LLVM_VER}" clang-format-"${LLVM_VER}" python3-clang-"${LLVM_VER}" clangd-"${LLVM_VER}" clang-tidy-"${LLVM_VER}" libfuzzer-"${LLVM_VER}"-dev libc++-"${LLVM_VER}"-dev libc++abi-"${LLVM_VER}"-dev libomp-"${LLVM_VER}"-dev libclc-"${LLVM_VER}"-dev libunwind-"${LLVM_VER}"-dev libmlir-"${LLVM_VER}"-dev mlir-"${LLVM_VER}"-tools
 }
@@ -200,7 +219,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="5.0.0"
+    TEXLAB_VER="5.2.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -355,7 +374,7 @@ install_cppcheck() {
     fi
 
     cd cppcheck || echo "Failed: cd cppcheck"
-    git checkout 2.9.3
+    git checkout 2.10.0
     mkdir -p build
     cd build || echo "Failed: cd build"
     cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
@@ -539,7 +558,7 @@ install_fzf() {
     fi
 
     cd fzf
-    git checkout 0.35.1
+    git checkout 0.37.0
     bash ./install
 }
 
@@ -556,6 +575,7 @@ apt autoclean
 # install_ubuntu_packages
 # install_gcc
 # install_llvm
+# install_cmake
 # install_fish
 # install_emacs
 # install_python
