@@ -212,8 +212,8 @@
                                                           (cape-capf-inside-string #'cape-ispell)
                                                           (cape-capf-inside-comment #'cape-ispell))))))))
 
-    (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
-      (add-hook lsp-prog-modes
+    (dolist (lsp-prog-mode '(c++-mode-hook java-mode-hook python-mode-hook))
+      (add-hook lsp-prog-mode
                 (lambda ()
                   (add-hook 'lsp-managed-mode-hook
                             (lambda()
@@ -249,7 +249,8 @@
                                            (cape-super-capf #'lsp-completion-at-point
                                                             #'citre-completion-at-point
                                                             ;; #'TeX--completion-at-point
-                                                            #'cape-tex
+                                                            ;; Leads to unwanted completions
+                                                            ;; #'cape-tex
                                                             #'cape-file
                                                             #'cape-dabbrev
                                                             #'cape-dict
@@ -272,8 +273,8 @@
                                                           (cape-capf-inside-string #'cape-ispell)
                                                           (cape-capf-inside-comment #'cape-ispell))))))))
 
-    (dolist (lsp-prog-modes '(c++-mode-hook java-mode-hook python-mode-hook))
-      (add-hook lsp-prog-modes
+    (dolist (lsp-prog-mode '(c++-mode-hook java-mode-hook python-mode-hook))
+      (add-hook lsp-prog-mode
                 (lambda ()
                   (add-hook 'eglot-managed-mode-hook
                             (lambda()
@@ -300,7 +301,8 @@
                                            (cape-super-capf #'eglot-completion-at-point
                                                             #'citre-completion-at-point
                                                             ;; #'TeX--completion-at-point
-                                                            #'cape-tex
+                                                            ;; Leads to unwanted completions
+                                                            ;; #'cape-tex
                                                             #'cape-file
                                                             #'cape-dabbrev
                                                             #'cape-dict

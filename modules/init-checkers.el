@@ -194,7 +194,8 @@
   (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ((bazel-mode-hook LaTeX-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode))
+   ;; Formatting LaTeX files with latexindent is very slow
+   ((bazel-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters '(("BibTeX" Emacs)
                            ("C" clang-format)
