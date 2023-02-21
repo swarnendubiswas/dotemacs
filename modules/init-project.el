@@ -55,7 +55,9 @@
   :commands consult-project-extra-find-other-window
   :bind
   (:map project-prefix-map
-        ("z" . consult-project-extra-find)))
+        ("z" . consult-project-extra-find))
+  :config
+  (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f)))
 
 ;; Many useful packages like `ibuffer-projectile' and `centaur-tabs' depend on `projectile'.
 (use-package projectile

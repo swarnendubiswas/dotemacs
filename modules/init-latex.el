@@ -105,7 +105,7 @@
         ;; Avoid emphasizing section headers
         font-latex-fontify-sectioning 1.0)
 
-  (setq-default TeX-master nil) ; Query for master file
+  (setq-default TeX-master nil) ; Always query for the master file
 
   ;; Revert PDF buffer after TeX compilation has finished
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)

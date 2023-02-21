@@ -47,6 +47,7 @@
 (require 'init-tramp)
 (require 'init-misc)
 (require 'init-checkers)
+(require 'init-tags)
 
 (cond
  ((eq sb/capf 'corfu) (require 'init-corfu))
@@ -67,8 +68,6 @@
 
 (require 'init-cc)
 (require 'init-python)
-
-(require 'init-tags)
 
 (require 'init-vcs)
 

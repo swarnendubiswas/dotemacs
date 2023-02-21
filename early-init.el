@@ -17,18 +17,7 @@
                                   interactive-only))
 
 (defconst sb/emacs-4MB    (*       4 1024 1024))
-(defconst sb/emacs-8MB    (*       8 1000 1024))
-(defconst sb/emacs-16MB   (*      16 1000 1024))
-(defconst sb/emacs-32MB   (*      32 1000 1024))
-(defconst sb/emacs-64MB   (*      64 1024 1024))
-(defconst sb/emacs-128MB  (*     128 1024 1024))
-(defconst sb/emacs-256MB  (*     256 1024 1024))
-(defconst sb/emacs-512MB  (*     512 1024 1024))
 (defconst sb/emacs-1GB    (*  1 1024 1024 1024))
-(defconst sb/emacs-2GB    (*  2 1024 1024 1024))
-(defconst sb/emacs-4GB    (*  4 1024 1024 1024))
-(defconst sb/emacs-8GB    (*  8 1024 1024 1024))
-(defconst sb/emacs-16GB   (* 16 1024 1024 1024))
 
 ;; Defer GC during startup
 (setq garbage-collection-messages nil
@@ -37,21 +26,21 @@
 
 ;; GC may happen after this many bytes are allocated since last GC. If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
-(defun sb/defer-garbage-collection ()
-  "Defer garbage collection."
+(defun sb/defer-gc-during-exec ()
+  "Defer garbage collection during execution."
   (setq gc-cons-threshold sb/emacs-1GB))
 
 ;; Ideally, we should reset `gc-cons-threshold' to its default value otherwise there can be
 ;; large pause times whenever GC eventually happens. But `lsp-mode' suggests increasing the limit
 ;; permanently.
 ;; https://github.com/emacs-lsp/lsp-mode#performance
-(defun sb/restore-garbage-collection ()
-  "Restore garbage collection."
+(defun sb/restore-gc-during-exec ()
+  "Restore garbage collection threshold during execution."
   (setq gc-cons-threshold sb/emacs-4MB))
 
-(add-hook 'emacs-startup-hook    #'sb/restore-garbage-collection)
-(add-hook 'minibuffer-setup-hook #'sb/defer-garbage-collection)
-(add-hook 'minibuffer-exit-hook  #'sb/restore-garbage-collection)
+(add-hook 'emacs-startup-hook    #'sb/restore-gc-during-exec)
+(add-hook 'minibuffer-setup-hook #'sb/defer-gc-during-exec)
+(add-hook 'minibuffer-exit-hook  #'sb/restore-gc-during-exec)
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following.
@@ -93,6 +82,7 @@
 (set-frame-parameter (selected-frame) 'alpha '(98 . 98))
 (add-to-list 'default-frame-alist '(alpha . (98 . 98)))
 
+;; Maximize Emacs on startup.
 ;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
 ;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 
@@ -101,8 +91,8 @@
 ;; Applies to every Emacs frame
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; Maximize Emacs on startup. Append to the hook instead of prepending, this means it will run after
-;; other hooks that might fiddle with the frame size.
+;; Append to the hook instead of prepending, this means it will run after other hooks that might
+;; fiddle with the frame size.
 
 ;; (add-hook 'emacs-startup-hook #'toggle-frame-maximized t)
 

@@ -78,6 +78,7 @@
   (defun sb/enable-lsp-citre-capf-backend ()
     "Enable the lsp + Citre capf backend in current buffer."
     (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
+  :demand t
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
   ;; :hook
@@ -96,6 +97,8 @@
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode))
+  ;; Disabling this to help with Corfu popups in a terminal
+  (citre-enable-capf-integration nil)
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
 %TAGSFILE%
@@ -110,7 +113,11 @@
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
   :config
-  ;; (with-eval-after-load "lsp-mode"
+  (with-eval-after-load "lsp-mode"
+    (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
+
+  ;; FIXME: Is this required?
+  ;; (with-eval-after-load "eglot"
   ;;   (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
 
   (dolist (func '(find-function

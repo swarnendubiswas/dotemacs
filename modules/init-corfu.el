@@ -183,15 +183,15 @@
             (lambda ()
               (setq-local completion-at-point-functions
                           (list
-                           (cape-super-capf #'citre-completion-at-point
-                                            ;; #'elisp-completion-at-point
-                                            #'cape-file
-                                            #'cape-symbol ; Elisp symbols
-                                            #'cape-dabbrev
-                                            (cape-capf-inside-string #'cape-dict)
-                                            (cape-capf-inside-comment #'cape-dict)
-                                            (cape-capf-inside-string #'cape-ispell)
-                                            (cape-capf-inside-comment #'cape-ispell))))))
+                           (cape-super-capf ;; #'citre-completion-at-point
+                            ;; #'elisp-completion-at-point
+                            #'cape-file
+                            #'cape-symbol ; Elisp symbols
+                            #'cape-dabbrev
+                            (cape-capf-inside-string #'cape-dict)
+                            (cape-capf-inside-comment #'cape-dict)
+                            (cape-capf-inside-string #'cape-ispell)
+                            (cape-capf-inside-comment #'cape-ispell))))))
 
   ;; FIXME: How can we simplify the following mess?
 
@@ -203,7 +203,7 @@
                             (setq-local completion-at-point-functions
                                         (list
                                          (cape-super-capf #'lsp-completion-at-point
-                                                          #'citre-completion-at-point
+                                                          ;; #'citre-completion-at-point
                                                           ;; #'sh-completion-at-point-function
                                                           #'cape-file
                                                           #'cape-dabbrev
@@ -220,7 +220,7 @@
                               (setq-local completion-at-point-functions
                                           (list
                                            (cape-super-capf #'lsp-completion-at-point
-                                                            #'citre-completion-at-point
+                                                            ;; #'citre-completion-at-point
                                                             ;; #'tags-completion-at-point-function
                                                             #'cape-file
                                                             #'cape-keyword
@@ -247,7 +247,7 @@
                               (setq-local completion-at-point-functions
                                           (list
                                            (cape-super-capf #'lsp-completion-at-point
-                                                            #'citre-completion-at-point
+                                                            ;; #'citre-completion-at-point
                                                             ;; #'TeX--completion-at-point
                                                             ;; Leads to unwanted completions
                                                             ;; #'cape-tex

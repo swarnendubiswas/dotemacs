@@ -126,7 +126,7 @@ This location is used for temporary installations and files.")
 ;; configurable and we also have `company-dict'.
 
 (defcustom sb/capf
-  'corfu
+  'company
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)
