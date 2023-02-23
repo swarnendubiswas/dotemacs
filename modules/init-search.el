@@ -97,7 +97,7 @@
 (use-package avy
   :commands avy-setup-default
   :bind
-  (("M-b" . avy-goto-word-1)
+  (("C-\\" . avy-goto-word-1)
    ("C-'" . avy-goto-char-timer)
    ("C-/" . avy-goto-line)
    :map isearch-mode-map

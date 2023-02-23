@@ -33,16 +33,6 @@
   (xref-search-program 'ripgrep)
   (xref-show-definitions-function #'xref-show-definitions-completing-read))
 
-(use-package dumb-jump
-  :after xref
-  :demand t
-  :hook
-  (xref-backend-functions . dumb-jump-xref-activate)
-  :custom
-  (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'completing-read)
-  (dumb-jump-quiet t))
-
 (use-package ivy-xref
   :after (ivy xref)
   :demand t
@@ -54,13 +44,6 @@
 
 (use-package citre
   :preface
-  (defun sb/citre-jump+ ()
-    (interactive)
-    (condition-case _
-        (citre-jump)
-      (error (let* ((xref-prompt-for-identifier nil))
-               (call-interactively #'xref-find-definitions)))))
-
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
 
@@ -81,13 +64,13 @@
   :demand t
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
-  ;; :hook
+  :hook
   ;; ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
   ;; ;; tags backend, which is not desired for plain text files.
-  ;; ((prog-mode-hook LaTeX-mode-hook) . citre-mode)
+  (prog-mode-hook . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
-   ("M-'"     . sb/citre-jump+)
+   ("M-'"     . citre-jump)
    ("C-x c J" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c c" . citre-create-tags-file)
@@ -96,9 +79,8 @@
   :custom
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
-  (citre-auto-enable-citre-mode-modes '(prog-mode latex-mode))
-  ;; Disabling this to help with Corfu popups in a terminal
-  (citre-enable-capf-integration nil)
+  (citre-auto-enable-citre-mode-modes '(prog-mode))
+  (citre-enable-capf-integration t)
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
 %TAGSFILE%
@@ -128,6 +110,7 @@
                   citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
 
+  ;; Try lsp first, then use Citre
   (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
     (let ((fetcher (apply -fn -args))
           (citre-fetcher

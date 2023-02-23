@@ -117,10 +117,10 @@ This location is used for temporary installations and files.")
           (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Corfu is easy to configure, but I am facing a few quirks with Corfu. I prefer to use TUI Emacs,
-;; and `corfu-terminal-mode' has a rendering problem for the completion popup at the right edges.
-;; Corfu does not work well with LaTeX for me. On the other hand, Corfu integrates nicely with
-;; `orderless' and provides better completion for elisp symbols.
+;; Corfu is easy to configure, integrates nicely with `orderless' and provides better completion for
+;; elisp symbols. However, I prefer to use TUI Emacs, and `corfu-terminal-mode' has a rendering
+;; problem for the completion popup at the right edges. The completion entries wrap around, and
+;; sometimes messes up the completion. Corfu does not work well with LaTeX for me.
 
 ;; Company works better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is
 ;; configurable and we also have `company-dict'.

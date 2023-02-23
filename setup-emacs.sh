@@ -377,7 +377,7 @@ install_cppcheck() {
     git checkout 2.10.0
     mkdir -p build
     cd build || echo "Failed: cd build"
-    cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON ..
+    cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON -DUSE_THREADS=ON ..
     cmake --build .
     make install
     cd ../..
@@ -409,9 +409,10 @@ install_ctags() {
 }
 
 install_global() {
-    wget http://tamacom.com/global/global-6.6.8.tar.gz
-    tar -xzvf global-6.6.8.tar.gz
-    cd global-6.6.8
+    GLOBAL_VER="6.6.9"
+    wget http://tamacom.com/global/global-${GLOBAL_VER}.tar.gz
+    tar -xzvf global-${GLOBAL_VER}.tar.gz
+    cd global-${GLOBAL_VER}
     ./configure --with-universal-ctags=/usr/local/bin/ctags
     make
     sudo make install
@@ -460,7 +461,7 @@ install_bear() {
     fi
 
     cd bear || echo "Failed: cd bear"
-    git checkout 3.0.21
+    git checkout 3.1.1
     mkdir -p build && cd build || echo "Failed: cd bear/build"
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all
@@ -531,7 +532,7 @@ install_zoxide() {
 }
 
 install_bat() {
-    BAT_VER="0.22.1"
+    BAT_VER="0.22.0"
 
     wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
     dpkg -i bat_"$BAT_VER"_amd64.deb

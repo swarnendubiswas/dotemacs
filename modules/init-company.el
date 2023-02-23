@@ -9,10 +9,9 @@
 
 (defvar sb/capf)
 
-;; Do not diminish company to see the backend used on the modeline with GUI Emacs. Otherwise, use
-;; "M-x company-diag" or the modeline status (without diminish) to see the backend used. Try "M-x
-;; company-complete-common" when there are no completions. Use "C-M-i" for `complete-symbol' with
-;; regex search.
+;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used for the
+;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
+;; `complete-symbol' with regex search.
 
 (use-package company
   :if (eq sb/capf 'company)
@@ -36,15 +35,20 @@
   :hook
   (emacs-startup-hook . global-company-mode)
   :bind
-  ;; `company-search-candidates' is bound to "C-s" and `company-filter-candidates' is bound to
-  ;; "C-M-s"
   (("C-M-/"    . company-other-backend)
    :map company-active-map
+   ("C-s"      . company-search-candidates)
+   ("C-M-s"    . company-filter-candidates)
    ("C-n"      . company-select-next)
    ("C-p"      . company-select-previous)
    ;; Insert the common part of all candidates, or select the next one
    ("<tab>"    . company-complete-common-or-cycle)
-   ("<escape>" . company-abort))
+   ("<escape>" . company-abort)
+   :map company-search-map
+   ("C-s"      . company-search-repeat-forward)
+   ("C-r"      . company-search-repeat-backward)
+   ("C-g"      . company-search-abort)
+   ("DEL"      . company-search-delete-char))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
@@ -82,8 +86,8 @@
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix))
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
-;; However, the width of the frame popup is often not enough and the right side gets cut off.
-;; https://github.com/company-mode/company-mode/issues/1010
+;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
+;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
 (use-package company-posframe
   :if (display-graphic-p)
@@ -114,8 +118,8 @@
   :commands company-statistics-mode
   :init (company-statistics-mode 1))
 
-;; Nice feature but slows completions. We should invoke this only at the very end of configuring
-;; `company'.
+;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
+;; slows completions.
 
 ;; (use-package company-fuzzy
 ;;   :straight flx
@@ -129,16 +133,6 @@
 ;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
 ;;   ;; Disabling the requirement may help with performance.
 ;;   (company-fuzzy-prefix-on-top t))
-
-;; ;; FIXME: Do we need this with the bash language sever?
-;; (use-package company-shell
-;;   :disabled t
-;;   :after company
-;;   :after (:any sh-mode fish-mode)
-;;   :demand t
-;;   :defines company-shell-delete-duplictes
-;;   :commands (company-shell company-shell-env company-fish-shell)
-;;   :custom (company-shell-delete-duplictes t))
 
 (use-package company-auctex
   :after (tex-mode company)
@@ -208,14 +202,10 @@
   :demand t)
 
 (use-package consult-company
-  :if (eq sb/minibuffer-completion 'vertico)
+  :after (company consult)
   :bind
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
-
-(use-package company-wordfreq
-  :straight (:type git :host github :repo "johannes-mueller/company-wordfreq.el")
-  :commands company-wordfreq)
 
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
@@ -262,9 +252,8 @@
 ;; (setq-local company-transformers '(company-sort-by-backend-importance
 ;;                                    delete-dups))
 
+;; Override `company-backends' for unhandled major modes.
 (with-eval-after-load "company"
-  ;; We override `company-backends', so it is not important to delete individual backends. This is
-  ;; the default for unhandled major modes.
   (setq company-backends '(company-dirfiles
                            company-capf
                            company-dabbrev-code
@@ -272,7 +261,8 @@
                            ;; `company-ispell' will be ignored.
                            (company-ispell :with
                                            company-dabbrev
-                                           company-dict))))
+                                           company-dict
+                                           :separate))))
 
 (with-eval-after-load "company"
   (progn
@@ -299,8 +289,7 @@
       ;; company-files company-dabbrev)
 
       (setq company-backends '(company-dirfiles
-                               (:separate
-                                company-math-symbols-latex ; math latex tags
+                               (company-math-symbols-latex ; Math latex tags
                                 company-latex-commands
                                 company-reftex-labels
                                 company-reftex-citations
@@ -309,15 +298,16 @@
                                 ;; Math unicode symbols and sub(super)scripts
                                 company-math-symbols-unicode
                                 company-auctex-symbols
-                                company-bibtex)
+                                company-bibtex
+                                :separate)
 
                                ;; FIXME: Untested
                                ;; company-yasnippet
 
                                (company-dabbrev :with
-                                                company-wordfreq
                                                 company-ispell
-                                                company-dict)
+                                                company-dict
+                                                :separate)
                                company-capf)))
 
     ;; (declare-function company-fuzzy-mode "company-fuzzy")
@@ -342,16 +332,18 @@
       (setq-local company-minimum-prefix-length 3)
       (make-local-variable 'company-backends)
       (setq company-backends '(company-dirfiles
-                               company-capf
                                (company-ispell :with
                                                company-dabbrev
-                                               company-dict))))
+                                               company-dict
+                                               :separate))))
 
     (add-hook 'org-mode-hook
               (lambda ()
-                (require 'pcomplete)
-                (add-hook 'completion-at-point-functions
-                          'pcomplete-completions-at-point nil t)
+
+                ;; (require 'pcomplete)
+                ;; (add-hook 'completion-at-point-functions
+                ;;           'pcomplete-completions-at-point nil t)
+
                 (sb/company-org-mode)
                 ;; (company-fuzzy-mode 1)
                 ;; (diminish 'company-fuzzy-mode)
@@ -371,10 +363,10 @@
 
       (set (make-local-variable 'company-backends)
            '(company-dirfiles
-             (company-wordfreq :with
-                               company-dabbrev
-                               company-ispell
-                               company-dict))))
+             (company-dabbrev :with
+                              company-ispell
+                              company-dict
+                              :separate))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook 'text-mode-hook
@@ -383,61 +375,12 @@
                             (derived-mode-p 'LaTeX-mode)
                             (derived-mode-p 'org-mode))
                   (sb/company-text-mode)
+
                   ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
+
                   ;; (company-fuzzy-mode 1)
                   ;; (diminish 'company-fuzzy-mode)
                   )))))
-
-;; (with-eval-after-load "company"
-;;   (progn
-;;     (declare-function sb/company-sh-mode "init-completion")
-
-;;     (defun sb/company-sh-mode ()
-;;       "Add backends for shell script completion in company mode."
-;;       (defvar company-minimum-prefix-length)
-;;       (defvar company-backends)
-
-;;       (setq-local company-minimum-prefix-length 3)
-;;       (make-local-variable 'company-backends)
-
-;;       (setq company-backends '(company-capf
-;;                                company-shell
-;;                                company-shell-env
-;;                                company-dabbrev-code
-;;                                company-files
-;;                                company-dabbrev)))
-
-;;     (add-hook 'sh-mode-hook (lambda ()
-;;                               (sb/company-sh-mode)
-;;                               ;; (company-fuzzy-mode 1)
-;;                               ;; (diminish 'company-fuzzy-mode)
-;;                               ))))
-
-;; (with-eval-after-load "company"
-;;   (progn
-;;     (declare-function sb/company-fish-mode "init-completion")
-
-;;     (defun sb/company-fish-mode ()
-;;       "Add backends for fish shell script completion in company mode."
-;;       (defvar company-minimum-prefix-length)
-;;       (defvar company-backends)
-
-;;       (setq-local company-minimum-prefix-length 3)
-;;       (make-local-variable 'company-backends)
-
-;;       (setq company-backends '(company-capf
-;;                                company-shell
-;;                                company-shell-env
-;;                                company-fish-shell
-;;                                company-dabbrev-code
-;;                                company-files
-;;                                company-dabbrev)))
-
-;;     (add-hook 'fish-mode-hook (lambda ()
-;;                                 (sb/company-fish-mode)
-;;                                 ;; (company-fuzzy-mode 1)
-;;                                 ;; (diminish 'company-fuzzy-mode)
-;;                                 ))))
 
 ;; `company-clang' is slow:
 ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
@@ -472,14 +415,13 @@
                                 company-citre-tags
                                 company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet)
-                               (company-wordfreq :with
-                                                 company-dabbrev
-                                                 company-dict
-                                                 company-ispell))))
+                               (company-dabbrev :with
+                                                company-dict
+                                                company-ispell
+                                                :separate))))
 
     (add-hook 'prog-mode-hook
               (lambda ()
-                ;; (unless (or (derived-mode-p 'sh-mode) (derived-mode-p 'fish-mode))
                 (sb/company-prog-mode)
                 ;; (company-fuzzy-mode 1)
                 ;; (diminish 'company-fuzzy-mode)

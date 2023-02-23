@@ -130,7 +130,7 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 
 *** Universal Ctags
 
-Use Universal Ctags (~u-ctags~) with ~counsel-etags~ or ~company-ctags~.
+Use Universal Ctags (~u-ctags~) with ~citre~.
 
 - ~-R~ -- recursively scan for files
 - ~-e~ -- use Emacs-compatible syntax
