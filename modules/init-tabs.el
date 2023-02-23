@@ -15,15 +15,16 @@
   (emacs-startup-hook . centaur-tabs-mode)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
-   ("M-<left>"  . centaur-tabs-backward-tab))
+   ("M-<left>"  . centaur-tabs-backward-tab)
+   ("M-\""      . centaur-tabs-ace-jump))
   :custom
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
   (centaur-tabs-set-close-button nil)
   (centaur-tabs-show-new-tab-button nil)
   (centaur-tabs-enable-ido-completion nil)
-  ;; Other styles like "wave" is not rendered on the terminal, and also does not work well with many
-  ;; themes
+  ;; Other styles like "wave" are not rendered on the terminal, and also does not work well with
+  ;; many themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
   (centaur-tabs-show-count nil "The feature is not useful")

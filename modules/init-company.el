@@ -61,8 +61,8 @@
   (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
   (company-show-quick-access t "Speed up completion")
-  ;; Align additional metadata, like type signatures, to the right-hand side
-  (company-tooltip-align-annotations t)
+  ;; Align additional metadata, like type signatures, to the right-hand side if non-nil.
+  (company-tooltip-align-annotations nil)
   ;; Other choices are: "company-pseudo-tooltip-unless-just-one-frontend" which shows popup unless
   ;; there is only one candidate, "company-preview-frontend" which shows the preview in-place which
   ;; is too instrusive, "company-preview-if-just-one-frontend" shows in-place preview if there is
@@ -75,13 +75,17 @@
                               gud-mode eshell-mode shell-mode
                               csv-mode))
   :config
-  (add-to-list 'company-transformers 'delete-dups)
+  ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
+  ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
+  ;; `delete-dups'.
+
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if
                          (lambda (c)
                            (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
+  (add-to-list 'company-transformers 'delete-dups)
   (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix))
 
@@ -113,10 +117,12 @@
   :hook
   (prog-mode-hook . company-quickhelp-terminal-mode))
 
-(use-package company-statistics
-  :after company
-  :commands company-statistics-mode
-  :init (company-statistics-mode 1))
+;; We are using `company-prescient'.
+
+;; (use-package company-statistics
+;;   :after company
+;;   :commands company-statistics-mode
+;;   :init (company-statistics-mode 1))
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
 ;; slows completions.
@@ -182,20 +188,6 @@
   (company-dict-enable-fuzzy t)
   (company-dict-enable-yasnippet nil))
 
-;; TODO: `company-citre' possibly makes this package obsolete.
-
-;; You can set `company-ctags-extra-tags-files' to load extra tags files. Check "../README.org" to
-;; see example of invocation.
-
-;; (use-package company-ctags
-;;   :straight (:type git :host github :repo "redguardtoo/company-ctags")
-;;   :after company
-;;   :demand t
-;;   :custom
-;;   (company-ctags-quiet t)
-;;   (company-ctags-fuzzy-match-p nil)
-;;   (company-ctags-everywhere t "Offer completions in comments and strings"))
-
 (use-package company-dirfiles ; Better replacement for `company-files'
   :straight (:type git :host github :repo "cwfoo/company-dirfiles")
   :after company
@@ -206,6 +198,15 @@
   :bind
   (:map company-mode-map
         ([remap completion-at-point] . consult-company)))
+
+;; Try completion backends in order untill there is a non-empty completion list:
+;; (setq company-backends '(company-xxx company-yyy company-zzz))
+
+;; Merge completions of all the backends:
+;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+
+;; Merge completions of all the backends, give priority to `company-xxx':
+;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
 
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
@@ -221,37 +222,6 @@
 ;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
 ;; the order of completions just like the backends returned them.
 
-;; Try completion backends in order untill there is a non-empty completion list.
-;; (setq company-backends '(company-xxx company-yyy company-zzz))
-
-;; Merge completions of all the backends
-;; (setq company-backends '((company-xxx company-yyy company-zzz)))
-
-;; Merge completions of all the backends, give priority to `company-xxx'
-;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
-;; (setq company-backends '((company-tabnine :separate company-capf company-yasnippet)))
-
-;; The first merges completions from `company-capf' and `company-dabbrev'. In the second case,
-;; `company' will use only the backends before `:with' for determining the prefix (the text to be
-;; completed). This implies that the candidates from backends after `:with' will be ignored by
-;; `company', irrespective of whether the backends return a prefix or no, if none of the backends
-;; before `:with' return a prefix.
-
-;;     (setq company-backends '((company-capf :with company-yasnippet)
-;;                              (company-files : with company-yasnippet)
-;;                              (company-dabbrev-code :with company-yasnippet)
-;;                              company-dabbrev)))
-
-;; (add-to-list 'company-backends '(company-capf company-dabbrev))
-;; (add-to-list 'company-backends '(company-capf :with company-dabbrev))
-
-;; Options: company-sort-prefer-same-case-prefix, company-sort-by-occurrence,
-;; company-sort-by-statistics, company-sort-by-length, company-sort-by-backend-importance,
-;; delete-dups
-
-;; (setq-local company-transformers '(company-sort-by-backend-importance
-;;                                    delete-dups))
-
 ;; Override `company-backends' for unhandled major modes.
 (with-eval-after-load "company"
   (setq company-backends '(company-dirfiles
@@ -262,9 +232,8 @@
                            (company-ispell :with
                                            company-dabbrev
                                            company-dict
-                                           :separate))))
+                                           :separate)))
 
-(with-eval-after-load "company"
   (progn
     (declare-function sb/company-latex-mode "init-company")
 
@@ -310,8 +279,6 @@
                                                 :separate)
                                company-capf)))
 
-    ;; (declare-function company-fuzzy-mode "company-fuzzy")
-
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook hook (lambda ()
                        (sb/company-latex-mode)
@@ -319,10 +286,9 @@
                        ;; `company-fuzzy-mode' to merge results from all backends.
                        ;; (company-fuzzy-mode 1)
                        ;; (diminish 'company-fuzzy-mode)
-                       )))))
+                       ))))
 
-;; https://emacs.stackexchange.com/questions/21171/company-mode-completion-for-org-keywords
-(with-eval-after-load "company"
+  ;; https://emacs.stackexchange.com/questions/21171/company-mode-completion-for-org-keywords
   (progn
     (declare-function sb/company-org-mode "init-company")
 
@@ -339,17 +305,8 @@
 
     (add-hook 'org-mode-hook
               (lambda ()
+                (sb/company-org-mode))))
 
-                ;; (require 'pcomplete)
-                ;; (add-hook 'completion-at-point-functions
-                ;;           'pcomplete-completions-at-point nil t)
-
-                (sb/company-org-mode)
-                ;; (company-fuzzy-mode 1)
-                ;; (diminish 'company-fuzzy-mode)
-                ))))
-
-(with-eval-after-load "company"
   (progn
     (declare-function sb/company-text-mode "init-company")
 
@@ -378,26 +335,11 @@
 
                   ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
 
-                  ;; (company-fuzzy-mode 1)
-                  ;; (diminish 'company-fuzzy-mode)
-                  )))))
+                  ))))
 
-;; `company-clang' is slow:
-;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
-(with-eval-after-load "company"
+  ;; `company-clang' is slow:
+  ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
   (progn
-
-    ;; (defvar citre-completion-case-sensitive)
-
-    ;; (declare-function citre-capf--get-annotation "citre")
-    ;; (declare-function citre-capf--get-collection "citre")
-    ;; (declare-function citre-get-property "citre")
-    ;; (declare-function citre-get-symbol "citre")
-
-    ;; (declare-function company-begin-backend "company")
-
-    (declare-function sb/company-prog-mode "init-company")
-
     (defun sb/company-prog-mode ()
       "Add backends for `prog-mode' completion in company mode."
       (defvar company-minimum-prefix-length)
@@ -410,11 +352,11 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-dirfiles
-                               (:separate
-                                company-capf
+                               (company-capf
                                 company-citre-tags
                                 company-dabbrev-code ; Useful for variable names
-                                :with company-yasnippet)
+                                :with company-yasnippet
+                                :separate)
                                (company-dabbrev :with
                                                 company-dict
                                                 company-ispell
@@ -422,10 +364,35 @@
 
     (add-hook 'prog-mode-hook
               (lambda ()
-                (sb/company-prog-mode)
-                ;; (company-fuzzy-mode 1)
-                ;; (diminish 'company-fuzzy-mode)
-                ))))
+                (unless (derived-mode-p 'emacs-lisp-mode-hook)
+                  (sb/company-prog-mode)))))
+
+  (progn
+    (defun sb/company-elisp-mode ()
+      "Add backends for `emacs-lisp-mode' completion in company mode."
+      (defvar company-minimum-prefix-length)
+      (defvar company-backends)
+
+      ;; Typing short prefixes help with faster completion and a more responsive UI
+      (setq-local company-minimum-prefix-length 2)
+
+      (make-local-variable 'company-backends)
+
+      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+      (setq company-backends '(company-dirfiles
+                               (company-citre-tags
+                                company-dabbrev-code ; Useful for variable names
+                                :with company-yasnippet
+                                :separate)
+                               (company-dabbrev :with
+                                                company-dict
+                                                company-ispell
+                                                :separate))))
+
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda ()
+                (sb/company-elisp-mode)))))
+
 
 (provide 'init-company)
 

@@ -18,8 +18,8 @@
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
 (use-package xref
-  :hook
-  ((prog-mode-hook LaTeX-mode-hook) . xref-etags-mode)
+  ;; :hook
+  ;; ((prog-mode-hook LaTeX-mode-hook) . xref-etags-mode)
   :bind
   (("M-'"   . xref-find-definitions)
    ("M-?"   . xref-find-references)
@@ -57,21 +57,16 @@
                 (nth 2 lsp-result)))
           lsp-result
         (citre-completion-at-point))))
-
-  (defun sb/enable-lsp-citre-capf-backend ()
-    "Enable the lsp + Citre capf backend in current buffer."
-    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
-  :demand t
   :commands
   (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
   :hook
-  ;; ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
-  ;; ;; tags backend, which is not desired for plain text files.
+  ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
+  ;; tags backend, which is not desired for plain text files.
   (prog-mode-hook . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
    ("M-'"     . citre-jump)
-   ("C-x c J" . citre-jump-back)
+   ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-this-tags-file)
@@ -81,6 +76,7 @@
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-capf-integration t)
+  (citre-enable-imenu-integration nil)
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
 %TAGSFILE%
@@ -96,7 +92,8 @@
 ;; add dirs/files to scan here, one line per dir/file")
   :config
   (with-eval-after-load "lsp-mode"
-    (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
+    ;; Enable the lsp + Citre capf backend in current buffer.
+    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
 
   ;; FIXME: Is this required?
   ;; (with-eval-after-load "eglot"

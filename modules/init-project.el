@@ -77,7 +77,7 @@
                         projectile-compile
                         projectile-compile-project)
   :hook
-  ;; We can open a project file without enabling projectile via bind-keys
+  ;; We can open a project file without enabling projectile via `bind-keys'
   (emacs-startup-hook . projectile-mode)
   :bind-keymap
   ("C-c p" . projectile-command-map)
@@ -100,7 +100,6 @@
                                    "package.json"
                                    "CMakeLists.txt"
                                    "Makefile"
-                                   "WORKSPACE"
                                    "meson.build"
                                    "SConstruct"
                                    "configure.ac"
@@ -148,7 +147,7 @@
     (bind-key "<f6>" #'projectile-find-file)))
 
 (use-package consult-projectile
-  :after (consult projectile)
+  :after projectile
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
