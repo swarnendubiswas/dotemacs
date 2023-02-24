@@ -10,6 +10,8 @@
 (add-hook 'prog-mode-hook
           (lambda ()
             (auto-fill-mode 1) ; Autofill comments
+            (which-function-mode 1)
+
             ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
             (when (display-graphic-p)
               (display-fill-column-indicator-mode 1))))

@@ -1574,8 +1574,10 @@
   '(
     ("ansewr" "answer" nil :count 0)
     ("complation" "compilation" nil :count 0)
+    ("derivaion" "derivation" nil :count 0)
     ("discssion" "discussion" nil :count 0)
     ("hvae" "have" nil :count 0)
+    ("metnion" "mention" nil :count 0)
     ("optimisation" "optimization" nil :count 0)
     ("randomozie" "randomize" nil :count 0)
     ("repored" "reported" nil :count 0)
