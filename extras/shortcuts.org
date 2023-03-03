@@ -504,7 +504,7 @@ Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This cal
 
 *** [[https://200ok.ch/posts/edit-remote-files-with-emacs.html][Edit remote files with Emacs]]
 
-- Open ~eshell~
+- Open =eshell=
 - Change to a remote directory: ~cd /ssh:swarnendu@swarnendu6.cse.iitk.ac.in:~
 - Edit files
 
@@ -522,11 +522,17 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
 *** Copy multiple directories/files to another destination directory
 
 - Set ~(setq dired-dwim-target t)~
-- Split the window and open the source and destination directories with ~dired~
-- Mark the desired directories/files in one ~dired~ window
+- Split the window and open the source and destination directories with =dired=
+- Mark the desired directories/files in one =dired= window
 - Move the files with ~R~, the destination directory will be the default prompt
 
-*** [[http://xahlee.info/emacs/emacs/emacs_string-rectangle_ascii-art.html][Delete columns of text, like in a LaTeX table]]
+*** [[http://xahlee.info/emacs/emacs/emacs_string-rectangle_ascii-art.html][Delete columns of text like in a LaTeX table]]
 
-- Place the cursor in front of the first column in the first row, and invoke ~set-mark-command~
-- Move the cursor to the end of the last column in the last row, and invoke ~kill-rectangle~
+- Place the cursor in front of the first column in the first row, and invoke =set-mark-command=
+- Move the cursor to the end of the last column in the last row, and invoke ==kill-rectangle=
+
+*** Replace all occurrences of  in a file
+
+- Visit the file that has ^M chars
+- Go to the beginning of the file (M-<)
+- Invoke =M-x replace-string RET =C-q C-m RET RET=

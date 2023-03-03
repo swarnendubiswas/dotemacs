@@ -2,13 +2,13 @@
 
 * GNU Emacs
 
-This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform, and are not tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform, and are not extensively tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ** Install GNU Emacs
 
 *** Ubuntu PPA
 
-The Emacs version on Ubuntu is usually outdated. Use the [[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]] PPA to install the latest stable version.
+The Emacs version on Ubuntu is usually outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but I personally prefer to build from source [[[*Build GNU Emacs]]].
 
 #+begin_src shell
 sudo add-apt-repository -y ppa:kelleyk/emacs
@@ -16,9 +16,9 @@ sudo apt update
 sudo apt install emacs28-nativecomp
 #+end_src
 
-*** Build GNU Emacs
+*** Build GNU Emacs from source
 
-Add the following repository if you are using Ubuntu 20.04.
+Add the following repository only if you are using Ubuntu 20.04.
 
 #+begin_src shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -26,7 +26,7 @@ sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
 #+end_src
 
-Use the following instructions to configure and build GNU Emacs from the source.
+Use the following instructions to configure and build GNU Emacs from the source (Ubuntu 20.04 or 22.04).
 
 #+begin_src shell
 wget https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz
@@ -37,8 +37,9 @@ export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
 
 make distclean
 ./autogen.sh
-./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop --with-dbus CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 
+# Enable support for native compilation with NATIVE_FULL_AOT
 make -j"$(nproc)" NATIVE_FULL_AOT=1
 sudo make install
 #+end_src
@@ -58,11 +59,12 @@ Evaluate the following to test that both fast JSON (Emacs 27+) and native compil
 (message "Native JSON is *not* available"))
 #+end_src
 
-You can also check the value of the ~system-configuration-features~ variable, look for "NATIVE__COMP".
+You can also check whether "NATIVE__COMP" is part of the ~system-configuration-features~ variable.
 
-Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=): =(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)=
+Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=):
+~(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)~
 
-** Setup Emacs config
+** Setup Emacs 
 
 Back up the contents of your ~.emacs.d~ directory if it is not empty, and then check out the source.
 
@@ -81,16 +83,17 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 The following are examples of a few customization options defined in [[./modules/init-config.el][init-config.el]]. Please check the file for more customization options.
 
-- ~sb/gui-theme~ -- Set the desired GUI theme from a bunch of themes
-- ~sb/tui-theme~ -- Set the desired TUI theme from a bunch of themes
-- ~sb/modeline-theme~ -- Set the desired modeline theme
-- ~sb/fill-column~ -- Column beyond which lines should not extend
+- ~sb/theme~ -- Set the desired theme from a bunch of themes (default is =modus-vivendi=)
+- ~sb/modeline-theme~ -- Set the desired modeline theme (default is =powerline-nano=)
+- ~sb/fill-column~ -- Column beyond which lines should not extend (default is 100)
+- ~sb/minibuffer-completion~ - Choose either =ivy= or =vertico= for narrowing and selection (default is =vertico=)
+- ~sb/capf~ - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
+- ~sb/tab-bar-handler~ - Choose either =awesome-tab= or =centaur-tabs= for tabbed display (default is =centaur-tabs=)
+- ~sb/project-handler~ - Choose either =project.el= or =projectile= for handling projects (default is =projectile=)
+- ~sb/disable-package.el~ - Disable =package.el= and prefer the =straight.el= package manager.
+- ~sb/python-langserver~ - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
 - ~sb/delete-trailing-whitespace-p~ - Control whether trailing whitespace should be deleted or not
-- ~sb/minibuffer-completion~ - Choose either ~ivy~ or ~vertico~ for narrowing and selection.
-- ~sb/tab-bar-handler~ - Choose either ~company~ or ~corfu~ for in-buffer completion at point.
-- ~sb/project-handler~ - Choose either ~project.el~ or ~projectile~ for handling projects.
-- ~sb/disable-package.el~ - Disable ~package.el~ and prefer the ~straight.el~ package manager.
-- ~sb/python-langserver~ - Choose between ~pylsp~ and ~pyright~ as the Python language server.
+  
 
 ** LSP
 

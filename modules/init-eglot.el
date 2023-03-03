@@ -34,20 +34,26 @@
                                             :foldingRangeProvider
                                             :documentOnTypeFormattingProvider))
 
-  ;; https://github.com/joaotavora/eglot/discussions/875
   (setq-default eglot-workspace-configuration
-                '((pylsp
-                   (configurationSources . ["setup.cfg"])
-                   (plugins
-                    (jedi_completion (include_params . t) (fuzzy . t))
-                    (pycodestyle (enabled . nil))
-                    (mccabe (enabled . nil))
-                    (pyflakes (enabled . nil))
-                    (flake8 (enabled . nil))
-                    (blacken (enabled . nil))
-                    (yapf (enabled . t))
-                    (pydocstyle (enabled . t))
-                    (pylint (enabled . t))))))
+                '((:pylsp .
+                          (:configurationSources ["setup.cfg"]
+                                                 :plugins (
+                                                           :jedi_completion (:include_params t
+                                                                                             :fuzzy t)
+                                                           :pycodestyle (:enabled :json-false)
+                                                           :mccabe (:enabled :json-false)
+                                                           :pyflakes (:enabled :json-false)
+                                                           :flake8 (:enabled :json-false
+                                                                             :maxLineLength 100)
+                                                           :black (:enabled :json-false
+                                                                            :line_length 100)
+                                                           :yapf (:enabled t)
+                                                           :pydocstyle (:enabled t
+                                                                                 :convention "numpy")
+                                                           :autopep8 (:enabled :json-false)
+                                                           :pylint (:enabled t)
+                                                           :pylsp_isort (:enabled t)
+                                                           :pylsp_mypy (:enabled t))))))
 
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) .
                                         ("clangd" "-j=4" "--all-scopes-completion"
@@ -68,6 +74,7 @@
   ;; It may be more useful to use Grammarly to check these files.
   (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode texinfo-mode
                                                    context-mode) "texlab"))
+
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
 
   (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio"))))

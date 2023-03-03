@@ -176,7 +176,8 @@
   :hook
   ((text-mode-hook prog-mode-hook) . olivetti-mode)
   :custom
-  (olivetti-body-width 110))
+  (olivetti-body-width 110)
+  :diminish)
 
 (provide 'init-ui)
 

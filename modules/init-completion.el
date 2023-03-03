@@ -123,7 +123,10 @@
   :straight (:host github :repo "radian-software/prescient.el"
                    :files ("vertico-prescient.el"))
   :after (vertico prescient)
-  :init (vertico-prescient-mode 1))
+  :init (vertico-prescient-mode 1)
+  ;; :custom
+  ;; (vertico-sort-override-function t)
+  )
 
 ;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
 ;; support for the `:separate' keyword in `company'.

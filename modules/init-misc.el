@@ -327,6 +327,9 @@
 (use-package change-inner
   :commands (change-inner change-outer yank-inner yank-outer))
 
+(use-package link-hint
+  :commands (link-hint-open-link link-hint-copy-link))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

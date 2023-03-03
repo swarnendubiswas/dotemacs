@@ -18,6 +18,14 @@ DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
 DIST_VERSION="${DISTRO}_${VERSION}"
 
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+        echo "$1 could not be found."
+        return
+    fi
+}
+
 install_emacs() {
     # Download GNU Emacs source
     EMACS_VERSION="28.2"
@@ -41,7 +49,7 @@ install_emacs() {
     make distclean
     ./autogen.sh
 
-    ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+    ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --without-pop --with-dbus CFLAGS="-O2 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 
     # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the
     # Emacs distribution instead of after startup
@@ -185,7 +193,7 @@ cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 #     fi
 # fi
 
-install_python() {
+install_python_packages() {
     sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave --user
 }
 
@@ -573,31 +581,31 @@ cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 apt autoremove
 apt autoclean
 
-# install_ubuntu_packages
-# install_gcc
-# install_llvm
-# install_cmake
-# install_fish
-# install_emacs
-# install_python
-# install_node
-# install_texlab
-# create_symlinks
-# install_shellcheck
-# install_shfmt
-# install_ripgrep
-# install_cppcheck
-# install_ctags
-# install_global
-# install_alacritty
-# install_bear
+install_ubuntu_packages
+install_gcc
+install_llvm
+install_cmake
+install_fish
+install_emacs
+install_python_packages
+install_node
+install_texlab
+create_symlinks
+install_shellcheck
+install_shfmt
+install_ripgrep
+install_cppcheck
+install_ctags
+install_global
+install_alacritty
+install_bear
 # install_powerline
-# install_tmux
-# install_delta
-# install_zoxide
-# install_bat
-# install_fd
-# install_fzf
+install_tmux
+install_delta
+install_zoxide
+install_bat
+install_fd
+install_fzf
 
 # Gem modules
 

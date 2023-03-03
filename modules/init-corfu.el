@@ -40,7 +40,7 @@
   (:map corfu-map
         ;; ("[tab]" . corfu-next)
         ;; ("[backtab]" . corfu-previous)
-        ("<escape>" . corfu-quit)
+        ("[escape]" . corfu-quit)
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
         ([remap move-end-of-line] . sb/corfu-end-of-prompt))
   :custom

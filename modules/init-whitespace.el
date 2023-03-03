@@ -7,12 +7,11 @@
 
 ;;; Code:
 
-(setq delete-trailing-lines t)
-
 ;; "M-x delete-trailing-whitespace" deletes trailing lines. This is different from
-;; `whitespace-cleanup-mode' since this is unconditional
-
+;; `whitespace-cleanup-mode' since this is unconditional.
 (when (bound-and-true-p sb/delete-trailing-whitespace-p)
+  (setq delete-trailing-lines t)
+
   (add-hook 'write-file-functions #'delete-trailing-whitespace)
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
@@ -33,9 +32,7 @@
                                   ;; tab-mark ; Mark any tabs
                                   ;; empty ; Empty lines at beginning or end of buffer
                                   ;; lines ; Lines that extend beyond `whitespace-line-column'
-                                  ;; Wrong kind of indentation (tab when spaces and vice versa)
-                                  ;; indentation
-                                  ;; space-mark
+                                  ;; space-mark ; Wrong kind of indentation (e.g., tab when spaces)
                                   ;; space-before-tab ; Mixture of space and tab on the same line
                                   ;; space-after-tab ; Mixture of space and tab on the same line
                                   ;; empty
@@ -49,7 +46,6 @@
 ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
 ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
 ;; to `t' in the `.dir-locals.el' file.
-
 (use-package whitespace-cleanup-mode
   :defines whitespace-cleanup-mode-ignore-modes
   :commands

@@ -43,7 +43,7 @@
    ("C-p"      . company-select-previous)
    ;; Insert the common part of all candidates, or select the next one
    ("<tab>"    . company-complete-common-or-cycle)
-   ("<escape>" . company-abort)
+   ("[escape]" . company-abort)
    :map company-search-map
    ("C-s"      . company-search-repeat-forward)
    ("C-r"      . company-search-repeat-backward)
@@ -225,7 +225,6 @@
 ;; Override `company-backends' for unhandled major modes.
 (with-eval-after-load "company"
   (setq company-backends '(company-dirfiles
-                           company-capf
                            company-dabbrev-code
                            ;; If we have `company-dabbrev' first, then other matches from
                            ;; `company-ispell' will be ignored.
@@ -364,7 +363,9 @@
 
     (add-hook 'prog-mode-hook
               (lambda ()
-                (unless (derived-mode-p 'emacs-lisp-mode-hook)
+                (unless (or (derived-mode-p 'emacs-lisp-mode)
+                            (derived-mode-p 'flex-mode)
+                            (derived-mode-p 'bison-mode))
                   (sb/company-prog-mode)))))
 
   (progn

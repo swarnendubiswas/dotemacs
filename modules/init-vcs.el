@@ -13,8 +13,8 @@
   :straight (:type built-in)
   :custom
   (vc-follow-symlinks t "No need to ask")
-  ;; Disabling vc improves performance, the alternate option is '(Git) to show branch
-  ;; information on the modeline.
+  ;; Disabling vc improves performance. An intermediate option is '(Git) to show branch information
+  ;; on the modeline.
   (vc-handled-backends '(Git)))
 
 (use-package magit
@@ -26,7 +26,7 @@
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  ;; Suppress the message we get about "Turning on magit-auto-revert-mode" when loading Magit
+  ;; Suppress the message "Turning on magit-auto-revert-mode" when loading Magit
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist '((stashes   . show)
@@ -136,8 +136,6 @@
 
 (use-package ediff
   :straight (:type built-in)
-  :after magit
-  :demand t
   :defines
   (ediff-window-setup-function)
   :commands
@@ -155,7 +153,7 @@
 ;; https://github.com/dandavison/magit-delta/issues/13
 (use-package magit-delta
   :if (executable-find "delta")
-  :disabled t ; The color combinations for magit-delta are not great with many themes.
+  ;; :disabled t ; The color combinations for magit-delta are not great with many themes.
   :hook
   (magit-mode-hook . magit-delta-mode)
   :diminish magit-delta-mode)

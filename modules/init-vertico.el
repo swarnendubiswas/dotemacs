@@ -37,16 +37,17 @@
     (setq read-extended-command-predicate #'command-completion-default-include-p))
 
   (when (display-graphic-p)
-    (bind-key "<escape>" #'minibuffer-keyboard-quit vertico-map))
+    (bind-key "[escape]" #'minibuffer-keyboard-quit vertico-map))
 
-  (cond
-   ((eq sb/theme 'modus-vivendi)
-    (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
-   ((eq sb/theme 'modus-operandi)
-    (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
-   ((eq sb/theme 'standard-light)
-    (set-face-attribute 'vertico-current nil :background "#9AB8C4" :inherit t))
-   (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t))))
+  ;; (cond
+  ;;  ((eq sb/theme 'modus-vivendi)
+  ;;   (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
+  ;;  ((eq sb/theme 'modus-operandi)
+  ;;   (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
+  ;;  ((eq sb/theme 'standard-light)
+  ;;   (set-face-attribute 'vertico-current nil :background "#9AB8C4" :inherit t))
+  ;;  (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t)))
+  )
 
 ;; More convenient directory navigation commands
 (use-package vertico-directory
@@ -72,15 +73,13 @@
    ("M-r"   . vertico-repeat-select)))
 
 (use-package vertico-indexed
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-indexed))
+  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-indexed))
   :after vertico
   :commands vertico-indexed-mode
   :init (vertico-indexed-mode 1))
 
 (use-package vertico-quick
-  :straight (vertico :files (:defaults "extensions/*")
-                     :includes (vertico-quick))
+  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-quick))
   :after vertico
   :bind
   (:map vertico-map
@@ -95,9 +94,9 @@
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
    ("<f2>" . find-file)
-   ;; Press SPC to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by files,
-   ;; "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list will be
-   ;; shown again.
+   ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
+   ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
+   ;; will be shown again.
    ("C-x b" . consult-buffer)
    ("<f3>" . consult-buffer)
    ([remap switch-to-buffer] . consult-buffer)
@@ -130,7 +129,6 @@
    ("<f9>" . consult-recent-file)
    ([remap recentf-open-files] . consult-recent-file)
    ([remap multi-occur] . consult-multi-occur)
-   ;; Isearch integration
    :map isearch-mode-map
    ("M-s e" . consult-isearch-history))
   :custom
@@ -170,7 +168,7 @@
    ("C-l"     . embark-act)
    ("C-c C-l" . embark-export))
   :custom
-  ;; Replace the key help with a completing-read interface"
+  ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command))
 
 (use-package embark-consult

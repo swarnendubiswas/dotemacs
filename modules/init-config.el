@@ -35,8 +35,9 @@
            (const :tag "none"              none))
   :group 'sb/emacs)
 
+;; Powerline theme for Nano looks great, but it does not show LSP status.
 (defcustom sb/modeline-theme
-  'powerline
+  'doom-modeline
   "Specify the mode-line theme to use."
   :type  '(radio
            (const :tag "powerline"       powerline)
@@ -103,7 +104,7 @@ This location is used for temporary installations and files.")
   'pylsp
   "Choose the Python Language Server implementation."
   :type  '(radio
-           (const :tag "pylsp"   pylsp) ; FIXME: PYLSP is not working with company.
+           (const :tag "pylsp"   pylsp)
            (const :tag "pyright" pyright)
            (const :tag "none"    none))
   :group 'sb/emacs)
@@ -123,7 +124,7 @@ This location is used for temporary installations and files.")
 ;; sometimes messes up the completion. Corfu does not work well with LaTeX for me.
 
 ;; Company works better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is
-;; configurable and we also have `company-dict'.
+;; configurable, and we can set up a custom file containing completions with `company-dict'.
 
 (defcustom sb/capf
   'company
@@ -177,7 +178,7 @@ Prefer the straight.el package manager instead."
 ;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
 ;; Emacs core.
 (defcustom sb/lsp-provider
-  'lsp-mode
+  'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio
           (const :tag "lsp-mode" lsp-mode)
