@@ -83,8 +83,8 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 The following are examples of a few customization options defined in [[./modules/init-config.el][init-config.el]]. Please check the file for more customization options.
 
-- ~sb/theme~ -- Set the desired theme from a bunch of themes (default is =modus-vivendi=)
-- ~sb/modeline-theme~ -- Set the desired modeline theme (default is =powerline-nano=)
+- =sb/theme= -- Set the desired theme from a bunch of themes (default is =modus-vivendi=)
+- =sb/modeline-theme= -- Set the desired modeline theme (default is =powerline-nano=)
 - ~sb/fill-column~ -- Column beyond which lines should not extend (default is 100)
 - ~sb/minibuffer-completion~ - Choose either =ivy= or =vertico= for narrowing and selection (default is =vertico=)
 - ~sb/capf~ - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
@@ -97,7 +97,24 @@ The following are examples of a few customization options defined in [[./modules
   
 ** LSP
 
-We enable LSP support for the more popular languages supported by ~lsp-mode~. You may need to install the necessary language servers to complement ~lsp-mode~. Use ~M-x lsp-install-server~ or check ~setup-emacs.sh~.
+We enable LSP support for the more popular languages supported with either =lsp-mode= or =eglot=. You may need to install the necessary language servers separately to complement the packages. Use =M-x lsp-install-server= or check =setup-emacs.sh=.
+
+**** Installing servers for Eglot
+
+#+begin_src shell
+npm install -save-dev @emacs-grammarly/grammarly-languageserver
+
+wget https://github.com/valentjn/ltex-ls/releases/download/15.2.0/ltex-ls-15.2.0-linux-x64.tar.gz
+tar xf ltex-ls-15.2.0-linux-x64.tar.gz
+cp ltex-ls-15.2.0/bin/* $HOME/.local/bin/.
+rm -rf ltex-ls-15.2.0-linux-x64.tar.gz ltex-ls-15.2.0
+
+wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.20.0.tar.gz
+tar xf v1.20.0.tar.gz
+cd eclipse.jdt.ls-1.20.0
+./mvnw clean verify -DskipTests=true
+
+#+end_src
 
 ** Support for Tags
 

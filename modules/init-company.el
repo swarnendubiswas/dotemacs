@@ -352,7 +352,8 @@
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-dirfiles
                                (company-capf
-                                company-citre-tags
+                                ;; FIXME: Not working with eglot
+                                ;; company-citre-tags
                                 company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet
                                 :separate)

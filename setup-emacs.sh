@@ -3,12 +3,12 @@
 # Helper script to install GNU Emacs if not already present. It also sets up packages related to my
 # setup.
 
-set -eux
+# set -eux
 
-if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root!"
-    exit 1
-fi
+# if [[ $EUID -ne 0 ]]; then
+    # echo "This script must be run as root!"
+    # exit 1
+# fi
 
 # We do not use $HOME since it will point to "/root"
 USER="swarnendu"
@@ -214,7 +214,7 @@ install_node() {
     npm init --yes
 
     # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier @prettier/plugin-php @prettier/plugin-lua prettier-plugin-solidity prettier-plugin-svelte prettier-plugin-toml stylelint remark-language-server marksman vscode-langservers-extracted npm-check-updates jshint
+    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier @prettier/plugin-php @prettier/plugin-lua prettier-plugin-solidity prettier-plugin-svelte prettier-plugin-toml stylelint remark-language-server vscode-langservers-extracted npm-check-updates jshint dockerfile-language-server-nodejs
 
     npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 
@@ -547,6 +547,14 @@ install_bat() {
     rm bat_"$BAT_VER"_amd64.deb
 }
 
+install_marksman() {
+    MK_VER="2023-03-04"
+
+    wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux
+    mv marksman-linux $USER_HOME/.local/bin/marksman
+    chmod a+x $USER_HOME/.local/bin/marksman
+}
+
 install_fd() {
     FD_VER="8.6.0"
 
@@ -573,6 +581,35 @@ install_fzf() {
     bash ./install
 }
 
+install_perl_server() {
+    apt install libanyevent-perl libclass-refresh-perl libcompiler-lexer-perl libdata-dump-perl libio-aio-perl libjson-perl libmoose-perl libpadwalker-perl libscalar-list-utils-perl libcoro-perl
+    cpanm Perl::LanguageServer
+}
+
+install_nerd_fonts_helper() {
+      echo "$1"
+      echo "$2"
+    wget https://github.com/ryanoasis/nerd-fonts/releases/download/v"$2"/"$1".zip
+    mkdir -p "$1"
+    unzip "$1".zip -d "$1"
+    mv "$1"/*.ttf $HOME/.fonts
+    rm -rf "$1"
+
+      }
+
+# Cloning the repository is challenging given its huge size
+install_nerd_fonts() {
+    NF_VER="2.3.3"
+
+    declare -a FONT_NAMES=("BitstreamVeraSansMono" "CascadiaCode" "DejaVuSansMono" "DroidSansMono" "FiraCode" "FiraMono" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
+
+    for i in "${FONT_NAMES[@]}"
+    do
+      install_nerd_fonts_helper "$i" "$NF_VER"
+    done
+
+    fc-cache -v -f
+    }
 # echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
 
 # cmdline=$"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit\n"
@@ -580,34 +617,39 @@ install_fzf() {
 
 # Remove junk
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
-apt autoremove
-apt autoclean
 
-install_ubuntu_packages
-install_gcc
-install_llvm
-install_cmake
-install_fish
-install_emacs
-install_python_packages
-install_node
-install_texlab
-create_symlinks
-install_shellcheck
-install_shfmt
-install_ripgrep
-install_cppcheck
-install_ctags
-install_global
-install_alacritty
-install_bear
+# apt autoremove
+# apt autoclean
+
+# install_ubuntu_packages
+# install_gcc
+# install_llvm
+# install_cmake
+# install_fish
+# install_emacs
+# install_python_packages
+# install_node
+# install_texlab
+# create_symlinks
+# install_shellcheck
+# install_shfmt
+# install_ripgrep
+# install_cppcheck
+# install_ctags
+# install_global
+# install_alacritty
+# install_bear
 # install_powerline
-install_tmux
-install_delta
-install_zoxide
-install_bat
-install_fd
-install_fzf
+# install_tmux
+# install_delta
+# install_zoxide
+# install_bat
+# install_fd
+# install_fzf
+# install_marksman
+# install_perl_server
+install_nerd_fonts
+
 
 # Gem modules
 
@@ -620,6 +662,4 @@ install_fzf
 # composer require felixfbecker/language-server
 # composer update
 
-# cpanm Perl::LanguageServer
-
-set +eux
+# set +eux

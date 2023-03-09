@@ -82,6 +82,7 @@
 (use-package consult-eglot
   :after (consult eglot))
 
+;; FIXME: Disable documentSymbol because otherwise imenu does not work
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
   :after eglot

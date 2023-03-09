@@ -161,6 +161,7 @@
   )
 
 (use-package mono-complete
+  :straight (:host codeberg :repo "ideasman42/emacs-mono-complete")
   :hook (prog-mode-hook . mono-complete-mode)
   :bind
   (:map mono-complete-mode-map
