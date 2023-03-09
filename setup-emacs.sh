@@ -227,7 +227,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="5.2.0"
+    TEXLAB_VER="5.3.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -558,6 +558,8 @@ install_fd() {
 cd $GITHUB
 
 install_fzf() {
+    FZF_VER="0.38.0"
+
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone --depth 1 https://github.com/junegunn/fzf.git
     else
@@ -567,7 +569,7 @@ install_fzf() {
     fi
 
     cd fzf
-    git checkout 0.37.0
+    git checkout ${FZF_VER}
     bash ./install
 }
 

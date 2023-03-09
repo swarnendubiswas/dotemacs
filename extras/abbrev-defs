@@ -398,6 +398,7 @@
     ("convertable" "convertible" nil :count 0)
     ("cooparate" "cooperate" nil :count 0)
     ("cooporate" "cooperate" nil :count 0)
+    ("coordianted" "coordinated" nil :count 0)
     ("copute" "compute" nil :count 0)
     ("corection" "correction" nil :count 1)
     ("corproation" "corporation" nil :count 0)

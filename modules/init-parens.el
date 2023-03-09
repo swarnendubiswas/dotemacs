@@ -48,23 +48,8 @@
 ;;   (add-hook 'minibuffer-exit-hook (lambda ()
 ;;                                     (electric-pair-mode 1))))
 
-;; `sp-cheat-sheet' will show you all the commands available, with examples. Seems to have
-;; performance issue with `latex-mode', `markdown-mode', and large JSON files.
-;; https://web.archive.org/web/20201109035847/http://ebzzry.io/en/emacs-pairs/
+;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens
-  :preface
-  ;; https://web-mode.org/
-  (defun sb/sp-web-mode-is-code-context (id action context)
-    (and (eq action 'insert)
-         (not (or (get-text-property (point) 'part-side)
-                  (get-text-property (point) 'block-side)))))
-
-  ;; https://xenodium.com/emacs-smartparens-auto-indent/
-  (defun sb/indent-between-pair (&rest _ignored)
-    (newline)
-    (indent-according-to-mode)
-    (forward-line -1)
-    (indent-according-to-mode))
   :commands
   (sp-pair sp-local-pair sp-raise-sexp sp-join-sexp sp-absorb-sexp
            sp-transpose-sexp sp-absort-sexp sp-copy-sexp
@@ -99,8 +84,6 @@
   :config
   (smartparens-strict-mode -1)
 
-  ;; (sp-local-pair 'web-mode "<" nil :when '(sb/sp-web-mode-is-code-context))
-
   ;; (sp-local-pair 'markdown-mode "<" ">")
 
   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
@@ -114,9 +97,8 @@
   ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
   (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
-  ;; (sp-local-pair 'prog-mode "{" nil :post-handlers '((sb/indent-between-pair "RET")))
-  ;; (sp-local-pair 'prog-mode "[" nil :post-handlers '((sb/indent-between-pair "RET")))
-  ;; (sp-local-pair 'prog-mode "(" nil :post-handlers '((sb/indent-between-pair "RET")))
+  ;; Do not insert a "=" pair when the point is at the beginning or the end of a word
+  (sp-local-pair 'org-mode "=" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
   :diminish)
 
 (provide 'init-parens)

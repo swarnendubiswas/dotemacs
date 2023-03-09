@@ -160,6 +160,14 @@
   ;;                                         (minibuffer (orderless flex)))))
   )
 
+(use-package mono-complete
+  :hook (prog-mode-hook . mono-complete-mode)
+  :bind
+  (:map mono-complete-mode-map
+        ("<tab>" . mono-complete-expand-or-fallback))
+  :custom
+  (mono-complete-fallback-command 'tab-to-tab-stop))
+
 (provide 'init-completion)
 
 ;;; init-completion.el ends here

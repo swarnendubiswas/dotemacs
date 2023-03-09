@@ -1,4 +1,4 @@
-personal_ws-1.1 en 438 
+personal_ws-1.1 en 438
 AUCTeX
 Aarchie
 Aastha
@@ -8,6 +8,7 @@ Agartala
 Aggarwal
 Agrawal
 Akash
+Akshay
 Alacritty
 Amey
 Amitanghsu
@@ -44,6 +45,7 @@ Deba
 Debadatta
 Debapriya
 Deepak
+Deodhar
 Dhandhania
 Durgapur
 Ericsson
@@ -54,6 +56,7 @@ GeForce
 Gouri
 Hamim
 Hemant
+Hooda
 Hrugved
 IIT
 IITK
@@ -83,14 +86,18 @@ Maiti
 Malakar
 Manan
 Manish
+Mayant
 Meeta
+Meghna
 Migrator
 Minjia
 Mishra
 Mittal
 Modi
 Modularity
+Molugu
 Mondal
+NVBit
 NVBit
 Nagen
 Nagendra
@@ -98,6 +105,7 @@ Naiza
 Naman
 Nath
 Nibir
+Nikhil
 Nirali
 Nishanth
 Nisheeth
@@ -108,6 +116,7 @@ Parallelize
 Parth
 Patidar
 Pingala
+Pingali
 Piyush
 Prafulla
 Prashant
@@ -143,6 +152,7 @@ Satpura
 Saurabh
 Saxena
 Sayak
+Sengupta
 Shailendra
 Sharma
 Sharwari
@@ -161,9 +171,13 @@ Surender
 Sutanu
 Swaprava
 Swarnendu
+Swarnendu
 TODO
+Tanmay
 Tanmoy
+Tavarageri
 Therac
+ThreadSanitizer
 Tilottama
 Tirthendu
 Tripathi
@@ -195,7 +209,6 @@ adaptivity
 advisee
 affine
 ageing
-akshay
 allocator
 allocators
 ambience
@@ -230,13 +243,11 @@ deallocation
 declaratively
 decrementing
 dental
-deodhar
 deoptimization
 deoptimized
 dependences
 deregister
 deterministically
-dey
 dialogs
 dimensionality
 disjunctions
@@ -258,7 +269,6 @@ haldar
 hardcoded
 haswell
 hatchling
-hooda
 incrementing
 indices
 indranil
@@ -283,8 +293,6 @@ liveness
 locksteps
 lookahead
 lookaside
-mayant
-meghna
 metadata
 microarchitectural
 microarchitecture
@@ -300,7 +308,6 @@ misclassify
 misprediction
 mispredictions
 modularizing
-molugu
 monotonicity
 mookit
 mukul
@@ -310,12 +317,10 @@ multilayer
 multithreaded
 multithreading
 neuromorphic
-nikhil
 nonblocking
 nondeterminism
 nonpreemptive
 nonzeros
-nvbit
 observability
 octants
 oneAPI
@@ -332,8 +337,8 @@ parallelizes
 parallelizing
 partitioner
 perceptron
+personal_ws-1.1 en 438 
 piecewise
-pingali
 polyhedra
 polymorphism
 posteriori
@@ -383,7 +388,6 @@ runtime
 runtimes
 scalability
 scalable
-sengupta
 serializability
 serializable
 strided
@@ -391,10 +395,6 @@ subexpression
 suboptimal
 summarization
 superset
-swarnendu
-tanmay
-tavarageri
-threadsanitizer
 tokenization
 toolchain
 toolchains

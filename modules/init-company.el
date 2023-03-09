@@ -319,10 +319,10 @@
 
       (set (make-local-variable 'company-backends)
            '(company-dirfiles
-             (company-dabbrev :with
-                              company-ispell
-                              company-dict
-                              :separate))))
+             (company-ispell
+              company-dabbrev
+              company-dict
+              :separate))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook 'text-mode-hook

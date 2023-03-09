@@ -21,6 +21,7 @@
   (ispell-local-dictionary "en_US")
   (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))
   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+  (ispell-alternate-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   :config
   ;; Skip regions in `org-mode'

@@ -90,50 +90,22 @@ The following are examples of a few customization options defined in [[./modules
 - ~sb/capf~ - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
 - ~sb/tab-bar-handler~ - Choose either =awesome-tab= or =centaur-tabs= for tabbed display (default is =centaur-tabs=)
 - ~sb/project-handler~ - Choose either =project.el= or =projectile= for handling projects (default is =projectile=)
+- ~~sb/lsp-provider~ - Choose between =lsp-mode= and =eglot= (default is =lsp-mode=) 
 - ~sb/disable-package.el~ - Disable =package.el= and prefer the =straight.el= package manager.
 - ~sb/python-langserver~ - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
 - ~sb/delete-trailing-whitespace-p~ - Control whether trailing whitespace should be deleted or not
   
-
 ** LSP
 
 We enable LSP support for the more popular languages supported by ~lsp-mode~. You may need to install the necessary language servers to complement ~lsp-mode~. Use ~M-x lsp-install-server~ or check ~setup-emacs.sh~.
 
 ** Support for Tags
 
-Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by ~lsp-mode~ and to understand complicated project structures which a language server may not understand. I do not use [[https://www.gnu.org/software/global/][GNU Global]], and instead prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]].
-
-*** GNU Global
-
-Use GNU Global with ~counsel-gtags~: ~gtags -cv --gtagslabel=new-ctags~
-
-**** C/C++
-
-#+begin_src shell
-find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -cv --gtagslabel=new-ctags -f -
-#+end_src
-
-**** Python
-
-#+begin_src shell
-find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
-#+end_src
-
-**** LaTeX
-
-#+begin_src shell
-find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
-#+end_src
-
-**** TensorFlow
-
-#+begin_src shell
-find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
-#+end_src
+Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by ~lsp-mode~ and to understand complicated project structures which a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
 
 *** Universal Ctags
 
-Use Universal Ctags (~u-ctags~) with ~citre~.
+Use Universal Ctags (=u-ctags=) with =citre=.
 
 - ~-R~ -- recursively scan for files
 - ~-e~ -- use Emacs-compatible syntax
@@ -207,6 +179,34 @@ dir3
 ctags -eR --languages=Python
 #+end_src
 
+*** GNU Global
+
+Use GNU Global with =counsel-gtags=: ~gtags -cv --gtagslabel=new-ctags~
+
+**** C/C++
+
+#+begin_src shell
+find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -cv --gtagslabel=new-ctags -f -
+#+end_src
+
+**** Python
+
+#+begin_src shell
+find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
+#+end_src
+
+**** LaTeX
+
+#+begin_src shell
+find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
+#+end_src
+
+**** TensorFlow
+
+#+begin_src shell
+find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
+#+end_src
+
 *** Use GNU Global with Universal Ctags support
 
 GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
@@ -217,7 +217,7 @@ GNU Global has better database search support while Universal Ctags supports mor
 
 ** Configuring Emacs Daemon
 
-Enable server support either through ~init.el~ or as a ~systemd~ service. I prefer the ~systemd~ approach. Create a file ~$HOME/.config/systemd/user/emacs.service~ with the following content.
+Enable server support either through =init.el= or as a =systemd= service. I prefer the ~systemd~ approach. Create a file ~$HOME/.config/systemd/user/emacs.service~ with the following content.
 
 #+begin_src config
 [Unit]
