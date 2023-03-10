@@ -355,6 +355,10 @@ after a successful compilation."
   (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
                                           sb/user-tmp-directory)))
 
+;; TODO: Try pcakages like `bibtex-capf' and `citar'
+;; https://github.com/mclear-tools/bibtex-capf/
+;; https://github.com/emacs-citar/citar
+
 (provide 'init-latex)
 
 ;;; init-latex.el ends here

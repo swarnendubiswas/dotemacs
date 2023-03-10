@@ -66,7 +66,7 @@ Run the following to native compile all Elisp files under a directory (e.g., =~/
 
 ** Setup Emacs 
 
-Back up the contents of your ~.emacs.d~ directory if it is not empty, and then check out the source.
+Back up the contents of your =.emacs.d= directory if it is not empty, and then check out the source.
 
 #+begin_src shell
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
@@ -74,7 +74,7 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ** Directory structure
 
-- ~modules~ - Emacs modules divided across features
+- =modules= - Emacs modules divided across features
 - ~extras~ - third-party packages (may not be available from the package archives)
 - ~snippets~ - custom snippets
 - ~references~ - documentation and help files
@@ -113,12 +113,13 @@ wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.20.0.tar.gz
 tar xf v1.20.0.tar.gz
 cd eclipse.jdt.ls-1.20.0
 ./mvnw clean verify -DskipTests=true
-
+# Add eclipse.jdt.ls-1.20.0/org.eclipse.jdt.ls.product/target/repository/bin to $PATH
+rm -rf eclipse.jdt.ls-1.20.0 
 #+end_src
 
 ** Support for Tags
 
-Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by ~lsp-mode~ and to understand complicated project structures which a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
+Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by =lsp-mode= and to understand complicated project structures which a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
 
 *** Universal Ctags
 

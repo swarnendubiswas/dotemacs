@@ -118,6 +118,19 @@
 ;;   (eldoc-box-fringe-use-same-bg nil)
 ;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
+(use-package flex-mode
+  :straight (:type built-in)
+  :config
+  ;; Disable electric indentation and on-type formatting
+  (add-hook 'flex-mode-hook
+            (lambda ()
+              (setq-local c-auto-newline nil
+                          ;; c-electric-brace nil
+                          c-electric-flag nil
+                          ;; c-electric-indent nil
+                          c-enable-auto-newline nil
+                          c-syntactic-indentation nil))))
+
 (provide 'init-prog)
 
 ;;; init-prog.el ends here

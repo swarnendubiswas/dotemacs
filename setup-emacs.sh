@@ -5,18 +5,20 @@
 
 # set -eux
 
-# if [[ $EUID -ne 0 ]]; then
-    # echo "This script must be run as root!"
-    # exit 1
-# fi
-
-# We do not use $HOME since it will point to "/root"
+# We do not use $HOME since it will point to "/root" when run with sudo privileges
 USER="swarnendu"
 USER_HOME="/home/$USER"
 
 DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
 DIST_VERSION="${DISTRO}_${VERSION}"
+
+is_sudo() {
+    if [[ $EUID -ne 0 ]]; then
+        echo "This script must be run as root!"
+        exit 1
+    fi
+}
 
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -85,7 +87,6 @@ install_ubuntu_packages() {
 }
 
 install_gcc() {
-    # Add necessary repositories
     case "${DIST_VERSION}" in
         Ubuntu_18.04 | Ubuntu_20.04)
             add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -198,7 +199,15 @@ install_python_packages() {
 }
 
 install_node() {
+    # Ubuntu 18 supports node 16
     NODEJS_VER="18"
+
+    case "${DIST_VERSION}" in
+        Ubuntu_18.04)
+            NODEJS_VER="16"
+            ;;
+        Ubuntu_20.04 | Ubuntu_22.04) ;;
+    esac
 
     curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
     apt install -y nodejs
@@ -382,7 +391,7 @@ install_cppcheck() {
     fi
 
     cd cppcheck || echo "Failed: cd cppcheck"
-    git checkout 2.10.0
+    git checkout 2.10
     mkdir -p build
     cd build || echo "Failed: cd build"
     cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON -DUSE_THREADS=ON ..
@@ -503,6 +512,8 @@ install_powerline() {
 cd "$GITHUB" || echo "Failed: cd $GITHUB"
 
 install_tmux() {
+    apt install libevent-dev
+
     if [ -d tmux ]; then
         cd tmux || echo "Failed: cd tmux"
         echo "Pulling tmux reposiory from GitHub..."
@@ -516,12 +527,18 @@ install_tmux() {
 
     cd tmux || echo "Failed: cd tmux"
     git checkout 3.3a
+    ./autogen.sh
     ./configure
     make
     make install
 }
 
 install_delta() {
+    # Latest releases do not work with Ubuntu 18
+    if [[ "${DIST_VERSION}" == Ubuntu_18.04 ]]; then
+        return
+    fi
+
     DELTA_VER="0.15.1"
 
     wget https://github.com/dandavison/delta/releases/download/"$DELTA_VER"/git-delta_"$DELTA_VER"_amd64.deb
@@ -569,7 +586,7 @@ install_fzf() {
     FZF_VER="0.38.0"
 
     if [ ! -d fzf ]; then
-        sudo -u swarnendu git clone --depth 1 https://github.com/junegunn/fzf.git
+        sudo -u swarnendu git clone https://github.com/junegunn/fzf.git
     else
         cd fzf || echo "Failed: cd fzf"
         sudo -u swarnendu git pull
@@ -582,44 +599,50 @@ install_fzf() {
 }
 
 install_perl_server() {
-    apt install libanyevent-perl libclass-refresh-perl libcompiler-lexer-perl libdata-dump-perl libio-aio-perl libjson-perl libmoose-perl libpadwalker-perl libscalar-list-utils-perl libcoro-perl
+    apt install libanyevent-perl libclass-refresh-perl libdata-dump-perl libio-aio-perl libjson-perl libmoose-perl libpadwalker-perl libscalar-list-utils-perl libcoro-perl
     cpanm Perl::LanguageServer
 }
 
 install_nerd_fonts_helper() {
-      echo "$1"
-      echo "$2"
+    echo "$1"
+    echo "$2"
     wget https://github.com/ryanoasis/nerd-fonts/releases/download/v"$2"/"$1".zip
     mkdir -p "$1"
     unzip "$1".zip -d "$1"
     mv "$1"/*.ttf $HOME/.fonts
     rm -rf "$1"
 
-      }
+}
 
-# Cloning the repository is challenging given its huge size
+# Cloning the nerd-fonts repository is challenging given its huge size
+
 install_nerd_fonts() {
     NF_VER="2.3.3"
 
-    declare -a FONT_NAMES=("BitstreamVeraSansMono" "CascadiaCode" "DejaVuSansMono" "DroidSansMono" "FiraCode" "FiraMono" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
+    # declare -a FONT_NAMES=("BitstreamVeraSansMono" "DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
 
-    for i in "${FONT_NAMES[@]}"
-    do
-      install_nerd_fonts_helper "$i" "$NF_VER"
-    done
+    # for i in "${FONT_NAMES[@]}"
+    # do
+    # install_nerd_fonts_helper "$i" "$NF_VER"
+    # done
 
     fc-cache -v -f
-    }
+}
+
 # echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
 
 # cmdline=$"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit\n"
 # printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 
 # Remove junk
-cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
+cleanup() {
+    cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
-# apt autoremove
-# apt autoclean
+    apt autoremove
+    apt autoclean
+}
+
+# is_sudo
 
 # install_ubuntu_packages
 # install_gcc
@@ -648,8 +671,9 @@ cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 # install_fzf
 # install_marksman
 # install_perl_server
-install_nerd_fonts
+# install_nerd_fonts
 
+# cleanup
 
 # Gem modules
 
