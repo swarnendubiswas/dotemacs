@@ -133,13 +133,6 @@
   (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
-;; (set-frame-font "DejaVu Sans Mono" nil t)
-
-;; (cond ((member "Inconsolata" (font-family-list))
-;;        (set-face-attribute 'default nil :font "Inconsolata-18"))
-;;       ((member "Monaco" (font-family-list))
-;;        (set-face-attribute 'default nil :font "Monaco" :height 120)
-;;        (setq default-frame-alist '((font . "Monaco-12")))))
 
 ;; These font preferences will be ignored when we use TUI Emacs. Then, the terminal font setting
 ;; will be used.

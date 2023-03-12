@@ -30,12 +30,15 @@
   (setq eglot-stay-out-of '(flymake company eldoc))
   (setq eglot-ignored-server-capabilities '(:codeLensProvider
                                             :executeCommandProvider
+                                            ;; Automatic documentation popups can be distracting
                                             :hoverProvider
                                             :foldingRangeProvider
-                                            :documentOnTypeFormattingProvider))
+                                            :documentOnTypeFormattingProvider
+                                            :documentLinkProvider))
 
   (setq-default eglot-workspace-configuration
-                '((:pylsp .
+                '(
+                  (:pylsp .
                           (:configurationSources ["setup.cfg"]
                                                  :plugins (
                                                            :jedi_completion (:include_params t
@@ -53,7 +56,8 @@
                                                            :autopep8 (:enabled :json-false)
                                                            :pylint (:enabled t)
                                                            :pylsp_isort (:enabled t)
-                                                           :pylsp_mypy (:enabled t))))))
+                                                           :pylsp_mypy (:enabled t))))
+                  (:pyright . ((useLibraryCodeForTypes . t)))))
 
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) .
                                         ("clangd" "-j=4" "--all-scopes-completion"
@@ -69,7 +73,10 @@
                                          "--pch-storage=memory"
                                          "--pretty")))
 
-  ;; (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               `(python-mode . ,(eglot-alternatives
+                                 '(("pylsp" "--stdio")
+                                   ("pyright-langserver" "--stdio")))))
 
   ;; It may be more useful to use Grammarly to check these files.
   (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode texinfo-mode
@@ -92,33 +99,40 @@
        (unless (derived-mode-p 'yaml-mode)
          (require 'eglot-grammarly)
          (eglot-ensure))))
-  ;; :config
+  :config
+  (setq eglot-ignored-server-capabilities '(:codeLensProvider
+                                            :executeCommandProvider
+                                            :hoverProvider
+                                            :foldingRangeProvider
+                                            :documentOnTypeFormattingProvider
+                                            :documentLinkProvider
+                                            :documentSymbolProvider))
   ;; (add-to-list eglot-workspace-configuration
   ;;              ((@emacs-grammarly/grammarly-languageserver
   ;;                . ((audience . "knowledgeable")))))
   )
 
-;; (use-package eglot-ltex
-;;   :disabled t
-;;   :hook
-;;   ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
-;;    . (lambda ()
-;;        (unless (derived-mode-p 'yaml-mode)
-;;          (require 'eglot-ltex)
-;;          (eglot-ensure))))
-;;   :init
-;;   (setq eglot-languagetool-server-path "")
-;;   ;; :config
-;;   ;; ((nil (eglot-workspace-configuration
-;;   ;;        . ((ltex . ((language . "fr")
-;;   ;;                    (disabledRules . ((fr . ["FRENCH_WHITESPACE"])))
-;;   ;;                    (additionalRules . ((languageModel . "/usr/share/ngrams/")))))))))
-;;   )
+(use-package eglot-ltex
+  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+  :after eglot
+  :hook
+  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
+   . (lambda ()
+       (unless (derived-mode-p 'yaml-mode)
+         (require 'eglot-ltex)
+         (eglot-ensure))))
+  :init
+  (setq eglot-languagetool-server-path (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
+  ;; :config
+  ;;(add-to-list 'eglot-workspace-configuration
+  ;;           ((:ltex . ((:language "en-US")
+  ;;                    (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+  )
 
 (use-package eglot-java
   :after eglot
   :hook
-  (java-mode-hook . eglot-java-init))
+  (java-mode-hook . eglot-java-mode))
 
 (provide 'init-eglot)
 

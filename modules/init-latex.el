@@ -75,6 +75,7 @@
   :hook
   (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
    ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
+   ;; Jump between editor and pdf viewer
    ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
    ((latex-mode-hook LaTeX-mode-hook) . turn-on-auto-fill)
    ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
@@ -214,10 +215,12 @@ Ignore if no file is found."
   (reftex-enable-partial-scans t)
   (reftex-highlight-selection 'both)
   (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
-  (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
   (reftex-revisit-to-follow t)
   (reftex-auto-recenter-toc t "Center on the section currently being edited")
+  (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
   (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
+  (reftex-toc-split-windows-horizontally t) ; Show reftex TOC on the left
+  (reftex-ref-macro-prompt nil) ; No unnecessary prompts
   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
   (reftex-use-fonts t "Use nice fonts for TOC")
   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")

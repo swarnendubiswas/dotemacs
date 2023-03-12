@@ -119,7 +119,17 @@
   :mode "\\.g4\\'")
 
 (use-package bison-mode
-  :mode "\\.bison\\'")
+  :mode ("\\.flex\\'" . flex-mode)
+  :mode ("\\.bison\\'" . bison-mode)
+  :hook
+  (flex-mode-hook . (lambda ()
+                      ;; Disable electric indentation and on-type formatting
+                      (setq-local c-auto-newline nil
+                                  ;; c-electric-brace nil
+                                  c-electric-flag nil
+                                  ;; c-electric-indent nil
+                                  c-enable-auto-newline nil
+                                  c-syntactic-indentation nil))))
 
 (use-package llvm-mode
   ;; :straight (llvm-mode :type git :host github

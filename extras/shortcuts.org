@@ -398,6 +398,14 @@ Use ~magit-status~ to display information about the current Git repository and ~
 - ~y~ - List and compare references (~magit-show-references~)
 - ~i~ - Instruct Git to ignore a file (~magit-gitignore~)
 
+** Ediff
+
+- =n= - Move to the next difference
+- =p= - Move to the previous difference
+- =a= - Copy the text from the left-hand file to the right-hand file
+- =b= - Copy text from the right-hand file to the left-hand file
+- =q= - Exit ediff
+  
 ** SMerge
 
 - ~C-c v u~ - (~smerge-keep-upper~)

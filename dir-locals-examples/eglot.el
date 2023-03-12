@@ -1,4 +1,11 @@
 (
+ ((nil
+  . ((eglot-workspace-configuration
+
+      . (:pylsp (:plugins (:jedi_completion (:include_params t
+                                             :fuzzy t)
+                           :pylint (:enabled :json-false)))
+         :gopls (:usePlaceholders t))))))
  (python-mode .
               ((eglot-workspace-configuration
                   .
@@ -11,17 +18,18 @@
                                         (expand-absolute-name "~/.local/lib/python-type-stubs"))))
                    (:pylsp .
                            (:plugins
-                            (:jedi_completion (:fuzzy t) (:include_params t)
+                            (:jedi_completion (:fuzzy t
+                                               :include_params t)
                              :pylsp_isort (:enabled t)
                              :pylsp_mypy (:enabled t)
-                             :pydocstyle (:enabled nil)
+                             :pydocstyle (:enabled :json-false)
                              :pycodestyle (:enabled :json-false)
-                             :mccabe (:enabled nil)
-                             :pyflakes (:enabled nil)
-                             :flake8 (:enabled nil)
-                             :black (:enabled nil)
+                             :mccabe (:enabled :json-false)
+                             :pyflakes (:enabled :json-false)
+                             :flake8 (:enabled :json-false)
+                             :black (:enabled :json-false)
                              :pylint (:enabled t)
-                             :mypy (:enabled nil))
+                             :mypy (:enabled :json-false))
                             :configurationSources ["setup.cfg"]))
                    ))))
 

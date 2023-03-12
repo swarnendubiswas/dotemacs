@@ -106,35 +106,22 @@
 ;; well supported with prescient.
 
 (use-package prescient
-  :straight (:host github :repo "radian-software/prescient.el")
+  :straight (:host github :repo "radian-software/prescient.el"
+                   :files (:defaults "/*.el"))
   :commands prescient-persist-mode
   :hook
   (emacs-startup-hook . prescient-persist-mode)
   :custom
-  (prescient-sort-full-matches-first t))
-
-(use-package corfu-prescient
-  :straight (:host github :repo "radian-software/prescient.el"
-                   :files ("corfu-prescient.el"))
-  :after (corfu prescient)
-  :init (corfu-prescient-mode 1))
-
-(use-package vertico-prescient
-  :straight (:host github :repo "radian-software/prescient.el"
-                   :files ("vertico-prescient.el"))
-  :after (vertico prescient)
-  :init (vertico-prescient-mode 1)
-  ;; :custom
-  ;; (vertico-sort-override-function t)
-  )
-
-;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
-;; support for the `:separate' keyword in `company'.
-(use-package company-prescient
-  :straight (:host github :repo "radian-software/prescient.el"
-                   :files ("company-prescient.el"))
-  :after (company prescient)
-  :init (company-prescient-mode 1))
+  (prescient-sort-full-matches-first t)
+  :config
+  (with-eval-after-load "corfu"
+    (corfu-prescient-mode 1))
+  (with-eval-after-load "vertico"
+    (vertico-prescient-mode 1))
+  ;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
+  ;; support for the `:separate' keyword in `company'.
+  (with-eval-after-load "company"
+    :init (company-prescient-mode 1)))
 
 ;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
@@ -147,18 +134,20 @@
 
 (use-package minibuffer
   :straight (:type built-in)
+  :after orderless
   :custom
   (completions-format 'vertical)
-  ;; :config
-  ;; (with-eval-after-load "orderless"
-  ;;   (setq completion-styles '(orderless basic)
-  ;;         ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-  ;;         ;; work. I also want substring matching for file names.
-  ;;         completion-category-overrides '((file (styles basic substring))
-  ;;                                         ;; (buffer (styles basic substring flex))
-  ;;                                         ;; (project-file (styles basic substring flex))
-  ;;                                         (minibuffer (orderless flex)))))
-  )
+  :config
+  ;; substring is needed to complete common prefix, orderless does not
+  (setq completion-styles '(substring orderless basic)
+        completion-category-defaults nil
+        ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+        ;; work. I also want substring matching for file names.
+        completion-category-overrides '((file (styles basic substring partial-completion))
+                                        ;; (buffer (styles basic substring flex))
+                                        ;; (project-file (styles basic substring flex))
+                                        ;; (minibuffer (orderless flex))
+                                        )))
 
 (use-package mono-complete
   :straight (:host codeberg :repo "ideasman42/emacs-mono-complete")

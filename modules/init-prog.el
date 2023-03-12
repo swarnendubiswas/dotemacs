@@ -95,7 +95,7 @@
   :hook
   (prog-mode-hook . turn-on-eldoc-mode)
   :custom
-  (eldoc-area-prefer-doc-buffer t)
+  (eldoc-area-prefer-doc-buffer t "Disable popups")
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
@@ -118,18 +118,7 @@
 ;;   (eldoc-box-fringe-use-same-bg nil)
 ;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
 
-(use-package flex-mode
-  :straight (:type built-in)
-  :config
-  ;; Disable electric indentation and on-type formatting
-  (add-hook 'flex-mode-hook
-            (lambda ()
-              (setq-local c-auto-newline nil
-                          ;; c-electric-brace nil
-                          c-electric-flag nil
-                          ;; c-electric-indent nil
-                          c-enable-auto-newline nil
-                          c-syntactic-indentation nil))))
+;; TODO: Try https://gitlab.com/jgkamat/rmsbolt, https://github.com/jart/disaster
 
 (provide 'init-prog)
 

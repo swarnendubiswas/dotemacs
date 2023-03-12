@@ -451,6 +451,20 @@
   ((prog-mode-hook . goto-address-prog-mode)
    (text-mode-hook . goto-address-mode)))
 
+(use-package ediff
+  :straight (:type built-in)
+  :defines
+  (ediff-window-setup-function)
+  :commands
+  (ediff-setup-windows-plain ediff-set-diff-options)
+  :custom
+  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+  (ediff-window-setup-function #'ediff-setup-windows-plain)
+  ;; Split windows horizontally in ediff (instead of vertically)
+  (ediff-split-window-function #'split-window-horizontally)
+  :config
+  (ediff-set-diff-options 'ediff-diff-options "-w"))
+
 ;; https://emacs.stackexchange.com/questions/10983/remember-permission-to-execute-risky-local-variables/44604#44604
 (advice-add 'risky-local-variable-p :override #'ignore)
 

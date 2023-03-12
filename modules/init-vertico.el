@@ -24,6 +24,8 @@
   (emacs-startup-hook . vertico-mode)
   :bind
   (:map vertico-map
+        ("M-<"   . vertico-first)
+        ("M->"   . vertico-last)
         ("C-M-j" . vertico-exit-input)
         ("<tab>" . vertico-insert))
   :custom
@@ -31,6 +33,11 @@
   (vertico-resize nil)
   (vertico-preselect 'first)
   :config
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties '(read-only t
+                                                 cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
   ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
   ;; hidden in normal buffers.
   (when sb/EMACS28+
@@ -51,7 +58,7 @@
 
 ;; More convenient directory navigation commands
 (use-package vertico-directory
-  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory))
+  :straight nil
   :after vertico
   :hook
   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
@@ -64,7 +71,7 @@
         ("M-DEL" . vertico-directory-delete-word)))
 
 (use-package vertico-repeat
-  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-repeat))
+  :straight nil
   :after vertico
   :hook
   (minibuffer-setup-hook . vertico-repeat-save)
@@ -73,13 +80,13 @@
    ("M-r"   . vertico-repeat-select)))
 
 (use-package vertico-indexed
-  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-indexed))
+  :straight nil
   :after vertico
   :commands vertico-indexed-mode
   :init (vertico-indexed-mode 1))
 
 (use-package vertico-quick
-  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-quick))
+  :straight nil
   :after vertico
   :bind
   (:map vertico-map
