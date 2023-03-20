@@ -51,13 +51,13 @@
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
 
-;; ;; Set `sb/theme' to `none' if you use this package
-;; (use-package circadian
-;;   :disabled t
-;;   :custom
-;;   (circadian-themes '((:sunrise . nano-light)
-;;                       (:sunset  . modus-vivendi)))
-;;   :hook (emacs-startup-hook . circadian-setup))
+;; Set `sb/theme' to `none' if you use this package
+
+(use-package circadian
+  :custom
+  (circadian-themes '((:sunrise . modus-vivendi)
+                      (:sunset  . modus-vivendi)))
+  :hook (emacs-startup-hook . circadian-setup))
 
 (use-package ef-themes
   :straight (:type git :host github :repo "protesilaos/ef-themes")

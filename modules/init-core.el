@@ -401,12 +401,12 @@
   :custom
   (windmove-wrap-around t "Wrap around at edges"))
 
-;; (use-package solar
-;;   :straight (:type built-in)
-;;   :custom
-;;   (calendar-latitude 26.50)
-;;   (calendar-location-name "Kanpur, UP, India")
-;;   (calendar-longitude 80.23))
+(use-package solar
+  :straight (:type built-in)
+  :custom
+  (calendar-latitude 26.50)
+  (calendar-location-name "Kanpur, UP, India")
+  (calendar-longitude 80.23))
 
 ;; NOTE: `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined
 ;; will also get run for all modes derived from a basic mode such as `text-mode'.

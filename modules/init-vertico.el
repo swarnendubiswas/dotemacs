@@ -47,13 +47,14 @@
     (bind-key "[escape]" #'minibuffer-keyboard-quit vertico-map))
 
   ;; (cond
-  ;;  ((eq sb/theme 'modus-vivendi)
-  ;;   (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
+  ;;  ;;  ((eq sb/theme 'modus-vivendi)
+  ;;  ;;   (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
   ;;  ((eq sb/theme 'modus-operandi)
   ;;   (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
-  ;;  ((eq sb/theme 'standard-light)
-  ;;   (set-face-attribute 'vertico-current nil :background "#9AB8C4" :inherit t))
-  ;;  (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t)))
+  ;;  ;;  ((eq sb/theme 'standard-light)
+  ;;  ;;   (set-face-attribute 'vertico-current nil :background "#9AB8C4" :inherit t))
+  ;;  (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t))
+  ;;  )
   )
 
 ;; More convenient directory navigation commands

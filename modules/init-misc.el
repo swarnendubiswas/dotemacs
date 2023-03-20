@@ -212,7 +212,9 @@
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
+
 (use-package amx
+  :after counsel
   :commands
   (execute-extended-command-for-buffer)
   :hook

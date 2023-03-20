@@ -120,6 +120,11 @@
   :hook
   (org-mode-hook . org-modern-mode))
 
+(use-package org-modern-indent
+  :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+  :hook
+  (org-mode-hook . org-modern-indent-mode))
+
 ;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
 ;; https://orgmode.org/manual/Escape-Character.html
 ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el

@@ -108,6 +108,7 @@
 (use-package prescient
   :straight (:host github :repo "radian-software/prescient.el"
                    :files (:defaults "/*.el"))
+  :disabled t
   :commands prescient-persist-mode
   :hook
   (emacs-startup-hook . prescient-persist-mode)

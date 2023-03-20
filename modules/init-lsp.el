@@ -369,6 +369,20 @@
              (error "Error during the unzip process: tar"))))
        error-callback)))))
 
+(use-package dap-mode
+  :after lsp-mode
+  :commands (dap-step-in dap-next dap-continue)
+  :init (dap-auto-configure-mode)
+  ;; :bind
+  ;; ("<f7>" . dap-step-in)
+  ;; ("<f8>" . dap-next)
+  ;; ("<f9>" . dap-continue)
+  )
+
+(use-package dap-java
+  :straight nil
+  :after lsp-java)
+
 (provide 'init-lsp)
 
 ;;; init-lsp.el ends here

@@ -75,25 +75,25 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 ** Directory structure
 
 - =modules= - Emacs modules divided across features
-- ~extras~ - third-party packages (may not be available from the package archives)
-- ~snippets~ - custom snippets
-- ~references~ - documentation and help files
-- ~dir-locals-examples~ - examples to show how to use directory-local variables
-- ~projectile-examples~ - projectile configuration files
+- =extras= - third-party packages (may not be available from the package archives)
+- =snippets= - custom snippets
+- =references= - documentation and help files
+- =dir-locals-examples= - examples to show how to use directory-local variables
+- =projectile-examples= - projectile configuration files
 
 The following are examples of a few customization options defined in [[./modules/init-config.el][init-config.el]]. Please check the file for more customization options.
 
 - =sb/theme= -- Set the desired theme from a bunch of themes (default is =modus-vivendi=)
 - =sb/modeline-theme= -- Set the desired modeline theme (default is =powerline-nano=)
-- ~sb/fill-column~ -- Column beyond which lines should not extend (default is 100)
-- ~sb/minibuffer-completion~ - Choose either =ivy= or =vertico= for narrowing and selection (default is =vertico=)
-- ~sb/capf~ - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
-- ~sb/tab-bar-handler~ - Choose either =awesome-tab= or =centaur-tabs= for tabbed display (default is =centaur-tabs=)
-- ~sb/project-handler~ - Choose either =project.el= or =projectile= for handling projects (default is =projectile=)
-- ~~sb/lsp-provider~ - Choose between =lsp-mode= and =eglot= (default is =lsp-mode=) 
-- ~sb/disable-package.el~ - Disable =package.el= and prefer the =straight.el= package manager.
-- ~sb/python-langserver~ - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
-- ~sb/delete-trailing-whitespace-p~ - Control whether trailing whitespace should be deleted or not
+- =sb/fill-column= -- Column beyond which lines should not extend (default is 100)
+- =sb/minibuffer-completion= - Choose either =ivy= or =vertico= for narrowing and selection (default is =vertico=)
+- =sb/capf= - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
+- =sb/tab-bar-handler= - Choose either =awesome-tab= or =centaur-tabs= for tabbed display (default is =centaur-tabs=)
+- =sb/project-handler= - Choose either =project.el= or =projectile= for handling projects (default is =projectile=)
+- =sb/lsp-provider= - Choose between =lsp-mode= and =eglot= (default is =lsp-mode=) 
+- =sb/disable-package.el= - Disable =package.el= and prefer the =straight.el= package manager.
+- =sb/python-langserver= - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
+- =sb/delete-trailing-whitespace-p= - Control whether trailing whitespace should be deleted or not
   
 ** LSP
 
@@ -113,7 +113,7 @@ wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.20.0.tar.gz
 tar xf v1.20.0.tar.gz
 cd eclipse.jdt.ls-1.20.0
 ./mvnw clean verify -DskipTests=true
-# Add eclipse.jdt.ls-1.20.0/org.eclipse.jdt.ls.product/target/repository/bin to $PATH
+# Add "eclipse.jdt.ls-1.20.0/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
 rm -rf eclipse.jdt.ls-1.20.0 
 #+end_src
 
@@ -123,17 +123,17 @@ Support for LSP in GNU Emacs means you will usually not need to create tags sepa
 
 *** Universal Ctags
 
-Use Universal Ctags (=u-ctags=) with =citre=.
+Use Universal Ctags (=u-ctags=) with =Citre=.
 
-- ~-R~ -- recursively scan for files
-- ~-e~ -- use Emacs-compatible syntax
-- ~--list-excludes~ -- check which patterns are excluded from processing
-- ~--list-languages~ -- list supported languages
-- ~--languages=Python~ -- include Python files
+- =-R= -- recursively scan for files
+- =-e= -- use Emacs-compatible syntax
+- =--list-excludes= -- check which patterns are excluded from processing
+- =--list-languages= -- list supported languages
+- =--languages=Python= -- include Python files
 
-By default, Emacs expects a tag file by the name ~TAGS~ in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
+By default, Emacs expects a tag file by the name =TAGS= in the current directory. Once the tag file is built, the following commands exercise the tag indexing feature.
 
-- ~M-x visit-tags-table <RET> FILE <RET>~ -- Select the tag file ~FILE~ to use
+- ~M-x visit-tags-table <RET> FILE <RET>~ -- Select the tag file =FILE= to use
 - ~M-. [TAG] <RET>~ -- Find the first definition of ~TAG~. The default tag is the identifier under the cursor.
 - ~M-*~ -- Pop back to where you invoked ~M-.~
 - ~C-u M-.~ -- Find the next definition for the last tag
@@ -259,7 +259,7 @@ WantedBy=default.target
 
 ** Desktop Entry
 
-Create ~emacs.desktop~ and ~emacsclient.desktop~ files in ~$HOME/.local/share/applications~ with the following content.
+Create =emacs.desktop= and =emacsclient.desktop= files in =$HOME/.local/share/applications= with the following content.
 
 #+begin_src config
 [Desktop Entry]

@@ -15,7 +15,7 @@
 
 ;; A dark theme looks good on the TUI.
 (defcustom sb/theme
-  'modus-vivendi
+  'none
   "Specify which Emacs theme to use."
   :type  '(radio
            (const :tag "doom-one"          doom-one)
@@ -77,7 +77,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file
-  nil
+  t
   "Enable features to debug errors and performance bottlenecks."
   :type  'boolean
   :group 'sb/emacs)
@@ -127,7 +127,7 @@ This location is used for temporary installations and files.")
 ;; configurable, and we can set up a custom file containing completions with `company-dict'.
 
 (defcustom sb/capf
-  'company
+  'corfu
   "Choose the framework to use for completion at point."
   :type '(radio
           (const :tag "corfu" corfu)

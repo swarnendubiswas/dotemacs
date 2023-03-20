@@ -65,7 +65,7 @@
         doom-modeline-indent-info nil
         doom-modeline-lsp t
         doom-modeline-minor-modes t
-        doom-modeline-buffer-file-name-style 'truncate-with-project ; Reduce space on the modeline
+        doom-modeline-buffer-file-name-style 'file-name ; Reduce space on the modeline
         doom-modeline-unicode-fallback t)
   :hook
   (emacs-startup-hook . doom-modeline-mode))

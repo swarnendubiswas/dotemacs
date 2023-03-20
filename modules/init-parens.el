@@ -62,9 +62,9 @@
            sp-wrap-curly sp-wrap-square sp-split-sexp)
   :hook
   ((emacs-startup-hook . (lambda ()
-                           (require 'smartparens-config)
                            (smartparens-global-mode 1)
-                           (show-smartparens-global-mode 1))))
+                           (show-smartparens-global-mode 1)
+                           (require 'smartparens-config))))
   :bind
   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
    ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
@@ -84,8 +84,6 @@
   :config
   (smartparens-strict-mode -1)
 
-  ;; (sp-local-pair 'markdown-mode "<" ">")
-
   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
   (sp-pair "("  nil :unless '(sp-point-before-word-p))
   (sp-pair "["  nil :unless '(sp-point-before-word-p))
@@ -98,7 +96,10 @@
   (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
   ;; Do not insert a "=" pair when the point is at the beginning or the end of a word
-  (sp-local-pair 'org-mode "=" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
+  (sp-with-modes 'org-mode
+    (sp-local-pair "~" "~" :unless '(sp-point-after-word-p sp-point-before-word-p))
+    (sp-local-pair "=" "=" :unless '(sp-point-after-word-p sp-point-before-word-p)))
+
   :diminish)
 
 (provide 'init-parens)

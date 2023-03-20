@@ -183,8 +183,9 @@
             (lambda ()
               (setq-local completion-at-point-functions
                           (list
-                           (cape-super-capf ;; #'citre-completion-at-point
-                            ;; #'elisp-completion-at-point
+                           (cape-super-capf
+                            #'elisp-completion-at-point
+                            #'citre-completion-at-point
                             #'cape-file
                             #'cape-symbol ; Elisp symbols
                             #'cape-dabbrev
@@ -221,7 +222,6 @@
                                           (list
                                            (cape-super-capf #'lsp-completion-at-point
                                                             #'citre-completion-at-point
-                                                            ;; #'tags-completion-at-point-function
                                                             #'cape-file
                                                             #'cape-keyword
                                                             #'cape-dabbrev
@@ -229,15 +229,6 @@
                                                             (cape-capf-inside-comment #'cape-dict)
                                                             (cape-capf-inside-string #'cape-ispell)
                                                             (cape-capf-inside-comment #'cape-ispell)))))))))
-
-    ;; (add-hook 'prog-mode-hook
-    ;;           (lambda ()
-    ;;             ;; (unless (derived-mode-p 'emacs-lisp-mode)
-    ;;             (add-to-list 'completion-at-point-functions #'cape-file 'append)
-    ;;             (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-    ;;             (add-to-list 'completion-at-point-functions #'cape-history 'append)
-    ;;             (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-    ;;             (add-to-list 'completion-at-point-functions #'cape-dict 'append)))
 
     (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
       (add-hook modes
@@ -256,80 +247,54 @@
                                                             #'cape-dict
                                                             #'cape-ispell)))))))))
 
-  (with-eval-after-load "eglot"
-    (add-hook 'sh-mode-hook
+  (add-hook 'sh-mode-hook
+            (lambda ()
+              (add-hook 'eglot-managed-mode-hook
+                        (lambda ()
+                          (setq-local completion-at-point-functions
+                                      (list
+                                       (cape-super-capf #'eglot-completion-at-point
+                                                        #'citre-completion-at-point
+                                                        ;; #'sh-completion-at-point-function
+                                                        #'cape-file
+                                                        #'cape-dabbrev
+                                                        (cape-capf-inside-string #'cape-dict)
+                                                        (cape-capf-inside-comment #'cape-dict)
+                                                        (cape-capf-inside-string #'cape-ispell)
+                                                        (cape-capf-inside-comment #'cape-ispell))))))))
+
+  ;; (dolist (prog '(c++-mode-hook java-mode-hook python-mode-hook))
+  ;; (add-hook prog
+  ;;           (lambda ()
+  ;;             (add-hook 'eglot-managed-mode-hook
+  ;;                       (lambda()
+  ;;                         (setq-local completion-at-point-functions
+  ;;                                     (list
+  ;;                                      (cape-super-capf #'eglot-completion-at-point
+  ;;                                                       #'citre-completion-at-point
+  ;;                                                       #'cape-file
+  ;;                                                       #'cape-keyword
+  ;;                                                       #'cape-dabbrev
+  ;;                                                       (cape-capf-inside-string #'cape-dict)
+  ;;                                                       (cape-capf-inside-comment #'cape-dict)
+  ;;                                                       (cape-capf-inside-string #'cape-ispell)
+  ;;                                                       (cape-capf-inside-comment #'cape-ispell)))))))))
+
+  (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook modes
               (lambda ()
                 (add-hook 'eglot-managed-mode-hook
-                          (lambda ()
+                          (lambda()
                             (setq-local completion-at-point-functions
                                         (list
                                          (cape-super-capf #'eglot-completion-at-point
                                                           #'citre-completion-at-point
-                                                          ;; #'sh-completion-at-point-function
+                                                          ;; #'cape-tex ; Leads to unwanted completions
                                                           #'cape-file
                                                           #'cape-dabbrev
-                                                          (cape-capf-inside-string #'cape-dict)
-                                                          (cape-capf-inside-comment #'cape-dict)
-                                                          (cape-capf-inside-string #'cape-ispell)
-                                                          (cape-capf-inside-comment #'cape-ispell))))))))
+                                                          #'cape-dict
+                                                          #'cape-ispell))))))))
 
-    (dolist (lsp-prog-mode '(c++-mode-hook java-mode-hook python-mode-hook))
-      (add-hook lsp-prog-mode
-                (lambda ()
-                  (add-hook 'eglot-managed-mode-hook
-                            (lambda()
-                              (setq-local completion-at-point-functions
-                                          (list
-                                           (cape-super-capf #'eglot-completion-at-point
-                                                            #'citre-completion-at-point
-                                                            ;; #'tags-completion-at-point-function
-                                                            #'cape-file
-                                                            #'cape-keyword
-                                                            #'cape-dabbrev
-                                                            (cape-capf-inside-string #'cape-dict)
-                                                            (cape-capf-inside-comment #'cape-dict)
-                                                            (cape-capf-inside-string #'cape-ispell)
-                                                            (cape-capf-inside-comment #'cape-ispell)))))))))
-
-    (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
-      (add-hook modes
-                (lambda ()
-                  (add-hook 'eglot-managed-mode-hook
-                            (lambda()
-                              (setq-local completion-at-point-functions
-                                          (list
-                                           (cape-super-capf #'eglot-completion-at-point
-                                                            #'citre-completion-at-point
-                                                            ;; #'TeX--completion-at-point
-                                                            ;; Leads to unwanted completions
-                                                            ;; #'cape-tex
-                                                            #'cape-file
-                                                            #'cape-dabbrev
-                                                            #'cape-dict
-                                                            #'cape-ispell)))))))))
-
-  ;; (add-hook 'LaTeX-mode-hook
-  ;;           (lambda ()
-  ;;             ;; (rquire 'company-auctex)
-  ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-bibs))
-  ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-labels))
-  ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-symbols))
-  ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-environments))
-  ;;             ;; (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-auctex-macros))
-  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-tex 'append)
-  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-  ;;             ;; (add-to-list 'completion-at-point-functions #'cape-dict 'append)
-  ;;             ))
-
-  ;; (add-hook 'text-mode-hook
-  ;;           (lambda ()
-  ;;             (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
-  ;;               (setq-local completion-at-point-functions
-  ;;                           (list (cape-super-capf #'cape-file
-  ;;                                                  #'cape-dabbrev
-  ;;                                                  #'cape-dict))))))
   )
 
 (use-package kind-icon
