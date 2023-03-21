@@ -21,6 +21,10 @@
    ("C-c l r" . eglot-rename)
    ("C-c l f" . eglot-format-buffer)
    ("C-c l x" . eglot-code-actions))
+  :hook
+  ((c-mode-hook c++-mode-hook python-mode-hook markdown-mode-hook
+                sh-mode-hook LaTeX-mode-hook bibtex-mode-hook
+                html-mode-hook json-mode-hook perl-mode-hook) . eglot-ensure)
   :custom
   (eglot-autoshutdown       t)
   (eglot-extend-to-xref     t)
@@ -132,7 +136,9 @@
 (use-package eglot-java
   :after eglot
   :hook
-  (java-mode-hook . eglot-java-mode))
+  (java-mode-hook . (lambda()
+                      (eglot-ensure)
+                      (eglot-java-mode))))
 
 (provide 'init-eglot)
 

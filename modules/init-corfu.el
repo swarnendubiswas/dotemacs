@@ -49,8 +49,11 @@
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
   ;; (corfu-max-width 60)
   :config
+  ;; We can use a smaller prefix for programming languages to get faster auto-completion, but the
+  ;; popup wraps around with `corfu-terminal-mode' on TUI Emacs. Hence, a larger prefix can limit to
+  ;; more precise and smaller entries.
   (add-hook 'prog-mode-hook (lambda ()
-                              (setq-local corfu-auto-prefix 2))))
+                              (setq-local corfu-auto-prefix 3))))
 
 (use-package corfu-info
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-info))

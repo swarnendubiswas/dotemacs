@@ -68,23 +68,21 @@
              ))
 
  (json-mode . (
-               (eval . (add-hook 'lsp-managed-mode-hook
+               (eval . (add-hook 'before-save-hook
                                  (lambda ()
-                                   (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-               (eval . (add-hook 'eglot-managed-mode-hook
-                                 (lambda ()
-                                   (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
+                                   (when (bound-and-true-p lsp-managed-mode)
+                                     (lsp-format-buffer))
+                                   (when (bound-and-true-p eglot--managed-mode)
+                                     (eglot-format-buffer))) nil t))
                ))
 
  (jsonc-mode . (
-                (eval . (add-hook 'lsp-managed-mode-hook
+                (eval . (add-hook 'before-save-hook
                                   (lambda ()
-                                    (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-                (eval . (add-hook 'eglot-managed-mode-hook
-                                  (lambda ()
-                                    (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
+                                    (when (bound-and-true-p lsp-managed-mode)
+                                      (lsp-format-buffer))
+                                    (when (bound-and-true-p eglot--managed-mode)
+                                      (eglot-format-buffer))) nil t))
                 ))
 
  ;; Does not support formatting
