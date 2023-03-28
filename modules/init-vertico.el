@@ -101,7 +101,6 @@
   :bind
   (("C-x M-:" . consult-complex-command)
    ([remap repeat-complex-command] . consult-complex-command)
-   ("<f2>" . find-file)
    ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
    ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
    ;; will be shown again.
@@ -124,6 +123,7 @@
    ([remap imenu] . consult-imenu)
    ("M-g I" . consult-imenu-multi)
    ([remap load-theme] . consult-theme)
+   ("C-c h" . consult-history)
    ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
    ("C-c s l" . consult-locate)
@@ -138,7 +138,9 @@
    ([remap recentf-open-files] . consult-recent-file)
    ([remap multi-occur] . consult-multi-occur)
    :map isearch-mode-map
-   ("M-s e" . consult-isearch-history))
+   ("M-s e" . consult-isearch-history)
+   :map minibuffer-local-map
+   ("M-s" . consult-history))
   :custom
   (consult-line-start-from-top t "Start search from the beginning")
   ;; Use Consult to select xref locations with preview
@@ -154,9 +156,14 @@
   (consult-customize
    consult-theme consult-line consult-ripgrep consult-git-grep consult-grep
    consult-recent-file consult-buffer consult-bookmark consult-xref consult-yank-from-kill-ring
-   :preview-key '(:debounce 0.5 any)
+   :preview-key '(:debounce 1.5 any)
    consult-find
-   :sort t)
+   :sort t
+   consult-line consult-ripgrep consult-grep
+   ;; Initialize search string with the highlighted region
+   :initial (when (use-region-p)
+              (buffer-substring-no-properties
+               (region-beginning) (region-end))))
 
   (with-eval-after-load "projectile"
     (setq consult-project-function #'projectile-project-root)

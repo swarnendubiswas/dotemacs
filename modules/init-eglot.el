@@ -22,9 +22,10 @@
    ("C-c l f" . eglot-format-buffer)
    ("C-c l x" . eglot-code-actions))
   :hook
-  ((c-mode-hook c++-mode-hook python-mode-hook markdown-mode-hook
-                sh-mode-hook LaTeX-mode-hook bibtex-mode-hook
-                html-mode-hook json-mode-hook perl-mode-hook) . eglot-ensure)
+  ((eglot-managed-mode-hook . eglot-inlay-hints-mode)
+   ((c-mode-hook c++-mode-hook python-mode-hook markdown-mode-hook
+                 sh-mode-hook LaTeX-mode-hook bibtex-mode-hook
+                 html-mode-hook json-mode-hook perl-mode-hook) . eglot-ensure))
   :custom
   (eglot-autoshutdown       t)
   (eglot-extend-to-xref     t)
@@ -96,21 +97,11 @@
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
+  :disabled t
   :after eglot
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
-   . (lambda ()
-       (unless (derived-mode-p 'yaml-mode)
-         (require 'eglot-grammarly)
-         (eglot-ensure))))
+  :demand t
+  :init (eglot-ensure)
   :config
-  (setq eglot-ignored-server-capabilities '(:codeLensProvider
-                                            :executeCommandProvider
-                                            :hoverProvider
-                                            :foldingRangeProvider
-                                            :documentOnTypeFormattingProvider
-                                            :documentLinkProvider
-                                            :documentSymbolProvider))
   ;; (add-to-list eglot-workspace-configuration
   ;;              ((@emacs-grammarly/grammarly-languageserver
   ;;                . ((audience . "knowledgeable")))))
@@ -119,14 +110,11 @@
 (use-package eglot-ltex
   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
   :after eglot
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook)
-   . (lambda ()
-       (unless (derived-mode-p 'yaml-mode)
-         (require 'eglot-ltex)
-         (eglot-ensure))))
+  :demand t
   :init
-  (setq eglot-languagetool-server-path (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
+  (setq eglot-languagetool-server-path
+        (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
+  (eglot-ensure)
   ;; :config
   ;;(add-to-list 'eglot-workspace-configuration
   ;;           ((:ltex . ((:language "en-US")

@@ -11,6 +11,9 @@
 (defvar which-key-use-C-h-commands)
 
 (use-package transient
+  :commands transient-bind-q-to-quit
+  :custom
+  (transient-semantic-coloring t)
   :config
   ;; Allow using `q' to quit out of popups, in addition to `C-g'
   (transient-bind-q-to-quit))
@@ -66,13 +69,13 @@
   :hook
   (emacs-startup-hook . smart-mark-mode))
 
-;; ;; Operate on the current line if no region is active
-;; (use-package whole-line-or-region
-;;   :commands
-;;   (whole-line-or-region-local-mode)
-;;   :hook
-;;   (emacs-startup-hook . whole-line-or-region-global-mode)
-;;   :diminish whole-line-or-region-local-mode)
+;; Operate on the current line if no region is active
+(use-package whole-line-or-region
+  :commands
+  (whole-line-or-region-local-mode)
+  :hook
+  (emacs-startup-hook . whole-line-or-region-global-mode)
+  :diminish whole-line-or-region-local-mode)
 
 (use-package goto-last-change
   :bind
@@ -273,9 +276,6 @@
    ("C-c d s" . crux-sudo-edit))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-(setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-
 (use-package rainbow-mode
   :hook
   ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode)
@@ -285,11 +285,6 @@
   :hook
   (emacs-startup-hook . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
-
-;; ;; Use Emacsclient as the $EDITOR of child processes
-;; (use-package with-editor
-;;   :hook
-;;   (after-init-hook . shell-command-with-editor-mode))
 
 (use-package unfill
   :commands
@@ -329,8 +324,8 @@
 (use-package change-inner
   :commands (change-inner change-outer yank-inner yank-outer))
 
-(use-package link-hint
-  :commands (link-hint-open-link link-hint-copy-link))
+;; (use-package link-hint
+;;   :commands (link-hint-open-link link-hint-copy-link))
 
 (provide 'init-misc)
 

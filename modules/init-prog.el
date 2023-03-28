@@ -72,6 +72,8 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
+  :straight (fancy-compilation :host codeberg :repo "ideasman42/emacs-fancy-compilation"
+                               :branch main)
   :after compile
   :init (fancy-compilation-mode 1))
 
@@ -109,16 +111,10 @@
                        'company-abort))
   :diminish)
 
-;; (use-package eldoc-box
-;;   :commands (eldoc-box-hover-at-point-mode)
-;;   `eldoc-box-hover-at-point-mode' blocks the view because it shows up at point.
-;;   :hook (eldoc-mode-hook . eldoc-box-hover-mode)
-;;   :custom
-;;   (eldoc-box-clear-with-C-g t)
-;;   (eldoc-box-fringe-use-same-bg nil)
-;;   :diminish eldoc-box-hover-mode eldoc-box-hover-at-point-mode)
-
 ;; TODO: Try https://gitlab.com/jgkamat/rmsbolt, https://github.com/jart/disaster
+
+;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+(setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
 
 (provide 'init-prog)
 

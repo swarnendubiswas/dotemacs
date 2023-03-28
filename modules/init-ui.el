@@ -167,9 +167,10 @@
 
 (use-package olivetti
   :hook
-  (emacs-startup-hook . olivetti-mode)
+  ;; `emacs-startup-hook' does not work
+  ((text-mode-hook prog-mode-hook fundamental-mode-hook) . olivetti-mode)
   :custom
-  (olivetti-style 'fancy)
+  (olivetti-body-width 108)
   :diminish)
 
 (provide 'init-ui)

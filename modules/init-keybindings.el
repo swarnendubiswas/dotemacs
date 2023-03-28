@@ -18,6 +18,8 @@
 (declare-function sb/switch-to-scratch "init-functions")
 (declare-function sb/counsel-all-files-recursively "init-functions")
 
+;; (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+
 (bind-keys
  ("RET"       . newline-and-indent)
  ("C-l"       . goto-line)

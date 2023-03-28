@@ -23,35 +23,25 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :straight
-  (corfu :files (:defaults "extensions/*")
-         ;; :includes (corfu-indexed
-         ;;                                              corfu-quick
-         ;;                                              corfu-history
-         ;;                                              corfu-echo
-         ;;                                              corfu-info
-         ;;                                              corfu-popupinfo)
-         )
+  :straight (corfu :files (:defaults "extensions/*"))
   :if (eq sb/capf 'corfu)
-  :commands corfu--goto
   :hook
   (emacs-startup-hook . global-corfu-mode)
   :bind
   (:map corfu-map
-        ;; ("[tab]" . corfu-next)
-        ;; ("[backtab]" . corfu-previous)
-        ("[escape]" . corfu-quit)
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
         ([remap move-end-of-line] . sb/corfu-end-of-prompt))
   :custom
-  ;; (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
+  ;; (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
   ;; (corfu-max-width 60)
+  (corfu-bar-width 0 "See if this helps with corfu-terminal wrap around")
   :config
-  ;; We can use a smaller prefix for programming languages to get faster auto-completion, but the
-  ;; popup wraps around with `corfu-terminal-mode' on TUI Emacs. Hence, a larger prefix can limit to
-  ;; more precise and smaller entries.
+  ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
+  ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
+  ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
+  ;; entries.
   (add-hook 'prog-mode-hook (lambda ()
                               (setq-local corfu-auto-prefix 3))))
 
@@ -66,28 +56,31 @@
 ;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-indexed))
+  :disabled t
   :after corfu
   :commands corfu-indexed-mode
   :init (corfu-indexed-mode 1)
   :config
   ;; Bind "C-num" and "M-num" for convenience.
   ;; https://github.com/minad/corfu/issues/231
-  (use-package loopy-iter
-    :straight (loopy :type git :host github :repo "okamsn/loopy")
-    :demand t)
 
-  (loopy-iter
-   (with (map corfu-map))
-   (numbering i :from 1 :to 9)
-   (let ((idx i))
-     (define-key map (kbd (format "M-%d" i))
-       (lambda () (interactive)
-         (let ((current-prefix-arg idx))
-           (call-interactively #'corfu-insert))))
-     (define-key map (kbd (format "C-%d" i))
-       (lambda () (interactive)
-         (let ((current-prefix-arg idx))
-           (call-interactively #'corfu-complete)))))))
+  ;; (use-package loopy-iter
+  ;;   :straight (loopy :type git :host github :repo "okamsn/loopy")
+  ;;   :demand t)
+
+  ;; (loopy-iter
+  ;;  (with (map corfu-map))
+  ;;  (numbering i :from 1 :to 9)
+  ;;  (let ((idx i))
+  ;;    (define-key map (kbd (format "M-%d" i))
+  ;;      (lambda () (interactive)
+  ;;        (let ((current-prefix-arg idx))
+  ;;          (call-interactively #'corfu-insert))))
+  ;;    (define-key map (kbd (format "C-%d" i))
+  ;;      (lambda () (interactive)
+  ;;        (let ((current-prefix-arg idx))
+  ;;          (call-interactively #'corfu-complete))))))
+  )
 
 (use-package corfu-quick
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-quick))
@@ -98,13 +91,13 @@
 
 ;; We do not need this if we use prescient-based sorting.
 
-;; (use-package corfu-history
-;;   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-history))
-;;   :after (corfu savehist)
-;;   :commands corfu-history-mode
-;;   :init
-;;   (add-to-list 'savehist-additional-variables 'corfu-history)
-;;   (corfu-history-mode 1))
+(use-package corfu-history
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-history))
+  :after (corfu savehist)
+  :commands corfu-history-mode
+  :init
+  (add-to-list 'savehist-additional-variables 'corfu-history)
+  (corfu-history-mode 1))
 
 (use-package corfu-echo
   :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo))
@@ -128,7 +121,9 @@
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook
-  (corfu-mode-hook . corfu-terminal-mode))
+  (corfu-mode-hook . corfu-terminal-mode)
+  :custom
+  (corfu-terminal-position-right-margin 10))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -324,6 +319,11 @@
   :demand t
   :config
   (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
+
+(use-package corfu-quick-access
+  :straight (corfu-quick-access :type git :host codeberg :repo "spike_spiegel/corfu-quick-access.el")
+  :after corfu
+  :init (corfu-quick-access-mode 1))
 
 (provide 'init-corfu)
 

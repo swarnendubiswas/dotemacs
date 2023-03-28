@@ -428,16 +428,16 @@
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
 ;; prefix argument is given. Then it will find file at point.
 
-;; (use-package ffap
-;;   :straight (:type built-in)
-;;   :if (eq sb/minibuffer-completion 'vertico)
-;;   :demand t
-;;   :custom
-;;   (ffap-machine-p-known 'reject "Do not ping things that look like domain names")
-;;   :config
-;;   (ffap-bindings)
-;;   ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
-;;   (bind-key "<f2>" #'ffap))
+(use-package ffap
+  :straight (:type built-in)
+  :if (eq sb/minibuffer-completion 'vertico)
+  :demand t
+  :custom
+  (ffap-machine-p-known 'reject "Do not ping things that look like domain names")
+  :config
+  (ffap-bindings)
+  ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
+  (bind-key "<f2>" #'ffap))
 
 ;; (use-package doc-view
 ;;   :custom

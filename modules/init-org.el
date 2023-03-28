@@ -67,7 +67,19 @@
   ;; doesn't give any hint on which line the broken link actually is.
   (org-export-with-broken-links 'mark)
   (org-indent-indentation-per-level 1)
+  (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   :config
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+
+  (setq org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
   :bind-keymap
@@ -93,6 +105,7 @@
 
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
+  :disabled t
   :hook
   (org-mode-hook . org-bullets-mode))
 
@@ -117,17 +130,24 @@
              org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern
+  :disabled t
   :hook
   (org-mode-hook . org-modern-mode))
 
 (use-package org-modern-indent
   :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+  :disabled t
   :hook
   (org-mode-hook . org-modern-indent-mode))
 
 ;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
 ;; https://orgmode.org/manual/Escape-Character.html
 ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
+
+(use-package org-superstar
+  :disabled t
+  :hook
+  (org-mode-hook . org-superstar-mode))
 
 (provide 'init-org)
 

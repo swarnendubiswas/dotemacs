@@ -33,8 +33,6 @@
   :straight (:type built-in)
   :defines
   (dired-clean-confirm-killing-deleted-buffers)
-  :commands
-  (dired-next-line dired-jump)
   :hook
   ;; Auto refresh dired when files change
   (dired-mode-hook . auto-revert-mode)
@@ -298,11 +296,6 @@
    :map minibuffer-local-completion-map
    ("C-x C-d" . consult-dir)
    ("C-x C-j" . consult-dir-jump-file)))
-
-;; (use-package zoxide
-;;   :straight (:type git :host gitlab :repo "Vonfry/zoxide.el")
-;;   :commands
-;;   (zoxide-find-file zoxide-open-with))
 
 ;; (use-package dirvish
 ;;   :straight
