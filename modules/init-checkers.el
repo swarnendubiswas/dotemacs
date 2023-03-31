@@ -129,7 +129,7 @@
 
   (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
 
-  ;; Chain flycheck checkers with lsp-mode. We prefer to use per-project directory local variables
+  ;; Chain flycheck checkers with lsp. We prefer to use per-project directory local variables
   ;; instead of defining here.
   ;; https://github.com/flycheck/flycheck/issues/1762
 
@@ -195,7 +195,7 @@
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
    ;; Formatting LaTeX files with latexindent is very slow
-   ((bazel-mode-hook web-mode-hook markdown-mode-hook) . format-all-mode))
+   ((web-mode-hook markdown-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters '(("BibTeX" Emacs)
                            ("C" clang-format)
@@ -277,8 +277,7 @@
   (add-to-list 'flycheck-checkers 'languagetool t))
 
 (use-package consult-flycheck
-  :if (eq sb/minibuffer-completion 'vertico)
-  :after (flycheck)
+  :after (flycheck consult)
   :bind
   (:map flycheck-command-map
         ("!" . consult-flycheck)))

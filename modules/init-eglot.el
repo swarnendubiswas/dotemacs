@@ -29,7 +29,7 @@
   :custom
   (eglot-autoshutdown       t)
   (eglot-extend-to-xref     t)
-  (eglot-events-buffer-size 0)
+  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   :config
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of '(flymake company eldoc))

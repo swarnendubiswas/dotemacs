@@ -28,6 +28,7 @@
   :commands
   (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode
+  ;; By default, files ending in ".h" are treated as C files.
   (("\\.h\\'" . c++-mode)
    ("\\.c\\'" . c++-mode))
   :hook

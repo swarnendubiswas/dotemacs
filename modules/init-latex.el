@@ -15,7 +15,7 @@
 ;; performance is very poor, so I continue to prefer `auctex'.
 
 (use-package lsp-latex
-  :if (eq sb/lsp-provider 'lsp-mode)
+  :after lsp-mode
   :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
                                        lsp-latex-bibtex-formatter-line-length
                                        lsp-latex-chktex-on-open-and-save
@@ -32,9 +32,19 @@
   (lsp-latex-latex-formatter              "latexindent")
   (lsp-latex-bibtex-formatter-line-length sb/fill-column)
   (lsp-latex-chktex-on-open-and-save      t)
-  (lsp-latex-build-is-continuous          t)
   ;; Delay time in milliseconds before reporting diagnostics
   (lsp-latex-diagnostics-delay            2000)
+
+  ;; Support forward search with Evince. Inverse search is already configured with evince-synctex,
+  ;; use Ctrl+Click in the PDF document.
+  ;; (lsp-latex-forward-search-executable "evince-synctex")
+  ;; “%f” is replaced with "The path of the current TeX file", "%p" with "The path of the current
+  ;; PDF file", "%l" with "The current line number" by texlab
+  ;; (lsp-latex-forward-search-args '("-f" "%l" "%p" "\"emacsclient +%l %f\""))
+
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
   :config
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc")

@@ -208,10 +208,9 @@
   :commands
   (esup))
 
-;; (use-package bug-hunter
-;;   :if (bound-and-true-p sb/debug-init-file)
-;;   :commands
-;;   (bug-hunter-init-file bug-hunter-file))
+(use-package bug-hunter
+  :commands
+  (bug-hunter-init-file bug-hunter-file))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.

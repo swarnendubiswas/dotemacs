@@ -26,6 +26,7 @@
   (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
       (all-the-icons-install-fonts t))
   :custom
+  ;; Small icons look nicer
   (all-the-icons-scale-factor 0.9)
   (all-the-icons-faicon-scale-factor 0.9)
   (all-the-icons-wicon-scale-factor 0.9)
@@ -41,14 +42,12 @@
   :hook
   (emacs-startup-hook . all-the-icons-ivy-setup))
 
-;; This does not work well with Treemacs, and it is difficult to make out the highlighted current
-;; line.
 (use-package auto-dim-other-buffers
   :commands adob--rescan-windows
   :hook
   (emacs-startup-hook . auto-dim-other-buffers-mode))
 
-;; Decrease minibuffer font
+;; Decrease minibuffer font size
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
   (defun sb/decrease-minibuffer-font ()
@@ -63,7 +62,7 @@
 ;; (setq resize-mini-windows nil
 ;;       max-mini-window-height 5)
 
-(use-package beacon ; Highlight the cursor position when the window scrolls
+(use-package beacon ; Highlight the cursor position after the window scrolls
   :hook
   (emacs-startup-hook . beacon-mode)
   :diminish)

@@ -111,10 +111,13 @@
                        'company-abort))
   :diminish)
 
-;; TODO: Try https://gitlab.com/jgkamat/rmsbolt, https://github.com/jart/disaster
-
 ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
 (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
+
+;; TODO: Try https://github.com/jart/disaster
+
+(use-package rmsbolt
+  :commands rmsbolt-mode)
 
 (provide 'init-prog)
 

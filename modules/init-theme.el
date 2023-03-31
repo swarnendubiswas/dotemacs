@@ -18,7 +18,10 @@
   (cond
    ((eq sb/theme 'doom-molokai) (load-theme 'doom-molokai t))
    ((eq sb/theme 'doom-one) (load-theme 'doom-one t))
-   ((eq sb/theme 'doom-nord) (load-theme 'doom-nord t))))
+   ((eq sb/theme 'doom-nord) (load-theme 'doom-nord t)))
+  :config
+  (with-eval-after-load "org-mode"
+    (require 'doom-themes-ext-org)))
 
 (use-package modus-themes
   :if (or (eq sb/theme 'modus-operandi)

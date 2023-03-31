@@ -194,6 +194,9 @@ Prefer the straight.el package manager instead."
 (defconst sb/EMACS27+   (> emacs-major-version 26)
   "Non-nil if Emacs version is 27 and above.")
 
+(defconst sb/EMACS28    (= emacs-major-version 28)
+  "Non-nil if Emacs version is 28.")
+
 (defconst sb/EMACS28+   (> emacs-major-version 27)
   "Non-nil if Emacs version is 28 and above.")
 

@@ -101,7 +101,8 @@
         ("M-a"       . org-backward-paragraph)
         ("M-e"       . org-forward-paragraph)
         ("M-{"       . org-backward-element)
-        ("M-}"       . org-forward-element)))
+        ("M-}"       . org-forward-element)
+        ("C-c C-,"   . org-insert-structure-template)))
 
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
@@ -135,7 +136,7 @@
   (org-mode-hook . org-modern-mode))
 
 (use-package org-modern-indent
-  :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+  :straight (:host github :repo "jdtsmith/org-modern-indent")
   :disabled t
   :hook
   (org-mode-hook . org-modern-indent-mode))
@@ -148,6 +149,12 @@
   :disabled t
   :hook
   (org-mode-hook . org-superstar-mode))
+
+(use-package org-block-capf
+  :straight (:host github :repo "xenodium/org-block-capf")
+  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+  :custom
+  (org-block-capf-edit-style 'inline))
 
 (provide 'init-org)
 

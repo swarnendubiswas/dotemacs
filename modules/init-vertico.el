@@ -9,7 +9,6 @@
 
 (defvar sb/minibuffer-completion)
 
-;; https://kristofferbalintona.me/posts/vertico-marginalia-all-the-icons-completion-and-orderless/
 (use-package vertico
   :straight
   (vertico :files (:defaults "extensions/*") :includes (vertico-directory

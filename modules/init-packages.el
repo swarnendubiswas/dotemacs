@@ -191,8 +191,7 @@
   ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
   ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
   ;; "prettier" from $PATH are also not found without the interactive flag.
-  (setq exec-path-from-shell-arguments '("-l" "-i")
-        exec-path-from-shell-check-startup-files nil
+  (setq exec-path-from-shell-check-startup-files nil
         exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 

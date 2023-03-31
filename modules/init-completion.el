@@ -21,6 +21,27 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
+(setq completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
+      completion-ignore-case t ; Ignore case when completing
+      read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
+      read-file-name-completion-ignore-case t) ; Ignore case when reading a file name
+
+(when sb/EMACS28+
+  (setq completions-detailed nil))
+
+(dolist (exts '(".dll"
+                ".exe"
+                ".fdb_latexmk"
+                ".fls"
+                ".lof"
+                ".pyc"
+                ".rel"
+                ".rip"
+                ".synctex.gz"
+                "TAGS"))
+  (add-to-list 'completion-ignored-extensions exts))
+
+
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
 (use-package dabbrev

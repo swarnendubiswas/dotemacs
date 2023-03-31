@@ -36,8 +36,6 @@
       case-fold-search t ; Searches and matches should ignore case
       ;; Useful in `prog-mode'
       comment-auto-fill-only-comments t
-      completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
-      completion-ignore-case t ; Ignore case when completing
       confirm-kill-emacs nil
       confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
       confirm-nonexistent-file-or-buffer t
@@ -75,8 +73,6 @@
       message-log-max 5000
       ;; mouse-drag-copy-region nil ; Mouse is disabled
       ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
-      read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
-      read-file-name-completion-ignore-case t ; Ignore case when reading a file name
       read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
       remote-file-name-inhibit-locks t
       require-final-newline t ; Always end a file with a newline
@@ -110,8 +106,7 @@
       x-underline-at-descent-line t)
 
 (when sb/EMACS28+
-  (setq completions-detailed t
-        next-error-message-highlight t
+  (setq next-error-message-highlight t
         read-minibuffer-restore-windows t))
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
@@ -134,17 +129,6 @@
 (setq-default bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
               bidi-paragraph-direction 'left-to-right)
 
-(dolist (exts '(".dll"
-                ".exe"
-                ".fdb_latexmk"
-                ".fls"
-                ".lof"
-                ".pyc"
-                ".rel"
-                ".rip"
-                ".synctex.gz"
-                "TAGS"))
-  (add-to-list 'completion-ignored-extensions exts))
 
 ;; Activate utf-8, these are needed (may not be all) for icons to work well in TUI
 (set-language-environment    "UTF-8")
@@ -244,12 +228,12 @@
 
 (use-package uniquify
   :straight (:type built-in)
-  :init
-  (setq uniquify-after-kill-buffer-p t
-        uniquify-buffer-name-style   'forward
-        uniquify-ignore-buffers-re   "^\\*"
-        uniquify-separator           "/"
-        uniquify-strip-common-suffix t))
+  :custom
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-buffer-name-style   'post-forward-angle-brackets)
+  (uniquify-ignore-buffers-re   "^\\*")
+  (uniquify-separator           "/")
+  (uniquify-strip-common-suffix t))
 
 (use-package abbrev
   :straight (:type built-in)
@@ -263,6 +247,7 @@
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
 (use-package so-long
   :straight (:type built-in)
+  :if sb/EMACS28+
   :hook
   (emacs-startup-hook . global-so-long-mode))
 
@@ -462,6 +447,7 @@
   (ediff-window-setup-function #'ediff-setup-windows-plain)
   ;; Split windows horizontally in ediff (instead of vertically)
   (ediff-split-window-function #'split-window-horizontally)
+  (ediff-merge-split-window-function 'split-window-horizontally)
   :config
   (ediff-set-diff-options 'ediff-diff-options "-w"))
 
