@@ -95,7 +95,7 @@
   :diminish)
 
 (use-package which-key-posframe
-  :if (display-graphic-p)
+  :if (and (symbol-value 'sb/IS-LINUX) (display-graphic-p))
   :hook
   (which-key-mode-hook . which-key-posframe-mode))
 
@@ -610,7 +610,7 @@
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
 (use-package term-keys
-  :straight (term-keys :type git :host github :repo "CyberShadow/term-keys")
+  :straight (:host github :repo "CyberShadow/term-keys")
   :hook
   (emacs-startup-hook . term-keys-mode)
   :config

@@ -284,8 +284,7 @@ Ignore if no file is found."
 
 ;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 (use-package auctex-latexmk
-  :straight
-  (auctex-latexmk :type git :host github :repo "wang1zhen/auctex-latexmk")
+  :straight (:host github :repo "wang1zhen/auctex-latexmk")
   :after tex-mode
   :demand t
   :commands
@@ -360,8 +359,7 @@ after a successful compilation."
 ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
 ;; in "$PATH".
 (use-package math-preview
-  :straight
-  (math-preview :type git :host gitlab :repo "matsievskiysv/math-preview")
+  :straight (:host gitlab :repo "matsievskiysv/math-preview")
   :commands
   (math-preview-all math-preview-at-point math-preview-region)
   :custom

@@ -71,7 +71,7 @@
   ("C-c d t" . counsel-tramp))
 
 (use-package consult-tramp
-  :straight (consult-tramp :type git :host github :repo "Ladicle/consult-tramp")
+  :straight (:host github :repo "Ladicle/consult-tramp")
   :after consult
   :bind
   ("C-c d t" . consult-tramp))

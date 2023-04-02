@@ -64,8 +64,7 @@
        "Emacs")
       (t
        (awesome-tab-get-group-name (current-buffer))))))
-  :straight
-  (:type git :host github :repo "manateelazycat/awesome-tab")
+  :straight (:host github :repo "manateelazycat/awesome-tab")
   :if (eq sb/tab-bar-handler 'awesome-tab)
   :hook
   (emacs-startup-hook . awesome-tab-mode)

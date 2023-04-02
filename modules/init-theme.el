@@ -63,7 +63,7 @@
   :hook (emacs-startup-hook . circadian-setup))
 
 (use-package ef-themes
-  :straight (:type git :host github :repo "protesilaos/ef-themes")
+  :straight (:host github :repo "protesilaos/ef-themes")
   :if (or (eq sb/theme 'ef-dark) (eq sb/theme 'ef-trio-dark)
           (eq sb/theme 'ef-bio))
   :init
@@ -73,7 +73,7 @@
    ((eq sb/theme 'ef-bio) (load-theme 'ef-bio t))))
 
 (use-package standard-themes
-  :straight (:type git :host github :repo "protesilaos/standard-themes")
+  :straight (:host github :repo "protesilaos/standard-themes")
   :if (or (eq sb/theme 'standard-light) (eq sb/theme 'standard-dark))
   :init
   (cond

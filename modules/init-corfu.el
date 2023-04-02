@@ -310,9 +310,7 @@
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package kind-all-the-icons
-  :straight
-  (kind-all-the-icons :type git :host github
-                      :repo "Hirozy/kind-all-the-icons")
+  :straight (:host github :repo "Hirozy/kind-all-the-icons")
   :if (and (eq sb/corfu-icons 'kind-all-the-icons)
            (display-graphic-p))
   :after corfu
@@ -321,7 +319,7 @@
   (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
 (use-package corfu-quick-access
-  :straight (corfu-quick-access :type git :host codeberg :repo "spike_spiegel/corfu-quick-access.el")
+  :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
   :after corfu
   :init (corfu-quick-access-mode 1))
 

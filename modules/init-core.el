@@ -109,6 +109,9 @@
   (setq next-error-message-highlight t
         read-minibuffer-restore-windows t))
 
+(when sb/IS-WINDOWS
+  (setq w32-get-true-file-attributes nil))
+
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
 (setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows

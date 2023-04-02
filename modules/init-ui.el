@@ -108,7 +108,7 @@
   :hook
   (emacs-startup-hook . global-hl-line-mode))
 
-;; This package disables the mouse completely which is an extreme.
+;; This package disables the mouse completely.
 (use-package disable-mouse
   :if (display-mouse-p)
   :hook
@@ -124,7 +124,7 @@
 
 ;; Icons for minibuffer completion (e.g., `find-file-at-point')
 (use-package all-the-icons-completion
-  :straight (:type git :host github :repo "MintSoup/all-the-icons-completion")
+  :straight (:host github :repo "MintSoup/all-the-icons-completion")
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode
   :init (all-the-icons-completion-mode 1)
@@ -143,6 +143,14 @@
          (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
          (set-face-attribute 'mode-line nil :height 120)
          (set-face-attribute 'mode-line-inactive nil :height 120))
+
+        ((string= (system-name) "DESKTOP-4T8O69V")
+         (progn
+           (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 140)
+           ;;(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
+           ;;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
+           (set-face-attribute 'mode-line nil :height 100)
+           (set-face-attribute 'mode-line-inactive nil :height 100)))
 
         ((string= (system-name) "dell-7506")
          (progn

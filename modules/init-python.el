@@ -114,8 +114,7 @@
                                    (setq python-shell-interpreter "python3")))))
 
 (use-package python-isort
-  :straight
-  (python-isort :type git :host github :repo "wyuenho/emacs-python-isort")
+  :straight (:host github :repo "wyuenho/emacs-python-isort")
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :hook
   (python-mode-hook . python-isort-on-save-mode)

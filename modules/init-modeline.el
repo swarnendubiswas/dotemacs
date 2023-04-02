@@ -95,8 +95,7 @@
 
 ;; Minimal modeline information
 (use-package awesome-tray ; Minimal modeline information
-  :straight
-  (awesome-tray :type git :host github :repo "manateelazycat/awesome-tray")
+  :straight (:host github :repo "manateelazycat/awesome-tray")
   :if (eq sb/modeline-theme 'awesome-tray)
   :hook
   (emacs-startup-hook . awesome-tray-mode)

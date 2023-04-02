@@ -112,8 +112,7 @@
 
 ;; Do not create multiple dired buffers
 (use-package dired+
-  :straight
-  (dired+ :type git :host github :repo "emacsmirror/dired-plus")
+  :straight (:host github :repo "emacsmirror/dired-plus")
   :commands diredp-toggle-find-file-reuse-dir
   :init
   ;; Set before the module is loaded

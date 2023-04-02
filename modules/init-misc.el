@@ -91,7 +91,7 @@
     (diminish mode)))
 
 (use-package vundo
-  :straight (vundo :type git :host github :repo "casouri/vundo")
+  :straight (:host github :repo "casouri/vundo")
   :if sb/EMACS28+
   :bind
   (([remap undo] . vundo)

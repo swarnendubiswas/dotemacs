@@ -175,8 +175,7 @@
   :commands company-bibtex)
 
 (use-package company-anywhere ; Complete in the middle of words
-  :straight
-  (company-anywhere :type git :host github :repo "zk-phi/company-anywhere")
+  :straight (:host github :repo "zk-phi/company-anywhere")
   :after company
   :demand t)
 
@@ -189,7 +188,7 @@
   (company-dict-enable-yasnippet nil))
 
 (use-package company-dirfiles ; Better replacement for `company-files'
-  :straight (:type git :host github :repo "cwfoo/company-dirfiles")
+  :straight (:host github :repo "cwfoo/company-dirfiles")
   :after company
   :demand t)
 
