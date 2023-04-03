@@ -16,14 +16,13 @@
 ;; A dark theme looks good on the TUI.
 (defcustom sb/theme
   'none
-  "Specify which Emacs theme to use."
+  "Specify which Emacs theme to use, unless we are using `circadian'."
   :type  '(radio
            (const :tag "doom-one"          doom-one)
            (const :tag "doom-nord"         doom-nord)
            (const :tag "doom-molokai"      doom-molokai)
            (const :tag "modus-operandi"    modus-operandi)
            (const :tag "modus-vivendi"     modus-vivendi)
-           (const :tag "ef-dark"           ef-dark)
            (const :tag "ef-trio-dark"      ef-trio-dark)
            ;; Greenish tinge
            (const :tag "ef-bio"            ef-bio)
@@ -178,7 +177,7 @@ Prefer the straight.el package manager instead."
 ;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
 ;; Emacs core.
 (defcustom sb/lsp-provider
-  'eglot
+  'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio
           (const :tag "lsp-mode" lsp-mode)

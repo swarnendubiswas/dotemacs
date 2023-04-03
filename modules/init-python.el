@@ -20,12 +20,9 @@
   :bind
   ;; Assigning a keybinding such as "C-[" is involved, "[" is treated as `meta'
   ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
-  ;; TODO: Bind other keys suitably
-  ;; python-nav-beginning-of-block
-  ;; python-nav-end-of-block
-  ;; python-nav-backward-defun
-  ;; python-nav-forward-defun
-  ;; python-nav-backward-statement
+
+  ;; TODO: Bind other functions suitably: python-nav-beginning-of-block, python-nav-end-of-block,
+  ;; python-nav-backward-defun, python-nav-forward-defun, python-nav-backward-statement,
   ;; python-nav-forward-statement
   (:map python-mode-map
         ("C-c C-d")

@@ -184,6 +184,7 @@
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 
 (use-package exec-path-from-shell
+  :if (symbol-value 'sb/IS-LINUX)
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
   :init

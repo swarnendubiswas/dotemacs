@@ -12,7 +12,7 @@
   :hook
   (emacs-startup-hook . show-paren-mode)
   :custom
-  (show-paren-style 'parenthesis); `mixed' may lead to performance problems
+  (show-paren-style 'parenthesis) ; `mixed' may lead to performance problems
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
@@ -80,8 +80,12 @@
    ;; "foo(2,3)" -> "foo[2,3]"
    ("C-M-r" . sp-rewrap-sexp))
   :custom
-  (sp-show-pair-from-inside t)
+  (sp-show-pair-from-inside nil "show-parens is faster")
+  (sp-highlight-pair-overlay nil "show-parens is faster")
+  (sp-highlight-wrap-overlay nil "show-parens is faster")
+  (sp-highlight-wrap-tag-overlay nil)
   :config
+  ;; Introduces overhead to track parentheses pairs
   (smartparens-strict-mode -1)
 
   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
@@ -95,11 +99,19 @@
   ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
   (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
+  (sp-with-modes '(c-mode c++-mode)
+    (sp-local-pair "/\*\*" "\*\*/"))
+
+  (sp-with-modes 'java-mode
+    (sp-local-pair "/\*\*" "\*\*/")
+    (sp-local-pair "/\*" "\*/"))
+
   ;; Do not insert a "=" pair when the point is at the beginning or the end of a word
   (sp-with-modes 'org-mode
     (sp-local-pair "~" "~" :unless '(sp-point-after-word-p sp-point-before-word-p))
-    (sp-local-pair "=" "=" :unless '(sp-point-after-word-p sp-point-before-word-p)))
-
+    (sp-local-pair "=" "="
+                   :unless '(sp-point-after-word-p sp-point-before-word-p)
+                   :post-handlers '(("[d1]" "SPC"))))
   :diminish)
 
 (provide 'init-parens)

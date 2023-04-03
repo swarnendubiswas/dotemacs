@@ -21,14 +21,14 @@
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
   (centaur-tabs-set-close-button nil)
-  (centaur-tabs-show-new-tab-button nil)
+  (centaur-tabs-show-new-tab-button nil "Do not use the mouse")
   (centaur-tabs-enable-ido-completion nil)
   ;; Other styles like "wave" are not rendered on the terminal, and also does not work well with
   ;; many themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
   (centaur-tabs-show-count nil "The feature is not useful")
-  (centaur-tabs-set-icons t)
+  (centaur-tabs-set-icons (display-graphic-p) "Icons may not be rendered in all terminals")
   :config
   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
 

@@ -58,8 +58,8 @@
 
 (use-package circadian
   :custom
-  (circadian-themes '((:sunrise . modus-vivendi)
-                      (:sunset  . modus-vivendi)))
+  (circadian-themes '((:sunrise . doom-nord)
+                      (:sunset  . doom-nord)))
   :hook (emacs-startup-hook . circadian-setup))
 
 (use-package ef-themes

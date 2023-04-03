@@ -40,7 +40,8 @@
         magit-diff-highlight-trailing nil))
 
 (use-package git-modes
-  :commands gitignore-mode gitattributes-mode gitconfig-mode)
+  :commands gitignore-mode gitattributes-mode gitconfig-mode
+  :mode ("dotgitconfig" . gitconfig-mode))
 
 ;; (use-package git-gutter
 ;;   :unless (boundp 'vc-handled-backends)

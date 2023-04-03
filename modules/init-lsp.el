@@ -123,7 +123,6 @@
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
-  ;; (lsp-semantic-tokens-enable t)
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
   ;; Do not customize breadcrumb faces based on errors
   (lsp-headerline-breadcrumb-enable-diagnostics nil)
@@ -131,14 +130,12 @@
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
-  ;; (lsp-keep-workspace-alive nil)
   (lsp-lens-enable nil)
-  (lsp-log-io nil "Increases memory usage because of JSON parsing if enabled")
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
   ;; additional errors. The problem is that the modeline can get too congested.
-  (lsp-modeline-diagnostics-enable (display-graphic-p))
+  ;; (lsp-modeline-diagnostics-enable (display-graphic-p))
   (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
-  (lsp-modeline-code-actions-enable (display-graphic-p))
+  ;; (lsp-modeline-code-actions-enable (display-graphic-p))
   (lsp-modeline-workspace-status-enable nil)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position,
   ;; manually request via `lsp-signature-activate'
@@ -221,13 +218,6 @@
         ("G" . lsp-ivy-global-workspace-symbol)
         ("W" . lsp-ivy-workspace-symbol)))
 
-;; (use-package dap-mode
-;;   :if (eq sb/lsp-provider 'lsp-mode)
-;;   :commands (dap-debug dap-hydra)
-;;   :hook
-;;   ((lsp-mode-hook . dap-mode)
-;;    (lsp-mode-hook . dap-ui-mode)))
-
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
   :if (eq sb/lsp-provider 'lsp-mode)
@@ -260,7 +250,10 @@
   (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url (expand-file-name
                                  "github/dotfiles/java/eclipse-format-swarnendu.xml"
-                                 sb/user-home-directory)))
+                                 sb/user-home-directory))
+  :config
+  (with-eval-after-load "dap-mode"
+    (require 'dap-java)))
 
 (use-package consult-lsp
   :after (consult lsp)
@@ -371,17 +364,16 @@
 
 (use-package dap-mode
   :after lsp-mode
-  :commands (dap-step-in dap-next dap-continue)
+  :commands (dap-step-in dap-next dap-continue dap-debug dap-hydra)
   :init (dap-auto-configure-mode)
+  :hook
+  ((lsp-mode-hook . dap-ui-mode)
+   (lsp-mode-hook . dap-mode))
   ;; :bind
   ;; ("<f7>" . dap-step-in)
   ;; ("<f8>" . dap-next)
   ;; ("<f9>" . dap-continue)
   )
-
-(use-package dap-java
-  :straight nil
-  :after lsp-java)
 
 (provide 'init-lsp)
 

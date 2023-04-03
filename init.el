@@ -26,12 +26,6 @@
 ;; Configure existing features
 (require 'init-core)
 
-;; Appearance
-(require 'init-ui)
-(require 'init-theme)
-(require 'init-modeline)
-(require 'init-tabs)
-
 (require 'init-buffer)
 (require 'init-dired)
 
@@ -62,6 +56,7 @@
 ;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
 ;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
 ;; nice to have TexLab and Grammarly with LaTeX files.
+
 (cond
  ((eq sb/lsp-provider 'lsp-mode) (require 'init-lsp))
  ((eq sb/lsp-provider 'eglot) (require 'init-eglot)))
@@ -76,6 +71,12 @@
 
 (require 'init-functions)
 (require 'init-temp)
+
+;; Configure appearance-related settings at the end
+(require 'init-ui)
+(require 'init-theme)
+(require 'init-modeline)
+(require 'init-tabs)
 
 (require 'init-keybindings)
 

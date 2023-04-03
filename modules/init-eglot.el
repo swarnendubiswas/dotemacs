@@ -115,6 +115,8 @@
   (setq eglot-languagetool-server-path
         (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
   (eglot-ensure)
+  :custom
+  (eglot-languagetool-active-modes '(text-mode org-mode))
   ;; :config
   ;;(add-to-list 'eglot-workspace-configuration
   ;;           ((:ltex . ((:language "en-US")

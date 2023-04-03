@@ -38,6 +38,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 
 ** Marking
 
+- ~C-SPC~ - Start a mark (~set-mark-command~)
 - ~C-M-h~ - Mark function body (~c-mark-function~)
 - ~C-x h~ - Mark whole buffer (~mark-whole-buffer~)
 - ~M-h~ - Put region around current paragraph (~mark-paragraph~)

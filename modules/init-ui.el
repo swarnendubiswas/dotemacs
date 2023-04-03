@@ -145,37 +145,31 @@
          (set-face-attribute 'mode-line-inactive nil :height 120))
 
         ((string= (system-name) "DESKTOP-4T8O69V")
-         (progn
-           (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 140)
-           ;;(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
-           ;;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-           (set-face-attribute 'mode-line nil :height 100)
-           (set-face-attribute 'mode-line-inactive nil :height 100)))
+         (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 140)
+         (set-face-attribute 'mode-line nil :height 100)
+         (set-face-attribute 'mode-line-inactive nil :height 100))
 
         ((string= (system-name) "dell-7506")
-         (progn
-           (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
-           (set-face-attribute 'mode-line nil :height 120)
-           (set-face-attribute 'mode-line-inactive nil :height 120)))
+         (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
+         (set-face-attribute 'mode-line nil :height 120)
+         (set-face-attribute 'mode-line-inactive nil :height 120))
 
         ((string= (system-name) "swarnendu-Dell-XPS-L502X")
-         (progn
-           (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
-           (set-face-attribute 'mode-line nil :height 110)
-           (set-face-attribute 'mode-line-inactive nil :height 110)))
+         (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
+         (set-face-attribute 'mode-line nil :height 110)
+         (set-face-attribute 'mode-line-inactive nil :height 110))
 
         ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-         (progn
-           (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
-           (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
-           (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
-           (set-face-attribute 'mode-line nil :height 110)
-           (set-face-attribute 'mode-line-inactive nil :height 110)))))
+         (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
+         (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
+         (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
+         (set-face-attribute 'mode-line nil :height 110)
+         (set-face-attribute 'mode-line-inactive nil :height 110))))
 
 (use-package olivetti
   :hook
   ;; `emacs-startup-hook' does not work
-  ((text-mode-hook prog-mode-hook fundamental-mode-hook) . olivetti-mode)
+  ((text-mode-hook prog-mode-hook) . olivetti-mode)
   :custom
   (olivetti-body-width 108)
   :diminish)
