@@ -55,9 +55,10 @@
       ;; Disable loading of `default.el' at startup
       inhibit-default-init t)
 
-;; Do not resize the frame at this early stage. Resizing the Emacs frame can be a terribly expensive
-;; part of changing the font. By inhibiting this, we easily halve startup times with fonts that are
-;; larger than the system default.
+;; Do not resize the frame to preserve the number of columns or lines being displayed when setting
+;; font, menu bar, tool bar, tab bar, internal borders, fringes, or scroll bars. Resizing the Emacs
+;; frame can be a terribly expensive part of changing the font. By inhibiting this, we easily halve
+;; startup times with fonts that are larger than the system default.
 (setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t
       window-resize-pixelwise t

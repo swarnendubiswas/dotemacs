@@ -109,6 +109,8 @@
    ("C-,"     . sb/flyspell-goto-previous-error))
   :custom
   (flyspell-abbrev-p t "Add corrections to abbreviation table")
+  ;; Do not print messages for every word (when checking the entire buffer). This is a major
+  ;; performance gain.
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
   :diminish)

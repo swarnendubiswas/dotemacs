@@ -50,3 +50,4 @@ tramp
 !/straight/versions
 /.cask/
 /eglot-java-eclipse-jdt-cache/
+/server/

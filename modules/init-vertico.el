@@ -147,15 +147,17 @@
   (xref-show-definitions-function #'consult-xref)
   (consult-line-numbers-widen t)
   (consult-preview-key nil "Disable preview by default, enable for selected commands")
-  (completion-in-region-function #'consult-completion-in-region)
+  (completion-in-region-function #'consult-completion-in-region "Complete M-:")
   ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly
   ;; between only buffers
   (consult-buffer-sources '(consult--source-buffer))
   :config
   (consult-customize
-   consult-theme consult-line consult-ripgrep consult-git-grep consult-grep
-   consult-recent-file consult-buffer consult-bookmark consult-xref consult-yank-from-kill-ring
+   consult-line consult-ripgrep consult-git-grep consult-grep
+   consult-recent-file consult-bookmark consult-xref consult-yank-from-kill-ring
    :preview-key '(:debounce 1.5 any)
+   consult-theme consult-buffer
+   :preview-key "M-."
    consult-find
    :sort t
    consult-line consult-ripgrep consult-grep

@@ -85,12 +85,9 @@
   (:map projectile-command-map
         ("A" . projectile-add-known-project))
   :custom
-  (projectile-enable-caching nil "Caching will not watch for file system changes")
   (projectile-file-exists-remote-cache-expire nil)
   (projectile-mode-line-prefix "" "Save modeline space")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
-  ;; The contents of ".projectile" are ignored when using the `alien' project indexing method
-  (projectile-indexing-method 'alien)
   ;; No sorting should be faster, note that files are not sorted if `projectile-indexing-method' is
   ;; set to `alien'.
   (projectile-sort-order 'recently-active)
@@ -106,10 +103,21 @@
                                    "configure.in"))
   (projectile-auto-discover nil "Disable auto-search for projects for faster startup")
   :config
+  ;; Set the indexing method after checks on Windows platform since otherwise the following error
+  ;; shows up: "'tr' is not recognized as an internal or external command, operable program or batch
+  ;; file."
+
+  ;; The contents of ".projectile" are ignored when using the `alien' project indexing.
+  (when (symbol-value 'sb/IS-LINUX)
+    (setq projectile-indexing-method 'alien))
+
   ;; https://github.com/MatthewZMD/.emacs.d
   (when (and (symbol-value 'sb/IS-WINDOWS)
              (executable-find "tr"))
     (setq projectile-indexing-method 'alien))
+
+  ;; Caching will not watch for file system changes
+  (setq projectile-enable-caching (symbol-value 'sb/IS-WINDOWS))
 
   ;; Disable computing the project type that is shown on the modeline
   (defun projectile-default-mode-line ()

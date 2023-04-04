@@ -67,7 +67,7 @@
       history-delete-duplicates t
       history-length 50 ; Reduce the state that is to be read
       indicate-buffer-boundaries nil
-      kill-do-not-save-duplicates t
+      kill-do-not-save-duplicates t ; Do not save duplicates to kill ring
       kill-whole-line t ; TODO: What is the utility of this variable?
       make-backup-files nil ; Stop making backup `~' files
       message-log-max 5000
@@ -163,10 +163,10 @@
 
 (fset 'display-startup-echo-area-message #'ignore)
 
+;; Type "y"/"n" instead of "yes"/"no"
 (progn
   (if (boundp 'use-short-answers)
       (setq use-short-answers t)
-    ;; Type "y"/"n" instead of "yes"/"no"
     (fset 'yes-or-no-p 'y-or-n-p))
 
   ;; Make RETURN key act the same way as "y" key for "y-or-n" prompts.
