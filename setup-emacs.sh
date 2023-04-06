@@ -429,7 +429,7 @@ install_global() {
     GLOBAL_VER="6.6.9"
     wget http://tamacom.com/global/global-${GLOBAL_VER}.tar.gz
     tar -xzvf global-${GLOBAL_VER}.tar.gz
-    cd global-${GLOBAL_VER}
+    cd global-${GLOBAL_VER} || exit
     ./configure --with-universal-ctags=/usr/local/bin/ctags
     make
     sudo make install
@@ -485,13 +485,13 @@ install_bear() {
     make install
 }
 
-cd "$HOME"
+cd "$HOME" || exit
 
 install_powerline() {
     apt install -y socat
 
     git clone git@github.com:powerline/powerline.git
-    cd powerline
+    cd powerline || exit
     git checkout 2.8.3
     python3 -m pip install --user --editable=.
 
@@ -505,7 +505,7 @@ install_powerline() {
     mv 10-powerline-symbols.conf ~/.config/fontconfig/conf.d/
 
     git clone https://github.com/powerline/fonts.git --depth=1 powerline-fonts
-    cd powerline-fonts
+    cd powerline-fonts || exit
     ./install.sh
 }
 
@@ -580,7 +580,7 @@ install_fd() {
     rm fd_"$FD_VER"_amd64.deb
 }
 
-cd $GITHUB
+cd $GITHUB || exit
 
 install_fzf() {
     FZF_VER="0.38.0"
@@ -593,7 +593,7 @@ install_fzf() {
         cd ..
     fi
 
-    cd fzf
+    cd fzf || exit
     git checkout ${FZF_VER}
     bash ./install
 }
@@ -609,7 +609,7 @@ install_nerd_fonts_helper() {
     wget https://github.com/ryanoasis/nerd-fonts/releases/download/v"$2"/"$1".zip
     mkdir -p "$1"
     unzip "$1".zip -d "$1"
-    mv "$1"/*.ttf $HOME/.fonts
+    mv "$1"/*.ttf "$HOME"/.fonts
     rm -rf "$1"
 
 }

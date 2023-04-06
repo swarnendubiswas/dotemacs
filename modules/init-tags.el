@@ -76,7 +76,7 @@
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-capf-integration t)
-  (citre-enable-imenu-integration nil)
+  (citre-enable-imenu-integration nil) ; Breaks imenu if enabled
   (citre-edit-cmd-buf-default-cmd "ctags
 -o
 %TAGSFILE%

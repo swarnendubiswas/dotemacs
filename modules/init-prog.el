@@ -10,11 +10,17 @@
 (add-hook 'prog-mode-hook
           (lambda ()
             (auto-fill-mode 1) ; Autofill comments
-            (which-function-mode 1)
 
             ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
             (when (display-graphic-p)
               (display-fill-column-indicator-mode 1))))
+
+(use-package which-func
+  :hook
+  (prog-mode-hook . which-func-mode)
+  :custom
+  (which-func-modes '(emacs-lisp-mode c-mode c++-mode perl-mode cperl-mode python-mode
+         	                          makefile-mode sh-mode java-mode)))
 
 (use-package subword
   :straight (:type built-in)
@@ -72,8 +78,7 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
-  :straight (fancy-compilation :host codeberg :repo "ideasman42/emacs-fancy-compilation"
-                               :branch main)
+  :straight (:host codeberg :repo "ideasman42/emacs-fancy-compilation" :branch "main")
   :after compile
   :init (fancy-compilation-mode 1))
 

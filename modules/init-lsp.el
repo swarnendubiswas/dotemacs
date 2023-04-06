@@ -133,7 +133,7 @@
   (lsp-lens-enable nil)
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
   ;; additional errors. The problem is that the modeline can get too congested.
-  ;; (lsp-modeline-diagnostics-enable (display-graphic-p))
+  (lsp-modeline-diagnostics-enable nil)
   (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
   ;; (lsp-modeline-code-actions-enable (display-graphic-p))
   (lsp-modeline-workspace-status-enable nil)
@@ -268,7 +268,7 @@
 ;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 
 (use-package lsp-grammarly
-  :if (eq sb/lsp-provider 'lsp-mode)
+  :after lsp-mode
   :defines
   (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands
@@ -310,7 +310,7 @@
         ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
 (use-package lsp-ltex
-  :if (eq sb/lsp-provider 'lsp-mode)
+  :after lsp-mode
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :commands
   (lsp-ltex--downloaded-extension-path lsp-ltex--execute)

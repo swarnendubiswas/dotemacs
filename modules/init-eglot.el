@@ -64,7 +64,7 @@
                                                            :pylsp_mypy (:enabled t))))
                   (:pyright . ((useLibraryCodeForTypes . t)))))
 
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) .
+  (add-to-list 'eglot-server-programs '((c++-mode c++-ts-mode c-mode c-ts-mode) .
                                         ("clangd" "-j=4" "--all-scopes-completion"
                                          "--background-index"
                                          "--clang-tidy"
@@ -79,9 +79,12 @@
                                          "--pretty")))
 
   (add-to-list 'eglot-server-programs
-               `(python-mode . ,(eglot-alternatives
-                                 '(("pylsp" "--stdio")
-                                   ("pyright-langserver" "--stdio")))))
+               `((python-mode python-ts-mode) . ,(eglot-alternatives
+                                                  '(("pylsp" "--stdio")
+                                                    ("pyright-langserver" "--stdio")))))
+
+  (add-to-list 'eglot-server-programs
+               '((php-mode phps-mode) . ("intelephense" "--stdio")))
 
   ;; It may be more useful to use Grammarly to check these files.
   (add-to-list 'eglot-server-programs  '((tex-mode bibtex-mode latex-mode texinfo-mode

@@ -336,6 +336,12 @@
 ;;   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
 ;;   :hook (emacs-lisp-mode-hook . elisp-autofmt-mode))
 
+(use-package flycheck-eglot
+  :straight (:host github :repo "intramurz/flycheck-eglot")
+  :after (flycheck eglot)
+  :init
+  (global-flycheck-eglot-mode 1))
+
 (provide 'init-checkers)
 
 ;;; init-checkers.el ends here

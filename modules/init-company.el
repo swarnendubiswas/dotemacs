@@ -117,12 +117,10 @@
   :hook
   (prog-mode-hook . company-quickhelp-terminal-mode))
 
-;; We are using `company-prescient'.
-
-;; (use-package company-statistics
-;;   :after company
-;;   :commands company-statistics-mode
-;;   :init (company-statistics-mode 1))
+(use-package company-statistics
+  :after company
+  :commands company-statistics-mode
+  :init (company-statistics-mode 1))
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
 ;; slows completions.

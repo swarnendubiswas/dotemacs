@@ -42,11 +42,6 @@
   :hook
   (emacs-startup-hook . all-the-icons-ivy-setup))
 
-(use-package auto-dim-other-buffers
-  :commands adob--rescan-windows
-  :hook
-  (emacs-startup-hook . auto-dim-other-buffers-mode))
-
 ;; Decrease minibuffer font size
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
@@ -124,7 +119,6 @@
 
 ;; Icons for minibuffer completion (e.g., `find-file-at-point')
 (use-package all-the-icons-completion
-  :straight (:host github :repo "MintSoup/all-the-icons-completion")
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode
   :init (all-the-icons-completion-mode 1)

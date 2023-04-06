@@ -62,7 +62,8 @@
 
  ;; Bash language server does not format files
  (sh-mode . (
-             (eval . (add-hook 'before-save-hook 'delete-trailing-whitespace nil t))
+             (sb/delete-trailing-whitespace-p . t)
+             ;; (eval . (add-hook 'before-save-hook 'delete-trailing-whitespace nil t))
              ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
              (subdirs . nil)
              ))

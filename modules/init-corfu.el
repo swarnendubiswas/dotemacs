@@ -30,7 +30,8 @@
   :bind
   (:map corfu-map
         ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
-        ([remap move-end-of-line] . sb/corfu-end-of-prompt))
+        ([remap move-end-of-line] . sb/corfu-end-of-prompt)
+        ([escape] . corfu-quit))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")

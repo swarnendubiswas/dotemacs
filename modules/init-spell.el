@@ -134,8 +134,7 @@
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
-  :straight (spell-fu :host codeberg :repo "ideasman42/emacs-spell-fu"
-                      :branch main)
+  :straight (spell-fu :host codeberg :repo "ideasman42/emacs-spell-fu" :branch "main")
   :if (executable-find "aspell")
   :defines spell-fu-directory
   :commands spell-fu-mode
