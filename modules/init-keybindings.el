@@ -94,10 +94,10 @@
   (which-key-setup-side-window-right-bottom)
   :diminish)
 
-(use-package which-key-posframe
-  :if (and (symbol-value 'sb/IS-LINUX) (display-graphic-p))
-  :hook
-  (which-key-mode-hook . which-key-posframe-mode))
+;; (use-package which-key-posframe
+;;   :if (and (symbol-value 'sb/IS-LINUX) (display-graphic-p))
+;;   :hook
+;;   (which-key-mode-hook . which-key-posframe-mode))
 
 ;; Hydras, https://github.com/abo-abo/hydra
 

@@ -93,17 +93,17 @@
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
 ;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
-(use-package company-posframe
-  :if (display-graphic-p)
-  :after company
-  :commands company-posframe-mode
-  :diminish
-  :custom
-  (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-  (company-posframe-show-indicator nil "The display is not great")
-  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-  :init
-  (company-posframe-mode 1))
+;; (use-package company-posframe
+;;   :if (display-graphic-p)
+;;   :after company
+;;   :commands company-posframe-mode
+;;   :diminish
+;;   :custom
+;;   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
+;;   (company-posframe-show-indicator nil "The display is not great")
+;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+;;   :init
+;;   (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
@@ -190,11 +190,11 @@
   :after company
   :demand t)
 
-(use-package consult-company
-  :after (company consult)
-  :bind
-  (:map company-mode-map
-        ([remap completion-at-point] . consult-company)))
+;; (use-package consult-company
+;;   :after (company consult)
+;;   :bind
+;;   (:map company-mode-map
+;;         ([remap completion-at-point] . consult-company)))
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))

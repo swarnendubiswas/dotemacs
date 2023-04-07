@@ -98,7 +98,6 @@
 
 (use-package eldoc
   :straight (:type built-in)
-  :if (symbol-value 'sb/IS-LINUX)
   :hook
   (prog-mode-hook . turn-on-eldoc-mode)
   :custom

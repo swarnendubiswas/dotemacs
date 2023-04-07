@@ -2,13 +2,13 @@
 
 * GNU Emacs
 
-This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform, and are not extensively tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform and are not extensively tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ** Install GNU Emacs
 
 *** Ubuntu PPA
 
-The Emacs version on Ubuntu is usually outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but I personally prefer to build from source [[[*Build GNU Emacs]]].
+The Emacs version on Ubuntu is usually outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but I prefer to build from source [[[*Build GNU Emacs]]].
 
 #+begin_src shell
 sudo add-apt-repository -y ppa:kelleyk/emacs
@@ -16,7 +16,7 @@ sudo apt update
 sudo apt install emacs28-nativecomp
 #+end_src
 
-*** Build GNU Emacs from source
+*** Build GNU Emacs from the source
 
 Add the following repository only if you are using Ubuntu 20.04.
 

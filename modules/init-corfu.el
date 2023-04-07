@@ -23,7 +23,7 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :straight (corfu :files (:defaults "extensions/*"))
+  :straight (:files (:defaults "extensions/*"))
   :if (eq sb/capf 'corfu)
   :hook
   (emacs-startup-hook . global-corfu-mode)
@@ -47,7 +47,7 @@
                               (setq-local corfu-auto-prefix 3))))
 
 (use-package corfu-info
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-info))
+  :straight (:files (:defaults "extensions/*") :includes (corfu-info))
   :after corfu
   :bind
   (:map corfu-map
@@ -56,7 +56,7 @@
 
 ;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-indexed))
+  :straight (:files (:defaults "extensions/*") :includes (corfu-indexed))
   :disabled t
   :after corfu
   :commands corfu-indexed-mode
@@ -84,7 +84,7 @@
   )
 
 (use-package corfu-quick
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-quick))
+  :straight (:files (:defaults "extensions/*") :includes (corfu-quick))
   :after corfu
   :bind
   (:map corfu-map
@@ -93,7 +93,7 @@
 ;; We do not need this if we use prescient-based sorting.
 
 (use-package corfu-history
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-history))
+  :straight (:files (:defaults "extensions/*") :includes (corfu-history))
   :after (corfu savehist)
   :commands corfu-history-mode
   :init
@@ -101,14 +101,14 @@
   (corfu-history-mode 1))
 
 (use-package corfu-echo
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo))
+  :straight (:files (:defaults "extensions/*") :includes (corfu-echo))
   :after corfu
   :commands corfu-echo-mode
   :init
   (corfu-echo-mode 1))
 
 (use-package corfu-popupinfo
-  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-popupinfo))
+  :straight (:files (:defaults "extensions/*") :includes (corfu-popupinfo))
   :after corfu
   :commands corfu-popupinfo-mode
   :init
