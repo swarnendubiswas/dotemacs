@@ -101,7 +101,9 @@
   (setq file-name-handler-alist nil)
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (setq file-name-handler-alist file-name-handler-alist-orig))))
+              (setq file-name-handler-alist file-name-handler-alist-orig)
+              (garbage-collect))
+            t))
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This is also useful if
 ;; we prefer "straight.el" over "package.el".

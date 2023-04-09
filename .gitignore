@@ -51,3 +51,5 @@ tramp
 /.cask/
 /eglot-java-eclipse-jdt-cache/
 /server/
+/hunspell/
+/elisp-autofmt-cache/

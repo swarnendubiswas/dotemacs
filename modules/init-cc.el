@@ -77,7 +77,6 @@
    ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
-  :commands opencl-mode
   :mode "\\.cl\\'")
 
 (use-package cmake-mode

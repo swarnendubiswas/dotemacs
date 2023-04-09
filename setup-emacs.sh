@@ -557,7 +557,7 @@ install_zoxide() {
 }
 
 install_bat() {
-    BAT_VER="0.22.0"
+    BAT_VER="0.23.0"
 
     wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
     dpkg -i bat_"$BAT_VER"_amd64.deb
@@ -573,7 +573,7 @@ install_marksman() {
 }
 
 install_fd() {
-    FD_VER="8.6.0"
+    FD_VER="8.7.0"
 
     wget https://github.com/sharkdp/fd/releases/download/v"$FD_VER"/fd_"$FD_VER"_amd64.deb
     dpkg -i fd_"$FD_VER"_amd64.deb
@@ -583,7 +583,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.38.0"
+    FZF_VER="0.39.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git

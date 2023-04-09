@@ -64,11 +64,9 @@
 
 (use-package ef-themes
   :straight (:host github :repo "protesilaos/ef-themes")
-  :if (or (eq sb/theme 'ef-dark) (eq sb/theme 'ef-trio-dark)
-          (eq sb/theme 'ef-bio))
+  :if (or (eq sb/theme 'ef-trio-dark) (eq sb/theme 'ef-bio))
   :init
   (cond
-   ((eq sb/theme 'ef-dark) (load-theme 'ef-dark t))
    ((eq sb/theme 'ef-trio-dark) (load-theme 'ef-trio-dark t))
    ((eq sb/theme 'ef-bio) (load-theme 'ef-bio t))))
 

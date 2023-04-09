@@ -235,23 +235,14 @@
 
     (defun sb/company-latex-mode ()
       "Add backends for latex completion in company mode."
-
-      (setq-local company-minimum-prefix-length 3)
-
       (make-local-variable 'company-backends)
 
-      ;; https://github.com/TheBB/company-reftex/issues/10
+      ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
 
       ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
       ;; labels and citations. `company-reftex-labels' is expected to be better than
       ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
       ;; `company-auctex-bibs'
-
-      ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
-      ;; ((:separate company-reftex-labels company-reftex-citations)
-      ;; (:separate company-auctex-symbols company-auctex-environments company-capf company-auctex-macros)
-      ;; (company-semantic company-dabbrev-code company-gtags company-etags company-keywords)
-      ;; company-files company-dabbrev)
 
       (setq company-backends '(company-dirfiles
                                (company-math-symbols-latex ; Math latex tags
@@ -284,39 +275,15 @@
                        ;; (diminish 'company-fuzzy-mode)
                        ))))
 
-  ;; https://emacs.stackexchange.com/questions/21171/company-mode-completion-for-org-keywords
-  (progn
-    (declare-function sb/company-org-mode "init-company")
-
-    (defun sb/company-org-mode ()
-      "Add backends for org-mode completion with company mode."
-
-      (setq-local company-minimum-prefix-length 3)
-      (make-local-variable 'company-backends)
-      (setq company-backends '(company-dirfiles
-                               (company-ispell :with
-                                               company-dabbrev
-                                               company-dict
-                                               :separate))))
-
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (sb/company-org-mode))))
-
   (progn
     (declare-function sb/company-text-mode "init-company")
 
     (defun sb/company-text-mode ()
       "Add backends for text completion in company mode."
-      (defvar company-minimum-prefix-length)
       (defvar company-backends)
-
-      ;; Slightly larger value to have more precise matches and so that the popup does not block
-      (setq-local company-minimum-prefix-length 3)
-
       (set (make-local-variable 'company-backends)
            '(company-dirfiles
-             (company-ispell
+             (company-ispell :with
               company-dabbrev
               company-dict
               :separate))))
@@ -325,32 +292,29 @@
     (add-hook 'text-mode-hook
               (lambda ()
                 (unless (or (derived-mode-p 'latex-mode)
-                            (derived-mode-p 'LaTeX-mode)
-                            (derived-mode-p 'org-mode))
+                            (derived-mode-p 'LaTeX-mode))
                   (sb/company-text-mode)
 
                   ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
 
                   ))))
 
-  ;; `company-clang' is slow:
-  ;; https://emacs.stackexchange.com/questions/19072/company-completion-very-slow
   (progn
     (defun sb/company-prog-mode ()
       "Add backends for `prog-mode' completion in company mode."
       (defvar company-minimum-prefix-length)
-      (defvar company-backends)
-
       ;; Typing short prefixes help with faster completion and a more responsive UI
       (setq-local company-minimum-prefix-length 2)
 
+      (defvar company-backends)
       (make-local-variable 'company-backends)
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-      (setq company-backends '(company-dirfiles
+
+      (cond ((eq sb/lsp-provider 'eglot)
+             (setq company-backends '(company-dirfiles
                                (company-capf
-                                ;; FIXME: Cannot use this backend with eglot
-                                ;; company-citre-tags
+                                ;; Cannot use company-citre-tags backend with eglot
                                 company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet
                                 :separate)
@@ -358,6 +322,17 @@
                                                 company-dict
                                                 company-ispell
                                                 :separate))))
+            ((eq sb/lsp-provider 'lsp-mode)
+             (setq company-backends '(company-dirfiles
+                               (company-capf
+                                company-citre-tags
+                                company-dabbrev-code ; Useful for variable names
+                                :with company-yasnippet
+                                :separate)
+                               (company-dabbrev :with
+                                                company-dict
+                                                company-ispell
+                                                :separate))))))
 
     (add-hook 'prog-mode-hook
               (lambda ()
@@ -370,16 +345,15 @@
     (defun sb/company-elisp-mode ()
       "Add backends for `emacs-lisp-mode' completion in company mode."
       (defvar company-minimum-prefix-length)
-      (defvar company-backends)
-
       ;; Typing short prefixes help with faster completion and a more responsive UI
       (setq-local company-minimum-prefix-length 2)
 
+      (defvar company-backends)
       (make-local-variable 'company-backends)
 
-      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends '(company-dirfiles
-                               (company-citre-tags
+                               (company-capf
+                                company-citre-tags
                                 company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet
                                 :separate)
@@ -391,7 +365,6 @@
     (add-hook 'emacs-lisp-mode-hook
               (lambda ()
                 (sb/company-elisp-mode)))))
-
 
 (provide 'init-company)
 
