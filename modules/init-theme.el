@@ -57,10 +57,13 @@
 ;; Set `sb/theme' to `none' if you use this package
 
 (use-package circadian
-  :custom
-  (circadian-themes '((:sunrise . doom-nord)
-                      (:sunset  . doom-nord)))
-  :hook (emacs-startup-hook . circadian-setup))
+  :hook (emacs-startup-hook . circadian-setup)
+  :config
+  (if (display-graphic-p)
+      (setq circadian-themes '((:sunrise . doom-nord)
+                               (:sunset  . doom-nord)))
+    (setq circadian-themes '((:sunrise . modus-vivendi)
+                             (:sunset . modus-vivendi)))))
 
 (use-package ef-themes
   :straight (:host github :repo "protesilaos/ef-themes")

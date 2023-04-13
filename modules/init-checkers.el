@@ -19,53 +19,56 @@
 (use-package writegood-mode
   :commands
   (writegood-passive-voice-turn-off
-   writegood-passive-voice-turn-on
-   writegood-weasels-turn-on
-   writegood-weasels-turn-off
-   writegood-duplicates-turn-on
-   writegood-duplicates-turn-off)
+    writegood-passive-voice-turn-on
+    writegood-weasels-turn-on
+    writegood-weasels-turn-off
+    writegood-duplicates-turn-on
+    writegood-duplicates-turn-off)
   :hook (text-mode-hook . writegood-duplicates-turn-on)
   :config
   ;; https://emacs.stackexchange.com/questions/32644/how-to-concatenate-two-lists
   ;; https://emacs.stackexchange.com/questions/20465/append-lists-smartly
-  (let ((sb/weasel-words
-         '("actionable"
-           "actually"
-           "basically"
-           "clearly"
-           "easily"
-           "easy"
-           "it turns out that"
-           "In this regard"
-           "In this sense"
-           "With this in mind"
-           "With the above in mind"
-           "may have"
-           "often"
-           "simple"
-           "probably"
-           "simply"
-           "specifically")))
+  (let
+    (
+      (sb/weasel-words
+        '
+        ("actionable"
+          "actually"
+          "basically"
+          "clearly"
+          "easily"
+          "easy"
+          "it turns out that"
+          "In this regard"
+          "In this sense"
+          "With this in mind"
+          "With the above in mind"
+          "may have"
+          "often"
+          "simple"
+          "probably"
+          "simply"
+          "specifically")))
     (cl-union writegood-weasel-words sb/weasel-words))
   :diminish)
 
 (use-package flycheck
   :commands
   (flycheck-add-next-checker
-   flycheck-next-checker
-   flycheck-mode
-   flycheck-previous-error
-   flycheck-describe-checker
-   flycheck-buffer
-   flycheck-list-errors
-   flycheck-select-checker
-   flycheck-verify-setup
-   flycheck-next-error
-   flycheck-disable-checker
-   flycheck-add-mode
-   flycheck-manual
-   flycheck-display-error-messages-unless-error-list
-   flycheck-sexp-to-string)
+    flycheck-next-checker
+    flycheck-mode
+    flycheck-previous-error
+    flycheck-describe-checker
+    flycheck-buffer
+    flycheck-list-errors
+    flycheck-select-checker
+    flycheck-verify-setup
+    flycheck-next-error
+    flycheck-disable-checker
+    flycheck-add-mode
+    flycheck-manual
+    flycheck-display-error-messages-unless-error-list
+    flycheck-sexp-to-string)
   :hook (after-init-hook . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we want the
@@ -81,7 +84,7 @@
   :config
   ;; Terminal Emacs does not support fringes
   (if (display-graphic-p)
-      (setq flycheck-indication-mode 'left-fringe)
+    (setq flycheck-indication-mode 'left-fringe)
     (setq flycheck-indication-mode 'left-margin))
 
   ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
@@ -93,56 +96,58 @@
     (setq flycheck-mode-line nil))
 
   (setq-default
-   flycheck-markdown-markdownlint-cli-config
-   (expand-file-name ".markdownlint.json" sb/user-home-directory)
-   flycheck-chktexrc "chktexrc"
-   flycheck-pylintrc '("setup.cfg" "pylintrc")
-   flycheck-python-pylint-executable "python3"
-   flycheck-shellcheck-follow-sources nil)
+    flycheck-markdown-markdownlint-cli-config
+    (expand-file-name ".markdownlint.json" sb/user-home-directory)
+    flycheck-chktexrc "chktexrc"
+    flycheck-pylintrc '("setup.cfg" "pylintrc")
+    flycheck-python-pylint-executable "python3"
+    flycheck-shellcheck-follow-sources nil)
 
   ;; Add support for textidote
-  (flycheck-define-checker tex-textidote
+  (flycheck-define-checker
+    tex-textidote
     "A LaTeX grammar/spelling checker using textidote.
   See https://github.com/sylvainhalle/textidote."
     :modes (latex-mode plain-tex-mode)
     :command
     ("java"
-     "-jar"
-     (eval (expand-file-name (no-littering-expand-etc-file-name "textidote.jar")))
-     "--read-all"
-     "--output"
-     "singleline"
-     "--no-color"
-     "--check"
-     (eval
-      (if ispell-current-dictionary
+      "-jar"
+      (eval (expand-file-name (no-littering-expand-etc-file-name "textidote.jar")))
+      "--read-all"
+      "--output"
+      "singleline"
+      "--no-color"
+      "--check"
+      (eval
+        (if ispell-current-dictionary
           (substring ispell-current-dictionary 0 2)
-        "en"))
-     ;; Try to honor local aspell dictionary and replacements if they exist
-     "--dict"
-     (eval (expand-file-name ispell-personal-dictionary))
-     "--replace"
-     (eval (expand-file-name "~/.aspell.en.prepl"))
-     "--ignore"
-     "lt:en:MORFOLOGIK_RULE_EN_US,lt:en:WORD_CONTAINS_UNDERSCORE"
-     ;; Using source ensures that a single temporary file in a different dir is created
-     ;; such that textidote won't process other files. This serves as a hacky workaround for
-     ;; https://github.com/sylvainhalle/textidote/issues/200.
-     source)
+          "en"))
+      ;; Try to honor local aspell dictionary and replacements if they exist
+      "--dict"
+      (eval (expand-file-name ispell-personal-dictionary))
+      "--replace"
+      (eval (expand-file-name "~/.aspell.en.prepl"))
+      "--ignore"
+      "lt:en:MORFOLOGIK_RULE_EN_US,lt:en:WORD_CONTAINS_UNDERSCORE"
+      ;; Using source ensures that a single temporary file in a different dir is created
+      ;; such that textidote won't process other files. This serves as a hacky workaround for
+      ;; https://github.com/sylvainhalle/textidote/issues/200.
+      source)
     :error-patterns
-    ((warning
-      line-start
-      (file-name)
-      "(L"
-      line
-      "C"
-      column
-      "-"
-      (or (seq "L" end-line "C" end-column) "?")
-      "): "
-      (message (one-or-more (not "\"")))
-      (one-or-more not-newline)
-      line-end)))
+    (
+      (warning
+        line-start
+        (file-name)
+        "(L"
+        line
+        "C"
+        column
+        "-"
+        (or (seq "L" end-line "C" end-column) "?")
+        "): "
+        (message (one-or-more (not "\"")))
+        (one-or-more not-newline)
+        line-end)))
 
   (add-to-list 'flycheck-checkers 'tex-textidote)
 
@@ -156,8 +161,8 @@
 
   (defun sb/flycheck-may-check-automatically (&rest _conditions)
     (or (null buffer-file-name)
-        (let ((bufname (file-truename buffer-file-name)))
-          (not (seq-some (lambda (re) (string-match-p re bufname)) sb/excluded-directory-regexps)))))
+      (let ((bufname (file-truename buffer-file-name)))
+        (not (seq-some (lambda (re) (string-match-p re bufname)) sb/excluded-directory-regexps)))))
 
   (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
 
@@ -169,7 +174,7 @@
 
   (defun sb/flycheck-checker-get (fn checker property)
     (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
-        (funcall fn checker property)))
+      (funcall fn checker property)))
 
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
@@ -198,22 +203,25 @@
   :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-   ;; Formatting LaTeX files with latexindent is very slow
-   ((web-mode-hook markdown-mode-hook) . format-all-mode))
+    ;; Formatting LaTeX files with latexindent is very slow
+    ((web-mode-hook markdown-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters
-   '(("BibTeX" Emacs)
-     ("C" clang-format)
-     ("C++" clang-format)
-     ("Cuda" clang-format)
-     ("Emacs Lisp" emacs-lisp)
-     ("HTML" tidy)
-     ("LaTeX" latexindent)
-     ("Markdown" prettier)
-     ("Perl" perltidy)
-     ("Python" (yapf "--style" "file") isort)
-     ("Shell script" shfmt)
-     ("YAML" prettier)))
+    '
+    (("Assembly" asmfmt)
+      ("BibTeX" Emacs)
+      ("C" clang-format)
+      ("C++" clang-format)
+      ("Cuda" clang-format)
+      ("Emacs Lisp" emacs-lisp)
+      ("Fish" fish-indent)
+      ("HTML" tidy)
+      ("LaTeX" latexindent)
+      ("Markdown" prettier "--print-width" "100")
+      ("Perl" perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100")
+      ("Python" (yapf "--style" "file") isort)
+      ("Shell script" shfmt)
+      ("YAML" prettier "--print-width" "100")))
   :diminish)
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
@@ -225,9 +233,9 @@
   :demand t
   :config
   (setq
-   flycheck-grammarly-check-time 3
-   ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-   flycheck-checkers (delete 'grammarly flycheck-checkers))
+    flycheck-grammarly-check-time 3
+    ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
+    flycheck-checkers (delete 'grammarly flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'grammarly t))
 
@@ -238,19 +246,20 @@
   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
   :init
   (setq
-   langtool-default-language "en-US"
-   languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-   languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-   languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
-   langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-   langtool-disabled-rules
-   '("MORFOLOGIK_RULE_EN_US"
-     ;; "WHITESPACE_RULE"
-     ;; "EN_QUOTES"
-     ;; "DASH_RULE"
-     ;; "OXFORD_SPELLING_ISE_VERBS"
-     ;; "OXFORD_SPELLING_NOUNS")
-     )))
+    langtool-default-language "en-US"
+    languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+    languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
+    languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
+    langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
+    langtool-disabled-rules
+    '
+    ("MORFOLOGIK_RULE_EN_US"
+      ;; "WHITESPACE_RULE"
+      ;; "EN_QUOTES"
+      ;; "DASH_RULE"
+      ;; "OXFORD_SPELLING_ISE_VERBS"
+      ;; "OXFORD_SPELLING_NOUNS")
+      )))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
@@ -259,9 +268,10 @@
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :demand t
   :init
-  (setq flycheck-languagetool-server-jar
-   (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
-   flycheck-checkers (delete 'languagetool flycheck-checkers))
+  (setq
+    flycheck-languagetool-server-jar
+    (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
+    flycheck-checkers (delete 'languagetool flycheck-checkers))
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
@@ -273,16 +283,16 @@
 ;; support via `lsp-grammarly' and `lsp-ltex'. We need to enable `flycheck' support for the
 ;; "*scratch*" buffer which is in `text-mode'.
 (add-hook
- 'text-mode-hook
- (lambda ()
-   (when (string= (buffer-name) "*scratch*")
-     (if (featurep 'flycheck-grammarly)
-         (progn
-           (flycheck-select-checker 'grammarly)
-           (when (featurep 'flycheck-languagetool)
-             (flycheck-add-next-checker 'grammarly 'languagetool)))
-       (when (featurep 'flycheck-languagetool)
-         (flycheck-select-checker 'languagetool))))))
+  'text-mode-hook
+  (lambda ()
+    (when (string= (buffer-name) "*scratch*")
+      (if (featurep 'flycheck-grammarly)
+        (progn
+          (flycheck-select-checker 'grammarly)
+          (when (featurep 'flycheck-languagetool)
+            (flycheck-add-next-checker 'grammarly 'languagetool)))
+        (when (featurep 'flycheck-languagetool)
+          (flycheck-select-checker 'languagetool))))))
 
 (use-package highlight-indentation
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
@@ -293,8 +303,7 @@
 (use-package elisp-autofmt
   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
   :hook (emacs-lisp-mode-hook . elisp-autofmt-mode)
-  :custom
-  (elisp-autofmt-style 'fixed))
+  :custom (elisp-autofmt-style 'fixed))
 
 (use-package flycheck-eglot
   :straight (:host github :repo "intramurz/flycheck-eglot")

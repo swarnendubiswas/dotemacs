@@ -7,8 +7,7 @@
 
 ;;; Code:
 
-(defgroup sb/emacs
-  nil
+(defgroup sb/emacs nil
   "Personal configuration for GNU Emacs."
   :group 'local)
 
@@ -30,8 +29,10 @@
 (require 'init-dired)
 
 (cond
- ((eq sb/minibuffer-completion 'ivy) (require 'init-ivy))
- ((eq sb/minibuffer-completion 'vertico) (require 'init-vertico)))
+  ((eq sb/minibuffer-completion 'ivy)
+    (require 'init-ivy))
+  ((eq sb/minibuffer-completion 'vertico)
+    (require 'init-vertico)))
 
 (require 'init-project)
 (require 'init-spell)
@@ -44,8 +45,10 @@
 (require 'init-tags)
 
 (cond
- ((eq sb/capf 'corfu) (require 'init-corfu))
- ((eq sb/capf 'company) (require 'init-company)))
+  ((eq sb/capf 'corfu)
+    (require 'init-corfu))
+  ((eq sb/capf 'company)
+    (require 'init-company)))
 ;; It is recommended to load `yasnippet' before `eglot'
 (require 'init-completion)
 
@@ -58,8 +61,10 @@
 ;; nice to have TexLab and Grammarly with LaTeX files.
 
 (cond
- ((eq sb/lsp-provider 'lsp-mode) (require 'init-lsp))
- ((eq sb/lsp-provider 'eglot) (require 'init-eglot)))
+  ((eq sb/lsp-provider 'lsp-mode)
+    (require 'init-lsp))
+  ((eq sb/lsp-provider 'eglot)
+    (require 'init-eglot)))
 
 (require 'init-cc)
 (require 'init-python)
@@ -81,16 +86,23 @@
 (require 'init-keybindings)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (if (bound-and-true-p sb/disable-package.el)
-                (let ((gc-time (float-time gc-elapsed)))
-                  (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
-                           (emacs-init-time) gc-time gcs-done))
-              (let ((packages (length package-activated-list))
-                    (gc-time  (float-time gc-elapsed)))
-                (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
-                         (emacs-init-time) packages gc-time gcs-done))
-              )))
+(add-hook
+  'emacs-startup-hook
+  (lambda ()
+    (if (bound-and-true-p sb/disable-package.el)
+      (let ((gc-time (float-time gc-elapsed)))
+        (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
+          (emacs-init-time)
+          gc-time
+          gcs-done))
+      (let
+        (
+          (packages (length package-activated-list))
+          (gc-time (float-time gc-elapsed)))
+        (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
+          (emacs-init-time)
+          packages
+          gc-time
+          gcs-done)))))
 
 ;;; init.el ends here

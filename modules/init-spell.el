@@ -39,6 +39,19 @@
     (setq ispell-program-name "aspell"
           ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))
 
+  (when (and (symbol-value 'sb/IS-LINUX) (executable-find "hunspell"))
+    (setenv "LANG" "en_US")
+    (setenv "DICTIONARY" "en_US")
+    (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
+
+    (setq ispell-local-dictionary "en_US"
+          ispell-program-name "hunspell"
+          ispell-local-dictionary-alist
+          '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+          ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+          ispell-hunspell-dict-paths-alist
+	      `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
+
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))

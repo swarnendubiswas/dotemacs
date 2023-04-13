@@ -82,6 +82,10 @@
   ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
   (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
+(use-package tabgo
+  :straight (:host github :repo "isamert/tabgo.el")
+  :bind ("M-t" . tabgo))
+
 (provide 'init-tabs)
 
 ;;; init-tabs.el ends here

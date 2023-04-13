@@ -330,6 +330,10 @@
   (:map dired-mode-map
         ("C-c C-r" . dired-rsync)))
 
+(use-package dired-gitignore
+  :straight (:host github :repo "johannes-mueller/dired-gitignore.el")
+  :hook (dired-mode-hook . dired-gitignore-mode))
+
 (provide 'init-dired)
 
 ;;; init-dired.el ends here

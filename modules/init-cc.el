@@ -23,58 +23,62 @@
 
 (use-package cc-mode
   :straight (:type built-in)
-  :defines
-  (c-electric-brace c-enable-auto-newline c-set-style)
-  :commands
-  (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
+  :defines (c-electric-brace c-enable-auto-newline c-set-style)
+  :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode
   ;; By default, files ending in ".h" are treated as C files.
-  (("\\.h\\'" . c++-mode)
-   ("\\.c\\'" . c++-mode))
+  (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
   :hook
-  (c++-mode-hook . (lambda ()
-                     (setq-local c-set-style "cc-mode"
-                                 c-basic-offset 2)
-                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+  (c++-mode-hook
+    .
+    (lambda ()
+      (setq-local
+        c-set-style "cc-mode"
+        c-basic-offset 2)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
   :bind
-  (:map c-mode-base-map
-        ("C-M-a" . c-beginning-of-defun)
-        ("C-M-e" . c-end-of-defun)
-        ("M-q"   . c-fill-paragraph)
-        ("C-c C-d")
-        :map c-mode-map
-        ("C-M-a"))
+  (:map
+    c-mode-base-map
+    ("C-M-a" . c-beginning-of-defun)
+    ("C-M-e" . c-end-of-defun)
+    ("M-q" . c-fill-paragraph)
+    ("C-c C-d")
+    :map
+    c-mode-map
+    ("C-M-a"))
   :config
   ;; Disable electric indentation and on-type formatting
-  (add-hook 'c++-mode-hook
-            (lambda ()
-              (setq-local c-auto-newline nil
-                          ;; c-electric-brace nil
-                          c-electric-flag nil
-                          ;; c-electric-indent nil
-                          c-enable-auto-newline nil
-                          c-syntactic-indentation nil)))
+  (add-hook
+    'c++-mode-hook
+    (lambda ()
+      (setq-local
+        c-auto-newline nil
+        ;; c-electric-brace nil
+        c-electric-flag nil
+        ;; c-electric-indent nil
+        c-enable-auto-newline nil
+        c-syntactic-indentation nil)))
 
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection "clangd")
-      :major-modes '(c-mode c++-mode)
-      :remote? t
-      :server-id 'clangd-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection "clangd")
+        :major-modes '(c-mode c++-mode)
+        :remote? t
+        :server-id 'clangd-r))))
 
 ;; Better highlight for modern C++
 (use-package modern-cpp-font-lock
-  :hook
-  (c++-mode-hook . modern-c++-font-lock-mode)
+  :hook (c++-mode-hook . modern-c++-font-lock-mode)
   :diminish modern-c++-font-lock-mode)
 
 (use-package cuda-mode
   :commands cuda-mode
-  :mode
-  (("\\.cu\\'"  . c++-mode)
-   ("\\.cuh\\'" . c++-mode)))
+  :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
   :mode "\\.cl\\'")
@@ -84,29 +88,32 @@
   :commands cmake-mode
   :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
-  (cmake-mode-hook . (lambda ()
-                       (spell-fu-mode -1)
-                       (flyspell-mode -1)
-                       (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                             ((eq sb/lsp-provider 'lsp-mode)
-                              (progn
-                                ;; Disable text checkers
-                                (make-local-variable 'lsp-disabled-clients)
-                                (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                                (lsp-deferred))))))
+  (cmake-mode-hook
+    .
+    (lambda ()
+      (spell-fu-mode -1)
+      (flyspell-mode -1)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (progn
+            ;; Disable text checkers
+            (make-local-variable 'lsp-disabled-clients)
+            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+            (lsp-deferred))))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection "cmake-language-server")
-      :major-modes '(cmake-mode)
-      :remote? t
-      :server-id 'cmakels-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection "cmake-language-server")
+        :major-modes '(cmake-mode)
+        :remote? t
+        :server-id 'cmakels-r))))
 
 ;; Advanced syntax coloring support for CMake scripts.
 (use-package cmake-font-lock
-  :hook
-  (cmake-mode-hook . cmake-font-lock-activate))
+  :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 (provide 'init-cc)
 

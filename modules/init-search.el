@@ -77,6 +77,8 @@
 ;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
 (use-package wgrep ; Writable grep
+  ;; Allows you to edit a deadgrep buffer and apply those changes to the file buffer.
+  :hook (deadgrep-finished-hook . wgrep-deadgrep-setup)
   :bind
   (:map grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
         ("C-x C-p" . wgrep-change-to-wgrep-mode)

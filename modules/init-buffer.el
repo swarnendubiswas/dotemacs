@@ -13,18 +13,15 @@
 
 (use-package ibuffer
   :straight (:type built-in)
-  :hook
-  (ibuffer-hook . ibuffer-auto-mode)
-  :bind
-  ("C-x C-b" . ibuffer)
+  :hook (ibuffer-hook . ibuffer-auto-mode)
+  :bind ("C-x C-b" . ibuffer)
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: `major-mode', `recency'
   (ibuffer-use-header-line t)
   ;; Do not show groups if there are no buffers in that group
   (ibuffer-show-empty-filter-groups nil)
-  :config
-  (defalias 'list-buffers 'ibuffer))
+  :config (defalias 'list-buffers 'ibuffer))
 
 ;; Provides ibuffer filtering and sorting functions to group buffers by function or regexp applied
 ;; to `default-directory'. By default buffers are grouped by `project-current' or by
@@ -33,9 +30,11 @@
 (use-package ibuffer-project
   :after project
   :hook
-  (ibuffer-hook . (lambda ()
-                    (unless (eq ibuffer-sorting-mode 'project-file-relative)
-                      (ibuffer-do-sort-by-project-file-relative))))
+  (ibuffer-hook
+    .
+    (lambda ()
+      (unless (eq ibuffer-sorting-mode 'project-file-relative)
+        (ibuffer-do-sort-by-project-file-relative))))
   :custom
   (ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
   (ibuffer-project-use-cache t "Avoid calculating project root, use cache")
@@ -45,16 +44,13 @@
 
 (use-package ibuffer-projectile ; Group buffers by Projectile project
   :after projectile
-  :hook
-  (ibuffer-hook . ibuffer-projectile-set-filter-groups))
+  :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
 
 ;; Display icons for all buffers in ibuffer
 (use-package all-the-icons-ibuffer
   :when (display-graphic-p)
-  :hook
-  (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
-  :custom
-  (all-the-icons-ibuffer-icon-size 0.8))
+  :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
+  :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t
@@ -66,24 +62,19 @@
 
 ;; When the *scratch* buffer is killed, immediately respawn it.
 (use-package immortal-scratch
-  :hook
-  (emacs-startup-hook . immortal-scratch-mode))
+  :hook (emacs-startup-hook . immortal-scratch-mode))
 
 ;; Helps to make the data in the "*scratch*" buffer persist.
 (use-package persistent-scratch
-  :hook
-  (emacs-startup-hook . persistent-scratch-setup-default)
-  :config
-  (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
+  :hook (emacs-startup-hook . persistent-scratch-setup-default)
+  :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el
 ;; https://github.com/dakrone/eos/blob/master/eos-core.org
 
 (use-package popwin
-  :hook
-  (emacs-startup-hook . popwin-mode)
-  :config
-  (defvar popwin:special-display-config-backup popwin:special-display-config)
+  :hook (emacs-startup-hook . popwin-mode)
+  :config (defvar popwin:special-display-config-backup popwin:special-display-config)
 
   ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
   ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
@@ -96,8 +87,7 @@
   ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
   ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
   ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode :noselect t :position bottom :height 20)
-        popwin:special-display-config)
+  (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
   ;;   (push "*Shell Command Output*"               popwin:special-display-config)
   ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
@@ -113,9 +103,7 @@
 
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
-  :bind
-  (([remap other-window] . ace-window)
-   ("M-o" . ace-window))
+  :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
   :config
   (add-to-list 'aw-ignored-buffers "*toc*")
   (ace-window-display-mode 1))
@@ -123,8 +111,7 @@
 ;; The keybinding will be hidden if we use tmux with its default prefix key, and we will need to
 ;; press twice.
 (use-package ace-jump-buffer
-  :bind
-  ("C-b" . ace-jump-buffer)
+  :bind ("C-b" . ace-jump-buffer)
   :custom
   (ajb-bs-configuration "files-and-scratch")
   (ajb-max-window-height 30)
@@ -134,14 +121,10 @@
 ;; `before-save-hook' and `after-save-hook' and leads to auto-formatters being invoked more
 ;; frequently.
 (use-package super-save
-  :defines
-  (super-save-remote-files super-save-triggers super-save-hook-triggers)
-  :hook
-  (emacs-startup-hook . super-save-mode)
-  :custom
-  (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
-  :config
-  (add-to-list 'super-save-triggers 'ace-window)
+  :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
+  :hook (emacs-startup-hook . super-save-mode)
+  :custom (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
+  :config (add-to-list 'super-save-triggers 'ace-window)
   :diminish)
 
 (provide 'init-buffer)

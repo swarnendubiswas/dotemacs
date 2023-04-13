@@ -44,10 +44,6 @@
   (("M-<down>" . move-text-down)
    ("M-<up>"   . move-text-up)))
 
-;; (use-package duplicate-thing
-;;   :bind*
-;;   ("C-c C-d" . duplicate-thing))
-
 ;; Discover key bindings and their meaning for the current Emacs major mode
 (use-package discover-my-major
   :bind
@@ -213,7 +209,7 @@
   :hook
   (emacs-startup-hook . amx-mode)
   :bind
-  (("M-x"  . amx) ; We need this if we use `vertico' and `consult'
+  (("M-x"  . amx)
    ("<f1>" . amx)))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
@@ -313,9 +309,6 @@
 
 (use-package change-inner
   :commands (change-inner change-outer yank-inner yank-outer))
-
-;; (use-package link-hint
-;;   :commands (link-hint-open-link link-hint-copy-link))
 
 (provide 'init-misc)
 

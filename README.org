@@ -22,7 +22,7 @@ Add the following repository only if you are using Ubuntu 20.04.
 
 #+begin_src shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-# Install gcc-10 packages with required support for libgccjit
+# Install gcc-10 packages with the required support for libgccjit
 sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
 #+end_src
 
@@ -229,6 +229,7 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 
 GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
 
+- [[https://github.com/rdbeni0/emacs.d/tree/main/ggtags]]
 - [[https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support][Compiling GNU Global with universal-ctags support]]
 - [[https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub][Tags for Emacs: Relationship between etags, ebrowse, cscope, GNU Global and exuberant ctags]]
 - [[https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html][GTags for Python in Emacs]]

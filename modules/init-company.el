@@ -70,7 +70,7 @@
   ;; area.
   (company-frontends '(company-pseudo-tooltip-frontend)) ; Always show candidates in overlay tooltip
   (company-global-modes '(not dired-mode erc-mode message-mode
-                              comint-mode inferior-python-mode
+                              comint-mode inferior-python-mode vterm-mode
                               magit-status-mode help-mode
                               gud-mode eshell-mode shell-mode
                               csv-mode))
@@ -93,17 +93,17 @@
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
 ;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
-;; (use-package company-posframe
-;;   :if (display-graphic-p)
-;;   :after company
-;;   :commands company-posframe-mode
-;;   :diminish
-;;   :custom
-;;   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-;;   (company-posframe-show-indicator nil "The display is not great")
-;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-;;   :init
-;;   (company-posframe-mode 1))
+(use-package company-posframe
+  :if (display-graphic-p)
+  :after company
+  :commands company-posframe-mode
+  :diminish
+  :custom
+  (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
+  (company-posframe-show-indicator nil "The display is not great")
+  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+  :init
+  (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
@@ -353,6 +353,8 @@
 
       (setq company-backends '(company-dirfiles
                                (company-capf
+                                company-elisp
+                                company-keywords
                                 company-citre-tags
                                 company-dabbrev-code ; Useful for variable names
                                 :with company-yasnippet

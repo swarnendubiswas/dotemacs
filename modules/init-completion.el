@@ -21,53 +21,43 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
-(setq completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
-      completion-ignore-case t ; Ignore case when completing
-      read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
-      read-file-name-completion-ignore-case t) ; Ignore case when reading a file name
+(setq
+  completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
+  completion-ignore-case t ; Ignore case when completing
+  read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
+  read-file-name-completion-ignore-case t) ; Ignore case when reading a file name
 
 (when sb/EMACS28+
   (setq completions-detailed nil))
 
-(dolist (exts '(".dll"
-                ".exe"
-                ".fdb_latexmk"
-                ".fls"
-                ".lof"
-                ".pyc"
-                ".rel"
-                ".rip"
-                ".synctex.gz"
-                "TAGS"))
+(dolist
+  (exts '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
   (add-to-list 'completion-ignored-extensions exts))
-
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
 (use-package dabbrev
   :straight (:type built-in)
-  :custom
-  (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
-  :bind
-  ("C-M-;" . dabbrev-completion))
+  :custom (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
+  :bind ("C-M-;" . dabbrev-completion))
 
 (use-package hippie-exp
   :straight (:type built-in)
   :custom
-  (hippie-expand-try-functions-list '(try-expand-dabbrev
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev-from-kill
-                                      try-complete-file-name-partially
-                                      try-complete-file-name
-                                      try-expand-all-abbrevs
-                                      try-expand-list
-                                      try-expand-line
-                                      try-complete-lisp-symbol-partially
-                                      try-complete-lisp-symbol))
+  (hippie-expand-try-functions-list
+    '
+    (try-expand-dabbrev
+      try-expand-dabbrev-all-buffers
+      try-expand-dabbrev-from-kill
+      try-complete-file-name-partially
+      try-complete-file-name
+      try-expand-all-abbrevs
+      try-expand-list
+      try-expand-line
+      try-complete-lisp-symbol-partially
+      try-complete-lisp-symbol))
   (hippie-expand-verbose nil)
-  :bind
-  (("M-/" . hippie-expand)
-   ([remap dabbrev-expand] . hippie-expand)))
+  :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
 
 ;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
 (use-package orderless
@@ -86,20 +76,18 @@
     (defvar ivy-re-builders-alist)
     (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
     ;; `counsel-rg' fails with `orderless'
-    (add-to-list 'ivy-highlight-functions-alist
-                 '(orderless-ivy-re-builder . orderless-ivy-highlight)))
+    (add-to-list
+      'ivy-highlight-functions-alist
+      '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
   (with-eval-after-load "company"
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 (use-package yasnippet
-  :commands
-  (snippet-mode yas-hippie-try-expand yas-reload-all)
+  :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook
-  ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
-  :custom
-  (yas-verbosity 0)
+  :hook ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
+  :custom (yas-verbosity 0)
   :config
   (with-eval-after-load "hippie-expand"
     (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
@@ -114,27 +102,22 @@
 (use-package ivy-yasnippet
   :if (eq sb/minibuffer-completion 'ivy)
   :after ivy
-  :bind
-  ("C-M-y" . ivy-yasnippet))
+  :bind ("C-M-y" . ivy-yasnippet))
 
 (use-package consult-yasnippet
   :after consult
-  :bind
-  ("C-M-y" . consult-yasnippet))
+  :bind ("C-M-y" . consult-yasnippet))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Vertico does its own sorting based on
 ;; recency, and Corfu has corfu-history. Company has company-statistics. Furthermore, Ivy is not
 ;; well supported with prescient.
 
 (use-package prescient
-  :straight (:host github :repo "radian-software/prescient.el"
-                   :files (:defaults "/*.el"))
+  :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
   :disabled t
   :commands prescient-persist-mode
-  :hook
-  (emacs-startup-hook . prescient-persist-mode)
-  :custom
-  (prescient-sort-full-matches-first t)
+  :hook (emacs-startup-hook . prescient-persist-mode)
+  :custom (prescient-sort-full-matches-first t)
   :config
   (with-eval-after-load "corfu"
     (corfu-prescient-mode 1))
@@ -157,19 +140,21 @@
 (use-package minibuffer
   :straight (:type built-in)
   :after orderless
-  :custom
-  (completions-format 'vertical)
+  :custom (completions-format 'vertical)
   :config
   ;; substring is needed to complete common prefix, orderless does not
-  (setq completion-styles '(substring orderless basic)
-        completion-category-defaults nil
-        ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-        ;; work. I also want substring matching for file names.
-        completion-category-overrides '((file (styles basic substring partial-completion))
-                                        ;; (buffer (styles basic substring flex))
-                                        ;; (project-file (styles basic substring flex))
-                                        ;; (minibuffer (orderless flex))
-                                        )))
+  (setq
+    completion-styles '(substring orderless basic)
+    completion-category-defaults nil
+    ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+    ;; work. I also want substring matching for file names.
+    completion-category-overrides
+    '
+    ((file (styles basic substring partial-completion))
+      ;; (buffer (styles basic substring flex))
+      ;; (project-file (styles basic substring flex))
+      ;; (minibuffer (orderless flex))
+      )))
 
 (provide 'init-completion)
 

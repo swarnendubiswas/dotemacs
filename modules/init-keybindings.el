@@ -21,77 +21,76 @@
 ;; (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 
 (bind-keys
- ("RET"       . newline-and-indent)
- ("C-l"       . goto-line)
- ("C-c z"     . repeat)
- ("C-z"       . undo)
- ("C-<f11>"   . delete-other-windows)
- ("C-x k"     . kill-this-buffer)
- ("C-c d f"   . auto-fill-mode)
- ("<f7>"      . previous-error) ; "M-g p" is the default keybinding
- ("<f8>"      . next-error) ; "M-g n" is the default keybinding
+  ("RET" . newline-and-indent)
+  ("C-l" . goto-line)
+  ("C-c z" . repeat)
+  ("C-z" . undo)
+  ("C-<f11>" . delete-other-windows)
+  ("C-x k" . kill-this-buffer)
+  ("C-c d f" . auto-fill-mode)
+  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
+  ("<f8>" . next-error) ; "M-g n" is the default keybinding
 
- ;; The default keybinding "C-S-backspace" does not work with the TUI. We make it work with
- ;; Alacritty with `term-keys-mode'. So, this is an alternative.
+  ;; The default keybinding "C-S-backspace" does not work with the TUI. We make it work with
+  ;; Alacritty with `term-keys-mode'. So, this is an alternative.
 
- ;; ("M-k"       . kill-whole-line)
+  ;; ("M-k"       . kill-whole-line)
 
- ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
- ;; manipulate the first character of the word.
+  ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
+  ;; manipulate the first character of the word.
 
- ;; ("M-c"       . capitalize-dwim)
- ;; ("M-u"       . upcase-dwim)
- ;; ("M-l"       . downcase-dwim)
+  ;; ("M-c"       . capitalize-dwim)
+  ;; ("M-u"       . upcase-dwim)
+  ;; ("M-l"       . downcase-dwim)
 
- ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
- ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
+  ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
+  ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
 
- ("C-c n"     . comment-region)
- ("C-c m"     . uncomment-region)
- ("C-c ;"     . sb/comment-line)
- ("C-c b"     . comment-box)
+  ("C-c n" . comment-region)
+  ("C-c m" . uncomment-region)
+  ("C-c ;" . sb/comment-line)
+  ("C-c b" . comment-box)
 
- ("C-s"       . save-buffer)
- ("C-S-s"     . sb/save-all-buffers)
+  ("C-s" . save-buffer)
+  ("C-S-s" . sb/save-all-buffers)
 
- ("C-<left>"  . backward-word)
- ("C-<right>" . forward-word)
+  ("C-<left>" . backward-word)
+  ("C-<right>" . forward-word)
 
- ("M-\\"      . delete-horizontal-space)
- ("M-#"       . cycle-spacing))
+  ("M-\\" . delete-horizontal-space)
+  ("M-#" . cycle-spacing))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 
+;; This was bound to `electric-newline-and-maybe-indent'. However, this causes problems when
+;; pressing "C-c C-j" quickly for `imenu'.
+(unbind-key "C-j")
+
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
-(bind-key   "C-x s" #'sb/switch-to-scratch)
+(bind-key "C-x s" #'sb/switch-to-scratch)
 
 (unless sb/tab-bar-handler
-  (global-set-key [remap next-buffer]     #'sb/next-buffer)
+  (global-set-key [remap next-buffer] #'sb/next-buffer)
   (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
   (bind-keys
-   ("M-<left>"          . sb/previous-buffer)
-   ("C-S-<iso-lefttab>" . sb/previous-buffer)
-   ("M-<right>"         . sb/next-buffer)
-   ("C-<tab>"           . sb/next-buffer)))
+    ("M-<left>" . sb/previous-buffer)
+    ("C-S-<iso-lefttab>" . sb/previous-buffer)
+    ("M-<right>" . sb/next-buffer)
+    ("C-<tab>" . sb/next-buffer)))
 
 (use-package default-text-scale
   :if (display-graphic-p)
-  :bind
-  (("C-M-+" . default-text-scale-increase)
-   ("C-M--" . default-text-scale-decrease)))
+  :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
   :commands free-keys)
 
 (use-package which-key ; Show help popups for prefix keys
   :commands which-key-setup-side-window-right-bottom
-  :hook
-  (emacs-startup-hook . which-key-mode)
-  :custom
-  (which-key-sort-order 'which-key-key-order-alpha)
-  :config
-  (which-key-setup-side-window-right-bottom)
+  :hook (emacs-startup-hook . which-key-mode)
+  :custom (which-key-sort-order 'which-key-key-order-alpha)
+  :config (which-key-setup-side-window-right-bottom)
   :diminish)
 
 ;; (use-package which-key-posframe
@@ -611,8 +610,7 @@
 
 (use-package term-keys
   :straight (:host github :repo "CyberShadow/term-keys")
-  :hook
-  (emacs-startup-hook . term-keys-mode)
+  :hook (emacs-startup-hook . term-keys-mode)
   :config
   ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
   (require 'term-keys-alacritty))

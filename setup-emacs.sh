@@ -512,7 +512,7 @@ install_powerline() {
 cd "$GITHUB" || echo "Failed: cd $GITHUB"
 
 install_tmux() {
-    apt install libevent-dev
+    apt install libevent-dev entr
 
     if [ -d tmux ]; then
         cd tmux || echo "Failed: cd tmux"

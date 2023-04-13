@@ -23,6 +23,8 @@
             org-src-tabs-acts-natively)
   :commands
   (org-indent-mode org-indent-item org-outdent-item)
+  :init
+  (setq org-modules '(ol-doi ol-bibtex ol-docview ol-info org-id org-protocol ob-python ob-sh))
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-emphasized-text t)

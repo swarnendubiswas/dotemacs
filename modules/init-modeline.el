@@ -31,7 +31,7 @@
                                                           emacs-minor-version))
                                                  nil 'l)))
                             (rhs (list
-                                  (when (and (boundp 'which-func-mode) which-func-mode)
+                                  (when which-function-mode
                                     (powerline-raw which-func-format face0 'l))
                                   (powerline-vc nil 'l)
                                   (powerline-raw "")

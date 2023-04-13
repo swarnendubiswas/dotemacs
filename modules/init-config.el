@@ -34,11 +34,12 @@
            (const :tag "none"              none))
   :group 'sb/emacs)
 
-;; Powerline theme for Nano looks great, but it does not show LSP status.
 (defcustom sb/modeline-theme
-  'doom-modeline
+  'powerline
   "Specify the mode-line theme to use."
   :type  '(radio
+           ;; Powerline theme for Nano looks great, and takes less space on the modeline. But it
+           ;; does not show lsp status and flycheck information.
            (const :tag "powerline"       powerline)
            (const :tag "doom-modeline"   doom-modeline)
            (const :tag "awesome-tray"    awesome-tray)

@@ -268,7 +268,8 @@
 ;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 
 (use-package lsp-grammarly
-  :after lsp-mode
+  ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
+  :if (eq sb/lsp-provider 'lsp-mode)
   :defines
   (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands
@@ -310,7 +311,8 @@
         ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
 
 (use-package lsp-ltex
-  :after lsp-mode
+  ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
+  :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :commands
   (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
