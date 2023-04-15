@@ -23,7 +23,10 @@
     (interactive)
     (corfu--goto -1)
     (goto-char (cadr completion-in-region--data)))
-  :straight (:files (:defaults "extensions/*"))
+  :straight
+  (corfu
+    :files (:defaults "extensions/*")
+    :includes (corfu-quick corfu-echo corfu-indexed corfu-popupinfo corfu-history))
   :if (eq sb/capf 'corfu)
   :hook (emacs-startup-hook . global-corfu-mode)
   :bind
@@ -46,13 +49,13 @@
   (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 3))))
 
 (use-package corfu-info
-  :straight (:files (:defaults "extensions/*") :includes (corfu-info))
+  :straight nil
   :after corfu
   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
 
 ;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
-  :straight (:files (:defaults "extensions/*") :includes (corfu-indexed))
+  :straight nil
   :disabled t
   :after corfu
   :commands corfu-indexed-mode
@@ -80,14 +83,14 @@
   )
 
 (use-package corfu-quick
-  :straight (:files (:defaults "extensions/*") :includes (corfu-quick))
+  :straight nil
   :after corfu
   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
 
 ;; We do not need this if we use prescient-based sorting.
 
 (use-package corfu-history
-  :straight (:files (:defaults "extensions/*") :includes (corfu-history))
+  :straight nil
   :after (corfu savehist)
   :commands corfu-history-mode
   :init
@@ -95,13 +98,13 @@
   (corfu-history-mode 1))
 
 (use-package corfu-echo
-  :straight (:files (:defaults "extensions/*") :includes (corfu-echo))
+  :straight nil
   :after corfu
   :commands corfu-echo-mode
   :init (corfu-echo-mode 1))
 
 (use-package corfu-popupinfo
-  :straight (:files (:defaults "extensions/*") :includes (corfu-popupinfo))
+  :straight nil
   :after corfu
   :commands corfu-popupinfo-mode
   :init (corfu-popupinfo-mode 1))
@@ -143,9 +146,9 @@
     cape-dict ; Complete word from dictionary at point
     cape-line ; Complete current line from other lines in buffer
     cape-symbol ; Elisp symbol
+    cape-elisp-block ; Complete Elisp in Org or Markdown code block
     cape-ispell ; Complete word at point with Ispell
-    ;; Complete with Dabbrev at point
-    cape-dabbrev
+    cape-dabbrev ; Complete with Dabbrev at point
     cape-capf-buster
     cape-company-to-capf
     cape-super-capf
@@ -156,14 +159,14 @@
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list
-    'completion-at-point-functions
-    (cape-super-capf #'cape-dabbrev #'cape-dict #'cape-ispell)
-    'append)
+  (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict) 'append)
   :custom (cape-dabbrev-min-length 3)
   ;; Checking all other buffers for completetion ignoring the major mode seems to be expensive
   (cape-dabbrev-check-other-buffers nil)
-  (cape-dict-file (expand-file-name "wordlist.5" sb/extras-directory))
+  (cape-dict-file
+    `
+    (,(expand-file-name "wordlist.5" sb/extras-directory)
+      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   :config
   ;; https://github.com/minad/cape/issues/53
   ;; Override CAPFS for specific major modes
@@ -180,9 +183,7 @@
             #'cape-symbol ; Elisp symbols
             #'cape-dabbrev
             (cape-capf-inside-string #'cape-dict)
-            (cape-capf-inside-comment #'cape-dict)
-            (cape-capf-inside-string #'cape-ispell)
-            (cape-capf-inside-comment #'cape-ispell))))))
+            (cape-capf-inside-comment #'cape-dict))))))
 
   ;; FIXME: How can we simplify the following mess?
 
@@ -202,9 +203,7 @@
                   #'cape-file
                   #'cape-dabbrev
                   (cape-capf-inside-string #'cape-dict)
-                  (cape-capf-inside-comment #'cape-dict)
-                  (cape-capf-inside-string #'cape-ispell)
-                  (cape-capf-inside-comment #'cape-ispell))))))))
+                  (cape-capf-inside-comment #'cape-dict))))))))
 
     (dolist (lsp-prog-mode '(c++-mode-hook java-mode-hook python-mode-hook))
       (add-hook
@@ -222,9 +221,7 @@
                     #'cape-keyword
                     #'cape-dabbrev
                     (cape-capf-inside-string #'cape-dict)
-                    (cape-capf-inside-comment #'cape-dict)
-                    (cape-capf-inside-string #'cape-ispell)
-                    (cape-capf-inside-comment #'cape-ispell)))))))))
+                    (cape-capf-inside-comment #'cape-dict)))))))))
 
     (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
       (add-hook
@@ -237,10 +234,8 @@
                 (list
                   (cape-super-capf
                     #'lsp-completion-at-point #'citre-completion-at-point
-                    ;; #'TeX--completion-at-point
-                    ;; Leads to unwanted completions
-                    ;; #'cape-tex
-                    #'cape-file #'cape-dabbrev #'cape-dict #'cape-ispell)))))))))
+                    ;; #'cape-tex ; Leads to unwanted completions
+                    #'cape-file #'cape-dabbrev #'cape-dict)))))))))
 
   (add-hook
     'sh-mode-hook
@@ -257,9 +252,7 @@
                 #'cape-file
                 #'cape-dabbrev
                 (cape-capf-inside-string #'cape-dict)
-                (cape-capf-inside-comment #'cape-dict)
-                (cape-capf-inside-string #'cape-ispell)
-                (cape-capf-inside-comment #'cape-ispell))))))))
+                (cape-capf-inside-comment #'cape-dict))))))))
 
   ;; (dolist (prog '(c++-mode-hook java-mode-hook python-mode-hook))
   ;; (add-hook prog
@@ -275,8 +268,7 @@
   ;;                                                       #'cape-dabbrev
   ;;                                                       (cape-capf-inside-string #'cape-dict)
   ;;                                                       (cape-capf-inside-comment #'cape-dict)
-  ;;                                                       (cape-capf-inside-string #'cape-ispell)
-  ;;                                                       (cape-capf-inside-comment #'cape-ispell)))))))))
+  ;;                                                       ))))))))
 
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
     (add-hook
@@ -290,7 +282,7 @@
                 (cape-super-capf
                   #'eglot-completion-at-point #'citre-completion-at-point
                   ;; #'cape-tex ; Leads to unwanted completions
-                  #'cape-file #'cape-dabbrev #'cape-dict #'cape-ispell)))))))))
+                  #'cape-file #'cape-dabbrev #'cape-dict)))))))))
 
 (use-package kind-icon
   :if (and (eq sb/corfu-icons 'kind-icon) (display-graphic-p))
