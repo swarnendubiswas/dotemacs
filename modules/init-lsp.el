@@ -18,102 +18,107 @@
   :preface
   ;; https://github.com/minad/corfu/wiki
   (defun sb/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(flex))
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex))
     (with-eval-after-load "orderless"
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(orderless))))
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(orderless))))
   :if (eq sb/lsp-provider 'lsp-mode)
-  :defines (lsp-perl-language-server-path
-            lsp-perl-language-server-port
-            lsp-perl-language-server-client-version
-            lsp-completion--regex-fuz
-            lsp-clients-clangd-args
-            lsp-clients-clangd-executable
-            lsp-completion-enable-additional-text-edit
-            lsp-completion-show-detail
-            lsp-completion-provider
-            lsp-completion-show-kind
-            lsp-enable-semantic-tokens
-            lsp-enable-which-key-integration
-            lsp-headerline-breadcrumb-mode
-            lsp-html-format-wrap-line-length
-            lsp-html-format-end-with-newline
-            lsp-html-format-indent-inner-html
-            lsp-html-format-max-preserve-new-lines
-            lsp-xml-logs-client
-            lsp-xml-jar-file
-            lsp-xml-jar-version
-            lsp-yaml-print-width
-            lsp-headerline-breadcrumb-enable-diagnostics
-            lsp-modeline-diagnostics-scope)
-  :commands (lsp--set-configuration lsp-completion--regex-fuz
-                                    lsp-register-client
-                                    lsp-tramp-connection
-                                    make-lsp-client
-                                    lsp-format-buffer
-                                    lsp-configuration-section lsp
-                                    lsp-deferred
-                                    lsp--set-configuration
-                                    lsp-package-ensure
-                                    lsp-signature-help
-                                    lsp-enable-which-key-integration
-                                    lsp-modeline-diagnostics-mode
-                                    lsp-modeline-code-actions-mode
-                                    lsp-symbol-highlight ht-merge
-                                    lsp-completion--regex-fuz
-                                    lsp-describe-thing-at-point
-                                    lsp-find-type-definition)
-  :bind-keymap
-  ("C-c l" . lsp-command-map)
+  :defines
+  (lsp-perl-language-server-path
+    lsp-perl-language-server-port
+    lsp-perl-language-server-client-version
+    lsp-completion--regex-fuz
+    lsp-clients-clangd-args
+    lsp-clients-clangd-executable
+    lsp-completion-enable-additional-text-edit
+    lsp-completion-show-detail
+    lsp-completion-provider
+    lsp-completion-show-kind
+    lsp-enable-semantic-tokens
+    lsp-enable-which-key-integration
+    lsp-headerline-breadcrumb-mode
+    lsp-html-format-wrap-line-length
+    lsp-html-format-end-with-newline
+    lsp-html-format-indent-inner-html
+    lsp-html-format-max-preserve-new-lines
+    lsp-xml-logs-client
+    lsp-xml-jar-file
+    lsp-xml-jar-version
+    lsp-yaml-print-width
+    lsp-headerline-breadcrumb-enable-diagnostics
+    lsp-modeline-diagnostics-scope)
+  :commands
+  (lsp--set-configuration
+    lsp-completion--regex-fuz
+    lsp-register-client
+    lsp-tramp-connection
+    make-lsp-client
+    lsp-format-buffer
+    lsp-configuration-section
+    lsp
+    lsp-deferred
+    lsp--set-configuration
+    lsp-package-ensure
+    lsp-signature-help
+    lsp-enable-which-key-integration
+    lsp-modeline-diagnostics-mode
+    lsp-modeline-code-actions-mode
+    lsp-symbol-highlight
+    ht-merge
+    lsp-completion--regex-fuz
+    lsp-describe-thing-at-point
+    lsp-find-type-definition)
+  :bind-keymap ("C-c l" . lsp-command-map)
   :bind
   ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
   ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
   (("M-." . lsp-find-definition)
-   :map lsp-command-map
-   ("=")
-   ("w")
-   ("g")
-   ("G")
-   ("a")
-   ("F")
-   ("L" . lsp)
-   ("q" . lsp-disconnect)
-   ("Q" . lsp-workspace-shutdown)
-   ("H" . lsp-describe-session)
-   ("R" . lsp-workspace-restart)
-   ("d" . lsp-find-declaration)
-   ("e" . lsp-find-definition)
-   ("r" . lsp-find-references)
-   ("i" . lsp-find-implementation)
-   ("I" . lsp-goto-implementation)
-   ("t" . lsp-goto-type-definition)
-   ("r" . lsp-rename)
-   ("h" . lsp-symbol-highlight)
-   ("f" . lsp-format-buffer)
-   ("x" . lsp-execute-code-action)
-   ("c" . lsp-imenu-create-categorised-index)
-   ("u" . lsp-imenu-create-uncategorised-index)
-   ("a" . lsp-workspace-folders-add)
-   ("v" . lsp-workspace-folders-remove)
-   ("b" . lsp-workspace-blacklist-remove))
+    :map
+    lsp-command-map
+    ("=")
+    ("w")
+    ("g")
+    ("G")
+    ("a")
+    ("F")
+    ("L" . lsp)
+    ("q" . lsp-disconnect)
+    ("Q" . lsp-workspace-shutdown)
+    ("H" . lsp-describe-session)
+    ("R" . lsp-workspace-restart)
+    ("d" . lsp-find-declaration)
+    ("e" . lsp-find-definition)
+    ("r" . lsp-find-references)
+    ("i" . lsp-find-implementation)
+    ("I" . lsp-goto-implementation)
+    ("t" . lsp-goto-type-definition)
+    ("r" . lsp-rename)
+    ("h" . lsp-symbol-highlight)
+    ("f" . lsp-format-buffer)
+    ("x" . lsp-execute-code-action)
+    ("c" . lsp-imenu-create-categorised-index)
+    ("u" . lsp-imenu-create-uncategorised-index)
+    ("a" . lsp-workspace-folders-add)
+    ("v" . lsp-workspace-folders-remove)
+    ("b" . lsp-workspace-blacklist-remove))
   :custom
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
   ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
   ;; and parent paths of each source file.
-  (lsp-clients-clangd-args '("-j=4"
-                             "--all-scopes-completion"
-                             "--background-index"
-                             "--clang-tidy"
-                             "--completion-style=detailed"
-                             "--fallback-style=LLVM"
-                             "--header-insertion=never"
-                             "--header-insertion-decorators=0"
-                             "--log=error"
-                             "--malloc-trim" ;; Release memory periodically
-                             ;; Increases memory usage but can improve performance
-                             "--pch-storage=memory"
-                             "--pretty"))
+  (lsp-clients-clangd-args
+    '
+    ("-j=4"
+      "--all-scopes-completion"
+      "--background-index"
+      "--clang-tidy"
+      "--completion-style=detailed"
+      "--fallback-style=LLVM"
+      "--header-insertion=never"
+      "--header-insertion-decorators=0"
+      "--log=error"
+      "--malloc-trim" ;; Release memory periodically
+      ;; Increases memory usage but can improve performance
+      "--pch-storage=memory"
+      "--pretty"))
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
   (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
@@ -148,37 +153,39 @@
   (lsp-yaml-print-width sb/fill-column)
   (lsp-warn-no-matched-clients nil)
   :config
-  (dolist (ignore-dirs '("/build\\'"
-                         "/\\.metadata\\'"
-                         "/\\.recommenders\\'"
-                         "/\\.clangd\\'"
-                         "/\\.cache\\'"
-                         "/__pycache__\\'"
-                         "/\\.log\\'"))
+  (dolist
+    (ignore-dirs
+      '
+      ("/build\\'"
+        "/\\.metadata\\'"
+        "/\\.recommenders\\'"
+        "/\\.clangd\\'"
+        "/\\.cache\\'"
+        "/__pycache__\\'"
+        "/\\.log\\'"))
     (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
 
   (with-eval-after-load "corfu"
-    (add-hook 'text-mode-hook (lambda ()
-                                (setq-local lsp-completion-enable nil)))
+    (add-hook 'text-mode-hook (lambda () (setq-local lsp-completion-enable nil)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
   :diminish)
 
 (use-package lsp-ui
   :after lsp-mode
   :defines lsp-ui-modeline-code-actions-enable
-  :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-doc--hide-frame
-                             lsp-ui-peek-find-implementation lsp-ui-imenu)
-  :hook
-  (lsp-mode-hook . lsp-ui-mode)
+  :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-doc--hide-frame lsp-ui-peek-find-implementation lsp-ui-imenu)
+  :hook (lsp-mode-hook . lsp-ui-mode)
   :bind
-  (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references]  . lsp-ui-peek-find-references)
-        :map lsp-command-map
-        ("D" . lsp-ui-doc-show))
+  (:map
+    lsp-ui-mode-map
+    ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+    ([remap xref-find-references] . lsp-ui-peek-find-references)
+    :map
+    lsp-command-map
+    ("D" . lsp-ui-doc-show))
   :custom
   ;; Invoke doc on demand with `lsp-ui-doc-show'
   ;; (lsp-ui-doc-enable nil "Disable on-hover dialogs")
@@ -194,7 +201,7 @@
   :config
   ;; Enabling the sideline creates flickering with Corfu popon.
   (if (and (display-graphic-p) (eq sb/capf 'corfu))
-      (setq lsp-ui-sideline-enable nil)
+    (setq lsp-ui-sideline-enable nil)
     (setq lsp-ui-sideline-enable t)))
 
 ;; Sync workspace folders and treemacs projects
@@ -203,65 +210,67 @@
   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
   :config (lsp-treemacs-sync-mode 1)
   :bind
-  (:map lsp-command-map
-        ("S" . lsp-treemacs-symbols)
-        ("F" . lsp-treemacs-references)
-        ("Y" . lsp-treemacs-sync-mode)
-        ("C" . lsp-treemacs-call-hierarchy)
-        ("T" . lsp-treemacs-type-hierarchy)
-        ("E" . lsp-treemacs-errors-list)))
+  (:map
+    lsp-command-map
+    ("S" . lsp-treemacs-symbols)
+    ("F" . lsp-treemacs-references)
+    ("Y" . lsp-treemacs-sync-mode)
+    ("C" . lsp-treemacs-call-hierarchy)
+    ("T" . lsp-treemacs-type-hierarchy)
+    ("E" . lsp-treemacs-errors-list)))
 
 (use-package lsp-ivy
   :after (lsp-mode ivy)
-  :bind
-  (:map lsp-command-map
-        ("G" . lsp-ivy-global-workspace-symbol)
-        ("W" . lsp-ivy-workspace-symbol)))
+  :bind (:map lsp-command-map ("G" . lsp-ivy-global-workspace-symbol) ("W" . lsp-ivy-workspace-symbol)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
   :if (eq sb/lsp-provider 'lsp-mode)
-  :commands (lsp-java-organize-imports lsp-java-build-project
-                                       lsp-java-update-project-configuration
-                                       lsp-java-actionable-notifications
-                                       lsp-java-update-user-settings
-                                       lsp-java-update-server
-                                       lsp-java-generate-to-string
-                                       lsp-java-generate-equals-and-hash-code
-                                       lsp-java-generate-overrides
-                                       lsp-java-generate-getters-and-setters
-                                       lsp-java-type-hierarchy
-                                       lsp-java-dependency-list
-                                       lsp-java-extract-to-constant
-                                       lsp-java-add-unimplemented-methods
-                                       lsp-java-create-parameter
-                                       lsp-java-create-field
-                                       lsp-java-create-local
-                                       lsp-java-extract-method
-                                       lsp-java-add-import)
+  :commands
+  (lsp-java-organize-imports
+    lsp-java-build-project
+    lsp-java-update-project-configuration
+    lsp-java-actionable-notifications
+    lsp-java-update-user-settings
+    lsp-java-update-server
+    lsp-java-generate-to-string
+    lsp-java-generate-equals-and-hash-code
+    lsp-java-generate-overrides
+    lsp-java-generate-getters-and-setters
+    lsp-java-type-hierarchy
+    lsp-java-dependency-list
+    lsp-java-extract-to-constant
+    lsp-java-add-unimplemented-methods
+    lsp-java-create-parameter
+    lsp-java-create-field
+    lsp-java-create-local
+    lsp-java-extract-method
+    lsp-java-add-import)
   :hook
-  (java-mode-hook . (lambda ()
-                      (setq-local c-basic-offset 4
-                                  c-set-style "java")
-                      (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                            ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+  (java-mode-hook
+    .
+    (lambda ()
+      (setq-local
+        c-basic-offset 4
+        c-set-style "java")
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
   :custom
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
-  (lsp-java-format-settings-url (expand-file-name
-                                 "github/dotfiles/java/eclipse-format-swarnendu.xml"
-                                 sb/user-home-directory))
+  (lsp-java-format-settings-url
+    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory))
   :config
   (with-eval-after-load "dap-mode"
     (require 'dap-java)))
 
 (use-package consult-lsp
   :after (consult lsp)
-  :commands
-  (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
-  :bind
-  (:map lsp-mode-map
-        ([remap xref-find-apropos] . consult-lsp-symbols)))
+  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
@@ -270,41 +279,40 @@
 (use-package lsp-grammarly
   ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
   :if (eq sb/lsp-provider 'lsp-mode)
-  :defines
-  (lsp-grammarly-active-modes lsp-grammarly-user-words)
+  :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :commands
-  (lsp-grammarly--server-command lsp-grammarly--init
-                                 lsp-grammarly--get-credentials
-                                 lsp-grammarly--get-token
-                                 lsp-grammarly--store-token
-                                 lsp-grammarly--show-error
-                                 lsp-grammarly--update-document-state)
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
+  (lsp-grammarly--server-command
+    lsp-grammarly--init
+    lsp-grammarly--get-credentials
+    lsp-grammarly--get-token
+    lsp-grammarly--store-token
+    lsp-grammarly--show-error
+    lsp-grammarly--update-document-state)
+  :hook ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
   :custom
   (lsp-grammarly-suggestions-oxford-comma t)
   (lsp-grammarly-suggestions-passive-voice t)
   (lsp-grammarly-suggestions-informal-pronouns-academic t)
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t)
-  (lsp-grammarly-user-words '(Swarnendu
-                              Biswas))
-  :config
-  (defvar lsp-grammarly-active-modes)
+  (lsp-grammarly-user-words '(Swarnendu Biswas))
+  :config (defvar lsp-grammarly-active-modes)
 
   (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-    :priority -1
-    :remote? t
-    :add-on? t
-    :server-id 'grammarly-r
-    :download-server-fn (lambda (_client callback error-callback _update?)
-                          (lsp-package-ensure 'grammarly-ls callback error-callback))
-    :after-open-fn #'lsp-grammarly--init
-    :async-request-handlers
-    (ht ("$/getCredentials" #'lsp-grammarly--get-credentials)
+    (make-lsp-client
+      :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+      :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+      :priority -1
+      :remote? t
+      :add-on? t
+      :server-id 'grammarly-r
+      :download-server-fn
+      (lambda (_client callback error-callback _update?)
+        (lsp-package-ensure 'grammarly-ls callback error-callback))
+      :after-open-fn #'lsp-grammarly--init
+      :async-request-handlers
+      (ht
+        ("$/getCredentials" #'lsp-grammarly--get-credentials)
         ("$/getToken" #'lsp-grammarly--get-token)
         ("$/storeToken" #'lsp-grammarly--store-token)
         ("$/showError" #'lsp-grammarly--show-error)
@@ -314,10 +322,8 @@
   ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
   :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
-  :commands
-  (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
-  :hook
-  ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
+  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
+  :hook ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
   :custom
   ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
   (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
@@ -333,9 +339,7 @@
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
   ;; Furthermore, we also use `flyspell' and `spell-fu'.
 
-  (setq lsp-ltex-disabled-rules
-        #s(hash-table size 30 data
-                      ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
+  (setq lsp-ltex-disabled-rules #s(hash-table size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
 
   ;; (setq lsp-ltex-disabled-rules
   ;;       (json-parse-string
@@ -344,33 +348,31 @@
   ;; (defvar lsp-ltex-active-modes)
 
   (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection
-                     (expand-file-name "lsp/server/ltex-ls/latest/bin/ltex-ls"
-                                       no-littering-var-directory))
-    :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-    :priority -2
-    :add-on? t
-    :remote? t
-    :server-id 'ltex-r
-    :download-server-fn
-    (lambda (_client _callback error-callback _update?)
-      (lsp-package-ensure
-       'ltex-ls
-       (lambda ()
-         (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-           (unless (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path)
-                                      "-C" dest)
-             (error "Error during the unzip process: tar"))))
-       error-callback)))))
+    (make-lsp-client
+      :new-connection
+      (lsp-tramp-connection
+        (expand-file-name "lsp/server/ltex-ls/latest/bin/ltex-ls" no-littering-var-directory))
+      :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+      :priority -2
+      :add-on? t
+      :remote? t
+      :server-id 'ltex-r
+      :download-server-fn
+      (lambda (_client _callback error-callback _update?)
+        (lsp-package-ensure
+          'ltex-ls
+          (lambda ()
+            (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+              (unless
+                (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path) "-C" dest)
+                (error "Error during the unzip process: tar"))))
+          error-callback)))))
 
 (use-package dap-mode
   :after lsp-mode
   :commands (dap-step-in dap-next dap-continue dap-debug dap-hydra)
   :init (dap-auto-configure-mode)
-  :hook
-  ((lsp-mode-hook . dap-ui-mode)
-   (lsp-mode-hook . dap-mode))
+  :hook ((lsp-mode-hook . dap-ui-mode) (lsp-mode-hook . dap-mode))
   ;; :bind
   ;; ("<f7>" . dap-step-in)
   ;; ("<f8>" . dap-next)

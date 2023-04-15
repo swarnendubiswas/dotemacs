@@ -9,14 +9,12 @@
 
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
-  :commands
-  (centaur-tabs-group-by-projectile-project centaur-tabs-headline-match)
-  :hook
-  (emacs-startup-hook . centaur-tabs-mode)
+  :commands (centaur-tabs-group-by-projectile-project centaur-tabs-headline-match)
+  :hook (emacs-startup-hook . centaur-tabs-mode)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
-   ("M-<left>"  . centaur-tabs-backward-tab)
-   ("M-\""      . centaur-tabs-ace-jump))
+    ("M-<left>" . centaur-tabs-backward-tab)
+    ("M-\"" . centaur-tabs-ace-jump))
   :custom
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
@@ -52,26 +50,29 @@
   \"Emacs\". Other buffer group by `awesome-tab-get-group-name'
   with project name."
     (list
-     (cond
-      ((or (string-equal "*" (substring (buffer-name) 0 1))
-           (memq major-mode '(magit-process-mode
-                              magit-status-mode
-                              magit-diff-mode
-                              magit-log-mode
-                              magit-file-mode
-                              magit-blob-mode
-                              magit-blame-mode)))
-       "Emacs")
-      (t
-       (awesome-tab-get-group-name (current-buffer))))))
+      (cond
+        (
+          (or (string-equal "*" (substring (buffer-name) 0 1))
+            (memq
+              major-mode
+              '
+              (magit-process-mode
+                magit-status-mode
+                magit-diff-mode
+                magit-log-mode
+                magit-file-mode
+                magit-blob-mode
+                magit-blame-mode)))
+          "Emacs")
+        (t
+          (awesome-tab-get-group-name (current-buffer))))))
   :straight (:host github :repo "manateelazycat/awesome-tab")
   :if (eq sb/tab-bar-handler 'awesome-tab)
-  :hook
-  (emacs-startup-hook . awesome-tab-mode)
+  :hook (emacs-startup-hook . awesome-tab-mode)
   :bind
   (("M-<right>" . awesome-tab-forward-tab)
-   ("M-<left>" . awesome-tab-backward-tab)
-   ("M-]" . awesome-tab-ace-jump))
+    ("M-<left>" . awesome-tab-backward-tab)
+    ("M-]" . awesome-tab-ace-jump))
   :custom-face
   (awesome-tab-selected-face ((t (:inherit default :height 1.0))))
   (awesome-tab-unselected-face ((t (:inherit default :height 0.8))))

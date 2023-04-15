@@ -31,19 +31,18 @@
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
   :straight (:type built-in)
-  :defines
-  (dired-clean-confirm-killing-deleted-buffers)
+  :defines (dired-clean-confirm-killing-deleted-buffers)
   :hook
   ;; Auto refresh dired when files change
   (dired-mode-hook . auto-revert-mode)
   :bind
-  (:map dired-mode-map
-        ("M-<home>" . sb/dired-go-home)
-        ("M-<up>"   . sb/dired-jump-to-top)
-        ("M-<down>" . sb/dired-jump-to-bottom)
-        ("i"        . find-file))
-  :custom
-  (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
+  (:map
+    dired-mode-map
+    ("M-<home>" . sb/dired-go-home)
+    ("M-<up>" . sb/dired-jump-to-top)
+    ("M-<down>" . sb/dired-jump-to-bottom)
+    ("i" . find-file))
+  :custom (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
   ;; Guess a default target directory. When there are two dired buffers, Emacs will select another
   ;; buffer as the target (e.g., target for copying files).
   (dired-dwim-target t)
@@ -68,11 +67,12 @@
   :defines dired-cleanup-buffers-too
   :hook
   ;; Load Dired X when Dired is loaded
-  (dired-mode-hook . (lambda ()
-                       (require 'dired-x)
-                       (dired-omit-mode)))
-  :bind
-  ("C-x C-j"  . dired-jump)
+  (dired-mode-hook
+    .
+    (lambda ()
+      (require 'dired-x)
+      (dired-omit-mode)))
+  :bind ("C-x C-j" . dired-jump)
   :custom
   (dired-cleanup-buffers-too t)
   (dired-omit-verbose nil "Do not show messages when omitting files")
@@ -84,17 +84,18 @@
     (setq dired-bind-jump t))
 
   (setq dired-omit-files
-        (concat dired-omit-files
-                "\\|^\\..*$" ; Hide all dotfiles
-                "\\|^.DS_Store\\'"
-                "\\|^.project\\(?:ile\\)?\\'"
-                "\\|^.\\(svn\\|git\\)\\'"
-                "\\|^.cache\\'"
-                "\\|^.ccls-cache\\'"
-                "\\|^__pycache__\\'"
-                "\\|^eln-cache\\'"
-                "\\|\\(?:\\.js\\)?\\.meta\\'"
-                "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+    (concat
+      dired-omit-files
+      "\\|^\\..*$" ; Hide all dotfiles
+      "\\|^.DS_Store\\'"
+      "\\|^.project\\(?:ile\\)?\\'"
+      "\\|^.\\(svn\\|git\\)\\'"
+      "\\|^.cache\\'"
+      "\\|^.ccls-cache\\'"
+      "\\|^__pycache__\\'"
+      "\\|^eln-cache\\'"
+      "\\|\\(?:\\.js\\)?\\.meta\\'"
+      "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
   ;; We can also configure dired-omit-extensions
 
@@ -102,13 +103,12 @@
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Remove 'Omit' from the modeline."
-    (diminish 'dired-omit-mode) dired-mode-map))
+    (diminish 'dired-omit-mode)
+    dired-mode-map))
 
 (use-package dired-narrow ; Narrow `dired' to match filter
   :after dired
-  :bind
-  (:map dired-mode-map
-        ("/" . dired-narrow)))
+  :bind (:map dired-mode-map ("/" . dired-narrow)))
 
 ;; Do not create multiple dired buffers
 (use-package dired+
@@ -118,9 +118,11 @@
   ;; Set before the module is loaded
   (setq diredp-bind-problematic-terminal-keys nil)
   :hook
-  (dired-mode-hook . (lambda ()
-                       (when sb/EMACS27
-                         (diredp-toggle-find-file-reuse-dir 1))))
+  (dired-mode-hook
+    .
+    (lambda ()
+      (when sb/EMACS27
+        (diredp-toggle-find-file-reuse-dir 1))))
   :custom
   (diredp-hide-details-initially-flag nil)
   (diredp-hide-details-propagate-flag nil))
@@ -284,17 +286,17 @@
 (use-package dired-async
   :straight async
   :after (dired async)
-  :hook
-  (dired-mode-hook . dired-async-mode)
+  :hook (dired-mode-hook . dired-async-mode)
   :diminish)
 
 (use-package consult-dir
   :if (eq sb/minibuffer-completion 'vertico)
   :bind
   (("C-x C-d" . consult-dir)
-   :map minibuffer-local-completion-map
-   ("C-x C-d" . consult-dir)
-   ("C-x C-j" . consult-dir-jump-file)))
+    :map
+    minibuffer-local-completion-map
+    ("C-x C-d" . consult-dir)
+    ("C-x C-j" . consult-dir-jump-file)))
 
 ;; (use-package dirvish
 ;;   :straight
@@ -315,20 +317,18 @@
 
 (use-package all-the-icons-dired
   :if (and (display-graphic-p) (not (featurep 'dirvish)))
-  :commands
-  (all-the-icons-dired--refresh-advice)
+  :commands (all-the-icons-dired--refresh-advice)
   :hook
-  (dired-mode-hook . (lambda ()
-                       (unless (file-remote-p default-directory)
-                         (all-the-icons-dired-mode 1))))
-  :custom
-  (all-the-icons-dired-monochrome nil)
+  (dired-mode-hook
+    .
+    (lambda ()
+      (unless (file-remote-p default-directory)
+        (all-the-icons-dired-mode 1))))
+  :custom (all-the-icons-dired-monochrome nil)
   :diminish)
 
 (use-package dired-rsync
-  :bind
-  (:map dired-mode-map
-        ("C-c C-r" . dired-rsync)))
+  :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
 
 (use-package dired-gitignore
   :straight (:host github :repo "johannes-mueller/dired-gitignore.el")

@@ -27,34 +27,34 @@
     (setenv "DICTIONARY" "en_US")
     (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
 
-    (setq ispell-local-dictionary "en_US"
-          ispell-program-name "hunspell"
-          ispell-local-dictionary-alist
-          '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-          ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-          ispell-hunspell-dict-paths-alist
-	      `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
+    (setq
+      ispell-local-dictionary "en_US"
+      ispell-program-name "hunspell"
+      ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+      ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+      ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
 
   (when (and (symbol-value 'sb/IS-LINUX) (executable-find "aspell"))
-    (setq ispell-program-name "aspell"
-          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))
+    (setq
+      ispell-program-name "aspell"
+      ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))
+
 
   (when (and (symbol-value 'sb/IS-LINUX) (executable-find "hunspell"))
     (setenv "LANG" "en_US")
     (setenv "DICTIONARY" "en_US")
     (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
 
-    (setq ispell-local-dictionary "en_US"
-          ispell-program-name "hunspell"
-          ispell-local-dictionary-alist
-          '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-          ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-          ispell-hunspell-dict-paths-alist
-	      `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
+    (setq
+      ispell-local-dictionary "en_US"
+      ispell-program-name "hunspell"
+      ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+      ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+      ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
 
   ;; Skip regions in `org-mode'
-  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC"     . "#\\+END_SRC"))
-  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src"     . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_EXAMPLE" . "#\\+END_EXAMPLE"))
   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
@@ -68,7 +68,7 @@
   ;; Skip some math environments
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
   (add-to-list 'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
-  (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}"    . "\\\\end{align}"))
+  (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}" . "\\\\end{align}"))
 
   ;; Hide the "Starting new Ispell process" message
   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
@@ -83,27 +83,31 @@
     "Go to arg previous spelling error."
     (interactive "p")
     (while (not (= 0 arg))
-      (let ((pos (point))
-            (min (point-min)))
-        (if (and (eq (current-buffer) flyspell-old-buffer-error)
-                 (eq pos flyspell-old-pos-error))
-            (progn
-              (if (= flyspell-old-pos-error min)
-                  ;; Goto beginning of buffer
-                  (progn
-                    (message "Restarting from end of buffer")
-                    (goto-char (point-max)))
-                (backward-word 1))
-              (setq pos (point))))
+      (let
+        (
+          (pos (point))
+          (min (point-min)))
+        (if (and (eq (current-buffer) flyspell-old-buffer-error) (eq pos flyspell-old-pos-error))
+          (progn
+            (if (= flyspell-old-pos-error min)
+              ;; Goto beginning of buffer
+              (progn
+                (message "Restarting from end of buffer")
+                (goto-char (point-max)))
+              (backward-word 1))
+            (setq pos (point))))
         ;; Seek the next error
-        (while (and (> pos min)
-                    (let ((ovs (overlays-at pos))
-                          (r '()))
-                      (while (and (not r) (consp ovs))
-                        (if (flyspell-overlay-p (car ovs))
-                            (setq r t)
-                          (setq ovs (cdr ovs))))
-                      (not r)))
+        (while
+          (and (> pos min)
+            (let
+              (
+                (ovs (overlays-at pos))
+                (r '()))
+              (while (and (not r) (consp ovs))
+                (if (flyspell-overlay-p (car ovs))
+                  (setq r t)
+                  (setq ovs (cdr ovs))))
+              (not r)))
           (backward-word 1)
           (setq pos (point)))
         ;; Save the current location for the next invocation
@@ -112,30 +116,31 @@
         (setq flyspell-old-buffer-error (current-buffer))
         (goto-char pos)
         (if (= pos min)
-            (progn
-              (message "No more misspelled words!")
-              (setq arg 0))
+          (progn
+            (message "No more misspelled words!")
+            (setq arg 0))
           (forward-word)))))
   :straight (:type built-in)
-  :commands
-  (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
+  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :hook
-  (;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
-   ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
-   ;; language-specific words. Furthermore, it is supposedly slow.
-   (prog-mode-hook . flyspell-prog-mode)
-   ;; `find-file-hook' will not work for buffers with no associated files
-   (emacs-startup-hook . (lambda ()
-                           (when (string= (buffer-name) "*scratch*")
-                             (flyspell-mode 1))))
-   (text-mode-hook . flyspell-mode))
+  ( ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
+    ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
+    ;; language-specific words. Furthermore, it is supposedly slow.
+    (prog-mode-hook . flyspell-prog-mode)
+    ;; `find-file-hook' will not work for buffers with no associated files
+    (emacs-startup-hook
+      .
+      (lambda ()
+        (when (string= (buffer-name) "*scratch*")
+          (flyspell-mode 1))))
+    (text-mode-hook . flyspell-mode))
   :bind
   (("C-c f f" . flyspell-mode)
-   ("C-c f b" . flyspell-buffer)
-   :map flyspell-mode-map
-   ("C-,"     . sb/flyspell-goto-previous-error))
-  :custom
-  (flyspell-abbrev-p t "Add corrections to abbreviation table")
+    ("C-c f b" . flyspell-buffer)
+    :map
+    flyspell-mode-map
+    ("C-," . sb/flyspell-goto-previous-error))
+  :custom (flyspell-abbrev-p t "Add corrections to abbreviation table")
   ;; Do not print messages for every word (when checking the entire buffer). This is a major
   ;; performance gain.
   (flyspell-issue-message-flag nil)
@@ -154,9 +159,7 @@
 
 (use-package flyspell-correct
   :after flyspell
-  :bind
-  (:map flyspell-mode-map
-        ("C-;" . flyspell-correct-at-point)))
+  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point)))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
@@ -167,75 +170,87 @@
   :defines spell-fu-directory
   :commands spell-fu-mode
   :init
-  (add-hook 'text-mode-hook
-            (lambda ()
-              (setq spell-fu-faces-exclude '(hl-line
-                                             ;; `nxml-mode' is derived from `text-mode'
-                                             nxml-attribute-local-name))
-              (spell-fu-mode)))
+  (add-hook
+    'text-mode-hook
+    (lambda ()
+      (setq spell-fu-faces-exclude
+        '
+        (hl-line
+          ;; `nxml-mode' is derived from `text-mode'
+          nxml-attribute-local-name))
+      (spell-fu-mode)))
 
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (setq spell-fu-faces-exclude '(org-block
-                                             org-block-begin-line
-                                             org-block-end-line
-                                             org-cite
-                                             org-cite-key
-                                             org-code
-                                             org-date
-                                             org-footnote
-                                             org-formula
-                                             org-latex-and-related
-                                             org-link
-                                             org-meta-line
-                                             org-property-value
-                                             org-ref-cite-face
-                                             org-special-keyword
-                                             org-tag
-                                             org-todo
-                                             org-todo-keyword-done
-                                             org-todo-keyword-habt
-                                             org-todo-keyword-kill
-                                             org-todo-keyword-outd
-                                             org-todo-keyword-todo
-                                             org-todo-keyword-wait
-                                             org-verbatim
-                                             org-modern-tag
-                                             hl-line))
-              (spell-fu-mode)))
+  (add-hook
+    'org-mode-hook
+    (lambda ()
+      (setq spell-fu-faces-exclude
+        '
+        (org-block
+          org-block-begin-line
+          org-block-end-line
+          org-cite
+          org-cite-key
+          org-code
+          org-date
+          org-footnote
+          org-formula
+          org-latex-and-related
+          org-link
+          org-meta-line
+          org-property-value
+          org-ref-cite-face
+          org-special-keyword
+          org-tag
+          org-todo
+          org-todo-keyword-done
+          org-todo-keyword-habt
+          org-todo-keyword-kill
+          org-todo-keyword-outd
+          org-todo-keyword-todo
+          org-todo-keyword-wait
+          org-verbatim
+          org-modern-tag
+          hl-line))
+      (spell-fu-mode)))
 
-  (add-hook 'markdown-mode-hook
-            (lambda ()
-              (setq spell-fu-faces-exclude '(markdown-blockquote-face
-                                             markdown-code-face
-                                             markdown-html-attr-name-face
-                                             markdown-html-attr-value-face
-                                             markdown-html-tag-name-face
-                                             markdown-inline-code-face
-                                             markdown-link-face
-                                             markdown-markup-face
-                                             markdown-plain-url-face
-                                             markdown-reference-face
-                                             markdown-url-face
-                                             pandoc-citation-key-face
-                                             hl-line))
-              (spell-fu-mode)))
+  (add-hook
+    'markdown-mode-hook
+    (lambda ()
+      (setq spell-fu-faces-exclude
+        '
+        (markdown-blockquote-face
+          markdown-code-face
+          markdown-html-attr-name-face
+          markdown-html-attr-value-face
+          markdown-html-tag-name-face
+          markdown-inline-code-face
+          markdown-link-face
+          markdown-markup-face
+          markdown-plain-url-face
+          markdown-reference-face
+          markdown-url-face
+          pandoc-citation-key-face
+          hl-line))
+      (spell-fu-mode)))
 
   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-    (add-hook hook (lambda ()
-                     (setq spell-fu-faces-exclude '(font-latex-math-face
-                                                    font-latex-sedate-face
-                                                    font-lock-function-name-face
-                                                    font-lock-keyword-face
-                                                    font-lock-variable-name-face
-                                                    hl-line))
-                     (spell-fu-mode))))
+    (add-hook
+      hook
+      (lambda ()
+        (setq spell-fu-faces-exclude
+          '
+          (font-latex-math-face
+            font-latex-sedate-face
+            font-lock-function-name-face
+            font-lock-keyword-face
+            font-lock-variable-name-face
+            hl-line))
+        (spell-fu-mode))))
   :bind
   (("C-c f n" . spell-fu-goto-next-error)
-   ("C-c f p" . spell-fu-goto-previous-error)
-   ("C-c f a" . spell-fu-word-add))
-  :custom
-  (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+    ("C-c f p" . spell-fu-goto-previous-error)
+    ("C-c f a" . spell-fu-word-add))
+  :custom (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
   :config
   ;; https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/64
   (add-to-list 'spell-fu-faces-include 'font-lock-string-face)
@@ -246,17 +261,17 @@
   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
 
   ;; Ignore read-only buffers
-  (setq global-spell-fu-ignore-buffer (lambda (buf)
-                                        (buffer-local-value 'buffer-read-only buf))))
+  (setq global-spell-fu-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))))
 
 (use-package consult-flyspell
   :after (consult flyspell)
   :defines consult-flyspell-select-function
   :bind ("C-c f l" . consult-flyspell)
   :config
-  (setq consult-flyspell-select-function (lambda ()
-                                           (flyspell-correct-at-point)
-                                           (consult-flyspell))))
+  (setq consult-flyspell-select-function
+    (lambda ()
+      (flyspell-correct-at-point)
+      (consult-flyspell))))
 
 (provide 'init-spell)
 

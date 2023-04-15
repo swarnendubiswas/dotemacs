@@ -25,13 +25,13 @@
     (goto-char (cadr completion-in-region--data)))
   :straight (:files (:defaults "extensions/*"))
   :if (eq sb/capf 'corfu)
-  :hook
-  (emacs-startup-hook . global-corfu-mode)
+  :hook (emacs-startup-hook . global-corfu-mode)
   :bind
-  (:map corfu-map
-        ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
-        ([remap move-end-of-line] . sb/corfu-end-of-prompt)
-        ([escape] . corfu-quit))
+  (:map
+    corfu-map
+    ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
+    ([remap move-end-of-line] . sb/corfu-end-of-prompt)
+    ([escape] . corfu-quit))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -43,16 +43,12 @@
   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
   ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
   ;; entries.
-  (add-hook 'prog-mode-hook (lambda ()
-                              (setq-local corfu-auto-prefix 3))))
+  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 3))))
 
 (use-package corfu-info
   :straight (:files (:defaults "extensions/*") :includes (corfu-info))
   :after corfu
-  :bind
-  (:map corfu-map
-        ("M-d" . corfu-info-documentation)
-        ("M-l" . corfu-info-location)))
+  :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
 
 ;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
 (use-package corfu-indexed
@@ -86,9 +82,7 @@
 (use-package corfu-quick
   :straight (:files (:defaults "extensions/*") :includes (corfu-quick))
   :after corfu
-  :bind
-  (:map corfu-map
-        ("C-'" . corfu-quick-insert)))
+  :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
 
 ;; We do not need this if we use prescient-based sorting.
 
@@ -104,15 +98,13 @@
   :straight (:files (:defaults "extensions/*") :includes (corfu-echo))
   :after corfu
   :commands corfu-echo-mode
-  :init
-  (corfu-echo-mode 1))
+  :init (corfu-echo-mode 1))
 
 (use-package corfu-popupinfo
   :straight (:files (:defaults "extensions/*") :includes (corfu-popupinfo))
   :after corfu
   :commands corfu-popupinfo-mode
-  :init
-  (corfu-popupinfo-mode 1))
+  :init (corfu-popupinfo-mode 1))
 
 (use-package popon
   :straight (:host codeberg :repo "akib/emacs-popon")
@@ -121,10 +113,8 @@
 (use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
-  :hook
-  (corfu-mode-hook . corfu-terminal-mode)
-  :custom
-  (corfu-terminal-position-right-margin 10))
+  :hook (corfu-mode-hook . corfu-terminal-mode)
+  :custom (corfu-terminal-position-right-margin 10))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -139,38 +129,38 @@
 `cape-capf-buster' version. Also add `cape-file' and
 `company-yasnippet' backends."
     (setf (elt (cl-member 'lsp-completion-at-point completion-at-point-functions) 0)
-          (cape-capf-buster #'lsp-completion-at-point))
+      (cape-capf-buster #'lsp-completion-at-point))
     (add-to-list 'completion-at-point-functions (cape-company-to-capf #'company-yasnippet))
     (add-to-list 'completion-at-point-functions #'cape-dabbrev t))
   :after corfu
   :demand t
   :commands
   (cape-history ; Complete from Eshell, Comint or minibuffer history
-   cape-file
-   cape-keyword ; Complete programming language keyword
-   cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
-   cape-abbrev ; Complete abbreviation at point
-   cape-dict ; Complete word from dictionary at point
-   cape-line ; Complete current line from other lines in buffer
-   cape-symbol ; Elisp symbol
-   cape-ispell ; Complete word at point with Ispell
-   ;; Complete with Dabbrev at point
-   cape-dabbrev
-   cape-capf-buster
-   cape-company-to-capf
-   cape-super-capf
-   sh-completion-at-point-function
-   comint-completion-at-point
-   citre-completion-at-point
-   TeX--completion-at-point)
+    cape-file
+    cape-keyword ; Complete programming language keyword
+    cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
+    cape-abbrev ; Complete abbreviation at point
+    cape-dict ; Complete word from dictionary at point
+    cape-line ; Complete current line from other lines in buffer
+    cape-symbol ; Elisp symbol
+    cape-ispell ; Complete word at point with Ispell
+    ;; Complete with Dabbrev at point
+    cape-dabbrev
+    cape-capf-buster
+    cape-company-to-capf
+    cape-super-capf
+    sh-completion-at-point-function
+    comint-completion-at-point
+    citre-completion-at-point
+    TeX--completion-at-point)
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev
-                                                               #'cape-dict
-                                                               #'cape-ispell) 'append)
-  :custom
-  (cape-dabbrev-min-length 3)
+  (add-to-list
+    'completion-at-point-functions
+    (cape-super-capf #'cape-dabbrev #'cape-dict #'cape-ispell)
+    'append)
+  :custom (cape-dabbrev-min-length 3)
   ;; Checking all other buffers for completetion ignoring the major mode seems to be expensive
   (cape-dabbrev-check-other-buffers nil)
   (cape-dict-file (expand-file-name "wordlist.5" sb/extras-directory))
@@ -178,89 +168,98 @@
   ;; https://github.com/minad/cape/issues/53
   ;; Override CAPFS for specific major modes
 
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (setq-local completion-at-point-functions
-                          (list
-                           (cape-super-capf
-                            #'elisp-completion-at-point
-                            #'citre-completion-at-point
-                            #'cape-file
-                            #'cape-symbol ; Elisp symbols
-                            #'cape-dabbrev
-                            (cape-capf-inside-string #'cape-dict)
-                            (cape-capf-inside-comment #'cape-dict)
-                            (cape-capf-inside-string #'cape-ispell)
-                            (cape-capf-inside-comment #'cape-ispell))))))
+  (add-hook
+    'emacs-lisp-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list
+          (cape-super-capf
+            #'elisp-completion-at-point
+            #'citre-completion-at-point
+            #'cape-file
+            #'cape-symbol ; Elisp symbols
+            #'cape-dabbrev
+            (cape-capf-inside-string #'cape-dict)
+            (cape-capf-inside-comment #'cape-dict)
+            (cape-capf-inside-string #'cape-ispell)
+            (cape-capf-inside-comment #'cape-ispell))))))
 
   ;; FIXME: How can we simplify the following mess?
 
   (with-eval-after-load "lsp-mode"
-    (add-hook 'sh-mode-hook
-              (lambda ()
-                (add-hook 'lsp-managed-mode-hook
-                          (lambda ()
-                            (setq-local completion-at-point-functions
-                                        (list
-                                         (cape-super-capf #'lsp-completion-at-point
-                                                          #'citre-completion-at-point
-                                                          ;; #'sh-completion-at-point-function
-                                                          #'cape-file
-                                                          #'cape-dabbrev
-                                                          (cape-capf-inside-string #'cape-dict)
-                                                          (cape-capf-inside-comment #'cape-dict)
-                                                          (cape-capf-inside-string #'cape-ispell)
-                                                          (cape-capf-inside-comment #'cape-ispell))))))))
+    (add-hook
+      'sh-mode-hook
+      (lambda ()
+        (add-hook
+          'lsp-managed-mode-hook
+          (lambda ()
+            (setq-local completion-at-point-functions
+              (list
+                (cape-super-capf
+                  #'lsp-completion-at-point
+                  #'citre-completion-at-point
+                  ;; #'sh-completion-at-point-function
+                  #'cape-file
+                  #'cape-dabbrev
+                  (cape-capf-inside-string #'cape-dict)
+                  (cape-capf-inside-comment #'cape-dict)
+                  (cape-capf-inside-string #'cape-ispell)
+                  (cape-capf-inside-comment #'cape-ispell))))))))
 
     (dolist (lsp-prog-mode '(c++-mode-hook java-mode-hook python-mode-hook))
-      (add-hook lsp-prog-mode
-                (lambda ()
-                  (add-hook 'lsp-managed-mode-hook
-                            (lambda()
-                              (setq-local completion-at-point-functions
-                                          (list
-                                           (cape-super-capf #'lsp-completion-at-point
-                                                            #'citre-completion-at-point
-                                                            #'cape-file
-                                                            #'cape-keyword
-                                                            #'cape-dabbrev
-                                                            (cape-capf-inside-string #'cape-dict)
-                                                            (cape-capf-inside-comment #'cape-dict)
-                                                            (cape-capf-inside-string #'cape-ispell)
-                                                            (cape-capf-inside-comment #'cape-ispell)))))))))
+      (add-hook
+        lsp-prog-mode
+        (lambda ()
+          (add-hook
+            'lsp-managed-mode-hook
+            (lambda ()
+              (setq-local completion-at-point-functions
+                (list
+                  (cape-super-capf
+                    #'lsp-completion-at-point
+                    #'citre-completion-at-point
+                    #'cape-file
+                    #'cape-keyword
+                    #'cape-dabbrev
+                    (cape-capf-inside-string #'cape-dict)
+                    (cape-capf-inside-comment #'cape-dict)
+                    (cape-capf-inside-string #'cape-ispell)
+                    (cape-capf-inside-comment #'cape-ispell)))))))))
 
     (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
-      (add-hook modes
-                (lambda ()
-                  (add-hook 'lsp-managed-mode-hook
-                            (lambda()
-                              (setq-local completion-at-point-functions
-                                          (list
-                                           (cape-super-capf #'lsp-completion-at-point
-                                                            #'citre-completion-at-point
-                                                            ;; #'TeX--completion-at-point
-                                                            ;; Leads to unwanted completions
-                                                            ;; #'cape-tex
-                                                            #'cape-file
-                                                            #'cape-dabbrev
-                                                            #'cape-dict
-                                                            #'cape-ispell)))))))))
-
-  (add-hook 'sh-mode-hook
+      (add-hook
+        modes
+        (lambda ()
+          (add-hook
+            'lsp-managed-mode-hook
             (lambda ()
-              (add-hook 'eglot-managed-mode-hook
-                        (lambda ()
-                          (setq-local completion-at-point-functions
-                                      (list
-                                       (cape-super-capf #'eglot-completion-at-point
-                                                        #'citre-completion-at-point
-                                                        ;; #'sh-completion-at-point-function
-                                                        #'cape-file
-                                                        #'cape-dabbrev
-                                                        (cape-capf-inside-string #'cape-dict)
-                                                        (cape-capf-inside-comment #'cape-dict)
-                                                        (cape-capf-inside-string #'cape-ispell)
-                                                        (cape-capf-inside-comment #'cape-ispell))))))))
+              (setq-local completion-at-point-functions
+                (list
+                  (cape-super-capf
+                    #'lsp-completion-at-point #'citre-completion-at-point
+                    ;; #'TeX--completion-at-point
+                    ;; Leads to unwanted completions
+                    ;; #'cape-tex
+                    #'cape-file #'cape-dabbrev #'cape-dict #'cape-ispell)))))))))
+
+  (add-hook
+    'sh-mode-hook
+    (lambda ()
+      (add-hook
+        'eglot-managed-mode-hook
+        (lambda ()
+          (setq-local completion-at-point-functions
+            (list
+              (cape-super-capf
+                #'eglot-completion-at-point
+                #'citre-completion-at-point
+                ;; #'sh-completion-at-point-function
+                #'cape-file
+                #'cape-dabbrev
+                (cape-capf-inside-string #'cape-dict)
+                (cape-capf-inside-comment #'cape-dict)
+                (cape-capf-inside-string #'cape-ispell)
+                (cape-capf-inside-comment #'cape-ispell))))))))
 
   ;; (dolist (prog '(c++-mode-hook java-mode-hook python-mode-hook))
   ;; (add-hook prog
@@ -280,25 +279,21 @@
   ;;                                                       (cape-capf-inside-comment #'cape-ispell)))))))))
 
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook modes
-              (lambda ()
-                (add-hook 'eglot-managed-mode-hook
-                          (lambda()
-                            (setq-local completion-at-point-functions
-                                        (list
-                                         (cape-super-capf #'eglot-completion-at-point
-                                                          #'citre-completion-at-point
-                                                          ;; #'cape-tex ; Leads to unwanted completions
-                                                          #'cape-file
-                                                          #'cape-dabbrev
-                                                          #'cape-dict
-                                                          #'cape-ispell))))))))
-
-  )
+    (add-hook
+      modes
+      (lambda ()
+        (add-hook
+          'eglot-managed-mode-hook
+          (lambda ()
+            (setq-local completion-at-point-functions
+              (list
+                (cape-super-capf
+                  #'eglot-completion-at-point #'citre-completion-at-point
+                  ;; #'cape-tex ; Leads to unwanted completions
+                  #'cape-file #'cape-dabbrev #'cape-dict #'cape-ispell)))))))))
 
 (use-package kind-icon
-  :if (and (eq sb/corfu-icons 'kind-icon)
-           (display-graphic-p))
+  :if (and (eq sb/corfu-icons 'kind-icon) (display-graphic-p))
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
@@ -307,17 +302,14 @@
   ;; Prefer smaller icons and a more compact popup
   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
   (kind-icon-blend-background nil)
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package kind-all-the-icons
   :straight (:host github :repo "Hirozy/kind-all-the-icons")
-  :if (and (eq sb/corfu-icons 'kind-all-the-icons)
-           (display-graphic-p))
+  :if (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
   :after corfu
   :demand t
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
+  :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
 (use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")

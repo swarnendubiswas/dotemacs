@@ -301,6 +301,7 @@
 ;; format-all-the-code just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 
 (use-package elisp-autofmt
+  :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main")
   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
   :hook (emacs-lisp-mode-hook . elisp-autofmt-mode)
   :custom (elisp-autofmt-style 'fixed))

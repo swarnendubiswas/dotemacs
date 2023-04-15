@@ -167,8 +167,7 @@
 
 (use-package olivetti
   :hook
-  ;; `emacs-startup-hook' does not work
-  ((text-mode-hook prog-mode-hook) . olivetti-mode)
+  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
   :custom (olivetti-body-width 108)
   :diminish)
 

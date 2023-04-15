@@ -33,40 +33,43 @@
 
   (setf straight-profiles `((nil . "straight.lockfile.el")))
 
-  (setq straight-build-dir (format "build/%d%s%d"
-                                   emacs-major-version
-                                   version-separator
-                                   emacs-minor-version)
-        ;; Do not check packages on startup to reduce load time
-        straight-check-for-modifications '(check-on-save find-when-checking)
-        straight-use-package-by-default t
-        ;; There is no need to download the whole Git history, and a single branch often suffices.
-        straight-vc-git-default-clone-depth '(1 single-branch)
-        straight-disable-native-compile nil)
+  (setq
+    straight-build-dir
+    (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
+    ;; Do not check packages on startup to reduce load time
+    straight-check-for-modifications '(check-on-save find-when-checking)
+    straight-use-package-by-default t
+    ;; There is no need to download the whole Git history, and a single branch often suffices.
+    straight-vc-git-default-clone-depth '(1 single-branch)
+    straight-disable-native-compile nil)
 
-  (let ((bootstrap-file
-         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-        (bootstrap-version 6))
+  (let
+    (
+      (bootstrap-file
+        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
+        (url-retrieve-synchronously
+          "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+          'silent
+          'inhibit-cookies)
         (goto-char (point-max))
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
   ;; These variables need to be set before loading `use-package'.
-  (setq use-package-enable-imenu-support t
-        use-package-hook-name-suffix     nil)
+  (setq
+    use-package-enable-imenu-support t
+    use-package-hook-name-suffix nil)
 
   (straight-use-package 'use-package))
 
 (unless (bound-and-true-p sb/disable-package.el)
   (with-eval-after-load 'package
-    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/")        t)
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
     (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-    (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/")           t))
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
   ;; Initialise the package management system. Another option is to construct the `load-path'
   ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
@@ -79,10 +82,11 @@
   (defvar use-package-always-ensure)
 
   ;; Avoid manual installations whenever I modify package installations
-  (setq use-package-always-ensure        t
-        ;; These variables need to best before loading `use-package'
-        use-package-enable-imenu-support t
-        use-package-hook-name-suffix     nil)
+  (setq
+    use-package-always-ensure t
+    ;; These variables need to best before loading `use-package'
+    use-package-enable-imenu-support t
+    use-package-hook-name-suffix nil)
 
   (eval-when-compile
     (require 'use-package)))
@@ -112,19 +116,21 @@
 (defvar use-package-minimum-reported-time)
 
 (if (bound-and-true-p sb/debug-init-file)
-    (progn
-      (setq debug-on-error                 nil
-            debug-on-event                 'sigusr2
-            use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-            use-package-verbose            t
-            use-package-minimum-reported-time 0 ; Show everything
-            use-package-expand-minimally   nil))
   (progn
-    (setq use-package-always-defer       t
-          ;; Disable error checks during macro expansion because the configuration just works
-          use-package-expand-minimally   t
-          use-package-compute-statistics nil
-          use-package-verbose            nil)))
+    (setq
+      debug-on-error nil
+      debug-on-event 'sigusr2
+      use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+      use-package-verbose t
+      use-package-minimum-reported-time 0 ; Show everything
+      use-package-expand-minimally nil))
+  (progn
+    (setq
+      use-package-always-defer t
+      ;; Disable error checks during macro expansion because the configuration just works
+      use-package-expand-minimally t
+      use-package-compute-statistics nil
+      use-package-verbose nil)))
 
 (use-package diminish
   :demand t)
@@ -137,36 +143,31 @@
 ;; https://github.com/jwiegley/use-package/pull/993/files
 (use-package bind-key
   :functions bind-key--remove
-  :bind
-  ("C-c d k" . describe-personal-keybindings))
+  :bind ("C-c d k" . describe-personal-keybindings))
 
 (use-package no-littering
   :demand t
   :config
   (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
+    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
 (use-package package
   :unless (bound-and-true-p sb/disable-package.el)
   :after no-littering
-  :bind
-  (("C-c d p" . package-quickstart-refresh)
-   ("C-c d l" . package-list-packages))
+  :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
   :custom
   ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
   (package-quickstart t))
 
-(defcustom sb/custom-file
-  (no-littering-expand-var-file-name "custom.el")
+(defcustom sb/custom-file (no-littering-expand-var-file-name "custom.el")
   "File to write Emacs customizations."
-  :type  'string
+  :type 'string
   :group 'sb/emacs)
 
 ;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
-(defcustom sb/private-file
-  (no-littering-expand-etc-file-name "private.el")
+(defcustom sb/private-file (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
-  :type  'string
+  :type 'string
   :group 'sb/emacs)
 
 ;; Asynchronously byte compile packages installed with `package.el'
@@ -191,8 +192,9 @@
   ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
   ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
   ;; "prettier" from $PATH are also not found without the interactive flag.
-  (setq exec-path-from-shell-check-startup-files nil
-        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
+  (setq
+    exec-path-from-shell-check-startup-files nil
+    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)

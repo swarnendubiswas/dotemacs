@@ -18,13 +18,12 @@
 
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
-  :defines (org-hide-leading-stars-before-indent-mode
-            org-src-strip-leading-and-trailing-blank-lines
-            org-src-tabs-acts-natively)
-  :commands
-  (org-indent-mode org-indent-item org-outdent-item)
-  :init
-  (setq org-modules '(ol-doi ol-bibtex ol-docview ol-info org-id org-protocol ob-python ob-sh))
+  :defines
+  (org-hide-leading-stars-before-indent-mode
+    org-src-strip-leading-and-trailing-blank-lines
+    org-src-tabs-acts-natively)
+  :commands (org-indent-mode org-indent-item org-outdent-item)
+  :init (setq org-modules '(ol-doi ol-bibtex ol-docview ol-info org-id org-protocol ob-python ob-sh))
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-emphasized-text t)
@@ -77,50 +76,49 @@
   (add-to-list 'org-latex-packages-alist '("" "minted"))
 
   (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+    '
+    ("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
-  :bind-keymap
-  ("C-c o" . org-mode-map)
+  :bind-keymap ("C-c o" . org-mode-map)
   :bind
-  (:map org-mode-map
-        ("M-<left>")
-        ("M-<right>")
-        ("M-<up>")
-        ("M-<down>")
-        ("C-'")
-        ("C-c C-d") ; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
-        ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
-        ("C-c C-j")
-        ;; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
-        ("M-e")
-        ("<tab>"     . org-indent-item)
-        ("<backtab>" . org-outdent-item)
-        ("M-a"       . org-backward-paragraph)
-        ("M-e"       . org-forward-paragraph)
-        ("M-{"       . org-backward-element)
-        ("M-}"       . org-forward-element)
-        ("C-c C-,"   . org-insert-structure-template)))
+  (:map
+    org-mode-map
+    ("M-<left>")
+    ("M-<right>")
+    ("M-<up>")
+    ("M-<down>")
+    ("C-'")
+    ("C-c C-d") ; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
+    ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
+    ("C-c C-j")
+    ;; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
+    ("M-e")
+    ("<tab>" . org-indent-item)
+    ("<backtab>" . org-outdent-item)
+    ("M-a" . org-backward-paragraph)
+    ("M-e" . org-forward-paragraph)
+    ("M-{" . org-backward-element)
+    ("M-}" . org-forward-element)
+    ("C-c C-," . org-insert-structure-template)))
 
 ;; Disable the package to get consistent styles across themes.
 (use-package org-bullets
   :disabled t
-  :hook
-  (org-mode-hook . org-bullets-mode))
+  :hook (org-mode-hook . org-bullets-mode))
 
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (:host github :repo "awth13/org-appear")
-  :hook
-  (org-mode-hook . org-appear-mode)
+  :hook (org-mode-hook . org-appear-mode)
   :custom
   (org-appear-autosubmarkers t)
-  (org-appear-autoentities   t)
-  (org-appear-autolinks      t)
-  (org-appear-autoemphasis   t))
+  (org-appear-autoentities t)
+  (org-appear-autolinks t)
+  (org-appear-autoemphasis t))
 
 (use-package ox-gfm
   :after org
@@ -128,20 +126,19 @@
 
 (use-package ox-pandoc
   :after org
-  :commands (org-pandoc-export-to-markdown
-             org-pandoc-export-as-markdown
-             org-pandoc-export-to-markdown-and-open))
+  :commands
+  (org-pandoc-export-to-markdown
+    org-pandoc-export-as-markdown
+    org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern
   :disabled t
-  :hook
-  (org-mode-hook . org-modern-mode))
+  :hook (org-mode-hook . org-modern-mode))
 
 (use-package org-modern-indent
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :disabled t
-  :hook
-  (org-mode-hook . org-modern-indent-mode))
+  :hook (org-mode-hook . org-modern-indent-mode))
 
 ;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
 ;; https://orgmode.org/manual/Escape-Character.html
@@ -149,14 +146,12 @@
 
 (use-package org-superstar
   :disabled t
-  :hook
-  (org-mode-hook . org-superstar-mode))
+  :hook (org-mode-hook . org-superstar-mode))
 
 (use-package org-block-capf
   :straight (:host github :repo "xenodium/org-block-capf")
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-  :custom
-  (org-block-capf-edit-style 'inline))
+  :custom (org-block-capf-edit-style 'inline))
 
 (provide 'init-org)
 

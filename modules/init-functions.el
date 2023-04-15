@@ -23,14 +23,9 @@ With negative prefix, apply to -N lines above.
 If region is active, apply to active region instead."
   (interactive "p")
   (if (use-region-p)
-      (comment-or-uncomment-region
-       (region-beginning) (region-end))
-    (let ((range
-           (list (line-beginning-position)
-                 (goto-char (line-end-position n)))))
-      (comment-or-uncomment-region
-       (apply #'min range)
-       (apply #'max range)))
+    (comment-or-uncomment-region (region-beginning) (region-end))
+    (let ((range (list (line-beginning-position) (goto-char (line-end-position n)))))
+      (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
     (forward-line 1)
     (back-to-indentation)))
 
@@ -40,7 +35,7 @@ If region is active, apply to active region instead."
 Increase line spacing by two line height."
   (interactive)
   (if (eq line-spacing nil)
-      (setq line-spacing 2)
+    (setq line-spacing 2)
     (setq line-spacing nil))
   (redraw-frame (selected-frame)))
 
@@ -60,7 +55,7 @@ Increase line spacing by two line height."
   "Switch to minibuffer window."
   (interactive)
   (if (active-minibuffer-window)
-      (select-window (active-minibuffer-window))
+    (select-window (active-minibuffer-window))
     (error "Minibuffer is not active")))
 
 (defun sb/switch-to-scratch ()
@@ -72,36 +67,36 @@ Increase line spacing by two line height."
 (defun sb/insert-date (arg)
   "Insert today's date.  With prefix argument ARG, use a different format."
   (interactive "P")
-  (insert (if arg
-              (format-time-string "%d.%m.%Y")
-            (format-time-string "%\"Mmmm\" %d, %Y"))))
+  (insert
+    (if arg
+      (format-time-string "%d.%m.%Y")
+      (format-time-string "%\"Mmmm\" %d, %Y"))))
 
 ;; http://zck.me/emacs-move-file
 (defun sb/move-file (new-location)
   "Write this file to NEW-LOCATION, and delete the old one."
-  (interactive (list (if buffer-file-name
-                         (read-file-name "Move file to: ")
-                       (read-file-name "Move file to: "
-                                       default-directory
-                                       (expand-file-name (file-name-nondirectory (buffer-name))
-                                                         default-directory)))))
+  (interactive
+    (list
+      (if buffer-file-name
+        (read-file-name "Move file to: ")
+        (read-file-name "Move file to: "
+          default-directory
+          (expand-file-name (file-name-nondirectory (buffer-name)) default-directory)))))
   (when (file-exists-p new-location)
     (delete-file new-location))
   (let ((old-location (buffer-file-name)))
     (write-file new-location t)
-    (when (and old-location
-               (file-exists-p new-location)
-               (not (string-equal old-location new-location)))
+    (when
+      (and old-location (file-exists-p new-location) (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
 ;; We can use the snap installation of "universal-ctags", but snap packages have poor performance. A
 ;; better alternative is to build and install "ctags" locally. Check "setup-emacs.sh" for
 ;; installation instructions.
 
-(defcustom sb/ctags-path
-  "/usr/local/bin/ctags"
+(defcustom sb/ctags-path "/usr/local/bin/ctags"
   "Absolute path to Universal Ctags executable."
-  :type  'string
+  :type 'string
   :group 'sb/emacs)
 
 ;; https://www.emacswiki.org/emacs/BuildTags
@@ -109,7 +104,10 @@ Increase line spacing by two line height."
   "Create tags file with ctags in DIR-NAME."
   (interactive "DDirectory: ")
   (shell-command
-   (format "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s" sb/ctags-path (directory-file-name dir-name))))
+    (format
+      "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s"
+      sb/ctags-path
+      (directory-file-name dir-name))))
 
 (declare-function ivy-read "ivy")
 
@@ -117,15 +115,37 @@ Increase line spacing by two line height."
 ;; You need to check for either major modes or buffer names, since a few major modes are commonly
 ;; used.
 (defcustom sb/skippable-buffers
-  '("TAGS" "*Messages*" "*Backtrace*" "*scratch*"
+  '
+  ("TAGS"
+    "*Messages*"
+    "*Backtrace*"
+    "*scratch*"
     "*company-documentation*" ; Major mode is `python-mode'
-    "*Help*" "*Packages*" "*prettier (local)*" "*emacs*" "*Warnings*" "*Compile-Log* *lsp-log*"
-    "*pyright*" "*texlab::stderr*" "*texlab*" "*Paradox Report*" "*perl-language-server*"
-    "*perl-language-server::stderr*" "*json-ls*" "*json-ls::stderr*" "*xmlls*" "*xmlls::stderr*"
-    "*pyright::stderr*" "*yamlls*" "*yamlls::stderr*" "*jdtls*" "*jdtls::stderr*"
-    "*clangd::stderr*" "*shfmt errors*")
+    "*Help*"
+    "*Packages*"
+    "*prettier (local)*"
+    "*emacs*"
+    "*Warnings*"
+    "*Compile-Log* *lsp-log*"
+    "*pyright*"
+    "*texlab::stderr*"
+    "*texlab*"
+    "*Paradox Report*"
+    "*perl-language-server*"
+    "*perl-language-server::stderr*"
+    "*json-ls*"
+    "*json-ls::stderr*"
+    "*xmlls*"
+    "*xmlls::stderr*"
+    "*pyright::stderr*"
+    "*yamlls*"
+    "*yamlls::stderr*"
+    "*jdtls*"
+    "*jdtls::stderr*"
+    "*clangd::stderr*"
+    "*shfmt errors*")
   "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
-  :type  '(repeat string)
+  :type '(repeat string)
   :group 'sb/emacs)
 
 ;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
@@ -134,21 +154,24 @@ Increase line spacing by two line height."
   (with-current-buffer buffer-or-string
     major-mode))
 
-(defcustom sb/skippable-modes '(dired-mode fundamental-mode
-                                           helpful-mode
-                                           special-mode
-                                           paradox-menu-mode
-                                           lsp-log-io-mode
-                                           help-mode
-                                           magit-status-mode
-                                           magit-process-mode
-                                           magit-diff-mode
-                                           tags-table-mode
-                                           compilation-mode
-                                           flycheck-verify-mode
-                                           ibuffer-mode)
+(defcustom sb/skippable-modes
+  '
+  (dired-mode
+    fundamental-mode
+    helpful-mode
+    special-mode
+    paradox-menu-mode
+    lsp-log-io-mode
+    help-mode
+    magit-status-mode
+    magit-process-mode
+    magit-diff-mode
+    tags-table-mode
+    compilation-mode
+    flycheck-verify-mode
+    ibuffer-mode)
   "List of major modes to skip over when calling `change-buffer'."
-  :type  '(repeat string)
+  :type '(repeat string)
   :group 'sb/emacs)
 
 (defun sb/change-buffer (change-buffer)
@@ -159,8 +182,9 @@ or the major mode is not in `sb/skippable-modes'."
     (funcall change-buffer)
     (let ((first-change (current-buffer)))
       (catch 'loop
-        (while (or (member (buffer-name) sb/skippable-buffers)
-                   (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
+        (while
+          (or (member (buffer-name) sb/skippable-buffers)
+            (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
           (funcall change-buffer)
           (when (eq (current-buffer) first-change)
             (switch-to-buffer initial)
@@ -188,8 +212,10 @@ or the major mode is not in `sb/skippable-modes'."
 (defun sb/get-derived-modes (mode)
   "Return a list of the ancestor modes that MODE is derived from."
   (interactive)
-  (let ((modes ())
-        (parent nil))
+  (let
+    (
+      (modes ())
+      (parent nil))
     (while (setq parent (get mode 'derived-mode-parent))
       (push parent modes)
       (setq mode parent))
@@ -199,9 +225,9 @@ or the major mode is not in `sb/skippable-modes'."
   "Show line numbers temporarily, while prompting for the line number input."
   (interactive)
   (unwind-protect
-      (progn
-        (linum-mode 1)
-        (forward-line (read-number "Goto line: ")))
+    (progn
+      (linum-mode 1)
+      (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
 
 ;; (defun sb/compile-and-run-c-program ()
@@ -216,9 +242,11 @@ or the major mode is not in `sb/skippable-modes'."
   "Show the current location and put it into the kill ring.
 Use the filename relative to the current VC root directory."
   (interactive)
-  (let* ((file-name (file-relative-name buffer-file-name (vc-root-dir)))
-	     (line-number (line-number-at-pos nil t))
-	     (location (format "%s:%s" file-name line-number)))
+  (let*
+    (
+      (file-name (file-relative-name buffer-file-name (vc-root-dir)))
+      (line-number (line-number-at-pos nil t))
+      (location (format "%s:%s" file-name line-number)))
     (kill-new location)
     (message location)))
 

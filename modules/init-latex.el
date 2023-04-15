@@ -16,24 +16,28 @@
 
 (use-package lsp-latex
   :after lsp-mode
-  :defines (lsp-latex-bibtex-formatter lsp-latex-latex-formatter
-                                       lsp-latex-bibtex-formatter-line-length
-                                       lsp-latex-chktex-on-open-and-save
-                                       lsp-latex-build-on-save
-                                       lsp-latex-build-is-continuous
-                                       lsp-latex-build-args
-                                       lsp-latex-diagnostics-delay)
+  :defines
+  (lsp-latex-bibtex-formatter
+    lsp-latex-latex-formatter
+    lsp-latex-bibtex-formatter-line-length
+    lsp-latex-chktex-on-open-and-save
+    lsp-latex-build-on-save
+    lsp-latex-build-is-continuous
+    lsp-latex-build-args
+    lsp-latex-diagnostics-delay)
   :hook
-  (latex-mode-hook . (lambda()
-                       (require 'lsp-latex)
-                       (lsp-deferred)))
+  (latex-mode-hook
+    .
+    (lambda ()
+      (require 'lsp-latex)
+      (lsp-deferred)))
   :custom
-  (lsp-latex-bibtex-formatter             "latexindent")
-  (lsp-latex-latex-formatter              "latexindent")
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
   (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-  (lsp-latex-chktex-on-open-and-save      t)
+  (lsp-latex-chktex-on-open-and-save t)
   ;; Delay time in milliseconds before reporting diagnostics
-  (lsp-latex-diagnostics-delay            2000)
+  (lsp-latex-diagnostics-delay 2000)
 
   ;; Support forward search with Evince. Inverse search is already configured with evince-synctex,
   ;; use Ctrl+Click in the PDF document.
@@ -50,11 +54,11 @@
   (add-to-list 'lsp-latex-build-args "-pvc")
 
   (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-tramp-connection "texlab")
-    :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-    :remote? t
-    :server-id 'texlab-r)))
+    (make-lsp-client
+      :new-connection (lsp-tramp-connection "texlab")
+      :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+      :remote? t
+      :server-id 'texlab-r)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
@@ -64,57 +68,67 @@
   :straight auctex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defines
-  (tex-fontify-script font-latex-fontify-script
-                      font-latex-fontify-sectioning
-                      TeX-syntactic-comment
-                      TeX-save-query LaTeX-item-indent
-                      LaTeX-syntactic-comments
-                      LaTeX-fill-break-at-separators)
-  :functions
-  (TeX-active-process)
+  (tex-fontify-script
+    font-latex-fontify-script
+    font-latex-fontify-sectioning
+    TeX-syntactic-comment
+    TeX-save-query
+    LaTeX-item-indent
+    LaTeX-syntactic-comments
+    LaTeX-fill-break-at-separators)
+  :functions (TeX-active-process)
   :commands
-  (TeX-active-process TeX-save-document tex-site
-                      LaTeX-mode LaTeX-math-mode
-                      TeX-PDF-mode
-                      TeX-source-correlate-mode
-                      TeX-active-process
-                      TeX-command-menu
-                      TeX-revert-document-buffer
-                      TeX-master-file
-                      TeX-next-error)
+  (TeX-active-process
+    TeX-save-document
+    tex-site
+    LaTeX-mode
+    LaTeX-math-mode
+    TeX-PDF-mode
+    TeX-source-correlate-mode
+    TeX-active-process
+    TeX-command-menu
+    TeX-revert-document-buffer
+    TeX-master-file
+    TeX-next-error)
   :hook
   (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
-   ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
-   ;; Jump between editor and pdf viewer
-   ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
-   ((latex-mode-hook LaTeX-mode-hook) . turn-on-auto-fill)
-   ((latex-mode-hook LaTeX-mode-hook) . (lambda ()
-                                          (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                                                ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred))))))
+    ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
+    ;; Jump between editor and pdf viewer
+    ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
+    ((latex-mode-hook LaTeX-mode-hook) . turn-on-auto-fill)
+    ((latex-mode-hook LaTeX-mode-hook)
+      .
+      (lambda ()
+        (cond
+          ((eq sb/lsp-provider 'eglot)
+            (eglot-ensure))
+          ((eq sb/lsp-provider 'lsp-mode)
+            (lsp-deferred))))))
   :config
-  (setq TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
-        TeX-auto-untabify t ; Remove all tabs before saving
-        TeX-clean-confirm nil
-        ;; Automatically insert braces after typing ^ and _ in math mode
-        TeX-electric-sub-and-superscript t
-        TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
-        TeX-parse-self t ; Parse documents
-        TeX-quote-after-quote nil ; Allow original LaTeX quotes
-        TeX-save-query nil ; Save buffers automatically when compiling
-        TeX-source-correlate-method 'synctex
-        ;; Do not start the emacs server when correlating sources
-        TeX-source-correlate-start-server t
-        TeX-syntactic-comment t
-        TeX-view-program-selection '((output-pdf "PDF Tools"))
-        TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-        LaTeX-item-indent 0 ; Indent lists by two spaces
-        LaTeX-syntactic-comments t
-        LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
-        tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
-        ;; Avoid superscripts and subscripts from being displayed in a different font size
-        font-latex-fontify-script nil
-        ;; Avoid emphasizing section headers
-        font-latex-fontify-sectioning 1.0)
+  (setq
+    TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+    TeX-auto-untabify t ; Remove all tabs before saving
+    TeX-clean-confirm nil
+    ;; Automatically insert braces after typing ^ and _ in math mode
+    TeX-electric-sub-and-superscript t
+    TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
+    TeX-parse-self t ; Parse documents
+    TeX-quote-after-quote nil ; Allow original LaTeX quotes
+    TeX-save-query nil ; Save buffers automatically when compiling
+    TeX-source-correlate-method 'synctex
+    ;; Do not start the emacs server when correlating sources
+    TeX-source-correlate-start-server t
+    TeX-syntactic-comment t
+    TeX-view-program-selection '((output-pdf "PDF Tools"))
+    TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+    LaTeX-item-indent 0 ; Indent lists by two spaces
+    LaTeX-syntactic-comments t
+    LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
+    tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
+    ;; Avoid superscripts and subscripts from being displayed in a different font size
+    font-latex-fontify-script nil
+    ;; Avoid emphasizing section headers
+    font-latex-fontify-sectioning 1.0)
 
   (setq-default TeX-master nil) ; Always query for the master file
 
@@ -128,40 +142,42 @@
   (unbind-key "C-c C-d" TeX-mode-map)
   (bind-key "$" #'self-insert-command TeX-mode-map)
   ;; (unbind-key "`" LaTeX-math-mode-map)
-  :bind
-  ("C-c x q" . TeX-insert-quote))
+  :bind ("C-c x q" . TeX-insert-quote))
 
 (use-package bibtex
   :straight (:type built-in)
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
-   (bibtex-mode-hook . (lambda ()
-                         (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                               ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred))))))
+    (bibtex-mode-hook
+      .
+      (lambda ()
+        (cond
+          ((eq sb/lsp-provider 'eglot)
+            (eglot-ensure))
+          ((eq sb/lsp-provider 'lsp-mode)
+            (lsp-deferred))))))
   :custom
-  (bibtex-align-at-equal-sign     t)
+  (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
-  (bibtex-comma-after-last-field  nil))
+  (bibtex-comma-after-last-field nil))
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
-  :defines (ivy-bibtex-default-action
-            bibtex-completion-cite-default-as-initial-input
-            bibtex-completion-cite-prompt-for-optional-arguments
-            bibtex-completion-display-formats)
-  :bind
-  ("C-c x b" . ivy-bibtex)
-  :custom
-  (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-  :config
-  (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+  :defines
+  (ivy-bibtex-default-action
+    bibtex-completion-cite-default-as-initial-input
+    bibtex-completion-cite-prompt-for-optional-arguments
+    bibtex-completion-display-formats)
+  :bind ("C-c x b" . ivy-bibtex)
+  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
+  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
   (require 'bibtex-completion)
 
-  (setq bibtex-completion-cite-default-as-initial-input t
-        bibtex-completion-cite-prompt-for-optional-arguments nil
-        bibtex-completion-display-formats
-        '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
+  (setq
+    bibtex-completion-cite-default-as-initial-input t
+    bibtex-completion-cite-prompt-for-optional-arguments nil
+    bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
@@ -174,9 +190,9 @@
 
   (defun sb/reftex-add-all-bibitems-from-bibtex ()
     (interactive)
-    (mapc 'LaTeX-add-bibitems
-          (apply 'append
-                 (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+    (mapc
+      'LaTeX-add-bibitems
+      (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
 
   (defun sb/find-bibliography-file ()
     "Try to find a bibliography file using RefTeX.
@@ -185,11 +201,13 @@ empty string if no file can be found"
     (interactive)
     (let ((bibfile-list nil))
       (condition-case nil
-          (setq bibfile-list (reftex-get-bibfile-list))
-        (error (ignore-errors
-                 (setq bibfile-list (reftex-default-bibliography)))))
+        (setq bibfile-list (reftex-get-bibfile-list))
+        (error
+          (ignore-errors
+            (setq bibfile-list (reftex-default-bibliography)))))
       (if bibfile-list
-          (car bibfile-list) "")))
+        (car bibfile-list)
+        "")))
 
   (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
     "Try to find a bibliography file using RefTex and parse the bib keys.
@@ -197,29 +215,28 @@ Ignore if no file is found."
     (interactive)
     (let ((bibfile-list nil))
       (condition-case nil
-          (setq bibfile-list (reftex-get-bibfile-list))
-        (error (ignore-errors
-                 (setq bibfile-list (reftex-default-bibliography)))))
+        (setq bibfile-list (reftex-get-bibfile-list))
+        (error
+          (ignore-errors
+            (setq bibfile-list (reftex-default-bibliography)))))
       ;; (message "%s" bibfile-list)
-      (mapc 'LaTeX-add-bibitems
-            (apply 'append
-                   (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+      (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
   :straight (:type built-in)
   :commands
-  (reftex-get-bibfile-list bibtex-parse-keys
-                           reftex-mode
-                           reftex-toc-rescan
-                           reftex-toc-Rescan
-                           reftex-default-bibliography)
-  :hook
-  ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
+  (reftex-get-bibfile-list
+    bibtex-parse-keys
+    reftex-mode
+    reftex-toc-rescan
+    reftex-toc-Rescan
+    reftex-default-bibliography)
+  :hook ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
   :bind
-  (("C-c ["   . reftex-citation)
-   ("C-c )"   . reftex-reference)
-   ("C-c ("   . reftex-label)
-   ("C-c ="   . reftex-toc)
-   ("C-c -"   . reftex-toc-recenter)
-   ("C-c &"   . reftex-view-crossref))
+  (("C-c [" . reftex-citation)
+    ("C-c )" . reftex-reference)
+    ("C-c (" . reftex-label)
+    ("C-c =" . reftex-toc)
+    ("C-c -" . reftex-toc-recenter)
+    ("C-c &" . reftex-view-crossref))
   :custom
   (reftex-plug-into-AUCTeX t)
   (reftex-enable-partial-scans t)
@@ -245,17 +262,19 @@ Ignore if no file is found."
   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
 
   (with-eval-after-load "reftex-toc"
-    (bind-keys :package reftex-toc
-               :map reftex-toc-mode-map
-               ("n" . reftex-toc-next)
-               ("p" . reftex-toc-previous)
-               ("r" . reftex-toc-rescan)
-               ("R" . reftex-toc-Rescan)
-               ("g" . revert-buffer)
-               ("q" . reftex-toc-quit)
-               ("z" . reftex-toc-jump)
-               (">" . reftex-toc-demote)
-               ("<" . reftex-toc-promote))
+    (bind-keys
+      :package reftex-toc
+      :map
+      reftex-toc-mode-map
+      ("n" . reftex-toc-next)
+      ("p" . reftex-toc-previous)
+      ("r" . reftex-toc-rescan)
+      ("R" . reftex-toc-Rescan)
+      ("g" . revert-buffer)
+      ("q" . reftex-toc-quit)
+      ("z" . reftex-toc-jump)
+      (">" . reftex-toc-demote)
+      ("<" . reftex-toc-promote))
 
     ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
     ;; but this is expensive.
@@ -287,13 +306,11 @@ Ignore if no file is found."
   :straight (:host github :repo "wang1zhen/auctex-latexmk")
   :after tex-mode
   :demand t
-  :commands
-  (auctex-latexmk-setup auctex-latexmk)
+  :commands (auctex-latexmk-setup auctex-latexmk)
   :custom
   (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
   (TeX-command-default "LatexMk")
-  :config
-  (auctex-latexmk-setup))
+  :config (auctex-latexmk-setup))
 
 ;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
 (declare-function TeX-active-process "tex.el")
@@ -305,7 +322,8 @@ Ignore if no file is found."
   ;; (require 'tex-buf)
   ;; Kill any active compilation process
   (let ((process (TeX-active-process)))
-    (if process (delete-process process)))
+    (if process
+      (delete-process process)))
   (let ((TeX-save-query nil))
     (TeX-save-document ""))
   (TeX-command-menu "LaTeXMk"))
@@ -317,20 +335,25 @@ Ignore if no file is found."
 Save the current buffer, run LaTeXMk, and switch to the PDF
 after a successful compilation."
   (interactive)
-  (let ((TeX-save-query nil)
-        (process (TeX-active-process))
-        (TeX-process-asynchronous nil)
-        (master-file (TeX-master-file)))
-    (if process (delete-process process))
+  (let
+    (
+      (TeX-save-query nil)
+      (process (TeX-active-process))
+      (TeX-process-asynchronous nil)
+      (master-file (TeX-master-file)))
+    (if process
+      (delete-process process))
     (TeX-save-document "")
     (TeX-run-TeX "latexmk" "latexmk -pdf" master-file)
     (if (plist-get TeX-error-report-switches (intern master-file))
-        (TeX-next-error t)
+      (TeX-next-error t)
       (progn
         (minibuffer-message "LaTeXMk done")
         (when (display-graphic-p)
-          (find-file (concat (file-name-directory (concat master-file ".tex"))
-                             (concat master-file ".pdf"))))))))
+          (find-file
+            (concat
+              (file-name-directory (concat master-file ".tex"))
+              (concat master-file ".pdf"))))))))
 
 ;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
 ;;   (add-hook hook
@@ -360,11 +383,8 @@ after a successful compilation."
 ;; in "$PATH".
 (use-package math-preview
   :straight (:host gitlab :repo "matsievskiysv/math-preview")
-  :commands
-  (math-preview-all math-preview-at-point math-preview-region)
-  :custom
-  (math-preview-command (expand-file-name "node_modules/.bin/math-preview"
-                                          sb/user-tmp-directory)))
+  :commands (math-preview-all math-preview-at-point math-preview-region)
+  :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
 
 ;; TODO: Try pcakages like `bibtex-capf' and `citar'
 ;; https://github.com/mclear-tools/bibtex-capf/

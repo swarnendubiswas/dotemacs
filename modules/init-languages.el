@@ -16,103 +16,103 @@
 (declare-function spell-fu-mode "spell-fu")
 
 (use-package ini-mode
-  :commands
-  (ini-mode))
+  :commands (ini-mode))
 
 (use-package conf-mode
   :straight (:type built-in)
-  :mode "\\.cfg\\'" "\\.conf\\'")
+  :mode
+  "\\.cfg\\'"
+  "\\.conf\\'")
 
 (use-package elisp-mode
   :straight (:type built-in)
-  :mode ("\\.el\\'"    . emacs-lisp-mode)
+  :mode ("\\.el\\'" . emacs-lisp-mode)
   :mode (".dir-locals" . emacs-lisp-mode)
   :hook
-  (emacs-lisp-mode-hook . (lambda ()
-                            (when buffer-file-name
-                              (add-hook 'after-save-hook #'check-parens nil t)
-                              (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc
-                                                         'append)))))
+  (emacs-lisp-mode-hook
+    .
+    (lambda ()
+      (when buffer-file-name
+        (add-hook 'after-save-hook #'check-parens nil t)
+        (flycheck-add-next-checker 'emacs-lisp 'emacs-lisp-checkdoc 'append)))))
 
 (use-package yaml-mode
-  :defines
-  (lsp-ltex-enabled lsp-disabled-clients)
-  :commands
-  (yaml-mode)
+  :defines (lsp-ltex-enabled lsp-disabled-clients)
+  :commands (yaml-mode)
   :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy" ".clangd")
   :hook
-  (yaml-mode-hook .
-                  (lambda ()
-                    ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
-                    ;; checking.
-                    (spell-fu-mode -1)
-                    (flyspell-mode -1)
-                    (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                          ((eq sb/lsp-provider 'lsp-mode)
-                           (progn
-                             (make-local-variable 'lsp-disabled-clients)
-                             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                             (lsp-deferred))))))
+  (yaml-mode-hook
+    .
+    (lambda ()
+      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
+      ;; checking.
+      (spell-fu-mode -1)
+      (flyspell-mode -1)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (progn
+            (make-local-variable 'lsp-disabled-clients)
+            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+            (lsp-deferred))))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       '("yaml-language-server" "--stdio"))
-      :major-modes '(yaml-mode)
-      :remote? t
-      :server-id 'yamlls-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection '("yaml-language-server" "--stdio"))
+        :major-modes '(yaml-mode)
+        :remote? t
+        :server-id 'yamlls-r))))
 
 (use-package yaml-imenu
-  :hook
-  (yaml-mode-hook . yaml-imenu-enable))
+  :hook (yaml-mode-hook . yaml-imenu-enable))
 
 (use-package css-mode
   :commands css-mode
   :hook
-  (css-mode-hook . (lambda()
-                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
-  :custom
-  (css-indent-offset 2)
+  (css-mode-hook
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
+  :custom (css-indent-offset 2)
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       '("css-languageserver" "--stdio"))
-      :major-modes '(css-mode)
-      :remote? t
-      :server-id 'cssls-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection '("css-languageserver" "--stdio"))
+        :major-modes '(css-mode)
+        :remote? t
+        :server-id 'cssls-r))))
 
 (use-package make-mode
   :straight (:type built-in)
   :mode
-  (("\\Makefile\\'"       . makefile-mode)
-   ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-   ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :hook
-  (makefile-mode-hook . (lambda ()
-                          (setq-local indent-tabs-mode t))))
+  (("\\Makefile\\'" . makefile-mode)
+    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
+    ("makefile\\.rules\\'" . makefile-gmake-mode))
+  :hook (makefile-mode-hook . (lambda () (setq-local indent-tabs-mode t))))
 
 (use-package makefile-executor
-  :hook
-  (makefile-mode-hook . makefile-executor-mode))
+  :hook (makefile-mode-hook . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
-  :defines
-  (lsp-disabled-clients)
-  :commands
-  (csv-mode)
+  :defines (lsp-disabled-clients)
+  :commands (csv-mode)
   :hook
-  (csv-mode-hook . (lambda ()
-                     (make-local-variable 'lsp-disabled-clients)
-                     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                     (spell-fu-mode -1)
-                     (flyspell-mode -1)))
-  :custom
-  (csv-separators '("," ";" "|" " ")))
+  (csv-mode-hook
+    .
+    (lambda ()
+      (make-local-variable 'lsp-disabled-clients)
+      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+      (spell-fu-mode -1)
+      (flyspell-mode -1)))
+  :custom (csv-separators '("," ";" "|" " ")))
 
 (use-package antlr-mode
   :straight (:type built-in)
@@ -122,14 +122,17 @@
   :mode ("\\.flex\\'" . flex-mode)
   :mode ("\\.bison\\'" . bison-mode)
   :hook
-  (flex-mode-hook . (lambda ()
-                      ;; Disable electric indentation and on-type formatting
-                      (setq-local c-auto-newline nil
-                                  ;; c-electric-brace nil
-                                  c-electric-flag nil
-                                  ;; c-electric-indent nil
-                                  c-enable-auto-newline nil
-                                  c-syntactic-indentation nil))))
+  (flex-mode-hook
+    .
+    (lambda ()
+      ;; Disable electric indentation and on-type formatting
+      (setq-local
+        c-auto-newline nil
+        ;; c-electric-brace nil
+        c-electric-flag nil
+        ;; c-electric-indent nil
+        c-enable-auto-newline nil
+        c-syntactic-indentation nil))))
 
 (use-package llvm-mode
   ;; :straight (llvm-mode :type git :host github
@@ -137,8 +140,7 @@
   ;;                      :files "llvm/utils/emacs/llvm-mode.el")
   :straight nil
   :load-path "extras"
-  :commands
-  (llvm-mode)
+  :commands (llvm-mode)
   :mode "\\.ll\\'")
 
 ;; (use-package tablegen-mode
@@ -149,8 +151,7 @@
 ;;   :mode "\\.td\\'")
 
 (use-package autodisass-llvm-bitcode
-  :commands
-  (autodisass-llvm-bitcode)
+  :commands (autodisass-llvm-bitcode)
   :mode "\\.bc\\'")
 
 ;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
@@ -158,35 +159,38 @@
 ;; https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
   :commands
-  (markdown-mode gfm-mode markdown-insert-bold
-                 markdown-insert-italic
-                 markdown-insert-blockquote markdown-insert-pre
-                 markdown-insert-code markdown-move-up
-                 markdown-insert-link markdown-insert-wiki-link
-                 markdown-demote markdown-move-down
-                 markdown-insert-header-dwim
-                 markdown-insert-reference-link-dwim
-                 markdown-insert-header-atx-1
-                 markdown-insert-header-atx-2
-                 markdown-insert-header-atx-3
-                 markdown-insert-header-atx-4 markdown-promote
-                 markdown-insert-list-item markdown-insert-uri
-                 markdown-insert-footnote)
+  (markdown-mode
+    gfm-mode
+    markdown-insert-bold
+    markdown-insert-italic
+    markdown-insert-blockquote
+    markdown-insert-pre
+    markdown-insert-code
+    markdown-move-up
+    markdown-insert-link
+    markdown-insert-wiki-link
+    markdown-demote
+    markdown-move-down
+    markdown-insert-header-dwim
+    markdown-insert-reference-link-dwim
+    markdown-insert-header-atx-1
+    markdown-insert-header-atx-2
+    markdown-insert-header-atx-3
+    markdown-insert-header-atx-4
+    markdown-promote
+    markdown-insert-list-item
+    markdown-insert-uri
+    markdown-insert-footnote)
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'"       . markdown-mode)
-   ("\\.markdown\\'" . markdown-mode)
-   ("README\\.md\\'" . gfm-mode))
-  :bind
-  (:map markdown-mode-map
-        ("C-c C-d")
-        ("C-c C-j"))
+  (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
+  :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j"))
   :custom
   (markdown-command
-   "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
+    "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
   (markdown-enable-math t "Syntax highlight for LaTeX fragments")
   (markdown-enable-wiki-links t)
   (markdown-fontify-code-blocks-natively t)
@@ -198,65 +202,68 @@
 
 ;; Generate TOC with `markdown-toc-generate-toc'
 (use-package markdown-toc
-  :commands
-  (markdown-toc-refresh-toc markdown-toc-generate-toc
-                            markdown-toc-generate-or-refresh-toc)
+  :commands (markdown-toc-refresh-toc markdown-toc-generate-toc markdown-toc-generate-or-refresh-toc)
   ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
   )
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
 ;; -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
-  :commands
-  (pandoc-load-default-settings pandoc-mode)
-  :hook
-  (markdown-mode-hook . pandoc-mode)
+  :commands (pandoc-load-default-settings pandoc-mode)
+  :hook (markdown-mode-hook . pandoc-mode)
   :config (pandoc-load-default-settings)
   :diminish)
 
 ;; Open preview of markdown file in a browser
 (use-package markdown-preview-mode
   :disabled t
-  :commands
-  markdown-preview-mode)
+  :commands markdown-preview-mode)
 
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
   :hook
-  (cperl-mode-hook . (lambda ()
-                       (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                             ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+  (cperl-mode-hook
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
 
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       (lambda ()
-                         (list lsp-perl-language-server-path
-                               "-MPerl::LanguageServer" "-e"
-                               "Perl::LanguageServer::run" "--"
-                               (format "--port %d --version %s"
-                                       lsp-perl-language-server-port
-                                       lsp-perl-language-server-client-version))))
-      :major-modes '(perl-mode cperl-mode)
-      :remote? t
-      :initialized-fn (lambda (workspace)
-                        (with-lsp-workspace workspace
-                                            (lsp--set-configuration
-                                             (lsp-configuration-section "perl"))))
-      :priority -1
-      :server-id 'perlls-r))))
+      (make-lsp-client
+        :new-connection
+        (lsp-tramp-connection
+          (lambda ()
+            (list
+              lsp-perl-language-server-path
+              "-MPerl::LanguageServer"
+              "-e"
+              "Perl::LanguageServer::run"
+              "--"
+              (format "--port %d --version %s"
+                lsp-perl-language-server-port
+                lsp-perl-language-server-client-version))))
+        :major-modes '(perl-mode cperl-mode)
+        :remote? t
+        :initialized-fn
+        (lambda (workspace)
+          (with-lsp-workspace
+            workspace
+            (lsp--set-configuration (lsp-configuration-section "perl"))))
+        :priority -1
+        :server-id 'perlls-r))))
 
 (use-package ant
-  :commands
-  (ant ant-clean ant-compile ant-test))
+  :commands (ant ant-clean ant-compile ant-test))
 
 (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
-  :commands
-  (autodisass-java-bytecode)
+  :commands (autodisass-java-bytecode)
   :mode "\\.class\\'")
 
 ;; (use-package groovy-mode ; Syntax highlighting for Gradle files
@@ -266,14 +273,16 @@
 
 (use-package sh-script ; Shell script mode
   :straight (:type built-in)
-  :mode
-  (("\\.zsh\\'"   . sh-mode)
-   ("\\bashrc\\'" . sh-mode))
+  :mode (("\\.zsh\\'" . sh-mode) ("\\bashrc\\'" . sh-mode))
   :hook
-  (sh-mode-hook .
-                (lambda ()
-                  (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                        ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+  (sh-mode-hook
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
   :custom
   (sh-basic-offset 2)
   (sh-indentation 2)
@@ -284,25 +293,20 @@
 
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       '("bash-language-server" "start"))
-      :major-modes '(sh-mode)
-      :remote? t
-      :server-id 'bashls-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
+        :major-modes '(sh-mode)
+        :remote? t
+        :server-id 'bashls-r))))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
   :interpreter "fish"
-  :commands
-  (fish-mode fish_indent-before-save)
-  :hook
-  (fish-mode-hook . (lambda ()
-                      (add-hook 'before-save-hook #'fish_indent-before-save))))
+  :commands (fish-mode fish_indent-before-save)
+  :hook (fish-mode-hook . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package shfmt
-  :hook
-  (sh-mode-hook . shfmt-on-save-mode)
+  :hook (sh-mode-hook . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
@@ -314,101 +318,105 @@
 ;;    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
-  :commands
-  (web-mode)
+  :commands (web-mode)
   :mode "\\.html?\\'"
   :hook
-  (web-mode-hook . (lambda ()
-                     (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                           ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
-  :bind
-  ("C-c C-d" . nil)
+  (web-mode-hook
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
+  :bind ("C-c C-d" . nil)
   :custom
-  (web-mode-enable-auto-closing              t)
-  (web-mode-enable-auto-pairing              nil "Prefer `smartparens'")
-  (web-mode-enable-auto-quoting              t)
-  (web-mode-enable-block-face                t)
-  (web-mode-enable-css-colorization          t)
+  (web-mode-enable-auto-closing t)
+  (web-mode-enable-auto-pairing nil "Prefer `smartparens'")
+  (web-mode-enable-auto-quoting t)
+  (web-mode-enable-block-face t)
+  (web-mode-enable-css-colorization t)
   (web-mode-enable-current-element-highlight t "Highlight the element under the cursor")
-  (web-mode-enable-current-column-highlight  t)
-  (web-mode-markup-indent-offset             2) ; HTML
-  (web-mode-css-indent-offset                2) ; CSS
-  (web-mode-code-indent-offset               2) ; Script
-  (web-mode-style-padding                    2) ; For `<style>' tag
-  (web-mode-script-padding                   2) ; For `<script>' tag
+  (web-mode-enable-current-column-highlight t)
+  (web-mode-markup-indent-offset 2) ; HTML
+  (web-mode-css-indent-offset 2) ; CSS
+  (web-mode-code-indent-offset 2) ; Script
+  (web-mode-style-padding 2) ; For `<style>' tag
+  (web-mode-script-padding 2) ; For `<script>' tag
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       '("html-languageserver" "--stdio"))
-      :major-modes '(html-mode web-mode mhtml-mode)
-      :remote? t
-      :server-id 'htmlls-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
+        :major-modes '(html-mode web-mode mhtml-mode)
+        :remote? t
+        :server-id 'htmlls-r))))
 
 (use-package emmet-mode
-  :defines
-  (emmet-move-cursor-between-quote)
-  :hook
-  ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
+  :defines (emmet-move-cursor-between-quote)
+  :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
   :straight (:type built-in)
-  :commands
-  (nxml-mode)
+  :commands (nxml-mode)
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
-  (nxml-mode-hook . (lambda ()
-                      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
-                      ;; checking.
-                      (spell-fu-mode -1)
-                      (flyspell-mode -1)
-                      (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                            ((eq sb/lsp-provider 'lsp-mode)
-                             (progn
-                               (make-local-variable 'lsp-disabled-clients)
-                               (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-                               (lsp-deferred))))))
+  (nxml-mode-hook
+    .
+    (lambda ()
+      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
+      ;; checking.
+      (spell-fu-mode -1)
+      (flyspell-mode -1)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (progn
+            (make-local-variable 'lsp-disabled-clients)
+            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+            (lsp-deferred))))))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
-  :config
-  (fset 'xml-mode 'nxml-mode)
+  :config (fset 'xml-mode 'nxml-mode)
 
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       '("java" "-jar" lsp-xml-jar-file))
-      :major-modes '(xml-mode nxml-mode)
-      :remote? t
-      :server-id 'xmlls-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
+        :major-modes '(xml-mode nxml-mode)
+        :remote? t
+        :server-id 'xmlls-r))))
 
 (use-package json-mode
-  :commands
-  (json-mode jsonc-mode json-mode-beautify)
+  :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
-  (("\\.json\\'"                  . json-mode)
-   ("pyrightconfig.json"          . jsonc-mode)
-   (".*/vscode/settings.json$"    . jsonc-mode)
-   (".*/\\.vscode/settings.json$" . jsonc-mode)
-   ("User/settings.json$"         . jsonc-mode))
+  (("\\.json\\'" . json-mode)
+    ("pyrightconfig.json" . jsonc-mode)
+    (".*/vscode/settings.json$" . jsonc-mode)
+    (".*/\\.vscode/settings.json$" . jsonc-mode)
+    ("User/settings.json$" . jsonc-mode))
   :hook
-  ((json-mode-hook jsonc-mode-hook) . (lambda ()
-                                        (make-local-variable 'js-indent-level)
-                                        (setq js-indent-level 2)
-                                        (cond ((eq sb/lsp-provider 'eglot) (eglot-ensure))
-                                              ((eq sb/lsp-provider 'lsp-mode) (lsp-deferred)))))
+  ((json-mode-hook jsonc-mode-hook)
+    .
+    (lambda ()
+      (make-local-variable 'js-indent-level)
+      (setq js-indent-level 2)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
   :config
   (when (eq sb/lsp-provider 'lsp-mode)
     (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-tramp-connection
-                       '("vscode-json-languageserver" "--stdio"))
-      :major-modes '(json-mode jsonc-mode)
-      :remote? t
-      :server-id 'jsonls-r))))
+      (make-lsp-client
+        :new-connection (lsp-tramp-connection '("vscode-json-languageserver" "--stdio"))
+        :major-modes '(json-mode jsonc-mode)
+        :remote? t
+        :server-id 'jsonls-r))))
 
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)
@@ -445,22 +453,18 @@
 
 ;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
 (use-package executable
-  :hook
-  (after-save-hook . executable-make-buffer-file-executable-if-script-p))
+  :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
 (use-package highlight-doxygen
-  :commands
-  (highlight-doxygen-global-mode)
+  :commands (highlight-doxygen-global-mode)
   :init (highlight-doxygen-global-mode))
 
 (use-package apt-sources-list
   :commands apt-sources-list-mode)
 
 (use-package ssh-config-mode
-  :commands
-  (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
-  :hook
-  (ssh-config-mode-hook . turn-on-font-lock))
+  :commands (ssh-config-mode ssh-known-hosts-mode ssh-authorized-keys-mode)
+  :hook (ssh-config-mode-hook . turn-on-font-lock))
 
 (provide 'init-languages)
 
