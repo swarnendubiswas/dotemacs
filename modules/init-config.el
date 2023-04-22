@@ -76,7 +76,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -153,6 +153,16 @@ Prefer the straight.el package manager instead."
     (const :tag "awesome-tab" awesome-tab)
     (const :tag "centaur-tabs" centaur-tabs)
     (const :tag "none" nil))
+  :group 'sb/emacs)
+
+(defcustom sb/icons-provider 'nerd-icons
+  "Choose the provider for icons."
+  :type
+  '
+  (radio
+    (const :tag "all-the-icons" all-the-icons)
+    (const :tag "nerd-icons" nerd-icons)
+    (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode. which is a useful feature. For

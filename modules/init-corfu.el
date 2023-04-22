@@ -199,7 +199,6 @@
                 (cape-super-capf
                   #'lsp-completion-at-point
                   #'citre-completion-at-point
-                  ;; #'sh-completion-at-point-function
                   #'cape-file
                   #'cape-dabbrev
                   (cape-capf-inside-string #'cape-dict)

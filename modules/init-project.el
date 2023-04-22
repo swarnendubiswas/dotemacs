@@ -25,6 +25,7 @@
     project-execute-extended-command
     project-known-project-roots
     project-remove-known-project
+    project-forget-project
     project-remember-project
     project-kill-buffers
     project-switch-to-buffer
@@ -80,7 +81,20 @@
   ;; We can open a project file without enabling projectile via `bind-keys'
   (emacs-startup-hook . projectile-mode)
   :bind-keymap ("C-c p" . projectile-command-map)
-  :bind (:map projectile-command-map ("A" . projectile-add-known-project))
+  :bind
+  (([project-switch-to-buffer] . projectile-switch-to-buffer)
+    ([project-compile] . projectile-compile-project)
+    ([project-find-dir] . projectile-find-dir)
+    ([project-dired] . projectile-dired)
+    ([project-find-file] . projectile-find-file)
+    ([project-or-external-find-file] . projectile-find-other-file)
+    ([project-kill-buffers] . projectile-kill-buffers)
+    ([project-switch-project] . projectile-switch-project)
+    ([project-vc-dir] . projectile-vc)
+    ([project-forget-project] . projectile-remove-known-project)
+    :map
+    projectile-command-map
+    ("A" . projectile-add-known-project))
   :custom
   (projectile-file-exists-remote-cache-expire nil)
   (projectile-mode-line-prefix "" "Save modeline space")

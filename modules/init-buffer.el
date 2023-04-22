@@ -48,9 +48,14 @@
 
 ;; Display icons for all buffers in ibuffer
 (use-package all-the-icons-ibuffer
-  :when (display-graphic-p)
+  :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
   :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
   :custom (all-the-icons-ibuffer-icon-size 0.8))
+
+(use-package nerd-icons-ibuffer
+  :when (eq sb/icons-provider 'nerd-icons)
+  :hook (ibuffer-mode-hook . nerd-icons-ibuffer-mode)
+  :custom (nerd-icons-ibuffer-icon-size 0.9))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t

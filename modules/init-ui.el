@@ -21,6 +21,7 @@
     (if (find-font (font-spec :name font-name))
       t
       nil))
+  :when (eq sb/icons-provider 'all-the-icons)
   :commands all-the-icons-install-fonts
   :init
   (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
@@ -43,7 +44,10 @@
 
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
-  :custom (nerd-icons-font-family "MesloLGS Nerd Font"))
+  :when (eq sb/icons-provider 'nerd-icons)
+  :custom
+  (nerd-icons-font-family "MesloLGS Nerd Font")
+  (nerd-icons-scale-factor 0.7))
 
 (use-package unicode-fonts
   :init (unicode-fonts-setup))

@@ -316,7 +316,7 @@
 ;;   (add-to-list 'dirvish-preview-disabled-exts "jpeg"))
 
 (use-package all-the-icons-dired
-  :if (and (display-graphic-p) (not (featurep 'dirvish)))
+  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p) (not (featurep 'dirvish)))
   :commands (all-the-icons-dired--refresh-advice)
   :hook
   (dired-mode-hook
@@ -329,10 +329,6 @@
 
 (use-package dired-rsync
   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
-
-(use-package dired-gitignore
-  :straight (:host github :repo "johannes-mueller/dired-gitignore.el")
-  :hook (dired-mode-hook . dired-gitignore-mode))
 
 (provide 'init-dired)
 

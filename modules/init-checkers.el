@@ -16,7 +16,8 @@
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
 ;; checks only the writing style. `textlint' includes `writegood'.
 
-(use-package writegood-mode
+(use-package
+  writegood-mode
   :commands
   (writegood-passive-voice-turn-off
     writegood-passive-voice-turn-on
@@ -52,7 +53,8 @@
     (cl-union writegood-weasel-words sb/weasel-words))
   :diminish)
 
-(use-package flycheck
+(use-package
+  flycheck
   :commands
   (flycheck-add-next-checker
     flycheck-next-checker
@@ -199,7 +201,8 @@
 ;; point after formatting.
 
 ;; Use for major modes which do not provide a formatter.
-(use-package format-all
+(use-package
+  format-all
   :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
@@ -227,7 +230,8 @@
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
-(use-package flycheck-grammarly
+(use-package
+  flycheck-grammarly
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
@@ -241,7 +245,8 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-(use-package langtool
+(use-package
+  langtool
   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
   :init
@@ -263,7 +268,8 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-(use-package flycheck-languagetool
+(use-package
+  flycheck-languagetool
   :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :demand t
@@ -275,7 +281,8 @@
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
-(use-package consult-flycheck
+(use-package
+  consult-flycheck
   :after (flycheck consult)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
@@ -294,19 +301,24 @@
         (when (featurep 'flycheck-languagetool)
           (flycheck-select-checker 'languagetool))))))
 
-(use-package highlight-indentation
+(use-package
+  highlight-indentation
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
 ;; format-all-the-code just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 
-(use-package elisp-autofmt
+(use-package
+  elisp-autofmt
   :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main")
   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
   :hook (emacs-lisp-mode-hook . elisp-autofmt-mode)
-  :custom (elisp-autofmt-style 'fixed))
+  :custom
+  (elisp-autofmt-style 'fixed)
+  (elisp-autofmt-python-bin "python3"))
 
-(use-package flycheck-eglot
+(use-package
+  flycheck-eglot
   :straight (:host github :repo "intramurz/flycheck-eglot")
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))

@@ -85,6 +85,9 @@
     ((eq sb/theme 'standard-dark)
       (load-theme 'standard-dark t))))
 
+(use-package nordic-night-theme
+  :init (load-theme 'nordic-night t))
+
 (provide 'init-theme)
 
 ;;; init-theme.el ends here
