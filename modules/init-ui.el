@@ -12,7 +12,8 @@
 (defvar sb/minibuffer-completion)
 
 ;; Install fonts with "M-x all-the-icons-install-fonts"
-(use-package all-the-icons
+(use-package
+  all-the-icons
   :preface
   ;; https://github.com/domtronn/all-the-icons.el/issues/120
   ;; FIXME: This seems to work only with GUI Emacs.
@@ -37,20 +38,21 @@
   (all-the-icons-alltheicon-scale-factor 0.9)
   (all-the-icons-color-icons t))
 
-(use-package all-the-icons-ivy
+(use-package
+  all-the-icons-ivy
   :if (display-graphic-p)
   :after ivy
   :hook (emacs-startup-hook . all-the-icons-ivy-setup))
 
-(use-package nerd-icons
+(use-package
+  nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (eq sb/icons-provider 'nerd-icons)
   :custom
   (nerd-icons-font-family "MesloLGS Nerd Font")
   (nerd-icons-scale-factor 0.7))
 
-(use-package unicode-fonts
-  :init (unicode-fonts-setup))
+(use-package unicode-fonts :init (unicode-fonts-setup))
 
 ;; Decrease minibuffer font size
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -67,7 +69,8 @@
 ;; (setq resize-mini-windows nil
 ;;       max-mini-window-height 5)
 
-(use-package beacon ; Highlight the cursor position after the window scrolls
+(use-package
+  beacon ; Highlight the cursor position after the window scrolls
   :hook (emacs-startup-hook . beacon-mode)
   :diminish)
 
@@ -109,25 +112,26 @@
 ;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
 ;;   (split-window-right))
 
-(use-package hl-line
-  :commands hl-line-highlight
-  :hook (emacs-startup-hook . global-hl-line-mode))
+(use-package hl-line :commands hl-line-highlight :hook (emacs-startup-hook . global-hl-line-mode))
 
 ;; This package disables the mouse completely.
-(use-package disable-mouse
-  :if (display-mouse-p)
-  :hook (after-init-hook . global-disable-mouse-mode)
-  :diminish disable-mouse-global-mode)
+
+;; (use-package disable-mouse
+;;   :if (display-mouse-p)
+;;   :hook (after-init-hook . global-disable-mouse-mode)
+;;   :diminish disable-mouse-global-mode)
 
 ;; Move the cursor from the line of view
-(use-package avoid
+(use-package
+  avoid
   :straight (:type built-in)
   :if (display-mouse-p)
   :commands mouse-avoidance-mode
   :init (mouse-avoidance-mode 'banish))
 
 ;; Icons for minibuffer completion (e.g., `find-file-at-point')
-(use-package all-the-icons-completion
+(use-package
+  all-the-icons-completion
   :if (display-graphic-p)
   :commands all-the-icons-completion-mode
   :init (all-the-icons-completion-mode 1)
@@ -169,7 +173,8 @@
       (set-face-attribute 'mode-line nil :height 110)
       (set-face-attribute 'mode-line-inactive nil :height 110))))
 
-(use-package olivetti
+(use-package
+  olivetti
   :hook
   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
   :custom (olivetti-body-width 108)

@@ -15,7 +15,8 @@
 (declare-function s-starts-with? "s")
 (declare-function s-ends-with? "s")
 
-(use-package dired
+(use-package
+  dired
   :preface
   (defun sb/dired-go-home ()
     (interactive)
@@ -62,7 +63,8 @@
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
-(use-package dired-x
+(use-package
+  dired-x
   :straight (:type built-in)
   :defines dired-cleanup-buffers-too
   :hook
@@ -106,12 +108,14 @@
     (diminish 'dired-omit-mode)
     dired-mode-map))
 
-(use-package dired-narrow ; Narrow `dired' to match filter
+(use-package
+  dired-narrow ; Narrow `dired' to match filter
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
 ;; Do not create multiple dired buffers
-(use-package dired+
+(use-package
+  dired+
   :straight (:host github :repo "emacsmirror/dired-plus")
   :commands diredp-toggle-find-file-reuse-dir
   :init
@@ -123,9 +127,7 @@
     (lambda ()
       (when sb/EMACS27
         (diredp-toggle-find-file-reuse-dir 1))))
-  :custom
-  (diredp-hide-details-initially-flag nil)
-  (diredp-hide-details-propagate-flag nil))
+  :custom (diredp-hide-details-initially-flag nil) (diredp-hide-details-propagate-flag nil))
 
 ;; ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
 ;; ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
@@ -283,13 +285,15 @@
 ;;   :demand t
 ;;   :config (treemacs-load-theme "all-the-icons"))
 
-(use-package dired-async
+(use-package
+  dired-async
   :straight async
   :after (dired async)
   :hook (dired-mode-hook . dired-async-mode)
   :diminish)
 
-(use-package consult-dir
+(use-package
+  consult-dir
   :if (eq sb/minibuffer-completion 'vertico)
   :bind
   (("C-x C-d" . consult-dir)
@@ -315,7 +319,8 @@
 ;;   (add-to-list 'dirvish-preview-disabled-exts "mp4")
 ;;   (add-to-list 'dirvish-preview-disabled-exts "jpeg"))
 
-(use-package all-the-icons-dired
+(use-package
+  all-the-icons-dired
   :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p) (not (featurep 'dirvish)))
   :commands (all-the-icons-dired--refresh-advice)
   :hook
@@ -327,8 +332,12 @@
   :custom (all-the-icons-dired-monochrome nil)
   :diminish)
 
-(use-package dired-rsync
-  :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
+(use-package dired-rsync :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
+
+(use-package
+  nerd-icons-dired
+  :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
+  :hook (dired-mode-hook . nerd-icons-dired-mode))
 
 (provide 'init-dired)
 
