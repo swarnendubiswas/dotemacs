@@ -11,7 +11,6 @@
 
 (use-package isearch
   :straight (:type built-in)
-  :commands (isearch-forward-regexp isearch-repeat-forward isearch-occur)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s")
@@ -30,22 +29,16 @@
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
-  :commands
-  (isearch-forward-symbol ; "M-s _"
-    isearch-forward-symbol-at-point ; "M-s ."
-    isearch-backward-symbol-at-point)
-  :bind ("C-c s p" . isearch-symbol-at-point))
+  :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
+  :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
 
 (use-package anzu
-  :commands (global-anzu-mode)
   :init
   (setq
     anzu-search-threshold 10000
     anzu-minimum-input-length 2)
   (global-anzu-mode 1)
-  :bind
-  (([remap query-replace] . anzu-query-replace)
-    ([remap query-replace-regexp] . anzu-query-replace-regexp))
+  :bind ([remap query-replace-regexp] . anzu-query-replace-regexp)
   :diminish anzu-mode)
 
 (use-package swiper
@@ -59,12 +52,13 @@
   (defvar grep-find-ignored-directories)
 
   (setq
-    grep-command "grep -irHn "
+    grep-command "grep --color -irHn "
     grep-highlight-matches t
     grep-scroll-output t)
 
   (when (executable-find "rg")
-    (setq grep-program "rg"))
+    (setq grep-program "rg")
+    (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
 
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
@@ -111,8 +105,9 @@
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
 (use-package visual-regexp
-  :commands (vr/replace vr/mark)
-  :bind ([remap query-replace] . vr/query-replace))
+  :bind
+  ([remap query-replace] . vr/query-replace)
+  ([remap replace-regex] . vr/replace))
 
 (provide 'init-search)
 

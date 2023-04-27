@@ -337,7 +337,8 @@
 (use-package
   nerd-icons-dired
   :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
-  :hook (dired-mode-hook . nerd-icons-dired-mode))
+  :hook (dired-mode-hook . nerd-icons-dired-mode)
+  :diminish)
 
 (provide 'init-dired)
 

@@ -27,6 +27,7 @@
   (centaur-tabs-set-bar 'under)
   (centaur-tabs-show-count nil "The feature is not useful")
   (centaur-tabs-set-icons (display-graphic-p) "Icons may not be rendered in all terminals")
+  (centaur-tabs-height 18)
   :config
   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
 
@@ -38,6 +39,7 @@
   ;;         (setq centaur-tabs-set-icons t)
   ;;       (setq centaur-tabs-set-icons nil))))
 
+  (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project))
 
 (use-package awesome-tab

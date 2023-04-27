@@ -301,9 +301,7 @@ Ignore if no file is found."
 ;;   (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
 ;;   :diminish bib-cite-minor-mode)
 
-;; TODO: https://github.com/tom-tan/auctex-latexmk/pull/40
 (use-package auctex-latexmk
-  :straight (:host github :repo "wang1zhen/auctex-latexmk")
   :after tex-mode
   :demand t
   :commands (auctex-latexmk-setup auctex-latexmk)
@@ -312,72 +310,13 @@ Ignore if no file is found."
   (TeX-command-default "LatexMk")
   :config (auctex-latexmk-setup))
 
-;; http://tex.stackexchange.com/questions/64897/automatically-run-latex-command-after-saving-tex-file-in-emacs
-(declare-function TeX-active-process "tex.el")
-
-(defun sb/save-buffer-and-run-latexmk ()
-  "Save the current buffer and run LaTeXMk also."
-  (interactive)
-  (require 'tex)
-  ;; (require 'tex-buf)
-  ;; Kill any active compilation process
-  (let ((process (TeX-active-process)))
-    (if process
-      (delete-process process)))
-  (let ((TeX-save-query nil))
-    (TeX-save-document ""))
-  (TeX-command-menu "LaTeXMk"))
-
-(declare-function TeX-run-TeX "tex")
-
-(defun sb/latex-compile-open-pdf ()
-  "Helper function to compile files.
-Save the current buffer, run LaTeXMk, and switch to the PDF
-after a successful compilation."
-  (interactive)
-  (let
-    (
-      (TeX-save-query nil)
-      (process (TeX-active-process))
-      (TeX-process-asynchronous nil)
-      (master-file (TeX-master-file)))
-    (if process
-      (delete-process process))
-    (TeX-save-document "")
-    (TeX-run-TeX "latexmk" "latexmk -pdf" master-file)
-    (if (plist-get TeX-error-report-switches (intern master-file))
-      (TeX-next-error t)
-      (progn
-        (minibuffer-message "LaTeXMk done")
-        (when (display-graphic-p)
-          (find-file
-            (concat
-              (file-name-directory (concat master-file ".tex"))
-              (concat master-file ".pdf"))))))))
-
-;; (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-;;   (add-hook hook
-;;             (lambda ()
-;;               (add-hook 'after-save-hook
-;;                         (lambda ()
-;;                           (sb/save-buffer-and-run-latexmk)) nil t))))
-
-;; (with-eval-after-load "tex-mode"
-;;   (defvar latex-mode-map)
-;;   (bind-key "C-x C-s" #'sb/latex-compile-open-pdf latex-mode-map))
-
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
 
   ;; Disable `LaTeX-insert-item' in favor of `imenu'
   (unbind-key "C-c C-j" LaTeX-mode-map)
 
-  ;; (unbind-key "C-c C-d" LaTeX-mode-map)
-  ;; Unset "C-c ;" since we want to bind it to 'comment-line
-  ;; (unbind-key "C-c ;" LaTeX-mode-map)
-
-  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map)
-  (bind-key "C-x C-s" #'sb/latex-compile-open-pdf LaTeX-mode-map))
+  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
 
 ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
 ;; in "$PATH".
