@@ -118,7 +118,7 @@
 (if (bound-and-true-p sb/debug-init-file)
   (progn
     (setq
-      debug-on-error nil
+      debug-on-error t
       debug-on-event 'sigusr2
       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
       use-package-verbose t
@@ -132,8 +132,7 @@
       use-package-compute-statistics nil
       use-package-verbose nil)))
 
-(use-package diminish
-  :demand t)
+(use-package diminish :demand t)
 
 ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
@@ -141,17 +140,17 @@
 ;; modes.
 
 ;; https://github.com/jwiegley/use-package/pull/993/files
-(use-package bind-key
-  :functions bind-key--remove
-  :bind ("C-c d k" . describe-personal-keybindings))
+(use-package bind-key :functions bind-key--remove :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package no-littering
+(use-package
+  no-littering
   :demand t
   :config
   (setq auto-save-file-name-transforms
     `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-(use-package package
+(use-package
+  package
   :unless (bound-and-true-p sb/disable-package.el)
   :after no-littering
   :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
@@ -171,7 +170,8 @@
   :group 'sb/emacs)
 
 ;; Asynchronously byte compile packages installed with `package.el'
-(use-package async
+(use-package
+  async
   :straight (:host github :repo "jwiegley/emacs-async")
   :unless (bound-and-true-p sb/disable-package.el)
   :commands async-bytecomp-package-mode
@@ -184,7 +184,8 @@
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 
-(use-package exec-path-from-shell
+(use-package
+  exec-path-from-shell
   :if (symbol-value 'sb/IS-LINUX)
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize

@@ -236,7 +236,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="5.4.1"
+    TEXLAB_VER="5.5.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz

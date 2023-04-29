@@ -1,4 +1,4 @@
-#+OPTIONS: ':t
+#+OPTIONS: ':t ^:{}
 
 * GNU Emacs
 
@@ -104,17 +104,17 @@ We enable LSP support for the more popular languages supported with either =lsp-
 #+begin_src shell
 npm install -save-dev @emacs-grammarly/grammarly-languageserver
 
-wget https://github.com/valentjn/ltex-ls/releases/download/15.2.0/ltex-ls-15.2.0-linux-x64.tar.gz
-tar xf ltex-ls-15.2.0-linux-x64.tar.gz
-cp ltex-ls-15.2.0/bin/* $HOME/.local/bin/.
-rm -rf ltex-ls-15.2.0-linux-x64.tar.gz ltex-ls-15.2.0
+wget https://github.com/valentjn/ltex-ls/releases/download/16.0.0/ltex-ls-16.0.0-linux-x64.tar.gz
+tar xf ltex-ls-16.0.0-linux-x64.tar.gz
+cp ltex-ls-16.0.0/bin/* $HOME/.local/bin/.
+# Add "ltex-ls-16.0.0" to $PATH
 
-wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.20.0.tar.gz
-tar xf v1.20.0.tar.gz
-cd eclipse.jdt.ls-1.20.0
+wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.23.0.tar.gz
+tar xf v1.23.0.tar.gz
+cd eclipse.jdt.ls-1.23.0
 ./mvnw clean verify -DskipTests=true
-# Add "eclipse.jdt.ls-1.20.0/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
-rm -rf eclipse.jdt.ls-1.20.0 
+# Add "eclipse.jdt.ls-1.23.0/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
+rm -rf eclipse.jdt.ls-1.23.0 
 #+end_src
 
 ** Support for Tags

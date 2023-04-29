@@ -9,8 +9,7 @@
 
 (defvar sb/theme)
 
-(use-package
-  doom-themes
+(use-package doom-themes
   :if (or (eq sb/theme 'doom-molokai) (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
   :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
@@ -25,8 +24,7 @@
   (with-eval-after-load "org-mode"
     (require 'doom-themes-ext-org)))
 
-(use-package
-  modus-themes
+(use-package modus-themes
   :if (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
   :defines
   (modus-themes-completions
@@ -48,7 +46,8 @@
   ;; (modus-themes-fringes 'intense)
   ;; (modus-themes-org-blocks 'tinted-background)
   ;; (org-fontify-whole-block-delimiter-line nil)
-  (modus-themes-italic-constructs t) (modus-themes-bold-constructs t))
+  (modus-themes-italic-constructs t)
+  (modus-themes-bold-constructs t))
 
 (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
   (progn
@@ -59,16 +58,14 @@
 
 ;; Set `sb/theme' to `none' if you use this package
 
-(use-package
-  circadian
+(use-package circadian
   :hook (emacs-startup-hook . circadian-setup)
   :config
   (if (display-graphic-p)
-    (setq circadian-themes '((:sunrise . modus-operandi) (:sunset . modus-vivendi)))
+    (setq circadian-themes '((:sunrise . doom-one) (:sunset . doom-one)))
     (setq circadian-themes '((:sunrise . modus-operandi) (:sunset . modus-vivendi)))))
 
-(use-package
-  ef-themes
+(use-package ef-themes
   :straight (:host github :repo "protesilaos/ef-themes")
   :if (or (eq sb/theme 'ef-trio-dark) (eq sb/theme 'ef-bio))
   :init
@@ -78,8 +75,7 @@
     ((eq sb/theme 'ef-bio)
       (load-theme 'ef-bio t))))
 
-(use-package
-  standard-themes
+(use-package standard-themes
   :straight (:host github :repo "protesilaos/standard-themes")
   :if (or (eq sb/theme 'standard-light) (eq sb/theme 'standard-dark))
   :init
@@ -88,8 +84,6 @@
       (load-theme 'standard-light t))
     ((eq sb/theme 'standard-dark)
       (load-theme 'standard-dark t))))
-
-(use-package nordic-night-theme :init (load-theme 'nordic-night t))
 
 (provide 'init-theme)
 

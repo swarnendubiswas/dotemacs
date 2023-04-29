@@ -1541,6 +1541,7 @@
 
 (define-abbrev-table 'markdown-mode-abbrev-table
   '(
+    ("ahve" "have" nil :count 0)
     ("arbitary" "arbitrary" nil :count 0)
     ("bandwdith" "bandwidth" nil :count 0)
     ("chaning" "changing" nil :count 0)
@@ -1577,13 +1578,18 @@
 (define-abbrev-table 'org-mode-abbrev-table
   '(
     ("ansewr" "answer" nil :count 0)
+    ("assmbly" "assembly" nil :count 0)
+    ("canot" "cannot" nil :count 0)
     ("complation" "compilation" nil :count 0)
     ("derivaion" "derivation" nil :count 0)
     ("discssion" "discussion" nil :count 0)
     ("hvae" "have" nil :count 0)
     ("incomoplete" "incomplete" nil :count 0)
+    ("methpd" "method" nil :count 0)
     ("metnion" "mention" nil :count 0)
+    ("notthing" "nothing" nil :count 0)
     ("optimisation" "optimization" nil :count 0)
+    ("propagaation" "propagation" nil :count 0)
     ("randomozie" "randomize" nil :count 0)
     ("repored" "reported" nil :count 0)
     ("tilign" "Tiling" nil :count 0)
@@ -1623,6 +1629,7 @@
     ("formattng" "formatting" nil :count 0)
     ("genomic" "genomics" nil :count 0)
     ("hueristically" "heuristically" nil :count 0)
+    ("implmeneted" "implemented" nil :count 0)
     ("informatino" "information" nil :count 0)
     ("initital" "initial" nil :count 0)
     ("inititation" "initiation" nil :count 0)

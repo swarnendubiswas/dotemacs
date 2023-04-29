@@ -145,6 +145,8 @@
   (magit-mode-hook . magit-delta-mode)
   :diminish magit-delta-mode)
 
+(use-package with-editor :diminish)
+
 (provide 'init-vcs)
 
 ;;; init-vcs.el ends here
