@@ -10,8 +10,7 @@
 (defvar sb/capf)
 
 ;; Corfu is not a completion framework, it is just a front-end for `completion-at-point'.
-(use-package
-  corfu
+(use-package corfu
   :preface
   (defun sb/corfu-beginning-of-prompt ()
     "Move to beginning of completion input."
@@ -49,52 +48,19 @@
   ;; entries.
   (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 3))))
 
-(use-package
-  corfu-info
+(use-package corfu-info
   :straight nil
   :after corfu
   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
 
-;; The indexed mode uses numeric prefix arguments, e.g., "C-0 RET" or "C-1 TAB".
-(use-package
-  corfu-indexed
-  :straight nil
-  :disabled t
-  :after corfu
-  :commands corfu-indexed-mode
-  :init (corfu-indexed-mode 1)
-  :config
-  ;; Bind "C-num" and "M-num" for convenience.
-  ;; https://github.com/minad/corfu/issues/231
-
-  ;; (use-package loopy-iter
-  ;;   :straight (loopy :type git :host github :repo "okamsn/loopy")
-  ;;   :demand t)
-
-  ;; (loopy-iter
-  ;;  (with (map corfu-map))
-  ;;  (numbering i :from 1 :to 9)
-  ;;  (let ((idx i))
-  ;;    (define-key map (kbd (format "M-%d" i))
-  ;;      (lambda () (interactive)
-  ;;        (let ((current-prefix-arg idx))
-  ;;          (call-interactively #'corfu-insert))))
-  ;;    (define-key map (kbd (format "C-%d" i))
-  ;;      (lambda () (interactive)
-  ;;        (let ((current-prefix-arg idx))
-  ;;          (call-interactively #'corfu-complete))))))
-  )
-
-(use-package
-  corfu-quick
+(use-package corfu-quick
   :straight nil
   :after corfu
   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
 
 ;; We do not need this if we use prescient-based sorting.
 
-(use-package
-  corfu-history
+(use-package corfu-history
   :straight nil
   :after (corfu savehist)
   :commands corfu-history-mode
@@ -102,27 +68,23 @@
   (add-to-list 'savehist-additional-variables 'corfu-history)
   (corfu-history-mode 1))
 
-(use-package
-  corfu-echo
+(use-package corfu-echo
   :straight nil
   :after corfu
   :commands corfu-echo-mode
   :init (corfu-echo-mode 1))
 
-(use-package
-  corfu-popupinfo
+(use-package corfu-popupinfo
   :straight nil
   :after corfu
   :commands corfu-popupinfo-mode
   :init (corfu-popupinfo-mode 1))
 
-(use-package
-  popon
+(use-package popon
   :straight (:host codeberg :repo "akib/emacs-popon")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p))))
 
-(use-package
-  corfu-terminal
+(use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode-hook . corfu-terminal-mode)
@@ -133,8 +95,7 @@
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
 ;; (add-hook 'completion-at-point-functions #'cape-path)
 
-(use-package
-  cape
+(use-package cape
   :preface
   ;; https://kristofferbalintona.me/posts/202203130102/
   (defun sb/cape-capf-setup-lsp ()
@@ -252,8 +213,7 @@
             #'cape-file
             (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
-(use-package
-  kind-icon
+(use-package kind-icon
   :if (and (eq sb/corfu-icons 'kind-icon) (display-graphic-p))
   :after corfu
   :demand t
@@ -265,16 +225,14 @@
   (kind-icon-blend-background nil)
   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-(use-package
-  kind-all-the-icons
+(use-package kind-all-the-icons
   :straight (:host github :repo "Hirozy/kind-all-the-icons")
   :if (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
   :after corfu
   :demand t
   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
-(use-package
-  corfu-quick-access
+(use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
   :after corfu
   :init (corfu-quick-access-mode 1))

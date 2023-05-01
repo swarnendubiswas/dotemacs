@@ -7,7 +7,8 @@
 
 ;;; Code:
 
-(use-package centaur-tabs
+(use-package
+  centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :bind*
@@ -17,16 +18,16 @@
   :custom
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-  (centaur-tabs-set-close-button nil)
-  (centaur-tabs-show-new-tab-button nil "Do not use the mouse")
+  (centaur-tabs-set-close-button nil "I do not use the mouse")
+  (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
   (centaur-tabs-enable-ido-completion nil)
   ;; Other styles like "wave" are not rendered on the terminal, and also does not work well with
   ;; many themes
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
-  (centaur-tabs-show-count nil "The feature is not useful")
   (centaur-tabs-set-icons (display-graphic-p) "Icons may not be rendered in all terminals")
   (centaur-tabs-height 18)
+  (centaur-tabs-gray-out-icons t "Gray out icons for inactive tabs")
   :config
   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
 
@@ -41,7 +42,8 @@
   (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project))
 
-(use-package awesome-tab
+(use-package
+  awesome-tab
   :preface
   (defun sb/awesome-tab-buffer-groups ()
     "`awesome-tab-buffer-groups' control buffers' group rules.

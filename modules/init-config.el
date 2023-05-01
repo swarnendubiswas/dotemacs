@@ -34,7 +34,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '
@@ -76,7 +76,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file nil
+(defcustom sb/debug-init-file t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)

@@ -24,7 +24,8 @@
     ("M-<" . vertico-first)
     ("M->" . vertico-last)
     ("C-M-j" . vertico-exit-input)
-    ("<tab>" . vertico-insert))
+    ;; https://emacs.stackexchange.com/questions/77036/how-can-i-bind-vertico-insert-to-toggle-in-the-list
+    ("TAB" . vertico-insert))
   :custom
   (vertico-cycle t)
   (vertico-resize nil)

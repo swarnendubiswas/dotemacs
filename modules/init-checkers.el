@@ -189,14 +189,6 @@
   (with-eval-after-load "counsel"
     (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map)))
 
-;; Showing error messages in the echo area is less intrusive.
-
-;; (use-package flycheck-popup-tip ; Show error messages in popups
-;;   :disabled t
-;;   :unless (display-graphic-p)
-;;   :hook
-;;   (flycheck-mode-hook . flycheck-popup-tip-mode))
-
 ;; `aphelia' allows for formatting via a background process, supports Tramp, and does not move the
 ;; point after formatting.
 
@@ -262,6 +254,7 @@
       ;; "WHITESPACE_RULE"
       ;; "EN_QUOTES"
       ;; "DASH_RULE"
+      ;; "COMMA_PARENTHESIS_WHITESPACE"
       ;; "OXFORD_SPELLING_ISE_VERBS"
       ;; "OXFORD_SPELLING_NOUNS")
       )))
@@ -287,19 +280,14 @@
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
-;; support via `lsp-grammarly' and `lsp-ltex'. We need to enable `flycheck' support for the
-;; "*scratch*" buffer which is in `text-mode'.
+;; support. We enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
 (add-hook
   'text-mode-hook
   (lambda ()
     (when (string= (buffer-name) "*scratch*")
-      (if (featurep 'flycheck-grammarly)
-        (progn
-          (flycheck-select-checker 'grammarly)
-          (when (featurep 'flycheck-languagetool)
-            (flycheck-add-next-checker 'grammarly 'languagetool)))
-        (when (featurep 'flycheck-languagetool)
-          (flycheck-select-checker 'languagetool))))))
+      (progn
+        (flycheck-select-checker 'grammarly)
+        (flycheck-add-next-checker 'grammarly 'languagetool)))))
 
 (use-package
   highlight-indentation

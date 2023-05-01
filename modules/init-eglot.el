@@ -7,7 +7,8 @@
 
 ;;; Code:
 
-(use-package eglot
+(use-package
+  eglot
   :commands
   (eglot
     eglot-ensure
@@ -109,8 +110,7 @@
       .
       ,(eglot-alternatives '(("pylsp" "--stdio") ("pyright-langserver" "--stdio")))))
 
-  (add-to-list 'eglot-server-programs
- '((php-mode phps-mode) . ("intelephense" "--stdio")))
+  (add-to-list 'eglot-server-programs '((php-mode phps-mode) . ("intelephense" "--stdio")))
 
   ;; It may be more useful to use Grammarly to check these files.
   (add-to-list
@@ -121,11 +121,11 @@
 
   (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio"))))
 
-(use-package consult-eglot
-  :after (consult eglot))
+(use-package consult-eglot :after (consult eglot))
 
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
-(use-package eglot-grammarly
+(use-package
+  eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
   :disabled t
   :after eglot
@@ -137,7 +137,8 @@
   ;;                . ((audience . "knowledgeable")))))
   )
 
-(use-package eglot-ltex
+(use-package
+  eglot-ltex
   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
   :after eglot
   :demand t
@@ -152,8 +153,8 @@
   ;;                    (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
   )
 
-(use-package eglot-java
-  :after eglot
+(use-package
+  eglot-java
   :hook
   (java-mode-hook
     .
