@@ -32,21 +32,21 @@
 (defvar tramp-ssh-controlmaster-options)
 (defvar sb/minibuffer-completion)
 
-(setq tramp-default-user user-login-name
-      ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
-      ;; files which is faster than SSH.
-      ;; tramp-default-method "ssh"
-      tramp-default-remote-shell "/usr/bin/bash"
-      remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
-      ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
-      ;; settings
-      ;; https://emacs.stackexchange.com/questions/22306/working-with-tramp-mode-on-slow-connection-emacs-does-network-trip-when-i-start
-      ;; https://puppet.com/blog/speed-up-ssh-by-reusing-connections
-      tramp-ssh-controlmaster-options ""
-      tramp-verbose 1
-      ;; Disable version control for remote files to improve performance
-      vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
-                                   vc-ignore-dir-regexp tramp-file-name-regexp))
+(setq
+  tramp-default-user user-login-name
+  ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
+  ;; files which is faster than SSH.
+  ;; tramp-default-method "ssh"
+  tramp-default-remote-shell "/usr/bin/bash"
+  remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
+  ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
+  ;; settings
+  ;; https://emacs.stackexchange.com/questions/22306/working-with-tramp-mode-on-slow-connection-emacs-does-network-trip-when-i-start
+  ;; https://puppet.com/blog/speed-up-ssh-by-reusing-connections
+  tramp-ssh-controlmaster-options ""
+  tramp-verbose 1
+  ;; Disable version control for remote files to improve performance
+  vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
 
 (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
 
@@ -67,14 +67,12 @@
 
 (use-package counsel-tramp
   :after counsel
-  :bind
-  ("C-c d t" . counsel-tramp))
+  :bind ("C-c d t" . counsel-tramp))
 
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
   :after consult
-  :bind
-  ("C-c d t" . consult-tramp))
+  :bind ("C-c d t" . consult-tramp))
 
 ;; TODO: SSH into Gcloud
 ;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
@@ -90,8 +88,7 @@
 
 (use-package password-cache
   :after tramp
-  :custom
-  (password-cache-expiry nil))
+  :custom (password-cache-expiry nil))
 
 (provide 'init-tramp)
 

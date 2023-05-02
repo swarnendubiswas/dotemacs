@@ -66,6 +66,11 @@
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish)
 
+(use-package all-the-icons-ivy
+  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
+  :after ivy
+  :hook (emacs-startup-hook . all-the-icons-ivy-setup))
+
 (use-package counsel
   :preface
   ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html

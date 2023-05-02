@@ -55,7 +55,7 @@
 (use-package nerd-icons-ibuffer
   :when (eq sb/icons-provider 'nerd-icons)
   :hook (ibuffer-mode-hook . nerd-icons-ibuffer-mode)
-  :custom (nerd-icons-ibuffer-icon-size 0.9))
+  :custom (nerd-icons-ibuffer-icon-size 1.2))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t

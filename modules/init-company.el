@@ -22,35 +22,40 @@
     ;; based on the candidate
     (just-one-space))
   :defines
-  (company-dabbrev-downcase company-dabbrev-ignore-case
-                            company-dabbrev-other-buffers
-                            company-ispell-available
-                            company-ispell-dictionary
-                            company-clang-insert-arguments)
+  (company-dabbrev-downcase
+    company-dabbrev-ignore-case
+    company-dabbrev-other-buffers
+    company-ispell-available
+    company-ispell-dictionary
+    company-clang-insert-arguments)
   :commands
-  (company-abort company-files company-yasnippet
-                 company-ispell company-dabbrev
-                 company-capf company-dabbrev-code
-                 company-clang-set-prefix)
-  :hook
-  (emacs-startup-hook . global-company-mode)
+  (company-abort
+    company-files
+    company-yasnippet
+    company-ispell
+    company-dabbrev
+    company-capf
+    company-dabbrev-code
+    company-clang-set-prefix)
+  :hook (emacs-startup-hook . global-company-mode)
   :bind
-  (("C-M-/"    . company-other-backend)
-   :map company-active-map
-   ("C-s"      . company-search-candidates)
-   ("C-M-s"    . company-filter-candidates)
-   ("C-n"      . company-select-next)
-   ("C-p"      . company-select-previous)
-   ;; Insert the common part of all candidates, or select the next one
-   ("<tab>"    . company-complete-common-or-cycle)
-   ("[escape]" . company-abort)
-   :map company-search-map
-   ("C-s"      . company-search-repeat-forward)
-   ("C-r"      . company-search-repeat-backward)
-   ("C-g"      . company-search-abort)
-   ("DEL"      . company-search-delete-char))
-  :custom
-  (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  (("C-M-/" . company-other-backend)
+    :map
+    company-active-map
+    ("C-s" . company-search-candidates)
+    ("C-M-s" . company-filter-candidates)
+    ("C-n" . company-select-next)
+    ("C-p" . company-select-previous)
+    ;; Insert the common part of all candidates, or select the next one
+    ("<tab>" . company-complete-common-or-cycle)
+    ("[escape]" . company-abort)
+    :map
+    company-search-map
+    ("C-s" . company-search-repeat-forward)
+    ("C-r" . company-search-repeat-backward)
+    ("C-g" . company-search-abort)
+    ("DEL" . company-search-delete-char))
+  :custom (company-dabbrev-downcase nil "Do not downcase returned candidates")
   ;; Do not ignore case when collecting completion candidates. It is recommended to change the
   ;; default value of "keep-prefix" if we modify `company-dabbrev-downcase'.
   (company-dabbrev-ignore-case nil)
@@ -69,11 +74,20 @@
   ;; only choice, and "company-echo-metadata-frontend" which shows selected candidate docs in echo
   ;; area.
   (company-frontends '(company-pseudo-tooltip-frontend)) ; Always show candidates in overlay tooltip
-  (company-global-modes '(not dired-mode erc-mode message-mode
-                              comint-mode inferior-python-mode vterm-mode
-                              magit-status-mode help-mode
-                              gud-mode eshell-mode shell-mode
-                              csv-mode))
+  (company-global-modes
+    '
+    (not dired-mode
+      erc-mode
+      message-mode
+      comint-mode
+      inferior-python-mode
+      vterm-mode
+      magit-status-mode
+      help-mode
+      gud-mode
+      eshell-mode
+      shell-mode
+      csv-mode))
   :config
   ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
   ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
@@ -81,10 +95,9 @@
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
-  (push (apply-partially #'cl-remove-if
-                         (lambda (c)
-                           (string-match-p "\\`[0-9]+\\'" c)))
-        company-transformers)
+  (push
+    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+    company-transformers)
   (add-to-list 'company-transformers 'delete-dups)
   (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix))
@@ -102,20 +115,17 @@
   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
   (company-posframe-show-indicator nil "The display is not great")
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-  :init
-  (company-posframe-mode 1))
+  :init (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
   :if (display-graphic-p)
-  :hook
-  (prog-mode-hook . company-quickhelp-mode))
+  :hook (prog-mode-hook . company-quickhelp-mode))
 
 (use-package company-quickhelp-terminal
   :after company
   :unless (display-graphic-p)
-  :hook
-  (prog-mode-hook . company-quickhelp-terminal-mode))
+  :hook (prog-mode-hook . company-quickhelp-terminal-mode))
 
 (use-package company-statistics
   :after company
@@ -142,9 +152,12 @@
   :after (tex-mode company)
   :demand t
   :commands
-  (company-auctex-init company-auctex-labels
-                       company-auctex-bibs company-auctex-macros
-                       company-auctex-symbols company-auctex-environments))
+  (company-auctex-init
+    company-auctex-labels
+    company-auctex-bibs
+    company-auctex-macros
+    company-auctex-symbols
+    company-auctex-environments))
 
 ;; Required by `ac-math' and `company-math'
 (use-package math-symbols
@@ -221,14 +234,13 @@
 
 ;; Override `company-backends' for unhandled major modes.
 (with-eval-after-load "company"
-  (setq company-backends '(company-dirfiles
-                           company-dabbrev-code
-                           ;; If we have `company-dabbrev' first, then other matches from
-                           ;; `company-ispell' will be ignored.
-                           (company-ispell :with
-                                           company-dabbrev
-                                           company-dict
-                                           :separate)))
+  (setq company-backends
+    '
+    (company-dirfiles
+      company-dabbrev-code
+      ;; If we have `company-dabbrev' first, then other matches from
+      ;; `company-ispell' will be ignored.
+      (company-ispell :with company-dabbrev company-dict :separate)))
 
   (progn
     (declare-function sb/company-latex-mode "init-company")
@@ -244,36 +256,36 @@
       ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
       ;; `company-auctex-bibs'
 
-      (setq company-backends '(company-dirfiles
-                               (company-math-symbols-latex ; Math latex tags
-                                company-latex-commands
-                                company-reftex-labels
-                                company-reftex-citations
-                                company-auctex-environments
-                                company-auctex-macros
-                                ;; Math unicode symbols and sub(super)scripts
-                                company-math-symbols-unicode
-                                company-auctex-symbols
-                                company-bibtex
-                                :separate)
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-math-symbols-latex ; Math latex tags
+            company-latex-commands
+            company-reftex-labels
+            company-reftex-citations
+            company-auctex-environments
+            company-auctex-macros
+            ;; Math unicode symbols and sub(super)scripts
+            company-math-symbols-unicode
+            company-auctex-symbols
+            company-bibtex
+            :separate)
 
-                               ;; FIXME: Untested
-                               ;; company-yasnippet
+          ;; FIXME: Untested
+          ;; company-yasnippet
 
-                               (company-dabbrev :with
-                                                company-ispell
-                                                company-dict
-                                                :separate)
-                               company-capf)))
+          (company-dabbrev :with company-ispell company-dict :separate) company-capf)))
 
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
-      (add-hook hook (lambda ()
-                       (sb/company-latex-mode)
-                       ;; `company-capf' does not pass to later backends with Texlab, so we use
-                       ;; `company-fuzzy-mode' to merge results from all backends.
-                       ;; (company-fuzzy-mode 1)
-                       ;; (diminish 'company-fuzzy-mode)
-                       ))))
+      (add-hook
+        hook
+        (lambda ()
+          (sb/company-latex-mode)
+          ;; `company-capf' does not pass to later backends with Texlab, so we use
+          ;; `company-fuzzy-mode' to merge results from all backends.
+          ;; (company-fuzzy-mode 1)
+          ;; (diminish 'company-fuzzy-mode)
+          ))))
 
   (progn
     (declare-function sb/company-text-mode "init-company")
@@ -281,23 +293,19 @@
     (defun sb/company-text-mode ()
       "Add backends for text completion in company mode."
       (defvar company-backends)
-      (set (make-local-variable 'company-backends)
-           '(company-dirfiles
-             (company-ispell :with
-              company-dabbrev
-              company-dict
-              :separate))))
+      (set
+        (make-local-variable 'company-backends)
+        '(company-dirfiles (company-ispell :with company-dabbrev company-dict :separate))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
-    (add-hook 'text-mode-hook
-              (lambda ()
-                (unless (or (derived-mode-p 'latex-mode)
-                            (derived-mode-p 'LaTeX-mode))
-                  (sb/company-text-mode)
+    (add-hook
+      'text-mode-hook
+      (lambda ()
+        (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
+          (sb/company-text-mode)
 
-                  ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
-
-                  ))))
+          ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
+          ))))
 
   (progn
     (defun sb/company-prog-mode ()
@@ -311,35 +319,36 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
 
-      (cond ((eq sb/lsp-provider 'eglot)
-             (setq company-backends '(company-dirfiles
-                               (company-capf
-                                ;; Cannot use company-citre-tags backend with eglot
-                                company-dabbrev-code ; Useful for variable names
-                                :with company-yasnippet
-                                :separate)
-                               (company-dabbrev :with
-                                                company-dict
-                                                company-ispell
-                                                :separate))))
-            ((eq sb/lsp-provider 'lsp-mode)
-             (setq company-backends '(company-dirfiles
-                               (company-capf
-                                company-citre-tags
-                                company-dabbrev-code ; Useful for variable names
-                                :with company-yasnippet
-                                :separate)
-                               (company-dabbrev :with
-                                                company-dict
-                                                company-ispell
-                                                :separate))))))
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (setq company-backends
+            '
+            (company-dirfiles
+              (company-capf
+                ;; Cannot use company-citre-tags backend with eglot
+                company-dabbrev-code ; Useful for variable names
+                :with company-yasnippet
+                :separate)
+              (company-dabbrev :with company-dict company-ispell :separate))))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (setq company-backends
+            '
+            (company-dirfiles
+              (company-capf
+                company-citre-tags
+                company-dabbrev-code ; Useful for variable names
+                :with company-yasnippet
+                :separate)
+              (company-dabbrev :with company-dict company-ispell :separate))))))
 
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (unless (or (derived-mode-p 'emacs-lisp-mode)
-                            (derived-mode-p 'flex-mode)
-                            (derived-mode-p 'bison-mode))
-                  (sb/company-prog-mode)))))
+    (add-hook
+      'prog-mode-hook
+      (lambda ()
+        (unless
+          (or (derived-mode-p 'emacs-lisp-mode)
+            (derived-mode-p 'flex-mode)
+            (derived-mode-p 'bison-mode))
+          (sb/company-prog-mode)))))
 
   (progn
     (defun sb/company-elisp-mode ()
@@ -351,22 +360,17 @@
       (defvar company-backends)
       (make-local-variable 'company-backends)
 
-      (setq company-backends '(company-dirfiles
-                               (company-capf
-                                company-elisp
-                                company-keywords
-                                company-citre-tags
-                                company-dabbrev-code ; Useful for variable names
-                                :with company-yasnippet
-                                :separate)
-                               (company-dabbrev :with
-                                                company-dict
-                                                company-ispell
-                                                :separate))))
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-capf
+            company-elisp company-keywords company-citre-tags
+            company-dabbrev-code ; Useful for variable names
+            :with company-yasnippet
+            :separate)
+          (company-dabbrev :with company-dict company-ispell :separate))))
 
-    (add-hook 'emacs-lisp-mode-hook
-              (lambda ()
-                (sb/company-elisp-mode)))))
+    (add-hook 'emacs-lisp-mode-hook (lambda () (sb/company-elisp-mode)))))
 
 (provide 'init-company)
 

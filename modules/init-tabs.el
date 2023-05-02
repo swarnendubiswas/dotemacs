@@ -7,8 +7,7 @@
 
 ;;; Code:
 
-(use-package
-  centaur-tabs
+(use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :bind*
@@ -42,8 +41,7 @@
   (centaur-tabs-headline-match)
   (centaur-tabs-group-by-projectile-project))
 
-(use-package
-  awesome-tab
+(use-package awesome-tab
   :preface
   (defun sb/awesome-tab-buffer-groups ()
     "`awesome-tab-buffer-groups' control buffers' group rules.

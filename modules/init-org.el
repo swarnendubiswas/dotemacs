@@ -15,7 +15,6 @@
 ;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
 ;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
 
-
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
   :defines

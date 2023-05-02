@@ -12,8 +12,7 @@
 
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
-(use-package
-  ispell
+(use-package ispell
   :straight (:type built-in)
   :bind ("M-$" . ispell-word)
   :custom
@@ -75,8 +74,7 @@
   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
-(use-package
-  flyspell
+(use-package flyspell
   :preface
   ;; Move point to previous error
   ;; http://emacs.stackexchange.com/a/14912/2017
@@ -145,7 +143,8 @@
   :custom (flyspell-abbrev-p t "Add corrections to abbreviation table")
   ;; Do not print messages for every word (when checking the entire buffer). This is a major
   ;; performance gain.
-  (flyspell-issue-message-flag nil) (flyspell-issue-welcome-flag nil)
+  (flyspell-issue-message-flag nil)
+  (flyspell-issue-welcome-flag nil)
   :diminish)
 
 ;; Silence "Starting 'look' process..." message
@@ -158,15 +157,13 @@
 ;;         ("C-;" . flyspell-popup-correct))
 ;;   :custom (flyspell-popup-correct-delay 0.1))
 
-(use-package
-  flyspell-correct
+(use-package flyspell-correct
   :after flyspell
   :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point)))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
-(use-package
-  spell-fu
+(use-package spell-fu
   :if (or (executable-find "aspell") (executable-find "hunspell"))
   :defines spell-fu-directory
   :commands spell-fu-mode
@@ -264,8 +261,7 @@
   ;; Ignore read-only buffers
   (setq global-spell-fu-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))))
 
-(use-package
-  consult-flyspell
+(use-package consult-flyspell
   :after (consult flyspell)
   :defines consult-flyspell-select-function
   :bind ("C-c f l" . consult-flyspell)

@@ -14,14 +14,13 @@
 ;; Install fonts with "M-x all-the-icons-install-fonts"
 (use-package all-the-icons
   :preface
-  ;; https://github.com/domtronn/all-the-icons.el/issues/120
   ;; FIXME: This seems to work only with GUI Emacs.
   (defun sb/font-installed-p (font-name)
     "Check if font with FONT-NAME is available."
     (if (find-font (font-spec :name font-name))
       t
       nil))
-  :when (eq sb/icons-provider 'all-the-icons)
+  :when (or (eq sb/icons-provider 'all-the-icons) (eq sb/tab-bar-handler 'centaur-tabs))
   :commands all-the-icons-install-fonts
   :init
   (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
@@ -37,22 +36,16 @@
   (all-the-icons-alltheicon-scale-factor 0.9)
   (all-the-icons-color-icons t))
 
-(use-package all-the-icons-ivy
-  :if (display-graphic-p)
-  :after ivy
-  :hook (emacs-startup-hook . all-the-icons-ivy-setup))
-
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (eq sb/icons-provider 'nerd-icons)
   :custom
   (nerd-icons-font-family "MesloLGS Nerd Font")
-  (nerd-icons-scale-factor 0.7))
+  (nerd-icons-scale-factor 0.9))
 
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
-  :after nerd-icons
-  :init (nerd-icons-completion-mode))
+  :init (nerd-icons-completion-mode 1))
 
 (use-package unicode-fonts
   :init (unicode-fonts-setup))
@@ -72,8 +65,7 @@
 ;; (setq resize-mini-windows nil
 ;;       max-mini-window-height 5)
 
-(use-package
-  beacon ; Highlight the cursor position after the window scrolls
+(use-package beacon ; Highlight the cursor position after the window scrolls
   :hook (emacs-startup-hook . beacon-mode)
   :diminish)
 
@@ -110,21 +102,9 @@
     split-height-threshold nil
     split-width-threshold 0))
 
-;; Start with a window split to make use of wider screens
-
-;; (when (string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-;;   (split-window-right))
-
 (use-package hl-line
   :commands hl-line-highlight
   :hook (emacs-startup-hook . global-hl-line-mode))
-
-;; This package disables the mouse completely.
-
-;; (use-package disable-mouse
-;;   :if (display-mouse-p)
-;;   :hook (after-init-hook . global-disable-mouse-mode)
-;;   :diminish disable-mouse-global-mode)
 
 ;; Move the cursor from the line of view
 (use-package avoid
@@ -135,7 +115,7 @@
 
 ;; Icons for minibuffer completion (e.g., `find-file-at-point')
 (use-package all-the-icons-completion
-  :if (display-graphic-p)
+  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
   :commands all-the-icons-completion-mode
   :init (all-the-icons-completion-mode 1)
   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
