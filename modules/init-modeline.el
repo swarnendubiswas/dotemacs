@@ -13,6 +13,26 @@
 ;; maintained.
 (use-package powerline
   :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let*
+        (
+          (rendered-str (format-mode-line str))
+          (padded-str
+            (concat
+              (when (and (> (length rendered-str) 0) (eq pad 'l))
+                "")
+              (if (listp str)
+                rendered-str
+                str)
+              (when (and (> (length rendered-str) 0) (eq pad 'r))
+                ""))))
+        (if face
+          (pl/add-text-property padded-str 'face face)
+          padded-str))))
+
   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
   (defun sb/powerline-sb-theme ()
     "Setup a nano-like modeline"
@@ -40,7 +60,7 @@
               (rhs
                 (list
                   (when which-function-mode
-                    (powerline-raw which-func-format face0 'l))
+                    (sb/powerline-raw which-func-format face0 'l))
                   (powerline-vc nil 'l)
                   (powerline-raw "")
                   (powerline-raw "%4l" nil 'l)
