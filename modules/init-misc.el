@@ -280,6 +280,9 @@
 (use-package change-inner
   :commands (change-inner change-outer yank-inner yank-outer))
 
+(use-package link-hint
+  :bind ("C-c C-l" . link-hint-open-link))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

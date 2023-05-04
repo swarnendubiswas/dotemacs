@@ -271,7 +271,10 @@
       (flyspell-correct-at-point)
       (consult-flyspell))))
 
-;; TODO: Try https://github.com/minad/jinx
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :custom (jinx-languages "en_US")
+  :bind ([remap ispell-word] . jinx-correct))
 
 (provide 'init-spell)
 

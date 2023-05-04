@@ -62,7 +62,7 @@
   :hook (emacs-startup-hook . circadian-setup)
   :config
   (if (display-graphic-p)
-    (setq circadian-themes '((:sunrise . doom-one) (:sunset . doom-one)))
+    (setq circadian-themes '((:sunrise . modus-operandi) (:sunset . modus-operandi)))
     (setq circadian-themes '((:sunrise . doom-one) (:sunset . doom-one)))))
 
 (use-package ef-themes

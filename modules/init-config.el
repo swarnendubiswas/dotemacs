@@ -76,7 +76,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)

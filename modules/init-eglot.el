@@ -107,7 +107,7 @@
     `
     ((python-mode python-ts-mode)
       .
-      ,(eglot-alternatives '(("pylsp" "--stdio") ("pyright-langserver" "--stdio")))))
+      ,(eglot-alternatives '(("pylsp") ("pyright-langserver" "--stdio")))))
 
   (add-to-list 'eglot-server-programs '((php-mode phps-mode) . ("intelephense" "--stdio")))
 

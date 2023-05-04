@@ -36,6 +36,13 @@
   (all-the-icons-alltheicon-scale-factor 0.9)
   (all-the-icons-color-icons t))
 
+;; Icons for minibuffer completion (e.g., `find-file-at-point')
+(use-package all-the-icons-completion
+  :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
+  :commands all-the-icons-completion-mode
+  :init (all-the-icons-completion-mode 1)
+  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
+
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (eq sb/icons-provider 'nerd-icons)
@@ -45,7 +52,9 @@
 
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
-  :init (nerd-icons-completion-mode 1))
+  :when (and (eq sb/icons-provider 'nerd-icons) (display-graphic-p))
+  :init (nerd-icons-completion-mode 1)
+  :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
 
 (use-package unicode-fonts
   :init (unicode-fonts-setup))
@@ -112,13 +121,6 @@
   :if (display-mouse-p)
   :commands mouse-avoidance-mode
   :init (mouse-avoidance-mode 'banish))
-
-;; Icons for minibuffer completion (e.g., `find-file-at-point')
-(use-package all-the-icons-completion
-  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
-  :commands all-the-icons-completion-mode
-  :init (all-the-icons-completion-mode 1)
-  :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
 ;; Value is in 1/10pt, so 100 will give you 10pt
 

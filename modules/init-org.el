@@ -117,7 +117,8 @@
   (org-appear-autosubmarkers t)
   (org-appear-autoentities t)
   (org-appear-autolinks t)
-  (org-appear-autoemphasis t))
+  (org-appear-autoemphasis t)
+  (org-appear-autokeywords t))
 
 (use-package ox-gfm
   :after org

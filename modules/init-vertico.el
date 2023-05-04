@@ -13,7 +13,7 @@
   :straight
   (vertico
     :files (:defaults "extensions/*")
-    :includes (vertico-directory vertico-indexed vertico-quick vertico-repeat))
+    :includes (vertico-directory vertico-indexed vertico-quick vertico-repeat vertico-multiform))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :commands (command-completion-default-include-p minibuffer-keyboard-quit)
@@ -86,6 +86,26 @@
   :after vertico
   :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
 
+(use-package vertico-multiform
+  :straight nil
+  :after vertico
+  :commands vertico-multiform-mode
+  :init (vertico-multiform-mode)
+  :custom
+  (vertico-multiform-categories '((embark-keybinding grid)))
+  (vertico-multiform-commands
+    '
+    ((consult-line buffer)
+      (execute-extended-command indexed)
+      (completion-at-point vertical)
+      (consult-imenu buffer indexed)
+      (find-file (vertico-sort-function . sort-directories-first))
+      (consult-grep buffer)
+      (consult-git-grep buffer)
+      (consult-yank-pop indexed)
+      (consult-ripgrep buffer)
+      (consult-outline buffer))))
+
 (use-package consult
   :after vertico
   :commands (consult--customize-put projectile-project-root)
@@ -135,10 +155,6 @@
     ([remap recentf-open-files] . consult-recent-file)
     ("<f9>" . consult-recent-file)
     ([remap multi-occur] . consult-multi-occur)
-    ([remap xref-show-xrefs-function] . consult-xref)
-    ([remap xref-show-definitions-function] . consult-xref)
-    ([remap xref-find-references] . consult-xref)
-    ([remap xref-find-definitions] . consult-xref)
     :map
     isearch-mode-map
     ("M-s e" . consult-isearch-history)
