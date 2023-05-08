@@ -20,7 +20,6 @@
   (radio
     (const :tag "doom-one" doom-one)
     (const :tag "doom-nord" doom-nord)
-    (const :tag "doom-molokai" doom-molokai)
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "ef-trio-dark" ef-trio-dark)
@@ -34,7 +33,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '
@@ -44,7 +43,6 @@
     (const :tag "powerline" powerline)
     (const :tag "doom-modeline" doom-modeline)
     (const :tag "awesome-tray" awesome-tray)
-    (const :tag "spaceline" spaceline)
     ;; No customization
     (const :tag "none" none))
   :group 'sb/emacs)

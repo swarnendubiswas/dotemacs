@@ -165,6 +165,7 @@
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package spell-fu
   :if (or (executable-find "aspell") (executable-find "hunspell"))
+  :disabled t
   :defines spell-fu-directory
   :commands spell-fu-mode
   :init

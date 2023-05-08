@@ -17,7 +17,8 @@
     eglot-format
     eglot-find-declaration
     eglot-find-implementation
-    eglot-find-typeDefinition)
+    eglot-find-typeDefinition
+    eglot-update)
   :bind
   (("M-." . xref-find-definitions)
     ("C-c l q" . eglot-shutdown)
@@ -59,28 +60,28 @@
       :documentOnTypeFormattingProvider
       :documentLinkProvider))
 
-  (setq-default eglot-workspace-configuration
-    '
-    (
-      (:pylsp
-        .
-        (:configurationSources
-          ["setup.cfg"]
-          :plugins
-          (:jedi_completion
-            (:include_params t :fuzzy t)
-            :pycodestyle (:enabled :json-false)
-            :mccabe (:enabled :json-false)
-            :pyflakes (:enabled :json-false)
-            :flake8 (:enabled :json-false :maxLineLength 100)
-            :black (:enabled :json-false :line_length 100)
-            :yapf (:enabled t)
-            :pydocstyle (:enabled t :convention "numpy")
-            :autopep8 (:enabled :json-false)
-            :pylint (:enabled t)
-            :pylsp_isort (:enabled t)
-            :pylsp_mypy (:enabled t))))
-      (:pyright . ((useLibraryCodeForTypes . t)))))
+  ;; (setq-default eglot-workspace-configuration
+  ;;   '
+  ;;   (
+  ;;     (:pylsp
+  ;;       .
+  ;;       (:configurationSources
+  ;;         ["setup.cfg"]
+  ;;         :plugins
+  ;;         (:jedi_completion
+  ;;           (:include_params t :fuzzy t)
+  ;;           :pycodestyle (:enabled :json-false)
+  ;;           :mccabe (:enabled :json-false)
+  ;;           :pyflakes (:enabled :json-false)
+  ;;           :flake8 (:enabled :json-false :maxLineLength 100)
+  ;;           :black (:enabled :json-false :line_length 100)
+  ;;           :yapf (:enabled t)
+  ;;           :pydocstyle (:enabled t :convention "numpy")
+  ;;           :autopep8 (:enabled :json-false)
+  ;;           :pylint (:enabled t)
+  ;;           :pylsp_isort (:enabled t)
+  ;;           :pylsp_mypy (:enabled t))))
+  ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
 
   (add-to-list
     'eglot-server-programs
@@ -102,23 +103,16 @@
         "--pch-storage=memory"
         "--pretty")))
 
-  (add-to-list
-    'eglot-server-programs
-    `
-    ((python-mode python-ts-mode)
-      .
-      ,(eglot-alternatives '(("pylsp") ("pyright-langserver" "--stdio")))))
-
-  (add-to-list 'eglot-server-programs '((php-mode phps-mode) . ("intelephense" "--stdio")))
-
-  ;; It may be more useful to use Grammarly to check these files.
-  (add-to-list
-    'eglot-server-programs
-    '((tex-mode bibtex-mode latex-mode texinfo-mode context-mode) "texlab"))
-
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `
+  ;;   ((python-mode python-ts-mode)
+  ;;     .
+  ;;     ,(eglot-alternatives '(("pylsp") ("pyright-langserver" "--stdio")))))
+  ;; (add-to-list 'eglot-server-programs '((php-mode phps-mode) . ("intelephense" "--stdio")))
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
-
-  (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio"))))
+  ;; (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio")))
+  )
 
 (use-package consult-eglot
   :after (consult eglot))
@@ -126,14 +120,13 @@
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
-  :disabled t
   :after eglot
   :demand t
   :init (eglot-ensure)
-  :config
+  ;; :config
   ;; (add-to-list eglot-workspace-configuration
   ;;              ((@emacs-grammarly/grammarly-languageserver
-  ;;                . ((audience . "knowledgeable")))))
+  ;;                ((audience "knowledgeable")))))
   )
 
 (use-package eglot-ltex
@@ -142,13 +135,13 @@
   :demand t
   :init
   (setq eglot-languagetool-server-path
-    (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
+    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
   (eglot-ensure)
-  :custom (eglot-languagetool-active-modes '(text-mode org-mode))
-  ;; :config
-  ;;(add-to-list 'eglot-workspace-configuration
-  ;;           ((:ltex . ((:language "en-US")
-  ;;                    (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode))
+  :config
+  ;; (add-to-list
+  ;;   'eglot-workspace-configuration
+  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
   )
 
 (use-package eglot-java

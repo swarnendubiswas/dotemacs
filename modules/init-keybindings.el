@@ -18,30 +18,18 @@
 (declare-function sb/switch-to-scratch "init-functions")
 (declare-function sb/counsel-all-files-recursively "init-functions")
 
-;; (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-
 (bind-keys
   ("RET" . newline-and-indent)
   ("C-l" . goto-line)
+
   ("C-c z" . repeat)
   ("C-z" . undo)
+
   ("C-<f11>" . delete-other-windows)
-  ("C-x k" . kill-this-buffer)
   ("C-c d f" . auto-fill-mode)
+
   ("<f7>" . previous-error) ; "M-g p" is the default keybinding
   ("<f8>" . next-error) ; "M-g n" is the default keybinding
-
-  ;; The default keybinding "C-S-backspace" does not work with the TUI. We make it work with
-  ;; Alacritty with `term-keys-mode'. So, this is an alternative.
-
-  ;; ("M-k"       . kill-whole-line)
-
-  ;; The dwim versions manipulate only the character under the cursor. Most often, I want to
-  ;; manipulate the first character of the word.
-
-  ;; ("M-c"       . capitalize-dwim)
-  ;; ("M-u"       . upcase-dwim)
-  ;; ("M-l"       . downcase-dwim)
 
   ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
   ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
@@ -53,6 +41,7 @@
 
   ("C-s" . save-buffer)
   ("C-S-s" . sb/save-all-buffers)
+  ("C-x k" . kill-this-buffer)
 
   ("C-<left>" . backward-word)
   ("C-<right>" . forward-word)
@@ -92,11 +81,6 @@
   :custom (which-key-sort-order 'which-key-key-order-alpha)
   :config (which-key-setup-side-window-right-bottom)
   :diminish)
-
-;; (use-package which-key-posframe
-;;   :if (and (symbol-value 'sb/IS-LINUX) (display-graphic-p))
-;;   :hook
-;;   (which-key-mode-hook . which-key-posframe-mode))
 
 ;; Hydras, https://github.com/abo-abo/hydra
 

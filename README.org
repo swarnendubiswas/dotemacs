@@ -2,7 +2,7 @@
 
 * GNU Emacs
 
-This repository lists my preferred setup for GNU Emacs, my primary editor. The customizations and install instructions should work on a GNU/Linux platform and are not extensively tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my preferred setup for GNU Emacs, my primary editor. The customization and install instructions should work on a GNU/Linux platform and are not extensively tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
 
 ** Install GNU Emacs
 
@@ -313,7 +313,7 @@ Using ~export TERM=xterm-24bit~ may lead to failures when accessing remote syste
 
 ** Emacsclient
 
-Start the Emacs daemon with ~emacs --daemon~. To run Emacsclient with a GUI, use =emacsclient -c -a ""=, where =-a ""= starts Emacs daemon and reattaches, and ~-t~ starts the client in the terminal. To run Emacsclient in a terminal, use ~emacsclient -nw -q~ or ~emacsclient -t -q~.
+Start the Emacs daemon with ~emacs --daemon~. To run Emacsclient with a GUI, use =emacsclient -c -a ""=, where =-a ""= starts Emacs daemon and reattaches. To run Emacsclient in a terminal, use ~emacsclient -nw -q~ or =emacsclient -t -q -a ""=, where =-t= starts the client in the terminal.
 
 Add the following to your ~.bashrc~ to use Emacsclient as your editor.
 

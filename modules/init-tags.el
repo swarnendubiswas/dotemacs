@@ -47,7 +47,10 @@
   :demand t
   :commands dumb-jump-xref-activate
   :hook (xref-backend-functions . dumb-jump-xref-activate)
-  :custom (dumb-jump-quiet t))
+  :custom
+  (dumb-jump-quiet t)
+  (dumb-jump-force-searcher 'rg)
+  (dumb-jump-prefer-searcher 'rg))
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 

@@ -52,7 +52,7 @@
 
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
-  :when (and (eq sb/icons-provider 'nerd-icons) (display-graphic-p))
+  :when (eq sb/icons-provider 'nerd-icons)
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
 
@@ -115,17 +115,8 @@
   :commands hl-line-highlight
   :hook (emacs-startup-hook . global-hl-line-mode))
 
-;; Move the cursor from the line of view
-(use-package avoid
-  :straight (:type built-in)
-  :if (display-mouse-p)
-  :commands mouse-avoidance-mode
-  :init (mouse-avoidance-mode 'banish))
-
-;; Value is in 1/10pt, so 100 will give you 10pt
-
-;; These font preferences will be ignored when we use TUI Emacs. Then, the terminal font setting
-;; will be used.
+;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
+;; we use TUI Emacs. Then, the terminal font setting will be used.
 
 (when (display-graphic-p)
   (cond

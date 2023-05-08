@@ -12,12 +12,11 @@
 (use-package vc-hooks
   :straight (:type built-in)
   :custom (vc-follow-symlinks t "No need to ask")
-  ;; Disabling vc improves performance. An intermediate option is '(Git) to show branch information
-  ;; on the modeline.
+  ;; Disabling vc is said to improve performance. However, I find it useful to show branch
+  ;; information on the modeline and highlight modifications in the current file.
   (vc-handled-backends '(Git)))
 
 (use-package magit
-  :commands magit-display-buffer-fullframe-status-v1
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
   :custom
   ;; Open the status buffer in a full frame
@@ -27,7 +26,6 @@
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist
     '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
-  (magit-commit-show-diff nil)
   :config
   (require 'magit-diff)
   (setq
@@ -37,23 +35,6 @@
 (use-package git-modes
   :commands (gitignore-mode gitattributes-mode gitconfig-mode)
   :mode ("dotgitconfig" . gitconfig-mode))
-
-;; (use-package git-gutter
-;;   :unless (boundp 'vc-handled-backends)
-;;   :commands global-git-gutter-mode
-;;   :diminish
-;;   :bind
-;;   (("C-x p" . git-gutter:previous-hunk)
-;;    ("C-x n" . git-gutter:next-hunk))
-;;   :hook (after-init-hook . global-git-gutter-mode)
-;;   :custom
-;;   (git-gutter:added-sign " ")
-;;   (git-gutter:deleted-sign " ")
-;;   (git-gutter:modified-sign " ")
-;;   (git-gutter:update-interval 1)
-;;   ;; https://github.com/syl20bnr/spacemacs/issues/10555
-;;   ;; https://github.com/syohex/emacs-git-gutter/issues/24
-;;   (git-gutter:disabled-modes '(fundamental-mode org-mode image-mode doc-view-mode pdf-view-mode)))
 
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
@@ -113,36 +94,22 @@
     smerge-combine-with-next
     smerge-resolve)
   :init
-  (add-hook 'find-file-hook #'sb/enable-smerge-maybe-without-vc :append)
-  (add-hook
-    'magit-diff-visit-file-hook
-    (lambda ()
-      (when smerge-mode
-        (sb/smerge-hydra/body))))
-  :bind-keymap ("C-c v" . smerge-command-prefix)
+  (add-hook 'find-file-hook #'sb/enable-smerge-maybe-with-vc :append)
+  (add-hook 'after-revert-hook #'sb/enable-smerge-maybe-with-vc :append)
   :bind
   (:map
     smerge-mode-map
     ("M-g n" . smerge-next)
     ("M-g p" . smerge-prev)
-    ("M-g k c" . smerge-keep-current)
-    ("M-g k u" . smerge-keep-upper)
-    ("M-g k l" . smerge-keep-lower)
-    ("M-g k b" . smerge-keep-base)
-    ("M-g k a" . smerge-keep-all)
+    ("M-g c" . smerge-keep-current)
+    ("M-g u" . smerge-keep-upper)
+    ("M-g l" . smerge-keep-lower)
+    ("M-g b" . smerge-keep-base)
+    ("M-g a" . smerge-keep-all)
     ("M-g e" . smerge-ediff)
     ("M-g K" . smerge-kill-current)
     ("M-g m" . smerge-context-menu)
     ("M-g M" . smerge-popup-context-menu)))
-
-;; Add the "delta" config into the global "~/.gitconfig" file.
-;; https://github.com/dandavison/delta#get-started
-;; https://github.com/dandavison/magit-delta/issues/13
-(use-package magit-delta
-  :if (executable-find "delta")
-  ;; :disabled t ; The color combinations for magit-delta are not great with many themes.
-  :hook (magit-mode-hook . magit-delta-mode)
-  :diminish magit-delta-mode)
 
 (use-package with-editor :diminish)
 

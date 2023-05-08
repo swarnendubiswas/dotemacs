@@ -9,7 +9,7 @@
 
 (defvar sb/theme)
 
-;; The Python virtualenv information is not shown on the modeline. The package is not being actively
+;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
 (use-package powerline
   :preface
@@ -60,7 +60,7 @@ PAD can be left (`l') or right (`r')."
               (rhs
                 (list
                   (when which-function-mode
-                    (sb/powerline-raw which-func-format face0 'l))
+                    (sb/powerline-raw which-func-format nil 'l))
                   (powerline-vc nil 'l)
                   (powerline-raw "")
                   (powerline-raw "%4l" nil 'l)
@@ -101,34 +101,6 @@ PAD can be left (`l') or right (`r')."
     doom-modeline-unicode-fallback t)
   :hook (emacs-startup-hook . doom-modeline-mode))
 
-(use-package spaceline
-  :defines
-  (spaceline-hud-p
-    spaceline-selection-info-p
-    spaceline-version-control-p
-    spaceline-input-method-p
-    spaceline-persp-name-p
-    spaceline-buffer-encoding-abbrev-p
-    spaceline-buffer-encoding-p
-    spaceline-buffer-size-p)
-  :if (eq sb/modeline-theme 'spaceline)
-  :init
-  (require 'spaceline-config)
-  (setq
-    spaceline-hud-p nil
-    spaceline-selection-info-p nil
-    spaceline-version-control-p t
-    spaceline-input-method-p nil
-    spaceline-buffer-size-p nil
-    ;; Line ending convention used in the current buffer (unix, dos or mac)
-    spaceline-buffer-encoding-abbrev-p nil
-    ;; Line ending convention used in the current buffer (unix, dos or mac) without abbreviation
-    spaceline-buffer-encoding-p nil
-    spaceline-persp-name-p nil)
-
-  (spaceline-emacs-theme))
-
-;; Minimal modeline information
 (use-package awesome-tray ; Minimal modeline information
   :straight (:host github :repo "manateelazycat/awesome-tray")
   :if (eq sb/modeline-theme 'awesome-tray)

@@ -16,8 +16,7 @@
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
 ;; checks only the writing style. `textlint' includes `writegood'.
 
-(use-package
-  writegood-mode
+(use-package writegood-mode
   :commands
   (writegood-passive-voice-turn-off
     writegood-passive-voice-turn-on
@@ -53,8 +52,7 @@
     (cl-union writegood-weasel-words sb/weasel-words))
   :diminish)
 
-(use-package
-  flycheck
+(use-package flycheck
   :commands
   (flycheck-add-next-checker
     flycheck-next-checker
@@ -89,18 +87,17 @@
     (setq flycheck-indication-mode 'left-fringe)
     (setq flycheck-indication-mode 'left-margin))
 
-  ;; We prefer not to use `textlint' and `proselint'. `chktex' errors are often not very helpful.
+  ;; We do not `textlint', `proselint', and `chktex' since they are very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))
 
   ;; These themes have their own styles for displaying flycheck info.
-  (when (or (eq sb/modeline-theme 'doom-modeline) (eq sb/modeline-theme 'spaceline))
+  (when (eq sb/modeline-theme 'doom-modeline)
     (setq flycheck-mode-line nil))
 
   (setq-default
     flycheck-markdown-markdownlint-cli-config
     (expand-file-name ".markdownlint.json" sb/user-home-directory)
-    flycheck-chktexrc "chktexrc"
     flycheck-pylintrc '("setup.cfg" "pylintrc")
     flycheck-python-pylint-executable "python3"
     flycheck-shellcheck-follow-sources nil)
@@ -110,7 +107,7 @@
     tex-textidote
     "A LaTeX grammar/spelling checker using textidote.
   See https://github.com/sylvainhalle/textidote."
-    :modes (latex-mode plain-tex-mode)
+    :modes (latex-mode LaTeX-mode plain-tex-mode)
     :command
     ("java"
       "-jar"
@@ -150,34 +147,29 @@
         (message (one-or-more (not "\"")))
         (one-or-more not-newline)
         line-end)))
-
   (add-to-list 'flycheck-checkers 'tex-textidote)
 
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Exclude directories and files from being checked
-  ;; https://github.com/flycheck/flycheck/issues/1745
+  ;; ;; Exclude directories and files from being checked
+  ;; ;; https://github.com/flycheck/flycheck/issues/1745
 
-  (defvar sb/excluded-directory-regexps '(".git" "elpa" ".cache" ".clangd"))
-
-  (defun sb/flycheck-may-check-automatically (&rest _conditions)
-    (or (null buffer-file-name)
-      (let ((bufname (file-truename buffer-file-name)))
-        (not (seq-some (lambda (re) (string-match-p re bufname)) sb/excluded-directory-regexps)))))
-
-  (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
+  ;; (defvar sb/excluded-directory-regexps '(".git" "elpa" ".cache" ".clangd"))
+  ;; (defun sb/flycheck-may-check-automatically (&rest _conditions)
+  ;;   (or (null buffer-file-name)
+  ;;     (let ((bufname (file-truename buffer-file-name)))
+  ;;       (not (seq-some (lambda (re) (string-match-p re bufname)) sb/excluded-directory-regexps)))))
+  ;; (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
 
   ;; Chain flycheck checkers with lsp. We prefer to use per-project directory local variables
   ;; instead of defining here.
   ;; https://github.com/flycheck/flycheck/issues/1762
 
   (defvar-local sb/flycheck-local-checkers nil)
-
   (defun sb/flycheck-checker-get (fn checker property)
     (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
       (funcall fn checker property)))
-
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
   ;; (add-hook 'lsp-managed-mode-hook
@@ -193,13 +185,13 @@
 ;; point after formatting.
 
 ;; Use for major modes which do not provide a formatter.
-(use-package
-  format-all
+(use-package format-all
   :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-    ;; Formatting LaTeX files with latexindent is very slow
-    ((web-mode-hook markdown-mode-hook) . format-all-mode))
+    ;; Formatting LaTeX files with latexindent is very slow, yaml language server does not support
+    ;; formatting.
+    ((web-mode-hook markdown-mode-hook yaml-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters
     '
@@ -222,8 +214,7 @@
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
-(use-package
-  flycheck-grammarly
+(use-package flycheck-grammarly
   :after flycheck
   :defines flycheck-grammarly-check-time
   :demand t
@@ -237,8 +228,7 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-(use-package
-  langtool
+(use-package langtool
   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
   :init
@@ -261,8 +251,7 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-(use-package
-  flycheck-languagetool
+(use-package flycheck-languagetool
   :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :demand t
@@ -274,8 +263,7 @@
 
   (add-to-list 'flycheck-checkers 'languagetool t))
 
-(use-package
-  consult-flycheck
+(use-package consult-flycheck
   :after (flycheck consult)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
@@ -289,15 +277,13 @@
         (flycheck-select-checker 'grammarly)
         (flycheck-add-next-checker 'grammarly 'languagetool)))))
 
-(use-package
-  highlight-indentation
+(use-package highlight-indentation
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
 ;; format-all-the-code just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 
-(use-package
-  elisp-autofmt
+(use-package elisp-autofmt
   :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main")
   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
   :hook (emacs-lisp-mode-hook . elisp-autofmt-mode)
@@ -305,8 +291,7 @@
   (elisp-autofmt-style 'fixed)
   (elisp-autofmt-python-bin "python3"))
 
-(use-package
-  flycheck-eglot
+(use-package flycheck-eglot
   :straight (:host github :repo "intramurz/flycheck-eglot")
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))

@@ -75,7 +75,7 @@
   :hook (minibuffer-setup-hook . vertico-repeat-save)
   :bind (("C-c r" . vertico-repeat-last) ("M-r" . vertico-repeat-select)))
 
-(use-package vertico-indexed
+(use-package vertico-indexed ; Select candidates by number with "C-u number RET"
   :straight nil
   :after vertico
   :commands vertico-indexed-mode
@@ -90,27 +90,26 @@
   :straight nil
   :after vertico
   :commands vertico-multiform-mode
-  :init (vertico-multiform-mode)
+  :init (vertico-multiform-mode 1)
   :custom
   (vertico-multiform-categories '((embark-keybinding grid)))
   (vertico-multiform-commands
     '
-    ((consult-line buffer)
-      (execute-extended-command indexed)
-      (completion-at-point vertical)
-      (consult-imenu buffer indexed)
-      (find-file (vertico-sort-function . sort-directories-first))
-      (consult-grep buffer)
-      (consult-git-grep buffer)
-      (consult-yank-pop indexed)
-      (consult-ripgrep buffer)
-      (consult-outline buffer))))
+    ((execute-extended-command indexed)
+      (completion-at-point vertical) (consult-imenu buffer indexed)
+      ;; (find-file-at-point (vertico-sort-function . sort-directories-first))
+      ;; (consult-line buffer)
+      ;; (consult-grep buffer)
+      ;; (consult-git-grep buffer)
+      ;; (consult-ripgrep buffer)
+      (consult-yank-pop indexed) (consult-outline buffer))))
 
 (use-package consult
   :after vertico
   :commands (consult--customize-put projectile-project-root)
   :bind
-  (("C-x M-:" . consult-complex-command)
+  (("<f1>" . execute-extended-command)
+    ("C-x M-:" . consult-complex-command)
     ([remap repeat-complex-command] . consult-complex-command)
     ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
     ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
