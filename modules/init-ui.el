@@ -46,9 +46,7 @@
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (eq sb/icons-provider 'nerd-icons)
-  :custom
-  (nerd-icons-font-family "MesloLGS Nerd Font")
-  (nerd-icons-scale-factor 0.9))
+  :custom (nerd-icons-font-family "MesloLGS Nerd Font"))
 
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")

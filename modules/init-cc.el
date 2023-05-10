@@ -45,7 +45,6 @@
     c-mode-base-map
     ("C-M-a" . c-beginning-of-defun)
     ("C-M-e" . c-end-of-defun)
-    ("M-q" . c-fill-paragraph)
     ("C-c C-d")
     :map
     c-mode-map
@@ -71,8 +70,7 @@
         :remote? t
         :server-id 'clangd-r))))
 
-;; Better highlight for modern C++
-(use-package modern-cpp-font-lock
+(use-package modern-cpp-font-lock ; Better highlight for modern C++
   :hook (c++-mode-hook . modern-c++-font-lock-mode)
   :diminish modern-c++-font-lock-mode)
 
@@ -111,8 +109,7 @@
         :remote? t
         :server-id 'cmakels-r))))
 
-;; Advanced syntax coloring support for CMake scripts.
-(use-package cmake-font-lock
+(use-package cmake-font-lock ; Advanced syntax coloring support for CMake scripts
   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 (provide 'init-cc)

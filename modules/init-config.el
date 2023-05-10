@@ -117,7 +117,7 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/corfu-icons 'kind-icons
+(defcustom sb/corfu-icons 'kind-icon
   "Choose the provider for Corfu icons."
   :type
   '

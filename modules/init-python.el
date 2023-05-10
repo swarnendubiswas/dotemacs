@@ -46,8 +46,7 @@
   (python-indent-offset 4)
   (python-shell-exec-path "python3")
   (python-shell-interpreter "python3")
-  :config (setenv "PYTHONPATH" "python3")
-
+  :config
   (with-eval-after-load "lsp-mode"
     (defvar lsp-pylsp-configuration-sources)
     (defvar lsp-pylsp-plugins-autopep8-enable)
@@ -98,7 +97,7 @@
   :commands (pip-requirements-mode))
 
 (use-package pyvenv
-  :commands (pyvenv-mode pyvenv-tracking-mode)
+  :commands (pyvenv-tracking-mode)
   :hook (python-mode-hook . pyvenv-mode)
   :custom
   (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:" pyvenv-virtual-env-name "] ")))
