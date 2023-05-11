@@ -28,6 +28,7 @@
     ;; Tries to mirror the default Emacs colors
     (const :tag "standard-light" standard-light)
     (const :tag "standard-dark" standard-dark)
+    (const :tag "catppuccin" catppuccin)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
@@ -153,6 +154,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" nil))
   :group 'sb/emacs)
 
+;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI.
 (defcustom sb/icons-provider 'nerd-icons
   "Choose the provider for icons."
   :type

@@ -46,7 +46,8 @@
     (lambda ()
       ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
       ;; checking.
-      (spell-fu-mode -1)
+      (when (fboundp 'spell-fu-mode)
+        (spell-fu-mode -1))
       (flyspell-mode -1)
       (cond
         ((eq sb/lsp-provider 'eglot)
@@ -110,7 +111,8 @@
     (lambda ()
       (make-local-variable 'lsp-disabled-clients)
       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-      (spell-fu-mode -1)
+      (when (fboundp 'spell-fu-mode)
+        (spell-fu-mode -1))
       (flyspell-mode -1)))
   :custom (csv-separators '("," ";" "|" " ")))
 
@@ -367,7 +369,8 @@
     (lambda ()
       ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
       ;; checking.
-      (spell-fu-mode -1)
+      (when (fboundp 'spell-fu-mode)
+        (spell-fu-mode -1))
       (flyspell-mode -1)
       (cond
         ((eq sb/lsp-provider 'eglot)

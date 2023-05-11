@@ -89,7 +89,8 @@
   (cmake-mode-hook
     .
     (lambda ()
-      (spell-fu-mode -1)
+      (when (fboundp 'spell-fu-mode)
+        (spell-fu-mode -1))
       (flyspell-mode -1)
       (cond
         ((eq sb/lsp-provider 'eglot)

@@ -46,7 +46,7 @@
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (eq sb/icons-provider 'nerd-icons)
-  :custom (nerd-icons-font-family "MesloLGS Nerd Font"))
+  :custom (nerd-icons-color-icons nil))
 
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
@@ -119,11 +119,11 @@
 (when (display-graphic-p)
   (cond
     ((string= (system-name) "inspiron-7572")
-      (set-face-attribute 'default nil :font "MesloLGS NF" :height 180)
+      (set-face-attribute 'default nil :font "MesloLGS NF" :height 170)
       (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 130)
       (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 130 :weight 'light)
-      (set-face-attribute 'mode-line nil :height 120)
-      (set-face-attribute 'mode-line-inactive nil :height 120))
+      (set-face-attribute 'mode-line nil :height 110)
+      (set-face-attribute 'mode-line-inactive nil :height 110))
 
     ((string= (system-name) "DESKTOP-4T8O69V")
       (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 140)

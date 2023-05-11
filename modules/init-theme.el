@@ -59,7 +59,7 @@
 ;; Set `sb/theme' to `none' if you use this package
 (use-package circadian
   :hook (emacs-startup-hook . circadian-setup)
-  :custom (circadian-themes '((:sunrise . modus-vivendi) (:sunset . modus-vivendi))))
+  :custom (circadian-themes '((:sunrise . catppuccin) (:sunset . catppuccin))))
 
 (use-package ef-themes
   :straight (:host github :repo "protesilaos/ef-themes")
@@ -80,6 +80,10 @@
       (load-theme 'standard-light t))
     ((eq sb/theme 'standard-dark)
       (load-theme 'standard-dark t))))
+
+(use-package catppuccin-theme
+  :straight (:host github :repo "catppuccin/emacs")
+  :init (load-theme 'catppuccin t))
 
 (provide 'init-theme)
 
