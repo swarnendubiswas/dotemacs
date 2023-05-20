@@ -283,6 +283,13 @@
 (use-package link-hint
   :bind ("C-c C-l" . link-hint-open-link))
 
+;; This is independent of LSP support and is more flexible. On the other hand, `which-func-mode'
+;; consumes less vertical space.
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb")
+  :disabled t
+  :hook (emacs-startup-hook . breadcrumb-mode))
+
 (provide 'init-misc)
 
 ;;; init-misc.el ends here

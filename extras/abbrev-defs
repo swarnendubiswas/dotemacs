@@ -1647,6 +1647,7 @@
     ("octber" "October" nil :count 0)
     ("paediatrician" "pediatrician" nil :count 0)
     ("parallely" "parallel" nil :count 0)
+    ("perfromed" "performed" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("preceedence" "precedence" nil :count 0)
     ("prefernce" "preference" nil :count 0)

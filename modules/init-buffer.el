@@ -14,7 +14,7 @@
 (use-package ibuffer
   :straight (:type built-in)
   :hook (ibuffer-hook . ibuffer-auto-mode)
-  :bind ("C-x C-b" . ibuffer)
+  :bind ("C-x C-b" . ibuffer-jump)
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic) ; Options: `major-mode', `recency'

@@ -19,8 +19,6 @@
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
 (use-package xref
-  ;; :hook
-  ;; ((prog-mode-hook LaTeX-mode-hook) . xref-etags-mode)
   :bind
   (("M-'" . xref-find-definitions)
     ("M-?" . xref-find-references)
@@ -56,12 +54,38 @@
 
 (use-package citre
   :preface
+  (defun sb/citre-jump+ ()
+    "Jump to the definition of the symbol at point.
+Fallback to `xref-find-definitions'."
+    (interactive)
+    (condition-case _
+      (citre-jump)
+      (error (call-interactively #'xref-find-definitions))))
+
+  (defun sb/citre-jump-back+ ()
+    "Go back to the position before last `citre-jump'.
+Fallback to `xref-go-back'."
+    (interactive)
+    (condition-case _
+      (citre-jump-back)
+      (error
+        (if (fboundp #'xref-go-back)
+          (call-interactively #'xref-go-back)
+          (call-interactively #'xref-pop-marker-stack)))))
+
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
 
-  (defun sb/lsp-citre-capf-function ()
+  (defun lsp-citre-capf-function ()
     "A capf backend that tries lsp first, then Citre."
-    (let ((lsp-result (lsp-completion-at-point)))
+    (let
+      (
+        (lsp-result
+          (cond
+            ((bound-and-true-p lsp-mode)
+              (and (fboundp #'lsp-completion-at-point) (lsp-completion-at-point)))
+            ((bound-and-true-p eglot--managed-mode)
+              (and (fboundp #'eglot-completion-at-point) (eglot-completion-at-point))))))
       (if
         (and lsp-result
           (try-completion
@@ -69,6 +93,10 @@
             (nth 2 lsp-result)))
         lsp-result
         (citre-completion-at-point))))
+
+  (defun enable-lsp-citre-capf-backend ()
+    "Enable the lsp + Citre capf backend in current buffer."
+    (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
   :commands (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
   :hook
   ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
@@ -76,8 +104,8 @@
   (prog-mode-hook . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
-    ("M-'" . citre-jump)
-    ("C-x c b" . citre-jump-back)
+    ("M-'" . sb/citre-jump+)
+    ("C-x c b" . sb/citre-jump-back+)
     ("C-x c p" . citre-peek)
     ("C-x c c" . citre-create-tags-file)
     ("C-x c u" . citre-update-this-tags-file)
@@ -102,14 +130,7 @@
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  :config
-  (with-eval-after-load "lsp-mode"
-    ;; Enable the lsp + Citre capf backend in current buffer.
-    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
-
-  ;; FIXME: Is this required?
-  ;; (with-eval-after-load "eglot"
-  ;;   (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend))
+  :config (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
 
   (dolist
     (func
@@ -117,18 +138,19 @@
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
 
   ;; Try lsp first, then use Citre
-  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-    (let
-      (
-        (fetcher (apply -fn -args))
-        (citre-fetcher
-          (let ((xref-backend-functions '(citre-xref-backend t)))
-            (apply -fn -args))))
-      (lambda ()
-        (or
-          (with-demoted-errors "%s, fallback to citre"
-            (funcall fetcher))
-          (funcall citre-fetcher)))))
+  (with-no-warnings
+    (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+      (let
+        (
+          (fetcher (apply -fn -args))
+          (citre-fetcher
+            (let ((xref-backend-functions '(citre-xref-backend t)))
+              (apply -fn -args))))
+        (lambda ()
+          (or
+            (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher))))))
 
   (with-eval-after-load "company"
     (defmacro citre-backend-to-company-backend (backend)

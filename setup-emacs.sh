@@ -60,11 +60,6 @@ install_emacs() {
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     rm "${EMACS_FILENAME}" || true
-
-    cmdline=$"\n\nexport EMACS_PATH=${EMACS_SOURCE}/src\n"
-    printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
-    cmdline=$"PATH=\${EMACS_PATH}:\$PATH"
-    printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
 # Install important packages. There is nothing to do if a package is already installed.
@@ -157,43 +152,6 @@ fi
 
 cd "$GITHUB" || echo "Failed: cd ${GITHUB}"
 
-# TODO: There does not seem to be a good way to checkout private repositories
-
-# DOTEMACS="$GITHUB/dotemacs"
-# EMACSD="${USER_HOME}/.emacs.d"
-
-# if [ -d "$DOTEMACS" ]; then
-#     cd "$DOTEMACS" || echo "Failed: cd ${DOTEMACS}"
-#     echo "Pulling dotemacs repository from GitHub..."
-#     sudo -u swarnendu git pull
-# else
-#     echo "Cloning dotemacs repository from GitHub..."
-#     sudo -u swarnendu git clone https://github.com/swarnendubiswas/dotemacs.git
-# fi
-# echo "...Done"
-# chown -R $USER:$USER $DOTEMACS
-
-# if [ -d "$DOTFILES" ]; then
-#     cd "$DOTFILES" || echo "Failed: cd ${DOTEMACS}"
-#     echo "Pulling dotfiles repository from GitHub..."
-#     sudo -u swarnendu git pull
-# else
-#     echo "Cloning dotfiles repository from GitHub..."
-#     sudo -u swarnendu git clone git@github.com:swarnendubiswas/dotfiles.git
-# fi
-# echo "...Done"
-# chown -R $USER:$USER $DOTFILES
-
-# Link .emacs.d
-
-# cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
-
-# if [ -d "$EMACSD" ]; then
-#     if [ ! -L "$EMACSD" ]; then
-#         ln -s "$DOTEMACS" "$EMACSD"
-#     fi
-# fi
-
 install_python_packages() {
     sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave --user
 }
@@ -236,7 +194,7 @@ install_node() {
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
 install_texlab() {
-    TEXLAB_VER="5.5.0"
+    TEXLAB_VER="5.5.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -478,7 +436,7 @@ install_bear() {
     fi
 
     cd bear || echo "Failed: cd bear"
-    git checkout 3.1.1
+    git checkout 3.1.2
     mkdir -p build && cd build || echo "Failed: cd bear/build"
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all
@@ -565,7 +523,7 @@ install_bat() {
 }
 
 install_marksman() {
-    MK_VER="2023-03-04"
+    MK_VER="2023-04-12"
 
     wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux
     mv marksman-linux $USER_HOME/.local/bin/marksman
@@ -583,7 +541,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.39.0"
+    FZF_VER="0.40.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git
@@ -617,7 +575,7 @@ install_nerd_fonts_helper() {
 # Cloning the nerd-fonts repository is challenging given its huge size
 
 install_nerd_fonts() {
-    NF_VER="2.3.3"
+    NF_VER="3.0.1"
 
     # declare -a FONT_NAMES=("BitstreamVeraSansMono" "DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
 

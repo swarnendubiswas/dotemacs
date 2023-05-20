@@ -147,11 +147,13 @@
       (set-face-attribute 'mode-line nil :height 110)
       (set-face-attribute 'mode-line-inactive nil :height 110))))
 
-(use-package olivetti
-  :hook
-  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
-  :custom (olivetti-body-width 108)
-  :diminish)
+;; TODO: This package is probably causing the jumping behavior with corfu-terminal-mode.
+
+;; (use-package olivetti
+;;   :hook
+;;   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
+;;   :custom (olivetti-body-width 108)
+;;   :diminish)
 
 (provide 'init-ui)
 

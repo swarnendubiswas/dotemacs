@@ -120,6 +120,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~R~ - Rename file (~ibuffer-do-rename-uniquely~)
 - ~m~ - Mark file (~ibuffer-mark-forward~)
 - ~u~ - Unmark the file (~ibuffer-unmark-forward~)
+- =TAB= - Jump to the next filter group (=ibuffer-forward-filter-group=)  
 
 ** Search
 

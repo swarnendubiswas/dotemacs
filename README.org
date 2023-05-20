@@ -338,3 +338,9 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 Estimate the best possible startup time: =emacs -q --eval​='(message "%s" (emacs-init-time))'=
 
 - [[https://blog.d46.us/advanced-emacs-startup][Advanced Techniques for Reducing Emacs Startup Time]]
+
+** Known Bugs
+
+- Flickering with =corfu-terminal-mode=
+- Disable pairing = before at the beginning of a word in =smartparens=
+- =flycheck-mode= is disabled for Elisp configuration files

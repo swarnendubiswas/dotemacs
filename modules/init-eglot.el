@@ -83,6 +83,14 @@
   ;;           :pylsp_mypy (:enabled t))))
   ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
 
+  ;; (add-hook
+  ;;   'before-save-hook
+  ;;   (lambda ()
+  ;;     (when (derived-mode-p 'rust-mode 'rust-ts-mode)
+  ;;       (ignore-errors
+  ;;         (eglot-code-action-organize-imports))
+  ;;       (eglot-format-buffer))))
+
   (add-to-list
     'eglot-server-programs
     '
@@ -138,7 +146,7 @@
     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
   (eglot-ensure)
   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode))
-  :config
+  ;; :config
   ;; (add-to-list
   ;;   'eglot-workspace-configuration
   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))

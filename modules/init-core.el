@@ -193,8 +193,9 @@
     (auto-save-visited-mode ; Autosave file-visiting buffers at idle time intervals
       column-number-mode
       delete-selection-mode ; Typing with the mark active will overwrite the marked region
-      ;; Use soft wraps, wrap lines without the ugly continuation marks
-      global-visual-line-mode size-indication-mode))
+      ;; TODO: This package is probably causing the jumping behavior with corfu-terminal-mode.
+      ;; global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
+      size-indication-mode))
   (when (fboundp mode)
     (funcall mode 1)))
 

@@ -120,8 +120,7 @@
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev 'append)
-  (add-to-list 'completion-at-point-functions #'cape-dict 'append)
+  (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict) 'append)
   :custom
   (cape-dabbrev-min-length 3)
   (cape-dict-grep nil "Load the word files in memory for better performance")
@@ -129,6 +128,7 @@
     `
     (,(expand-file-name "wordlist.5" sb/extras-directory)
       ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  (cape-dabbrev-check-other-buffers 'some)
   :config
   ;; https://github.com/minad/cape/issues/53
   ;; Override CAPFS for specific major modes
@@ -138,7 +138,10 @@
     (lambda ()
       (setq-local completion-at-point-functions
         (list
-          #'elisp-completion-at-point #'citre-completion-at-point #'cape-symbol ; Elisp symbols
+          (cape-super-capf
+            #'elisp-completion-at-point #'citre-completion-at-point
+            #'cape-symbol ; Elisp symbols
+            )
           #'cape-file #'cape-dabbrev #'cape-dict))))
 
   (add-hook
@@ -168,21 +171,18 @@
         (when (bound-and-true-p lsp-managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'lsp-completion-at-point
-              #'citre-completion-at-point
-              #'cape-keyword
+              (cape-super-capf #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
               #'cape-file
               #'cape-dabbrev
               #'cape-dict)))
         (when (bound-and-true-p eglot--managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'eglot-completion-at-point
-              #'citre-completion-at-point
-              #'cape-keyword
-              #'cape-file
-              #'cape-dabbrev
-              #'cape-dict))))))
+              (cape-super-capf
+                #'eglot-completion-at-point
+                #'citre-completion-at-point
+                #'cape-keyword)
+              #'cape-file #'cape-dabbrev #'cape-dict))))))
 
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
     (add-hook
@@ -191,15 +191,19 @@
         (when (bound-and-true-p lsp-managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'lsp-completion-at-point #'citre-completion-at-point
-              #'cape-tex ; Leads to unwanted completions
-              #'cape-file #'cape-dabbrev #'cape-dict)))
+              (cape-super-capf
+                #'lsp-completion-at-point #'citre-completion-at-point
+                #'cape-tex ; Leads to unwanted completions
+                )
+              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
         (when (bound-and-true-p eglot--managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'eglot-completion-at-point #'citre-completion-at-point
-              #'cape-tex ; Leads to unwanted completions
-              #'cape-file #'cape-dabbrev #'cape-dict)))))))
+              (cape-super-capf
+                #'eglot-completion-at-point #'citre-completion-at-point
+                #'cape-tex ; Leads to unwanted completions
+                )
+              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))))))
 
 (use-package kind-icon
   :if (eq sb/corfu-icons 'kind-icon)
