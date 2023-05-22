@@ -15,7 +15,6 @@
 
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
 ;; checks only the writing style. `textlint' includes `writegood'.
-
 (use-package writegood-mode
   :commands
   (writegood-passive-voice-turn-off

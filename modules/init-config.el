@@ -138,7 +138,7 @@ Prefer the straight.el package manager instead."
 
 ;; I do not find any difference in terms of features. However, packages like `centaur-tabs' only
 ;; support `projectile'.
-(defcustom sb/project-handler 'projectile
+(defcustom sb/project-handler 'project
   "Choose the handler for projects."
   :type '(radio (const :tag "project.el" project) (const :tag "projectile" projectile))
   :group 'sb/emacs)

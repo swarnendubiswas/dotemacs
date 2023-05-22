@@ -16,7 +16,7 @@ quelpa
 request
 spell-fu
 .log
-
+.directory
 *.elc
 .session
 session.*

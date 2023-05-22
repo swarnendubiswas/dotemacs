@@ -17,10 +17,9 @@
   :bind ("C-x C-b" . ibuffer-jump)
   :custom
   (ibuffer-display-summary nil)
-  (ibuffer-default-sorting-mode 'alphabetic) ; Options: `major-mode', `recency'
+  (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-use-header-line t)
-  ;; Do not show groups if there are no buffers in that group
-  (ibuffer-show-empty-filter-groups nil)
+  (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
   :config (defalias 'list-buffers 'ibuffer))
 
 ;; Provides ibuffer filtering and sorting functions to group buffers by function or regexp applied

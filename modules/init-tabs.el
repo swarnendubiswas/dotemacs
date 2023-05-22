@@ -39,7 +39,9 @@
   ;;       (setq centaur-tabs-set-icons nil))))
 
   (centaur-tabs-headline-match)
-  (centaur-tabs-group-by-projectile-project))
+
+  (when (fboundp 'projectile-mode)
+    (centaur-tabs-group-by-projectile-project)))
 
 (use-package awesome-tab
   :preface
