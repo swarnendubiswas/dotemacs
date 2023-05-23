@@ -51,12 +51,17 @@
     ("C" . recompile))
   :config
   (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
+  (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
+  (setq project-switch-commands
+    (delete '(project-find-regexp "Find regexp") project-switch-commands))
+
   (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
   (add-to-list 'project-switch-commands '(project-compile "Compile") t)
   (add-to-list 'project-switch-commands '(project-dired "Project Root") t))
 
 (use-package consult-project-extra
-  :after (consult project)
+  :if (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
+  :demand t
   :commands consult-project-extra-find-other-window
   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
   :config
