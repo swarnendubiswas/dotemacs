@@ -86,7 +86,7 @@
     (setq flycheck-indication-mode 'left-fringe)
     (setq flycheck-indication-mode 'left-margin))
 
-  ;; We do not `textlint', `proselint', and `chktex' since they are very helpful.
+  ;; We do not use `textlint', `proselint', and `chktex' since they are very helpful.
   (dolist (checkers '(proselint textlint tex-chktex))
     (delq checkers flycheck-checkers))
 

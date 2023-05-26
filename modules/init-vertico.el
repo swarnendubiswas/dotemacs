@@ -198,7 +198,7 @@
       (buffer-substring-no-properties (region-beginning) (region-end))))
 
   (with-eval-after-load "projectile"
-    (setq consult-project-function #'projectile-project-root)
+    (setq consult-project-function (lambda (_) (projectile-project-root)))
     (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
     (bind-key [remap projectile-grep] #'consult-grep)))
 

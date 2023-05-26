@@ -104,6 +104,7 @@ We enable LSP support for the more popular languages supported with either =lsp-
 #+begin_src shell
 npm install -save-dev @emacs-grammarly/grammarly-languageserver
 
+sudo apt-get install -y libslf4j-java liblog4j1.2-java
 wget https://github.com/valentjn/ltex-ls/releases/download/16.0.0/ltex-ls-16.0.0-linux-x64.tar.gz
 tar xf ltex-ls-16.0.0-linux-x64.tar.gz
 cp ltex-ls-16.0.0/bin/* $HOME/.local/bin/.

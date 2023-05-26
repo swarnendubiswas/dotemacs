@@ -30,7 +30,7 @@
     ("C-c l f" . eglot-format-buffer)
     ("C-c l x" . eglot-code-actions))
   :hook
-  ((eglot-managed-mode-hook . eglot-inlay-hints-mode)
+  ( ;; (eglot-managed-mode-hook . eglot-inlay-hints-mode) ; Inlay hints are distracting
     (
       (c-mode-hook
         c++-mode-hook
@@ -54,11 +54,12 @@
     '
     (:codeLensProvider
       :executeCommandProvider
-      ;; Automatic documentation popups can be distracting
-      :hoverProvider
+      :hoverProvider ; Automatic documentation popups can be distracting
       :foldingRangeProvider
       :documentOnTypeFormattingProvider
-      :documentLinkProvider))
+      :documentLinkProvider
+      ;; Inlay hints are distracting
+      :inlayHintProvider))
 
   ;; (setq-default eglot-workspace-configuration
   ;;   '
@@ -128,25 +129,46 @@
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
-  :after eglot
-  :demand t
-  :init (eglot-ensure)
-  ;; :config
+  :hook
+  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
+    .
+    (lambda ()
+      (require 'eglot-grammarly)
+      (eglot-ensure)))
+  :custom (eglot-grammarly-active-modes '(text-mode LaTeX-mode org-mode markdown-mode))
+  :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-grammarly-active-modes . ,(eglot-grammarly--server-command))
+  ;;   'append)
+  (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
   ;; (add-to-list eglot-workspace-configuration
   ;;              ((@emacs-grammarly/grammarly-languageserver
   ;;                ((audience "knowledgeable")))))
   )
 
+;; FIXME: Fix issue with SLF4J
 (use-package eglot-ltex
   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-  :after eglot
-  :demand t
+  :disabled t
   :init
   (setq eglot-languagetool-server-path
     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
-  (eglot-ensure)
-  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode))
-  ;; :config
+  :hook
+  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook rst-mode-hook)
+    .
+    (lambda ()
+      (require 'eglot-ltex)
+      (eglot-ensure)))
+  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode rst-mode))
+  :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+  ;;   'append)
+  (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
   ;; (add-to-list
   ;;   'eglot-workspace-configuration
   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))

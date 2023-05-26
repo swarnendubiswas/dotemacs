@@ -88,123 +88,6 @@
   :hook (corfu-mode-hook . corfu-terminal-mode)
   :custom (corfu-terminal-position-right-margin 10))
 
-;; Here is a snippet to show how to support `company' backends with `cape'.
-;; https://github.com/minad/cape/issues/20
-;; (fset #'cape-path (cape-company-to-capf #'company-files))
-;; (add-hook 'completion-at-point-functions #'cape-path)
-
-(use-package cape
-  :after corfu
-  :demand t
-  :commands
-  (cape-history ; Complete from Eshell, Comint or minibuffer history
-    cape-file
-    cape-keyword ; Complete programming language keyword
-    cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
-    cape-abbrev ; Complete abbreviation at point
-    cape-dict ; Complete word from dictionary at point
-    cape-line ; Complete current line from other lines in buffer
-    cape-symbol ; Elisp symbol
-    cape-elisp-block ; Complete Elisp in Org or Markdown code block
-    cape-ispell ; Complete word at point with Ispell
-    cape-dabbrev ; Complete with Dabbrev at point
-    cape-capf-buster
-    cape-company-to-capf
-    cape-super-capf
-    sh-completion-at-point-function
-    comint-completion-at-point
-    citre-completion-at-point
-    TeX--completion-at-point
-    completion-at-point
-    complete-tag)
-  :init
-  ;; Initialize for all generic languages that are not specifically handled
-  (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict) 'append)
-  :custom
-  (cape-dabbrev-min-length 3)
-  (cape-dict-grep nil "Load the word files in memory for better performance")
-  (cape-dict-file
-    `
-    (,(expand-file-name "wordlist.5" sb/extras-directory)
-      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-  (cape-dabbrev-check-other-buffers 'some)
-  :config
-  ;; https://github.com/minad/cape/issues/53
-  ;; Override CAPFS for specific major modes
-
-  (add-hook
-    'emacs-lisp-mode-hook
-    (lambda ()
-      (setq-local completion-at-point-functions
-        (list
-          (cape-super-capf
-            #'elisp-completion-at-point #'citre-completion-at-point
-            #'cape-symbol ; Elisp symbols
-            )
-          #'cape-file #'cape-dabbrev #'cape-dict))))
-
-  (add-hook
-    'sh-mode-hook
-    (lambda ()
-      (when (bound-and-true-p eglot--managed-mode)
-        (setq-local completion-at-point-functions
-          (list
-            #'eglot-completion-at-point
-            #'citre-completion-at-point
-            #'cape-file
-            #'cape-dabbrev
-            #'cape-dict)))
-      (when (bound-and-true-p lsp-managed-mode)
-        (setq-local completion-at-point-functions
-          (list
-            #'lsp-completion-at-point
-            #'citre-completion-at-point
-            #'cape-file
-            #'cape-dabbrev
-            #'cape-dict)))))
-
-  (dolist (lsp-prog-modes '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook))
-    (add-hook
-      lsp-prog-modes
-      (lambda ()
-        (when (bound-and-true-p lsp-managed-mode)
-          (setq-local completion-at-point-functions
-            (list
-              (cape-super-capf #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
-              #'cape-file
-              #'cape-dabbrev
-              #'cape-dict)))
-        (when (bound-and-true-p eglot--managed-mode)
-          (setq-local completion-at-point-functions
-            (list
-              (cape-super-capf
-                #'eglot-completion-at-point
-                #'citre-completion-at-point
-                #'cape-keyword)
-              #'cape-file #'cape-dabbrev #'cape-dict))))))
-
-  (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook
-      modes
-      (lambda ()
-        (when (bound-and-true-p lsp-managed-mode)
-          (setq-local completion-at-point-functions
-            (list
-              (cape-super-capf
-                #'lsp-completion-at-point #'citre-completion-at-point
-                #'cape-tex ; Leads to unwanted completions
-                )
-              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
-        (when (bound-and-true-p eglot--managed-mode)
-          (setq-local completion-at-point-functions
-            (list
-              (cape-super-capf
-                #'eglot-completion-at-point #'citre-completion-at-point
-                #'cape-tex ; Leads to unwanted completions
-                )
-              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))))))
-
 (use-package kind-icon
   :if (eq sb/corfu-icons 'kind-icon)
   :after corfu
@@ -274,6 +157,97 @@
   :after corfu
   :commands corfu-quick-access-mode
   :init (corfu-quick-access-mode 1))
+
+;; Here is a snippet to show how to support `company' backends with `cape'.
+;; https://github.com/minad/cape/issues/20
+;; (fset #'cape-path (cape-company-to-capf #'company-files))
+;; (add-hook 'completion-at-point-functions #'cape-path)
+
+(use-package cape
+  :after corfu
+  :demand t
+  :commands
+  (cape-history ; Complete from Eshell, Comint or minibuffer history
+    cape-file
+    cape-keyword ; Complete programming language keyword
+    cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
+    cape-abbrev ; Complete abbreviation at point
+    cape-dict ; Complete word from dictionary at point
+    cape-line ; Complete current line from other lines in buffer
+    cape-symbol ; Elisp symbol
+    cape-elisp-block ; Complete Elisp in Org or Markdown code block
+    cape-ispell ; Complete word at point with Ispell
+    cape-dabbrev ; Complete with Dabbrev at point
+    cape-capf-buster
+    cape-company-to-capf
+    cape-super-capf
+    sh-completion-at-point-function
+    comint-completion-at-point
+    citre-completion-at-point
+    TeX--completion-at-point
+    completion-at-point
+    complete-tag)
+  :init
+  ;; Initialize for all generic languages that are not specifically handled
+  (add-to-list 'completion-at-point-functions #'cape-file 'append)
+  (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict) 'append)
+  :custom
+  (cape-dabbrev-min-length 3)
+  (cape-dict-grep nil "Load the word files in memory for better performance")
+  (cape-dict-file
+    `
+    (,(expand-file-name "wordlist.5" sb/extras-directory)
+      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  (cape-dabbrev-check-other-buffers 'some)
+  :config
+  ;; https://github.com/minad/cape/issues/53
+  ;; Override CAPFS for specific major modes
+
+  (add-hook
+    'emacs-lisp-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list
+          (cape-super-capf #'elisp-completion-at-point #'citre-completion-at-point #'cape-symbol)
+          #'cape-file
+          #'cape-dabbrev
+          #'cape-dict))))
+
+  (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook
+      modes
+      (lambda ()
+        (when (bound-and-true-p lsp-managed-mode)
+          (setq-local completion-at-point-functions
+            (list
+              (cape-super-capf
+                #'lsp-completion-at-point #'citre-completion-at-point
+                #'cape-tex ; Leads to unwanted completions
+                )
+              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
+        (when (bound-and-true-p eglot--managed-mode)
+          (setq-local completion-at-point-functions
+            (list
+              (cape-super-capf
+                #'eglot-completion-at-point #'citre-completion-at-point
+                #'cape-tex ; Leads to unwanted completions
+                )
+              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
+
+  (dolist (lsp-prog-modes '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))
+    (add-hook
+      lsp-prog-modes
+      (lambda ()
+        (setq completion-at-point-functions
+          (append
+            completion-at-point-functions
+            '(cape-keyword cape-file (cape-super-capf cape-dabbrev cape-dict))))
+        ;; (progn
+        ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+        ;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
+        ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
+        ;;     'append))
+        ))))
 
 (provide 'init-corfu)
 

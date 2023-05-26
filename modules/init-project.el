@@ -49,15 +49,15 @@
     ("r" . project-query-replace-regexp)
     ("m" . magit-project-status)
     ("C" . recompile))
-  :config
-  (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
-  (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
-  (setq project-switch-commands
-    (delete '(project-find-regexp "Find regexp") project-switch-commands))
-
-  (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
-  (add-to-list 'project-switch-commands '(project-compile "Compile") t)
-  (add-to-list 'project-switch-commands '(project-dired "Project Root") t))
+  ;; :config
+  ;; (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
+  ;; (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
+  ;; (setq project-switch-commands
+  ;;   (delete '(project-find-regexp "Find regexp") project-switch-commands))
+  ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+  ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
+  ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
+  )
 
 (use-package consult-project-extra
   :if (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
@@ -65,8 +65,8 @@
   :commands consult-project-extra-find-other-window
   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
   :config
-  (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
-  (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
+  ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
+  ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
   (setq project-switch-commands 'consult-project-extra-find))
 
 ;; Many useful packages like `ibuffer-projectile' and `centaur-tabs' depend on `projectile'.
