@@ -19,7 +19,7 @@
   ;; https://stackoverflow.com/questions/56382840/is-there-a-way-to-automatically-add-a-whitespace-upon-completion-in-company-mode
   (defun sb/company-after-completion-hook (&rest _ignored)
     ;; This would be called with the completion candidate, so you could modify it to insert spaces
-    ;; based on the candidate
+    ;; based on the candidate.
     (just-one-space))
   :defines
   (company-dabbrev-downcase
@@ -56,8 +56,7 @@
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
   :custom (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  ;; Do not ignore case when collecting completion candidates. It is recommended to change the
-  ;; default value of "keep-prefix" if we modify `company-dabbrev-downcase'.
+  ;; Do not ignore case when collecting completion candidates.
   (company-dabbrev-ignore-case nil)
   ;; Search in other buffers with the same major mode. This can cause performance overhead if
   ;; there are lots of open buffers.
@@ -87,7 +86,8 @@
       gud-mode
       eshell-mode
       shell-mode
-      csv-mode))
+      csv-mode
+      minibuffer-inactive-mode))
   :config
   ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
   ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
@@ -106,16 +106,16 @@
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
 ;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
-(use-package company-posframe
-  :if (display-graphic-p)
-  :after company
-  :commands company-posframe-mode
-  :diminish
-  :custom
-  (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-  (company-posframe-show-indicator nil "The display is not great")
-  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-  :init (company-posframe-mode 1))
+;; (use-package company-posframe
+;;   :if (display-graphic-p)
+;;   :after company
+;;   :commands company-posframe-mode
+;;   :diminish
+;;   :custom
+;;   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
+;;   (company-posframe-show-indicator nil "The backend display in the posframe modeline is not great")
+;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+;;   :init (company-posframe-mode 1))
 
 (use-package company-quickhelp
   :after company
@@ -202,12 +202,6 @@
   :straight (:host github :repo "cwfoo/company-dirfiles")
   :after company
   :demand t)
-
-;; (use-package consult-company
-;;   :after (company consult)
-;;   :bind
-;;   (:map company-mode-map
-;;         ([remap completion-at-point] . consult-company)))
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))

@@ -229,9 +229,7 @@
     (find-file-hook . bm-buffer-restore)
     (emacs-startup-hook . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f2>" . bm-next) ("C-<f3>" . bm-previous))
-  :config
-  ;; Save bookmarks
-  (setq-default bm-buffer-persistence t))
+  :custom (bm-buffer-persistence t "Save bookmarks"))
 
 (use-package crux
   :bind

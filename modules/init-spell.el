@@ -272,10 +272,16 @@
       (flyspell-correct-at-point)
       (consult-flyspell))))
 
+;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
+;; the entire buffer.
 (use-package jinx
-  :hook (emacs-startup . global-jinx-mode)
+  :hook (emacs-startup-hook . global-jinx-mode)
   :custom (jinx-languages "en_US")
-  :bind ([remap ispell-word] . jinx-correct))
+  :bind ([remap ispell-word] . jinx-correct)
+  :config
+  (with-eval-after-load "vertico-multiform"
+    (add-to-list 'vertico-multiform-categories '(jinx grid (vertico-grid-annotate . 20))))
+  :diminish)
 
 (provide 'init-spell)
 

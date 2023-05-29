@@ -383,6 +383,7 @@
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
+  (nxml-sexp-element-flag t)
   :config (fset 'xml-mode 'nxml-mode)
 
   (when (eq sb/lsp-provider 'lsp-mode)

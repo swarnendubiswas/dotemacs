@@ -75,8 +75,13 @@
 (use-package corfu-popupinfo
   :straight nil
   :after corfu
-  :commands corfu-popupinfo-mode
-  :init (corfu-popupinfo-mode 1))
+  :hook (corfu-mode-hook . corfu-popupinfo-mode)
+  :bind
+  (:map
+    corfu-map
+    ("M-n" . corfu-popupinfo-scroll-up)
+    ("M-p" . corfu-popupinfo-scroll-down)
+    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
 
 (use-package popon
   :straight (:host codeberg :repo "akib/emacs-popon")

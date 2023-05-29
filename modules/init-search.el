@@ -97,10 +97,8 @@
     ("C-'" . avy-isearch))
   :custom (avy-background t "Provides better contrast"))
 
-(progn
-  (defvar reb-re-syntax)
-
-  (setq reb-re-syntax 'string))
+(use-package re-builder
+  :custom (reb-re-syntax 'string))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.

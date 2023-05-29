@@ -95,18 +95,27 @@
   (vertico-multiform-categories '((embark-keybinding grid)))
   (vertico-multiform-commands
     '
-    ((execute-extended-command indexed)
-      (completion-at-point vertical) (consult-imenu buffer indexed)
+    ( ;; (execute-extended-command indexed)
+      ;; (completion-at-point vertical)
+      ;; (consult-imenu buffer indexed)
+      ;; (ffap flat (vertico-cycle . t))
+      ;; (consult-projectile-switch-project grid)
+      ;; (consult-yank-pop indexed)
+      ;; (embark-bindings buffer)
+      ;; (xref-find-references buffer)
       ;; (find-file-at-point (vertico-sort-function . sort-directories-first))
       ;; (consult-line buffer)
       ;; (consult-grep buffer)
       ;; (consult-git-grep buffer)
       ;; (consult-ripgrep buffer)
-      (consult-yank-pop indexed) (consult-outline buffer))))
+      )))
 
 (use-package consult
   :after vertico
   :commands (consult--customize-put projectile-project-root)
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode-hook . consult-preview-at-point-mode)
   :bind
   (("<f1>" . execute-extended-command)
     ("C-x M-:" . consult-complex-command)

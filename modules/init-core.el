@@ -194,7 +194,7 @@
       column-number-mode
       delete-selection-mode ; Typing with the mark active will overwrite the marked region
       ;; TODO: This package is probably causing the jumping behavior with corfu-terminal-mode.
-      ;; global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
+      global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
       size-indication-mode))
   (when (fboundp mode)
     (funcall mode 1)))
@@ -234,7 +234,9 @@
       file-name-history
       kill-ring
       search-ring
-      regexp-search-ring)))
+      regexp-search-ring
+      compile-command
+      compile-history)))
 
 (use-package uniquify
   :straight (:type built-in)
