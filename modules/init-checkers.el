@@ -86,8 +86,7 @@
     (setq flycheck-indication-mode 'left-fringe)
     (setq flycheck-indication-mode 'left-margin))
 
-  ;; We do not use `textlint', `proselint', and `chktex' since they are very helpful.
-  (dolist (checkers '(proselint textlint tex-chktex))
+  (dolist (checkers '(proselint textlint tex-chktex emacs-lisp-checkdoc))
     (delq checkers flycheck-checkers))
 
   ;; These themes have their own styles for displaying flycheck info.
@@ -161,8 +160,7 @@
   ;;       (not (seq-some (lambda (re) (string-match-p re bufname)) sb/excluded-directory-regexps)))))
   ;; (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
 
-  ;; Chain flycheck checkers with lsp. We prefer to use per-project directory local variables
-  ;; instead of defining here.
+  ;; Chain flycheck checkers with lsp.
   ;; https://github.com/flycheck/flycheck/issues/1762
 
   (defvar-local sb/flycheck-local-checkers nil)
@@ -170,6 +168,8 @@
     (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
       (funcall fn checker property)))
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
+
+  ;; We prefer to use per-project directory local variables instead of defining here.
 
   ;; (add-hook 'lsp-managed-mode-hook
   ;;           (lambda ()
@@ -179,9 +179,6 @@
 
   (with-eval-after-load "counsel"
     (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map)))
-
-;; `aphelia' allows for formatting via a background process, supports Tramp, and does not move the
-;; point after formatting.
 
 ;; Use for major modes which do not provide a formatter.
 (use-package format-all
@@ -294,6 +291,9 @@
   :straight (:host github :repo "intramurz/flycheck-eglot")
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
+
+(use-package flycheck-vale
+  :hook (flycheck-mode-hook . flycheck-vale-setup))
 
 (provide 'init-checkers)
 

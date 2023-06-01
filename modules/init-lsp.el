@@ -115,12 +115,10 @@
       "--header-insertion=never"
       "--header-insertion-decorators=0"
       "--log=error"
-      "--malloc-trim" ;; Release memory periodically
-      ;; Increases memory usage but can improve performance
-      "--pch-storage=memory"
+      "--malloc-trim" ; Release memory periodically
+      "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty"))
-  ;; Enable integration of custom backends other than `capf'
-  (lsp-completion-provider :none)
+  (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
   (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
   (lsp-completion-show-kind nil "Disable completion kind to shorten popup width")
   (lsp-completion-show-label-description nil "Disable description of completion candidates")
@@ -329,7 +327,7 @@
   (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
   (lsp-ltex-check-frequency "save")
   (lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64")
-  (lsp-ltex-version "15.2.0")
+  (lsp-ltex-version "16.0.0")
   (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
   ;; https://github.com/ggbaker/doom-emacs-config/blob/main/config.el

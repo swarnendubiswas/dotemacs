@@ -107,8 +107,6 @@ npm install -save-dev @emacs-grammarly/grammarly-languageserver
 sudo apt-get install -y libslf4j-java liblog4j1.2-java
 wget https://github.com/valentjn/ltex-ls/releases/download/16.0.0/ltex-ls-16.0.0-linux-x64.tar.gz
 tar xf ltex-ls-16.0.0-linux-x64.tar.gz
-cp ltex-ls-16.0.0/bin/* $HOME/.local/bin/.
-# Add "ltex-ls-16.0.0" to $PATH
 
 wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.23.0.tar.gz
 tar xf v1.23.0.tar.gz

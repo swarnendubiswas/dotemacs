@@ -83,6 +83,7 @@
 
 (use-package catppuccin-theme
   :straight (:host github :repo "catppuccin/emacs")
+  :if (eq sb/theme 'catppuccin)
   :init (load-theme 'catppuccin t))
 
 (provide 'init-theme)

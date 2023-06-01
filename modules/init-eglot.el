@@ -108,8 +108,7 @@
         "--header-insertion-decorators=0"
         "--log=error"
         "--malloc-trim" ; Release memory periodically
-        ;; Increases memory usage but can improve performance
-        "--pch-storage=memory"
+        "--pch-storage=memory" ; Increases memory usage but can improve performance
         "--pretty")))
 
   ;; (add-to-list
@@ -148,13 +147,12 @@
   ;;                ((audience "knowledgeable")))))
   )
 
-;; FIXME: Fix issue with SLF4J
+;; FIXME: Fix issue with SLF4J with LTEX 16.0.0
 (use-package eglot-ltex
   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-  :disabled t
   :init
   (setq eglot-languagetool-server-path
-    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
+    (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
   :hook
   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook rst-mode-hook)
     .
