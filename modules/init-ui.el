@@ -54,9 +54,6 @@
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
 
-(use-package unicode-fonts
-  :init (unicode-fonts-setup))
-
 ;; Decrease minibuffer font size
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn

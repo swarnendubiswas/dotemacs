@@ -45,7 +45,7 @@
   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
   ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
   ;; entries.
-  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 3))))
+  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
 
 (use-package corfu-info
   :straight nil
@@ -243,7 +243,7 @@
     (add-hook
       lsp-prog-modes
       (lambda ()
-        (setq completion-at-point-functions
+        (setq-local completion-at-point-functions
           (append
             completion-at-point-functions
             '(cape-keyword cape-file (cape-super-capf cape-dabbrev cape-dict))))
