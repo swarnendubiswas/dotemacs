@@ -161,24 +161,6 @@
   (bibtex-maintain-sorted-entries t)
   (bibtex-comma-after-last-field nil))
 
-(use-package ivy-bibtex
-  :if (eq sb/minibuffer-completion 'ivy)
-  :defines
-  (ivy-bibtex-default-action
-    bibtex-completion-cite-default-as-initial-input
-    bibtex-completion-cite-prompt-for-optional-arguments
-    bibtex-completion-display-formats)
-  :bind ("C-c x b" . ivy-bibtex)
-  :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-  :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-
-  (require 'bibtex-completion)
-
-  (setq
-    bibtex-completion-cite-default-as-initial-input t
-    bibtex-completion-cite-prompt-for-optional-arguments nil
-    bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
-
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 
@@ -290,7 +272,7 @@ Ignore if no file is found."
 ;;                                          (bib-cite-minor-mode 1)))
 ;;   ;; :bind
 ;;   ;; (:map bib-cite-minor-mode-map
-;;   ;;       ("C-c b"   . nil) ; We use `C-c b' for `comment-box'
+;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
 ;;   ;;       ("C-c l a" . bib-apropos)
 ;;   ;;       ("C-c l b" . bib-make-bibliography)
 ;;   ;;       ("C-c l d" . bib-display)

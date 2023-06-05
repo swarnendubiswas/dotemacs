@@ -144,15 +144,6 @@
   :hook (dired-mode-hook . dired-async-mode)
   :diminish)
 
-(use-package consult-dir
-  :if (eq sb/minibuffer-completion 'vertico)
-  :bind
-  (("C-x C-d" . consult-dir)
-    :map
-    minibuffer-local-completion-map
-    ("C-x C-d" . consult-dir)
-    ("C-x C-j" . consult-dir-jump-file)))
-
 (use-package all-the-icons-dired
   :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p) (not (featurep 'dirvish)))
   :commands (all-the-icons-dired--refresh-advice)

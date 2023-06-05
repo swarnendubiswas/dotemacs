@@ -86,29 +86,29 @@
   :after vertico
   :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
 
-(use-package vertico-multiform
-  :straight nil
-  :after vertico
-  :commands vertico-multiform-mode
-  :init (vertico-multiform-mode 1)
-  :custom
-  (vertico-multiform-categories '((embark-keybinding grid)))
-  (vertico-multiform-commands
-    '
-    ( ;; (execute-extended-command indexed)
-      ;; (completion-at-point vertical)
-      ;; (consult-imenu buffer indexed)
-      ;; (ffap flat (vertico-cycle . t))
-      ;; (consult-projectile-switch-project grid)
-      ;; (consult-yank-pop indexed)
-      ;; (embark-bindings buffer)
-      ;; (xref-find-references buffer)
-      ;; (find-file-at-point (vertico-sort-function . sort-directories-first))
-      ;; (consult-line buffer)
-      ;; (consult-grep buffer)
-      ;; (consult-git-grep buffer)
-      ;; (consult-ripgrep buffer)
-      )))
+;; (use-package vertico-multiform
+;;   :straight nil
+;;   :after vertico
+;;   :commands vertico-multiform-mode
+;;   :init (vertico-multiform-mode 1)
+;;   :custom
+;;   (vertico-multiform-categories '((embark-keybinding grid)))
+;;   (vertico-multiform-commands
+;;     '
+;;     ( ;; (execute-extended-command indexed)
+;;       ;; (completion-at-point vertical)
+;;       ;; (consult-imenu buffer indexed)
+;;       ;; (ffap flat (vertico-cycle . t))
+;;       ;; (consult-projectile-switch-project grid)
+;;       ;; (consult-yank-pop indexed)
+;;       ;; (embark-bindings buffer)
+;;       ;; (xref-find-references buffer)
+;;       ;; (find-file-at-point (vertico-sort-function . sort-directories-first))
+;;       ;; (consult-line buffer)
+;;       ;; (consult-grep buffer)
+;;       ;; (consult-git-grep buffer)
+;;       ;; (consult-ripgrep buffer)
+;;       )))
 
 (use-package consult
   :after vertico
@@ -240,6 +240,57 @@
   :config
   ;; Add project-buffer annotator.
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
+
+(use-package consult-tramp
+  :straight (:host github :repo "Ladicle/consult-tramp")
+  :after consult
+  :bind ("C-c d t" . consult-tramp))
+
+(use-package consult-eglot
+  :after (consult eglot)
+  :commands consult-eglot-symbols)
+
+(use-package consult-project-extra
+  :if (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
+  :demand t
+  :commands consult-project-extra-find-other-window
+  :bind (:map project-prefix-map ("z" . consult-project-extra-find))
+  :config
+  ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
+  ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
+  (setq project-switch-commands 'consult-project-extra-find))
+
+(use-package consult-dir
+  :if (eq sb/minibuffer-completion 'vertico)
+  :bind
+  (("C-x C-d" . consult-dir)
+    :map
+    minibuffer-local-completion-map
+    ("C-x C-d" . consult-dir)
+    ("C-x C-j" . consult-dir-jump-file)))
+
+(use-package consult-flyspell
+  :after (consult flyspell)
+  :defines consult-flyspell-select-function
+  :bind ("C-c f l" . consult-flyspell)
+  :config
+  (setq consult-flyspell-select-function
+    (lambda ()
+      (flyspell-correct-at-point)
+      (consult-flyspell))))
+
+(use-package consult-flycheck
+  :after (flycheck consult)
+  :bind (:map flycheck-command-map ("!" . consult-flycheck)))
+
+(use-package consult-lsp
+  :after (consult lsp)
+  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
+
+(use-package consult-yasnippet
+  :after consult
+  :bind ("C-M-y" . consult-yasnippet))
 
 (provide 'init-vertico)
 

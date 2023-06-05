@@ -13,7 +13,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI.
-(defcustom sb/theme 'none
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -169,7 +169,7 @@ Prefer the straight.el package manager instead."
 ;; example, I can use `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. However,
 ;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
 ;; Emacs core.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)

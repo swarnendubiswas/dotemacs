@@ -29,8 +29,8 @@
 (require 'init-dired)
 
 (cond
-  ((eq sb/minibuffer-completion 'ivy)
-    (require 'init-ivy))
+  ;; ((eq sb/minibuffer-completion 'ivy)
+  ;;    (require 'init-ivy))
   ((eq sb/minibuffer-completion 'vertico)
     (require 'init-vertico)))
 
@@ -38,8 +38,6 @@
 (require 'init-spell)
 (require 'init-search)
 (require 'init-parens)
-(require 'init-whitespace)
-(require 'init-tramp)
 (require 'init-misc)
 (require 'init-checkers)
 (require 'init-tags)
@@ -47,12 +45,12 @@
 (cond
   ((eq sb/capf 'corfu)
     (require 'init-corfu))
-  ((eq sb/capf 'company)
-    (require 'init-company)))
+  ;; ((eq sb/capf 'company)
+  ;;   (require 'init-company))
+  )
 ;; It is recommended to load `yasnippet' before `eglot'
 (require 'init-completion)
 
-(require 'init-prog)
 (require 'init-languages)
 
 ;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
@@ -66,24 +64,51 @@
   ((eq sb/lsp-provider 'eglot)
     (require 'init-eglot)))
 
-(require 'init-cc)
-(require 'init-python)
-
 (require 'init-vcs)
 
 (require 'init-org)
 (require 'init-latex)
 
 (require 'init-functions)
-(require 'init-temp)
 
 ;; Configure appearance-related settings at the end
 (require 'init-ui)
 (require 'init-theme)
-(require 'init-modeline)
-(require 'init-tabs)
 
 (require 'init-keybindings)
+
+(defvar sb/custom-file)
+(defvar sb/private-file)
+
+(setq custom-file sb/custom-file)
+
+(let ((gc-cons-threshold most-positive-fixnum))
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror 'nomessage))
+  (when (file-exists-p sb/private-file)
+    (load sb/private-file 'noerror 'nomessage)))
+
+;; Mark safe variables
+
+(put 'compilation-read-command 'safe-local-variable #'stringp)
+
+;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
+;; (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
+;; (put 'company-clang-arguments                 'safe-local-variable #'listp)
+;; (put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
+;; (put 'flycheck-checker                        'safe-local-variable #'listp)
+;; (put 'flycheck-clang-include-path             'safe-local-variable #'listp)
+;; (put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
+;; (put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
+;; (put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
+;; (put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
+;; (put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
+;; (put 'projectile-enable-caching               'safe-local-variable #'stringp)
+;; (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
+;; (put 'projectile-project-root                 'safe-local-variable #'stringp)
+;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
+;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
+;; (put 'tags-table-list                         'safe-local-variable #'listp)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook

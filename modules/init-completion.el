@@ -22,13 +22,9 @@
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
 (setq
-  completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
   completion-ignore-case t ; Ignore case when completing
-  read-buffer-completion-ignore-case t ; Ignore case when reading a buffer name
-  read-file-name-completion-ignore-case t) ; Ignore case when reading a file name
-
-(when sb/EMACS28+
-  (setq completions-detailed nil))
+  ;; Ignore case when reading a buffer name
+  read-buffer-completion-ignore-case t)
 
 (dolist
   (exts '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
@@ -86,7 +82,7 @@
 (use-package yasnippet
   :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode)
+  :hook ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode-on)
   :custom (yas-verbosity 0)
   :config
   (with-eval-after-load "hippie-expand"
@@ -98,15 +94,6 @@
 (use-package yasnippet-snippets
   :after yasnippet
   :commands yasnippet-snippets-initialize)
-
-(use-package ivy-yasnippet
-  :if (eq sb/minibuffer-completion 'ivy)
-  :after ivy
-  :bind ("C-M-y" . ivy-yasnippet))
-
-(use-package consult-yasnippet
-  :after consult
-  :bind ("C-M-y" . consult-yasnippet))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Vertico does its own sorting based on
 ;; recency, and Corfu has corfu-history. Company has company-statistics. Furthermore, Ivy is not
@@ -140,12 +127,18 @@
 (use-package minibuffer
   :straight (:type built-in)
   :after orderless
-  :custom (completions-format 'vertical)
-  :config
+  :custom
+  (completions-format 'vertical)
+  (read-file-name-completion-ignore-case t "Ignore case when reading a file name")
+  (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
   ;; substring is needed to complete common prefix, orderless does not
+  (completion-styles '(substring orderless basic))
+  (completion-category-defaults nil)
+  :config
+  (when sb/EMACS28+
+    (setq completions-detailed t))
+
   (setq
-    completion-styles '(substring orderless basic)
-    completion-category-defaults nil
     ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
     ;; work. I also want substring matching for file names.
     completion-category-overrides

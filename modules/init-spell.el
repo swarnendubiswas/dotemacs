@@ -262,20 +262,10 @@
   ;; Ignore read-only buffers
   (setq global-spell-fu-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))))
 
-(use-package consult-flyspell
-  :after (consult flyspell)
-  :defines consult-flyspell-select-function
-  :bind ("C-c f l" . consult-flyspell)
-  :config
-  (setq consult-flyspell-select-function
-    (lambda ()
-      (flyspell-correct-at-point)
-      (consult-flyspell))))
-
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.
 (use-package jinx
-  :hook (emacs-startup-hook . global-jinx-mode)
+  :hook (text-mode-hook . jinx-mode)
   :custom (jinx-languages "en_US")
   :bind ([remap ispell-word] . jinx-correct)
   :config

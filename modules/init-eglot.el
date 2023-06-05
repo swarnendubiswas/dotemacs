@@ -122,9 +122,6 @@
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio")))
   )
 
-(use-package consult-eglot
-  :after (consult eglot))
-
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")

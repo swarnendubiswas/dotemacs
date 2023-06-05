@@ -60,21 +60,18 @@
 ;; We do not need this if we use prescient-based sorting.
 (use-package corfu-history
   :straight nil
-  :after (corfu savehist)
-  :commands corfu-history-mode
-  :init
-  (add-to-list 'savehist-additional-variables 'corfu-history)
-  (corfu-history-mode 1))
+  :if (eq sb/capf 'corfu)
+  :after (savehist)
+  :hook (corfu-mode-hook . corfu-history-mode)
+  :config (add-to-list 'savehist-additional-variables 'corfu-history))
 
 (use-package corfu-echo
   :straight nil
-  :after corfu
-  :commands corfu-echo-mode
-  :init (corfu-echo-mode 1))
+  :if (eq sb/capf 'corfu)
+  :hook (corfu-mode-hook . corfu-echo-mode))
 
 (use-package corfu-popupinfo
   :straight nil
-  :after corfu
   :hook (corfu-mode-hook . corfu-popupinfo-mode)
   :bind
   (:map
@@ -185,6 +182,9 @@
     cape-dabbrev ; Complete with Dabbrev at point
     cape-capf-buster
     cape-company-to-capf
+    ;; `cape-super-capf' works only well for static completion functions like `cape-dabbrev',
+    ;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like
+    ;; `cape-file'.
     cape-super-capf
     sh-completion-at-point-function
     comint-completion-at-point
@@ -213,10 +213,11 @@
     (lambda ()
       (setq-local completion-at-point-functions
         (list
-          (cape-super-capf #'elisp-completion-at-point #'citre-completion-at-point #'cape-symbol)
+          #'elisp-completion-at-point
+          #'citre-completion-at-point
+          #'cape-symbol
           #'cape-file
-          #'cape-dabbrev
-          #'cape-dict))))
+          (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
     (add-hook
@@ -225,34 +226,29 @@
         (when (bound-and-true-p lsp-managed-mode)
           (setq-local completion-at-point-functions
             (list
-              (cape-super-capf
-                #'lsp-completion-at-point #'citre-completion-at-point
-                #'cape-tex ; Leads to unwanted completions
-                )
+              #'lsp-completion-at-point #'citre-completion-at-point
+              #'cape-tex ; Leads to unwanted completions
               #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
         (when (bound-and-true-p eglot--managed-mode)
           (setq-local completion-at-point-functions
             (list
-              (cape-super-capf
-                #'eglot-completion-at-point #'citre-completion-at-point
-                #'cape-tex ; Leads to unwanted completions
-                )
+              #'eglot-completion-at-point #'citre-completion-at-point
+              #'cape-tex ; Leads to unwanted completions
               #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
   (dolist (lsp-prog-modes '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))
     (add-hook
       lsp-prog-modes
       (lambda ()
-        (setq-local completion-at-point-functions
-          (append
-            completion-at-point-functions
-            '(cape-keyword cape-file (cape-super-capf cape-dabbrev cape-dict))))
-        ;; (progn
-        ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-        ;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-        ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
-        ;;     'append))
-        ))))
+        ;; (setq-local completion-at-point-functions
+        ;;   (append
+        ;;     completion-at-point-functions
+        ;;     '(cape-keyword cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
+        (progn
+          (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+          (add-to-list 'completion-at-point-functions #'cape-file 'append)
+          (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
+            'append))))))
 
 (provide 'init-corfu)
 

@@ -115,55 +115,57 @@
 
 ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
 ;; Use `isearch', `swiper' will not work
-(use-package pdf-tools
-  :if (display-graphic-p)
-  :defines pdf-annot-activate-created-annotations
-  :commands
-  (pdf-tools-install
-    pdf-loader-install
-    pdf-view-mode
-    pdf-annot-delete
-    pdf-annot-add-highlight-markup-annotation
-    pdf-annot-add-text-annotation)
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
-  ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
-  :magic ("%PDF" . pdf-view-mode)
-  :bind
-  (:map
-    pdf-view-mode-map
-    ("j" . pdf-view-next-line-or-next-page)
-    ("k" . pdf-view-previous-line-or-previous-page)
-    ("n" . pdf-view-next-page-command)
-    ("p" . pdf-view-previous-page-command)
-    ("a" . pdf-view-first-page)
-    ("e" . pdf-view-last-page)
-    ("l" . pdf-view-goto-page)
-    ("P" . pdf-view-fit-page-to-window)
-    ("W" . pdf-view-fit-width-to-window)
-    ("H" . pdf-view-fit-height-to-window)
-    ("+" . pdf-view-enlarge)
-    ("-" . pdf-view-shrink)
-    ("r" . pdf-view-revert-buffer)
-    ("d" . pdf-annot-delete)
-    ("h" . pdf-annot-add-highlight-markup-annotation)
-    ("t" . pdf-annot-add-text-annotation)
-    ("M" . pdf-view-midnight-minor-mode))
-  :custom
-  (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
-  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
-  :config
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
-  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+;; (use-package pdf-tools
+;;   :if (display-graphic-p)
+;;   :defines pdf-annot-activate-created-annotations
+;;   :commands
+;;   (pdf-tools-install
+;;     pdf-loader-install
+;;     pdf-view-mode
+;;     pdf-annot-delete
+;;     pdf-annot-add-highlight-markup-annotation
+;;     pdf-annot-add-text-annotation)
+;;   :mode ("\\.pdf\\'" . pdf-view-mode)
+;;   ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
+;;   ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
+;;   :magic ("%PDF" . pdf-view-mode)
+;;   :bind
+;;   (:map
+;;     pdf-view-mode-map
+;;     ("j" . pdf-view-next-line-or-next-page)
+;;     ("k" . pdf-view-previous-line-or-previous-page)
+;;     ("n" . pdf-view-next-page-command)
+;;     ("p" . pdf-view-previous-page-command)
+;;     ("a" . pdf-view-first-page)
+;;     ("e" . pdf-view-last-page)
+;;     ("l" . pdf-view-goto-page)
+;;     ("P" . pdf-view-fit-page-to-window)
+;;     ("W" . pdf-view-fit-width-to-window)
+;;     ("H" . pdf-view-fit-height-to-window)
+;;     ("+" . pdf-view-enlarge)
+;;     ("-" . pdf-view-shrink)
+;;     ("r" . pdf-view-revert-buffer)
+;;     ("d" . pdf-annot-delete)
+;;     ("h" . pdf-annot-add-highlight-markup-annotation)
+;;     ("t" . pdf-annot-add-text-annotation)
+;;     ("M" . pdf-view-midnight-minor-mode))
+;;   :custom
+;;   (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
+;;   (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
+;;   :config
+;;   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
 
-  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
+;;   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+
+;;   ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
+;;   (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
 
 ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
-(use-package saveplace-pdf-view
-  :after (pdf-tools saveplace)
-  :demand t)
+
+;; (use-package saveplace-pdf-view
+;;   :after (pdf-tools saveplace)
+;;   :demand t)
 
 (use-package wc-mode
   :commands (wc-mode))
@@ -172,21 +174,15 @@
 (use-package define-word
   :commands (define-word define-word-at-point))
 
-(use-package esup
-  :if (bound-and-true-p sb/debug-init-file)
-  :commands (esup))
+;; (use-package esup
+;;   :if (bound-and-true-p sb/debug-init-file)
+;;   :commands (esup))
 
-(use-package bug-hunter
-  :commands (bug-hunter-init-file bug-hunter-file))
+;; (use-package bug-hunter
+;;   :commands (bug-hunter-init-file bug-hunter-file))
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
-
-(use-package amx
-  :after counsel
-  :commands (execute-extended-command-for-buffer)
-  :hook (emacs-startup-hook . amx-mode)
-  :bind (("M-x" . amx) ("<f1>" . amx)))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
@@ -249,8 +245,8 @@
 (use-package unfill
   :commands (unfill-region unfill-paragraph unfill-toggle))
 
-(use-package info-colors ; Better looking info pages
-  :hook (Info-selection-hook . info-colors-fontify-node))
+;; (use-package info-colors ; Better looking info pages
+;;   :hook (Info-selection-hook . info-colors-fontify-node))
 
 (use-package xclip
   :if (or (executable-find "xclip") (executable-find "xsel"))
@@ -287,6 +283,23 @@
   :straight (:host github :repo "joaotavora/breadcrumb")
   :disabled t
   :hook (emacs-startup-hook . breadcrumb-mode))
+
+;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
+;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
+;; to `t' in the `.dir-locals.el' file.
+(use-package whitespace-cleanup-mode
+  :defines whitespace-cleanup-mode-ignore-modes
+  :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
+  :custom
+  (whitespace-cleanup-mode-preserve-point t)
+  (whitespace-cleanup-mode-only-if-initially-clean t)
+  :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
+  :diminish)
+
+;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+(use-package ws-butler
+  :hook (prog-mode-hook . ws-butler-mode)
+  :diminish)
 
 (provide 'init-misc)
 

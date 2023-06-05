@@ -16,6 +16,7 @@
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
 ;; checks only the writing style. `textlint' includes `writegood'.
 (use-package writegood-mode
+  :when (executable-find "writegood")
   :commands
   (writegood-passive-voice-turn-off
     writegood-passive-voice-turn-on
@@ -25,8 +26,6 @@
     writegood-duplicates-turn-off)
   :hook (text-mode-hook . writegood-duplicates-turn-on)
   :config
-  ;; https://emacs.stackexchange.com/questions/32644/how-to-concatenate-two-lists
-  ;; https://emacs.stackexchange.com/questions/20465/append-lists-smartly
   (let
     (
       (sb/weasel-words
@@ -192,6 +191,7 @@
   (format-all-formatters
     '
     (("Assembly" asmfmt)
+      ("Awk" gawk)
       ("BibTeX" Emacs)
       ("C" clang-format)
       ("C++" clang-format)
@@ -211,57 +211,46 @@
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
 (use-package flycheck-grammarly
-  :after flycheck
   :defines flycheck-grammarly-check-time
-  :demand t
+  :custom (flycheck-grammarly-check-time 3)
+  :hook (flycheck-mode-hook . flycheck-grammarly-setup)
   :config
-  (setq
-    flycheck-grammarly-check-time 3
-    ;; Remove from the beginning of the list `flycheck-checkers' and append to the end
-    flycheck-checkers (delete 'grammarly flycheck-checkers))
-
-  (add-to-list 'flycheck-checkers 'grammarly t))
+  ;; Remove from the beginning of the list and append to the end
+  (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-(use-package langtool
-  :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
-  :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
-  :init
-  (setq
-    langtool-default-language "en-US"
-    languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-    languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-    languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
-    langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-    langtool-disabled-rules
-    '
-    ("MORFOLOGIK_RULE_EN_US"
-      ;; "WHITESPACE_RULE"
-      ;; "EN_QUOTES"
-      ;; "DASH_RULE"
-      ;; "COMMA_PARENTHESIS_WHITESPACE"
-      ;; "OXFORD_SPELLING_ISE_VERBS"
-      ;; "OXFORD_SPELLING_NOUNS")
-      )))
+
+;; (use-package langtool
+;;   :defines (languagetool-java-arguments languagetool-console-command languagetool-server-command)
+;;   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
+;;   :init
+;;   (setq
+;;     langtool-default-language "en-US"
+;;     languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+;;     languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
+;;     languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
+;;     langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
+;;     langtool-disabled-rules
+;;     '
+;;     ("MORFOLOGIK_RULE_EN_US"
+;;       ;; "WHITESPACE_RULE"
+;;       ;; "EN_QUOTES"
+;;       ;; "DASH_RULE"
+;;       ;; "COMMA_PARENTHESIS_WHITESPACE"
+;;       ;; "OXFORD_SPELLING_ISE_VERBS"
+;;       ;; "OXFORD_SPELLING_NOUNS")
+;;       )))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
 (use-package flycheck-languagetool
-  :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
-  :demand t
-  :init
-  (setq
-    flycheck-languagetool-server-jar
-    (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
-    flycheck-checkers (delete 'languagetool flycheck-checkers))
-
-  (add-to-list 'flycheck-checkers 'languagetool t))
-
-(use-package consult-flycheck
-  :after (flycheck consult)
-  :bind (:map flycheck-command-map ("!" . consult-flycheck)))
+  :hook (flycheck-mode-hook . flycheck-languagetool-setup)
+  :custom
+  (flycheck-languagetool-server-jar
+    (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar"))
+  :config (add-to-list 'flycheck-checkers (pop flycheck-checkers) t))
 
 ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
 ;; support. We enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
@@ -293,7 +282,15 @@
   :init (global-flycheck-eglot-mode 1))
 
 (use-package flycheck-vale
-  :hook (flycheck-mode-hook . flycheck-vale-setup))
+  :when (executable-find "vale")
+  :hook (flycheck-mode-hook . flycheck-vale-setup)
+  :config (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append))
+
+(use-package shfmt
+  :hook (sh-mode-hook . shfmt-on-save-mode)
+  :custom
+  ;; p: Posix, ci: indent case labels, i: indent with spaces
+  (shfmt-arguments '("-i" "4" "-p" "-ci")))
 
 (provide 'init-checkers)
 

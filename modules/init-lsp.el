@@ -69,9 +69,7 @@
     lsp-find-type-definition)
   :bind-keymap ("C-c l" . lsp-command-map)
   :bind
-  ;; `lsp-imenu-create-categorised-index' - sorts the items by kind.
-  ;; `lsp-imenu-create-uncategorized-index' - will have the items sorted by position.
-  (("M-." . lsp-find-definition)
+  (("M-." . xref-find-definitions)
     :map
     lsp-command-map
     ("=")
@@ -95,8 +93,8 @@
     ("h" . lsp-symbol-highlight)
     ("f" . lsp-format-buffer)
     ("x" . lsp-execute-code-action)
-    ("c" . lsp-imenu-create-categorised-index)
-    ("u" . lsp-imenu-create-uncategorised-index)
+    ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
+    ("u" . lsp-imenu-create-uncategorised-index) ; sorts the items by position
     ("a" . lsp-workspace-folders-add)
     ("v" . lsp-workspace-folders-remove)
     ("b" . lsp-workspace-blacklist-remove))
@@ -121,7 +119,7 @@
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
   (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
   (lsp-completion-show-kind nil "Disable completion kind to shorten popup width")
-  (lsp-completion-show-label-description nil "Disable description of completion candidates")
+  (lsp-completion-show-label-description t "Disable description of completion candidates")
   (lsp-eldoc-enable-hover t)
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
@@ -136,20 +134,21 @@
   (lsp-lens-enable nil)
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
   ;; additional errors. The problem is that the modeline can get too congested.
-  (lsp-modeline-diagnostics-enable nil)
+  (lsp-modeline-diagnostics-enable t)
   (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
-  ;; (lsp-modeline-code-actions-enable (display-graphic-p))
-  (lsp-modeline-workspace-status-enable nil)
+  (lsp-modeline-code-actions-enable t)
+  (lsp-modeline-workspace-status-enable t)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position,
-  ;; manually request via `lsp-signature-activate'
+  ;; manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
   ;; Disable showing function documentation with `eldoc'
-  ;; (lsp-signature-render-documentation nil)
-  ;; Avoid annoying questions, we expect a server restart to succeed more often than not
-  (lsp-restart 'auto-restart)
+  (lsp-signature-render-documentation t)
+  (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
   (lsp-warn-no-matched-clients nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-enable-file-watchers nil)
   :config
   (dolist
     (ignore-dirs
@@ -203,23 +202,20 @@
     (setq lsp-ui-sideline-enable t)))
 
 ;; Sync workspace folders and treemacs projects
-(use-package lsp-treemacs
-  :if (eq sb/lsp-provider 'lsp-mode)
-  :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
-  :config (lsp-treemacs-sync-mode 1)
-  :bind
-  (:map
-    lsp-command-map
-    ("S" . lsp-treemacs-symbols)
-    ("F" . lsp-treemacs-references)
-    ("Y" . lsp-treemacs-sync-mode)
-    ("C" . lsp-treemacs-call-hierarchy)
-    ("T" . lsp-treemacs-type-hierarchy)
-    ("E" . lsp-treemacs-errors-list)))
 
-(use-package lsp-ivy
-  :after (lsp-mode ivy)
-  :bind (:map lsp-command-map ("G" . lsp-ivy-global-workspace-symbol) ("W" . lsp-ivy-workspace-symbol)))
+;; (use-package lsp-treemacs
+;;   :if (eq sb/lsp-provider 'lsp-mode)
+;;   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
+;;   :config (lsp-treemacs-sync-mode 1)
+;;   :bind
+;;   (:map
+;;     lsp-command-map
+;;     ("S" . lsp-treemacs-symbols)
+;;     ("F" . lsp-treemacs-references)
+;;     ("Y" . lsp-treemacs-sync-mode)
+;;     ("C" . lsp-treemacs-call-hierarchy)
+;;     ("T" . lsp-treemacs-type-hierarchy)
+;;     ("E" . lsp-treemacs-errors-list)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -264,11 +260,6 @@
   :config
   (with-eval-after-load "dap-mode"
     (require 'dap-java)))
-
-(use-package consult-lsp
-  :after (consult lsp)
-  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
-  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
@@ -366,16 +357,16 @@
                 (error "Error during the unzip process: tar"))))
           error-callback)))))
 
-(use-package dap-mode
-  :after lsp-mode
-  :commands (dap-step-in dap-next dap-continue dap-debug dap-hydra)
-  :init (dap-auto-configure-mode)
-  :hook ((lsp-mode-hook . dap-ui-mode) (lsp-mode-hook . dap-mode))
-  ;; :bind
-  ;; ("<f7>" . dap-step-in)
-  ;; ("<f8>" . dap-next)
-  ;; ("<f9>" . dap-continue)
-  )
+;; (use-package dap-mode
+;;   :after lsp-mode
+;;   :commands (dap-step-in dap-next dap-continue dap-debug dap-hydra)
+;;   :init (dap-auto-configure-mode)
+;;   :hook ((lsp-mode-hook . dap-ui-mode) (lsp-mode-hook . dap-mode))
+;;   ;; :bind
+;;   ;; ("<f7>" . dap-step-in)
+;;   ;; ("<f8>" . dap-next)
+;;   ;; ("<f9>" . dap-continue)
+;;   )
 
 (provide 'init-lsp)
 

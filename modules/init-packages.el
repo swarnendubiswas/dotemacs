@@ -129,10 +129,11 @@
       use-package-always-defer t
       ;; Disable error checks during macro expansion because the configuration just works
       use-package-expand-minimally t
-      use-package-compute-statistics nil
+      use-package-compute-statistics t
       use-package-verbose nil)))
 
-(use-package diminish :demand t)
+(use-package diminish
+  :demand t)
 
 ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
@@ -140,17 +141,20 @@
 ;; modes.
 
 ;; https://github.com/jwiegley/use-package/pull/993/files
-(use-package bind-key :functions bind-key--remove :bind ("C-c d k" . describe-personal-keybindings))
+(use-package bind-key
+  :functions bind-key--remove
+  :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package
-  no-littering
+(use-package benchmark-init
+  :hook (emacs-startup-hook . benchmark-init/deactivate))
+
+(use-package no-littering
   :demand t
   :config
   (setq auto-save-file-name-transforms
     `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-(use-package
-  package
+(use-package package
   :unless (bound-and-true-p sb/disable-package.el)
   :after no-littering
   :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
@@ -170,8 +174,7 @@
   :group 'sb/emacs)
 
 ;; Asynchronously byte compile packages installed with `package.el'
-(use-package
-  async
+(use-package async
   :straight (:host github :repo "jwiegley/emacs-async")
   :unless (bound-and-true-p sb/disable-package.el)
   :commands async-bytecomp-package-mode
@@ -184,19 +187,18 @@
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 
-(use-package
-  exec-path-from-shell
-  :if (symbol-value 'sb/IS-LINUX)
-  :defines exec-path-from-shell-check-startup-files
-  :commands exec-path-from-shell-initialize
-  :init
-  ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
-  ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
-  ;; "prettier" from $PATH are also not found without the interactive flag.
-  (setq
-    exec-path-from-shell-check-startup-files nil
-    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
-  (exec-path-from-shell-initialize))
+;; (use-package exec-path-from-shell
+;;   :if (symbol-value 'sb/IS-LINUX)
+;;   :defines exec-path-from-shell-check-startup-files
+;;   :commands exec-path-from-shell-initialize
+;;   :init
+;;   ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
+;;   ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
+;;   ;; "prettier" from $PATH are also not found without the interactive flag.
+;;   (setq
+;;     exec-path-from-shell-check-startup-files nil
+;;     exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
+;;   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)
 

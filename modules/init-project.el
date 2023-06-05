@@ -59,16 +59,6 @@
   ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
   )
 
-(use-package consult-project-extra
-  :if (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
-  :demand t
-  :commands consult-project-extra-find-other-window
-  :bind (:map project-prefix-map ("z" . consult-project-extra-find))
-  :config
-  ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
-  ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
-  (setq project-switch-commands 'consult-project-extra-find))
-
 ;; Many useful packages like `ibuffer-projectile' and `centaur-tabs' depend on `projectile'.
 (use-package projectile
   :preface
@@ -214,19 +204,6 @@
   (when (eq sb/minibuffer-completion 'ivy)
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))
-
-(use-package consult-projectile
-  :after projectile
-  :commands consult-projectile-recentf
-  :bind
-  (("<f5>" . consult-projectile-switch-project)
-    ("<f6>" . consult-projectile)
-    ([remap projectile-recentf] . consult-projectile-recentf)
-    ([remap projectile-switch-to-buffer] . consult-projectile-switch-to-buffer)
-    ([remap projectile-find-file] . consult-projectile-find-file)
-    ([remap projectile-find-dir] . consult-projectile-find-dir)
-    ([remap projectile-switch-project] . consult-projectile-switch-project))
-  :config (consult-customize consult-projectile :preview-key nil))
 
 (provide 'init-project)
 

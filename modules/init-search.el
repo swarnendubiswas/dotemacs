@@ -15,13 +15,8 @@
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s")
     ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
-    ("C-f" . isearch-forward-regexp)
-    ("C-r" . isearch-backward-regexp)
-    :map
-    isearch-mode-map
-    ("C-s" . nil)
-    ("C-f" . isearch-repeat-forward)
-    ("C-c C-o" . isearch-occur))
+    ("C-f" . isearch-forward-regexp) ("C-r" . isearch-backward-regexp)
+    :map isearch-mode-map ("C-s") ("C-f" . isearch-repeat-forward) ("C-c C-o" . isearch-occur))
   :custom
   (search-highlight t "Highlight incremental search")
   (isearch-lazy-highlight t)
@@ -32,19 +27,14 @@
   :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
 
-(use-package anzu
-  :init
-  (setq
-    anzu-search-threshold 10000
-    anzu-minimum-input-length 2)
-  (global-anzu-mode 1)
-  :bind ([remap query-replace-regexp] . anzu-query-replace-regexp)
-  :diminish anzu-mode)
-
-(use-package swiper
-  :if (eq sb/minibuffer-completion 'ivy)
-  :commands (swiper swiper-isearch)
-  :custom (swiper-action-recenter t))
+;; (use-package anzu
+;;   :init
+;;   (setq
+;;     anzu-search-threshold 10000
+;;     anzu-minimum-input-length 2)
+;;   (global-anzu-mode 1)
+;;   :bind ([remap query-replace-regexp] . anzu-query-replace-regexp)
+;;   :diminish anzu-mode)
 
 (with-eval-after-load "grep"
   (defvar grep-highlight-matches)

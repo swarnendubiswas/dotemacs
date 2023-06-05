@@ -504,6 +504,15 @@ install_delta() {
     rm git-delta_"$DELTA_VER"_amd64.deb
 }
 
+install_difft() {
+    DIFFT_VER="0.47.0"
+
+    wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
+    tar xz difft-x86_64-unknown-linux-gnu.tar.gz
+    mv difft "${USER_HOME}/.local/bin/"
+    rm difft-x86_64-unknown-linux-gnu.tar.gz
+}
+
 install_zoxide() {
     curl -sS https://webinstall.dev/zoxide | bash
 
@@ -630,18 +639,8 @@ cleanup() {
 # install_marksman
 # install_perl_server
 # install_nerd_fonts
+# install_difft
 
 # cleanup
-
-# Gem modules
-
-# gem install scss_lint
-# gem update
-
-# Composer modules
-
-# composer require jetbrains/phpstorm-stubs:dev-master
-# composer require felixfbecker/language-server
-# composer update
 
 # set +eux

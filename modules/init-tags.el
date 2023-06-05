@@ -33,22 +33,15 @@
   (xref-search-program 'ripgrep)
   (xref-show-definitions-function #'xref-show-definitions-completing-read))
 
-(use-package ivy-xref
-  :after (ivy xref)
-  :demand t
-  :custom
-  (xref-show-definitions-function #'ivy-xref-show-defs)
-  (xref-show-xrefs-function #'ivy-xref-show-xrefs))
-
-(use-package dumb-jump
-  :after xref
-  :demand t
-  :commands dumb-jump-xref-activate
-  :hook (xref-backend-functions . dumb-jump-xref-activate)
-  :custom
-  (dumb-jump-quiet t)
-  (dumb-jump-force-searcher 'rg)
-  (dumb-jump-prefer-searcher 'rg))
+;; (use-package dumb-jump
+;;   :after xref
+;;   :demand t
+;;   :commands dumb-jump-xref-activate
+;;   :hook (xref-backend-functions . dumb-jump-xref-activate)
+;;   :custom
+;;   (dumb-jump-quiet t)
+;;   (dumb-jump-force-searcher 'rg)
+;;   (dumb-jump-prefer-searcher 'rg))
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 
