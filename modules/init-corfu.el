@@ -40,6 +40,21 @@
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
   (corfu-bar-width 0 "See if this helps with corfu-terminal wrap around")
+  (corfu-exclude-modes
+    '
+    (dired-mode
+      erc-mode
+      message-mode
+      comint-mode
+      inferior-python-mode
+      vterm-mode
+      magit-status-mode
+      help-mode
+      gud-mode
+      eshell-mode
+      shell-mode
+      csv-mode
+      minibuffer-inactive-mode))
   :config
   ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
@@ -95,11 +110,10 @@
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
-  :custom
-  (kind-icon-default-face 'corfu-default) ; To compute blended backgrounds correctly
+  :custom (kind-icon-default-face 'corfu-default "Compute blended backgrounds correctly")
   ;; Prefer smaller icons and a more compact popup
   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
-  (kind-icon-blend-background nil)
+  ;; (kind-icon-blend-background nil)
   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
   (when (eq sb/corfu-icons 'nerd-icons)
@@ -168,9 +182,7 @@
 
 (use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
-  :after corfu
-  :commands corfu-quick-access-mode
-  :init (corfu-quick-access-mode 1))
+  :hook (corfu-mode-hook . corfu-quick-access-mode))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -217,7 +229,6 @@
       ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   (cape-dabbrev-check-other-buffers 'some)
   :config
-  ;; https://github.com/minad/cape/issues/53
   ;; Override CAPFS for specific major modes
 
   (add-hook
@@ -225,9 +236,7 @@
     (lambda ()
       (setq-local completion-at-point-functions
         (list
-          #'elisp-completion-at-point
-          #'citre-completion-at-point
-          #'cape-symbol
+          (cape-super-capf #'elisp-completion-at-point #'citre-completion-at-point #'cape-symbol)
           #'cape-file
           (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 

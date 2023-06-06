@@ -84,7 +84,7 @@
   ;; Avoid manual installations whenever I modify package installations
   (setq
     use-package-always-ensure t
-    ;; These variables need to best before loading `use-package'
+    ;; These variables need to be set before loading `use-package'
     use-package-enable-imenu-support t
     use-package-hook-name-suffix nil)
 
@@ -115,28 +115,28 @@
 (defvar use-package-always-defer)
 (defvar use-package-minimum-reported-time)
 
-(if (bound-and-true-p sb/debug-init-file)
-  (progn
+(cond
+  ((eq sb/op-mode 'daemon)
     (setq
-      debug-on-error t
-      debug-on-event 'sigusr2
-      use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-      use-package-verbose t
-      use-package-minimum-reported-time 0 ; Show everything
+      use-package-always-demand t
       use-package-expand-minimally nil
-      use-package-always-demand t))
-  (progn
-    (setq
-      use-package-always-defer nil
-      ;; Disable error checks during macro expansion because the configuration just works
-      use-package-expand-minimally t
-      use-package-compute-statistics t
-      use-package-verbose nil)))
-
-(setq use-package-enable-imenu-support t)
-
-(when (eq sb/op-mode 'daemon)
-  (setq use-package-always-demand t))
+      use-package-always-defer nil))
+  ((eq sb/op-mode 'standalone)
+    (if (bound-and-true-p sb/debug-init-file)
+      (progn
+        (setq
+          debug-on-error t
+          debug-on-event 'sigusr2
+          use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+          use-package-verbose t
+          use-package-minimum-reported-time 0 ; Show everything
+          use-package-always-demand t))
+      (progn
+        (setq
+          use-package-always-defer t
+          ;; Disable error checks during macro expansion because the configuration just works
+          use-package-expand-minimally t
+          use-package-compute-statistics nil)))))
 
 (use-package diminish
   :demand t)
@@ -152,6 +152,8 @@
   :bind ("C-c d k" . describe-personal-keybindings))
 
 (use-package benchmark-init
+  :when (and (eq sb/op-mode 'standalone) (bound-and-true-p sb/debug-init-file))
+  :init (benchmark-init/activate)
   :hook (emacs-startup-hook . benchmark-init/deactivate))
 
 (use-package no-littering
@@ -162,11 +164,10 @@
 
 (use-package package
   :unless (bound-and-true-p sb/disable-package.el)
+  ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
   :after no-littering
   :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
-  :custom
-  ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
-  (package-quickstart t))
+  :custom (package-quickstart t))
 
 (defcustom sb/custom-file (no-littering-expand-var-file-name "custom.el")
   "File to write Emacs customizations."

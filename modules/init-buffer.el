@@ -94,6 +94,24 @@
   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t)))
 
+;; TODO: Try Shackle
+(use-package shackle
+  :disabled t
+  :init (shackle-mode)
+  :config
+  (setq shackle-inhibit-window-quit-on-same-windows t)
+  (setq shackle-default-alignment 'below)
+  (setq shackle-default-size 0.4)
+  (setq shackle-rules
+    '
+    ((helpful-mode :align t :select t)
+      (help-mode :align t :select t)
+      (compilation-mode :align t :select t)
+      (apropos-mode :align t :select t)
+      ("^\\*eldoc" :regexp t :align below :select t)
+      ("^\\*Occur" :regexp t :align t :select t)))
+  (setq shackle-default-rule nil))
+
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))

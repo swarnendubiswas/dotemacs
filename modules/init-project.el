@@ -65,9 +65,6 @@
   (defun sb/projectile-do-not-visit-tags-table ()
     "Do not visit the tags table automatically even if it is present."
     nil)
-  :straight ripgrep
-  :straight rg
-  :straight t
   :if (eq sb/project-handler 'projectile)
   :commands
   (projectile-project-p

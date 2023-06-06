@@ -97,6 +97,20 @@
   ([remap query-replace] . vr/query-replace)
   ([remap replace-regex] . vr/replace))
 
+(use-package ripgrep
+  :commands (ripgrep-regexp projectile-ripgrep))
+
+(use-package rg
+  :commands
+  (rg-menu
+    rg-isearch-menu
+    rg-project
+    rg
+    rg-literal
+    rg-dwim
+    rg-dwim-current-dir
+    rg-dwim-project-dir))
+
 (provide 'init-search)
 
 ;;; init-search.el ends here
