@@ -41,19 +41,25 @@
   :if (boundp 'vc-handled-backends)
   :commands diff-hl-dired-mode-unless-remote
   :hook
-  ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
-    (magit-pre-refresh-hook . diff-hl-magit-pre-refresh)
-    (emacs-startup-hook . global-diff-hl-mode))
+  (
+    (diff-hl-mode-on-hook
+      .
+      (lambda ()
+        (unless (display-graphic-p)
+          (diff-hl-margin-local-mode 1))))
+    (dired-mode-hook . diff-hl-dired-mode-unless-remote) (emacs-startup-hook . global-diff-hl-mode))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   (diff-hl-disable-on-remote t)
   :config (diff-hl-flydiff-mode 1)
 
   ;; Display margin since the fringe is unavailable in TTY
-  (unless (display-graphic-p)
-    (diff-hl-margin-mode 1))
+  ;; (unless (display-graphic-p)
+  ;;   (diff-hl-margin-mode 1))
 
-  (add-hook 'dired-mode-hook #'diff-hl-dired-mode-unless-remote))
+  (with-eval-after-load "magit"
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+    (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit

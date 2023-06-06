@@ -181,9 +181,6 @@
 ;; (use-package bug-hunter
 ;;   :commands (bug-hunter-init-file bug-hunter-file))
 
-;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
-;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
-
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.

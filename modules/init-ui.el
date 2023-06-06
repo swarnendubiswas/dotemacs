@@ -12,29 +12,48 @@
 (defvar sb/minibuffer-completion)
 
 ;; Install fonts with "M-x all-the-icons-install-fonts"
-(use-package all-the-icons
-  :preface
-  ;; FIXME: This seems to work only with GUI Emacs.
-  (defun sb/font-installed-p (font-name)
-    "Check if font with FONT-NAME is available."
-    (if (find-font (font-spec :name font-name))
-      t
-      nil))
-  :when (or (eq sb/icons-provider 'all-the-icons) (eq sb/tab-bar-handler 'centaur-tabs))
-  :commands all-the-icons-install-fonts
-  :init
-  (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
-    (all-the-icons-install-fonts t))
-  :custom
-  ;; Small icons look nicer
-  (all-the-icons-scale-factor 0.9)
-  (all-the-icons-faicon-scale-factor 0.9)
-  (all-the-icons-wicon-scale-factor 0.9)
-  (all-the-icons-octicon-scale-factor 0.9)
-  (all-the-icons-fileicon-scale-factor 0.9)
-  (all-the-icons-material-scale-factor 0.9)
-  (all-the-icons-alltheicon-scale-factor 0.9)
-  (all-the-icons-color-icons t))
+
+;; (use-package all-the-icons
+;;   :preface
+;;   ;; FIXME: This seems to work only with GUI Emacs.
+;;   (defun sb/font-installed-p (font-name)
+;;     "Check if font with FONT-NAME is available."
+;;     (if (find-font (font-spec :name font-name))
+;;       t
+;;       nil))
+;;   :when (or (eq sb/icons-provider 'all-the-icons) (eq sb/tab-bar-handler 'centaur-tabs))
+;;   :commands all-the-icons-install-fonts
+;;   :init
+;;   (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
+;;     (all-the-icons-install-fonts t))
+;;   :custom
+;;   ;; Small icons look nicer
+;;   (all-the-icons-scale-factor 0.9)
+;;   (all-the-icons-faicon-scale-factor 0.9)
+;;   (all-the-icons-wicon-scale-factor 0.9)
+;;   (all-the-icons-octicon-scale-factor 0.9)
+;;   (all-the-icons-fileicon-scale-factor 0.9)
+;;   (all-the-icons-material-scale-factor 0.9)
+;;   (all-the-icons-alltheicon-scale-factor 0.9)
+;;   (all-the-icons-color-icons t))
+
+(use-package all-the-icons-dired
+  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p) (not (featurep 'dirvish)))
+  :commands (all-the-icons-dired--refresh-advice)
+  :hook
+  (dired-mode-hook
+    .
+    (lambda ()
+      (unless (file-remote-p default-directory)
+        (all-the-icons-dired-mode 1))))
+  :custom (all-the-icons-dired-monochrome nil)
+  :diminish)
+
+;; Display icons for all buffers in ibuffer
+(use-package all-the-icons-ibuffer
+  :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
+  :hook (ibuffer-mode-hook . all-the-icons-ibuffer-mode)
+  :custom (all-the-icons-ibuffer-icon-size 0.8))
 
 ;; Icons for minibuffer completion (e.g., `find-file-at-point')
 (use-package all-the-icons-completion
@@ -53,6 +72,16 @@
   :when (eq sb/icons-provider 'nerd-icons)
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
+
+(use-package nerd-icons-dired
+  :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
+  :hook (dired-mode-hook . nerd-icons-dired-mode)
+  :diminish)
+
+(use-package nerd-icons-ibuffer
+  :when (eq sb/icons-provider 'nerd-icons)
+  :hook (ibuffer-mode-hook . nerd-icons-ibuffer-mode)
+  :custom (nerd-icons-ibuffer-icon-size 1.2))
 
 ;; Decrease minibuffer font size
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
@@ -144,8 +173,15 @@
       (set-face-attribute 'mode-line nil :height 110)
       (set-face-attribute 'mode-line-inactive nil :height 110))))
 
-;; TODO: This package is probably causing the jumping behavior with `corfu-terminal-mode'.
+(when (daemonp)
+  (cond
+    ((string= (system-name) "inspiron-7572")
+      (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17")))
 
+    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+      (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17")))))
+
+;; TODO: This package is probably causing the jumping behavior with `corfu-terminal-mode'.
 (use-package olivetti
   :hook
   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
@@ -171,8 +207,13 @@
   (centaur-tabs-set-bar 'under)
   (centaur-tabs-set-icons (display-graphic-p) "Icons may not be rendered in all terminals")
   (centaur-tabs-height 18)
-  (centaur-tabs-gray-out-icons t "Gray out icons for inactive tabs")
   :config
+  (with-eval-after-load "all-the-icons"
+    (setq
+      centaur-tabs-set-icons t
+      ;; Gray out icons for inactive tabs
+      centaur-tabs-gray-out-icons t))
+
   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
 
   ;; (let ((themes '("doom-one"

@@ -329,6 +329,8 @@
   :after counsel
   :bind ("C-c d t" . counsel-tramp))
 
+;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
+;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
 (use-package amx
   :after counsel
   :commands (execute-extended-command-for-buffer)
@@ -357,19 +359,6 @@
   :if (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch)
   :custom (swiper-action-recenter t))
-
-(use-package consult-projectile
-  :after projectile
-  :commands consult-projectile-recentf
-  :bind
-  (("<f5>" . consult-projectile-switch-project)
-    ("<f6>" . consult-projectile)
-    ([remap projectile-recentf] . consult-projectile-recentf)
-    ([remap projectile-switch-to-buffer] . consult-projectile-switch-to-buffer)
-    ([remap projectile-find-file] . consult-projectile-find-file)
-    ([remap projectile-find-dir] . consult-projectile-find-dir)
-    ([remap projectile-switch-project] . consult-projectile-switch-project))
-  :config (consult-customize consult-projectile :preview-key nil))
 
 (provide 'init-ivy)
 

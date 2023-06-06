@@ -161,7 +161,7 @@
         c-enable-auto-newline nil
         c-syntactic-indentation nil)))
 
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection "clangd")
@@ -201,7 +201,7 @@
             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
             (lsp-deferred))))))
   :config
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection "cmake-language-server")
@@ -391,7 +391,7 @@
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
 
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection
@@ -443,7 +443,7 @@
   :config
   (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
 
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
@@ -510,7 +510,7 @@
             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
             (lsp-deferred))))))
   :config
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection '("yaml-language-server" "--stdio"))
@@ -534,7 +534,7 @@
           (lsp-deferred)))))
   :custom (css-indent-offset 2)
   :config
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection '("css-languageserver" "--stdio"))
@@ -702,7 +702,7 @@
   (web-mode-style-padding 2) ; For <style> tag
   (web-mode-script-padding 2) ; For <script> tag
   :config
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
@@ -742,7 +742,7 @@
   (nxml-sexp-element-flag t)
   :config (fset 'xml-mode 'nxml-mode)
 
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
@@ -770,7 +770,7 @@
         ((eq sb/lsp-provider 'lsp-mode)
           (lsp-deferred)))))
   :config
-  (when (eq sb/lsp-provider 'lsp-mode)
+  (with-eval-after-load "lsp-mode"
     (lsp-register-client
       (make-lsp-client
         :new-connection (lsp-tramp-connection '("vscode-json-languageserver" "--stdio"))

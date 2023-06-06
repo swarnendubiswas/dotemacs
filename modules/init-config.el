@@ -80,6 +80,16 @@ Sometimes we do not want to unnecessarily add differences due to
   :type 'boolean
   :group 'sb/emacs)
 
+(defcustom sb/op-mode 'daemon
+  "Specify the way you expect Emacs to be used."
+  :type
+  '
+  (radio
+    (const :tag "server" server)
+    (const :tag "daemon" daemon)
+    (const :tag "standalone" standalone))
+  :group 'sb/emacs)
+
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -118,13 +128,14 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/corfu-icons 'kind-icon
+(defcustom sb/corfu-icons 'nerd-icons
   "Choose the provider for Corfu icons."
   :type
   '
   (radio
     (const :tag "kind-icon" kind-icon)
     (const :tag "kind-all-the-icons" kind-all-the-icons)
+    (const :tag "nerd-icons" nerd-icons)
     (const :tag "none" none))
   :group 'sb/emacs)
 

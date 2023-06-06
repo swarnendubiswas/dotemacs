@@ -19,18 +19,14 @@
 ;; performance.
 
 (require 'init-config)
-
 (require 'init-packages)
-
-;; Configure existing features
 (require 'init-core)
-
 (require 'init-buffer)
 (require 'init-dired)
 
 (cond
-  ;; ((eq sb/minibuffer-completion 'ivy)
-  ;;    (require 'init-ivy))
+  ((eq sb/minibuffer-completion 'ivy)
+    (require 'init-ivy))
   ((eq sb/minibuffer-completion 'vertico)
     (require 'init-vertico)))
 
@@ -45,9 +41,8 @@
 (cond
   ((eq sb/capf 'corfu)
     (require 'init-corfu))
-  ;; ((eq sb/capf 'company)
-  ;;   (require 'init-company))
-  )
+  ((eq sb/capf 'company)
+    (require 'init-company)))
 ;; It is recommended to load `yasnippet' before `eglot'
 (require 'init-completion)
 
@@ -65,16 +60,13 @@
     (require 'init-eglot)))
 
 (require 'init-vcs)
-
 (require 'init-org)
 (require 'init-latex)
-
 (require 'init-functions)
 
 ;; Configure appearance-related settings at the end
 (require 'init-ui)
 (require 'init-theme)
-
 (require 'init-keybindings)
 
 (defvar sb/custom-file)
@@ -109,6 +101,13 @@
 ;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
 ;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
 ;; (put 'tags-table-list                         'safe-local-variable #'listp)
+
+(when (eq sb/op-mode 'server)
+  ;; Start server if not root user
+  (unless (string-equal "root" (getenv "USER"))
+    (when (and (fboundp 'server-running-p) (not (server-running-p)))
+      (server-mode)
+      (setq server-client-instructions nil))))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook

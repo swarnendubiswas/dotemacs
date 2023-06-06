@@ -123,14 +123,20 @@
       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
       use-package-verbose t
       use-package-minimum-reported-time 0 ; Show everything
-      use-package-expand-minimally nil))
+      use-package-expand-minimally nil
+      use-package-always-demand t))
   (progn
     (setq
-      use-package-always-defer t
+      use-package-always-defer nil
       ;; Disable error checks during macro expansion because the configuration just works
       use-package-expand-minimally t
       use-package-compute-statistics t
       use-package-verbose nil)))
+
+(setq use-package-enable-imenu-support t)
+
+(when (eq sb/op-mode 'daemon)
+  (setq use-package-always-demand t))
 
 (use-package diminish
   :demand t)

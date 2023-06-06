@@ -144,25 +144,8 @@
   :hook (dired-mode-hook . dired-async-mode)
   :diminish)
 
-(use-package all-the-icons-dired
-  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p) (not (featurep 'dirvish)))
-  :commands (all-the-icons-dired--refresh-advice)
-  :hook
-  (dired-mode-hook
-    .
-    (lambda ()
-      (unless (file-remote-p default-directory)
-        (all-the-icons-dired-mode 1))))
-  :custom (all-the-icons-dired-monochrome nil)
-  :diminish)
-
 (use-package dired-rsync
   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
-
-(use-package nerd-icons-dired
-  :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
-  :hook (dired-mode-hook . nerd-icons-dired-mode)
-  :diminish)
 
 (provide 'init-dired)
 

@@ -211,12 +211,17 @@
     (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
     (bind-key [remap projectile-grep] #'consult-grep)))
 
+(use-package embark-consult
+  :after (consult)
+  :demand t)
+
 ;; Provide context-dependent actions similar to a content menu
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 (use-package embark
   :after vertico
   :defines (vertico-map which-key-use-C-h-commands)
   :commands embark-prefix-help-command
+  :hook (embark-collect-mode-hook . consult-preview-at-point-mode)
   :bind
   (([remap describe-bindings] . embark-bindings)
     ("C-`" . embark-dwim)
@@ -227,9 +232,6 @@
   :custom
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command))
-
-(use-package embark-consult
-  :after (embark consult))
 
 ;; Enriches the completion display with annotations, e.g., documentation strings or file
 ;; information.
@@ -291,6 +293,19 @@
 (use-package consult-yasnippet
   :after consult
   :bind ("C-M-y" . consult-yasnippet))
+
+(use-package consult-projectile
+  :after projectile
+  :commands consult-projectile-recentf
+  :bind
+  (("<f5>" . consult-projectile-switch-project)
+    ("<f6>" . consult-projectile)
+    ([remap projectile-recentf] . consult-projectile-recentf)
+    ([remap projectile-switch-to-buffer] . consult-projectile-switch-to-buffer)
+    ([remap projectile-find-file] . consult-projectile-find-file)
+    ([remap projectile-find-dir] . consult-projectile-find-dir)
+    ([remap projectile-switch-project] . consult-projectile-switch-project))
+  :config (consult-customize consult-projectile :preview-key nil))
 
 (provide 'init-vertico)
 
