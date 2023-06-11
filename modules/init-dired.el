@@ -110,33 +110,23 @@
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
 ;; Do not create multiple dired buffers
-(use-package dired+
-  :straight (:host github :repo "emacsmirror/dired-plus")
-  :commands diredp-toggle-find-file-reuse-dir
-  :init
-  ;; Set before the module is loaded
-  (setq diredp-bind-problematic-terminal-keys nil)
-  :hook
-  (dired-mode-hook
-    .
-    (lambda ()
-      (when sb/EMACS27
-        (diredp-toggle-find-file-reuse-dir 1))))
-  :custom
-  (diredp-hide-details-initially-flag nil)
-  (diredp-hide-details-propagate-flag nil))
 
-;; ;; "r" is bound to `diredp-rename-this-file', but I prefer `dired-efap'. This binding only works if
-;; ;; we load `dired-efap' after `dired+' and not `dired', even with `bind-keys*'.
-;; (use-package dired-efap
-;;   :disabled t ; Recent themes do not seem to support in-place rename with efap well.
-;;   :after dired
-;;   :defines dired-efap-initial-filename-selection
-;;   :bind*
-;;   (:map dired-mode-map
-;;         ("r" . dired-efap))
+;; (use-package dired+
+;;   :straight (:host github :repo "emacsmirror/dired-plus")
+;;   :commands diredp-toggle-find-file-reuse-dir
+;;   :init
+;;   ;; Set before the module is loaded
+;;   (setq diredp-bind-problematic-terminal-keys nil)
+;;   (setq-local font-lock-maximum-decoration nil)
+;;   :hook
+;;   (dired-mode-hook
+;;     .
+;;     (lambda ()
+;;       (when sb/EMACS27
+;;         (diredp-toggle-find-file-reuse-dir 1))))
 ;;   :custom
-;;   (dired-efap-initial-filename-selection nil))
+;;   (diredp-hide-details-initially-flag nil)
+;;   (diredp-hide-details-propagate-flag nil))
 
 (use-package dired-async
   :straight async
@@ -146,6 +136,9 @@
 
 (use-package dired-rsync
   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
+
+(use-package diredfl
+  :hook (dired-mode-hook . diredfl-mode))
 
 (provide 'init-dired)
 

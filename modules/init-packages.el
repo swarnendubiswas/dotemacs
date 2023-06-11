@@ -136,7 +136,8 @@
           use-package-always-defer t
           ;; Disable error checks during macro expansion because the configuration just works
           use-package-expand-minimally t
-          use-package-compute-statistics nil)))))
+          use-package-compute-statistics nil
+          use-package-verbose nil)))))
 
 (use-package diminish
   :demand t)
@@ -194,18 +195,18 @@
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 
-;; (use-package exec-path-from-shell
-;;   :if (symbol-value 'sb/IS-LINUX)
-;;   :defines exec-path-from-shell-check-startup-files
-;;   :commands exec-path-from-shell-initialize
-;;   :init
-;;   ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
-;;   ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
-;;   ;; "prettier" from $PATH are also not found without the interactive flag.
-;;   (setq
-;;     exec-path-from-shell-check-startup-files nil
-;;     exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH"))
-;;   (exec-path-from-shell-initialize))
+(use-package exec-path-from-shell
+  :if (symbol-value 'sb/IS-LINUX)
+  :defines exec-path-from-shell-check-startup-files
+  :commands exec-path-from-shell-initialize
+  :init
+  ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
+  ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
+  ;; "prettier" from $PATH are also not found without the interactive flag.
+  (setq
+    exec-path-from-shell-check-startup-files nil
+    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY"))
+  (exec-path-from-shell-initialize))
 
 (provide 'init-packages)
 

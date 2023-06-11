@@ -173,12 +173,12 @@
           (group ,(nerd-icons-codicon "nf-cod-variable_group") :face font-lock-variable-name-face)
           (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face))))))
 
-(use-package kind-all-the-icons
-  :straight (:host github :repo "Hirozy/kind-all-the-icons")
-  :if (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
-  :after corfu
-  :demand t
-  :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
+;; (use-package kind-all-the-icons
+;;   :straight (:host github :repo "Hirozy/kind-all-the-icons")
+;;   :if (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
+;;   :after corfu
+;;   :demand t
+;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
 (use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")

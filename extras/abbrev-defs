@@ -1612,6 +1612,7 @@
     ("atomocity" "atomicity" nil :count 0)
     ("beging" "being" nil :count 0)
     ("beyodn" "beyond" nil :count 0)
+    ("breif" "brief" nil :count 0)
     ("buget" "budget" nil :count 0)
     ("candidats" "candidates" nil :count 0)
     ("captalization" "capitalization" nil :count 0)

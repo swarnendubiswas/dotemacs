@@ -216,7 +216,9 @@
   :hook (flycheck-mode-hook . flycheck-grammarly-setup)
   :config
   ;; Remove from the beginning of the list and append to the end
-  (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append))
+  ;; (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append)
+  (setq flycheck-checkers (delete 'grammarly flycheck-checkers))
+  (add-to-list 'flycheck-checkers 'grammarly t))
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
@@ -250,7 +252,10 @@
   :custom
   (flycheck-languagetool-server-jar
     (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar"))
-  :config (add-to-list 'flycheck-checkers (pop flycheck-checkers) t))
+  :config
+  ;; (add-to-list 'flycheck-checkers (pop flycheck-checkers) t)
+  (setq flycheck-checkers (delete 'languagetool flycheck-checkers))
+  (add-to-list 'flycheck-checkers 'languagetool t))
 
 ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
 ;; support. We enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
@@ -266,8 +271,7 @@
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
-;; format-all-the-code just runs Emacs' built-in `indent-region' for `emacs-lisp'.
-
+;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
   :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main")
   :commands (elisp-autofmt-buffer)
@@ -280,11 +284,6 @@
   :straight (:host github :repo "intramurz/flycheck-eglot")
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
-
-(use-package flycheck-vale
-  :when (executable-find "vale")
-  :hook (flycheck-mode-hook . flycheck-vale-setup)
-  :config (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append))
 
 (use-package shfmt
   :hook (sh-mode-hook . shfmt-on-save-mode)

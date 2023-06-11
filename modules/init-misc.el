@@ -72,7 +72,6 @@
 
 (use-package vundo
   :straight (:host github :repo "casouri/vundo")
-  :if sb/EMACS28+
   :bind
   (([remap undo] . vundo)
     ("C-z" . vundo)
@@ -109,7 +108,7 @@
     highlight-numbers-mode))
 
 (use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
-  :commands (page-break-lines-mode)
+  :commands page-break-lines-mode
   :hook (emacs-startup-hook . global-page-break-lines-mode)
   :diminish)
 
@@ -168,7 +167,7 @@
 ;;   :demand t)
 
 (use-package wc-mode
-  :commands (wc-mode))
+  :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
@@ -242,9 +241,6 @@
 (use-package unfill
   :commands (unfill-region unfill-paragraph unfill-toggle))
 
-;; (use-package info-colors ; Better looking info pages
-;;   :hook (Info-selection-hook . info-colors-fontify-node))
-
 (use-package xclip
   :if (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup-hook . xclip-mode))
@@ -256,7 +252,6 @@
   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
 (use-package gcmh ; Allow GC to happen after a period of idle time
-  :commands gcmh-idle-garbage-collect
   :hook (emacs-startup-hook . gcmh-mode)
   :diminish)
 
@@ -276,10 +271,10 @@
 
 ;; This is independent of LSP support and is more flexible. On the other hand, `which-func-mode'
 ;; consumes less vertical space.
-(use-package breadcrumb
-  :straight (:host github :repo "joaotavora/breadcrumb")
-  :disabled t
-  :hook (emacs-startup-hook . breadcrumb-mode))
+
+;; (use-package breadcrumb
+;;   :straight (:host github :repo "joaotavora/breadcrumb")
+;;   :hook (emacs-startup-hook . breadcrumb-mode))
 
 ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
 ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'

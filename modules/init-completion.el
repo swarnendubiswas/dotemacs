@@ -99,21 +99,21 @@
 ;; recency, and Corfu has corfu-history. Company has company-statistics. Furthermore, Ivy is not
 ;; well supported with prescient.
 
-(use-package prescient
-  :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
-  :disabled t
-  :commands prescient-persist-mode
-  :hook (emacs-startup-hook . prescient-persist-mode)
-  :custom (prescient-sort-full-matches-first t)
-  :config
-  (with-eval-after-load "corfu"
-    (corfu-prescient-mode 1))
-  (with-eval-after-load "vertico"
-    (vertico-prescient-mode 1))
-  ;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
-  ;; support for the `:separate' keyword in `company'.
-  (with-eval-after-load "company"
-    :init (company-prescient-mode 1)))
+;; (use-package prescient
+;;   :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+;;   :disabled t
+;;   :commands prescient-persist-mode
+;;   :hook (emacs-startup-hook . prescient-persist-mode)
+;;   :custom (prescient-sort-full-matches-first t)
+;;   :config
+;;   (with-eval-after-load "corfu"
+;;     (corfu-prescient-mode 1))
+;;   (with-eval-after-load "vertico"
+;;     (vertico-prescient-mode 1))
+;;   ;; We want `capf' sort for programming modes, not with recency. `company-prescient' seems to break
+;;   ;; support for the `:separate' keyword in `company'.
+;;   (with-eval-after-load "company"
+;;     :init (company-prescient-mode 1)))
 
 ;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".

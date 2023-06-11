@@ -137,7 +137,6 @@
   bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
   bidi-paragraph-direction 'left-to-right)
 
-
 ;; Activate utf-8, these are needed (may not be all) for icons to work well in TUI
 (set-language-environment "UTF-8")
 (setq locale-coding-system 'utf-8)

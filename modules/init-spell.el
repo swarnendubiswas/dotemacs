@@ -163,104 +163,105 @@
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
-(use-package spell-fu
-  :if (or (executable-find "aspell") (executable-find "hunspell"))
-  :disabled t
-  :defines spell-fu-directory
-  :commands spell-fu-mode
-  :init
-  (add-hook
-    'text-mode-hook
-    (lambda ()
-      (setq spell-fu-faces-exclude
-        '
-        (hl-line
-          ;; `nxml-mode' is derived from `text-mode'
-          nxml-attribute-local-name))
-      (spell-fu-mode)))
 
-  (add-hook
-    'org-mode-hook
-    (lambda ()
-      (setq spell-fu-faces-exclude
-        '
-        (org-block
-          org-block-begin-line
-          org-block-end-line
-          org-cite
-          org-cite-key
-          org-code
-          org-date
-          org-footnote
-          org-formula
-          org-latex-and-related
-          org-link
-          org-meta-line
-          org-property-value
-          org-ref-cite-face
-          org-special-keyword
-          org-tag
-          org-todo
-          org-todo-keyword-done
-          org-todo-keyword-habt
-          org-todo-keyword-kill
-          org-todo-keyword-outd
-          org-todo-keyword-todo
-          org-todo-keyword-wait
-          org-verbatim
-          org-modern-tag
-          hl-line))
-      (spell-fu-mode)))
+;; (use-package spell-fu
+;;   :if (or (executable-find "aspell") (executable-find "hunspell"))
+;;   :disabled t
+;;   :defines spell-fu-directory
+;;   :commands spell-fu-mode
+;;   :init
+;;   (add-hook
+;;     'text-mode-hook
+;;     (lambda ()
+;;       (setq spell-fu-faces-exclude
+;;         '
+;;         (hl-line
+;;           ;; `nxml-mode' is derived from `text-mode'
+;;           nxml-attribute-local-name))
+;;       (spell-fu-mode)))
 
-  (add-hook
-    'markdown-mode-hook
-    (lambda ()
-      (setq spell-fu-faces-exclude
-        '
-        (markdown-blockquote-face
-          markdown-code-face
-          markdown-html-attr-name-face
-          markdown-html-attr-value-face
-          markdown-html-tag-name-face
-          markdown-inline-code-face
-          markdown-link-face
-          markdown-markup-face
-          markdown-plain-url-face
-          markdown-reference-face
-          markdown-url-face
-          pandoc-citation-key-face
-          hl-line))
-      (spell-fu-mode)))
+;;   (add-hook
+;;     'org-mode-hook
+;;     (lambda ()
+;;       (setq spell-fu-faces-exclude
+;;         '
+;;         (org-block
+;;           org-block-begin-line
+;;           org-block-end-line
+;;           org-cite
+;;           org-cite-key
+;;           org-code
+;;           org-date
+;;           org-footnote
+;;           org-formula
+;;           org-latex-and-related
+;;           org-link
+;;           org-meta-line
+;;           org-property-value
+;;           org-ref-cite-face
+;;           org-special-keyword
+;;           org-tag
+;;           org-todo
+;;           org-todo-keyword-done
+;;           org-todo-keyword-habt
+;;           org-todo-keyword-kill
+;;           org-todo-keyword-outd
+;;           org-todo-keyword-todo
+;;           org-todo-keyword-wait
+;;           org-verbatim
+;;           org-modern-tag
+;;           hl-line))
+;;       (spell-fu-mode)))
 
-  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-    (add-hook
-      hook
-      (lambda ()
-        (setq spell-fu-faces-exclude
-          '
-          (font-latex-math-face
-            font-latex-sedate-face
-            font-lock-function-name-face
-            font-lock-keyword-face
-            font-lock-variable-name-face
-            hl-line))
-        (spell-fu-mode))))
-  :bind
-  (("C-c f n" . spell-fu-goto-next-error)
-    ("C-c f p" . spell-fu-goto-previous-error)
-    ("C-c f a" . spell-fu-word-add))
-  :custom (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
-  :config
-  ;; https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/64
-  (add-to-list 'spell-fu-faces-include 'font-lock-string-face)
-  (add-to-list 'spell-fu-faces-include 'font-lock-doc-face)
-  (add-to-list 'spell-fu-faces-include 'font-lock-comment-face)
-  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:comment)
-  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:doc)
-  (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
+;;   (add-hook
+;;     'markdown-mode-hook
+;;     (lambda ()
+;;       (setq spell-fu-faces-exclude
+;;         '
+;;         (markdown-blockquote-face
+;;           markdown-code-face
+;;           markdown-html-attr-name-face
+;;           markdown-html-attr-value-face
+;;           markdown-html-tag-name-face
+;;           markdown-inline-code-face
+;;           markdown-link-face
+;;           markdown-markup-face
+;;           markdown-plain-url-face
+;;           markdown-reference-face
+;;           markdown-url-face
+;;           pandoc-citation-key-face
+;;           hl-line))
+;;       (spell-fu-mode)))
 
-  ;; Ignore read-only buffers
-  (setq global-spell-fu-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))))
+;;   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+;;     (add-hook
+;;       hook
+;;       (lambda ()
+;;         (setq spell-fu-faces-exclude
+;;           '
+;;           (font-latex-math-face
+;;             font-latex-sedate-face
+;;             font-lock-function-name-face
+;;             font-lock-keyword-face
+;;             font-lock-variable-name-face
+;;             hl-line))
+;;         (spell-fu-mode))))
+;;   :bind
+;;   (("C-c f n" . spell-fu-goto-next-error)
+;;     ("C-c f p" . spell-fu-goto-previous-error)
+;;     ("C-c f a" . spell-fu-word-add))
+;;   :custom (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
+;;   :config
+;;   ;; https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/64
+;;   (add-to-list 'spell-fu-faces-include 'font-lock-string-face)
+;;   (add-to-list 'spell-fu-faces-include 'font-lock-doc-face)
+;;   (add-to-list 'spell-fu-faces-include 'font-lock-comment-face)
+;;   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:comment)
+;;   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:doc)
+;;   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
+
+;;   ;; Ignore read-only buffers
+;;   (setq global-spell-fu-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))))
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.

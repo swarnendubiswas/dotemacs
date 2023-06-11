@@ -59,7 +59,12 @@
 
 ;; Helps to make the data in the "*scratch*" buffer persist.
 (use-package persistent-scratch
-  :hook (emacs-startup-hook . persistent-scratch-setup-default)
+  :hook
+  (emacs-startup-hook
+    .
+    (lambda ()
+      (ignore-errors
+        (persistent-scratch-setup-default))))
   :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 ;; https://git.framasoft.org/distopico/distopico-dotemacs/blob/master/emacs/modes/conf-popwin.el

@@ -103,9 +103,10 @@
     ("C-c C-," . org-insert-structure-template)))
 
 ;; Disable the package to get consistent styles across themes.
-(use-package org-bullets
-  :disabled t
-  :hook (org-mode-hook . org-bullets-mode))
+
+;; (use-package org-bullets
+;;   :disabled t
+;;   :hook (org-mode-hook . org-bullets-mode))
 
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (:host github :repo "awth13/org-appear")
@@ -128,26 +129,26 @@
     org-pandoc-export-as-markdown
     org-pandoc-export-to-markdown-and-open))
 
-(use-package org-modern
-  :disabled t
-  :hook (org-mode-hook . org-modern-mode))
+;; (use-package org-modern
+;;   :disabled t
+;;   :hook (org-mode-hook . org-modern-mode))
 
-(use-package org-modern-indent
-  :straight (:host github :repo "jdtsmith/org-modern-indent")
-  :disabled t
-  :hook (org-mode-hook . org-modern-indent-mode))
+;; (use-package org-modern-indent
+;;   :straight (:host github :repo "jdtsmith/org-modern-indent")
+;;   :disabled t
+;;   :hook (org-mode-hook . org-modern-indent-mode))
 
 ;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
 ;; https://orgmode.org/manual/Escape-Character.html
 ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
 
-(use-package org-superstar
-  :disabled t
-  :hook (org-mode-hook . org-superstar-mode))
+;; (use-package org-superstar
+;;   :disabled t
+;;   :hook (org-mode-hook . org-superstar-mode))
 
 (use-package org-block-capf
   :straight (:host github :repo "xenodium/org-block-capf")
-  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+  :hook (org-mode-hook . org-block-capf-add-to-completion-at-point-functions)
   :custom (org-block-capf-edit-style 'inline))
 
 (provide 'init-org)

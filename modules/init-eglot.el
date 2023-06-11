@@ -27,7 +27,8 @@
     ("C-c l i" . eglot-find-implementation)
     ("C-c l t" . eglot-find-typeDefinition)
     ("C-c l r" . eglot-rename)
-    ("C-c l f" . eglot-format-buffer)
+    ("C-c l f" . eglot-format)
+    ("C-c l F" . eglot-format-buffer)
     ("C-c l x" . eglot-code-actions))
   :hook
   ( ;; (eglot-managed-mode-hook . eglot-inlay-hints-mode) ; Inlay hints are distracting
@@ -49,8 +50,9 @@
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   :config
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq eglot-stay-out-of '(flymake company eldoc))
-  (setq eglot-ignored-server-capabilities
+  (setq
+    eglot-stay-out-of '(flymake company eldoc)
+    eglot-ignored-server-capabilities
     '
     (:codeLensProvider
       :executeCommandProvider
@@ -58,8 +60,19 @@
       :foldingRangeProvider
       :documentOnTypeFormattingProvider
       :documentLinkProvider
+      :documentHighlightProvider
       ;; Inlay hints are distracting
       :inlayHintProvider))
+
+  ;; Show all of the available eldoc information when we want it. This way Flymake errors
+  ;; don't just get clobbered by docstrings.
+  (add-hook
+    'eglot-managed-mode-hook
+    (lambda ()
+      "Make sure Eldoc will show us all of the feedback at point."
+      (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
+
+  (advice-add 'jsonrpc--log-event :around (lambda (_orig-func &rest _)))
 
   ;; (setq-default eglot-workspace-configuration
   ;;   '

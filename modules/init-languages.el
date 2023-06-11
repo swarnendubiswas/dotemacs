@@ -665,9 +665,10 @@
   :diminish)
 
 ;; Open preview of markdown file in a browser
-(use-package markdown-preview-mode
-  :disabled t
-  :commands markdown-preview-mode)
+
+;; (use-package markdown-preview-mode
+;;   :disabled t
+;;   :commands markdown-preview-mode)
 
 ;; (use-package bat-mode
 ;;   :straight (:type built-in)
@@ -808,8 +809,8 @@
 ;;   :load-path "extras"
 ;;   :mode "\\.mlir\\'")
 
-(use-package dotenv-mode
-  :mode "\\.env\\'")
+;; (use-package dotenv-mode
+;;   :mode "\\.env\\'")
 
 (use-package apt-sources-list
   :commands apt-sources-list-mode)
