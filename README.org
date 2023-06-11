@@ -93,7 +93,7 @@ The following are examples of a few customization options defined in [[./modules
 - =sb/lsp-provider= - Choose between =lsp-mode= and =eglot= (default is =lsp-mode=) 
 - =sb/disable-package.el= - Disable =package.el= and prefer the =straight.el= package manager.
 - =sb/python-langserver= - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
-- =sb/delete-trailing-whitespace-p= - Control whether trailing whitespace should be deleted or not
+- =sb/delete-trailing-whitespace-p= - Control whether trailing whitespace should be deleted
   
 ** LSP
 

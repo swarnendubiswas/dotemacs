@@ -10,9 +10,6 @@
               (setq sb/flycheck-local-checkers
                 '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
 
-            (when (derived-mode-p 'sh-mode)
-              (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (sh-shellcheck)))))))
-
             (when (derived-mode-p 'yaml-mode)
               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (yaml-yamllint)))))))
 

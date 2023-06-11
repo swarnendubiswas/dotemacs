@@ -197,6 +197,7 @@
 
 (use-package exec-path-from-shell
   :if (symbol-value 'sb/IS-LINUX)
+  :defer 2
   :defines exec-path-from-shell-check-startup-files
   :commands exec-path-from-shell-initialize
   :init

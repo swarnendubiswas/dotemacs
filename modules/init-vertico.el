@@ -249,6 +249,7 @@
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-eglot
+  :if (eq sb/lsp-provider 'eglot)
   :after (consult eglot)
   :commands consult-eglot-symbols)
 

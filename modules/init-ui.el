@@ -271,8 +271,7 @@
   (modus-themes-prompts '(intense bold gray background))
   (modus-themes-org-blocks 'tinted-background)
   ;; (org-fontify-whole-block-delimiter-line nil)
-  (modus-themes-completions
-    (quote ((matches . (extrabold underline)) (selection . (semibold italic)))))
+  (modus-themes-completions '((matches . (extrabold underline)) (selection . (semibold))))
   (modus-themes-italic-constructs t)
   (modus-themes-bold-constructs t))
 
@@ -432,8 +431,8 @@
     ((string= (system-name) "inspiron-7572")
       (progn
         (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
-        (set-face-attribute 'mode-line nil :height 130)
-        (set-face-attribute 'mode-line-inactive nil :height 130)))
+        (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 130)
+        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 130)))
 
     ((string= (system-name) "DESKTOP-4T8O69V")
       (progn
@@ -456,11 +455,8 @@
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
         (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
-        (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 140)
-        (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 140 :weight 'light)
-        (set-face-attribute 'mode-line nil :height 110)
-        (set-face-attribute 'mode-line-inactive nil :height 110)
-        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17"))))))
+        (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 110)
+        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 110)))))
 
 (defun sb/init-fonts-daemon (frame)
   (cond
@@ -468,9 +464,8 @@
       (progn
         (add-to-list 'default-frame-alist '(font . "MesloLGSNF-16"))))))
 
-(when (display-graphic-p)
-  (sb/init-fonts-graphic))
-(add-hook 'after-make-frame-functions #'sb/init-fonts-daemon)
+(add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
+(add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
 
 (provide 'init-ui)
 

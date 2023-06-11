@@ -161,13 +161,14 @@
         c-enable-auto-newline nil
         c-syntactic-indentation nil)))
 
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection "clangd")
-        :major-modes '(c-mode c++-mode)
-        :remote? t
-        :server-id 'clangd-r))))
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection "clangd")
+  ;;       :major-modes '(c-mode c++-mode)
+  ;;       :remote? t
+  ;;       :server-id 'clangd-r)))
+  )
 
 (use-package modern-cpp-font-lock ; Better highlight for modern C++
   :hook (c++-mode-hook . modern-c++-font-lock-mode)
@@ -200,14 +201,15 @@
             (make-local-variable 'lsp-disabled-clients)
             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
             (lsp-deferred))))))
-  :config
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection "cmake-language-server")
-        :major-modes '(cmake-mode)
-        :remote? t
-        :server-id 'cmakels-r))))
+  ;; :config
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection "cmake-language-server")
+  ;;       :major-modes '(cmake-mode)
+  ;;       :remote? t
+  ;;       :server-id 'cmakels-r)))
+  )
 
 (use-package cmake-font-lock ; Advanced syntax coloring support for CMake scripts
   :hook (cmake-mode-hook . cmake-font-lock-activate))
@@ -333,49 +335,6 @@
   :hook (python-mode-hook . yapf-mode)
   :diminish yapf-mode)
 
-;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
-;; --createstub pandas".
-(use-package lsp-pyright
-  :if
-  (and (eq sb/lsp-provider 'lsp-mode)
-    (eq sb/python-langserver 'pyright)
-    (executable-find "pyright"))
-  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-  :hook (python-mode-hook . (lambda () (require 'lsp-pyright)))
-  :custom
-  (lsp-pyright-python-executable-cmd "python3")
-  (lsp-pyright-typechecking-mode "basic")
-  (lsp-pyright-auto-import-completions t)
-  (lsp-pyright-auto-search-paths t)
-  :config
-  (lsp-register-client
-    (make-lsp-client
-      :new-connection
-      (lsp-tramp-connection
-        (lambda () (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
-      :major-modes '(python-mode)
-      :remote? t
-      :server-id 'pyright-r
-      :multi-root lsp-pyright-multi-root
-      :priority 3
-      :initialization-options
-      (lambda ()
-        (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))
-      :initialized-fn
-      (lambda (workspace)
-        (with-lsp-workspace
-          workspace
-          (lsp--set-configuration
-            (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))))
-      :download-server-fn
-      (lambda (_client callback error-callback _update?)
-        (lsp-package-ensure 'pyright callback error-callback))
-      :notification-handlers
-      (lsp-ht
-        ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-        ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-        ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
-
 (use-package cperl-mode
   :mode ("latexmkrc\\'")
   :hook
@@ -391,30 +350,31 @@
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode)
 
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection
-        (lsp-tramp-connection
-          (lambda ()
-            (list
-              lsp-perl-language-server-path
-              "-MPerl::LanguageServer"
-              "-e"
-              "Perl::LanguageServer::run"
-              "--"
-              (format "--port %d --version %s"
-                lsp-perl-language-server-port
-                lsp-perl-language-server-client-version))))
-        :major-modes '(perl-mode cperl-mode)
-        :remote? t
-        :initialized-fn
-        (lambda (workspace)
-          (with-lsp-workspace
-            workspace
-            (lsp--set-configuration (lsp-configuration-section "perl"))))
-        :priority -1
-        :server-id 'perlls-r))))
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection
+  ;;       (lsp-tramp-connection
+  ;;         (lambda ()
+  ;;           (list
+  ;;             lsp-perl-language-server-path
+  ;;             "-MPerl::LanguageServer"
+  ;;             "-e"
+  ;;             "Perl::LanguageServer::run"
+  ;;             "--"
+  ;;             (format "--port %d --version %s"
+  ;;               lsp-perl-language-server-port
+  ;;               lsp-perl-language-server-client-version))))
+  ;;       :major-modes '(perl-mode cperl-mode)
+  ;;       :remote? t
+  ;;       :initialized-fn
+  ;;       (lambda (workspace)
+  ;;         (with-lsp-workspace
+  ;;           workspace
+  ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
+  ;;       :priority -1
+  ;;       :server-id 'perlls-r)))
+  )
 
 (use-package ant
   :commands (ant ant-clean ant-compile ant-test))
@@ -435,21 +395,25 @@
           (eglot-ensure))
         ((eq sb/lsp-provider 'lsp-mode)
           (lsp-deferred)))))
+  :bind
+  (:map
+    sh-mode-map
+    ;; Was bound to `sh-cd-here'
+    ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
   (sh-indentation 2)
   (sh-indent-after-continuation 'always)
   (sh-indent-comment t "Indent comments as a regular line")
-  :config
-  (unbind-key "C-c C-d" sh-mode-map) ; Was bound to `sh-cd-here'
-
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
-        :major-modes '(sh-mode)
-        :remote? t
-        :server-id 'bashls-r))))
+  ;; :config
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
+  ;;       :major-modes '(sh-mode)
+  ;;       :remote? t
+  ;;       :server-id 'bashls-r)))
+  )
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -509,14 +473,15 @@
             (make-local-variable 'lsp-disabled-clients)
             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
             (lsp-deferred))))))
-  :config
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection '("yaml-language-server" "--stdio"))
-        :major-modes '(yaml-mode)
-        :remote? t
-        :server-id 'yamlls-r))))
+  ;; :config
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("yaml-language-server" "--stdio"))
+  ;;       :major-modes '(yaml-mode)
+  ;;       :remote? t
+  ;;       :server-id 'yamlls-r)))
+  )
 
 (use-package yaml-imenu
   :hook (yaml-mode-hook . yaml-imenu-enable))
@@ -533,14 +498,15 @@
         ((eq sb/lsp-provider 'lsp-mode)
           (lsp-deferred)))))
   :custom (css-indent-offset 2)
-  :config
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection '("css-languageserver" "--stdio"))
-        :major-modes '(css-mode)
-        :remote? t
-        :server-id 'cssls-r))))
+  ;; :config
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("css-languageserver" "--stdio"))
+  ;;       :major-modes '(css-mode)
+  ;;       :remote? t
+  ;;       :server-id 'cssls-r)))
+  )
 
 (use-package make-mode
   :straight (:type built-in)
@@ -702,14 +668,15 @@
   (web-mode-code-indent-offset 2) ; Script
   (web-mode-style-padding 2) ; For <style> tag
   (web-mode-script-padding 2) ; For <script> tag
-  :config
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
-        :major-modes '(html-mode web-mode mhtml-mode)
-        :remote? t
-        :server-id 'htmlls-r))))
+  ;; :config
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
+  ;;       :major-modes '(html-mode web-mode mhtml-mode)
+  ;;       :remote? t
+  ;;       :server-id 'htmlls-r)))
+  )
 
 (use-package emmet-mode
   :defines (emmet-move-cursor-between-quote)
@@ -743,13 +710,14 @@
   (nxml-sexp-element-flag t)
   :config (fset 'xml-mode 'nxml-mode)
 
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
-        :major-modes '(xml-mode nxml-mode)
-        :remote? t
-        :server-id 'xmlls-r))))
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
+  ;;       :major-modes '(xml-mode nxml-mode)
+  ;;       :remote? t
+  ;;       :server-id 'xmlls-r)))
+  )
 
 (use-package json-mode
   :commands (json-mode jsonc-mode json-mode-beautify)
@@ -770,14 +738,15 @@
           (eglot-ensure))
         ((eq sb/lsp-provider 'lsp-mode)
           (lsp-deferred)))))
-  :config
-  (with-eval-after-load "lsp-mode"
-    (lsp-register-client
-      (make-lsp-client
-        :new-connection (lsp-tramp-connection '("vscode-json-languageserver" "--stdio"))
-        :major-modes '(json-mode jsonc-mode)
-        :remote? t
-        :server-id 'jsonls-r))))
+  ;; :config
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("vscode-json-languageserver" "--stdio"))
+  ;;       :major-modes '(json-mode jsonc-mode)
+  ;;       :remote? t
+  ;;       :server-id 'jsonls-r)))
+  )
 
 (use-package json-reformat
   :after (:any json-mode jsonc-mode)

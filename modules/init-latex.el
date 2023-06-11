@@ -10,56 +10,6 @@
 (defvar sb/minibuffer-completion)
 (defvar sb/user-tmp-directory)
 
-;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
-;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
-;; performance is very poor, so I continue to prefer `auctex'.
-
-(use-package lsp-latex
-  :after lsp-mode
-  :defines
-  (lsp-latex-bibtex-formatter
-    lsp-latex-latex-formatter
-    lsp-latex-bibtex-formatter-line-length
-    lsp-latex-chktex-on-open-and-save
-    lsp-latex-build-on-save
-    lsp-latex-build-is-continuous
-    lsp-latex-build-args
-    lsp-latex-diagnostics-delay)
-  :hook
-  (latex-mode-hook
-    .
-    (lambda ()
-      (require 'lsp-latex)
-      (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-  (lsp-latex-chktex-on-open-and-save t)
-  ;; Delay time in milliseconds before reporting diagnostics
-  (lsp-latex-diagnostics-delay 2000)
-
-  ;; Support forward search with Evince. Inverse search is already configured with evince-synctex,
-  ;; use Ctrl+Click in the PDF document.
-  ;; (lsp-latex-forward-search-executable "evince-synctex")
-  ;; “%f” is replaced with "The path of the current TeX file", "%p" with "The path of the current
-  ;; PDF file", "%l" with "The current line number" by texlab
-  ;; (lsp-latex-forward-search-args '("-f" "%l" "%p" "\"emacsclient +%l %f\""))
-
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
-  :config
-  (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc")
-
-  (lsp-register-client
-    (make-lsp-client
-      :new-connection (lsp-tramp-connection "texlab")
-      :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-      :remote? t
-      :server-id 'texlab-r)))
-
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.

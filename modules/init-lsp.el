@@ -285,27 +285,27 @@
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t)
   (lsp-grammarly-user-words '(Swarnendu Biswas))
-  :config (defvar lsp-grammarly-active-modes)
-
-  (lsp-register-client
-    (make-lsp-client
-      :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-      :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-      :priority -1
-      :remote? t
-      :add-on? t
-      :server-id 'grammarly-r
-      :download-server-fn
-      (lambda (_client callback error-callback _update?)
-        (lsp-package-ensure 'grammarly-ls callback error-callback))
-      :after-open-fn #'lsp-grammarly--init
-      :async-request-handlers
-      (ht
-        ("$/getCredentials" #'lsp-grammarly--get-credentials)
-        ("$/getToken" #'lsp-grammarly--get-token)
-        ("$/storeToken" #'lsp-grammarly--store-token)
-        ("$/showError" #'lsp-grammarly--show-error)
-        ("$/updateDocumentState" #'lsp-grammarly--update-document-state)))))
+  ;; :config (defvar lsp-grammarly-active-modes)
+  ;; (lsp-register-client
+  ;;   (make-lsp-client
+  ;;     :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
+  ;;     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
+  ;;     :priority -1
+  ;;     :remote? t
+  ;;     :add-on? t
+  ;;     :server-id 'grammarly-r
+  ;;     :download-server-fn
+  ;;     (lambda (_client callback error-callback _update?)
+  ;;       (lsp-package-ensure 'grammarly-ls callback error-callback))
+  ;;     :after-open-fn #'lsp-grammarly--init
+  ;;     :async-request-handlers
+  ;;     (ht
+  ;;       ("$/getCredentials" #'lsp-grammarly--get-credentials)
+  ;;       ("$/getToken" #'lsp-grammarly--get-token)
+  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
+  ;;       ("$/showError" #'lsp-grammarly--show-error)
+  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
+  )
 
 (use-package lsp-ltex
   ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
@@ -336,26 +336,27 @@
 
   ;; (defvar lsp-ltex-active-modes)
 
-  (lsp-register-client
-    (make-lsp-client
-      :new-connection
-      (lsp-tramp-connection
-        (expand-file-name "lsp/server/ltex-ls/latest/bin/ltex-ls" no-littering-var-directory))
-      :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-      :priority -2
-      :add-on? t
-      :remote? t
-      :server-id 'ltex-r
-      :download-server-fn
-      (lambda (_client _callback error-callback _update?)
-        (lsp-package-ensure
-          'ltex-ls
-          (lambda ()
-            (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-              (unless
-                (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path) "-C" dest)
-                (error "Error during the unzip process: tar"))))
-          error-callback)))))
+  ;; (lsp-register-client
+  ;;   (make-lsp-client
+  ;;     :new-connection
+  ;;     (lsp-tramp-connection
+  ;;       (expand-file-name "lsp/server/ltex-ls/latest/bin/ltex-ls" no-littering-var-directory))
+  ;;     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
+  ;;     :priority -2
+  ;;     :add-on? t
+  ;;     :remote? t
+  ;;     :server-id 'ltex-r
+  ;;     :download-server-fn
+  ;;     (lambda (_client _callback error-callback _update?)
+  ;;       (lsp-package-ensure
+  ;;         'ltex-ls
+  ;;         (lambda ()
+  ;;           (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
+  ;;             (unless
+  ;;               (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path) "-C" dest)
+  ;;               (error "Error during the unzip process: tar"))))
+  ;;         error-callback))))
+  )
 
 ;; (use-package dap-mode
 ;;   :after lsp-mode
@@ -367,6 +368,101 @@
 ;;   ;; ("<f8>" . dap-next)
 ;;   ;; ("<f9>" . dap-continue)
 ;;   )
+
+;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
+;; --createstub pandas".
+
+;; (use-package lsp-pyright
+;;   :if
+;;   (and (eq sb/lsp-provider 'lsp-mode)
+;;     (eq sb/python-langserver 'pyright)
+;;     (executable-find "pyright"))
+;;   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
+;;   :hook (python-mode-hook . (lambda () (require 'lsp-pyright)))
+;;   :custom
+;;   (lsp-pyright-python-executable-cmd "python3")
+;;   (lsp-pyright-typechecking-mode "basic")
+;;   (lsp-pyright-auto-import-completions t)
+;;   (lsp-pyright-auto-search-paths t)
+;;   :config
+;;   (lsp-register-client
+;;     (make-lsp-client
+;;       :new-connection
+;;       (lsp-tramp-connection
+;;         (lambda () (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
+;;       :major-modes '(python-mode)
+;;       :remote? t
+;;       :server-id 'pyright-r
+;;       :multi-root lsp-pyright-multi-root
+;;       :priority 3
+;;       :initialization-options
+;;       (lambda ()
+;;         (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))
+;;       :initialized-fn
+;;       (lambda (workspace)
+;;         (with-lsp-workspace
+;;           workspace
+;;           (lsp--set-configuration
+;;             (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))))
+;;       :download-server-fn
+;;       (lambda (_client callback error-callback _update?)
+;;         (lsp-package-ensure 'pyright callback error-callback))
+;;       :notification-handlers
+;;       (lsp-ht
+;;         ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+;;         ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+;;         ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+
+;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
+;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
+;; performance is very poor, so I continue to prefer `auctex'.
+
+(use-package lsp-latex
+  :after lsp-mode
+  :defines
+  (lsp-latex-bibtex-formatter
+    lsp-latex-latex-formatter
+    lsp-latex-bibtex-formatter-line-length
+    lsp-latex-chktex-on-open-and-save
+    lsp-latex-build-on-save
+    lsp-latex-build-is-continuous
+    lsp-latex-build-args
+    lsp-latex-diagnostics-delay)
+  :hook
+  (latex-mode-hook
+    .
+    (lambda ()
+      (require 'lsp-latex)
+      (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
+  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+  (lsp-latex-chktex-on-open-and-save t)
+  ;; Delay time in milliseconds before reporting diagnostics
+  (lsp-latex-diagnostics-delay 2000)
+
+  ;; Support forward search with Evince. Inverse search is already configured with evince-synctex,
+  ;; use Ctrl+Click in the PDF document.
+  ;; (lsp-latex-forward-search-executable "evince-synctex")
+  ;; “%f” is replaced with "The path of the current TeX file", "%p" with "The path of the current
+  ;; PDF file", "%l" with "The current line number" by texlab
+  ;; (lsp-latex-forward-search-args '("-f" "%l" "%p" "\"emacsclient +%l %f\""))
+
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
+  :config
+  (add-to-list 'lsp-latex-build-args "-c")
+  (add-to-list 'lsp-latex-build-args "-pvc")
+
+  ;; (lsp-register-client
+  ;;   (make-lsp-client
+  ;;     :new-connection (lsp-tramp-connection "texlab")
+  ;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
+  ;;     :remote? t
+  ;;     :server-id 'texlab-r))
+  )
 
 (provide 'init-lsp)
 

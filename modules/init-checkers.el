@@ -15,40 +15,41 @@
 
 ;; Identify weasel words, passive voice, and duplicate words. The module does not check grammar and
 ;; checks only the writing style. `textlint' includes `writegood'.
-(use-package writegood-mode
-  :when (executable-find "writegood")
-  :commands
-  (writegood-passive-voice-turn-off
-    writegood-passive-voice-turn-on
-    writegood-weasels-turn-on
-    writegood-weasels-turn-off
-    writegood-duplicates-turn-on
-    writegood-duplicates-turn-off)
-  :hook (text-mode-hook . writegood-duplicates-turn-on)
-  :config
-  (let
-    (
-      (sb/weasel-words
-        '
-        ("actionable"
-          "actually"
-          "basically"
-          "clearly"
-          "easily"
-          "easy"
-          "it turns out that"
-          "In this regard"
-          "In this sense"
-          "With this in mind"
-          "With the above in mind"
-          "may have"
-          "often"
-          "simple"
-          "probably"
-          "simply"
-          "specifically")))
-    (cl-union writegood-weasel-words sb/weasel-words))
-  :diminish)
+
+;; (use-package writegood-mode
+;;   :when (executable-find "writegood")
+;;   :commands
+;;   (writegood-passive-voice-turn-off
+;;     writegood-passive-voice-turn-on
+;;     writegood-weasels-turn-on
+;;     writegood-weasels-turn-off
+;;     writegood-duplicates-turn-on
+;;     writegood-duplicates-turn-off)
+;;   :hook (text-mode-hook . writegood-duplicates-turn-on)
+;;   :config
+;;   (let
+;;     (
+;;       (sb/weasel-words
+;;         '
+;;         ("actionable"
+;;           "actually"
+;;           "basically"
+;;           "clearly"
+;;           "easily"
+;;           "easy"
+;;           "it turns out that"
+;;           "In this regard"
+;;           "In this sense"
+;;           "With this in mind"
+;;           "With the above in mind"
+;;           "may have"
+;;           "often"
+;;           "simple"
+;;           "probably"
+;;           "simply"
+;;           "specifically")))
+;;     (cl-union writegood-weasel-words sb/weasel-words))
+;;   :diminish)
 
 (use-package flycheck
   :commands
@@ -282,6 +283,7 @@
 
 (use-package flycheck-eglot
   :straight (:host github :repo "intramurz/flycheck-eglot")
+  :if (eq sb/lsp-provider 'eglot)
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
 
