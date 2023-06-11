@@ -38,10 +38,6 @@
 (use-package move-text ; Move lines with "M-<up>" and "M-<down>"
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
-;; Discover key bindings and their meaning for the current Emacs major mode
-(use-package discover-my-major
-  :bind (("C-h C-m" . discover-my-major) ("C-h M-m" . discover-my-mode)))
-
 (use-package expand-region ; Expand region by semantic units
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
