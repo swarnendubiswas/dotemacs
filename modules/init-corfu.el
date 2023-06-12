@@ -11,35 +11,17 @@
 
 ;; Corfu is not a completion framework, it is just a front-end for `completion-at-point'.
 (use-package corfu
-  :preface
-  (defun sb/corfu-beginning-of-prompt ()
-    "Move to beginning of completion input."
-    (interactive)
-    (corfu--goto -1)
-    (goto-char (car completion-in-region--data)))
-
-  (defun sb/corfu-end-of-prompt ()
-    "Move to end of completion input."
-    (interactive)
-    (corfu--goto -1)
-    (goto-char (cadr completion-in-region--data)))
   :straight
   (corfu
     :files (:defaults "extensions/*")
     :includes (corfu-quick corfu-echo corfu-indexed corfu-popupinfo corfu-history))
   :if (eq sb/capf 'corfu)
   :hook (emacs-startup-hook . global-corfu-mode)
-  :bind
-  (:map
-    corfu-map
-    ([remap move-beginning-of-line] . sb/corfu-beginning-of-prompt)
-    ([remap move-end-of-line] . sb/corfu-end-of-prompt)
-    ([escape] . corfu-quit))
+  :bind (:map corfu-map ([escape] . corfu-quit))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
-  (corfu-bar-width 0 "See if this helps with corfu-terminal wrap around")
   (corfu-exclude-modes
     '
     (dired-mode
@@ -60,6 +42,7 @@
   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
   ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
   ;; entries.
+  (setq corfu-bar-width 0) ; See if this helps with corfu-terminal wrap around
   (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
 
 (use-package corfu-info
@@ -67,10 +50,14 @@
   :after corfu
   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
 
-(use-package corfu-quick
-  :straight nil
-  :after corfu
-  :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
+;; (use-package corfu-quick
+;;   :straight nil
+;;   :after corfu
+;;   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
+
+(use-package corfu-quick-access
+  :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
+  :hook (corfu-mode-hook . corfu-quick-access-mode))
 
 ;; We do not need this if we use prescient-based sorting.
 (use-package corfu-history
@@ -180,10 +167,6 @@
 ;;   :demand t
 ;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
-(use-package corfu-quick-access
-  :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
-  :hook (corfu-mode-hook . corfu-quick-access-mode))
-
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
@@ -247,14 +230,12 @@
         (when (bound-and-true-p lsp-managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'lsp-completion-at-point #'citre-completion-at-point
-              #'cape-tex ; Leads to unwanted completions
+              #'lsp-completion-at-point #'cape-tex ; Leads to unwanted completions
               #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
         (when (bound-and-true-p eglot--managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'eglot-completion-at-point #'citre-completion-at-point
-              #'cape-tex ; Leads to unwanted completions
+              #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
               #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
   (dolist (lsp-prog-modes '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))

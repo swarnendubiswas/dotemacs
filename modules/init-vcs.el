@@ -39,7 +39,6 @@
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
   :if (boundp 'vc-handled-backends)
-  :commands diff-hl-dired-mode-unless-remote
   :hook
   (
     (diff-hl-mode-on-hook
@@ -63,7 +62,6 @@
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit
-  :commands git-commit-turn-on-flyspell
   :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
   :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 

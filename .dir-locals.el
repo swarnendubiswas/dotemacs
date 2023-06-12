@@ -22,6 +22,10 @@
             (when (derived-mode-p 'c++-mode)
               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (c/c++-cppcheck)))))))
 
+            (when (derived-mode-p 'latex-mode)
+              (setq sb/flycheck-local-checkers
+                '((lsp . ((next-checkers . (tex-textidote . (tex-chktex))))))))
+
             (when (derived-mode-p 'html-mode)
               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (html-tidy)))))))
 

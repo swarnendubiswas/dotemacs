@@ -46,27 +46,7 @@
     lsp-yaml-print-width
     lsp-headerline-breadcrumb-enable-diagnostics
     lsp-modeline-diagnostics-scope)
-  :commands
-  (lsp--set-configuration
-    lsp-completion--regex-fuz
-    lsp-register-client
-    lsp-tramp-connection
-    make-lsp-client
-    lsp-format-buffer
-    lsp-configuration-section
-    lsp
-    lsp-deferred
-    lsp--set-configuration
-    lsp-package-ensure
-    lsp-signature-help
-    lsp-enable-which-key-integration
-    lsp-modeline-diagnostics-mode
-    lsp-modeline-code-actions-mode
-    lsp-symbol-highlight
-    ht-merge
-    lsp-completion--regex-fuz
-    lsp-describe-thing-at-point
-    lsp-find-type-definition)
+  :commands (lsp-deferred lsp-describe-thing-at-point)
   :bind-keymap ("C-c l" . lsp-command-map)
   :bind
   (("M-." . xref-find-definitions)
@@ -141,7 +121,7 @@
   ;; Sudden changes in the height of the echo area causes the cursor to lose position,
   ;; manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
-  ;; Disable showing function documentation with `eldoc'
+  ;; Enable/disable showing function documentation with `eldoc'
   (lsp-signature-render-documentation t)
   (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
@@ -166,7 +146,7 @@
     (diminish 'lsp-lens-mode))
 
   (with-eval-after-load "corfu"
-    (add-hook 'text-mode-hook (lambda () (setq-local lsp-completion-enable nil)))
+    ;; (add-hook 'text-mode-hook (lambda () (setq-local lsp-completion-enable nil)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
   :diminish)
 
@@ -197,9 +177,11 @@
   (lsp-ui-peek-enable nil)
   :config
   ;; Enabling the sideline creates flickering with Corfu popon.
-  (if (and (display-graphic-p) (eq sb/capf 'corfu))
-    (setq lsp-ui-sideline-enable nil)
-    (setq lsp-ui-sideline-enable t)))
+
+  ;; (if (and (display-graphic-p) (eq sb/capf 'corfu))
+  ;;   (setq lsp-ui-sideline-enable nil)
+  ;;   (setq lsp-ui-sideline-enable t))
+  )
 
 ;; Sync workspace folders and treemacs projects
 
