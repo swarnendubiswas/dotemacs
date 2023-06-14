@@ -129,6 +129,7 @@
   (lsp-warn-no-matched-clients nil)
   (lsp-keep-workspace-alive nil)
   (lsp-enable-file-watchers nil)
+  (lsp-semantic-tokens-enable t)
   :config
   (dolist
     (ignore-dirs

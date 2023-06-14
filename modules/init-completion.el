@@ -132,7 +132,7 @@
   (read-file-name-completion-ignore-case t "Ignore case when reading a file name")
   (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
   ;; substring is needed to complete common prefix, orderless does not
-  (completion-styles '(substring orderless basic))
+  (completion-styles '(orderless substring basic))
   (completion-category-defaults nil)
   :config
   (when sb/EMACS28+

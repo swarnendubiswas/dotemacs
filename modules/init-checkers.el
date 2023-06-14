@@ -80,12 +80,10 @@
   ;; There are no checkers for `csv-mode', and many program modes use lsp. `yaml-mode' is
   ;; derived from `text-mode'.
   (flycheck-global-modes '(not csv-mode conf-mode))
+  ;; Terminal Emacs does not support fringes. Furthermore, we will need to distinguish daemon
+  ;; frames.
+  (flycheck-indication-mode nil)
   :config
-  ;; Terminal Emacs does not support fringes
-  (if (display-graphic-p)
-    (setq flycheck-indication-mode 'left-fringe)
-    (setq flycheck-indication-mode 'left-margin))
-
   (dolist (checkers '(proselint textlint tex-chktex emacs-lisp-checkdoc))
     (delq checkers flycheck-checkers))
 

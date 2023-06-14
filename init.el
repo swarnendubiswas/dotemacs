@@ -184,7 +184,7 @@ Prefer the straight.el package manager instead."
 ;; example, I can use `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. However,
 ;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
 ;; Emacs core.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)

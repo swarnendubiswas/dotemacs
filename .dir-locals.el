@@ -71,7 +71,10 @@
               (lsp-format-buffer))
             (when (bound-and-true-p eglot--managed-mode)
               (eglot-format-buffer)))
-          nil t)))))
+          nil t))))
+
+
+  (org-mode . ((eglot-workspace-configuration . ((:ltex-ls . (:language . "en")))))))
 
 
 ;; Local Variables:

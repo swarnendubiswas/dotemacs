@@ -17,7 +17,14 @@
     :includes (corfu-quick corfu-echo corfu-indexed corfu-popupinfo corfu-history))
   :if (eq sb/capf 'corfu)
   :hook (emacs-startup-hook . global-corfu-mode)
-  :bind (:map corfu-map ([escape] . corfu-quit))
+  :bind
+  (:map
+    corfu-map
+    ([escape] . corfu-quit)
+    ("TAB" . corfu-next)
+    ([tab] . corfu-next)
+    ("S-TAB" . corfu-previous)
+    ([backtab] . corfu-previous))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")

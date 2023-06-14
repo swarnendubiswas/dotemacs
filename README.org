@@ -343,3 +343,4 @@ Estimate the best possible startup time: =emacs -q --eval​='(message "%s" (ema
 - Flickering with =corfu-terminal-mode=
 - Disable pairing = before at the beginning of a word in =smartparens=
 - =flycheck-mode= is disabled for Elisp configuration files
+- Fix issue with copying and yanking
