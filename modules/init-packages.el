@@ -206,7 +206,8 @@
   ;; "prettier" from $PATH are also not found without the interactive flag.
   (setq
     exec-path-from-shell-check-startup-files nil
-    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY"))
+    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY")
+    exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
 (provide 'init-packages)

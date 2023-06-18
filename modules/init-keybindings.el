@@ -75,12 +75,12 @@
 (use-package free-keys
   :commands free-keys)
 
-(use-package which-key ; Show help popups for prefix keys
-  :commands which-key-setup-side-window-right-bottom
-  :hook (emacs-startup-hook . which-key-mode)
-  :custom (which-key-sort-order 'which-key-key-order-alpha)
-  :config (which-key-setup-side-window-right-bottom)
-  :diminish)
+;; (use-package which-key ; Show help popups for prefix keys
+;;   :commands which-key-setup-side-window-right-bottom
+;;   :hook (emacs-startup-hook . which-key-mode)
+;;   :custom (which-key-sort-order 'which-key-key-order-alpha)
+;;   :config (which-key-setup-side-window-right-bottom)
+;;   :diminish)
 
 ;; Hydras, https://github.com/abo-abo/hydra
 
@@ -597,7 +597,8 @@
   :hook (emacs-startup-hook . term-keys-mode)
   :config
   ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
-  (require 'term-keys-alacritty))
+  ;; (require 'term-keys-alacritty)
+  (require 'term-keys-konsole))
 
 ;; (with-eval-after-load "transient"
 ;;   (transient-define-prefix sb/help-transient ()

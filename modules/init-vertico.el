@@ -75,16 +75,16 @@
   :hook (minibuffer-setup-hook . vertico-repeat-save)
   :bind (("C-c r" . vertico-repeat-last) ("M-r" . vertico-repeat-select)))
 
-(use-package vertico-indexed ; Select candidates by number with "C-u number RET"
-  :straight nil
-  :after vertico
-  :commands vertico-indexed-mode
-  :init (vertico-indexed-mode 1))
+;; (use-package vertico-indexed ; Select candidates by number with "C-u number RET"
+;;   :straight nil
+;;   :after vertico
+;;   :commands vertico-indexed-mode
+;;   :init (vertico-indexed-mode 1))
 
-(use-package vertico-quick
-  :straight nil
-  :after vertico
-  :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
+;; (use-package vertico-quick
+;;   :straight nil
+;;   :after vertico
+;;   :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
 
 ;; (use-package vertico-multiform
 ;;   :straight nil
@@ -112,7 +112,6 @@
 
 (use-package consult
   :after vertico
-  :commands (consult--customize-put projectile-project-root)
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode-hook . consult-preview-at-point-mode)
@@ -296,6 +295,7 @@
   :bind ("C-M-y" . consult-yasnippet))
 
 (use-package consult-projectile
+  :if (eq sb/project-handler 'projectile)
   :after projectile
   :commands consult-projectile-recentf
   :bind

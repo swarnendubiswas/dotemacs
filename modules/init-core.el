@@ -398,12 +398,12 @@
   :init (windmove-default-keybindings)
   :custom (windmove-wrap-around t "Wrap around at edges"))
 
-(use-package solar
-  :straight (:type built-in)
-  :custom
-  (calendar-latitude 26.50)
-  (calendar-location-name "Kanpur, UP, India")
-  (calendar-longitude 80.23))
+;; (use-package solar
+;;   :straight (:type built-in)
+;;   :custom
+;;   (calendar-latitude 26.50)
+;;   (calendar-location-name "Kanpur, UP, India")
+;;   (calendar-longitude 80.23))
 
 ;; NOTE: `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined
 ;; will also get run for all modes derived from a basic mode such as `text-mode'.
@@ -429,6 +429,7 @@
   :straight (:type built-in)
   :if (eq sb/minibuffer-completion 'vertico)
   :demand t
+  :defer 2
   :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names")
   :config (ffap-bindings)
   ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
@@ -447,7 +448,7 @@
 (use-package ediff
   :straight (:type built-in)
   :defines (ediff-window-setup-function)
-  :commands (ediff-setup-windows-plain ediff-set-diff-options)
+  :commands (ediff ediff3)
   :custom
   ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -529,9 +530,9 @@
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
 
-(use-package password-cache
-  :after tramp
-  :custom (password-cache-expiry nil))
+;; (use-package password-cache
+;;   :after tramp
+;;   :custom (password-cache-expiry nil))
 
 (use-package whitespace
   :commands (global-whitespace-mode whitespace-buffer whitespace-cleanup whitespace-turn-off)

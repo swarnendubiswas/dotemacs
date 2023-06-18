@@ -53,9 +53,7 @@
 
 (use-package flycheck
   :commands
-  (flycheck-add-next-checker
-    flycheck-next-checker
-    flycheck-mode
+  (flycheck-mode
     flycheck-previous-error
     flycheck-describe-checker
     flycheck-buffer
@@ -63,11 +61,7 @@
     flycheck-select-checker
     flycheck-verify-setup
     flycheck-next-error
-    flycheck-disable-checker
-    flycheck-add-mode
-    flycheck-manual
-    flycheck-display-error-messages-unless-error-list
-    flycheck-sexp-to-string)
+    flycheck-disable-checker)
   :hook (after-init-hook . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we want the
@@ -202,7 +196,7 @@
       ("Markdown" prettier "--print-width" "100")
       ("Perl" perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100")
       ("Python" (yapf "--style" "file") isort)
-      ("Shell script" shfmt)
+      ("Shell script" shfmt "-i" "1" "-ci")
       ("YAML" prettier "--print-width" "100")))
   :diminish)
 
@@ -210,9 +204,10 @@
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
 (use-package flycheck-grammarly
+  :after flycheck
   :defines flycheck-grammarly-check-time
+  :init (flycheck-grammarly-setup)
   :custom (flycheck-grammarly-check-time 3)
-  :hook (flycheck-mode-hook . flycheck-grammarly-setup)
   :config
   ;; Remove from the beginning of the list and append to the end
   ;; (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append)
@@ -246,8 +241,9 @@
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
 (use-package flycheck-languagetool
+  :after flycheck
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
-  :hook (flycheck-mode-hook . flycheck-languagetool-setup)
+  :init (flycheck-languagetool-setup)
   :custom
   (flycheck-languagetool-server-jar
     (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar"))

@@ -131,31 +131,32 @@
   ;;     .
   ;;     ,(eglot-alternatives '(("pylsp") ("pyright-langserver" "--stdio")))))
   ;; (add-to-list 'eglot-server-programs '((php-mode phps-mode) . ("intelephense" "--stdio")))
-  ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio")))
   )
 
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
-(use-package eglot-grammarly
-  :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
-  :hook
-  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
-    .
-    (lambda ()
-      (require 'eglot-grammarly)
-      (eglot-ensure)))
-  :custom (eglot-grammarly-active-modes '(text-mode LaTeX-mode org-mode markdown-mode))
-  :config
-  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-  ;; (add-to-list
-  ;;   'eglot-server-programs
-  ;;   `(,eglot-grammarly-active-modes . ,(eglot-grammarly--server-command))
-  ;;   'append)
-  (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-  ;; (add-to-list eglot-workspace-configuration
-  ;;              ((@emacs-grammarly/grammarly-languageserver
-  ;;                ((audience "knowledgeable")))))
-  )
+
+;; (use-package eglot-grammarly
+;;   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
+;;   :hook
+;;   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
+;;     .
+;;     (lambda ()
+;;       (require 'eglot-grammarly)
+;;       (eglot-ensure)))
+;;   :custom (eglot-grammarly-active-modes '(text-mode LaTeX-mode org-mode markdown-mode))
+;;   :config
+;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+;;   ;; (add-to-list
+;;   ;;   'eglot-server-programs
+;;   ;;   `(,eglot-grammarly-active-modes . ,(eglot-grammarly--server-command))
+;;   ;;   'append)
+;;   (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+;;   ;; (add-to-list eglot-workspace-configuration
+;;   ;;              ((@emacs-grammarly/grammarly-languageserver
+;;   ;;                ((audience "knowledgeable")))))
+;;   )
 
 ;; FIXME: Fix issue with SLF4J with LTEX 16.0.0
 (use-package eglot-ltex
@@ -169,7 +170,7 @@
     (lambda ()
       (require 'eglot-ltex)
       (eglot-ensure)))
-  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode rst-mode))
+  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
   :config
   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
   ;; (add-to-list

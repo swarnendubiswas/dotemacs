@@ -36,16 +36,16 @@
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
 
-(use-package hideshow
-  :straight (:type built-in)
-  :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-  :hook
-  ;; Hideshow is not defined for `ini-mode'.
-  ((python-mode-hook c-mode-hook c++-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook)
-    .
-    hs-minor-mode)
-  :custom (hs-isearch-open t "Open all folds while searching")
-  :diminish hs-minor-mode)
+;; (use-package hideshow
+;;   :straight (:type built-in)
+;;   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
+;;   :hook
+;;   ;; Hideshow is not defined for `ini-mode'.
+;;   ((python-mode-hook c-mode-hook c++-mode-hook emacs-lisp-mode-hook java-mode-hook sh-mode-hook)
+;;     .
+;;     hs-minor-mode)
+;;   :custom (hs-isearch-open t "Open all folds while searching")
+;;   :diminish hs-minor-mode)
 
 (use-package symbol-overlay ; Highlight symbol under point
   :commands (transient-define-prefix)
@@ -616,11 +616,8 @@
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-hide-urls t))
 
-;; Generate TOC with `markdown-toc-generate-toc'
-(use-package markdown-toc
-  :commands (markdown-toc-refresh-toc markdown-toc-generate-toc markdown-toc-generate-or-refresh-toc)
-  ;; :hook (markdown-mode-hook . markdown-toc-generate-toc)
-  )
+;; (use-package markdown-toc
+;;   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc markdown-toc-generate-or-refresh-toc))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
 ;; -f markdown -t org -o output-file.org input-file.md"

@@ -230,6 +230,17 @@
           #'cape-file
           (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 
+  (add-hook
+    'text-mode-hook
+    (lambda ()
+      (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t)
+      ;; (setq-local completion-at-point-functions
+      ;;   '(cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))
+
+      (progn
+        (add-to-list 'completion-at-point-functions #'cape-file)
+        (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)))))
+
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
     (add-hook
       modes

@@ -169,14 +169,10 @@
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
   (centaur-tabs-height 18)
+  (centaur-tabs-set-icons nil)
+  (centaur-tabs-icon-type 'nerd-icons)
+  (centaur-tabs-gray-out-icons t "Gray out icons for inactive tabs")
   :config
-  ;; I now prefer using `nerd-icons'. Furthermore, icons may not be rendered in all terminals.
-  (with-eval-after-load "all-the-icons"
-    (setq
-      centaur-tabs-set-icons (display-graphic-p)
-      ;; Gray out icons for inactive tabs
-      centaur-tabs-gray-out-icons t))
-
   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
 
   ;; (let ((themes '("doom-one"
@@ -187,10 +183,10 @@
   ;;         (setq centaur-tabs-set-icons t)
   ;;       (setq centaur-tabs-set-icons nil))))
 
-  (centaur-tabs-headline-match)
-
-  (when (fboundp 'projectile-mode)
-    (centaur-tabs-group-by-projectile-project)))
+  ;; (centaur-tabs-headline-match)
+  ;; (with-eval-after-load "projectile"
+  ;;   (centaur-tabs-group-by-projectile-project))
+  )
 
 ;; (use-package awesome-tab
 ;;   :preface
@@ -430,7 +426,7 @@
   (cond
     ((string= (system-name) "inspiron-7572")
       (progn
-        (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
         (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 130)
         (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 130)))
 
@@ -454,15 +450,16 @@
 
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
-        (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
-        (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 110)
-        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 110)))))
+        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 150)
+        (set-face-attribute 'mode-line nil :font "JetBrainsMono Nerd Font" :height 120)
+        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono Nerd Font" :height 120)))))
 
 (defun sb/init-fonts-daemon (frame)
   (cond
     ((string= (system-name) "inspiron-7572")
       (progn
-        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-16"))))))
+        ;; (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17"))
+        (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)

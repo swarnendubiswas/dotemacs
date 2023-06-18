@@ -252,10 +252,11 @@ Ignore if no file is found."
 
 ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
 ;; in "$PATH".
-(use-package math-preview
-  :straight (:host gitlab :repo "matsievskiysv/math-preview")
-  :commands (math-preview-all math-preview-at-point math-preview-region)
-  :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
+
+;; (use-package math-preview
+;;   :straight (:host gitlab :repo "matsievskiysv/math-preview")
+;;   :commands (math-preview-all math-preview-at-point math-preview-region)
+;;   :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
 
 ;; TODO: Try pcakages like `bibtex-capf' and `citar'
 ;; https://github.com/mclear-tools/bibtex-capf/

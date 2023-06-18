@@ -79,12 +79,7 @@ Sometimes we do not want to unnecessarily add differences due to
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file nil
-  "Enable features to debug errors and performance bottlenecks."
-  :type 'boolean
-  :group 'sb/emacs)
-
-(defcustom sb/op-mode 'daemon
+(defcustom sb/op-mode 'standalone
   "Specify the way you expect Emacs to be used."
   :type
   '
@@ -92,6 +87,11 @@ Sometimes we do not want to unnecessarily add differences due to
     (const :tag "server" server)
     (const :tag "daemon" daemon)
     (const :tag "standalone" standalone))
+  :group 'sb/emacs)
+
+(defcustom sb/debug-init-file nil
+  "Enable features to debug errors and performance bottlenecks."
+  :type 'boolean
   :group 'sb/emacs)
 
 (defconst sb/user-home-directory (getenv "HOME")
@@ -153,7 +153,7 @@ Prefer the straight.el package manager instead."
 
 ;; I do not find any difference in terms of features. However, packages like `centaur-tabs' only
 ;; support `projectile'.
-(defcustom sb/project-handler 'projectile
+(defcustom sb/project-handler 'project
   "Choose the handler for projects."
   :type '(radio (const :tag "project.el" project) (const :tag "projectile" projectile))
   :group 'sb/emacs)

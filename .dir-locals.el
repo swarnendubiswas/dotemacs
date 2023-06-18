@@ -34,7 +34,10 @@
 
   (dired-mode
     .
-    ((dired-omit-files . "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|\\eln-cache\\'")))
+    (
+      (dired-omit-files
+        .
+        "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|\\eln-cache\\'|\\eglot-java-eclipse-jdt-cache\\'|\\elisp-autofmt-cache\\'")))
 
   (emacs-lisp-mode
     .

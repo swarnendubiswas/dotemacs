@@ -135,6 +135,7 @@
   :diminish)
 
 (use-package dired-rsync
+  :after dired
   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
 
 (use-package diredfl

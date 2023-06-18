@@ -17,11 +17,12 @@
 
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
+  :defer 2
   :defines
   (org-hide-leading-stars-before-indent-mode
     org-src-strip-leading-and-trailing-blank-lines
     org-src-tabs-acts-natively)
-  :commands (org-indent-mode org-indent-item org-outdent-item)
+  :commands (org-indent-mode)
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-emphasized-text t)
@@ -146,10 +147,10 @@
 ;;   :disabled t
 ;;   :hook (org-mode-hook . org-superstar-mode))
 
-(use-package org-block-capf
-  :straight (:host github :repo "xenodium/org-block-capf")
-  :hook (org-mode-hook . org-block-capf-add-to-completion-at-point-functions)
-  :custom (org-block-capf-edit-style 'inline))
+;; (use-package org-block-capf
+;;   :straight (:host github :repo "xenodium/org-block-capf")
+;;   :hook (org-mode-hook . org-block-capf-add-to-completion-at-point-functions)
+;;   :custom (org-block-capf-edit-style 'inline))
 
 (provide 'init-org)
 
