@@ -35,8 +35,7 @@
     company-ispell
     company-dabbrev
     company-capf
-    company-dabbrev-code
-    company-clang-set-prefix)
+    company-dabbrev-code)
   :hook (emacs-startup-hook . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend)
@@ -55,12 +54,10 @@
     ("C-r" . company-search-repeat-backward)
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
-  :custom (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  ;; Do not ignore case when collecting completion candidates.
-  (company-dabbrev-ignore-case nil)
-  ;; Search in other buffers with the same major mode. This can cause performance overhead if
-  ;; there are lots of open buffers.
-  (company-dabbrev-other-buffers t)
+  :custom
+  (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  (company-dabbrev-ignore-case nil "Do not ignore case when collecting completion candidates")
+  (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow input string that do not match candidates")
@@ -88,6 +85,7 @@
       shell-mode
       csv-mode
       minibuffer-inactive-mode))
+  (company-format-margin-function nil "Disable icons")
   :config
   ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
   ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
@@ -152,8 +150,7 @@
   :after (tex-mode company)
   :demand t
   :commands
-  (company-auctex-init
-    company-auctex-labels
+  (company-auctex-labels
     company-auctex-bibs
     company-auctex-macros
     company-auctex-symbols
@@ -181,7 +178,7 @@
   (company-reftex-labels-parse-all nil))
 
 (use-package company-bibtex
-  :after tex-mode
+  :after (tex-mode company)
   :demand t
   :commands company-bibtex)
 
@@ -212,6 +209,11 @@
 ;; Merge completions of all the backends, give priority to `company-xxx':
 ;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
 
+;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
+;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
+;; (e.g. outside of strings and comments), and pass on control to later backends when outside of
+;; that major mode or context.
+
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
 ;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
@@ -226,8 +228,8 @@
 ;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
 ;; the order of completions just like the backends returned them.
 
-;; Override `company-backends' for unhandled major modes.
 (with-eval-after-load "company"
+  ;; Override `company-backends' for unhandled major modes.
   (setq company-backends
     '
     (company-dirfiles

@@ -11,10 +11,7 @@
 
 ;; Corfu is not a completion framework, it is just a front-end for `completion-at-point'.
 (use-package corfu
-  :straight
-  (corfu
-    :files (:defaults "extensions/*")
-    :includes (corfu-quick corfu-echo corfu-indexed corfu-popupinfo corfu-history))
+  :straight (corfu :files (:defaults "extensions/*") :includes (corfu-echo corfu-popupinfo))
   :if (eq sb/capf 'corfu)
   :hook (emacs-startup-hook . global-corfu-mode)
   :bind

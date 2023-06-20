@@ -127,7 +127,7 @@ This location is used for temporary installations and files.")
 ;; Company works better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is
 ;; configurable, and we can set up a custom file containing completions with `company-dict'.
 
-(defcustom sb/capf 'corfu
+(defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -227,7 +227,6 @@ Prefer the straight.el package manager instead."
   ((eq sb/minibuffer-completion 'vertico)
     (require 'init-vertico)))
 
-(require 'init-project)
 (require 'init-spell)
 (require 'init-search)
 (require 'init-parens)

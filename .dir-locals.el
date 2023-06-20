@@ -30,7 +30,11 @@
               (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (html-tidy)))))))
 
             (when (derived-mode-p 'xml-mode)
-              (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (xml-xmllint))))))))))))
+              (setq sb/flycheck-local-checkers '((lsp . ((next-checkers . (xml-xmllint))))))))))
+
+      (eglot-workspace-configuration
+        .
+        ((ltex . (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"])))))))
 
   (dired-mode
     .

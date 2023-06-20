@@ -8,17 +8,7 @@
 ;;; Code:
 
 (use-package eglot
-  :commands
-  (eglot
-    eglot-ensure
-    eglot-server-programs
-    eglot-rename
-    eglot-code-actions
-    eglot-format
-    eglot-find-declaration
-    eglot-find-implementation
-    eglot-find-typeDefinition
-    eglot-update)
+  :commands (eglot)
   :bind
   (("M-." . xref-find-definitions)
     ("C-c l q" . eglot-shutdown)
@@ -120,7 +110,8 @@
         "--header-insertion=never"
         "--header-insertion-decorators=0"
         "--log=error"
-        "--malloc-trim" ; Release memory periodically
+        ;; Unsupported option with Clangd 10
+        ;; "--malloc-trim" ; Release memory periodically
         "--pch-storage=memory" ; Increases memory usage but can improve performance
         "--pretty")))
 
@@ -163,9 +154,9 @@
   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
   :init
   (setq eglot-languagetool-server-path
-    (expand-file-name "software/ltex-ls-15.2.0" sb/user-home-directory))
+    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
   :hook
-  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook rst-mode-hook)
+  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
     .
     (lambda ()
       (require 'eglot-ltex)
@@ -177,9 +168,7 @@
   ;;   'eglot-server-programs
   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
   ;;   'append)
-  (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-  ;; (add-to-list
-  ;;   'eglot-workspace-configuration
+  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
   )
 

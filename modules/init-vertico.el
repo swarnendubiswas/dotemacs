@@ -10,13 +10,9 @@
 (defvar sb/minibuffer-completion)
 
 (use-package vertico
-  :straight
-  (vertico
-    :files (:defaults "extensions/*")
-    :includes (vertico-directory vertico-indexed vertico-quick vertico-repeat vertico-multiform))
+  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
-  :commands (command-completion-default-include-p minibuffer-keyboard-quit)
   :hook (emacs-startup-hook . vertico-mode)
   :bind
   (:map
