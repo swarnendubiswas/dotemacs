@@ -151,9 +151,9 @@ Prefer the straight.el package manager instead."
   :type 'boolean
   :group 'sb/emacs)
 
-;; I do not find any difference in terms of features. However, packages like `centaur-tabs' only
-;; support `projectile'.
-(defcustom sb/project-handler 'project
+;; I do not find any difference in terms of the features I require. However, packages like
+;; `centaur-tabs' only support `projectile'.
+(defcustom sb/project-handler 'projectile
   "Choose the handler for projects."
   :type '(radio (const :tag "project.el" project) (const :tag "projectile" projectile))
   :group 'sb/emacs)
@@ -180,11 +180,11 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Eglot does not allow multiple servers to connect to a major mode. which is a useful feature. For
-;; example, I can use `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. However,
-;; Eglot has simpler setup and I expect it to receive significant improvements now that it is in
-;; Emacs core.
-(defcustom sb/lsp-provider 'eglot
+;; Eglot does not allow multiple servers to connect to a major mode. For example, I can use
+;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. It also does not support
+;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
+;; improvements now that it is in Emacs core.
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)

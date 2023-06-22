@@ -38,11 +38,9 @@
   (eglot-autoshutdown t)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
-  :config
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq
-    eglot-stay-out-of '(flymake company eldoc)
-    eglot-ignored-server-capabilities
+  (eglot-stay-out-of '(flymake company eldoc))
+  (eglot-ignored-server-capabilities
     '
     (:codeLensProvider
       :executeCommandProvider
@@ -53,7 +51,7 @@
       :documentHighlightProvider
       ;; Inlay hints are distracting
       :inlayHintProvider))
-
+  :config
   ;; Show all of the available eldoc information when we want it. This way Flymake errors
   ;; don't just get clobbered by docstrings.
   (add-hook
@@ -150,27 +148,28 @@
 ;;   )
 
 ;; FIXME: Fix issue with SLF4J with LTEX 16.0.0
-(use-package eglot-ltex
-  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-  :init
-  (setq eglot-languagetool-server-path
-    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
-  :hook
-  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
-    .
-    (lambda ()
-      (require 'eglot-ltex)
-      (eglot-ensure)))
-  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-  :config
-  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-  ;; (add-to-list
-  ;;   'eglot-server-programs
-  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-  ;;   'append)
-  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-  )
+
+;; (use-package eglot-ltex
+;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+;;   :init
+;;   (setq eglot-languagetool-server-path
+;;     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
+;;   :hook
+;;   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
+;;     .
+;;     (lambda ()
+;;       (require 'eglot-ltex)
+;;       (eglot-ensure)))
+;;   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+;;   :config
+;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+;;   ;; (add-to-list
+;;   ;;   'eglot-server-programs
+;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+;;   ;;   'append)
+;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+;;   )
 
 (use-package eglot-java
   :hook

@@ -93,12 +93,13 @@
       "--header-insertion=never"
       "--header-insertion-decorators=0"
       "--log=error"
-      "--malloc-trim" ; Release memory periodically
+      ;; Unsupported option with Clangd 10
+      ;; "--malloc-trim" ; Release memory periodically
       "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty"))
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
-  (lsp-completion-show-detail nil "Disable completion metadata since they can be very long")
-  (lsp-completion-show-kind nil "Disable completion kind to shorten popup width")
+  (lsp-completion-show-detail t "Disable completion metadata since they can be very long")
+  (lsp-completion-show-kind t "Disable completion kind to shorten popup width")
   (lsp-completion-show-label-description t "Disable description of completion candidates")
   (lsp-eldoc-enable-hover t)
   (lsp-enable-dap-auto-configure nil)
@@ -113,13 +114,14 @@
   (lsp-imenu-sort-methods '(position))
   (lsp-lens-enable nil)
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
-  ;; additional errors. The problem is that the modeline can get too congested.
+  ;; additional errors. The downside of enabling lsp diagnostics is that the modeline can get too
+  ;; congested.
   (lsp-modeline-diagnostics-enable t)
-  (lsp-modeline-diagnostics-scope :file "Focus on the errors at hand")
+  (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
   (lsp-modeline-code-actions-enable t)
   (lsp-modeline-workspace-status-enable t)
-  ;; Sudden changes in the height of the echo area causes the cursor to lose position,
-  ;; manually request via `lsp-signature-activate'.
+  ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
+  ;; request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
   ;; Enable/disable showing function documentation with `eldoc'
   (lsp-signature-render-documentation t)
@@ -154,7 +156,7 @@
 (use-package lsp-ui
   :after lsp-mode
   :defines lsp-ui-modeline-code-actions-enable
-  :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-doc--hide-frame lsp-ui-peek-find-implementation lsp-ui-imenu)
+  :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-peek-find-implementation lsp-ui-imenu)
   :hook (lsp-mode-hook . lsp-ui-mode)
   :bind
   (:map

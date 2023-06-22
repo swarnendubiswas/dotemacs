@@ -592,13 +592,13 @@
 
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
+  ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
 (use-package term-keys
   :straight (:host github :repo "CyberShadow/term-keys")
+  :unless (display-graphic-p)
   :hook (emacs-startup-hook . term-keys-mode)
   :config
-  ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
-  ;; (require 'term-keys-alacritty)
-  (require 'term-keys-konsole))
+  (require 'term-keys-alacritty))
 
 ;; (with-eval-after-load "transient"
 ;;   (transient-define-prefix sb/help-transient ()

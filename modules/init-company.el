@@ -86,6 +86,8 @@
       csv-mode
       minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
+  (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
+  (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
   :config
   ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
   ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',

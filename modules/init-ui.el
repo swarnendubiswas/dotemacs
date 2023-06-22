@@ -184,9 +184,10 @@
   ;;       (setq centaur-tabs-set-icons nil))))
 
   ;; (centaur-tabs-headline-match)
-  ;; (with-eval-after-load "projectile"
-  ;;   (centaur-tabs-group-by-projectile-project))
-  )
+
+  ;; Group tabs according to projectile's definition of projects
+  (with-eval-after-load "projectile"
+    (centaur-tabs-group-by-projectile-project)))
 
 ;; (use-package awesome-tab
 ;;   :preface
@@ -402,33 +403,37 @@
     doom-modeline-unicode-fallback t)
   :hook (emacs-startup-hook . doom-modeline-mode))
 
-;; (use-package awesome-tray ; Minimal modeline information
-;;   :straight (:host github :repo "manateelazycat/awesome-tray")
-;;   :if (eq sb/modeline-theme 'awesome-tray)
-;;   :hook (emacs-startup-hook . awesome-tray-mode)
-;;   :custom
-;;   (awesome-tray-active-modules '("file-path" "buffer-name" "mode-name" "location" "git"))
-;;   (awesome-tray-git-update-duration 30 "Seconds")
-;;   (awesome-tray-file-path-full-dirname-levels 1)
-;;   :custom-face
-;;   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-;;   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-;;   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-;;   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-;;   (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-;;   (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-;;   (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
-;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+(use-package awesome-tray ; Minimal modeline information
+  :straight (:host github :repo "manateelazycat/awesome-tray")
+  :if (eq sb/modeline-theme 'awesome-tray)
+  :hook (emacs-startup-hook . awesome-tray-mode)
+  :custom
+  (awesome-tray-active-modules
+    '("file-path" "buffer-name" "mode-name" "location" "belong" "flymake" "git" "hostname"))
+  (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
+  (awesome-tray-file-path-full-dirname-levels 2)
+  (awesome-tray-evil-show-mode nil)
+  (awesome-tray-meow-show-mode nil)
+  (awesome-tray-mode-line-active-color "lavender")
+  :custom-face
+  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
+  (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
+  (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
+  (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
 (defun sb/init-fonts-graphic ()
   (cond
     ((string= (system-name) "inspiron-7572")
       (progn
         (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
-        (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 130)
-        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 130)))
+        (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 140)
+        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 140)))
 
     ((string= (system-name) "DESKTOP-4T8O69V")
       (progn

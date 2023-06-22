@@ -294,8 +294,7 @@
   :hook (prog-mode-hook . ws-butler-mode)
   :diminish)
 
-;; Projectile is unable to remember remote projects which is also not supported by the current
-;; version of `project'.
+;; Both project.el and projectile are unable to remember remote projects.
 
 (use-package project
   :if (eq sb/project-handler 'project)
@@ -340,140 +339,130 @@
   ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
   )
 
-;; (use-package projectile
-;;   :preface
-;;   (defun sb/projectile-do-not-visit-tags-table ()
-;;     "Do not visit the tags table automatically even if it is present."
-;;     nil)
-;;   :if (eq sb/project-handler 'projectile)
-;;   :commands (projectile-mode projectile-compile-project)
-;;   :hook
-;;   ;; We can open a project file without enabling projectile via `bind-keys'
-;;   (emacs-startup-hook . projectile-mode)
-;;   :bind-keymap ("C-c p" . projectile-command-map)
-;;   :bind
-;;   (([project-switch-to-buffer] . projectile-switch-to-buffer)
-;;     ([project-compile] . projectile-compile-project)
-;;     ([project-find-dir] . projectile-find-dir)
-;;     ([project-dired] . projectile-dired)
-;;     ([project-find-file] . projectile-find-file)
-;;     ([project-or-external-find-file] . projectile-find-other-file)
-;;     ([project-kill-buffers] . projectile-kill-buffers)
-;;     ([project-switch-project] . projectile-switch-project)
-;;     ([project-vc-dir] . projectile-vc)
-;;     ([project-forget-project] . projectile-remove-known-project)
-;;     :map
-;;     projectile-command-map
-;;     ("A" . projectile-add-known-project))
-;;   :custom
-;;   (projectile-file-exists-remote-cache-expire nil)
-;;   (projectile-mode-line-prefix "" "Save modeline space")
-;;   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
-;;   ;; No sorting should be faster, note that files are not sorted if `projectile-indexing-method' is
-;;   ;; set to `alien'.
-;;   (projectile-sort-order 'recently-active)
-;;   (projectile-verbose nil)
-;;   (projectile-project-root-files
-;;     '
-;;     ("setup.py"
-;;       "requirements.txt"
-;;       "package.json"
-;;       "CMakeLists.txt"
-;;       "Makefile"
-;;       "meson.build"
-;;       "SConstruct"
-;;       "configure.ac"
-;;       "configure.in"))
-;;   (projectile-auto-discover nil "Disable auto-search for projects for faster startup")
-;;   :config
-;;   ;; Set the indexing method after checks on Windows platform since otherwise the following error
-;;   ;; shows up: "'tr' is not recognized as an internal or external command, operable program or batch
-;;   ;; file."
+;; The contents of ".projectile" are ignored when using the `alien' project indexing.
+(use-package projectile
+  :preface
+  (defun sb/projectile-do-not-visit-tags-table ()
+    "Do not visit the tags table automatically even if it is present."
+    nil)
+  :if (eq sb/project-handler 'projectile)
+  ;; We can open a project file without enabling projectile via `bind-keys'
+  :hook (emacs-startup-hook . projectile-mode)
+  :bind-keymap ("C-c p" . projectile-command-map)
+  :bind
+  (([remap project-switch-to-buffer] . projectile-switch-to-buffer)
+    ([remap project-compile] . projectile-compile-project)
+    ([remap project-find-dir] . projectile-find-dir)
+    ([remap project-dired] . projectile-dired)
+    ([remap project-find-file] . projectile-find-file)
+    ([remap project-or-external-find-file] . projectile-find-other-file)
+    ([remap project-kill-buffers] . projectile-kill-buffers)
+    ([remap project-switch-project] . projectile-switch-project)
+    ([remap project-vc-dir] . projectile-vc)
+    ([remap project-forget-project] . projectile-remove-known-project)
+    :map
+    projectile-command-map
+    ("A" . projectile-add-known-project))
+  :custom
+  (projectile-file-exists-remote-cache-expire nil)
+  (projectile-mode-line-prefix "" "Save modeline space")
+  (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
+  ;; No sorting should be faster. Files are not sorted if `projectile-indexing-method' is set to
+  ;; `alien'.
+  (projectile-sort-order 'recently-active)
+  (projectile-verbose nil)
+  (projectile-project-root-files
+    '
+    ("setup.py"
+      "requirements.txt"
+      "package.json"
+      "CMakeLists.txt"
+      "Makefile"
+      "meson.build"
+      "SConstruct"
+      "configure.ac"
+      "configure.in"))
+  (projectile-auto-discover nil "Disable auto-search for projects for faster startup")
+  ;; Caching will not watch for file system changes
+  (projectile-enable-caching (symbol-value 'sb/IS-WINDOWS))
+  :config
+  ;; Set the indexing method after checks on Windows platform since otherwise the following error
+  ;; shows up: "'tr' is not recognized as an internal or external command, operable program or batch
+  ;; file."
+  (when (and (symbol-value 'sb/IS-WINDOWS) (executable-find "tr"))
+    (setq projectile-indexing-method 'alien))
 
-;;   ;; The contents of ".projectile" are ignored when using the `alien' project indexing.
-;;   (when (symbol-value 'sb/IS-LINUX)
-;;     (setq projectile-indexing-method 'alien))
+  ;; Disable computing the project type that is shown on the modeline
+  (defun projectile-default-mode-line ()
+    "Report only the project name in the modeline."
+    (let ((project-name (projectile-project-name)))
+      (format " [%s]" (or project-name "-"))))
 
-;;   ;; https://github.com/MatthewZMD/.emacs.d
-;;   (when (and (symbol-value 'sb/IS-WINDOWS) (executable-find "tr"))
-;;     (setq projectile-indexing-method 'alien))
+  (advice-add
+    'projectile-visit-project-tags-table
+    :override #'sb/projectile-do-not-visit-tags-table)
 
-;;   ;; Caching will not watch for file system changes
-;;   (setq projectile-enable-caching (symbol-value 'sb/IS-WINDOWS))
+  (dolist
+    (prjs
+      (list
+        (expand-file-name sb/user-home-directory) ; Do not consider $HOME as a project
+        "~/" ; Do not consider $HOME as a project
+        (expand-file-name "/tmp")))
+    (add-to-list 'projectile-ignored-projects prjs))
 
-;;   ;; Disable computing the project type that is shown on the modeline
-;;   (defun projectile-default-mode-line ()
-;;     "Report project name and type in the modeline."
-;;     (let ((project-name (projectile-project-name)))
-;;       (format " [%s]" (or project-name "-"))))
+  ;; Filtering works with `alien' indexing
+  (dolist
+    (dirs
+      '
+      (".dropbox"
+        ".git"
+        ".hg"
+        ".metadata"
+        ".nx"
+        ".recommenders"
+        ".svn"
+        ".vscode"
+        "__pycache__"
+        "auto"
+        "elpa"
+        "node_modules"))
+    (add-to-list 'projectile-globally-ignored-directories dirs))
 
-;;   (advice-add
-;;     'projectile-visit-project-tags-table
-;;     :override #'sb/projectile-do-not-visit-tags-table)
+  (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"))
+    (add-to-list 'projectile-globally-ignored-files items))
 
-;;   (dolist
-;;     (prjs
-;;       (list
-;;         (expand-file-name sb/user-home-directory) ; Do not consider $HOME as a project
-;;         "~/" ; Do not consider $HOME as a project
-;;         (expand-file-name "/tmp")))
-;;     (add-to-list 'projectile-ignored-projects prjs))
+  (dolist
+    (exts
+      '
+      (".a"
+        ".aux"
+        ".bak"
+        ".blg"
+        ".class"
+        ".deb"
+        ".doc"
+        ".docx"
+        "egg-info"
+        ".elc"
+        ".o"
+        ".odt"
+        ".ppt"
+        ".pptx"
+        ".pt"
+        ".pyc"
+        ".rel"
+        ".rip"
+        ".rpm"
+        ".so"
+        "swp"
+        ".xls"
+        ".xlsx"
+        "~$"))
+    (add-to-list 'projectile-globally-ignored-file-suffixes exts))
 
-;;   ;; Filtering works with `alien' indexing
-;;   (dolist
-;;     (dirs
-;;       '
-;;       (".cache"
-;;         ".clangd"
-;;         ".dropbox"
-;;         ".git"
-;;         ".hg"
-;;         ".metadata"
-;;         ".nx"
-;;         ".recommenders"
-;;         ".svn"
-;;         ".vscode"
-;;         "__pycache__"
-;;         "auto"
-;;         "elpa"
-;;         "node_modules"))
-;;     (add-to-list 'projectile-globally-ignored-directories dirs))
-
-;;   (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"))
-;;     (add-to-list 'projectile-globally-ignored-files items))
-
-;;   (dolist
-;;     (exts
-;;       '
-;;       (".a"
-;;         ".aux"
-;;         ".bak"
-;;         ".blg"
-;;         ".class"
-;;         ".deb"
-;;         ".doc"
-;;         ".docx"
-;;         "egg-info"
-;;         ".elc"
-;;         ".o"
-;;         ".odt"
-;;         ".ppt"
-;;         ".pptx"
-;;         ".pt"
-;;         ".pyc"
-;;         ".rel"
-;;         ".rip"
-;;         ".rpm"
-;;         ".so"
-;;         "swp"
-;;         ".xls"
-;;         ".xlsx"
-;;         "~$"))
-;;     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
-
-;;   (when (eq sb/minibuffer-completion 'ivy)
-;;     (bind-key "<f5>" #'projectile-switch-project)
-;;     (bind-key "<f6>" #'projectile-find-file)))
+  (when (eq sb/minibuffer-completion 'ivy)
+    (bind-key "<f5>" #'projectile-switch-project)
+    (bind-key "<f6>" #'projectile-find-file)))
 
 (provide 'init-misc)
 
