@@ -47,12 +47,13 @@
 (use-package citre
   :preface
   (defun sb/citre-jump+ ()
-    "Jump to the definition of the symbol at point.
-Fallback to `xref-find-definitions'."
+    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
     (interactive)
     (condition-case _
       (citre-jump)
-      (error (call-interactively #'xref-find-definitions))))
+      (error
+        (let* ((xref-prompt-for-identifier nil))
+          (call-interactively #'xref-find-definitions)))))
 
   (defun sb/citre-jump-back+ ()
     "Go back to the position before last `citre-jump'.
@@ -68,7 +69,7 @@ Fallback to `xref-go-back'."
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
 
-  (defun lsp-citre-capf-function ()
+  (defun sb/lsp-citre-capf-function ()
     "A capf backend that tries lsp first, then Citre."
     (let
       (
@@ -86,10 +87,10 @@ Fallback to `xref-go-back'."
         lsp-result
         (citre-completion-at-point))))
 
-  (defun enable-lsp-citre-capf-backend ()
+  (defun sb/enable-lsp-citre-capf-backend ()
     "Enable the lsp + Citre capf backend in current buffer."
-    (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
-  :commands (citre-create-tags-file citre-update-tags-file citre-completion-at-point)
+    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
+  :commands (citre-create-tags-file citre-update-tags-file)
   :hook
   ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
   ;; tags backend, which is not desired for plain text files.
@@ -106,8 +107,9 @@ Fallback to `xref-go-back'."
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
-  (citre-enable-capf-integration t)
-  (citre-enable-imenu-integration nil) ; Breaks imenu if enabled
+  (citre-enable-capf-integration nil)
+  (citre-enable-imenu-integration nil)
+  (citre-enable-xref-integration t)
   (citre-edit-cmd-buf-default-cmd
     "ctags
 -o
@@ -122,8 +124,7 @@ Fallback to `xref-go-back'."
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  :config
-  ;; (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
+  :config (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
 
   (dolist
     (func
@@ -168,10 +169,9 @@ used in `company-backends'."
             ('prefix
               (and (bound-and-true-p citre-mode)
                 (citre-backend-usable-p ',backend)
-                ;; We shouldn't use this as it's defined for getting
-                ;; definitions/references. But the Citre completion backend design is not
-                ;; fully compliant with company's design so there's no simple "right"
-                ;; solution, and this works for tags/global backends.
+                ;; We shouldn't use this as it's defined for getting definitions/references. But the
+                ;; Citre completion backend design is not fully compliant with company's design so
+                ;; there's no simple "right" solution, and this works for tags/global backends.
                 (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
             ('meta (citre-get-property 'signature arg))
             ('annotation (citre-get-property 'annotation arg))

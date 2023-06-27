@@ -98,33 +98,32 @@
       "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty"))
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
-  (lsp-completion-show-detail t "Disable completion metadata since they can be very long")
-  (lsp-completion-show-kind t "Disable completion kind to shorten popup width")
-  (lsp-completion-show-label-description t "Disable description of completion candidates")
-  (lsp-eldoc-enable-hover t)
+  (lsp-completion-show-detail nil "Disable completion metadata, e.g., java.util.ArrayList")
+  (lsp-completion-show-kind t "Show completion kind, e.g., interface/class")
+  (lsp-completion-show-label-description t "Show description of completion candidates")
+  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil)
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
-  ;; Do not customize breadcrumb faces based on errors
   (lsp-headerline-breadcrumb-enable-diagnostics nil)
+  (lsp-diagnostics-provider :auto "Prefer flycheck, otherwise use flymake")
+  ;; Do not customize breadcrumb faces based on errors
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position))
-  (lsp-lens-enable nil)
+  (lsp-lens-enable nil "Lenses are intrusive")
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
-  ;; additional errors. The downside of enabling lsp diagnostics is that the modeline can get too
-  ;; congested.
-  (lsp-modeline-diagnostics-enable t)
+  ;; additional errors. The downside is that the modeline gets congested.
+  (lsp-modeline-diagnostics-enable (eq sb/modeline-theme 'doom-modeline))
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
-  (lsp-modeline-code-actions-enable t)
+  (lsp-modeline-code-actions-enable t "Useful to show code actions on the modeline")
   (lsp-modeline-workspace-status-enable t)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
   ;; request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
-  ;; Enable/disable showing function documentation with `eldoc'
-  (lsp-signature-render-documentation t)
+  (lsp-signature-render-documentation t "Show the function documentation along with the prototype")
   (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
@@ -132,6 +131,7 @@
   (lsp-keep-workspace-alive nil)
   (lsp-enable-file-watchers nil)
   (lsp-semantic-tokens-enable t)
+  (lsp-enable-symbol-highlighting t)
   :config
   (dolist
     (ignore-dirs
@@ -167,14 +167,13 @@
     lsp-command-map
     ("D" . lsp-ui-doc-show))
   :custom
-  ;; Invoke doc on demand with `lsp-ui-doc-show'
-  ;; (lsp-ui-doc-enable nil "Disable on-hover dialogs")
+  (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
   (lsp-ui-doc-include-signature t)
   (lsp-ui-imenu-auto-refresh 'after-save)
-  ;; Showing code actions in the sideline enables understanding when to invoke them
-  (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-code-actions t "Enables understanding when to invoke code actions")
+  (lsp-ui-sideline-enable nil "Noisy to show symbol information in the sideline")
   ;; Hide diagnostics when typing because they can be intrusive
-  (lsp-ui-sideline-show-diagnostics nil)
+  (lsp-ui-sideline-show-diagnostics nil "Flycheck/flymake already highlights errors")
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil)

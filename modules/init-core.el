@@ -570,6 +570,12 @@
   (add-hook 'write-file-functions #'delete-trailing-whitespace)
   (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
+;; When you call `find-file', you do not need to clear the existing file path before adding the new
+;; one. Just start typing the whole path and Emacs will "shadow" the current one. For example, you
+;; are at "~/Documents/notes/file.txt" and you want to go to "~/.emacs.d/init.el", type the latter
+;; directly and Emacs will take you there.
+(file-name-shadow-mode 1)
+
 (provide 'init-core)
 
 ;;; init-core.el ends here

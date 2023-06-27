@@ -48,7 +48,6 @@
       :foldingRangeProvider
       :documentOnTypeFormattingProvider
       :documentLinkProvider
-      :documentHighlightProvider
       ;; Inlay hints are distracting
       :inlayHintProvider))
   :config

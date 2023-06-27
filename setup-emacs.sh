@@ -21,11 +21,10 @@ is_sudo() {
 }
 
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-        echo "$1 could not be found."
-        return
+    if command -v "$1" >/dev/null 2>&1; then
+        return 0 # true
     fi
+    return 1
 }
 
 install_emacs() {
@@ -607,6 +606,12 @@ cleanup() {
 }
 
 # is_sudo
+
+if command_exists emacs; then
+    echo "emacs found"
+else
+    echo "emacs not found"
+fi
 
 # install_ubuntu_packages
 # install_gcc

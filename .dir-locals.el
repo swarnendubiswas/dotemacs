@@ -41,7 +41,7 @@
     (
       (dired-omit-files
         .
-        "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|\\eln-cache\\'|\\eglot-java-eclipse-jdt-cache\\'|\\elisp-autofmt-cache\\'")))
+        "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|eln-cache|eglot-java-eclipse-jdt-cache|elisp-autofmt-cache|tree-sitter|share|elpa")))
 
   (emacs-lisp-mode
     .

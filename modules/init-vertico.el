@@ -57,6 +57,9 @@
   :hook
   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
   ;; the following fixes the path so the selected path does not have prepended junk left behind.
+  ;; This works with `file-name-shadow-mode' enabled. When you are in a sub-directory and use, say,
+  ;; `find-file' to go to your home '~/' or root '/' directory, Vertico will clear the old path to
+  ;; keep only your current input.
   (rfn-eshadow-update-overlay-hook . vertico-directory-tidy)
   :bind
   (:map

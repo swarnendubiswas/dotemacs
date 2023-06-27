@@ -313,82 +313,82 @@
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
 
-;; (use-package powerline
-;;   :preface
-;;   (defun sb/powerline-raw (str &optional face pad)
-;;     "Render STR as mode-line data using FACE and optionally PAD import.
-;; PAD can be left (`l') or right (`r')."
-;;     (when str
-;;       (let*
-;;         (
-;;           (rendered-str (format-mode-line str))
-;;           (padded-str
-;;             (concat
-;;               (when (and (> (length rendered-str) 0) (eq pad 'l))
-;;                 "")
-;;               (if (listp str)
-;;                 rendered-str
-;;                 str)
-;;               (when (and (> (length rendered-str) 0) (eq pad 'r))
-;;                 ""))))
-;;         (if face
-;;           (pl/add-text-property padded-str 'face face)
-;;           padded-str))))
+(use-package powerline
+  :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let*
+        (
+          (rendered-str (format-mode-line str))
+          (padded-str
+            (concat
+              (when (and (> (length rendered-str) 0) (eq pad 'l))
+                "")
+              (if (listp str)
+                rendered-str
+                str)
+              (when (and (> (length rendered-str) 0) (eq pad 'r))
+                ""))))
+        (if face
+          (pl/add-text-property padded-str 'face face)
+          padded-str))))
 
-;;   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-;;   (defun sb/powerline-sb-theme ()
-;;     "Setup a nano-like modeline"
-;;     (interactive)
-;;     (setq-default mode-line-format
-;;       '
-;;       ("%e"
-;;         (:eval
-;;           (let*
-;;             (
-;;               (active (powerline-selected-window-active))
-;;               (face0
-;;                 (if active
-;;                   'powerline-active0
-;;                   'powerline-inactive0))
-;;               (lhs
-;;                 (list
-;;                   (powerline-raw
-;;                     (concat
-;;                       "GNU Emacs "
-;;                       (number-to-string emacs-major-version)
-;;                       "."
-;;                       (number-to-string emacs-minor-version))
-;;                     nil 'l)))
-;;               (rhs
-;;                 (list
-;;                   (when which-function-mode
-;;                     (sb/powerline-raw which-func-format nil 'l))
-;;                   (powerline-vc nil 'l)
-;;                   (powerline-raw "")
-;;                   (powerline-raw "%4l" nil 'l)
-;;                   (powerline-raw ",")
-;;                   (powerline-raw "%3c" nil 'r)
-;;                   (if (buffer-modified-p)
-;;                     (powerline-raw " ⠾" nil 'r)
-;;                     (powerline-raw "  " nil 'r))))
-;;               (center (list (powerline-raw "%b" nil 'r))))
-;;             (concat
-;;               (powerline-render lhs)
-;;               (powerline-fill-center nil (/ (powerline-width center) 2.0))
-;;               (powerline-render center)
-;;               (powerline-fill nil (powerline-width rhs))
-;;               (powerline-render rhs)))))))
-;;   :if (eq sb/modeline-theme 'powerline)
-;;   :commands powerline-default-theme
-;;   :init
-;;   (setq
-;;     powerline-display-hud nil ; Visualization of the buffer position is not useful
-;;     powerline-display-buffer-size nil
-;;     powerline-display-mule-info nil ; File encoding information is not useful
-;;     powerline-gui-use-vcs-glyph t
-;;     powerline-height 20)
+  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+  (defun sb/powerline-sb-theme ()
+    "Setup a nano-like modeline"
+    (interactive)
+    (setq-default mode-line-format
+      '
+      ("%e"
+        (:eval
+          (let*
+            (
+              (active (powerline-selected-window-active))
+              (face0
+                (if active
+                  'powerline-active0
+                  'powerline-inactive0))
+              (lhs
+                (list
+                  (powerline-raw
+                    (concat
+                      "GNU Emacs "
+                      (number-to-string emacs-major-version)
+                      "."
+                      (number-to-string emacs-minor-version))
+                    nil 'l)))
+              (rhs
+                (list
+                  (when which-function-mode
+                    (sb/powerline-raw which-func-format nil 'l))
+                  (powerline-vc nil 'l)
+                  (powerline-raw "")
+                  (powerline-raw "%4l" nil 'l)
+                  (powerline-raw ",")
+                  (powerline-raw "%3c" nil 'r)
+                  (if (buffer-modified-p)
+                    (powerline-raw " ⠾" nil 'r)
+                    (powerline-raw "  " nil 'r))))
+              (center (list (powerline-raw "%b" nil 'r))))
+            (concat
+              (powerline-render lhs)
+              (powerline-fill-center nil (/ (powerline-width center) 2.0))
+              (powerline-render center)
+              (powerline-fill nil (powerline-width rhs))
+              (powerline-render rhs)))))))
+  :if (eq sb/modeline-theme 'powerline)
+  :commands powerline-default-theme
+  :init
+  (setq
+    powerline-display-hud nil ; Visualization of the buffer position is not useful
+    powerline-display-buffer-size nil
+    powerline-display-mule-info nil ; File encoding information is not useful
+    powerline-gui-use-vcs-glyph t
+    powerline-height 20)
 
-;;   (sb/powerline-sb-theme))
+  (sb/powerline-sb-theme))
 
 (use-package doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
@@ -431,9 +431,10 @@
   (cond
     ((string= (system-name) "inspiron-7572")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
-        (set-face-attribute 'mode-line nil :font "JetBrainsMono NF" :height 140)
-        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono NF" :height 140)))
+        ;; (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
+        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
+        (set-face-attribute 'mode-line nil :height 140)
+        (set-face-attribute 'mode-line-inactive nil :height 140)))
 
     ((string= (system-name) "DESKTOP-4T8O69V")
       (progn
@@ -456,8 +457,8 @@
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
         (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 150)
-        (set-face-attribute 'mode-line nil :font "JetBrainsMono Nerd Font" :height 120)
-        (set-face-attribute 'mode-line-inactive nil :font "JetBrainsMono Nerd Font" :height 120)))))
+        (set-face-attribute 'mode-line nil :height 120)
+        (set-face-attribute 'mode-line-inactive nil :height 120)))))
 
 (defun sb/init-fonts-daemon (frame)
   (cond

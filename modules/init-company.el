@@ -38,7 +38,10 @@
     company-dabbrev-code)
   :hook (emacs-startup-hook . global-company-mode)
   :bind
-  (("C-M-/" . company-other-backend)
+  (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
+    :map
+    company-mode-map
+    ([escape] . company-abort)
     :map
     company-active-map
     ("C-s" . company-search-candidates)
@@ -47,29 +50,29 @@
     ("C-p" . company-select-previous)
     ;; Insert the common part of all candidates, or select the next one
     ("<tab>" . company-complete-common-or-cycle)
-    ("[escape]" . company-abort)
+    ([escape] . company-abort)
+    ("C-w" . company-show-location)
     :map
     company-search-map
     ("C-s" . company-search-repeat-forward)
     ("C-r" . company-search-repeat-backward)
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
-  :custom
-  (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  (company-dabbrev-ignore-case nil "Do not ignore case when collecting completion candidates")
-  (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
+  :custom (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
+  ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
+  ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
-  (company-require-match nil "Allow input string that do not match candidates")
+  (company-require-match nil "Allow typing input characters that do not match candidates")
   (company-show-quick-access t "Speed up completion")
   ;; Align additional metadata, like type signatures, to the right-hand side if non-nil.
   (company-tooltip-align-annotations nil)
-  ;; Other choices are: "company-pseudo-tooltip-unless-just-one-frontend" which shows popup unless
-  ;; there is only one candidate, "company-preview-frontend" which shows the preview in-place which
-  ;; is too instrusive, "company-preview-if-just-one-frontend" shows in-place preview if there is
-  ;; only choice, and "company-echo-metadata-frontend" which shows selected candidate docs in echo
-  ;; area.
-  (company-frontends '(company-pseudo-tooltip-frontend)) ; Always show candidates in overlay tooltip
+  ;; Choices are: "company-pseudo-tooltip-unless-just-one-frontend" shows popup unless there is only
+  ;; one candidate, "company-preview-frontend" shows the preview in-place which is too intrusive,
+  ;; "company-preview-if-just-one-frontend" shows in-place preview if there is only choice,
+  ;; "company-echo-metadata-frontend" shows selected candidate docs in echo area, and
+  ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
+  (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (company-global-modes
     '
     (not dired-mode
@@ -202,14 +205,26 @@
   :after company
   :demand t)
 
+(use-package company-org-block
+  :after company
+  :demand t)
+
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
 ;; Merge completions of all the backends:
 ;; (setq company-backends '((company-xxx company-yyy company-zzz)))
 
-;; Merge completions of all the backends, give priority to `company-xxx':
-;; (setq company-backends '((company-xxx :separate company-yyy company-zzz)))
+;; Merge completions of all the backends but keep the candidates organized in accordance with the
+;; grouped backends order.
+;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
+
+;; Another keyword :with helps to make sure the results from major/minor mode agnostic backends
+;; (such as company-yasnippet, company-dabbrev-code) are returned without preventing results from
+;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
+;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
+;; :with, and only then put context agnostic backend(s).
+;; (setq company-backends '((company-capf :with company-yasnippet)))
 
 ;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
 ;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
@@ -232,19 +247,26 @@
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
-  (setq company-backends
+  (setq
+    company-backends
     '
     (company-dirfiles
-      company-dabbrev-code
-      ;; If we have `company-dabbrev' first, then other matches from
-      ;; `company-ispell' will be ignored.
-      (company-ispell :with company-dabbrev company-dict :separate)))
+      (company-capf :with company-dabbrev-code company-yasnippet)
+      ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
+      ;; ignored.
+      (company-ispell company-dabbrev company-dict :separate))
+    company-transformers
+    '
+    (delete-dups ; company-sort-by-backend-importance
+      ; company-sort-by-occurrence
+      company-sort-by-statistics
+      company-sort-prefer-same-case-prefix))
 
   (progn
     (declare-function sb/company-latex-mode "init-company")
 
     (defun sb/company-latex-mode ()
-      "Add backends for latex completion in company mode."
+      "Add backends for `latex-mode' completion in company mode."
       (make-local-variable 'company-backends)
 
       ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
@@ -286,14 +308,26 @@
           ))))
 
   (progn
+    (defun sb/company-org-mode ()
+      "Add backends for org completion in company mode."
+      (set
+        (make-local-variable 'company-backends)
+        '
+        (company-dirfiles
+          company-org-block
+          (company-ispell company-dabbrev company-dict :separate))))
+
+    (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
+
+  (progn
     (declare-function sb/company-text-mode "init-company")
 
     (defun sb/company-text-mode ()
-      "Add backends for text completion in company mode."
+      "Add backends for `text-mode' completion in company mode."
       (defvar company-backends)
       (set
         (make-local-variable 'company-backends)
-        '(company-dirfiles (company-ispell :with company-dabbrev company-dict :separate))))
+        '(company-dirfiles (company-dabbrev company-ispell company-dict :separate))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -323,21 +357,22 @@
             '
             (company-dirfiles
               (company-capf
-                ;; Cannot use company-citre-tags backend with eglot
+                :with
                 company-dabbrev-code ; Useful for variable names
-                :with company-yasnippet
+                company-yasnippet
                 :separate)
-              (company-dabbrev :with company-dict company-ispell :separate))))
+              (company-dabbrev company-dict company-ispell :separate))))
         ((eq sb/lsp-provider 'lsp-mode)
           (setq company-backends
             '
             (company-dirfiles
               (company-capf
                 company-citre-tags
+                :with
                 company-dabbrev-code ; Useful for variable names
-                :with company-yasnippet
+                company-yasnippet
                 :separate)
-              (company-dabbrev :with company-dict company-ispell :separate))))))
+              (company-dabbrev company-dict company-ispell :separate))))))
 
     (add-hook
       'prog-mode-hook
@@ -362,11 +397,12 @@
         '
         (company-dirfiles
           (company-capf
-            company-elisp company-keywords company-citre-tags
+            company-elisp company-citre-tags
+            :with company-keywords
             company-dabbrev-code ; Useful for variable names
-            :with company-yasnippet
+            company-yasnippet
             :separate)
-          (company-dabbrev :with company-dict company-ispell :separate))))
+          (company-dabbrev company-dict company-ispell :separate))))
 
     (add-hook 'emacs-lisp-mode-hook (lambda () (sb/company-elisp-mode)))))
 
