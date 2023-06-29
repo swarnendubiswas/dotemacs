@@ -321,6 +321,7 @@
     ("cna" "can" nil :count 1)
     ("cnosistency" "Consistency" nil :count 1)
     ("coflicting" "conflicting" nil :count 1)
+    ("cohices" "choices" nil :count 0)
     ("colection" "collection" nil :count 0)
     ("collission" "collision" nil :count 1)
     ("comanies" "companies" nil :count 0)

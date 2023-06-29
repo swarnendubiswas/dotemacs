@@ -65,8 +65,7 @@
   :custom
   (compilation-always-kill t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")
-  ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first
-  ;; error.
+  ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first error.
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation

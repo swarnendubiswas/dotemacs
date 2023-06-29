@@ -135,6 +135,7 @@
   (completion-styles '(orderless substring basic))
   (completion-category-defaults nil)
   :config
+  ;; Show docstring description for completion candidates in commands like `describe-function'.
   (when sb/EMACS28+
     (setq completions-detailed t))
 

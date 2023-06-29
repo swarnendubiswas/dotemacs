@@ -13,6 +13,7 @@
 (defvar sb/minibuffer-completion)
 (defvar sb/project-handler)
 
+(declare-function sb/smerge-hydra/body "init-keybindings")
 (declare-function consult--customize-put "consult")
 
 (use-package transient
@@ -463,6 +464,216 @@
   (when (eq sb/minibuffer-completion 'ivy)
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))
+
+(use-package isearch
+  :straight (:type built-in)
+  :bind
+  ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
+  (("C-s")
+    ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `sp-forward-sexp'
+    ("C-f" . isearch-forward-regexp) ("C-r" . isearch-backward-regexp)
+    :map isearch-mode-map ("C-s") ("C-f" . isearch-repeat-forward) ("C-c C-o" . isearch-occur))
+  :custom
+  (search-highlight t "Highlight incremental search")
+  (isearch-lazy-highlight t)
+  (isearch-lazy-count t))
+
+(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
+  :after isearch
+  :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
+  :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
+
+;; (use-package anzu
+;;   :init
+;;   (setq
+;;     anzu-search-threshold 10000
+;;     anzu-minimum-input-length 2)
+;;   (global-anzu-mode 1)
+;;   :bind ([remap query-replace-regexp] . anzu-query-replace-regexp)
+;;   :diminish anzu-mode)
+
+(with-eval-after-load "grep"
+  (defvar grep-highlight-matches)
+  (defvar grep-scroll-output)
+  (defvar grep-find-ignored-directories)
+
+  (setq
+    grep-command "grep --color -irHn "
+    grep-highlight-matches t
+    grep-scroll-output t)
+
+  (when (executable-find "rg")
+    (setq grep-program "rg")
+    (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
+
+  (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
+    (add-to-list 'grep-find-ignored-directories dirs)))
+
+(when (executable-find "fd")
+  (setq find-program "fd"))
+
+;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
+;; minutes.
+(use-package wgrep ; Writable grep
+  ;; Allows you to edit a deadgrep buffer and apply those changes to the file buffer.
+  :hook (deadgrep-finished-hook . wgrep-deadgrep-setup)
+  :bind
+  (:map
+    grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
+    ("C-x C-p" . wgrep-change-to-wgrep-mode)
+    ("C-x C-s" . wgrep-finish-edit)
+    ("C-x C-k" . wgrep-abort-changes)
+    ("C-x C-q" . wgrep-exit))
+  :custom (wgrep-auto-save-buffer t))
+
+(use-package deadgrep
+  :bind ("C-c s d" . deadgrep)
+  :custom (deadgrep-max-buffers 1))
+
+;; `avy-setup-default' will bind `avy-isearch' to "C-'" in `isearch-mode-map', so that you can
+;; select one of the currently visible `isearch' candidates using `avy'.
+(use-package avy
+  :commands avy-setup-default
+  :bind
+  (("C-\\" . avy-goto-word-1)
+    ("C-'" . avy-goto-char-timer) ("C-/" . avy-goto-line)
+    :map isearch-mode-map
+    ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
+    ;; `isearch' candidates.
+    ("C-'" . avy-isearch))
+  :custom (avy-background t "Provides better contrast"))
+
+(use-package re-builder
+  :custom (reb-re-syntax 'string))
+
+;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
+;; and replacements as you type.
+(use-package visual-regexp
+  :bind
+  ([remap query-replace] . vr/query-replace)
+  ([remap replace-regex] . vr/replace))
+
+(use-package ripgrep
+  :commands (ripgrep-regexp projectile-ripgrep))
+
+(use-package rg
+  :commands
+  (rg-menu
+    rg-isearch-menu
+    rg-project
+    rg
+    rg-literal
+    rg-dwim
+    rg-dwim-current-dir
+    rg-dwim-project-dir))
+
+(use-package vc-hooks
+  :straight (:type built-in)
+  :custom (vc-follow-symlinks t "No need to ask")
+  ;; Disabling vc is said to improve performance. However, I find it useful to show branch
+  ;; information on the modeline and highlight modifications in the current file.
+  (vc-handled-backends '(Git)))
+
+(use-package magit
+  :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
+  :custom
+  ;; Open the status buffer in a full frame
+  (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  ;; Suppress the message "Turning on magit-auto-revert-mode" when loading Magit
+  (magit-no-message '("Turning on magit-auto-revert-mode..."))
+  ;; https://irreal.org/blog/?p=8877
+  (magit-section-initial-visibility-alist
+    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
+  :config
+  (require 'magit-diff)
+  (setq
+    magit-diff-refine-hunk t
+    magit-diff-highlight-trailing nil))
+
+(use-package git-modes
+  :commands (gitignore-mode gitattributes-mode gitconfig-mode)
+  :mode ("dotgitconfig" . gitconfig-mode))
+
+;; Diff-hl looks nicer than git-gutter, and is based on `vc'
+(use-package diff-hl
+  :if (boundp 'vc-handled-backends)
+  :hook
+  (
+    (diff-hl-mode-on-hook
+      .
+      (lambda ()
+        (unless (display-graphic-p)
+          (diff-hl-margin-local-mode 1))))
+    (dired-mode-hook . diff-hl-dired-mode-unless-remote) (emacs-startup-hook . global-diff-hl-mode))
+  :custom
+  (diff-hl-draw-borders nil "Highlight without a border looks nicer")
+  (diff-hl-disable-on-remote t)
+  :config (diff-hl-flydiff-mode 1)
+
+  ;; Display margin since the fringe is unavailable in TTY
+  ;; (unless (display-graphic-p)
+  ;;   (diff-hl-margin-mode 1))
+
+  (with-eval-after-load "magit"
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+    (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
+
+;; Use "M-p/n" to cycle between older commit messages.
+(use-package git-commit
+  :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
+  :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
+
+;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
+(use-package smerge-mode
+  :preface
+  (defun sb/enable-smerge-maybe-with-vc ()
+    "Enable `smerge-mode' automatically based on conflict markers."
+    (when (and buffer-file-name (vc-backend buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^<<<<<<< " nil t)
+          (smerge-mode 1)))))
+
+  (defun sb/enable-smerge-maybe-without-vc ()
+    "Enable `smerge-mode' automatically based on conflict markers."
+    (save-excursion
+      (goto-char (point-min))
+      (when (re-search-forward "^<<<<<<< " nil t)
+        (smerge-mode 1))))
+  :straight (:type built-in)
+  :commands
+  (smerge-next
+    smerge-prev
+    smerge-auto-leave
+    smerge-keep-base
+    smerge-keep-upper
+    smerge-keep-lower
+    smerge-keep-all
+    smerge-diff-base-lower
+    smerge-diff-base-upper
+    smerge-diff-upper-lower
+    smerge-refine
+    smerge-combine-with-next
+    smerge-resolve)
+  :init
+  (add-hook 'find-file-hook #'sb/enable-smerge-maybe-with-vc :append)
+  (add-hook 'after-revert-hook #'sb/enable-smerge-maybe-with-vc :append)
+  :bind
+  (:map
+    smerge-mode-map
+    ("M-g n" . smerge-next)
+    ("M-g p" . smerge-prev)
+    ("M-g c" . smerge-keep-current)
+    ("M-g u" . smerge-keep-upper)
+    ("M-g l" . smerge-keep-lower)
+    ("M-g b" . smerge-keep-base)
+    ("M-g a" . smerge-keep-all)
+    ("M-g e" . smerge-ediff)
+    ("M-g K" . smerge-kill-current)
+    ("M-g m" . smerge-context-menu)
+    ("M-g M" . smerge-popup-context-menu)))
+
+(use-package with-editor :diminish)
 
 (provide 'init-misc)
 

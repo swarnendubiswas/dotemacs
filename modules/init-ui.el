@@ -118,9 +118,11 @@
     split-height-threshold nil
     split-width-threshold 0))
 
-(use-package hl-line
-  :commands hl-line-highlight
-  :hook (emacs-startup-hook . global-hl-line-mode))
+;; The color sometimes makes it difficult to distinguish text on terminals.
+
+;; (use-package hl-line
+;;   :commands hl-line-highlight
+;;   :hook (emacs-startup-hook . global-hl-line-mode))
 
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
 ;; we use TUI Emacs. Then, the terminal font setting will be used.

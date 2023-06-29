@@ -228,7 +228,6 @@ Prefer the straight.el package manager instead."
     (require 'init-vertico)))
 
 (require 'init-spell)
-(require 'init-search)
 (require 'init-parens)
 (require 'init-misc)
 (require 'init-checkers)
@@ -255,7 +254,6 @@ Prefer the straight.el package manager instead."
   ((eq sb/lsp-provider 'eglot)
     (require 'init-eglot)))
 
-(require 'init-vcs)
 (require 'init-org)
 (require 'init-latex)
 (require 'init-functions)

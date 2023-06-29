@@ -50,13 +50,11 @@
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens
   :commands
-  (sp-pair
-    sp-local-pair
+  (sp-local-pairs
     sp-raise-sexp
     sp-join-sexp
     sp-absorb-sexp
     sp-transpose-sexp
-    sp-absort-sexp
     sp-copy-sexp
     sp-backward-kill-sexp
     sp-kill-sexp
@@ -83,8 +81,7 @@
       .
       (lambda ()
         (smartparens-global-mode 1)
-        (show-smartparens-global-mode 1)
-        (require 'smartparens-config))))
+        (show-smartparens-global-mode 1))))
   :bind
   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
     ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
@@ -104,7 +101,7 @@
   (sp-highlight-pair-overlay nil "show-parens is faster")
   (sp-highlight-wrap-overlay nil "show-parens is faster")
   (sp-highlight-wrap-tag-overlay nil)
-  :config
+  :config (require 'smartparens)
   ;; Introduces overhead to track parentheses pairs
   (smartparens-strict-mode -1)
 
@@ -112,26 +109,59 @@
   (sp-pair "(" nil :unless '(sp-point-before-word-p))
   (sp-pair "[" nil :unless '(sp-point-before-word-p))
   (sp-pair "{" nil :unless '(sp-point-before-word-p))
-
   ;; Do not pair quotes unless they are free
   (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
-  ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
-  (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
+  (with-eval-after-load "cc-mode"
+    (require 'smartparens-c)
+    (sp-with-modes '(c-mode c++-mode) (sp-local-pair "/\*\*" "\*\*/")))
 
-  (sp-with-modes '(c-mode c++-mode) (sp-local-pair "/\*\*" "\*\*/"))
+  (dolist (majmode '("html-mode" "nxml-mode" "web-mode"))
+    (with-eval-after-load majmode
+      (require 'smartparens-html)))
+
+  (with-eval-after-load "latex-mode"
+    (require 'smartparens-latex)
+    ;; Do not insert a "$" pair when the point is at the beginning or the end of a word
+    (sp-local-pair 'latex-mode "$" nil :unless '(sp-point-before-word-p sp-point-after-word-p)))
+
+  (with-eval-after-load "markdown-mode"
+    (require 'smartparens-markdown))
+
+  (with-eval-after-load "python-mode"
+    (require 'smartparens-python))
+
+  (with-eval-after-load "text-mode"
+    (require 'smartparens-text))
 
   (sp-with-modes 'java-mode (sp-local-pair "/\*\*" "\*\*/") (sp-local-pair "/\*" "\*/"))
 
-  ;; Do not insert a "=" pair when the point is at the beginning or the end of a word
-  (sp-with-modes
-    'org-mode
-    (sp-local-pair "~" "~" :unless '(sp-point-after-word-p sp-point-before-word-p))
-    (sp-local-pair
-      "="
-      "="
-      :unless '(sp-point-after-word-p sp-point-before-word-p)
-      :post-handlers '(("[d1]" "SPC"))))
+  (with-eval-after-load "org"
+    (require 'smartparens-org)
+    (sp-with-modes
+      'org-mode
+      (sp-local-pair
+        "*"
+        "*"
+        :unless '(sp-point-before-word-p sp-point-after-word-p sp-point-at-bol-p)
+        :skip-match 'sp--org-skip-asterisk)
+      (sp-local-pair "_" "_" :unless '(sp-point-before-word-p sp-point-after-word-p))
+      (sp-local-pair
+        "/"
+        "/"
+        :unless '(sp-point-before-word-p sp-point-after-word-p sp-org-point-after-left-square-bracket-p)
+        :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair
+        "~"
+        "~"
+        :unless '(sp-point-after-word-p sp-point-before-word-p)
+        :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair
+        "="
+        "="
+        :unless '(sp-point-after-word-p sp-point-before-word-p)
+        :post-handlers '(("[d1]" "SPC")))
+      (sp-local-pair "«" "»")))
   :diminish)
 
 (provide 'init-parens)

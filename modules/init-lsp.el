@@ -22,6 +22,7 @@
     (with-eval-after-load "orderless"
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(orderless))))
   :if (eq sb/lsp-provider 'lsp-mode)
+  :after tree-sitter
   :defines
   (lsp-perl-language-server-path
     lsp-perl-language-server-port

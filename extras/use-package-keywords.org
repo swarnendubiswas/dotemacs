@@ -1,29 +1,29 @@
-* Order of ~use-package~ keywords
+* Order of =use-package= keywords
 
-- ~:preface~
-- ~:straight~ or ~:ensure~
-- ~:if~ or ~:when~ or ~:unless~
-- ~:disabled~
-- ~:after~ or ~:requires~
-- ~:demand~
-- ~:no-require~
-- ~:defer~
-- ~:load-path~
-- ~:pin~
-- ~:defines~
-- ~:functions~
-- ~:commands~
-- ~:init~
-- ~:magic~
-- ~:mode~
-- ~:interpreter~
-- ~:hook~
-- ~:bind-keymap~ or ~:bind-keymap*~
-- ~:bind~ or ~:bind*~
-- ~:custom-face~
-- ~:custom~
-- ~:config~
-- ~:catch~
-- ~:diminish~ or ~:delight~
+- =:preface=
+- =:straight= or =:ensure=
+- =:if= or =:when= or =:unless=
+- =:disabled=
+- =:after= or =:requires=
+- =:demand=
+- =:no-require=
+- =:defer=
+- =:load-path=
+- =:pin=
+- =:defines=
+- =:functions=
+- =:commands=
+- =:init=
+- =:magic=
+- =:mode=
+- =:interpreter=
+- =:hook=
+- =:bind-keymap= or =:bind-keymap*=
+- =:bind= or =:bind*=
+- =:custom-face=
+- =:custom=
+- =:config=
+- =:catch=
+- =:diminish= or =:delight=
 
-  Put the keyword on a separate line if the following clause spans multiple lines.
+Put the keyword on a separate line if the following clause spans multiple lines.

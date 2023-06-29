@@ -98,7 +98,8 @@
   ;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
-  (add-to-list 'popwin:special-display-config '(comint-mode :noselect t)))
+  (add-to-list 'popwin:special-display-config '(comint-mode :noselect t))
+  (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil)))
 
 ;; TODO: Try Shackle
 (use-package shackle

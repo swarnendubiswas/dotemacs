@@ -17,6 +17,7 @@
   :bind
   (:map
     corfu-map
+    ("ESCAPE" . corfu-quit)
     ([escape] . corfu-quit)
     ("TAB" . corfu-next)
     ([tab] . corfu-next)
@@ -176,12 +177,16 @@
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
 ;; (add-hook 'completion-at-point-functions #'cape-path)
 
+;; `cape-super-capf' works only well for static completion functions like `cape-dabbrev',
+;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like
+;; `cape-file'.
+
 (use-package cape
   :after corfu
   :demand t
   :commands
   (cape-history ; Complete from Eshell, Comint or minibuffer history
-    cape-file
+    cape-file ; Complete file name at point
     cape-keyword ; Complete programming language keyword
     cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
     cape-abbrev ; Complete abbreviation at point
@@ -189,20 +194,8 @@
     cape-line ; Complete current line from other lines in buffer
     cape-symbol ; Elisp symbol
     cape-elisp-block ; Complete Elisp in Org or Markdown code block
-    cape-ispell ; Complete word at point with Ispell
-    cape-dabbrev ; Complete with Dabbrev at point
-    cape-capf-buster
-    cape-company-to-capf
-    ;; `cape-super-capf' works only well for static completion functions like `cape-dabbrev',
-    ;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like
-    ;; `cape-file'.
-    cape-super-capf
-    sh-completion-at-point-function
-    comint-completion-at-point
-    citre-completion-at-point
-    TeX--completion-at-point
-    completion-at-point
-    complete-tag)
+    ;; Complete with Dabbrev at point
+    cape-dabbrev)
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
@@ -230,13 +223,14 @@
   (add-hook
     'text-mode-hook
     (lambda ()
-      (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t)
-      ;; (setq-local completion-at-point-functions
-      ;;   '(cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))
+      ;; (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t)
 
-      (progn
-        (add-to-list 'completion-at-point-functions #'cape-file)
-        (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)))))
+      ;; (progn
+      ;;   (add-to-list 'completion-at-point-functions #'cape-file)
+      ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)))
+
+      (setq-local completion-at-point-functions
+        (list (cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))))
 
   (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
     (add-hook
@@ -257,15 +251,17 @@
     (add-hook
       lsp-prog-modes
       (lambda ()
-        ;; (setq-local completion-at-point-functions
-        ;;   (append
-        ;;     completion-at-point-functions
-        ;;     '(cape-keyword cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
-        (progn
-          (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-          (add-to-list 'completion-at-point-functions #'cape-file 'append)
-          (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
-            'append))))))
+        (setq-local completion-at-point-functions
+          (append
+            completion-at-point-functions
+            (list (#'cape-keyword #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
+
+          ;; (progn
+          ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+          ;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
+          ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
+          ;;     'append))
+          )))))
 
 (provide 'init-corfu)
 

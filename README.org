@@ -332,9 +332,12 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 
 ** Profile startup time
 
-~emacs -Q -l /home/swarnendu/github/dotemacs/extras/profile-dotemacs.el -f profile-dotemacs~
+Estimate the best possible startup time with =emacs -q --eval​='(message "%s" (emacs-init-time))'=.
+There are a few choices to evaluate the performance of the configuration.
 
-Estimate the best possible startup time: =emacs -q --eval​='(message "%s" (emacs-init-time))'=
+- Set =use-package-compute-statistics= and then invoke =use-package-report=
+- Use the package =benchmark-init=
+- Use the script =profile-dotemacs.el= as follows: ~emacs -Q -l $HOME/.emacs.d/extras/profile-dotemacs.el -f profile-dotemacs~
 
 - [[https://blog.d46.us/advanced-emacs-startup][Advanced Techniques for Reducing Emacs Startup Time]]
 
@@ -342,5 +345,6 @@ Estimate the best possible startup time: =emacs -q --eval​='(message "%s" (ema
 
 - Flickering with =corfu-terminal-mode=
 - Disable pairing = before at the beginning of a word in =smartparens=
-- =flycheck-mode= is disabled for Elisp configuration files
-- Fix issue with copying and yanking
+- Enable =flycheck-mode= for Elisp configuration files
+- Fix the issue with copying and yanking
+- Support multihop SSH

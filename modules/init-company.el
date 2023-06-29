@@ -40,9 +40,6 @@
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
     :map
-    company-mode-map
-    ([escape] . company-abort)
-    :map
     company-active-map
     ("C-s" . company-search-candidates)
     ("C-M-s" . company-filter-candidates)

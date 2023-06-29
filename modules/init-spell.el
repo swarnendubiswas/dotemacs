@@ -22,35 +22,34 @@
   (ispell-alternate-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (ispell-silently-savep t "Save a new word to personal dictionary without asking")
   :config
-  (when (and (symbol-value 'sb/IS-WINDOWS) (executable-find "hunspell"))
-    (setenv "LANG" "en_US")
-    (setenv "DICTIONARY" "en_US")
-    (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-
-    (setq
-      ispell-local-dictionary "en_US"
-      ispell-program-name "hunspell"
-      ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-      ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-      ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
-
-  (when (and (symbol-value 'sb/IS-LINUX) (executable-find "aspell"))
-    (setq
-      ispell-program-name "aspell"
-      ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))
-
-
-  (when (and (symbol-value 'sb/IS-LINUX) (executable-find "hunspell"))
-    (setenv "LANG" "en_US")
-    (setenv "DICTIONARY" "en_US")
-    (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-
-    (setq
-      ispell-local-dictionary "en_US"
-      ispell-program-name "hunspell"
-      ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-      ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-      ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))
+  (cond
+    ((and (symbol-value 'sb/IS-LINUX) (executable-find "hunspell"))
+      (progn
+        (setenv "LANG" "en_US")
+        (setenv "DICTIONARY" "en_US")
+        (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
+        (setq
+          ispell-local-dictionary "en_US"
+          ispell-program-name "hunspell"
+          ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+          ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+          ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
+    ((and (symbol-value 'sb/IS-LINUX) (executable-find "aspell"))
+      (progn
+        (setq
+          ispell-program-name "aspell"
+          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))))
+    (((and (symbol-value 'sb/IS-WINDOWS) (executable-find "hunspell")))
+      (progn
+        (setenv "LANG" "en_US")
+        (setenv "DICTIONARY" "en_US")
+        (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
+        (setq
+          ispell-local-dictionary "en_US"
+          ispell-program-name "hunspell"
+          ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+          ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+          ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))))
 
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
@@ -121,7 +120,6 @@
             (setq arg 0))
           (forward-word)))))
   :straight (:type built-in)
-  :commands (flyspell-overlay-p flyspell-correct-previous flyspell-correct-next flyspell-buffer)
   :hook
   ( ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
     ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and

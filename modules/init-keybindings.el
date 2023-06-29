@@ -7,6 +7,10 @@
 
 ;;; Code:
 
+;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
+;; "C-<up>". Standalone special keys (and some combinations) can be written in square brackets, e.g.
+;; [tab] instead of "<tab>".
+
 (defvar sb/minibuffer-completion)
 (defvar popup-menu-keymap)
 (defvar sb/tab-bar-handler)
@@ -592,13 +596,12 @@
 
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
-  ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
+;; Alacritty is my preferred terminal for customizing Emacs keybindings.
 (use-package term-keys
   :straight (:host github :repo "CyberShadow/term-keys")
   :unless (display-graphic-p)
   :hook (emacs-startup-hook . term-keys-mode)
-  :config
-  (require 'term-keys-alacritty))
+  :config (require 'term-keys-alacritty))
 
 ;; (with-eval-after-load "transient"
 ;;   (transient-define-prefix sb/help-transient ()
