@@ -7,6 +7,7 @@
 
 ;;; Code:
 
+(defvar tags-revert-without-query)
 (defvar sb/fill-column)
 (defvar hs-isearch-open)
 (defvar sb/minibuffer-completion)
@@ -837,6 +838,579 @@
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
   :hook (ssh-config-mode-hook . turn-on-font-lock))
+
+;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
+;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
+;; There are two easy options: (i) press "C-c C-l" (`org-insert-link') while your point is within a
+;; link and you will be prompted to edit its URL in the minibuffer. You can use the same command to
+;; create new links (when your point is not on an existing link). (ii) You can convert the
+;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
+;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
+
+;; https://orgmode.org/manual/In_002dbuffer-Settings.html
+(use-package org
+  :defer 2
+  :defines
+  (org-hide-leading-stars-before-indent-mode
+    org-src-strip-leading-and-trailing-blank-lines
+    org-src-tabs-acts-natively)
+  :commands (org-indent-mode)
+  :custom
+  (org-fontify-whole-heading-line nil)
+  (org-fontify-emphasized-text t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
+  (org-hide-leading-stars nil "Show every star as it helps identify the indentation level")
+  (org-hide-leading-stars-before-indent-mode nil)
+  ;; Code block fontification using the major-mode of the code
+  (org-src-fontify-natively t)
+  (org-src-preserve-indentation t)
+  (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
+  (org-src-window-setup 'current-window)
+  ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
+  ;; feels better with the mode disabled.
+  (org-startup-indented t "Indentation looks nice")
+  (org-startup-truncated nil)
+  ;; https://orgmode.org/manual/Initial-visibility.html
+  (org-startup-folded 'showeverything)
+  (org-startup-with-inline-images t)
+  (org-support-shift-select t)
+  ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
+  ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
+  ;; blocks commands and their related keys.
+  (org-use-speed-commands t)
+  (org-src-strip-leading-and-trailing-blank-lines t)
+  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
+  (org-pretty-entities t)
+  ;; Render subscripts and superscripts in org buffers
+  (org-pretty-entities-include-sub-superscripts t)
+  ;; Automatically sorted and renumbered whenever I insert a new one
+  (org-footnote-auto-adjust t)
+  (org-return-follows-link t)
+  (org-adapt-indentation nil)
+  (org-odd-levels-only t "Use odd levels to add more indentation")
+  (org-export-with-smart-quotes t "#+OPTIONS ':t")
+  (org-export-with-section-numbers nil "#+OPTIONS num:nil")
+  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a headline
+  (org-export-with-toc nil)
+  (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
+  ;; This exports broken links as [BROKEN LINK %s], so we can actually find them. The default value
+  ;; nil just aborts the export process with an error message "Unable to resolve link: nil". This
+  ;; doesn't give any hint on which line the broken link actually is.
+  (org-export-with-broken-links 'mark)
+  (org-indent-indentation-per-level 1)
+  (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
+  :config
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+
+  (setq org-latex-pdf-process
+    '
+    ("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+
+  (with-eval-after-load "org-indent"
+    (diminish 'org-indent-mode))
+  :bind-keymap ("C-c o" . org-mode-map)
+  :bind
+  (:map
+    org-mode-map
+    ("M-<left>")
+    ("M-<right>")
+    ("M-<up>")
+    ("M-<down>")
+    ("C-'")
+    ("C-c C-d") ; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
+    ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
+    ("C-c C-j")
+    ;; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
+    ("M-e")
+    ("<tab>" . org-indent-item)
+    ("<backtab>" . org-outdent-item)
+    ("M-{" . org-backward-element)
+    ("M-}" . org-forward-element)
+    ("C-c C-," . org-insert-structure-template)))
+
+;; Disable the package to get consistent styles across themes.
+
+;; (use-package org-bullets
+;;   :disabled t
+;;   :hook (org-mode-hook . org-bullets-mode))
+
+(use-package org-appear ; Make invisible parts of Org elements appear visible
+  :straight (:host github :repo "awth13/org-appear")
+  :hook (org-mode-hook . org-appear-mode)
+  :custom
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities t)
+  (org-appear-autolinks t)
+  (org-appear-autoemphasis t)
+  (org-appear-autokeywords t))
+
+(use-package ox-gfm
+  :after org
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
+
+(use-package ox-pandoc
+  :after org
+  :commands
+  (org-pandoc-export-to-markdown
+    org-pandoc-export-as-markdown
+    org-pandoc-export-to-markdown-and-open))
+
+;; (use-package org-modern
+;;   :disabled t
+;;   :hook (org-mode-hook . org-modern-mode))
+
+;; (use-package org-modern-indent
+;;   :straight (:host github :repo "jdtsmith/org-modern-indent")
+;;   :disabled t
+;;   :hook (org-mode-hook . org-modern-indent-mode))
+
+;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
+
+;; (use-package org-superstar
+;;   :disabled t
+;;   :hook (org-mode-hook . org-superstar-mode))
+
+;; (use-package org-block-capf
+;;   :straight (:host github :repo "xenodium/org-block-capf")
+;;   :hook (org-mode-hook . org-block-capf-add-to-completion-at-point-functions)
+;;   :custom (org-block-capf-edit-style 'inline))
+
+(defvar sb/minibuffer-completion)
+(defvar sb/user-tmp-directory)
+
+;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
+;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
+;; the tex package.
+
+(use-package tex
+  :straight auctex
+  :mode ("\\.tex\\'" . LaTeX-mode)
+  :defines
+  (tex-fontify-script
+    font-latex-fontify-script
+    font-latex-fontify-sectioning
+    TeX-syntactic-comment
+    TeX-save-query
+    LaTeX-item-indent
+    LaTeX-syntactic-comments
+    LaTeX-fill-break-at-separators)
+  :functions (TeX-active-process)
+  :commands
+  (TeX-active-process
+    TeX-save-document
+    tex-site
+    LaTeX-mode
+    LaTeX-math-mode
+    TeX-PDF-mode
+    TeX-source-correlate-mode
+    TeX-active-process
+    TeX-command-menu
+    TeX-revert-document-buffer
+    TeX-master-file
+    TeX-next-error)
+  :hook
+  (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
+    ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
+    ;; Jump between editor and pdf viewer
+    ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
+    ((latex-mode-hook LaTeX-mode-hook) . turn-on-auto-fill)
+    ((latex-mode-hook LaTeX-mode-hook)
+      .
+      (lambda ()
+        (cond
+          ((eq sb/lsp-provider 'eglot)
+            (eglot-ensure))
+          ((eq sb/lsp-provider 'lsp-mode)
+            (lsp-deferred))))))
+  :config
+  (setq
+    TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
+    TeX-auto-untabify t ; Remove all tabs before saving
+    TeX-clean-confirm nil
+    ;; Automatically insert braces after typing ^ and _ in math mode
+    TeX-electric-sub-and-superscript t
+    TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
+    TeX-parse-self t ; Parse documents
+    TeX-quote-after-quote nil ; Allow original LaTeX quotes
+    TeX-save-query nil ; Save buffers automatically when compiling
+    TeX-source-correlate-method 'synctex
+    ;; Do not start the emacs server when correlating sources
+    TeX-source-correlate-start-server t
+    TeX-syntactic-comment t
+    TeX-view-program-selection '((output-pdf "PDF Tools"))
+    TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+    LaTeX-item-indent 0 ; Indent lists by two spaces
+    LaTeX-syntactic-comments t
+    LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
+    tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
+    ;; Avoid superscripts and subscripts from being displayed in a different font size
+    font-latex-fontify-script nil
+    ;; Avoid emphasizing section headers
+    font-latex-fontify-sectioning 1.0)
+
+  (setq-default TeX-master nil) ; Always query for the master file
+
+  ;; Revert PDF buffer after TeX compilation has finished
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+
+  ;; Enable rainbow mode after applying styles to the buffer
+  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
+
+  (unbind-key "C-c ;" TeX-mode-map)
+  (unbind-key "C-c C-d" TeX-mode-map)
+  (bind-key "$" #'self-insert-command TeX-mode-map)
+  ;; (unbind-key "`" LaTeX-math-mode-map)
+  :bind ("C-c x q" . TeX-insert-quote))
+
+(use-package bibtex
+  :straight (:type built-in)
+  :hook
+  ((bibtex-mode-hook . turn-on-auto-revert-mode)
+    (bibtex-mode-hook
+      .
+      (lambda ()
+        (cond
+          ((eq sb/lsp-provider 'eglot)
+            (eglot-ensure))
+          ((eq sb/lsp-provider 'lsp-mode)
+            (lsp-deferred))))))
+  :custom
+  (bibtex-align-at-equal-sign t)
+  (bibtex-maintain-sorted-entries t)
+  (bibtex-comma-after-last-field nil))
+
+;; Reftex is useful to view ToC even with LSP support
+;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
+
+(use-package reftex
+  :preface
+  (defun sb/get-bibtex-keys (file)
+    (with-current-buffer (find-file-noselect file)
+      (mapcar 'car (bibtex-parse-keys))))
+
+  (defun sb/reftex-add-all-bibitems-from-bibtex ()
+    (interactive)
+    (mapc
+      'LaTeX-add-bibitems
+      (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+
+  (defun sb/find-bibliography-file ()
+    "Try to find a bibliography file using RefTeX.
+      Returns a string with text properties (as expected by read-file-name) or
+empty string if no file can be found"
+    (interactive)
+    (let ((bibfile-list nil))
+      (condition-case nil
+        (setq bibfile-list (reftex-get-bibfile-list))
+        (error
+          (ignore-errors
+            (setq bibfile-list (reftex-default-bibliography)))))
+      (if bibfile-list
+        (car bibfile-list)
+        "")))
+
+  (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
+    "Try to find a bibliography file using RefTex and parse the bib keys.
+Ignore if no file is found."
+    (interactive)
+    (let ((bibfile-list nil))
+      (condition-case nil
+        (setq bibfile-list (reftex-get-bibfile-list))
+        (error
+          (ignore-errors
+            (setq bibfile-list (reftex-default-bibliography)))))
+      ;; (message "%s" bibfile-list)
+      (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+  :straight (:type built-in)
+  :commands
+  (reftex-get-bibfile-list
+    bibtex-parse-keys
+    reftex-mode
+    reftex-toc-rescan
+    reftex-toc-Rescan
+    reftex-default-bibliography)
+  :hook ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
+  :bind
+  (("C-c [" . reftex-citation)
+    ("C-c )" . reftex-reference)
+    ("C-c (" . reftex-label)
+    ("C-c =" . reftex-toc)
+    ("C-c -" . reftex-toc-recenter)
+    ("C-c &" . reftex-view-crossref))
+  :custom
+  (reftex-plug-into-AUCTeX t)
+  (reftex-enable-partial-scans t)
+  (reftex-highlight-selection 'both)
+  (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
+  (reftex-revisit-to-follow t)
+  (reftex-auto-recenter-toc t "Center on the section currently being edited")
+  (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
+  (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
+  (reftex-toc-split-windows-horizontally t) ; Show reftex TOC on the left
+  (reftex-ref-macro-prompt nil) ; No unnecessary prompts
+  ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
+  (reftex-use-fonts t "Use nice fonts for TOC")
+  ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
+  (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
+  ;; Throw away buffers created for parsing, but keep the ones created for lookup
+  (reftex-keep-temporary-buffers 1)
+  (reftex-trust-label-prefix '("fn:" "eq:" "sec:" "fig:" "tab:"))
+  (reftex-allow-automatic-rescan nil)
+  (reftex-enable-partial-scans t)
+  :config
+  ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
+  ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+
+  (with-eval-after-load "reftex-toc"
+    (bind-keys
+      :package reftex-toc
+      :map
+      reftex-toc-mode-map
+      ("n" . reftex-toc-next)
+      ("p" . reftex-toc-previous)
+      ("r" . reftex-toc-rescan)
+      ("R" . reftex-toc-Rescan)
+      ("g" . revert-buffer)
+      ("q" . reftex-toc-quit)
+      ("z" . reftex-toc-jump)
+      (">" . reftex-toc-demote)
+      ("<" . reftex-toc-promote))
+
+    ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
+    ;; but this is expensive.
+    (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+  :diminish)
+
+;; Read document like a hypertext document, supports mouse highlighting
+
+;; (use-package bib-cite
+;;   :straight auctex
+;;   :hook
+;;   ((LaTeX-mode-hook latex-mode-hook) . (lambda()
+;;                                          (bib-cite-minor-mode 1)))
+;;   ;; :bind
+;;   ;; (:map bib-cite-minor-mode-map
+;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
+;;   ;;       ("C-c l a" . bib-apropos)
+;;   ;;       ("C-c l b" . bib-make-bibliography)
+;;   ;;       ("C-c l d" . bib-display)
+;;   ;;       ("C-c l t" . bib-etags)
+;;   ;;       ("C-c l f" . bib-find)
+;;   ;;       ("C-c l n" . bib-find-next))
+;;   :custom
+;;   (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+;;   :diminish bib-cite-minor-mode)
+
+(use-package auctex-latexmk
+  :after tex-mode
+  :demand t
+  :commands (auctex-latexmk-setup auctex-latexmk)
+  :custom
+  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  (TeX-command-default "LatexMk")
+  :config (auctex-latexmk-setup))
+
+(with-eval-after-load "latex"
+  (defvar LaTeX-mode-map)
+
+  ;; Disable `LaTeX-insert-item' in favor of `imenu'
+  (unbind-key "C-c C-j" LaTeX-mode-map)
+
+  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
+
+;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
+;; in "$PATH".
+
+;; (use-package math-preview
+;;   :straight (:host gitlab :repo "matsievskiysv/math-preview")
+;;   :commands (math-preview-all math-preview-at-point math-preview-region)
+;;   :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
+
+;; TODO: Try pcakages like `bibtex-capf' and `citar'
+;; https://github.com/mclear-tools/bibtex-capf/
+;; https://github.com/emacs-citar/citar
+
+(setq
+  large-file-warning-threshold (* 500 1024 1024) ; MB
+  tags-add-tables nil
+  tags-case-fold-search nil ; "t"=case-insensitive, "nil"=case-sensitive
+  ;; Do not ask before rereading the "TAGS" files if they have changed
+  tags-revert-without-query t)
+
+;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
+;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
+(use-package xref
+  :bind
+  (("M-'" . xref-find-definitions)
+    ("M-?" . xref-find-references)
+    ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
+    ("M-," . xref-go-back)
+    :map
+    xref--xref-buffer-mode-map
+    ("C-o" . xref-show-location-at-point)
+    ("<tab>" . xref-quit-and-goto-xref)
+    ("r" . xref-query-replace-in-results))
+  :custom
+  (xref-search-program 'ripgrep)
+  (xref-show-definitions-function #'xref-show-definitions-completing-read))
+
+(use-package dumb-jump
+  :after xref
+  :commands dumb-jump-xref-activate
+  :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
+  :custom
+  (dumb-jump-quiet t)
+  (dumb-jump-force-searcher 'rg)
+  (dumb-jump-prefer-searcher 'rg))
+
+;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
+
+(use-package citre
+  :preface
+  (defun sb/citre-jump+ ()
+    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
+    (interactive)
+    (condition-case _
+      (citre-jump)
+      (error
+        (let* ((xref-prompt-for-identifier nil))
+          (call-interactively #'xref-find-definitions)))))
+
+  (defun sb/citre-jump-back+ ()
+    "Go back to the position before last `citre-jump'.
+Fallback to `xref-go-back'."
+    (interactive)
+    (condition-case _
+      (citre-jump-back)
+      (error
+        (if (fboundp #'xref-go-back)
+          (call-interactively #'xref-go-back)
+          (call-interactively #'xref-pop-marker-stack)))))
+
+  (defun sb/push-point-to-xref-marker-stack (&rest r)
+    (xref-push-marker-stack (point-marker)))
+
+  (defun sb/lsp-citre-capf-function ()
+    "A capf backend that tries lsp first, then Citre."
+    (let
+      (
+        (lsp-result
+          (cond
+            ((bound-and-true-p lsp-mode)
+              (and (fboundp #'lsp-completion-at-point) (lsp-completion-at-point)))
+            ((bound-and-true-p eglot--managed-mode)
+              (and (fboundp #'eglot-completion-at-point) (eglot-completion-at-point))))))
+      (if
+        (and lsp-result
+          (try-completion
+            (buffer-substring (nth 0 lsp-result) (nth 1 lsp-result))
+            (nth 2 lsp-result)))
+        lsp-result
+        (citre-completion-at-point))))
+
+  (defun sb/enable-lsp-citre-capf-backend ()
+    "Enable the lsp + Citre capf backend in current buffer."
+    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
+  :commands (citre-create-tags-file citre-update-tags-file)
+  :hook
+  ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
+  ;; tags backend, which is not desired for plain text files.
+  (prog-mode-hook . citre-mode)
+  :bind
+  (("C-x c j" . citre-jump)
+    ("M-'" . sb/citre-jump+)
+    ("C-x c b" . sb/citre-jump-back+)
+    ("C-x c p" . citre-peek)
+    ("C-x c c" . citre-create-tags-file)
+    ("C-x c u" . citre-update-this-tags-file)
+    ("C-x c e" . citre-edit-tags-file-recipe))
+  :custom
+  (citre-use-project-root-when-creating-tags t)
+  (citre-default-create-tags-file-location 'project-cache)
+  (citre-auto-enable-citre-mode-modes '(prog-mode))
+  (citre-enable-capf-integration nil)
+  (citre-enable-imenu-integration nil)
+  (citre-enable-xref-integration t)
+  (citre-edit-cmd-buf-default-cmd
+    "ctags
+-o
+%TAGSFILE%
+;; Edit the relevant programming languages to keep the tags file size reasonable
+--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
+--kinds-all=*
+--fields=*
+--extras=*
+-R
+;; -e
+--exclude=@./.ctagsignore
+;; add exclude by: --exclude=target
+;; add dirs/files to scan here, one line per dir/file")
+  :config (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
+
+  (dolist
+    (func
+      '(find-function counsel-imenu projectile-grep counsel-rg lsp-ivy-workspace-symbol citre-jump))
+    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
+
+  ;; Try lsp first, then use Citre
+  (with-no-warnings
+    (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+      (let
+        (
+          (fetcher (apply -fn -args))
+          (citre-fetcher
+            (let ((xref-backend-functions '(citre-xref-backend t)))
+              (apply -fn -args))))
+        (lambda ()
+          (or
+            (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher))))))
+
+  (with-eval-after-load "company"
+    (defmacro citre-backend-to-company-backend (backend)
+      "Create a company backend from Citre completion backend BACKEND.
+The result is a company backend called
+`company-citre-<backend>' (like `company-citre-tags') and can be
+used in `company-backends'."
+      (let
+        (
+          (backend-name (intern (concat "company-citre-" (symbol-name backend))))
+          (docstring
+            (concat
+              "`company-mode' backend from the `"
+              (symbol-name backend)
+              "' Citre backend.\n"
+              "`citre-mode' needs to be enabled to use this.")))
+        `
+        (defun ,backend-name (command &optional arg &rest ignored)
+          ,docstring
+          (pcase command
+            ('interactive (company-begin-backend ',backend-name))
+            ('prefix
+              (and (bound-and-true-p citre-mode)
+                (citre-backend-usable-p ',backend)
+                ;; We shouldn't use this as it's defined for getting definitions/references. But the
+                ;; Citre completion backend design is not fully compliant with company's design so
+                ;; there's no simple "right" solution, and this works for tags/global backends.
+                (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
+            ('meta (citre-get-property 'signature arg))
+            ('annotation (citre-get-property 'annotation arg))
+            ('candidates
+              (let ((citre-completion-backends '(,backend)))
+                (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+
+    (citre-backend-to-company-backend tags))
+  :diminish)
 
 (provide 'init-languages)
 

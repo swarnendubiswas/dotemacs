@@ -45,8 +45,8 @@
     ("C-M-s" . company-filter-candidates)
     ("C-n" . company-select-next)
     ("C-p" . company-select-previous)
-    ;; Insert the common part of all candidates, or select the next one
-    ("<tab>" . company-complete-common-or-cycle)
+    ("<tab>" . company-complete-common)
+    ("TAB" . company-complete-common)
     ([escape] . company-abort)
     ("C-w" . company-show-location)
     :map
@@ -55,7 +55,9 @@
     ("C-r" . company-search-repeat-backward)
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
-  :custom (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
+  :custom
+  (company-idle-delay 0.05 "Start autocompletion faster")
+  (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
   ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
   ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
@@ -206,6 +208,11 @@
   :after company
   :demand t)
 
+(use-package company-c-headers
+  :after company
+  :demand t
+  :config (setq company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
+
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
@@ -354,7 +361,8 @@
             '
             (company-dirfiles
               (company-capf
-                :with
+                company-c-headers
+                :with company-keywords
                 company-dabbrev-code ; Useful for variable names
                 company-yasnippet
                 :separate)
@@ -364,8 +372,8 @@
             '
             (company-dirfiles
               (company-capf
-                company-citre-tags
-                :with
+                company-citre-tags company-c-headers
+                :with company-keywords
                 company-dabbrev-code ; Useful for variable names
                 company-yasnippet
                 :separate)

@@ -218,8 +218,7 @@ Prefer the straight.el package manager instead."
 
 (require 'init-packages)
 (require 'init-core)
-(require 'init-buffer)
-(require 'init-dired)
+(require 'buffer-dired)
 
 (cond
   ((eq sb/minibuffer-completion 'ivy)
@@ -228,10 +227,8 @@ Prefer the straight.el package manager instead."
     (require 'init-vertico)))
 
 (require 'init-spell)
-(require 'init-parens)
 (require 'init-misc)
-(require 'init-checkers)
-(require 'init-tags)
+(require 'linters-formatters)
 
 (cond
   ((eq sb/capf 'corfu)
@@ -241,21 +238,14 @@ Prefer the straight.el package manager instead."
 ;; It is recommended to load `yasnippet' before `eglot'
 (require 'init-completion)
 
-(require 'init-languages)
-
 ;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
 ;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
 ;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
 ;; nice to have TexLab and Grammarly with LaTeX files.
 
-(cond
-  ((eq sb/lsp-provider 'lsp-mode)
-    (require 'init-lsp))
-  ((eq sb/lsp-provider 'eglot)
-    (require 'init-eglot)))
+(require 'init-lsp)
 
-(require 'init-org)
-(require 'init-latex)
+(require 'init-languages)
 (require 'init-functions)
 
 ;; Configure appearance-related settings at the end
