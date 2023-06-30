@@ -76,7 +76,7 @@
   (flycheck-global-modes '(not csv-mode conf-mode))
   ;; Terminal Emacs does not support fringes. Furthermore, we will need to distinguish daemon
   ;; frames.
-  (flycheck-indication-mode 'left-margin)
+  (flycheck-indication-mode 'left-fringe)
   :config
   (dolist (checkers '(proselint textlint tex-chktex emacs-lisp-checkdoc))
     (delq checkers flycheck-checkers))

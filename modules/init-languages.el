@@ -1354,7 +1354,8 @@ Fallback to `xref-go-back'."
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  :config (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
+  :config
+  ;; (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
 
   (dolist
     (func
