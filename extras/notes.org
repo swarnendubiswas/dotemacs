@@ -153,16 +153,16 @@ https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-ma
 - https://github.com/d12frosted/environment/tree/master/emacs
 - https://github.com/raxod502/radian/tree/develop/emacs
 - https://github.com/dholm/dotemacs
-- https://tychoish.com/post/towards-faster-emacs-start-times/
+- https://tychoish.com/post/towards-faster-emacs-start-times
 - https://github.com/wandersoncferreira/dotfiles
 - https://github.com/rememberYou/.emacs.d
-- https://github.com/seagle0128/.emacs.d/
-- https://github.com/Gleek/emacs.d/
+- https://github.com/seagle0128/.emacs.d
+- https://github.com/Gleek/emacs.d
 - https://github.com/magnars/.emacs.d
 - https://github.com/kaushalmodi/.emacs.d
 - https://luca.cambiaghi.me/vanilla-emacs/readme.html
-- https://sachachua.com/dotemacs/
-- https://emacs.nasy.moe/
+- https://sachachua.com/dotemacs
+- https://emacs.nasy.moe
 - https://github.com/milkypostman/dotemacs
 - https://github.com/tecosaur/emacs-config
 - https://github.com/wdenton/.emacs.d
@@ -172,4 +172,6 @@ https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-ma
 - https://alhassy.github.io/emacs.d/index.html
 - https://github.com/Lambda-Emacs/lambda-emacs
 - https://alhassy.github.io/emacs.d
-- [[https://github.com/xenodium/dotsies/]]
+- [[https://github.com/xenodium/dotsies]]
+- [[https://github.com/skangas/dot-emacs]]
+  

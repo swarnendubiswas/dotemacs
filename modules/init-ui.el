@@ -338,7 +338,7 @@ PAD can be left (`l') or right (`r')."
           padded-str))))
 
   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-  (defun sb/powerline-sb-theme ()
+  (defun sb/powerline-nano-theme ()
     "Setup a nano-like modeline"
     (interactive)
     (setq-default mode-line-format
@@ -390,7 +390,7 @@ PAD can be left (`l') or right (`r')."
     powerline-gui-use-vcs-glyph t
     powerline-height 20)
 
-  (sb/powerline-sb-theme))
+  (sb/powerline-nano-theme))
 
 (use-package doom-modeline
   :if (eq sb/modeline-theme 'doom-modeline)
@@ -469,8 +469,8 @@ PAD can be left (`l') or right (`r')."
         ;; (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17"))
         (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))))))
 
-(add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
-(add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
+;; (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
+;; (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
 
 (provide 'init-ui)
 

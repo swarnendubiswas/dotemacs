@@ -37,10 +37,8 @@
   "Defer garbage collection during execution."
   (setq gc-cons-threshold sb/emacs-1GB))
 
-;; Ideally, we should reset `gc-cons-threshold' to its default value otherwise there can be
-;; large pause times whenever GC eventually happens. But `lsp-mode' suggests increasing the limit
-;; permanently.
-;; https://github.com/emacs-lsp/lsp-mode#performance
+;; There will be large pause times with large `gc-cons-threshold' values whenever GC eventually
+;; happens. `lsp-mode' suggests increasing the limit permanently to a reasonable value.
 (defun sb/restore-gc-during-exec ()
   "Restore garbage collection threshold during execution."
   (setq gc-cons-threshold sb/emacs-4MB))
@@ -133,6 +131,8 @@
 
   ;; Set the right directory to store the native compilation cache
   (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache" user-emacs-directory)))
+
+(add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
 
 (provide 'early-init)
 

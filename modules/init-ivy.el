@@ -11,16 +11,8 @@
 (defvar sb/minibuffer-completion)
 
 (use-package ivy
-  :preface
-  ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
-  (defun sb/ignore-dired-buffers (str)
-    "Return non-nil if STR names a Dired buffer.
-  This function is intended for use with `ivy-ignore-buffers'."
-    (let ((buf (get-buffer str)))
-      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
   :if (eq sb/minibuffer-completion 'ivy)
   :functions ivy-format-function-line
-  :commands (ivy-read)
   :hook (emacs-startup-hook . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
@@ -32,18 +24,18 @@
   (ivy-count-format "(%d/%d) " "Helps identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
   (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
-  (ivy-height 12)
   ;; Make the height of the minibuffer proportionate to the screen
   ;; (ivy-height-alist '((t
   ;;                      lambda (_caller)
   ;;                      (/ (frame-height) 2))))
-  (ivy-truncate-lines nil) ; `counsel-flycheck' output gets truncated
+  (ivy-truncate-lines t) ; NOTE: `counsel-flycheck' output gets truncated
   (ivy-wrap t)
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
   (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
   ;; The default sorter is much too slow and the default for `ivy-sort-max-size' is way too
   ;; big (30,000). Turn it down so big repos affect project navigation less.
   (ivy-sort-max-size 10000)
+  (ivy-use-selectable-prompt t)
   :config
   (dolist
     (buffer
@@ -63,13 +55,21 @@
   ;;                               (t                 . ivy--regex-plus)))
 
   ;; Ignore `dired' buffers from `ivy-switch-buffer'
+  ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
+
+  (defun sb/ignore-dired-buffers (str)
+    "Return non-nil if STR names a Dired buffer.
+  This function is intended for use with `ivy-ignore-buffers'."
+    (let ((buf (get-buffer str)))
+      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
+
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
   :diminish)
 
-(use-package all-the-icons-ivy
-  :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
-  :after ivy
-  :hook (emacs-startup-hook . all-the-icons-ivy-setup))
+;; (use-package all-the-icons-ivy
+;;   :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
+;;   :after ivy
+;;   :hook (emacs-startup-hook . all-the-icons-ivy-setup))
 
 (use-package counsel
   :preface
@@ -102,7 +102,6 @@
   ( ;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
     ([remap execute-extended-command] . counsel-M-x)
     ("<f1>" . counsel-M-x)
-    ;; ([remap completion-at-point]      . counsel-company)
     ("C-M-i" . counsel-company)
     ([remap find-file] . counsel-find-file)
     ("<f2>" . counsel-find-file)
@@ -111,13 +110,14 @@
     ("C-c d m" . counsel-minor)
     ("C-c s g" . counsel-git)
     ("C-c s G" . counsel-git-grep)
-    ("C-c s r" . counsel-rg) ; `counsel-rg' fails with `orderless'
+    ("C-c s r" . counsel-rg)
     ("<f4>" . counsel-grep-or-swiper)
     ([remap locate] . counsel-locate)
     ("C-c s l" . counsel-locate)
     ([remap yank-pop] . counsel-yank-pop)
     ("M-y" . counsel-yank-pop)
     ("C-c C-m" . counsel-mark-ring)
+    ("<f3>" . counsel-switch-buffer)
     ("S-<f3>" . counsel-switch-buffer)
     ([remap imenu] . counsel-imenu)
     ("C-c C-j" . counsel-imenu)
@@ -175,64 +175,133 @@
   ;; Enabling preview can make switching over remote buffers slow
   (counsel-switch-buffer-preview-virtual-buffers nil)
   (counsel-yank-pop-preselect-last t)
-  (counsel-yank-pop-separator "\n------------------------------------------\n")
+  (counsel-yank-pop-separator "\n---------------------------------------------------\n")
   :diminish)
 
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
 ;; seem an overkill, and it hides long file names.
-(use-package all-the-icons-ivy-rich
-  :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
-  :custom (all-the-icons-ivy-rich-icon-size 0.9)
+
+;; (use-package all-the-icons-ivy-rich
+;;   :hook (ivy-mode-hook . all-the-icons-ivy-rich-mode)
+;;   :custom
+;;   (all-the-icons-ivy-rich-icon nil "Disable icons")
+;;   (all-the-icons-ivy-rich-icon-size 0.9)
+;;   :config
+;;   (plist-put
+;;     all-the-icons-ivy-rich-display-transformers-list 'counsel-recentf
+;;     '
+;;     (:columns
+;;       ((all-the-icons-ivy-rich-file-icon)
+;;         (all-the-icons-ivy-rich-file-name (:width 0.70))
+;;         (all-the-icons-ivy-rich-file-id
+;;           (:width 10 :face all-the-icons-ivy-rich-file-owner-face :align right))
+;;         (ivy-rich-file-last-modified-time (:face all-the-icons-ivy-rich-time-face)))
+;;       :delimiter "\t"))
+
+;;   (plist-put
+;;     all-the-icons-ivy-rich-display-transformers-list 'counsel-find-file
+;;     '
+;;     (:columns
+;;       ((all-the-icons-ivy-rich-file-icon)
+;;         (all-the-icons-ivy-rich-file-name (:width 0.4))
+;;         (all-the-icons-ivy-rich-file-id
+;;           (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
+;;       :delimiter "\t"))
+
+;;   (plist-put
+;;     all-the-icons-ivy-rich-display-transformers-list 'ivy-switch-buffer
+;;     '
+;;     (:columns
+;;       ((all-the-icons-ivy-rich-buffer-icon)
+;;         (ivy-rich-candidate (:width 30))
+;;         (ivy-rich-switch-buffer-indicators
+;;           (:width 4 :face all-the-icons-ivy-rich-indicator-face :align right))
+;;         (all-the-icons-ivy-rich-switch-buffer-major-mode
+;;           (:width 18 :face all-the-icons-ivy-rich-major-mode-face))
+;;         (ivy-rich-switch-buffer-project (:width 0.12 :face all-the-icons-ivy-rich-project-face))
+;;         (ivy-rich-switch-buffer-path
+;;           (:width
+;;             (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3)))
+;;             :face all-the-icons-ivy-rich-path-face)))
+;;       :predicate (lambda (cand) (get-buffer cand))
+;;       :delimiter "\t"))
+
+;;   (with-eval-after-load "projectile"
+;;     (plist-put
+;;       all-the-icons-ivy-rich-display-transformers-list 'projectile-completing-read
+;;       '
+;;       (:columns
+;;         ((all-the-icons-ivy-rich-file-icon)
+;;           (all-the-icons-ivy-rich-project-find-file-transformer (:width 0.4))
+;;           (all-the-icons-ivy-rich-project-file-id
+;;             (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
+;;         :delimiter "\t"))))
+
+(use-package nerd-icons-ivy-rich
+  :hook (ivy-mode-hook . nerd-icons-ivy-rich-mode)
+  :custom
+  (nerd-icons-ivy-rich-icon nil "Disable icons")
+  (nerd-icons-ivy-rich-icon-size 0.9)
   :config
   (plist-put
-    all-the-icons-ivy-rich-display-transformers-list 'counsel-recentf
+    nerd-icons-ivy-rich-display-transformers-list 'counsel-recentf
     '
     (:columns
-      ((all-the-icons-ivy-rich-file-icon)
-        (all-the-icons-ivy-rich-file-name (:width 0.70))
-        (all-the-icons-ivy-rich-file-id
-          (:width 10 :face all-the-icons-ivy-rich-file-owner-face :align right))
-        (ivy-rich-file-last-modified-time (:face all-the-icons-ivy-rich-time-face)))
+      ((nerd-icons-ivy-rich-file-icon)
+        (nerd-icons-ivy-rich-file-name (:width 0.75))
+        (nerd-icons-ivy-rich-file-id
+          (:width 10 :face nerd-icons-ivy-rich-file-owner-face :align right))
+        (ivy-rich-file-last-modified-time (:face nerd-icons-ivy-rich-time-face)))
       :delimiter "\t"))
 
   (plist-put
-    all-the-icons-ivy-rich-display-transformers-list 'counsel-find-file
+    nerd-icons-ivy-rich-display-transformers-list 'counsel-find-file
     '
     (:columns
-      ((all-the-icons-ivy-rich-file-icon)
-        (all-the-icons-ivy-rich-file-name (:width 0.4))
-        (all-the-icons-ivy-rich-file-id
-          (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
+      ((nerd-icons-ivy-rich-file-icon)
+        (nerd-icons-ivy-rich-file-name (:width 0.6))
+        (nerd-icons-ivy-rich-file-id
+          (:width 15 :face nerd-icons-ivy-rich-file-owner-face :align right))
+        (ivy-rich-file-last-modified-time (:face nerd-icons-ivy-rich-time-face)))
       :delimiter "\t"))
 
   (plist-put
-    all-the-icons-ivy-rich-display-transformers-list 'ivy-switch-buffer
+    nerd-icons-ivy-rich-display-transformers-list 'ivy-switch-buffer
     '
     (:columns
-      ((all-the-icons-ivy-rich-buffer-icon)
+      ((nerd-icons-ivy-rich-buffer-icon)
         (ivy-rich-candidate (:width 30))
         (ivy-rich-switch-buffer-indicators
-          (:width 4 :face all-the-icons-ivy-rich-indicator-face :align right))
-        (all-the-icons-ivy-rich-switch-buffer-major-mode
-          (:width 18 :face all-the-icons-ivy-rich-major-mode-face))
-        (ivy-rich-switch-buffer-project (:width 0.12 :face all-the-icons-ivy-rich-project-face))
+          (:width 4 :face nerd-icons-ivy-rich-indicator-face :align right))
+        (nerd-icons-ivy-rich-switch-buffer-major-mode
+          (:width 18 :face nerd-icons-ivy-rich-major-mode-face))
+        (ivy-rich-switch-buffer-project (:width 0.12 :face nerd-icons-ivy-rich-project-face))
         (ivy-rich-switch-buffer-path
           (:width
             (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3)))
-            :face all-the-icons-ivy-rich-path-face)))
+            :face nerd-icons-ivy-rich-path-face)))
       :predicate (lambda (cand) (get-buffer cand))
       :delimiter "\t"))
 
   (with-eval-after-load "projectile"
     (plist-put
-      all-the-icons-ivy-rich-display-transformers-list 'projectile-completing-read
+      nerd-icons-ivy-rich-display-transformers-list 'projectile-completing-read
       '
       (:columns
-        ((all-the-icons-ivy-rich-file-icon)
-          (all-the-icons-ivy-rich-project-find-file-transformer (:width 0.4))
-          (all-the-icons-ivy-rich-project-file-id
-            (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
-        :delimiter "\t"))))
+        ((nerd-icons-ivy-rich-file-icon)
+          (nerd-icons-ivy-rich-project-find-file-transformer (:width 0.4))
+          (nerd-icons-ivy-rich-project-file-id
+            (:width 15 :face nerd-icons-ivy-rich-file-owner-face :align right)))
+        :delimiter "\t")))
+
+  (with-eval-after-load "amx"
+    (plist-put
+      nerd-icons-ivy-rich-display-transformers-list 'amx-completing-read
+      '
+      (:columns
+        ((nerd-icons-ivy-rich-function-icon)
+          (counsel-M-x-transformer (:width 0.3))
+          (ivy-rich-counsel-function-docstring (:face nerd-icons-ivy-rich-doc-face)))))))
 
 (use-package ivy-rich
   :preface
@@ -262,18 +331,11 @@
             (user-name (user-login-name user-id)))
           (format "%s" user-name)))))
   :after (ivy counsel)
-  :commands
-  (ivy-rich-mode
-    ivy-rich-modify-column
-    ivy-rich-set-columns
-    ivy-rich-modify-columns
-    ivy-format-function-line)
   :init (ivy-rich-mode 1)
-  :config
-  (setq ivy-rich-parse-remote-buffer nil)
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  :custom (ivy-rich-parse-remote-buffer nil)
+  :config (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow-line)
 
-  (ivy-rich-project-root-cache-mode 1)
+  ;; (ivy-rich-project-root-cache-mode 1)
 
   ;; (if (display-graphic-p)
   ;;     (ivy-rich-set-columns 'counsel-find-file
@@ -333,7 +395,6 @@
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
 (use-package amx
   :after counsel
-  :commands (execute-extended-command-for-buffer)
   :hook (emacs-startup-hook . amx-mode)
   :bind (("M-x" . amx) ("<f1>" . amx)))
 
@@ -357,8 +418,10 @@
 
 (use-package swiper
   :if (eq sb/minibuffer-completion 'ivy)
-  :commands (swiper swiper-isearch)
-  :custom (swiper-action-recenter t))
+  :commands (swiper swiper-isearch swiper-isearch-thing-at-point)
+  :custom
+  (swiper-action-recenter t)
+  (swiper-verbose nil))
 
 (provide 'init-ivy)
 

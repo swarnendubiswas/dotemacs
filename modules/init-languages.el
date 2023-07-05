@@ -64,6 +64,7 @@
   ;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
   (("<f10>" . compile) ("<f11>" . recompile))
   :custom
+  (compile-command (format "make -k -j%s " (num-processors)))
   (compilation-always-kill t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")
   ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first error.

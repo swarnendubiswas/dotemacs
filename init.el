@@ -114,7 +114,7 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "pylsp" pylsp) (const :tag "pyright" pyright) (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/minibuffer-completion 'vertico
+(defcustom sb/minibuffer-completion 'ivy
   "Choose the framework to use for narrowing and selection."
   :type '(radio (const :tag "vertico" vertico) (const :tag "ivy" ivy) (const :tag "none" none))
   :group 'sb/emacs)
@@ -170,7 +170,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI.
-(defcustom sb/icons-provider 'nerd-icons
+(defcustom sb/icons-provider 'none
   "Choose the provider for icons."
   :type
   '
@@ -181,9 +181,9 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode. For example, I can use
-;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. It also does not support
+;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
 ;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
-;; improvements now that it is in Emacs core.
+;; improvements now that it is in the Emacs core.
 (defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
@@ -214,7 +214,7 @@ Prefer the straight.el package manager instead."
 
 ;; Splitting the configuration across multiple files is much easier to maintain, and looks less
 ;; cluttered. The downside is that more files need to be loaded during startup, possibly affecting
-;; performance.
+;; startup performance.
 
 (require 'init-packages)
 (require 'init-core)
@@ -285,11 +285,11 @@ Prefer the straight.el package manager instead."
 ;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
 ;; (put 'tags-table-list                         'safe-local-variable #'listp)
 
-(when (eq sb/op-mode 'server)
-  ;; Start server if not root user
-  (unless (string-equal "root" (getenv "USER"))
-    (when (and (fboundp 'server-running-p) (not (server-running-p)))
-      (server-mode))))
+;; (when (eq sb/op-mode 'server)
+;;   ;; Start server if not root user
+;;   (unless (string-equal "root" (getenv "USER"))
+;;     (when (and (fboundp 'server-running-p) (not (server-running-p)))
+;;       (server-mode))))
 
 (when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
   (setq server-client-instructions nil))

@@ -587,7 +587,7 @@
   :config
   (require 'magit-diff)
   (setq
-    magit-diff-refine-hunk t
+    magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
 
 (use-package git-modes

@@ -92,7 +92,6 @@
   shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
   sort-fold-case nil ; Do not ignore case when sorting
   standard-indent 2
-  suggest-key-bindings t
   switch-to-buffer-preserve-window-point t
   use-dialog-box nil ; Do not use dialog boxes with mouse commands
   use-file-dialog nil

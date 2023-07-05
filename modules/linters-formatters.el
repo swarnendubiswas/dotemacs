@@ -97,7 +97,7 @@
     tex-textidote
     "A LaTeX grammar/spelling checker using textidote.
   See https://github.com/sylvainhalle/textidote."
-    :modes (latex-mode LaTeX-mode plain-tex-mode)
+    :modes (latex-mode LaTeX-mode)
     :command
     ("java"
       "-jar"

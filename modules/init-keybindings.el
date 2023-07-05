@@ -22,6 +22,8 @@
 (declare-function sb/switch-to-scratch "init-functions")
 (declare-function sb/counsel-all-files-recursively "init-functions")
 
+(setq suggest-key-bindings t)
+
 (bind-keys
   ("RET" . newline-and-indent)
   ("C-l" . goto-line)

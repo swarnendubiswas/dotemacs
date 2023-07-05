@@ -1,7 +1,15 @@
 (
   (nil
     .
-    (
+    ((make-local-variable 'completion-ignored-extensions)
+      (eval . (add-to-list 'completion-ignored-extensions "elisp-autofmt-cache/"))
+      (eval . (add-to-list 'completion-ignored-extensions "eln-cache/"))
+      (eval . (add-to-list 'completion-ignored-extensions "tree-sitter/"))
+      (eval . (add-to-list 'completion-ignored-extensions "eglot-java-eclipse-jdt-cache/"))
+
+      (counsel-find-file-ignore-regexp
+        .
+        "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.elc$\\|.o$\\|.out$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace\\|^eglot-java-eclipse-jdt-cache\\|^elpa\\|^share\\|^tree-sitter")
       (eval .
         (add-hook
           'lsp-managed-mode-hook
