@@ -3,6 +3,7 @@
 -/var
 -/etc
 -/straight
+-/.vscode
 
 -*.doc
 -*.docx 

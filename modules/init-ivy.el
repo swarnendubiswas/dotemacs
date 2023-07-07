@@ -400,6 +400,7 @@
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
+  :after latex
   :defines
   (ivy-bibtex-default-action
     bibtex-completion-cite-default-as-initial-input

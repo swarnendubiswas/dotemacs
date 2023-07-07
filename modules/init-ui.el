@@ -472,6 +472,9 @@ PAD can be left (`l') or right (`r')."
 ;; (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 ;; (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
 
+(use-package disable-mouse
+  :hook (emacs-startup-hook . global-disable-mouse-mode))
+
 (provide 'init-ui)
 
 ;;; init-ui.el ends here

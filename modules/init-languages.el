@@ -78,13 +78,18 @@
 (use-package rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
-;; Tree-sitter provides advanced syntax highlighting features
+;; Tree-sitter provides advanced syntax highlighting features. Run
+;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
+;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
 
 (use-package tree-sitter
+  :when (executable-find "tree-sitter")
   :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
+  :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
   :config
   (use-package tree-sitter-langs
-    :demand t)
+    :demand t
+    :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
   :diminish tree-sitter-mode)
 
 ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/

@@ -16,8 +16,31 @@
   :type 'string
   :group 'sb/emacs)
 
+(defcustom sb/op-mode 'standalone
+  "Specify the way you expect Emacs to be used."
+  :type
+  '
+  (radio
+    (const :tag "server" server)
+    (const :tag "daemon" daemon)
+    (const :tag "standalone" standalone))
+  :group 'sb/emacs)
+
+(defcustom sb/debug-init-file nil
+  "Enable features to debug errors and performance bottlenecks."
+  :type 'boolean
+  :group 'sb/emacs)
+
+;; Prefer "straight.el" over "package.el". A big advantage with "straight.el" is it is easy to
+;; install packages from arbitrary sources like GitHub.
+(defcustom sb/disable-package.el t
+  "Disable package.el.
+Prefer the straight.el package manager instead."
+  :type 'boolean
+  :group 'sb/emacs)
+
 ;; A dark theme looks good on the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'modus-operandi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -33,6 +56,7 @@
     (const :tag "standard-light" standard-light)
     (const :tag "standard-dark" standard-dark)
     (const :tag "catppuccin" catppuccin)
+    (const :tag "haki" haki)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
@@ -76,21 +100,6 @@ This depends on the orientation of the display."
 Control whether the trailing whitespace should be deleted or not.
 Sometimes we do not want to unnecessarily add differences due to
   whitespaces."
-  :type 'boolean
-  :group 'sb/emacs)
-
-(defcustom sb/op-mode 'standalone
-  "Specify the way you expect Emacs to be used."
-  :type
-  '
-  (radio
-    (const :tag "server" server)
-    (const :tag "daemon" daemon)
-    (const :tag "standalone" standalone))
-  :group 'sb/emacs)
-
-(defcustom sb/debug-init-file nil
-  "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
 
@@ -141,14 +150,6 @@ This location is used for temporary installations and files.")
     (const :tag "kind-all-the-icons" kind-all-the-icons)
     (const :tag "nerd-icons" nerd-icons)
     (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; Prefer "straight.el" over "package.el". A big advantage with "straight.el" is it is easy to
-;; install packages from arbitrary sources like GitHub.
-(defcustom sb/disable-package.el t
-  "Disable package.el.
-Prefer the straight.el package manager instead."
-  :type 'boolean
   :group 'sb/emacs)
 
 ;; I do not find any difference in terms of the features I require. However, packages like

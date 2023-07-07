@@ -493,7 +493,7 @@ install_delta() {
         return
     fi
 
-    DELTA_VER="0.15.1"
+    DELTA_VER="0.16.5"
 
     wget https://github.com/dandavison/delta/releases/download/"$DELTA_VER"/git-delta_"$DELTA_VER"_amd64.deb
     dpkg -i git-delta_"$DELTA_VER"_amd64.deb
