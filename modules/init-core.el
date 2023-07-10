@@ -221,7 +221,6 @@
 
 (use-package savehist ; Save minibuffer history across sessions
   :straight (:type built-in)
-  :commands savehist-mode
   :hook (emacs-startup-hook . savehist-mode)
   :custom
   (savehist-additional-variables
@@ -234,7 +233,8 @@
       search-ring
       regexp-search-ring
       compile-command
-      compile-history)))
+      compile-history))
+  (savehist-autosave-interval 60))
 
 (use-package uniquify
   :straight (:type built-in)
@@ -274,12 +274,6 @@
 (use-package recentf
   :straight (:type built-in)
   :functions straight--emacs-dir
-  :commands
-  (recentf-add-file
-    recentf-save-file
-    recentf-save-list
-    recentf-apply-filename-handlers
-    recentf-cleanup)
   :hook (emacs-startup-hook . recentf-mode)
   :custom (recentf-auto-cleanup 'never "Do not stat remote files")
   ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
@@ -329,44 +323,6 @@
   ;; timers.
   (run-with-idle-timer 60 t #'recentf-cleanup))
 
-;; (use-package image-mode
-;;   :preface
-;;   ;; http://emacs.stackexchange.com/a/7693/289
-;;   (defun sb/show-image-dimensions-in-mode-line ()
-;;     (let* ((image-dimensions (image-size (image-get-display-property) :pixels))
-;;            (width (car image-dimensions))
-;;            (height (cdr image-dimensions)))
-;;       (setq mode-line-buffer-identification
-;;             (format "%s %dx%d" (propertized-buffer-identification "%12b") width height))))
-;;   :straight (:type built-in)
-;;   :if (display-graphic-p)
-;;   :commands image-get-display-property
-;;   :hook
-;;   (image-mode-hook . sb/show-image-dimensions-in-mode-line)
-;;   :mode "\\.svg$"
-;;   :custom
-;;   ;; Enable converting external formats (i.e., webp) to internal ones.
-;;   (image-use-external-converter t))
-
-;; ;; Use "emacsclient -c -nw" to start a new frame.
-;; ;; https://andreyorst.gitlab.io/posts/2020-06-29-using-single-emacs-instance-to-edit-files/
-;; (use-package server
-;;   :straight (:type built-in)
-;;   ;; There is no use keeping this enabled if I am not using the daemon.
-;;   :disabled t
-;;   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
-;;   :commands server-running-p
-;;   :hook
-;;   (emacs-startup-hook . (lambda ()
-;;                        ;; Only start server mode if not root
-;;                        (unless (string-equal "root" (getenv "USER"))
-;;                          (unless (and (fboundp 'server-running-p) (server-running-p))
-;;                            (server-start)))))
-;;   :config
-;;   ;; Hide "When done with a buffer, type C-x 5" message
-;;   (when (boundp 'server-client-instructions)
-;;     (setq server-client-instructions nil)))
-
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."
   (let ((inhibit-message t))
@@ -393,7 +349,6 @@
 ;; since I do not split Emacs frames often.
 (use-package windmove ; "Shift + direction" arrows
   :straight (:type built-in)
-  :commands windmove-default-keybindings
   :init (windmove-default-keybindings)
   :custom (windmove-wrap-around t "Wrap around at edges"))
 
@@ -534,7 +489,6 @@
 ;;   :custom (password-cache-expiry nil))
 
 (use-package whitespace
-  :commands (global-whitespace-mode whitespace-buffer whitespace-cleanup whitespace-turn-off)
   :hook
   (markdown-mode-hook
     .

@@ -32,9 +32,6 @@
   (ivy-wrap t)
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
   (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
-  ;; The default sorter is much too slow and the default for `ivy-sort-max-size' is way too
-  ;; big (30,000). Turn it down so big repos affect project navigation less.
-  (ivy-sort-max-size 10000)
   (ivy-use-selectable-prompt t)
   :config
   (dolist
@@ -64,6 +61,9 @@
       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
 
   ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
+
+  (with-eval-after-load "savehist"
+    (add-to-list 'savehist-additional-variables 'ivy-views))
   :diminish)
 
 ;; (use-package all-the-icons-ivy
@@ -105,6 +105,8 @@
     ("C-M-i" . counsel-company)
     ([remap find-file] . counsel-find-file)
     ("<f2>" . counsel-find-file)
+    ([remap dired] . counsel-dired)
+    ([remap recentf-open-files] . counsel-recentf)
     ("<f9>" . counsel-recentf)
     ("C-<f9>" . sb/counsel-goto-recent-directory)
     ("C-c d m" . counsel-minor)
@@ -131,51 +133,16 @@
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
   (counsel-find-file-at-point t)
-  (counsel-find-file-ignore-regexp
-    (concat
-      "\\(?:\\`[#.]\\)"
-      "\\|\\(?:\\`.+?[#~]\\'\\)"
-      "\\|.cb$"
-      "\\|.cb2$"
-      "\\|.class$"
-      "\\|.djvu$"
-      "\\|.doc$"
-      "\\|.docx$"
-      "\\|.elc$"
-      "\\|.fdb_latexmk$"
-      "\\|.fls$"
-      "\\|.lof$"
-      "\\|.lot$"
-      "\\|.o$"
-      "\\|.ppt$"
-      "\\|.pptx$"
-      "\\|.pyc$"
-      "\\|.rel$"
-      "\\|.rip$"
-      "\\|.so$"
-      "\\|.synctex$"
-      "\\|.synctex.gz$"
-      "\\|.toc$"
-      "\\|.xls$"
-      "\\|.xlsx$"
-      "\\|tags"
-      "\\|TAGS"
-      "\\|GPATH"
-      "\\|GRTAGS"
-      "\\|GTAGS"
-      "\\|tramp"
-      "\\|.clangd"
-      "\\|.cache"
-      "\\|.metadata"
-      "\\|.recommenders"
-      "\\|typings"
-      "\\|__pycache__"))
+  (counsel-find-file-ignore-regexp (regexp-opt completion-ignored-extensions))
   (counsel-mode-override-describe-bindings t)
   (counsel-preselect-current-file t)
   ;; Enabling preview can make switching over remote buffers slow
   (counsel-switch-buffer-preview-virtual-buffers nil)
   (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n---------------------------------------------------\n")
+  :config
+  (with-eval-after-load "savehist"
+    (add-to-list 'savehist-additional-variables 'counsel-compile-history))
   :diminish)
 
 ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)

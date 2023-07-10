@@ -178,7 +178,7 @@ install_node() {
     npm init --yes
 
     # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier @prettier/plugin-php @prettier/plugin-lua prettier-plugin-solidity prettier-plugin-svelte prettier-plugin-toml prettier-eslint @prettier/plugin-xml stylelint stylelint-prettier stylelint-config-prettier remark-language-server vscode-langservers-extracted npm-check-updates jshint dockerfile-language-server-nodejs
+    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier prettier-eslint @prettier/plugin-xml stylelint stylelint-prettier stylelint-config-prettier remark-language-server vscode-langservers-extracted npm-check-updates jshint dockerfile-language-server-nodejs awk-language-server tree-sitter-cli
 
     npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
 

@@ -6,10 +6,42 @@
       (eval . (add-to-list 'completion-ignored-extensions "eln-cache/"))
       (eval . (add-to-list 'completion-ignored-extensions "tree-sitter/"))
       (eval . (add-to-list 'completion-ignored-extensions "eglot-java-eclipse-jdt-cache/"))
+      (eval . (add-to-list 'completion-ignored-extensions "share/"))
+      (eval . (add-to-list 'completion-ignored-extensions "auto-save-list/"))
+      (eval . (add-to-list 'completion-ignored-extensions "\\.tags/"))
+      (eval . (add-to-list 'completion-ignored-extensions "\\.cache/"))
 
-      (counsel-find-file-ignore-regexp
-        .
-        "\\(?:\\`[#.]\\)\\|\\(?:\\`.+?[#~]\\'\\)\\|__pycache__\\|.elc$\\|.o$\\|.out$\\|TAGS\\|GPATH\\|GRTAGS\\|GTAGS\\|tramp\\|.metadata\\|.clangd\\|auto-save-list\\|eclipse.jdt.ls\\|session*\\|request\\|^workspace\\|^eglot-java-eclipse-jdt-cache\\|^elpa\\|^share\\|^tree-sitter")
+      (eval .
+        (setq-local counsel-find-file-ignore-regexp
+                    (regexp-opt
+            '
+            ("\\(?:\\`[#.]\\)"
+              "\\(?:\\`.+?[#~]\\'\\)"
+              "__pycache__"
+              ".elc"
+              ".o"
+              ".out"
+              "TAGS"
+              "GPATH"
+              "GRTAGS"
+              "GTAGS"
+              "tramp"
+              ".vscode"
+              ".metadata"
+              ".clangd"
+              ".cache"
+              "auto-save-list"
+              "eclipse.jdt.ls"
+              "session*"
+              "request"
+              "workspace"
+              "eglot-java-eclipse-jdt-cache"
+              "elpa"
+              "share"
+              "tree-sitter"
+              "eln-cache"
+              "elisp-autofmt-cache"))))
+
       (eval .
         (add-hook
           'lsp-managed-mode-hook
@@ -62,7 +94,13 @@
       ;; directory, not in any subdirectories.
       (subdirs . nil)))
 
-  (sh-mode . ((sb/delete-trailing-whitespace-p . t) (subdirs . nil)))
+  (sh-mode
+    .
+    (
+      ;; Bash language server does not support formatting
+      ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+      (sb/delete-trailing-whitespace-p . t)
+      (subdirs . nil)))
 
   (json-mode
     .
@@ -88,6 +126,12 @@
               (eglot-format-buffer)))
           nil t))))
 
+  (yaml-mode
+    .
+    (
+      ;; YAML language server does not support formatting
+      ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+      ))
 
   (org-mode . ((eglot-workspace-configuration . ((:ltex-ls . (:language . "en")))))))
 

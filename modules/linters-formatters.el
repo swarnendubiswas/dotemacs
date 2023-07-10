@@ -254,13 +254,16 @@
 
 ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
 ;; support. We enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
-(add-hook
-  'text-mode-hook
+(run-with-idle-timer
+  5 nil
   (lambda ()
-    (when (string= (buffer-name) "*scratch*")
-      (progn
-        (flycheck-select-checker 'grammarly)
-        (flycheck-add-next-checker 'grammarly 'languagetool)))))
+    (add-hook
+      'text-mode-hook
+      (lambda ()
+        (when (string= (buffer-name) "*scratch*")
+          (progn
+            (flycheck-select-checker 'grammarly)
+            (flycheck-add-next-checker 'grammarly 'languagetool)))))))
 
 (use-package highlight-indentation
   :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)

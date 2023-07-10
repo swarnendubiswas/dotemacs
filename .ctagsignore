@@ -12,3 +12,6 @@ snippets
 etc
 references
 company-dict
+elisp-autofmt-cache
+./eglot-java-eclipse-jdt-cache
+./share

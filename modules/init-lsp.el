@@ -85,7 +85,7 @@
   ;; and parent paths of each source file.
   (lsp-clients-clangd-args
     '
-    ("-j=4"
+    ("-j 4"
       "--all-scopes-completion"
       "--background-index"
       "--clang-tidy"
@@ -96,14 +96,15 @@
       "--log=error"
       ;; Unsupported option with Clangd 10
       ;; "--malloc-trim" ; Release memory periodically
-      "--pch-storage=memory" ; Increases memory usage but can improve performance
+      "--enable-config"
+      ;;"--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty"))
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
   (lsp-completion-show-detail nil "Disable completion metadata, e.g., java.util.ArrayList")
   (lsp-completion-show-kind t "Show completion kind, e.g., interface/class")
   (lsp-completion-show-label-description t "Show description of completion candidates")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
-  (lsp-enable-dap-auto-configure nil)
+  (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
@@ -113,10 +114,11 @@
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
-  (lsp-imenu-sort-methods '(position))
+  (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
   (lsp-lens-enable nil "Lenses are intrusive")
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
-  ;; additional errors. The downside is that the modeline gets congested.
+  ;; additional errors. The downside is that the modeline gets congested. Powerline does not support
+  ;; lsp.
   (lsp-modeline-diagnostics-enable (eq sb/modeline-theme 'doom-modeline))
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
   (lsp-modeline-code-actions-enable t "Useful to show code actions on the modeline")
@@ -128,11 +130,12 @@
   (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
-  (lsp-warn-no-matched-clients nil)
+  (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
   (lsp-keep-workspace-alive nil)
-  (lsp-enable-file-watchers nil)
-  (lsp-semantic-tokens-enable t)
-  (lsp-enable-symbol-highlighting t)
+  (lsp-enable-file-watchers nil "Avoid watcher warnings")
+  (lsp-semantic-tokens-enable t "Useful to identify disabled code")
+  (lsp-enable-symbol-highlighting nil "I am using symbol-overlay")
+  (lsp-enable-snippet nil "Annoying to overwrite the snippet placeholders")
   :config
   (dolist
     (ignore-dirs
@@ -142,8 +145,7 @@
         "/\\.recommenders\\'"
         "/\\.clangd\\'"
         "/\\.cache\\'"
-        "/__pycache__\\'"
-        "/\\.log\\'"))
+        "/__pycache__\\'"))
     (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
   (with-eval-after-load "lsp-lens"
@@ -159,14 +161,14 @@
   :defines lsp-ui-modeline-code-actions-enable
   :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-peek-find-implementation lsp-ui-imenu)
   :hook (lsp-mode-hook . lsp-ui-mode)
-  :bind
-  (:map
-    lsp-ui-mode-map
-    ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-    ([remap xref-find-references] . lsp-ui-peek-find-references)
-    :map
-    lsp-command-map
-    ("D" . lsp-ui-doc-show))
+  ;; :bind
+  ;; (:map
+  ;;   lsp-ui-mode-map
+  ;;   ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+  ;;   ([remap xref-find-references] . lsp-ui-peek-find-references)
+  ;;   :map
+  ;;   lsp-command-map
+  ;;   ("D" . lsp-ui-doc-show))
   :custom
   (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
   (lsp-ui-doc-include-signature t)
@@ -177,14 +179,7 @@
   (lsp-ui-sideline-show-diagnostics nil "Flycheck/flymake already highlights errors")
   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-  (lsp-ui-peek-enable nil)
-  :config
-  ;; Enabling the sideline creates flickering with Corfu popon.
-
-  ;; (if (and (display-graphic-p) (eq sb/capf 'corfu))
-  ;;   (setq lsp-ui-sideline-enable nil)
-  ;;   (setq lsp-ui-sideline-enable t))
-  )
+  (lsp-ui-peek-enable nil))
 
 ;; Sync workspace folders and treemacs projects
 
@@ -209,15 +204,12 @@
   (lsp-java-organize-imports
     lsp-java-build-project
     lsp-java-update-project-configuration
-    lsp-java-actionable-notifications
-    lsp-java-update-user-settings
     lsp-java-update-server
     lsp-java-generate-to-string
     lsp-java-generate-equals-and-hash-code
     lsp-java-generate-overrides
     lsp-java-generate-getters-and-setters
     lsp-java-type-hierarchy
-    lsp-java-dependency-list
     lsp-java-extract-to-constant
     lsp-java-add-unimplemented-methods
     lsp-java-create-parameter
@@ -250,18 +242,10 @@
 ;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
 ;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 
+;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
 (use-package lsp-grammarly
-  ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
   :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
-  :commands
-  (lsp-grammarly--server-command
-    lsp-grammarly--init
-    lsp-grammarly--get-credentials
-    lsp-grammarly--get-token
-    lsp-grammarly--store-token
-    lsp-grammarly--show-error
-    lsp-grammarly--update-document-state)
   :hook ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
   :custom
   (lsp-grammarly-suggestions-oxford-comma t)
@@ -292,11 +276,10 @@
   ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
   )
 
+;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
 (use-package lsp-ltex
-  ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
   :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
-  :commands (lsp-ltex--downloaded-extension-path lsp-ltex--execute)
   :hook ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
   :custom
   ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
@@ -306,13 +289,8 @@
   (lsp-ltex-version "16.0.0")
   (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
-  ;; https://github.com/ggbaker/doom-emacs-config/blob/main/config.el
-  ;; https://github.com/emacs-languagetool/lsp-ltex/issues/5
-  ;; https://www.reddit.com/r/emacs/comments/ril2m4/comment/hqqbxbm/
-
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
-  ;; Furthermore, we also use `flyspell' and `spell-fu'.
-
+  ;; Furthermore, we also use `flyspell' and `jinx'.
   (setq lsp-ltex-disabled-rules #s(hash-table size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
 
   ;; (setq lsp-ltex-disabled-rules
@@ -541,7 +519,7 @@
     ((c++-mode c++-ts-mode c-mode c-ts-mode)
       .
       ("clangd"
-        "-j=4"
+        "-j 4"
         "--all-scopes-completion"
         "--background-index"
         "--clang-tidy"
@@ -552,16 +530,10 @@
         "--log=error"
         ;; Unsupported option with Clangd 10
         ;; "--malloc-trim" ; Release memory periodically
-        "--pch-storage=memory" ; Increases memory usage but can improve performance
+        "--enable-config"
+        ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
         "--pretty")))
 
-  ;; (add-to-list
-  ;;   'eglot-server-programs
-  ;;   `
-  ;;   ((python-mode python-ts-mode)
-  ;;     .
-  ;;     ,(eglot-alternatives '(("pylsp") ("pyright-langserver" "--stdio")))))
-  ;; (add-to-list 'eglot-server-programs '((php-mode phps-mode) . ("intelephense" "--stdio")))
   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio")))
   )
@@ -589,29 +561,29 @@
 ;;   ;;                ((audience "knowledgeable")))))
 ;;   )
 
-;; FIXME: Fix issue with SLF4J with LTEX 16.0.0
-
-;; (use-package eglot-ltex
-;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-;;   :init
-;;   (setq eglot-languagetool-server-path
-;;     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
-;;   :hook
-;;   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
-;;     .
-;;     (lambda ()
-;;       (require 'eglot-ltex)
-;;       (eglot-ensure)))
-;;   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-;;   :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-;;   ;;   'append)
-;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-;;   )
+;; FIXME: Fix issue with LTEX 16.0.0
+(use-package eglot-ltex
+  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+  :when (eq sb/lsp-provider 'eglot)
+  :init
+  (setq eglot-languagetool-server-path
+    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
+  :hook
+  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
+    .
+    (lambda ()
+      (require 'eglot-ltex)
+      (eglot-ensure)))
+  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+  :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+  ;;   'append)
+  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+  )
 
 (use-package eglot-java
   :when (eq sb/lsp-provider 'eglot)

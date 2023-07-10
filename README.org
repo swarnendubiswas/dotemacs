@@ -108,12 +108,12 @@ sudo apt-get install -y libslf4j-java liblog4j1.2-java
 wget https://github.com/valentjn/ltex-ls/releases/download/16.0.0/ltex-ls-16.0.0-linux-x64.tar.gz
 tar xf ltex-ls-16.0.0-linux-x64.tar.gz
 
-wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.23.0.tar.gz
-tar xf v1.23.0.tar.gz
-cd eclipse.jdt.ls-1.23.0
+wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.25.0.tar.gz
+tar xf v1.25.0.tar.gz
+cd eclipse.jdt.ls-1.25.0
 ./mvnw clean verify -DskipTests=true
-# Add "eclipse.jdt.ls-1.23.0/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
-rm -rf eclipse.jdt.ls-1.23.0 
+# Add "eclipse.jdt.ls-1.25.0/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
+rm -rf eclipse.jdt.ls-1.25.0 
 #+end_src
 
 ** Support for Tags
@@ -346,5 +346,3 @@ There are a few choices to evaluate the performance of the configuration.
 - Flickering with =corfu-terminal-mode=
 - Disable pairing = before at the beginning of a word in =smartparens=
 - Enable =flycheck-mode= for Elisp configuration files
-- Fix the issue with copying and yanking
-- Support multihop SSH

@@ -344,6 +344,25 @@
           ))))
 
   (progn
+    (declare-function sb/company-yaml-mode "init-company")
+
+    (defun sb/company-yaml-mode ()
+      "Add backends for `yaml-mode' completion in company mode."
+      (defvar company-backends)
+      (make-local-variable 'company-backends)
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-capf
+            :with
+            company-dabbrev-code ; Useful for variable names
+            company-yasnippet
+            :separate)
+          (company-dabbrev company-dict company-ispell :separate))))
+
+    (add-hook 'yaml-mode-hook (lambda () (sb/company-yaml-mode))))
+
+  (progn
     (defun sb/company-prog-mode ()
       "Add backends for `prog-mode' completion in company mode."
       (defvar company-minimum-prefix-length)

@@ -9,43 +9,32 @@
 
 ;;; Code:
 
-(setq byte-compile-warnings
-  '
-  (not unresolved
-    free-vars
-    callargs
-    redefine
-    obsolete
-    noruntime
-    lexical
-    make-local
-    cl-functions
-    interactive-only))
-
 (defconst sb/emacs-4MB (* 4 1024 1024))
 (defconst sb/emacs-1GB (* 1 1024 1024 1024))
 
 ;; Defer GC during startup
 (setq
   garbage-collection-messages nil
-  gc-cons-percentage 0.3 ; Portion of heap used for allocation
+  gc-cons-percentage 0.5 ; Portion of heap used for allocation
   gc-cons-threshold most-positive-fixnum)
 
 ;; GC may happen after this many bytes are allocated since last GC. If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
-(defun sb/defer-gc-during-exec ()
+(defun sb/defer-gc ()
   "Defer garbage collection during execution."
   (setq gc-cons-threshold sb/emacs-1GB))
 
 ;; There will be large pause times with large `gc-cons-threshold' values whenever GC eventually
 ;; happens. `lsp-mode' suggests increasing the limit permanently to a reasonable value.
-(defun sb/restore-gc-during-exec ()
+(defun sb/restore-gc ()
   "Restore garbage collection threshold during execution."
-  (setq gc-cons-threshold sb/emacs-4MB))
+  (setq
+    gc-cons-threshold sb/emacs-4MB
+    gc-cons-percentage 0.3))
 
-(add-hook 'emacs-startup-hook #'sb/restore-gc-during-exec)
-(add-hook 'minibuffer-setup-hook #'sb/defer-gc-during-exec)
-(add-hook 'minibuffer-exit-hook #'sb/restore-gc-during-exec)
+(add-hook 'emacs-startup-hook #'sb/restore-gc)
+(add-hook 'minibuffer-setup-hook #'sb/defer-gc)
+(add-hook 'minibuffer-exit-hook #'sb/restore-gc)
 
 ;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
 ;; Get a list of loaded packages that depend on `cl' by calling the following.
@@ -62,9 +51,7 @@
   inhibit-default-init t)
 
 ;; Do not resize the frame to preserve the number of columns or lines being displayed when setting
-;; font, menu bar, tool bar, tab bar, internal borders, fringes, or scroll bars. Resizing the Emacs
-;; frame can be a terribly expensive part of changing the font. By inhibiting this, we easily halve
-;; startup times with fonts that are larger than the system default.
+;; font, menu bar, tool bar, tab bar, internal borders, fringes, or scroll bars.
 (setq
   frame-inhibit-implied-resize t
   frame-resize-pixelwise t
@@ -72,8 +59,8 @@
   inhibit-compacting-font-caches t ; Do not compact font caches during GC
   inhibit-startup-echo-area-message t
   inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
-  ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start,
-  ;; but I use *scratch* for composing emails.
+  ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start, but
+  ;; I use *scratch* for composing emails.
   initial-major-mode 'text-mode
   initial-scratch-message nil
   ;; Prefer new files to avoid loading stale bytecode
@@ -92,18 +79,11 @@
 (add-to-list 'default-frame-alist '(alpha . (95 . 95)))
 
 ;; Maximize Emacs on startup.
-;; https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up
-;; https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/
 
 ;; Applies only to the initial (startup) Emacs frame
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 ;; Applies to every Emacs frame
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-;; Append to the hook instead of prepending, this means it will run after other hooks that might
-;; fiddle with the frame size.
-
-;; (add-hook 'emacs-startup-hook #'toggle-frame-maximized t)
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)
@@ -127,12 +107,9 @@
     native-comp-async-report-warnings-errors nil
     package-native-compile t ; Enable ahead-of-time compilation when installing a package
     ;; Compile loaded packages asynchronously
-    native-comp-deferred-compilation t)
+    native-comp-deferred-compilation t))
 
-  ;; Set the right directory to store the native compilation cache
-  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache" user-emacs-directory)))
-
-(add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
+;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
 
 (provide 'early-init)
 

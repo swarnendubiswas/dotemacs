@@ -146,8 +146,6 @@
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
 ;; all the bindings available in a buffer, "C-h m" shows the keybindings for the major and the minor
 ;; modes.
-
-;; https://github.com/jwiegley/use-package/pull/993/files
 (use-package bind-key
   :functions bind-key--remove
   :bind ("C-c d k" . describe-personal-keybindings))
@@ -182,14 +180,15 @@
   :group 'sb/emacs)
 
 ;; Asynchronously byte compile packages installed with `package.el'
-(use-package async
-  :straight (:host github :repo "jwiegley/emacs-async")
-  :unless (bound-and-true-p sb/disable-package.el)
-  :commands async-bytecomp-package-mode
-  :init (async-bytecomp-package-mode 1))
 
-;; Get PATH with "(getenv "PATH")".
-;; Set PATH with "(setenv "PATH" (concat (getenv "PATH") ":/home/swarnendu/bin"))".
+;; (use-package async
+;;   :straight (:host github :repo "jwiegley/emacs-async")
+;;   :unless (bound-and-true-p sb/disable-package.el)
+;;   :commands async-bytecomp-package-mode
+;;   :init (async-bytecomp-package-mode 1))
+
+;; Get PATH with "(getenv "PATH")". Set PATH with "(setenv "PATH" (concat (getenv "PATH")
+;; ":/home/swarnendu/bin"))".
 
 ;; These are alternative ways to manipulate the `exec-path'.
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
@@ -199,11 +198,7 @@
   :if (symbol-value 'sb/IS-LINUX)
   :defer 2
   :defines exec-path-from-shell-check-startup-files
-  :commands exec-path-from-shell-initialize
   :init
-  ;; "-i" is expensive but Tramp is unable to find executables without the option. I rarely use
-  ;; Tramp, and instead, I prefer terminal Emacs over SSH. However, other executables like
-  ;; "prettier" from $PATH are also not found without the interactive flag.
   (setq
     exec-path-from-shell-check-startup-files nil
     exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY")

@@ -40,7 +40,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI.
-(defcustom sb/theme 'modus-operandi
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -62,7 +62,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '
@@ -286,14 +286,26 @@ This location is used for temporary installations and files.")
 ;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
 ;; (put 'tags-table-list                         'safe-local-variable #'listp)
 
+;; (use-package server
+;;   :straight (:type built-in)
+;;   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
+;;   :hook
+;;   (emacs-startup-hook . (lambda ()
+;;                          (unless (and (fboundp 'server-running-p) (server-running-p))
+;;                            (server-start)))))
+;;   :config
+;;   ;; Hide "When done with a buffer, type C-x 5" message
+;;   (when (boundp 'server-client-instructions)
+;;     (setq server-client-instructions nil)))
+
 ;; (when (eq sb/op-mode 'server)
 ;;   ;; Start server if not root user
 ;;   (unless (string-equal "root" (getenv "USER"))
 ;;     (when (and (fboundp 'server-running-p) (not (server-running-p)))
 ;;       (server-mode))))
 
-(when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
-  (setq server-client-instructions nil))
+;; (when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
+;;   (setq server-client-instructions nil))
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook
