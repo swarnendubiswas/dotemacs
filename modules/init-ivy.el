@@ -10,6 +10,9 @@
 (defvar recentf-list)
 (defvar sb/minibuffer-completion)
 
+(use-package amx
+  :hook (emacs-startup-hook . amx-mode))
+
 (use-package ivy
   :if (eq sb/minibuffer-completion 'ivy)
   :functions ivy-format-function-line
@@ -256,19 +259,13 @@
       '
       (:columns
         ((nerd-icons-ivy-rich-file-icon)
-          (nerd-icons-ivy-rich-project-find-file-transformer (:width 0.4))
+          (nerd-icons-ivy-rich-project-find-file-transformer (:width 0.6))
           (nerd-icons-ivy-rich-project-file-id
-            (:width 15 :face nerd-icons-ivy-rich-file-owner-face :align right)))
+            (:width 15 :face nerd-icons-ivy-rich-file-owner-face :align right))
+          (nerd-icons-ivy-rich-project-file-size (:width 7 :face nerd-icons-ivy-rich-size-face)))
         :delimiter "\t")))
 
-  (with-eval-after-load "amx"
-    (plist-put
-      nerd-icons-ivy-rich-display-transformers-list 'amx-completing-read
-      '
-      (:columns
-        ((nerd-icons-ivy-rich-function-icon)
-          (counsel-M-x-transformer (:width 0.3))
-          (ivy-rich-counsel-function-docstring (:face nerd-icons-ivy-rich-doc-face)))))))
+  (nerd-icons-ivy-rich-reload))
 
 (use-package ivy-rich
   :preface
@@ -360,10 +357,6 @@
 
 ;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
 ;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
-(use-package amx
-  :after counsel
-  :hook (emacs-startup-hook . amx-mode)
-  :bind (("M-x" . amx) ("<f1>" . amx)))
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)

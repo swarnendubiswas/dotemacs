@@ -8,3 +8,7 @@ etc
 eln-cache
 .vscode
 .tags
+projectile-examples
+
+.projectile
+.gitignore
