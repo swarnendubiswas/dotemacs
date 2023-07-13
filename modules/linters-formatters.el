@@ -273,7 +273,7 @@
 (use-package elisp-autofmt
   :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt" :branch "main")
   :commands (elisp-autofmt-buffer)
-  :hook (emacs-lisp-mode-hook . elisp-autofmt-mode)
+  :hook ((emacs-lisp-mode-hook lisp-data-mode-hook) . elisp-autofmt-mode)
   :custom
   (elisp-autofmt-style 'fixed)
   (elisp-autofmt-python-bin "python3"))

@@ -167,15 +167,15 @@
     :map
     minibuffer-local-map
     ("M-s" . consult-history))
-  :custom (consult-line-start-from-top t "Start search from the beginning")
-  ;; Use Consult to select xref locations with preview
+  :custom
+  (consult-line-start-from-top t "Start search from the beginning")
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
   (consult-line-numbers-widen t)
   (consult-preview-key nil "Disable preview by default, enable for selected commands")
   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
   ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly
-  ;; between only buffers
+  ;; between only buffers, especially while wrapping around.
   (consult-buffer-sources '(consult--source-buffer))
   :config
   (consult-customize
@@ -210,7 +210,7 @@
     (bind-key [remap projectile-grep] #'consult-grep)))
 
 (use-package embark-consult
-  :after (consult)
+  :after consult
   :demand t)
 
 ;; Provide context-dependent actions similar to a content menu
@@ -235,10 +235,11 @@
 ;; information.
 (use-package marginalia
   :after vertico
-  :commands marginalia-mode
   :init (marginalia-mode 1)
+  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  ;; Add project-buffer annotator.
+  (setq marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
+  (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
 (use-package consult-tramp

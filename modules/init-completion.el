@@ -34,8 +34,8 @@
 ;; presents suggestions for completion.
 (use-package dabbrev
   :straight (:type built-in)
-  :custom (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'"))
-  :bind ("C-M-;" . dabbrev-completion))
+  :bind ("C-M-;" . dabbrev-completion)
+  :custom (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 (use-package hippie-exp
   :straight (:type built-in)
@@ -79,6 +79,7 @@
   (with-eval-after-load "company"
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
+;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
   :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)

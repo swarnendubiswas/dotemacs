@@ -255,6 +255,11 @@
 (use-package diredfl
   :hook (dired-mode-hook . diredfl-mode))
 
+(use-package dired-hist
+  :straight (:host github :repo "karthink/dired-hist")
+  :hook (dired-mode-hook . dired-hist-mode)
+  :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+
 (provide 'buffer-dired)
 
 ;;; init-buffer.el ends here

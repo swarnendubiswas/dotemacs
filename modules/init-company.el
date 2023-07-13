@@ -428,7 +428,8 @@
             :separate)
           (company-dabbrev company-dict company-ispell :separate))))
 
-    (add-hook 'emacs-lisp-mode-hook (lambda () (sb/company-elisp-mode)))))
+    (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
+      (add-hook hook (lambda () (sb/company-elisp-mode))))))
 
 (provide 'init-company)
 

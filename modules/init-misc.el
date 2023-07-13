@@ -173,7 +173,8 @@
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 (use-package define-word
-  :commands (define-word define-word-at-point))
+  :commands define-word
+  :bind ("C-c w" . define-word-at-point))
 
 ;; (use-package esup
 ;;   :if (bound-and-true-p sb/debug-init-file)
@@ -223,7 +224,9 @@
     (find-file-hook . bm-buffer-restore)
     (emacs-startup-hook . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
-  :custom (bm-buffer-persistence t "Save bookmarks"))
+  :custom
+  (bm-buffer-persistence t "Save bookmarks")
+  (bm-highlight-style 'bm-highlight-only-fringe))
 
 (use-package crux
   :bind
@@ -268,8 +271,8 @@
 (use-package change-inner
   :commands (change-inner change-outer yank-inner yank-outer))
 
-(use-package link-hint
-  :bind ("C-c C-l" . link-hint-open-link))
+;; (use-package link-hint
+;;   :bind ("C-c C-l" . link-hint-open-link))
 
 ;; This is independent of LSP support and is more flexible. On the other hand, `which-func-mode'
 ;; consumes less vertical space.
@@ -372,9 +375,12 @@
   ;; `alien'.
   (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
+  ;; The topmost file has precedence
   (projectile-project-root-files
     '
-    ("setup.py"
+    ("GTAGS"
+      "TAGS"
+      "setup.py"
       "requirements.txt"
       "package.json"
       "CMakeLists.txt"
@@ -544,6 +550,7 @@
   :custom (avy-background t "Provides better contrast"))
 
 (use-package re-builder
+  :commands re-builder
   :custom (reb-re-syntax 'string))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
@@ -620,7 +627,13 @@
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit
-  :hook (git-commit-setup-hook . git-commit-turn-on-flyspell)
+  :hook
+  (git-commit-setup-hook
+    .
+    (lambda ()
+      (git-commit-save-message)
+      (git-commit-turn-on-auto-fill)
+      (git-commit-turn-on-flyspell)))
   :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them

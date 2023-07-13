@@ -85,7 +85,7 @@
   ;; and parent paths of each source file.
   (lsp-clients-clangd-args
     '
-    ("-j 4"
+    ("-j=4"
       "--all-scopes-completion"
       "--background-index"
       "--clang-tidy"
@@ -519,7 +519,7 @@
     ((c++-mode c++-ts-mode c-mode c-ts-mode)
       .
       ("clangd"
-        "-j 4"
+        "-j=4"
         "--all-scopes-completion"
         "--background-index"
         "--clang-tidy"

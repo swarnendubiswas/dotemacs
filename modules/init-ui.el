@@ -146,13 +146,6 @@
   ;; Use a blinking bar for the cursor style to help identify it easily.
   (blink-cursor-mode 1))
 
-;; TODO: This package is probably causing the jumping behavior with `corfu-terminal-mode'.
-(use-package olivetti
-  :hook
-  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
-  :custom (olivetti-body-width 108)
-  :diminish)
-
 (use-package centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :hook (emacs-startup-hook . centaur-tabs-mode)
@@ -174,6 +167,7 @@
   (centaur-tabs-set-icons nil)
   (centaur-tabs-icon-type 'nerd-icons)
   (centaur-tabs-gray-out-icons t "Gray out icons for inactive tabs")
+  (centaur-tabs-show-count t "Helpful to identify tab overflows")
   :config
   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
 
@@ -234,21 +228,6 @@
 ;;   ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
 ;;   (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
-;; (use-package doom-themes
-;;   :if (or (eq sb/theme 'doom-molokai) (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
-;;   :commands (doom-themes-org-config doom-themes-treemacs-config)
-;;   :init
-;;   (cond
-;;     ((eq sb/theme 'doom-molokai)
-;;       (load-theme 'doom-molokai t))
-;;     ((eq sb/theme 'doom-one)
-;;       (load-theme 'doom-one t))
-;;     ((eq sb/theme 'doom-nord)
-;;       (load-theme 'doom-nord t)))
-;;   :config
-;;   (with-eval-after-load "org-mode"
-;;     (require 'doom-themes-ext-org)))
-
 (use-package modus-themes
   :if (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
   :defines
@@ -306,11 +285,6 @@
 ;;       (load-theme 'standard-light t))
 ;;     ((eq sb/theme 'standard-dark)
 ;;       (load-theme 'standard-dark t))))
-
-;; (use-package catppuccin-theme
-;;   :straight (:host github :repo "catppuccin/emacs")
-;;   :if (eq sb/theme 'catppuccin)
-;;   :init (load-theme 'catppuccin t))
 
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
@@ -475,6 +449,13 @@ PAD can be left (`l') or right (`r')."
 (use-package disable-mouse
   :hook (emacs-startup-hook . disable-mouse-global-mode)
   :diminish disable-mouse-global-mode)
+
+;; TODO: This package is probably causing the jumping behavior with `corfu-terminal-mode'.
+(use-package olivetti
+  :hook
+  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
+  :custom (olivetti-body-width 108)
+  :diminish)
 
 (provide 'init-ui)
 

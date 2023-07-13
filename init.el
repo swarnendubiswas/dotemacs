@@ -26,7 +26,7 @@
     (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file nil
+(defcustom sb/debug-init-file t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -45,8 +45,6 @@ Prefer the straight.el package manager instead."
   :type
   '
   (radio
-    (const :tag "doom-one" doom-one)
-    (const :tag "doom-nord" doom-nord)
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "ef-trio-dark" ef-trio-dark)
@@ -55,8 +53,6 @@ Prefer the straight.el package manager instead."
     ;; Tries to mirror the default Emacs colors
     (const :tag "standard-light" standard-light)
     (const :tag "standard-dark" standard-dark)
-    (const :tag "catppuccin" catppuccin)
-    (const :tag "haki" haki)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
@@ -231,13 +227,12 @@ This location is used for temporary installations and files.")
 (require 'init-misc)
 (require 'linters-formatters)
 
+(require 'init-completion)
 (cond
   ((eq sb/capf 'corfu)
     (require 'init-corfu))
   ((eq sb/capf 'company)
     (require 'init-company)))
-;; It is recommended to load `yasnippet' before `eglot'
-(require 'init-completion)
 
 ;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
 ;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI

@@ -27,7 +27,7 @@
 
 (use-package which-func
   :hook (prog-mode-hook . which-function-mode)
-  :custom (which-func-modes '(emacs-lisp-mode c-mode c++-mode python-mode makefile-mode sh-mode java-mode)))
+  :custom (which-func-modes '(c-mode c++-mode python-mode sh-mode java-mode)))
 
 (use-package subword
   :straight (:type built-in)
@@ -71,7 +71,7 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
-  :straight (:host codeberg :repo "ideasman42/emacs-fancy-compilation" :branch "main")
+  :straight (:host codeberg :repo "ideasman42/emacs-fancy-compilation")
   :after compile
   :init (fancy-compilation-mode 1))
 
@@ -357,7 +357,7 @@
       lsp-pylsp-plugins-yapf-enabled t
       lsp-pylsp-plugins-flake8-enabled nil
       lsp-pylsp-plugins-black-enabled nil
-      lsp-pylsp-plugins-jedi-use-pyenv-environment t)))
+      lsp-pylsp-plugins-jedi-use-pyenv-environment nil)))
 
 (use-package python-docstring
   :after python-mode
@@ -390,54 +390,55 @@
       "--tc" ; Use a trailing comma on multiline imports
       "-")))
 
-;; Yapfify works on the original file, so that any project settings supported by YAPF itself are
-;; used. We do not use `lsp-format-buffer' or `eglot-format-buffer' since `pyright' does not support
-;; document formatting.
-(use-package yapfify
-  :if (executable-find "yapf")
-  :hook (python-mode-hook . yapf-mode)
-  :diminish yapf-mode)
+;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with `pyright' since it does not
+;; support document formatting. So, we have to use yapf with pyright. Yapfify works on the original
+;; file, so that any project settings supported by YAPF itself are used.
 
-(use-package cperl-mode
-  :mode ("latexmkrc\\'")
-  :hook
-  (cperl-mode-hook
-    .
-    (lambda ()
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
-  :config
-  ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode)
+;; (use-package yapfify
+;;   :if (executable-find "yapf")
+;;   :hook (python-mode-hook . yapf-mode)
+;;   :diminish yapf-mode)
 
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection
-  ;;       (lsp-tramp-connection
-  ;;         (lambda ()
-  ;;           (list
-  ;;             lsp-perl-language-server-path
-  ;;             "-MPerl::LanguageServer"
-  ;;             "-e"
-  ;;             "Perl::LanguageServer::run"
-  ;;             "--"
-  ;;             (format "--port %d --version %s"
-  ;;               lsp-perl-language-server-port
-  ;;               lsp-perl-language-server-client-version))))
-  ;;       :major-modes '(perl-mode cperl-mode)
-  ;;       :remote? t
-  ;;       :initialized-fn
-  ;;       (lambda (workspace)
-  ;;         (with-lsp-workspace
-  ;;           workspace
-  ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
-  ;;       :priority -1
-  ;;       :server-id 'perlls-r)))
-  )
+;; (use-package cperl-mode
+;;   :mode ("latexmkrc\\'")
+;;   :hook
+;;   (cperl-mode-hook
+;;     .
+;;     (lambda ()
+;;       (cond
+;;         ((eq sb/lsp-provider 'eglot)
+;;           (eglot-ensure))
+;;         ((eq sb/lsp-provider 'lsp-mode)
+;;           (lsp-deferred)))))
+;;   :config
+;;   ;; Prefer CPerl mode to Perl mode
+;;   (fset 'perl-mode 'cperl-mode)
+
+;;   ;; (with-eval-after-load "lsp-mode"
+;;   ;;   (lsp-register-client
+;;   ;;     (make-lsp-client
+;;   ;;       :new-connection
+;;   ;;       (lsp-tramp-connection
+;;   ;;         (lambda ()
+;;   ;;           (list
+;;   ;;             lsp-perl-language-server-path
+;;   ;;             "-MPerl::LanguageServer"
+;;   ;;             "-e"
+;;   ;;             "Perl::LanguageServer::run"
+;;   ;;             "--"
+;;   ;;             (format "--port %d --version %s"
+;;   ;;               lsp-perl-language-server-port
+;;   ;;               lsp-perl-language-server-client-version))))
+;;   ;;       :major-modes '(perl-mode cperl-mode)
+;;   ;;       :remote? t
+;;   ;;       :initialized-fn
+;;   ;;       (lambda (workspace)
+;;   ;;         (with-lsp-workspace
+;;   ;;           workspace
+;;   ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
+;;   ;;       :priority -1
+;;   ;;       :server-id 'perlls-r)))
+;;   )
 
 (use-package ant
   :commands (ant ant-clean ant-compile ant-test))
@@ -486,6 +487,16 @@
 (use-package highlight-doxygen
   :commands (highlight-doxygen-global-mode)
   :hook ((c-mode-hook c++-mode-hook) . highlight-doxygen-mode))
+
+(use-package lisp-mode
+  :straight (:type built-in)
+  :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode)
+  :hook
+  (lisp-data-mode-hook
+    .
+    (lambda ()
+      (when buffer-file-name
+        (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package elisp-mode
   :straight (:type built-in)

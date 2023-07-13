@@ -99,7 +99,7 @@
   visible-bell nil
   ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
   warning-minimum-level
-  :emergency
+  :error
   window-combination-resize t ; Resize windows proportionally
   x-gtk-use-system-tooltips nil ; Do not use system tooltips
   x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
@@ -275,8 +275,8 @@
   :straight (:type built-in)
   :functions straight--emacs-dir
   :hook (emacs-startup-hook . recentf-mode)
-  :custom (recentf-auto-cleanup 'never "Do not stat remote files")
-  ;; Check the regex with `re-builder', use `recentf-cleanup' to update the list
+  :custom
+  (recentf-auto-cleanup 'never "Do not stat remote files")
   (recentf-exclude
     '
     ("[/\\]elpa/"
@@ -294,6 +294,7 @@
       "/.autosaves/"
       ".*/TAGS\\'"
       "*.cache"
+      "*[/\\]straight/repos/*"
       ".*/treemacs/persist.org"))
   ;; https://stackoverflow.com/questions/2068697/emacs-is-slow-opening-recent-files
   ;; Keep remote file without testing if they still exist
@@ -347,10 +348,11 @@
 
 ;; NOTE: We use the "Shift+direction" keybindings for moving around windows in tmux which is okay
 ;; since I do not split Emacs frames often.
-(use-package windmove ; "Shift + direction" arrows
-  :straight (:type built-in)
-  :init (windmove-default-keybindings)
-  :custom (windmove-wrap-around t "Wrap around at edges"))
+
+;; (use-package windmove ; "Shift + direction" arrows
+;;   :straight (:type built-in)
+;;   :init (windmove-default-keybindings)
+;;   :custom (windmove-wrap-around t "Wrap around at edges"))
 
 ;; (use-package solar
 ;;   :straight (:type built-in)

@@ -10,7 +10,10 @@
 (defvar recentf-list)
 (defvar sb/minibuffer-completion)
 
-(use-package amx
+;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
+;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
+
+(use-package amx ; Sort most-used commands and show keyboard shortcuts
   :hook (emacs-startup-hook . amx-mode))
 
 (use-package ivy
@@ -28,21 +31,27 @@
   (ivy-extra-directories nil "Hide . and ..")
   (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
   ;; Make the height of the minibuffer proportionate to the screen
-  ;; (ivy-height-alist '((t
-  ;;                      lambda (_caller)
-  ;;                      (/ (frame-height) 2))))
+  ;; (ivy-height-alist '((t lambda (_caller) (/ (frame-height) 2))))
+  (ivy-height-alist
+    '
+    ((counsel-M-x . 10)
+      (counsel-switch-buffer . 10)
+      (counsel-yank-pop . 15)
+      (swiper . 15)
+      (swiper-isearch . 15)))
   (ivy-truncate-lines t) ; NOTE: `counsel-flycheck' output gets truncated
-  (ivy-wrap t)
+  (ivy-wrap t "Easy to navigate")
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
   (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
-  (ivy-use-selectable-prompt t)
+  (ivy-use-selectable-prompt t "Easier to edit names with common prefixes")
+  (ivy-sort-max-size 50000 "Increase the limit to allow sorting.")
   :config
   (dolist
     (buffer
       '
-      ("TAGS" "magit-process" "*emacs*" "*xref*" "^\\*.+Completions\\*$"
+      ("TAGS" "magit-process" "*emacs*" "*xref*" "^\\*.+Completions\\*$" "^\\*Compile-Log\\*$"
         ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
-        ;; "^\\*Compile-Log\\*$"  "^\\*Backtrace\\*$"
+        ;;   "^\\*Backtrace\\*$"
         ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
         ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
         ))
@@ -76,22 +85,6 @@
 
 (use-package counsel
   :preface
-  ;; http://blog.binchen.org/posts/use-ivy-to-open-recent-directories.html
-  (defun sb/counsel-goto-recent-directory ()
-    "Open recent directories with `dired'."
-    (interactive)
-    (unless recentf-mode
-      (recentf-mode 1))
-    (let
-      (
-        (collection
-          (delete-dups
-            (append
-              (mapcar 'file-name-directory recentf-list)
-              (if (executable-find "fasd")
-                (split-string (shell-command-to-string "fasd -ld") "\n" t))))))
-      (ivy-read "Directories:" collection :action 'dired)))
-
   ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
   (defun sb/counsel-all-files-recursively (dir-name)
     "List all files recursively in DIR-NAME."
@@ -105,13 +98,13 @@
   ( ;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
     ([remap execute-extended-command] . counsel-M-x)
     ("<f1>" . counsel-M-x)
+    ([remap completion-at-point] . counsel-company)
     ("C-M-i" . counsel-company)
     ([remap find-file] . counsel-find-file)
     ("<f2>" . counsel-find-file)
     ([remap dired] . counsel-dired)
     ([remap recentf-open-files] . counsel-recentf)
     ("<f9>" . counsel-recentf)
-    ("C-<f9>" . sb/counsel-goto-recent-directory)
     ("C-c d m" . counsel-minor)
     ("C-c s g" . counsel-git)
     ("C-c s G" . counsel-git-grep)
@@ -131,7 +124,8 @@
     ("M-g o" . counsel-outline)
     ([remap load-theme] . counsel-theme)
     ([remap load-library] . counsel-load-library)
-    ("C-x j" . sb/counsel-all-files-recursively))
+    ("C-x j" . sb/counsel-all-files-recursively)
+    ([remap compile] . counsel-compile))
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -139,7 +133,6 @@
   (counsel-find-file-ignore-regexp (regexp-opt completion-ignored-extensions))
   (counsel-mode-override-describe-bindings t)
   (counsel-preselect-current-file t)
-  ;; Enabling preview can make switching over remote buffers slow
   (counsel-switch-buffer-preview-virtual-buffers nil)
   (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n---------------------------------------------------\n")
@@ -337,7 +330,7 @@
 
 (use-package ivy-yasnippet
   :if (eq sb/minibuffer-completion 'ivy)
-  :after ivy
+  :after (ivy yasnippet)
   :bind ("C-M-y" . ivy-yasnippet))
 
 (use-package lsp-ivy
@@ -354,9 +347,6 @@
 (use-package counsel-tramp
   :after counsel
   :bind ("C-c d t" . counsel-tramp))
-
-;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
-;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
 
 (use-package ivy-bibtex
   :if (eq sb/minibuffer-completion 'ivy)
@@ -377,6 +367,8 @@
     bibtex-completion-cite-prompt-for-optional-arguments nil
     bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
 
+;; "M-n" will search for the word under cursor, "C-s" will search for the next occurrence, "C-s"
+;; will search for a previously searched string.
 (use-package swiper
   :if (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch swiper-isearch-thing-at-point)
