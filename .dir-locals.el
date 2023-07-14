@@ -13,7 +13,7 @@
 
       (eval .
         (setq-local counsel-find-file-ignore-regexp
-                    (regexp-opt
+          (regexp-opt
             '
             ("\\(?:\\`[#.]\\)"
               "\\(?:\\`.+?[#~]\\'\\)"
@@ -106,31 +106,31 @@
     .
     (
       (eval .
-        (add-hook 'before-save-hook
-          (lambda ()
-            (when (bound-and-true-p lsp-managed-mode)
-              (lsp-format-buffer))
-            (when (bound-and-true-p eglot--managed-mode)
-              (eglot-format-buffer)))
-          nil t))))
+        (add-hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+      (eval .
+        (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
   (jsonc-mode
     .
     (
       (eval .
-        (add-hook 'before-save-hook
-          (lambda ()
-            (when (bound-and-true-p lsp-managed-mode)
-              (lsp-format-buffer))
-            (when (bound-and-true-p eglot--managed-mode)
-              (eglot-format-buffer)))
-          nil t))))
+        (add-hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+      (eval .
+        (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
   (yaml-mode
     .
     (
       ;; YAML language server does not support formatting
-      ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
       ))
 
   (org-mode . ((eglot-workspace-configuration . ((:ltex-ls . (:language . "en")))))))
