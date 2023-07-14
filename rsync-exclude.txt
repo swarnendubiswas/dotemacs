@@ -1,0 +1,12 @@
+.git
+straight
+etc
+var
+eglot-java-eclipse-jdt-cache
+eln-cache
+share
+var
+.tags
+.vscode
+.cache
+tree-sitter
