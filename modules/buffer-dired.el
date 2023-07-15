@@ -248,9 +248,13 @@
 ;;   :hook (dired-mode-hook . dired-async-mode)
 ;;   :diminish)
 
-(use-package dired-rsync
+;; (use-package dired-rsync
+;;   :after dired
+;;   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
+
+(use-package dired-rsync-transient
   :after dired
-  :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
+  :bind (:map dired-mode-map ("C-c C-x" . dired-rsync-transient)))
 
 (use-package diredfl
   :hook (dired-mode-hook . diredfl-mode))

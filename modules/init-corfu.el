@@ -229,7 +229,7 @@
     'text-mode-hook
     (lambda ()
       (setq-local completion-at-point-functions
-        (list #'cape-file #''cape-abbrev (cape-super-capf #'cape-dabbrev #'cape-dict)))))
+        (list #'cape-file #'cape-abbrev (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 
   ;; (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
   ;;   (add-hook
@@ -246,22 +246,21 @@
   ;;             #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
   ;;             #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
-  ;; (dolist (lsp-prog-modes '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))
-  ;;   (add-hook
-  ;;     lsp-prog-modes
-  ;;     (lambda ()
-  ;;       (setq-local completion-at-point-functions
-  ;;         (append
-  ;;           completion-at-point-functions
-  ;;           (list (#'cape-keyword #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
+  (dolist (lsp-prog-mode '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))
+    (add-hook
+      lsp-prog-mode
+      (lambda ()
+        (setq-local completion-at-point-functions
+          (append
+            completion-at-point-functions
+            (list #'cape-keyword #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
 
-  ;;         ;; (progn
-  ;;         ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-  ;;         ;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  ;;         ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
-  ;;         ;;     'append))
-  ;;         ))))
-  )
+        ;; (progn
+        ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+        ;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
+        ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
+        ;;     'append))
+        ))))
 
 (provide 'init-corfu)
 

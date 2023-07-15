@@ -244,14 +244,14 @@
       (load-theme 'modus-operandi t))
     ((eq sb/theme 'modus-vivendi)
       (load-theme 'modus-vivendi t)))
-  :custom
-  (modus-themes-paren-match '(bold))
-  (modus-themes-prompts '(intense bold gray background))
-  (modus-themes-org-blocks 'tinted-background)
+  :custom (modus-themes-paren-match '(bold))
+  ;; (modus-themes-prompts '(intense bold gray background))
+  ;; (modus-themes-org-blocks 'tinted-background)
   ;; (org-fontify-whole-block-delimiter-line nil)
-  (modus-themes-completions '((matches . (extrabold underline)) (selection . (semibold))))
-  (modus-themes-italic-constructs t)
-  (modus-themes-bold-constructs t))
+  ;; (modus-themes-completions '((matches . (extrabold underline)) (selection . (semibold))))
+  ;; (modus-themes-italic-constructs t)
+  ;; (modus-themes-bold-constructs t)
+  )
 
 (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
   (progn

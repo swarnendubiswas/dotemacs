@@ -200,7 +200,7 @@
   (company-dict-enable-yasnippet nil))
 
 (use-package company-dirfiles ; Better replacement for `company-files'
-  :straight (:host github :repo "cwfoo/company-dirfiles")
+  :straight (:host codeberg :repo "cwfoo/company-dirfiles")
   :after company
   :demand t)
 

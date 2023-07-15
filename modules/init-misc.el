@@ -757,7 +757,7 @@
     sp-wrap-square
     sp-split-sexp)
   :hook
-  (
+  ((minibuffer-setup-hook . turn-on-smartparens-strict-mode)
     (emacs-startup-hook
       .
       (lambda ()
@@ -783,8 +783,6 @@
   (sp-highlight-wrap-overlay nil "show-parens is faster")
   (sp-highlight-wrap-tag-overlay nil)
   :config (require 'smartparens)
-  ;; Introduces overhead to track parentheses pairs
-  (smartparens-strict-mode -1)
 
   ;; Do not insert a parenthesis pair when the point is at the beginning of a word
   (sp-pair "(" nil :unless '(sp-point-before-word-p))

@@ -166,9 +166,6 @@
       'company-abort))
   :diminish)
 
-;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-(setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-
 ;; Available C styles: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
 ;;   "gnu": The default style for GNU projects
 ;;   "k&r": What Kernighan and Ritchie, the authors of C used in their book

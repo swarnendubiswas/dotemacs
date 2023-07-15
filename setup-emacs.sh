@@ -150,7 +150,7 @@ if [ ! -d "$GITHUB" ]; then
 fi
 
 install_python_packages() {
-    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave semgrep --user
+    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave semgrep ruff-lsp --user
 }
 
 install_node() {
@@ -488,12 +488,12 @@ install_tmux() {
 }
 
 install_delta() {
-    # Latest releases do not work with Ubuntu 18
-    if [[ "${DIST_VERSION}" == Ubuntu_18.04 ]]; then
-        return
-    fi
-
+    # Latest releases do not work with Ubuntu 18/20
     DELTA_VER="0.16.5"
+
+    if [[ "${DIST_VERSION}" == Ubuntu_20.04 ]]; then
+        DELTA_VER="0.14.0"
+    fi
 
     wget https://github.com/dandavison/delta/releases/download/"$DELTA_VER"/git-delta_"$DELTA_VER"_amd64.deb
     dpkg -i git-delta_"$DELTA_VER"_amd64.deb
@@ -501,7 +501,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.47.0"
+    DIFFT_VER="0.48.0"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xz difft-x86_64-unknown-linux-gnu.tar.gz
@@ -528,7 +528,7 @@ install_bat() {
 }
 
 install_marksman() {
-    MK_VER="2023-06-05"
+    MK_VER="2023-07-01"
 
     wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux
     mv marksman-linux $USER_HOME/.local/bin/marksman

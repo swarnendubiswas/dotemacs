@@ -466,7 +466,10 @@
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   ;; https://stackoverflow.com/questions/26630640/tramp-ignores-tramp-remote-path#26649558
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+  ;; Recommended to connect with Bash
+  (setenv "SHELL" shell-file-name))
 
 ;; https://www.gnu.org/software/tramp/
 (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
