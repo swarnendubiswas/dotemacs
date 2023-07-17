@@ -82,71 +82,75 @@
 ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
 ;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
 
-(use-package tree-sitter
-  :when (executable-find "tree-sitter")
-  :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
-  :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
-  :config
-  (use-package tree-sitter-langs
-    :demand t
-    :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
-  :diminish tree-sitter-mode)
+;; (use-package tree-sitter
+;;   :when (executable-find "tree-sitter")
+;;   :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
+;;   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
+;;   :config
+;;   (use-package tree-sitter-langs
+;;     :demand t
+;;     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
+;;   :diminish tree-sitter-mode)
 
 ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
 ;; https://github.com/renzmann/treesit-auto
 
-;; (use-package treesit
-;;   :straight (:type built-in)
-;;   :demand t
-;;   :config
-;;   (setq treesit-language-source-alist
-;;     '
-;;     ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-;;       (c "https://github.com/tree-sitter/tree-sitter-c")
-;;       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-;;       (cmake "https://github.com/uyha/tree-sitter-cmake")
-;;       (css "https://github.com/tree-sitter/tree-sitter-css")
-;;       (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-;;       (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
-;;       (html "https://github.com/tree-sitter/tree-sitter-html")
-;;       (java "https://github.com/tree-sitter/tree-sitter-java")
-;;       (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-;;       (json "https://github.com/tree-sitter/tree-sitter-json")
-;;       (make "https://github.com/alemuller/tree-sitter-make")
-;;       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-;;       (org "https://github.com/milisims/tree-sitter-org")
-;;       (python "https://github.com/tree-sitter/tree-sitter-python")
-;;       (rust "https://github.com/tree-sitter/tree-sitter-rust")
-;;       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+(use-package treesit
+  :straight (:type built-in)
+  :demand t
+  :custom (treesit-font-lock-level 4)
+  :config
+  (setq treesit-language-source-alist
+    '
+    ((bash "https://github.com/tree-sitter/tree-sitter-bash")
+      (c "https://github.com/tree-sitter/tree-sitter-c")
+      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+      (cmake "https://github.com/uyha/tree-sitter-cmake")
+      (css "https://github.com/tree-sitter/tree-sitter-css")
+      (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+      (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
+      (html "https://github.com/tree-sitter/tree-sitter-html")
+      (java "https://github.com/tree-sitter/tree-sitter-java")
+      (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+      (json "https://github.com/tree-sitter/tree-sitter-json")
+      (make "https://github.com/alemuller/tree-sitter-make")
+      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+      (org "https://github.com/milisims/tree-sitter-org")
+      (python "https://github.com/tree-sitter/tree-sitter-python")
+      (rust "https://github.com/tree-sitter/tree-sitter-rust")
+      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-;;   (add-to-list 'major-mode-remap-alist '(bash-mode . bash-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(make-mode . make-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
-;;   (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(bash-mode . bash-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(make-mode . make-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
 
-;;   (setq
-;;     bash-ts-mode-hook bash-mode-hook
-;;     c-ts-mode-hook c-mode-hook
-;;     cpp-ts-mode-hook c++-mode-hook
-;;     cmake-ts-mode-hook cmake-mode-hook
-;;     css-ts-mode-hook css-mode-hook
-;;     html-ts-mode-hook html-mode-hook
-;;     java-ts-mode-hook java-mode-hook
-;;     json-ts-mode-hook json-mode-hook
-;;     make-ts-mode-hook make-mode-hook
-;;     markdown-ts-mode-hook markdown-mode-hook
-;;     org-ts-mode-hook org-mode-hook
-;;     python-ts-mode-hook python-mode-hook
-;;     yaml-ts-mode-hook yaml-ts-mode-hook))
+  ;;   (setq
+  ;;     bash-ts-mode-hook bash-mode-hook
+  ;;     c-ts-mode-hook c-mode-hook
+  ;;     cpp-ts-mode-hook c++-mode-hook
+  ;;     cmake-ts-mode-hook cmake-mode-hook
+  ;;     css-ts-mode-hook css-mode-hook
+  ;;     html-ts-mode-hook html-mode-hook
+  ;;     java-ts-mode-hook java-mode-hook
+  ;;     json-ts-mode-hook json-mode-hook
+  ;;     make-ts-mode-hook make-mode-hook
+  ;;     markdown-ts-mode-hook markdown-mode-hook
+  ;;     org-ts-mode-hook org-mode-hook
+  ;;     python-ts-mode-hook python-mode-hook
+  ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
+  )
 
 (use-package eldoc
   :straight (:type built-in)
