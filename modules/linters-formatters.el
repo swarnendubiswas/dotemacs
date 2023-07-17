@@ -179,7 +179,7 @@
   ((format-all-mode-hook . format-all-ensure-formatter)
     ;; Formatting LaTeX files with latexindent is very slow, yaml language server does not support
     ;; formatting.
-    ((web-mode-hook markdown-mode-hook yaml-mode-hook) . format-all-mode))
+    ((web-mode-hook markdown-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters
     '

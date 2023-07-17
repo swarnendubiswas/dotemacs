@@ -1264,7 +1264,7 @@ Ignore if no file is found."
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
 (use-package xref
   :bind
-  (("M-'" . xref-find-definitions)
+  (("M-." . xref-find-definitions)
     ("M-?" . xref-find-references)
     ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
     ("M-," . xref-go-back)

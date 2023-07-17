@@ -50,8 +50,7 @@
   :commands (lsp-deferred lsp-describe-thing-at-point)
   :bind-keymap ("C-c l" . lsp-command-map)
   :bind
-  (("M-." . xref-find-definitions)
-    :map
+  (:map
     lsp-command-map
     ("=")
     ("w")
@@ -108,9 +107,9 @@
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
+  ;; Do not customize breadcrumb faces based on errors
   (lsp-headerline-breadcrumb-enable-diagnostics nil)
   (lsp-diagnostics-provider :auto "Prefer flycheck, otherwise use flymake")
-  ;; Do not customize breadcrumb faces based on errors
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -119,9 +118,10 @@
   ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
   ;; additional errors. The downside is that the modeline gets congested. Powerline does not support
   ;; lsp.
-  (lsp-modeline-diagnostics-enable (eq sb/modeline-theme 'doom-modeline))
+  (lsp-modeline-diagnostics-enable t)
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
   (lsp-modeline-code-actions-enable t "Useful to show code actions on the modeline")
+  (lsp-modeline-code-actions-segments '(count icon name))
   (lsp-modeline-workspace-status-enable t)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
   ;; request via `lsp-signature-activate'.
@@ -133,8 +133,12 @@
   (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
   (lsp-keep-workspace-alive nil)
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  (lsp-semantic-tokens-enable t "Useful to identify disabled code")
-  (lsp-enable-symbol-highlighting nil "I am using symbol-overlay")
+  ;; Useful to identify disabled code but not all language servers support this feature. Recent
+  ;; versions of clangd do.
+  (lsp-semantic-tokens-enable nil)
+  ;; I am using symbol-overlay for languages that do not have a server
+  (lsp-enable-symbol-highlighting nil)
+  ;; https://github.com/emacs-lsp/lsp-mode/issues/2831
   (lsp-enable-snippet nil "Annoying to overwrite the snippet placeholders")
   :config
   (dolist
@@ -431,8 +435,7 @@
   :when (eq sb/lsp-provider 'eglot)
   :commands (eglot)
   :bind
-  (("M-." . xref-find-definitions)
-    ("C-c l q" . eglot-shutdown)
+  (("C-c l q" . eglot-shutdown)
     ("C-c l Q" . eglot-shutdown-all)
     ("C-c l d" . eglot-find-declaration)
     ("C-c l i" . eglot-find-implementation)
@@ -505,14 +508,6 @@
   ;;           :pylsp_mypy (:enabled t))))
   ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
 
-  ;; (add-hook
-  ;;   'before-save-hook
-  ;;   (lambda ()
-  ;;     (when (derived-mode-p 'rust-mode 'rust-ts-mode)
-  ;;       (ignore-errors
-  ;;         (eglot-code-action-organize-imports))
-  ;;       (eglot-format-buffer))))
-
   (add-to-list
     'eglot-server-programs
     '
@@ -534,9 +529,7 @@
         ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
         "--pretty")))
 
-  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
-  ;; (add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio")))
-  )
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
 
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
 

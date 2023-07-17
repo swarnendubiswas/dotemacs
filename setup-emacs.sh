@@ -44,7 +44,6 @@ install_emacs() {
     chown -R $USER:$USER "${EMACS_SOURCE}"
 
     # Build the source
-
     cd "${EMACS_SOURCE}" || echo "Failed: cd ${EMACS_SOURCE}"
     export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
     make distclean
@@ -138,7 +137,6 @@ install_llvm() {
 }
 
 # Checkout configurations
-
 GITHUB="${USER_HOME}/github"
 DOTFILES="$GITHUB/dotfiles"
 
@@ -530,7 +528,7 @@ install_bat() {
 install_marksman() {
     MK_VER="2023-07-01"
 
-    wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux
+    wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
     mv marksman-linux $USER_HOME/.local/bin/marksman
     chmod a+x $USER_HOME/.local/bin/marksman
 }
