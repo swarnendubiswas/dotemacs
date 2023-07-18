@@ -98,6 +98,7 @@
     (use-package treesit
       :straight (:type built-in)
       :demand t
+      :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
       :custom (treesit-font-lock-level 4 "Increase default font locking")
       :config
       (setq treesit-language-source-alist
@@ -122,17 +123,17 @@
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
       (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
       (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
       (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-Mode))
       (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
       (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
       (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
       (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
       ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
       (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
       (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
       (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
       (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
@@ -328,8 +329,6 @@
   (:map
     python-mode-map
     ("C-c C-d")
-    ("C-M-a" . python-nav-beginning-of-defun)
-    ("C-M-e" . python-nav-end-of-defun)
     ("M-a" . python-nav-backward-block)
     ("M-e" . python-nav-forward-block)
     ("C-c <" . python-indent-shift-left)
@@ -417,10 +416,10 @@
 ;; support document formatting. So, we have to use yapf with pyright. Yapfify works on the original
 ;; file, so that any project settings supported by YAPF itself are used.
 
-;; (use-package yapfify
-;;   :if (executable-find "yapf")
-;;   :hook (python-mode-hook . yapf-mode)
-;;   :diminish yapf-mode)
+(use-package yapfify
+  :if (and (executable-find "yapf") (eq sb/python-langserver 'pyright))
+  :hook ((python-mode-hook python-ts-mode-hook) . yapf-mode)
+  :diminish yapf-mode)
 
 ;; (use-package cperl-mode
 ;;   :mode ("latexmkrc\\'")

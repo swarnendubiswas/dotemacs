@@ -8,6 +8,9 @@
 # We do not use $HOME since it will point to "/root" when run with sudo privileges
 USER="swarnendu"
 USER_HOME="/home/$USER"
+GITHUB="${USER_HOME}/github"
+DOTFILES="$GITHUB/dotfiles"
+CONFIG_DIR="${USER_HOME}/.config"
 
 DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
@@ -136,10 +139,6 @@ install_llvm() {
     apt install -y clang-"${LLVM_VER}" lldb-"${LLVM_VER}" lld-"${LLVM_VER}" libllvm-"${LLVM_VER}"-ocaml-dev libllvm"${LLVM_VER}" llvm-"${LLVM_VER}" llvm-"${LLVM_VER}"-dev llvm-"${LLVM_VER}"-doc llvm-"${LLVM_VER}"-examples llvm-"${LLVM_VER}"-runtime clang-tools-"${LLVM_VER}" clang-"${LLVM_VER}"-doc libclang-common-"${LLVM_VER}"-dev libclang-"${LLVM_VER}"-dev libclang1-"${LLVM_VER}" clang-format-"${LLVM_VER}" python3-clang-"${LLVM_VER}" clangd-"${LLVM_VER}" clang-tidy-"${LLVM_VER}" libfuzzer-"${LLVM_VER}"-dev libc++-"${LLVM_VER}"-dev libc++abi-"${LLVM_VER}"-dev libomp-"${LLVM_VER}"-dev libclc-"${LLVM_VER}"-dev libunwind-"${LLVM_VER}"-dev libmlir-"${LLVM_VER}"-dev mlir-"${LLVM_VER}"-tools
 }
 
-# Checkout configurations
-GITHUB="${USER_HOME}/github"
-DOTFILES="$GITHUB/dotfiles"
-
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
 if [ ! -d "$GITHUB" ]; then
@@ -176,9 +175,7 @@ install_node() {
     npm init --yes
 
     # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev npm less eslint jsonlint bash-language-server vscode-html-languageserver-bin js-beautify typescript-language-server typescript vscode-css-languageserver-bin intelephense markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint javascript-typescript-langserver unified-language-server prettier prettier-eslint @prettier/plugin-xml stylelint stylelint-prettier stylelint-config-prettier remark-language-server vscode-langservers-extracted npm-check-updates jshint dockerfile-language-server-nodejs awk-language-server tree-sitter-cli
-
-    npm install git+https://gitlab.com/matsievskiysv/math-preview --save-dev
+    npm install --save-dev less jsonlint bash-language-server vscode-html-languageserver-bin vscode-css-languageserver-bin markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint unified-language-server prettier @prettier/plugin-xml remark-language-server vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli
 
     # Add the following to $HOME/.bashrc
     # echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
@@ -203,105 +200,73 @@ install_texlab() {
 # HOME Directory
 cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
+# $1 is source, $2 is the destination
+create_file_symlink() {
+    if [ ! -L "$2" ]; then
+        echo "Creating symlink for $2..."
+        ln -s "$1" "$2"
+    else
+        echo "Overwriting symlink for $2..."
+        ln -nsf "$1" "$2"
+    fi
+    echo "...Done"
+}
+
 create_symlinks() {
-    if [ ! -L ".markdownlint.json" ]; then
-        echo "Creating symlink for .markdownlint.json..."
-        ln -s "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
-    else
-        echo "Overwriting symlink for .markdownlint.json..."
-        ln -nsf "$DOTFILES/markdown/dotmarkdownlint.json" .markdownlint.json
-    fi
-    echo "...Done"
+    # HOME directory
+    sfname="$DOTFILES/markdown/dotmarkdownlint.json"
+    dfname="$USER_HOME/.markdownlint.json"
+    create_file_symlink $sfname, $dfname
 
-    if [ -f ".prettierrc" ]; then
-        echo "Overwriting symlink for .prettierrc..."
-        ln -nsf "$DOTFILES/dotprettierrc" "$USER_HOME/.prettierrc"
-    else
-        echo "Creating symlink for .prettierrc..."
-        ln -s "$DOTFILES/dotprettierrc" "$USER_HOME/.prettierrc"
-    fi
-    echo "...Done"
+    sfname="$DOTFILES/dotprettierrc"
+    dfname="$USER_HOME/.prettierrc"
+    create_file_symlink $sfname, $dfname
 
-    if [ -f ".tidyrc" ]; then
-        echo "Overwriting symlink for .tidyrc..."
-        ln -nsf "$DOTFILES/tidyrc" "$USER_HOME/.tidyrc"
-    else
-        echo "Creating symlink for .prettierrc..."
-        ln -s "$DOTFILES/tidyrc" "$USER_HOME/.tidyrc"
-    fi
-    echo "...Done"
+    sfname="$DOTFILES/tidyrc"
+    dfname="$USER_HOME/.tidyrc"
+    create_file_symlink $sfname, $dfname
 
-    # CONFIG Directory
+    sfname="$DOTFILES/dotripgreprc"
+    dfname="$USER_HOME/.ripgreprc"
+    create_file_symlink $sfname, $dfname
 
-    # FIXME: Avoid duplication by replacing with a function call
+    sfname="$DOTFILES/tmux/tmux.conf"
+    dfname="$USER_HOME/.tmux.conf"
+    create_file_symlink $sfname, $dfname
 
-    CONFIG_DIR="${USER_HOME}/.config"
-    if [ ! -d "${CONFIG_DIR}" ]; then
-        mkdir -p "${CONFIG_DIR}"
-        chown -R $USER:$USER "${CONFIG_DIR}"
-    fi
-    cd "${CONFIG_DIR}" || echo "Failed: cd ${CONFIG_DIR}"
+    sfname="$DOTFILES/dotgitconfig"
+    dfname="$USER_HOME/.gitconfig"
+    create_file_symlink $sfname, $dfname
 
-    if [ ! -L "pylintrc" ]; then
-        echo "Creating symlink for pylintrc..."
-        ln -s "$DOTFILES/python/pylintrc" .
-    else
-        echo "Overwriting symlink for pylintrc..."
-        ln -s "$DOTFILES/python/pylintrc" .
-    fi
-    echo "...Done"
+    # if [ ! -d "${CONFIG_DIR}" ]; then
+    #     mkdir -p "${CONFIG_DIR}"
+    #     chown -R $USER:$USER "${CONFIG_DIR}"
+    # fi
+    # cd "${CONFIG_DIR}" || echo "Failed: cd ${CONFIG_DIR}"
 
-    if [ -d "yapf" ]; then
-        if [ ! -L "yapf" ]; then
-            echo "${CONFIG_DIR}/yapf present and is not a symlink!"
-        else
-            echo "Overwriting symlink for yapf..."
-            ln -nsf "$DOTFILES/python/yapf" .
-        fi
-    else
-        echo "Creating symlink for yapf..."
-        ln -s "$DOTFILES/python/yapf" .
-    fi
-    echo "...Done"
+    sfname="$DOTFILES/python/pylintrc"
+    dfname="$CONFIG_DIR/pylintrc"
+    create_file_symlink $sfname, $dfname
 
-    if [ -d "yamllint" ]; then
-        if [ ! -L "yamllint" ]; then
-            echo "${CONFIG_DIR}/yamllint present and is not a symlink!"
-        else
-            echo "Overwriting symlink for yamllint..."
-            ln -nsf "$DOTFILES/yamllint" .
-        fi
-    else
-        echo "Creating symlink for yamllint..."
-        ln -s "$DOTFILES/yamllint" .
-    fi
-    echo "...Done"
+    sfname="$DOTFILES/python/yapf"
+    dfname="$CONFIG_DIR/yapf"
+    create_file_symlink $sfname, $dfname
 
-    if [ -d "alacritty" ]; then
-        if [ ! -L "alacritty" ]; then
-            echo "${CONFIG_DIR}/alacritty present and is not a symlink!"
-        else
-            echo "Overwriting symlink for alacritty..."
-            ln -nsf "$DOTFILES/alacritty" .
-        fi
-    else
-        echo "Creating symlink for alacritty..."
-        ln -s "$DOTFILES/alacritty" .
-    fi
-    echo "...Done"
+    sfname="$DOTFILES/yamllint"
+    dfname="$CONFIG_DIR/yamllint"
+    create_file_symlink $sfname, $dfname
 
-    if [ -d ".ctags.d" ]; then
-        if [ ! -L ".ctags.d" ]; then
-            echo "${CONFIG_DIR}/.ctags.d present and is not a symlink!"
-        else
-            echo "Overwriting symlink for .ctags.d..."
-            ln -nsf "$DOTFILES/ctags/dotctags.d" .
-        fi
-    else
-        echo "Creating symlink for .ctags.d..."
-        ln -s "$DOTFILES/ctags/dotctags.d" .
-    fi
-    echo "...Done"
+    sfname="$DOTFILES/alacritty"
+    dfname="$CONFIG_DIR/alacritty"
+    create_file_symlink $sfname, $dfname
+
+    sfname="$DOTFILES/ctags/dotctags.d"
+    dfname="${CONFIG_DIR}/.ctags.d"
+    create_file_symlink $sfname, $dfname
+
+    sfname="$DOTFILES/bat"
+    dfname="${CONFIG_DIR}/bat"
+    create_file_symlink $sfname, $dfname
 }
 
 install_shellcheck() {
@@ -486,9 +451,9 @@ install_tmux() {
 }
 
 install_delta() {
-    # Latest releases do not work with Ubuntu 18/20
     DELTA_VER="0.16.5"
 
+    # Latest releases do not work with Ubuntu 18/20
     if [[ "${DIST_VERSION}" == Ubuntu_20.04 ]]; then
         DELTA_VER="0.14.0"
     fi
@@ -575,19 +540,22 @@ install_nerd_fonts_helper() {
 
 }
 
-# Cloning the nerd-fonts repository is challenging given its huge size
+install_font() {
+    wget https://github.com/ryanoasis/nerd-fonts/releases/download/v"$2"/"$1.tar.xz"
+    tar xf "$1.tar.xz"
+    mv "$1"/*.ttf $USER_HOME/.local/fonts/.
+    fc-cache -v $USER_HOME/.local/fonts/.
+}
 
 install_nerd_fonts() {
     NF_VER="3.0.2"
 
-    # declare -a FONT_NAMES=("BitstreamVeraSansMono" "DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
+    declare -a FONT_NAMES=("DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
 
-    # for i in "${FONT_NAMES[@]}"
-    # do
-    # install_nerd_fonts_helper "$i" "$NF_VER"
-    # done
-
-    fc-cache -v -f
+    for i in "${FONT_NAMES[@]}"
+    do
+    install_font "$i" "$NF_VER"
+    done
 }
 
 # echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
@@ -617,12 +585,6 @@ fi
 # install_cmake
 # install_fish
 # install_emacs
-# install_python_packages
-# install_node
-# install_texlab
-# create_symlinks
-# install_shellcheck
-# install_shfmt
 # install_ripgrep
 # install_cppcheck
 # install_ctags
@@ -632,14 +594,21 @@ fi
 # install_powerline
 # install_tmux
 # install_delta
-# install_zoxide
 # install_bat
 # install_fd
-# install_fzf
-# install_marksman
 # install_perl_server
-# install_nerd_fonts
-# install_difft
+
+install_python_packages
+install_node
+install_texlab
+install_shellcheck
+install_shfmt
+install_zoxide
+install_fzf
+install_marksman
+install_nerd_fonts
+install_difft
+create_symlinks
 
 # cleanup
 

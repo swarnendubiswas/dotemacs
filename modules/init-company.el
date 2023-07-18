@@ -41,6 +41,7 @@
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
     :map
     company-active-map
+    ("C-M-/" . company-other-backend)
     ("C-s" . company-search-candidates)
     ("C-M-s" . company-filter-candidates)
     ("C-n" . company-select-next)
@@ -48,7 +49,8 @@
     ("<tab>" . company-complete-common)
     ("TAB" . company-complete-common)
     ([escape] . company-abort)
-    ("C-w" . company-show-location)
+    ("M-." . company-show-location)
+    ("C-h" . company-show-doc-buffer)
     :map
     company-search-map
     ("C-s" . company-search-repeat-forward)

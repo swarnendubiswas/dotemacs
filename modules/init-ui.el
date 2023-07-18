@@ -63,10 +63,10 @@
 ;;   :init (all-the-icons-completion-mode 1)
 ;;   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
-;; (use-package nerd-icons
-;;   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
-;;   :when (eq sb/icons-provider 'nerd-icons)
-;;   :custom (nerd-icons-color-icons nil))
+(use-package nerd-icons
+  :straight (:host github :repo "rainstormstudio/nerd-icons.el")
+  ;; :when (eq sb/icons-provider 'nerd-icons)
+  :custom (nerd-icons-color-icons nil))
 
 ;; (use-package nerd-icons-completion
 ;;   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")

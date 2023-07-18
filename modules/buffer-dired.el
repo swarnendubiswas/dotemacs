@@ -106,6 +106,7 @@
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
+  :custom (aw-minibuffer-flag t)
   :config
   (add-to-list 'aw-ignored-buffers "*toc*")
   (ace-window-display-mode 1))

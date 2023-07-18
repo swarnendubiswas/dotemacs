@@ -45,6 +45,7 @@
   (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
   (ivy-use-selectable-prompt t "Easier to edit names with common prefixes")
   (ivy-sort-max-size 50000 "Increase the limit to allow sorting.")
+  (ivy-flx-limit 1500)
   :config
   (dolist
     (buffer
@@ -125,7 +126,10 @@
     ([remap load-theme] . counsel-theme)
     ([remap load-library] . counsel-load-library)
     ("C-x j" . sb/counsel-all-files-recursively)
-    ([remap compile] . counsel-compile))
+    ([remap compile] . counsel-compile)
+    :map
+    minibuffer-local-map
+    ("C-c h" . counsel-minor-history))
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)

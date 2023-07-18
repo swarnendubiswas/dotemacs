@@ -221,7 +221,7 @@
     lsp-java-extract-method
     lsp-java-add-import)
   :hook
-  (java-mode-hook
+  ((java-mode-hook java-ts-mode-hook)
     .
     (lambda ()
       (setq-local
@@ -338,51 +338,49 @@
 ;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
 ;; --createstub pandas".
 
-;; (use-package lsp-pyright
-;;   :if
-;;   (and (eq sb/lsp-provider 'lsp-mode)
-;;     (eq sb/python-langserver 'pyright)
-;;     (executable-find "pyright"))
-;;   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-;;   :hook (python-mode-hook . (lambda () (require 'lsp-pyright)))
-;;   :custom
-;;   (lsp-pyright-python-executable-cmd "python3")
-;;   (lsp-pyright-typechecking-mode "basic")
-;;   (lsp-pyright-auto-import-completions t)
-;;   (lsp-pyright-auto-search-paths t)
-;;   :config
-;;   (lsp-register-client
-;;     (make-lsp-client
-;;       :new-connection
-;;       (lsp-tramp-connection
-;;         (lambda () (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
-;;       :major-modes '(python-mode)
-;;       :remote? t
-;;       :server-id 'pyright-r
-;;       :multi-root lsp-pyright-multi-root
-;;       :priority 3
-;;       :initialization-options
-;;       (lambda ()
-;;         (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))
-;;       :initialized-fn
-;;       (lambda (workspace)
-;;         (with-lsp-workspace
-;;           workspace
-;;           (lsp--set-configuration
-;;             (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))))
-;;       :download-server-fn
-;;       (lambda (_client callback error-callback _update?)
-;;         (lsp-package-ensure 'pyright callback error-callback))
-;;       :notification-handlers
-;;       (lsp-ht
-;;         ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-;;         ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-;;         ("pyright/endProgress" 'lsp-pyright--end-progress-callback)))))
+(use-package lsp-pyright
+  :if
+  (and (eq sb/lsp-provider 'lsp-mode)
+    (eq sb/python-langserver 'pyright)
+    (executable-find "pyright"))
+  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
+  :hook (python-mode-hook . (lambda () (require 'lsp-pyright)))
+  :custom
+  (lsp-pyright-python-executable-cmd "python3")
+  (lsp-pyright-typechecking-mode "basic")
+  (lsp-pyright-auto-import-completions t)
+  (lsp-pyright-auto-search-paths t)
+  ;; :config
+  ;; (lsp-register-client
+  ;;   (make-lsp-client
+  ;;     :new-connection
+  ;;     (lsp-tramp-connection
+  ;;       (lambda () (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
+  ;;     :major-modes '(python-mode)
+  ;;     :remote? t
+  ;;     :server-id 'pyright-r
+  ;;     :multi-root lsp-pyright-multi-root
+  ;;     :priority 3
+  ;;     :initialization-options
+  ;;     (lambda ()
+  ;;       (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))
+  ;;     :initialized-fn
+  ;;     (lambda (workspace)
+  ;;       (with-lsp-workspace
+  ;;         workspace
+  ;;         (lsp--set-configuration
+  ;;           (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))))
+  ;;     :download-server-fn
+  ;;     (lambda (_client callback error-callback _update?)
+  ;;       (lsp-package-ensure 'pyright callback error-callback))
+  ;;     :notification-handlers
+  ;;     (lsp-ht
+  ;;       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
+  ;;       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
+  ;;       ("pyright/endProgress" 'lsp-pyright--end-progress-callback))))
+  )
 
-;; `lsp-latex' provides better support for the `texlab' server compared to `lsp-tex'. On the other
-;; hand, `lsp-tex' supports `digestif'. `lsp-latex' does not require `auctex'. However, the server
-;; performance is very poor, so I continue to prefer `auctex'.
-
+;; `lsp-tex' provides minimal settings for Texlab, lsp-latex supports full features of Texlab.
 (use-package lsp-latex
   :after lsp-mode
   :defines
