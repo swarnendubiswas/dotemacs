@@ -74,54 +74,9 @@
   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package flyspell
-  :preface
-  ;; Move point to previous error
-  ;; http://emacs.stackexchange.com/a/14912/2017
-  ;; http://pragmaticemacs.com/emacs/jump-back-to-previous-typo/
-  (defun sb/flyspell-goto-previous-error (arg)
-    "Go to arg previous spelling error."
-    (interactive "p")
-    (while (not (= 0 arg))
-      (let
-        (
-          (pos (point))
-          (min (point-min)))
-        (if (and (eq (current-buffer) flyspell-old-buffer-error) (eq pos flyspell-old-pos-error))
-          (progn
-            (if (= flyspell-old-pos-error min)
-              ;; Goto beginning of buffer
-              (progn
-                (message "Restarting from end of buffer")
-                (goto-char (point-max)))
-              (backward-word 1))
-            (setq pos (point))))
-        ;; Seek the next error
-        (while
-          (and (> pos min)
-            (let
-              (
-                (ovs (overlays-at pos))
-                (r '()))
-              (while (and (not r) (consp ovs))
-                (if (flyspell-overlay-p (car ovs))
-                  (setq r t)
-                  (setq ovs (cdr ovs))))
-              (not r)))
-          (backward-word 1)
-          (setq pos (point)))
-        ;; Save the current location for the next invocation
-        (setq arg (1- arg))
-        (setq flyspell-old-pos-error pos)
-        (setq flyspell-old-buffer-error (current-buffer))
-        (goto-char pos)
-        (if (= pos min)
-          (progn
-            (message "No more misspelled words!")
-            (setq arg 0))
-          (forward-word)))))
   :straight (:type built-in)
   :hook
-  ( ;; (before-save-hook . flyspell-buffer) ; Saving files will be slow
+  ((text-mode-hook . flyspell-mode)
     ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
     ;; language-specific words. Furthermore, it is supposedly slow.
     (prog-mode-hook . flyspell-prog-mode)
@@ -130,17 +85,10 @@
       .
       (lambda ()
         (when (string= (buffer-name) "*scratch*")
-          (flyspell-mode 1))))
-    (text-mode-hook . flyspell-mode))
-  :bind
-  (("C-c f f" . flyspell-mode)
-    ("C-c f b" . flyspell-buffer)
-    :map
-    flyspell-mode-map
-    ("C-," . sb/flyspell-goto-previous-error))
-  :custom (flyspell-abbrev-p t "Add corrections to abbreviation table")
-  ;; Do not print messages for every word (when checking the entire buffer). This is a major
-  ;; performance gain.
+          (flyspell-mode 1)))))
+  :bind (("C-c f f" . flyspell-mode) ("C-c f b" . flyspell-buffer))
+  :custom
+  (flyspell-abbrev-p t "Add corrections to abbreviation table")
   (flyspell-issue-message-flag nil)
   (flyspell-issue-welcome-flag nil)
   :diminish)
@@ -157,7 +105,7 @@
 
 (use-package flyspell-correct
   :after flyspell
-  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point)))
+  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point) ("C-," . flyspell-correct-previous)))
 
 ;; As of Emacs 28, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.

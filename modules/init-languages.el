@@ -27,7 +27,19 @@
 
 (use-package which-func
   :hook (prog-mode-hook . which-function-mode)
-  :custom (which-func-modes '(c-mode c++-mode python-mode sh-mode java-mode)))
+  :custom
+  (which-func-modes
+    '
+    (c-mode
+      c-ts-mode
+      c++-mode
+      c++-ts-mode
+      python-mode
+      python-ts-mode
+      sh-mode
+      bash-ts-mode
+      java-mode
+      java-ts-mode)))
 
 (use-package subword
   :straight (:type built-in)
@@ -78,79 +90,88 @@
 (use-package rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
-;; Tree-sitter provides advanced syntax highlighting features. Run
-;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
-;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
+(cond
+  ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
+  ;; https://github.com/renzmann/treesit-auto
+  ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
+  ((featurep 'treesit)
+    (use-package treesit
+      :straight (:type built-in)
+      :demand t
+      :custom (treesit-font-lock-level 4 "Increase default font locking")
+      :config
+      (setq treesit-language-source-alist
+        '
+        ((bash "https://github.com/tree-sitter/tree-sitter-bash")
+          (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+          (c "https://github.com/tree-sitter/tree-sitter-c")
+          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+          (cmake "https://github.com/uyha/tree-sitter-cmake")
+          (css "https://github.com/tree-sitter/tree-sitter-css")
+          (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+          (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
+          (html "https://github.com/tree-sitter/tree-sitter-html")
+          (java "https://github.com/tree-sitter/tree-sitter-java")
+          (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+          (json "https://github.com/tree-sitter/tree-sitter-json")
+          (latex "https://github.com/latex-lsp/tree-sitter-latex")
+          (make "https://github.com/alemuller/tree-sitter-make")
+          (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+          (org "https://github.com/milisims/tree-sitter-org")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
+          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-;; (use-package tree-sitter
-;;   :when (executable-find "tree-sitter")
-;;   :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
-;;   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
-;;   :config
-;;   (use-package tree-sitter-langs
-;;     :demand t
-;;     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
-;;   :diminish tree-sitter-mode)
+      (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+      ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
+      (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
 
-;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
-;; https://github.com/renzmann/treesit-auto
+      ;;   (setq
+      ;;     bash-ts-mode-hook bash-mode-hook
+      ;;     c-ts-mode-hook c-mode-hook
+      ;;     cpp-ts-mode-hook c++-mode-hook
+      ;;     cmake-ts-mode-hook cmake-mode-hook
+      ;;     css-ts-mode-hook css-mode-hook
+      ;;     html-ts-mode-hook html-mode-hook
+      ;;     java-ts-mode-hook java-mode-hook
+      ;;     json-ts-mode-hook json-mode-hook
+      ;;     make-ts-mode-hook make-mode-hook
+      ;;     markdown-ts-mode-hook markdown-mode-hook
+      ;;     org-ts-mode-hook org-mode-hook
+      ;;     python-ts-mode-hook python-mode-hook
+      ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
+      ))
 
-(use-package treesit
-  :straight (:type built-in)
-  :demand t
-  :custom (treesit-font-lock-level 4)
-  :config
-  (setq treesit-language-source-alist
-    '
-    ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-      (c "https://github.com/tree-sitter/tree-sitter-c")
-      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-      (cmake "https://github.com/uyha/tree-sitter-cmake")
-      (css "https://github.com/tree-sitter/tree-sitter-css")
-      (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-      (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
-      (html "https://github.com/tree-sitter/tree-sitter-html")
-      (java "https://github.com/tree-sitter/tree-sitter-java")
-      (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-      (json "https://github.com/tree-sitter/tree-sitter-json")
-      (make "https://github.com/alemuller/tree-sitter-make")
-      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-      (org "https://github.com/milisims/tree-sitter-org")
-      (python "https://github.com/tree-sitter/tree-sitter-python")
-      (rust "https://github.com/tree-sitter/tree-sitter-rust")
-      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  (t
 
-  (add-to-list 'major-mode-remap-alist '(bash-mode . bash-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(make-mode . make-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
-
-  ;;   (setq
-  ;;     bash-ts-mode-hook bash-mode-hook
-  ;;     c-ts-mode-hook c-mode-hook
-  ;;     cpp-ts-mode-hook c++-mode-hook
-  ;;     cmake-ts-mode-hook cmake-mode-hook
-  ;;     css-ts-mode-hook css-mode-hook
-  ;;     html-ts-mode-hook html-mode-hook
-  ;;     java-ts-mode-hook java-mode-hook
-  ;;     json-ts-mode-hook json-mode-hook
-  ;;     make-ts-mode-hook make-mode-hook
-  ;;     markdown-ts-mode-hook markdown-mode-hook
-  ;;     org-ts-mode-hook org-mode-hook
-  ;;     python-ts-mode-hook python-mode-hook
-  ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
-  )
+    ;; Tree-sitter provides advanced syntax highlighting features. Run
+    ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for
+    ;; tree-sitter. Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
+    (use-package tree-sitter
+      :when (executable-find "tree-sitter")
+      :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
+      :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
+      :config
+      (use-package tree-sitter-langs
+        :demand t
+        :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
+      :diminish tree-sitter-mode)))
 
 (use-package eldoc
   :straight (:type built-in)
@@ -190,9 +211,9 @@
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
   :mode
   ;; By default, files ending in ".h" are treated as C files.
-  (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
+  (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
   :hook
-  (c++-mode-hook
+  ((c++-mode-hook c++-ts-mode-hook)
     .
     (lambda ()
       (setq-local
@@ -214,16 +235,17 @@
     ("C-M-a"))
   :config
   ;; Disable electric indentation and on-type formatting
-  (add-hook
-    'c++-mode-hook
-    (lambda ()
-      (setq-local
-        c-auto-newline nil
-        ;; c-electric-brace nil
-        c-electric-flag nil
-        ;; c-electric-indent nil
-        c-enable-auto-newline nil
-        c-syntactic-indentation nil)))
+  (dolist (mode '(c++-mode c++-ts-mode))
+    (add-hook
+      mode
+      (lambda ()
+        (setq-local
+          c-auto-newline nil
+          ;; c-electric-brace nil
+          c-electric-flag nil
+          ;; c-electric-indent nil
+          c-enable-auto-newline nil
+          c-syntactic-indentation nil))))
 
   ;; (with-eval-after-load "lsp-mode"
   ;;   (lsp-register-client
@@ -234,13 +256,13 @@
   ;;       :server-id 'clangd-r)))
   )
 
-(use-package modern-cpp-font-lock ; Better highlight for modern C++
-  :hook (c++-mode-hook . modern-c++-font-lock-mode)
-  :diminish modern-c++-font-lock-mode)
+;; (use-package modern-cpp-font-lock ; Better highlight for modern C++
+;;   :hook (c++-mode-hook . modern-c++-font-lock-mode)
+;;   :diminish modern-c++-font-lock-mode)
 
 (use-package cuda-mode
   :commands cuda-mode
-  :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
+  :mode (("\\.cu\\'" . c++-ts-mode) ("\\.cuh\\'" . c++-ts-mode)))
 
 (use-package opencl-mode
   :mode "\\.cl\\'")
@@ -250,7 +272,7 @@
   :commands cmake-mode
   :mode "\(CMakeLists\.txt|\.cmake\)$"
   :hook
-  (cmake-mode-hook
+  ((cmake-mode-hook cmake-ts-mode-hook)
     .
     (lambda ()
       (when (fboundp 'spell-fu-mode)
@@ -275,8 +297,8 @@
   ;;       :server-id 'cmakels-r)))
   )
 
-(use-package cmake-font-lock ; Advanced syntax coloring support for CMake scripts
-  :hook (cmake-mode-hook . cmake-font-lock-activate))
+;; (use-package cmake-font-lock ; Advanced syntax coloring support for CMake scripts
+;;   :hook (cmake-mode-hook . cmake-font-lock-activate))
 
 ;; (use-package rmsbolt
 ;;   :commands rmsbolt-mode)
@@ -284,11 +306,11 @@
 (use-package python
   :straight (:type built-in)
   :mode
-  (("SCon\(struct\|script\)$" . python-mode)
+  (("SCon\(struct\|script\)$" . python-ts-mode)
     ("[./]flake8\\'" . conf-mode)
     ("/Pipfile\\'" . conf-mode))
   :hook
-  (python-mode-hook
+  ((python-mode-hook python-ts-mode-hook)
     .
     (lambda ()
       (cond
@@ -372,7 +394,7 @@
 
 (use-package pyvenv
   :commands (pyvenv-tracking-mode)
-  :hook (python-mode-hook . pyvenv-mode)
+  :hook ((python-mode-hook python-ts-mode-hook) . pyvenv-mode)
   :custom
   (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:" pyvenv-virtual-env-name "] ")))
   (pyvenv-post-activate-hooks
@@ -382,7 +404,7 @@
 (use-package python-isort
   :straight (:host github :repo "wyuenho/emacs-python-isort")
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-  :hook (python-mode-hook . python-isort-on-save-mode)
+  :hook ((python-mode-hook python-ts-mode-hook) . python-isort-on-save-mode)
   :custom
   (python-isort-arguments
     '
@@ -449,9 +471,9 @@
 
 (use-package sh-script ; Shell script mode
   :straight (:type built-in)
-  :mode (("\\.zsh\\'" . sh-mode) ("\\bashrc\\'" . sh-mode))
+  :mode ("\\bashrc\\'" . bash-ts-mode)
   :hook
-  (sh-mode-hook
+  ((sh-mode-hook bash-ts-mode-hook)
     .
     (lambda ()
       (cond
@@ -487,7 +509,7 @@
 
 (use-package highlight-doxygen
   :commands (highlight-doxygen-global-mode)
-  :hook ((c-mode-hook c++-mode-hook) . highlight-doxygen-mode))
+  :hook ((c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook) . highlight-doxygen-mode))
 
 (use-package lisp-mode
   :straight (:type built-in)
@@ -521,9 +543,14 @@
 (use-package yaml-mode
   :defines (lsp-ltex-enabled lsp-disabled-clients)
   :commands (yaml-mode)
-  :mode ("\\.yml\\'" "\\.yaml\\'" ".clang-format" ".clang-tidy" ".clangd")
+  :mode
+  (("\\.yml\\'" . yaml-ts-mode)
+    ("\\.yaml\\'" . yaml-ts-mode)
+    (".clang-format" . yaml-ts-mode)
+    (".clang-tidy" . yaml-ts-mode)
+    (".clangd" . yaml-ts-mode))
   :hook
-  (yaml-mode-hook
+  ((yaml-mode-hook yaml-ts-mode-hook)
     .
     (lambda ()
       ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
@@ -558,7 +585,7 @@
 (use-package css-mode
   :commands css-mode
   :hook
-  (css-mode-hook
+  ((css-mode-hook css-ts-mode-hook)
     .
     (lambda ()
       (cond
@@ -580,13 +607,13 @@
 (use-package make-mode
   :straight (:type built-in)
   :mode
-  (("\\Makefile\\'" . makefile-mode)
+  (("\\Makefile\\'" . make-ts-mode)
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-    ("makefile\\.rules\\'" . makefile-gmake-mode))
-  :hook (makefile-mode-hook . (lambda () (setq-local indent-tabs-mode t))))
+    ("makefile\\.rules\\'" . make-ts-mode))
+  :hook ((makefile-mode-hook make-ts-mode-hook) . (lambda () (setq-local indent-tabs-mode t))))
 
 (use-package makefile-executor
-  :hook (makefile-mode-hook . makefile-executor-mode))
+  :hook ((makefile-mode-hook make-ts-mode-hook) . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
@@ -671,7 +698,9 @@
   ;; (setq-default markdown-hide-markup t)
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
+  (("\\.md\\'" . markdown-ts-mode)
+    ("\\.markdown\\'" . markdown-ts-mode)
+    ("README\\.md\\'" . gfm-mode))
   :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j"))
   :custom
   (markdown-command
@@ -746,7 +775,7 @@
 
 (use-package emmet-mode
   :defines (emmet-move-cursor-between-quote)
-  :hook ((web-mode-hook css-mode-hook html-mode-hook) . emmet-mode)
+  :hook ((web-mode-hook css-mode-hook css-ts-mode-hook html-mode-hook html-ts-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
@@ -788,13 +817,13 @@
 (use-package json-mode
   :commands (json-mode jsonc-mode json-mode-beautify)
   :mode
-  (("\\.json\\'" . json-mode)
+  (("\\.json\\'" . json-ts-mode)
     ("pyrightconfig.json" . jsonc-mode)
     (".*/vscode/settings.json$" . jsonc-mode)
     (".*/\\.vscode/settings.json$" . jsonc-mode)
     ("User/settings.json$" . jsonc-mode))
   :hook
-  ((json-mode-hook jsonc-mode-hook)
+  ((json-mode-hook json-ts-mode-hook jsonc-mode-hook)
     .
     (lambda ()
       (make-local-variable 'js-indent-level)
@@ -815,7 +844,7 @@
   )
 
 (use-package json-reformat
-  :after (:any json-mode jsonc-mode)
+  :after (:any json-mode jsonc-mode json-ts-mode)
   :demand t
   :custom
   (json-reformat:indent-width 2)
@@ -929,7 +958,6 @@
     ("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
       "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
       "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
 
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))

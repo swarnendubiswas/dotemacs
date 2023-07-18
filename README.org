@@ -37,7 +37,7 @@ export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
 
 make distclean
 ./autogen.sh
-./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop --with-dbus --with-tree-sitter CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
+./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound  --with-dbus --without-pop --with-dbus --with-tree-sitter CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer" prefix=/usr/local
 
 # Enable support for native compilation with NATIVE_FULL_AOT
 make -j"$(nproc)" NATIVE_FULL_AOT=1
@@ -46,20 +46,7 @@ sudo make install
 
 Try the [[https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html][following]] if the build fails: ~make bootstrap~ or ~rm lisp/loaddefs.el; make;~.
 
-Evaluate the following to test that both fast JSON (Emacs 27+) and native compilation (Emacs 28+) are working.
-
-#+begin_src emacs-lisp
-(if (and (fboundp 'native-comp-available-p)
-       (native-comp-available-p))
-  (message "Native compilation is available")
-(message "Native compilation is *not* available"))
-
-(if (functionp 'json-serialize)
-  (message "Native JSON is available")
-(message "Native JSON is *not* available"))
-#+end_src
-
-You can also check whether "NATIVE__COMP" is part of the ~system-configuration-features~ variable.
+You can check whether "NATIVE__COMP" is part of the ~system-configuration-features~ variable.
 
 Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=):
 ~(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)~

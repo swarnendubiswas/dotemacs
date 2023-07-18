@@ -539,10 +539,12 @@
 ;; `avy-setup-default' will bind `avy-isearch' to "C-'" in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
-  :commands avy-setup-default
   :bind
   (("C-\\" . avy-goto-word-1)
-    ("C-'" . avy-goto-char-timer) ("C-/" . avy-goto-line)
+    ("C-'" . avy-goto-char-timer)
+    ("C-/" . avy-goto-line)
+    ("C-M-g" . avy-copy-line)
+    ("C-M-G" . avy-move-line)
     :map isearch-mode-map
     ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
     ;; `isearch' candidates.

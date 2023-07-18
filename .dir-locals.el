@@ -102,6 +102,19 @@
       (sb/delete-trailing-whitespace-p . t)
       (subdirs . nil)))
 
+  (yaml-mode
+    .
+    (
+      (eval .
+        (add-hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+      (eval .
+        (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+
   (json-mode
     .
     (
@@ -122,18 +135,11 @@
         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
       (eval .
         (add-hook
           'eglot-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
-
-  (yaml-mode
-    .
-    (
-      ;; YAML language server does not support formatting
-      ))
-
-  (org-mode . ((eglot-workspace-configuration . ((:ltex-ls . (:language . "en")))))))
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t)))))))
 
 
 ;; Local Variables:

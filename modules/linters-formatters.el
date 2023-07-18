@@ -179,7 +179,7 @@
   ((format-all-mode-hook . format-all-ensure-formatter)
     ;; Formatting LaTeX files with latexindent is very slow, yaml language server does not support
     ;; formatting.
-    ((web-mode-hook markdown-mode-hook) . format-all-mode))
+    ((web-mode-hook markdown-mode-hook markdown-ts-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters
     '
@@ -266,7 +266,10 @@
             (flycheck-add-next-checker 'grammarly 'languagetool)))))))
 
 (use-package highlight-indentation
-  :hook ((yaml-mode-hook python-mode-hook) . highlight-indentation-mode)
+  :hook
+  ((yaml-mode-hook yaml-ts-mode-hook python-mode-hook python-ts-mode-hook)
+    .
+    highlight-indentation-mode)
   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
@@ -285,7 +288,7 @@
   :init (global-flycheck-eglot-mode 1))
 
 (use-package shfmt
-  :hook (sh-mode-hook . shfmt-on-save-mode)
+  :hook ((sh-mode-hook bash-ts-mode-hook) . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-p" "-ci")))
