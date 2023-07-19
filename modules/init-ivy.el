@@ -45,8 +45,8 @@
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
   (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
   (ivy-use-selectable-prompt t "Easier to edit names with common prefixes")
-  (ivy-sort-max-size 50000 "Increase the limit to allow sorting.")
-  (ivy-flx-limit 1500)
+  (ivy-sort-max-size 50000 "Increase the limit to allow sorting")
+  (ivy-flx-limit 1500 "Increase the limit to allow flex sorting")
   :config
   (dolist
     (buffer

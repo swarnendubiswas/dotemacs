@@ -356,7 +356,8 @@
             :separate)
           (company-dabbrev company-dict company-ispell :separate))))
 
-    (add-hook 'yaml-mode-hook (lambda () (sb/company-yaml-mode))))
+    (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
+      (add-hook mode (lambda () (sb/company-yaml-mode)))))
 
   (progn
     (defun sb/company-prog-mode ()

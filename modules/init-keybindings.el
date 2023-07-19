@@ -603,7 +603,9 @@
   :straight (:host github :repo "CyberShadow/term-keys")
   :unless (display-graphic-p)
   :hook (emacs-startup-hook . term-keys-mode)
-  :config (require 'term-keys-alacritty))
+  :config (require 'term-keys-alacritty)
+  ;; https://github.com/alacritty/alacritty/issues/3569#issuecomment-610558110
+  (add-to-list 'term-file-aliases '("alacritty" . "xterm")))
 
 ;; (with-eval-after-load "transient"
 ;;   (transient-define-prefix sb/help-transient ()
