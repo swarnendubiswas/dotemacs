@@ -94,11 +94,25 @@
       ;; directory, not in any subdirectories.
       (subdirs . nil)))
 
+  (lisp-data-mode
+    .
+    ((elisp-autofmt-on-save-p . always)
+      (elisp-autofmt-load-packages-local . ("use-package"))
+      (sb/delete-trailing-whitespace-p . t)
+      ;; The special `subdirs' element is not a variable, but a special keyword which
+      ;; indicates that the mode settings are only to be applied in the current
+      ;; directory, not in any subdirectories.
+      (subdirs . nil)))
+
   (sh-mode
     .
     (
-      ;; Bash language server does not support formatting
-      ;; (eval . (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+      (sb/delete-trailing-whitespace-p . t)
+      (subdirs . nil)))
+
+  (bash-ts-mode
+    .
+    (
       (sb/delete-trailing-whitespace-p . t)
       (subdirs . nil)))
 
@@ -115,7 +129,33 @@
           'eglot-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
+  (yaml-ts-mode
+    .
+    (
+      (eval .
+        (add-hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+      (eval .
+        (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+
   (json-mode
+    .
+    (
+      (eval .
+        (add-hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+      (eval .
+        (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+
+  (json-ts-mode
     .
     (
       (eval .

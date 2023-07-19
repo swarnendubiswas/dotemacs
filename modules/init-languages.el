@@ -421,46 +421,46 @@
   :hook ((python-mode-hook python-ts-mode-hook) . yapf-mode)
   :diminish yapf-mode)
 
-;; (use-package cperl-mode
-;;   :mode ("latexmkrc\\'")
-;;   :hook
-;;   (cperl-mode-hook
-;;     .
-;;     (lambda ()
-;;       (cond
-;;         ((eq sb/lsp-provider 'eglot)
-;;           (eglot-ensure))
-;;         ((eq sb/lsp-provider 'lsp-mode)
-;;           (lsp-deferred)))))
-;;   :config
-;;   ;; Prefer CPerl mode to Perl mode
-;;   (fset 'perl-mode 'cperl-mode)
+(use-package cperl-mode
+  :mode "latexmkrc\\'"
+  :hook
+  (cperl-mode-hook
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
+  :config
+  ;; Prefer CPerl mode to Perl mode
+  (fset 'perl-mode 'cperl-mode)
 
-;;   ;; (with-eval-after-load "lsp-mode"
-;;   ;;   (lsp-register-client
-;;   ;;     (make-lsp-client
-;;   ;;       :new-connection
-;;   ;;       (lsp-tramp-connection
-;;   ;;         (lambda ()
-;;   ;;           (list
-;;   ;;             lsp-perl-language-server-path
-;;   ;;             "-MPerl::LanguageServer"
-;;   ;;             "-e"
-;;   ;;             "Perl::LanguageServer::run"
-;;   ;;             "--"
-;;   ;;             (format "--port %d --version %s"
-;;   ;;               lsp-perl-language-server-port
-;;   ;;               lsp-perl-language-server-client-version))))
-;;   ;;       :major-modes '(perl-mode cperl-mode)
-;;   ;;       :remote? t
-;;   ;;       :initialized-fn
-;;   ;;       (lambda (workspace)
-;;   ;;         (with-lsp-workspace
-;;   ;;           workspace
-;;   ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
-;;   ;;       :priority -1
-;;   ;;       :server-id 'perlls-r)))
-;;   )
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection
+  ;;       (lsp-tramp-connection
+  ;;         (lambda ()
+  ;;           (list
+  ;;             lsp-perl-language-server-path
+  ;;             "-MPerl::LanguageServer"
+  ;;             "-e"
+  ;;             "Perl::LanguageServer::run"
+  ;;             "--"
+  ;;             (format "--port %d --version %s"
+  ;;               lsp-perl-language-server-port
+  ;;               lsp-perl-language-server-client-version))))
+  ;;       :major-modes '(perl-mode cperl-mode)
+  ;;       :remote? t
+  ;;       :initialized-fn
+  ;;       (lambda (workspace)
+  ;;         (with-lsp-workspace
+  ;;           workspace
+  ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
+  ;;       :priority -1
+  ;;       :server-id 'perlls-r)))
+  )
 
 (use-package ant
   :commands (ant ant-clean ant-compile ant-test))
@@ -1049,22 +1049,13 @@
     LaTeX-syntactic-comments
     LaTeX-fill-break-at-separators)
   :functions (TeX-active-process)
-  :commands
-  (TeX-active-process
-    TeX-save-document
-    tex-site
-    LaTeX-mode
-    LaTeX-math-mode
-    TeX-PDF-mode
-    TeX-source-correlate-mode
-    TeX-active-process
-    TeX-command-menu
-    TeX-revert-document-buffer
-    TeX-master-file
-    TeX-next-error)
   :hook
   (((latex-mode-hook LaTeX-mode-hook) . LaTeX-math-mode)
     ((latex-mode-hook LaTeX-mode-hook) . TeX-PDF-mode) ; Use `pdflatex'
+    ;; Revert PDF buffer after TeX compilation has finished
+    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+    ;; Enable rainbow mode after applying styles to the buffer
+    (TeX-update-style-hook . rainbow-delimiters-mode)
     ;; Jump between editor and pdf viewer
     ((latex-mode-hook LaTeX-mode-hook) . TeX-source-correlate-mode)
     ((latex-mode-hook LaTeX-mode-hook) . turn-on-auto-fill)
@@ -1076,45 +1067,44 @@
             (eglot-ensure))
           ((eq sb/lsp-provider 'lsp-mode)
             (lsp-deferred))))))
+  :bind
+  (:map
+    TeX-mode-map
+    ("C-c ;")
+    ("C-c C-d")
+    ("C-c C-c" . TeX-command-master)
+    ("$" . self-insert-command)
+    ("C-c x q" . TeX-insert-quote))
+  :custom
+  (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
+  (TeX-auto-untabify t "Remove all tabs before saving")
+  (TeX-clean-confirm nil)
+  ;; Automatically insert braces after typing ^ and _ in math mode
+  (TeX-electric-sub-and-superscript t)
+  (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
+  (TeX-parse-self t "Parse documents")
+  (TeX-quote-after-quote nil "Allow original LaTeX quotes")
+  (TeX-save-query nil "Save buffers automatically when compiling")
+  (TeX-source-correlate-method 'synctex)
+  ;; Do not start the Emacs server when correlating sources
+  (TeX-source-correlate-start-server t)
+  (TeX-syntactic-comment t)
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view)))
+  (LaTeX-item-indent 0 "Indent lists by two spaces")
+  (LaTeX-syntactic-comments t)
+  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
+  (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
+  ;; Avoid superscripts and subscripts from being displayed in a different font size
+  (font-latex-fontify-script nil)
+  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
-  (setq
-    TeX-auto-save t ; Enable parse on save, stores parsed information in an `auto' directory
-    TeX-auto-untabify t ; Remove all tabs before saving
-    TeX-clean-confirm nil
-    ;; Automatically insert braces after typing ^ and _ in math mode
-    TeX-electric-sub-and-superscript t
-    TeX-electric-math t ; Inserting $ completes the math mode and positions the cursor
-    TeX-parse-self t ; Parse documents
-    TeX-quote-after-quote nil ; Allow original LaTeX quotes
-    TeX-save-query nil ; Save buffers automatically when compiling
-    TeX-source-correlate-method 'synctex
-    ;; Do not start the emacs server when correlating sources
-    TeX-source-correlate-start-server t
-    TeX-syntactic-comment t
-    TeX-view-program-selection '((output-pdf "PDF Tools"))
-    TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-    LaTeX-item-indent 0 ; Indent lists by two spaces
-    LaTeX-syntactic-comments t
-    LaTeX-fill-break-at-separators nil ; Do not insert line-break at inline math
-    tex-fontify-script nil ; Avoid raising of superscripts and lowering of subscripts
-    ;; Avoid superscripts and subscripts from being displayed in a different font size
-    font-latex-fontify-script nil
-    ;; Avoid emphasizing section headers
-    font-latex-fontify-sectioning 1.0)
-
-  (setq-default TeX-master nil) ; Always query for the master file
-
-  ;; Revert PDF buffer after TeX compilation has finished
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-
-  ;; Enable rainbow mode after applying styles to the buffer
-  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
-
-  (unbind-key "C-c ;" TeX-mode-map)
-  (unbind-key "C-c C-d" TeX-mode-map)
-  (bind-key "$" #'self-insert-command TeX-mode-map)
-  ;; (unbind-key "`" LaTeX-math-mode-map)
-  :bind ("C-c x q" . TeX-insert-quote))
+  ;; Always query for the master file
+  (setq-default TeX-master nil)
+  (with-eval-after-load "auctex"
+    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
+    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
+    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
 
 (use-package bibtex
   :straight (:type built-in)
@@ -1258,11 +1248,10 @@ Ignore if no file is found."
 (use-package auctex-latexmk
   :after tex-mode
   :demand t
-  :commands (auctex-latexmk-setup auctex-latexmk)
-  :custom
-  (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
-  (TeX-command-default "LatexMk")
-  :config (auctex-latexmk-setup))
+  :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  :config
+  (setq-default TeX-command-default "LatexMk")
+  (auctex-latexmk-setup))
 
 (with-eval-after-load "latex"
   (defvar LaTeX-mode-map)
@@ -1281,8 +1270,12 @@ Ignore if no file is found."
 ;;   :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
 
 ;; TODO: Try pcakages like `bibtex-capf' and `citar'
-;; https://github.com/mclear-tools/bibtex-capf/
 ;; https://github.com/emacs-citar/citar
+
+(use-package bibtex-capf
+  :straight (:type git :host github :repo "mclear-tools/bibtex-capf")
+  :when (eq sb/capf 'corfu)
+  :hook ((org-mode markdown-mode tex-mode latex-mode reftex-mode) . bibtex-capf-mode))
 
 (setq
   large-file-warning-threshold (* 500 1024 1024) ; MB

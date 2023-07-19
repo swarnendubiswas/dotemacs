@@ -147,7 +147,7 @@ if [ ! -d "$GITHUB" ]; then
 fi
 
 install_python_packages() {
-    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave semgrep ruff-lsp --user
+    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave semgrep ruff-lsp pyright --user
 }
 
 install_node() {
@@ -236,6 +236,10 @@ create_symlinks() {
 
     sfname="$DOTFILES/dotgitconfig"
     dfname="$USER_HOME/.gitconfig"
+    create_file_symlink $sfname, $dfname
+
+    sfname="$DOTFILES/latex/jabref.xml"
+    dfname="$USER_HOME/jabref.xml"
     create_file_symlink $sfname, $dfname
 
     # if [ ! -d "${CONFIG_DIR}" ]; then
@@ -552,9 +556,8 @@ install_nerd_fonts() {
 
     declare -a FONT_NAMES=("DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
 
-    for i in "${FONT_NAMES[@]}"
-    do
-    install_font "$i" "$NF_VER"
+    for i in "${FONT_NAMES[@]}"; do
+        install_font "$i" "$NF_VER"
     done
 }
 

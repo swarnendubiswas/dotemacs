@@ -432,7 +432,7 @@ PAD can be left (`l') or right (`r')."
 
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 150)
+        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 160)
         (set-face-attribute 'mode-line nil :height 120)
         (set-face-attribute 'mode-line-inactive nil :height 120)))))
 

@@ -238,9 +238,7 @@ This location is used for temporary installations and files.")
 ;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
 ;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
 ;; nice to have TexLab and Grammarly with LaTeX files.
-
 (require 'init-lsp)
-
 (require 'init-languages)
 (require 'init-functions)
 

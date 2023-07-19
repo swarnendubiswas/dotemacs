@@ -60,7 +60,6 @@ An alist.")
     (template . ,(all-the-icons-material "format_align_left" :height 0.8 :v-adjust -0.15))
     (t . ,(all-the-icons-material "find_in_page" :height 0.8 :v-adjust -0.15))))
 
-
 (defsubst corfu-icon--metadata-get (metadata type-name)
   (or
    (plist-get completion-extra-properties (intern (format ":%s" type-name)))

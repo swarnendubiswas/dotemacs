@@ -793,6 +793,13 @@
   ;; Do not pair quotes unless they are free
   (sp-pair "\"" nil :unless '(sp-point-before-word-p sp-point-after-word-p))
 
+  (dolist (lispmode '(emacs-lisp-mode lisp-data-mode))
+    (with-eval-after-load lispmode
+      (sp-with-modes
+        sp-lisp-modes
+        ;; disable ', it's the quote character!
+        (sp-local-pair "'" nil :actions nil))))
+
   (with-eval-after-load "cc-mode"
     (require 'smartparens-c)
     (sp-with-modes '(c-mode c++-mode) (sp-local-pair "/\*\*" "\*\*/")))

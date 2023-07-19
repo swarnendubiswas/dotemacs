@@ -34,11 +34,12 @@
   ;; (ivy-height-alist '((t lambda (_caller) (/ (frame-height) 2))))
   (ivy-height-alist
     '
-    ((counsel-M-x . 10)
+    ((counsel-M-x . 15)
       (counsel-switch-buffer . 10)
       (counsel-yank-pop . 15)
       (swiper . 15)
-      (swiper-isearch . 15)))
+      (swiper-isearch . 15)
+      (counsel-recentf . 15)))
   (ivy-truncate-lines t) ; NOTE: `counsel-flycheck' output gets truncated
   (ivy-wrap t "Easy to navigate")
   (ivy-initial-inputs-alist nil "Do not start searches with ^")

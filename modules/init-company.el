@@ -110,16 +110,14 @@
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
 ;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
-;; (use-package company-posframe
-;;   :if (display-graphic-p)
-;;   :after company
-;;   :commands company-posframe-mode
-;;   :diminish
-;;   :custom
-;;   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-;;   (company-posframe-show-indicator nil "The backend display in the posframe modeline is not great")
-;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-;;   :init (company-posframe-mode 1))
+(use-package company-posframe
+  :when (display-graphic-p)
+  :hook (company-mode . company-posframe-mode)
+  :custom
+  (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
+  (company-posframe-show-indicator nil "The backend display in the posframe modeline is not great")
+  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+  :diminish)
 
 (use-package company-quickhelp
   :after company
@@ -296,11 +294,7 @@
             company-auctex-symbols
             company-bibtex
             :separate)
-
-          ;; FIXME: Untested
-          ;; company-yasnippet
-
-          (company-dabbrev :with company-ispell company-dict :separate) company-capf)))
+          company-dict company-ispell company-dabbrev company-capf)))
 
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook

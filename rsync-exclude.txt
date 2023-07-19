@@ -1,6 +1,5 @@
 .git
 straight
-etc
 var
 eglot-java-eclipse-jdt-cache
 eln-cache

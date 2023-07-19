@@ -1508,6 +1508,7 @@
     ("behaviour" "behavior" nil :count 0)
     ("chosing" "Choosing" nil :count 0)
     ("concurreny" "Concurrency" nil :count 0)
+    ("curret" "current" nil :count 0)
     ("dealth" "dealt" nil :count 0)
     ("dimesnion" "dimension" nil :count 0)
     ("distinguih" "Distinguish" nil :count 0)

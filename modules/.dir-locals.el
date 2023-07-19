@@ -8,8 +8,6 @@
       (elisp-autofmt-load-packages-local . ("use-package"))
       (no-byte-compile . t)
       (sb/delete-trailing-whitespace-p . t)
-      ;; (eval . (progn
-      ;;           (format-all-mode 1)))
       )))
 
 ;; Local Variables:

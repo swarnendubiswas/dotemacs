@@ -291,7 +291,7 @@
   :hook ((sh-mode-hook bash-ts-mode-hook) . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
-  (shfmt-arguments '("-i" "4" "-p" "-ci")))
+  (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
 
 (provide 'linters-formatters)
 
