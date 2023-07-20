@@ -167,7 +167,7 @@ This location is used for temporary installations and files.")
   :group 'sb/emacs)
 
 ;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI.
-(defcustom sb/icons-provider 'none
+(defcustom sb/icons-provider 'nerd-icons
   "Choose the provider for icons."
   :type
   '

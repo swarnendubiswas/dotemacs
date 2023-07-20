@@ -208,7 +208,7 @@
 (use-package nerd-icons-ivy-rich
   :hook (ivy-mode-hook . nerd-icons-ivy-rich-mode)
   :custom
-  (nerd-icons-ivy-rich-icon nil "Disable icons")
+  (nerd-icons-ivy-rich-icon t)
   (nerd-icons-ivy-rich-icon-size 0.9)
   :config
   (plist-put

@@ -148,7 +148,8 @@
   :straight (:type built-in)
   :defines (dired-clean-confirm-killing-deleted-buffers)
   :hook
-  (dired-mode-hook . auto-revert-mode) ; Auto refresh dired when files change
+  ((dired-mode-hook . auto-revert-mode) ; Auto refresh dired when files change
+    (dired-mode-hook . dired-hide-details-mode))
   :bind
   (:map
     dired-mode-map

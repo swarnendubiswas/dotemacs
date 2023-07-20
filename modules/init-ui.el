@@ -66,24 +66,26 @@
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   ;; :when (eq sb/icons-provider 'nerd-icons)
-  :custom (nerd-icons-color-icons nil))
+  :custom
+  (nerd-icons-color-icons nil)
+  (nerd-icons-scale-factor 0.9))
 
-;; (use-package nerd-icons-completion
-;;   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
-;;   :when (eq sb/icons-provider 'nerd-icons)
-;;   :init (nerd-icons-completion-mode 1)
-;;   :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
+(use-package nerd-icons-completion
+  :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
+  :when (eq sb/icons-provider 'nerd-icons)
+  :init (nerd-icons-completion-mode 1)
+  :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
 
-;; (use-package nerd-icons-dired
-;;   :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
-;;   :when (eq sb/icons-provider 'nerd-icons)
-;;   :hook (dired-mode-hook . nerd-icons-dired-mode)
-;;   :diminish)
+(use-package nerd-icons-dired
+  :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
+  :when (eq sb/icons-provider 'nerd-icons)
+  :hook (dired-mode-hook . nerd-icons-dired-mode)
+  :diminish)
 
-;; (use-package nerd-icons-ibuffer
-;;   :when (eq sb/icons-provider 'nerd-icons)
-;;   :hook (ibuffer-mode-hook . nerd-icons-ibuffer-mode)
-;;   :custom (nerd-icons-ibuffer-icon-size 1.1))
+(use-package nerd-icons-ibuffer
+  :when (eq sb/icons-provider 'nerd-icons)
+  :hook (ibuffer-mode-hook . nerd-icons-ibuffer-mode)
+  :custom (nerd-icons-ibuffer-icon-size 1.0))
 
 ;; Decrease minibuffer font size
 ;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
