@@ -177,8 +177,7 @@
   :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-    ;; Formatting LaTeX files with latexindent is very slow, yaml language server does not support
-    ;; formatting.
+    ;; Formatting LaTeX files with latexindent is very slow
     ((web-mode-hook markdown-mode-hook markdown-ts-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters

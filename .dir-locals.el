@@ -97,24 +97,15 @@
   (lisp-data-mode
     .
     ((elisp-autofmt-on-save-p . always)
-      (elisp-autofmt-load-packages-local . ("use-package"))
-      (sb/delete-trailing-whitespace-p . t)
+      (elisp-autofmt-load-packages-local . ("use-package")) (sb/delete-trailing-whitespace-p . t)
       ;; The special `subdirs' element is not a variable, but a special keyword which
       ;; indicates that the mode settings are only to be applied in the current
       ;; directory, not in any subdirectories.
       (subdirs . nil)))
 
-  (sh-mode
-    .
-    (
-      (sb/delete-trailing-whitespace-p . t)
-      (subdirs . nil)))
+  (sh-mode . ((sb/delete-trailing-whitespace-p . t) (subdirs . nil)))
 
-  (bash-ts-mode
-    .
-    (
-      (sb/delete-trailing-whitespace-p . t)
-      (subdirs . nil)))
+  (bash-ts-mode . ((sb/delete-trailing-whitespace-p . t) (subdirs . nil)))
 
   (yaml-mode
     .

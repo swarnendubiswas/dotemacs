@@ -23,9 +23,12 @@
   :bind
   (("C-c r" . ivy-resume)
     ("<f3>" . ivy-switch-buffer)
-    :map ivy-minibuffer-map
+    :map
+    ivy-minibuffer-map
     ("<RET>" . ivy-alt-done) ; Continue completion
-    ("<left>" . ivy-previous-line) ("<right>" . ivy-next-line))
+    ("<left>" . ivy-previous-line)
+    ("<right>" . ivy-next-line)
+    ([escape] . minibuffer-keyboard-quit))
   :custom
   (ivy-count-format "(%d/%d) " "Helps identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
@@ -134,7 +137,7 @@
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
-  (counsel-find-file-at-point t)
+  (counsel-find-file-at-point t "Identify file at point")
   (counsel-find-file-ignore-regexp (regexp-opt completion-ignored-extensions))
   (counsel-mode-override-describe-bindings t)
   (counsel-preselect-current-file t)
@@ -208,7 +211,10 @@
 (use-package nerd-icons-ivy-rich
   :hook (ivy-mode-hook . nerd-icons-ivy-rich-mode)
   :custom
-  (nerd-icons-ivy-rich-icon t)
+  (nerd-icons-ivy-rich-icon
+    (if (eq sb/icons-provider 'nerd-icons)
+      t
+      nil))
   (nerd-icons-ivy-rich-icon-size 0.9)
   :config
   (plist-put
@@ -292,12 +298,12 @@
             (user-id (file-attribute-user-id (file-attributes candidate)))
             (user-name (user-login-name user-id)))
           (format "%s" user-name)))))
-  :after (ivy counsel)
+  :after counsel
   :init (ivy-rich-mode 1)
   :custom (ivy-rich-parse-remote-buffer nil)
   :config (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow-line)
 
-  ;; (ivy-rich-project-root-cache-mode 1)
+  (ivy-rich-project-root-cache-mode 1)
 
   ;; (if (display-graphic-p)
   ;;     (ivy-rich-set-columns 'counsel-find-file

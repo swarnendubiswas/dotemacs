@@ -166,8 +166,9 @@ This location is used for temporary installations and files.")
     (const :tag "none" nil))
   :group 'sb/emacs)
 
-;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI.
-(defcustom sb/icons-provider 'nerd-icons
+;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI. Using icons
+;; sometimes lead to visual misalignment in lists.
+(defcustom sb/icons-provider 'none
   "Choose the provider for icons."
   :type
   '
@@ -219,9 +220,9 @@ This location is used for temporary installations and files.")
 
 (cond
   ((eq sb/minibuffer-completion 'ivy)
-    (require 'init-ivy))
+    (require 'ivy-counsel))
   ((eq sb/minibuffer-completion 'vertico)
-    (require 'init-vertico)))
+    (require 'vertico-consult)))
 
 (require 'init-spell)
 (require 'init-misc)

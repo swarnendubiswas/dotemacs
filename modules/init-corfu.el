@@ -246,7 +246,20 @@
   ;;             #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
   ;;             #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
-  (dolist (lsp-prog-mode '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))
+  (dolist
+    (lsp-prog-mode
+      '
+      (c-mode-hook
+        c-ts-mode-hook
+        c++-mode-hook
+        c++-ts-mode-hook
+        java-mode-hook
+        java-ts-mode-hook
+        python-mode-hook
+        python-ts-mode-hook
+        sh-mode-hook
+        bash-ts-mode-hook
+        cmake-ts-mode-hook))
     (add-hook
       lsp-prog-mode
       (lambda ()

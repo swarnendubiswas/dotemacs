@@ -120,7 +120,6 @@
   (lsp-modeline-diagnostics-enable t)
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
   (lsp-modeline-code-actions-enable t "Useful to show code actions on the modeline")
-  (lsp-modeline-code-actions-segments '(count icon name))
   (lsp-modeline-workspace-status-enable t)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
   ;; request via `lsp-signature-activate'.
@@ -140,6 +139,9 @@
   ;; https://github.com/emacs-lsp/lsp-mode/issues/2831
   (lsp-enable-snippet nil "Annoying to overwrite the snippet placeholders")
   :config
+  (when (display-graphic-p)
+    (setq lsp-modeline-code-actions-segments '(count icon name)))
+
   (dolist
     (ignore-dirs
       '
@@ -380,7 +382,7 @@
   ;;       ("pyright/endProgress" 'lsp-pyright--end-progress-callback))))
   )
 
-;; `lsp-tex' provides minimal settings for Texlab, lsp-latex supports full features of Texlab.
+;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
 (use-package lsp-latex
   :after lsp-mode
   :defines
