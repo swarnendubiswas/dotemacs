@@ -343,7 +343,8 @@
   ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
   )
 
-;; The contents of ".projectile" are ignored when using the `alien' project indexing.
+;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
+;; indexing.
 (use-package projectile
   :preface
   (defun sb/projectile-do-not-visit-tags-table ()
@@ -371,11 +372,10 @@
   (projectile-file-exists-remote-cache-expire nil)
   (projectile-mode-line-prefix "" "Save modeline space")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
-  ;; No sorting should be faster. Files are not sorted if `projectile-indexing-method' is set to
-  ;; `alien'.
+  ;; No sorting is faster. Files are not sorted if `projectile-indexing-method' is set to `alien'.
   (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
-  ;; The topmost file has precedence
+  ;; The topmost file in a hierarchy has precedence
   (projectile-project-root-files
     '
     ("GTAGS"

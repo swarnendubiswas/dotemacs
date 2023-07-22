@@ -412,8 +412,8 @@ PAD can be left (`l') or right (`r')."
       (progn
         ;; (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
         (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 170)
-        (set-face-attribute 'mode-line nil :height 130)
-        (set-face-attribute 'mode-line-inactive nil :height 130)))
+        (set-face-attribute 'mode-line nil :height 140)
+        (set-face-attribute 'mode-line-inactive nil :height 140)))
 
     ((string= (system-name) "DESKTOP-4T8O69V")
       (progn

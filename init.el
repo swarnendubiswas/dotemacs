@@ -26,7 +26,7 @@
     (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -58,7 +58,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'none
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '
@@ -168,7 +168,7 @@ This location is used for temporary installations and files.")
 
 ;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI. Using icons
 ;; sometimes lead to visual misalignment in lists.
-(defcustom sb/icons-provider 'none
+(defcustom sb/icons-provider 'nerd-icons
   "Choose the provider for icons."
   :type
   '

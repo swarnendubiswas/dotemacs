@@ -1364,7 +1364,7 @@ Fallback to `xref-go-back'."
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-capf-integration nil)
-  (citre-enable-imenu-integration nil)
+  (citre-enable-imenu-integration t)
   (citre-enable-xref-integration t)
   (citre-edit-cmd-buf-default-cmd
     "ctags
