@@ -65,7 +65,8 @@
 
 (use-package nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
-  ;; :when (eq sb/icons-provider 'nerd-icons)
+  ;; `nerd-icons-ivy-rich' depends on this package
+  :when (or (eq sb/icons-provider 'nerd-icons) (eq sb/minibuffer-completion 'ivy))
   :custom
   (nerd-icons-color-icons nil)
   (nerd-icons-scale-factor 0.9))

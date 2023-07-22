@@ -72,7 +72,10 @@
   :straight nil
   :after vertico
   :hook (minibuffer-setup-hook . vertico-repeat-save)
-  :bind (("C-c r" . vertico-repeat-last) ("M-r" . vertico-repeat-select)))
+  :bind (("C-c r" . vertico-repeat-last) ("M-r" . vertico-repeat-select))
+  :config
+  (with-eval-after-load "savehist"
+    (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
 ;; (use-package vertico-indexed ; Select candidates by number with "C-u number RET"
 ;;   :straight nil
@@ -80,10 +83,10 @@
 ;;   :commands vertico-indexed-mode
 ;;   :init (vertico-indexed-mode 1))
 
-;; (use-package vertico-quick
-;;   :straight nil
-;;   :after vertico
-;;   :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
+(use-package vertico-quick
+  :straight nil
+  :after vertico
+  :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
 
 ;; (use-package vertico-multiform
 ;;   :straight nil
@@ -308,6 +311,6 @@
     ([remap projectile-switch-project] . consult-projectile-switch-project))
   :config (consult-customize consult-projectile :preview-key nil))
 
-(provide 'init-vertico)
+(provide 'vertico-consult)
 
 ;;; init-vertico.el ends here

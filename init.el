@@ -31,8 +31,8 @@
   :type 'boolean
   :group 'sb/emacs)
 
-;; Prefer "straight.el" over "package.el". A big advantage with "straight.el" is it is easy to
-;; install packages from arbitrary sources like GitHub.
+;; Prefer "straight.el" over "package.el". "straight.el" makes it easy to install packages from
+;; arbitrary sources like GitHub.
 (defcustom sb/disable-package.el t
   "Disable package.el.
 Prefer the straight.el package manager instead."
@@ -119,7 +119,7 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "pylsp" pylsp) (const :tag "pyright" pyright) (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/minibuffer-completion 'ivy
+(defcustom sb/minibuffer-completion 'vertico
   "Choose the framework to use for narrowing and selection."
   :type '(radio (const :tag "vertico" vertico) (const :tag "ivy" ivy) (const :tag "none" none))
   :group 'sb/emacs)
@@ -132,7 +132,7 @@ This location is used for temporary installations and files.")
 ;; Company works better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is
 ;; configurable, and we can set up a custom file containing completions with `company-dict'.
 
-(defcustom sb/capf 'company
+(defcustom sb/capf 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -166,8 +166,9 @@ This location is used for temporary installations and files.")
     (const :tag "none" nil))
   :group 'sb/emacs)
 
-;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI.
-(defcustom sb/icons-provider 'nerd-icons
+;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI. Using icons
+;; sometimes lead to visual misalignment in lists.
+(defcustom sb/icons-provider 'none
   "Choose the provider for icons."
   :type
   '
@@ -219,9 +220,9 @@ This location is used for temporary installations and files.")
 
 (cond
   ((eq sb/minibuffer-completion 'ivy)
-    (require 'init-ivy))
+    (require 'ivy-counsel))
   ((eq sb/minibuffer-completion 'vertico)
-    (require 'init-vertico)))
+    (require 'vertico-consult)))
 
 (require 'init-spell)
 (require 'init-misc)

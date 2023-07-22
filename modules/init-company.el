@@ -258,7 +258,7 @@
       (company-capf :with company-dabbrev-code company-yasnippet)
       ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
       ;; ignored.
-      (company-ispell company-dabbrev company-dict :separate))
+      company-dict company-ispell company-dabbrev)
     company-transformers
     '
     (delete-dups ; company-sort-by-backend-importance
@@ -278,7 +278,7 @@
       ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
       ;; labels and citations. `company-reftex-labels' is expected to be better than
       ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
-      ;; `company-auctex-bibs'
+      ;; `company-auctex-bibs'.
 
       (setq company-backends
         '
@@ -292,7 +292,7 @@
             ;; Math unicode symbols and sub(super)scripts
             company-math-symbols-unicode
             company-auctex-symbols
-            company-bibtex
+            ;; company-bibtex
             :separate)
           company-dict company-ispell company-dabbrev company-capf)))
 
@@ -312,10 +312,7 @@
       "Add backends for org completion in company mode."
       (set
         (make-local-variable 'company-backends)
-        '
-        (company-dirfiles
-          company-org-block
-          (company-ispell company-dabbrev company-dict :separate))))
+        '(company-dirfiles company-org-block company-dict company-ispell company-dabbrev)))
 
     (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
 
@@ -327,7 +324,7 @@
       (defvar company-backends)
       (set
         (make-local-variable 'company-backends)
-        '(company-dirfiles (company-dabbrev company-ispell company-dict :separate))))
+        '(company-dirfiles company-dict company-ispell company-dabbrev)))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -354,7 +351,7 @@
             company-dabbrev-code ; Useful for variable names
             company-yasnippet
             :separate)
-          (company-dabbrev company-dict company-ispell :separate))))
+          company-dict company-ispell company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode (lambda () (sb/company-yaml-mode)))))
@@ -382,7 +379,7 @@
                 company-dabbrev-code ; Useful for variable names
                 company-yasnippet
                 :separate)
-              (company-dabbrev company-dict company-ispell :separate))))
+              company-dict company-ispell company-dabbrev)))
         ((eq sb/lsp-provider 'lsp-mode)
           (setq company-backends
             '
@@ -393,7 +390,7 @@
                 company-dabbrev-code ; Useful for variable names
                 company-yasnippet
                 :separate)
-              (company-dabbrev company-dict company-ispell :separate))))))
+              company-dict company-ispell company-dabbrev)))))
 
     (add-hook
       'prog-mode-hook
@@ -423,7 +420,7 @@
             company-dabbrev-code ; Useful for variable names
             company-yasnippet
             :separate)
-          (company-dabbrev company-dict company-ispell :separate))))
+          company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))

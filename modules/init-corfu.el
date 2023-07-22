@@ -65,15 +65,21 @@
 (use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
   :if (eq sb/capf 'corfu)
-  :hook (corfu-mode-hook . corfu-quick-access-mode))
+  :hook
+  (corfu-mode-hook
+    .
+    (lambda ()
+      (ignore-errors
+        (corfu-quick-access-mode)))))
 
 ;; We do not need this if we use prescient-based sorting.
 (use-package corfu-history
   :straight nil
   :if (eq sb/capf 'corfu)
-  :after (savehist)
   :hook (corfu-mode-hook . corfu-history-mode)
-  :config (add-to-list 'savehist-additional-variables 'corfu-history))
+  :config
+  (with-eval-after-load "savehist"
+    (add-to-list 'savehist-additional-variables 'corfu-history)))
 
 (use-package corfu-echo
   :straight nil
@@ -231,29 +237,51 @@
       (setq-local completion-at-point-functions
         (list #'cape-file #'cape-abbrev (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 
-  ;; (dolist (modes '(latex-mode-hook LaTeX-mode-hook))
-  ;;   (add-hook
-  ;;     modes
-  ;;     (lambda ()
-  ;;       (when (bound-and-true-p lsp-managed-mode)
-  ;;         (setq-local completion-at-point-functions
-  ;;           (list
-  ;;             #'lsp-completion-at-point #'cape-tex ; Leads to unwanted completions
-  ;;             #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
-  ;;       (when (bound-and-true-p eglot--managed-mode)
-  ;;         (setq-local completion-at-point-functions
-  ;;           (list
-  ;;             #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
-  ;;             #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
+  (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook
+      mode
+      (lambda ()
+        (when (bound-and-true-p lsp-managed-mode)
+          (setq-local completion-at-point-functions
+            (list
+              #'lsp-completion-at-point #'cape-tex ; Leads to unwanted completions
+              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
+        (when (bound-and-true-p eglot--managed-mode)
+          (setq-local completion-at-point-functions
+            (list
+              #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
+              #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
-  (dolist (lsp-prog-mode '(c-mode-hook c++-mode-hook java-mode-hook python-mode-hook sh-mode-hook))
+  (dolist
+    (lsp-prog-mode
+      '
+      (c-mode-hook
+        c-ts-mode-hook
+        c++-mode-hook
+        c++-ts-mode-hook
+        java-mode-hook
+        java-ts-mode-hook
+        python-mode-hook
+        python-ts-mode-hook
+        sh-mode-hook
+        bash-ts-mode-hook
+        cmake-mode-hook
+        cmake-ts-mode-hook))
     (add-hook
       lsp-prog-mode
       (lambda ()
         (setq-local completion-at-point-functions
-          (append
-            completion-at-point-functions
-            (list #'cape-keyword #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict))))
+          (list
+            #'lsp-completion-at-point
+            #'citre-completion-at-point
+            #'cape-keyword
+            #'cape-file
+            (cape-super-capf #'cape-dabbrev #'cape-dict))
+
+          ;; (append
+          ;;   completion-at-point-functions
+          ;;   (list #'cape-keyword #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))
+          )
 
         ;; (progn
         ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)

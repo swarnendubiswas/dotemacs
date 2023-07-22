@@ -126,7 +126,7 @@
       ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
       (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
       (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-Mode))
+      (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
       (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
       (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
       (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
@@ -160,7 +160,6 @@
       ))
 
   (t
-
     ;; Tree-sitter provides advanced syntax highlighting features. Run
     ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for
     ;; tree-sitter. Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
@@ -210,44 +209,28 @@
   :straight (:type built-in)
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
-  :mode
-  ;; By default, files ending in ".h" are treated as C files.
-  (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
+  :mode (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
   :hook
   ((c++-mode-hook c++-ts-mode-hook)
     .
     (lambda ()
       (setq-local
         c-set-style "cc-mode"
-        c-basic-offset 2)
+        c-basic-offset 2
+        ;; Disable electric indentation and on-type formatting
+        c-auto-newline nil
+        ;; c-electric-brace nil
+        c-electric-flag nil
+        ;; c-electric-indent nil
+        c-enable-auto-newline nil
+        c-syntactic-indentation nil)
       (cond
         ((eq sb/lsp-provider 'eglot)
           (eglot-ensure))
         ((eq sb/lsp-provider 'lsp-mode)
           (lsp-deferred)))))
-  :bind
-  (:map
-    c-mode-base-map
-    ("C-M-a" . c-beginning-of-defun)
-    ("C-M-e" . c-end-of-defun)
-    ("C-c C-d")
-    :map
-    c-mode-map
-    ("C-M-a"))
-  :config
-  ;; Disable electric indentation and on-type formatting
-  (dolist (mode '(c++-mode c++-ts-mode))
-    (add-hook
-      mode
-      (lambda ()
-        (setq-local
-          c-auto-newline nil
-          ;; c-electric-brace nil
-          c-electric-flag nil
-          ;; c-electric-indent nil
-          c-enable-auto-newline nil
-          c-syntactic-indentation nil))))
-
+  :bind (:map c-mode-base-map ("C-c C-d"))
+  ;; :config
   ;; (with-eval-after-load "lsp-mode"
   ;;   (lsp-register-client
   ;;     (make-lsp-client
@@ -270,8 +253,7 @@
 
 (use-package cmake-mode
   :if (executable-find "cmake")
-  :commands cmake-mode
-  :mode "\(CMakeLists\.txt|\.cmake\)$"
+  :mode ("\(CMakeLists\.txt|\.cmake\)$" . cmake-ts-mode)
   :hook
   ((cmake-mode-hook cmake-ts-mode-hook)
     .
@@ -1090,7 +1072,6 @@
   (TeX-source-correlate-start-server t)
   (TeX-syntactic-comment t)
   (TeX-view-program-selection '((output-pdf "PDF Tools")))
-  (TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view)))
   (LaTeX-item-indent 0 "Indent lists by two spaces")
   (LaTeX-syntactic-comments t)
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
@@ -1099,6 +1080,12 @@
   (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
+  (when (executable-find "okular")
+    (setq
+      TeX-view-program-list
+      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+      TeX-view-program-selection '((output-pdf "Okular"))))
+
   ;; Always query for the master file
   (setq-default TeX-master nil)
   (with-eval-after-load "auctex"
@@ -1247,6 +1234,7 @@ Ignore if no file is found."
 
 (use-package auctex-latexmk
   :after tex-mode
+  :when (executable-find "latexmk")
   :demand t
   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
   :config

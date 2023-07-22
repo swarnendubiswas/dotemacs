@@ -546,8 +546,8 @@
     ("C-M-g" . avy-copy-line)
     ("C-M-G" . avy-move-line)
     :map isearch-mode-map
-    ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the currently visible
-    ;; `isearch' candidates.
+    ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
+    ;; visible `isearch' candidates.
     ("C-'" . avy-isearch))
   :custom (avy-background t "Provides better contrast"))
 

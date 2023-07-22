@@ -175,7 +175,7 @@ install_node() {
     npm init --yes
 
     # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev less jsonlint bash-language-server vscode-html-languageserver-bin vscode-css-languageserver-bin markdownlint-cli markdownlint-cli2 yaml-language-server vscode-json-languageserver write-good htmlhint unified-language-server prettier @prettier/plugin-xml remark-language-server vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli
+    npm install --save-dev less jsonlint bash-language-server markdownlint-cli markdownlint-cli2 yaml-language-server write-good htmlhint unified-language-server prettier @prettier/plugin-xml vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli
 
     # Add the following to $HOME/.bashrc
     # echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
