@@ -29,7 +29,7 @@
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0.1 "Recommended to not use zero for performance reasons")
+  (corfu-auto-delay 0.05 "Recommended to not use zero for performance reasons")
   (corfu-exclude-modes
     '
     (dired-mode
@@ -104,7 +104,8 @@
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode-hook . corfu-terminal-mode)
-  :custom (corfu-terminal-position-right-margin 10))
+  ;; :custom (corfu-terminal-position-right-margin 10)
+  )
 
 ;; (use-package kind-icon
 ;;   :if (or (eq sb/corfu-icons 'kind-icon) (eq sb/corfu-icons 'nerd-icons))
@@ -116,7 +117,6 @@
 ;;   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
 ;;   ;; (kind-icon-blend-background nil)
 ;;   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-
 ;;   (when (eq sb/corfu-icons 'nerd-icons)
 ;;     (with-eval-after-load "nerd-icons"
 ;;       (setq kind-icon-use-icons nil)
@@ -187,14 +187,12 @@
 ;; (add-hook 'completion-at-point-functions #'cape-path)
 
 ;; `cape-super-capf' works only well for static completion functions like `cape-dabbrev',
-;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like
-;; `cape-file'.
-
+;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like `cape-file'.
 (use-package cape
   :after corfu
   :demand t
   :commands
-  (cape-history ; Complete from Eshell, Comint or minibuffer history
+  (cape-history ; Complete from Eshell, Comint, or minibuffer history
     cape-file ; Complete file name at point
     cape-keyword ; Complete programming language keyword
     cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
@@ -265,15 +263,17 @@
         sh-mode-hook
         bash-ts-mode-hook
         cmake-mode-hook
-        cmake-ts-mode-hook))
+        cmake-ts-mode-hook
+        json-mode-hook
+        json-ts-mode-hook
+        yaml-mode-hook
+        yaml-ts-mode-hook))
     (add-hook
       lsp-prog-mode
       (lambda ()
         (setq-local completion-at-point-functions
           (list
-            #'lsp-completion-at-point
-            #'citre-completion-at-point
-            #'cape-keyword
+            (cape-super-capf #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
             #'cape-file
             (cape-super-capf #'cape-dabbrev #'cape-dict))
 

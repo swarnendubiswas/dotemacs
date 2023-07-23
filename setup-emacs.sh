@@ -166,32 +166,28 @@ install_node() {
     # apt install -y nodejs
 
     # Setup Node packages
-
     TMP_HOME="$USER_HOME/tmp"
-
     NPM_HOME="$TMP_HOME"
     mkdir -p "${NPM_HOME}"
     cd "${NPM_HOME}" || echo "Failed: cd ${NPM_HOME}"
 
     npm init --yes
+    npm install --save-dev less jsonlint bash-language-server markdownlint-cli markdownlint-cli2 yaml-language-server write-good htmlhint unified-language-server prettier @prettier/plugin-xml vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli prettier-plugin-awk
 
-    # This list matches with "package.json" in $DOTFILES
-    npm install --save-dev less jsonlint bash-language-server markdownlint-cli markdownlint-cli2 yaml-language-server write-good htmlhint unified-language-server prettier @prettier/plugin-xml vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli
-
-    # Add the following to $HOME/.bashrc
+    # Add the following to "$HOME/.bashrc"
     # echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
 
     # cmdline=$"\n\nexport NODE_PATH=\$HOME/tmp/node_modules\n"
     # printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
-# Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
+# Install Texlab.
 install_texlab() {
     TEXLAB_VER="5.7.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
-    tar xf texlab-x86_64-linux.tar.gz
+    tar xzf texlab-x86_64-linux.tar.gz
     mv texlab "${USER_HOME}/.local/bin"
     rm texlab-x86_64-linux.tar.gz
 }
@@ -276,7 +272,6 @@ create_symlinks() {
 
 install_shellcheck() {
     SHELLCHECK_VER="0.9.0"
-
     SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -355,37 +350,14 @@ install_global() {
     cd global-${GLOBAL_VER} || exit
     ./configure --with-universal-ctags=/usr/local/bin/ctags
     make
-    sudo make install
+    make install
     echo "GTAGSCONF=/usr/local/share/gtags/gtags.conf" >>"$HOME"/.bashrc
     echo "GTAGSLABEL=new-ctags" >>"$HOME"/.bashrc
 }
 
 install_alacritty() {
-    # ALACRITTY_VER="0.11.0"
-    # cd "$GITHUB"
-    # wget https://github.com/alacritty/alacritty/archive/refs/tags/v"${ALACRITTY_VER}".tar.gz
-    # tar xz alacritty-"${ALACRITTY_VER}".tar.gz
-    # cd alacritty-"${ALACRITTY_VER}"
-    # cargo build --release
-
     add-apt-repository ppa:aslatter/ppa -y
     apt install alacritty
-
-    cd "${CONFIG_DIR}" || echo "Failed: cd ${CONFIG_DIR}"
-
-    if [ -d "alacritty" ]; then
-        if [ ! -L "alacritty" ]; then
-            echo "${CONFIG_DIR}/yamllint present and is not a symlink!"
-        else
-            echo "Overwriting symlink for yamllint..."
-            ln -nsf "$DOTFILES/alacritty" .
-        fi
-    else
-        echo "Creating symlink for yapf..."
-        ln -s "$DOTFILES/alacritty" .
-    fi
-    echo "...Done"
-
     # Setup 24bit terminal support
     /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
 }
@@ -458,7 +430,6 @@ install_tmux() {
 
 install_delta() {
     DELTA_VER="0.16.5"
-
     # Latest releases do not work with Ubuntu 18/20
     if [[ "${DIST_VERSION}" == Ubuntu_20.04 ]]; then
         DELTA_VER="0.14.0"
@@ -474,7 +445,7 @@ install_difft() {
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
-    mv difft "${USER_HOME}/.local/bin/"
+    mv difft "${USER_HOME}/.local/bin/."
     rm difft-x86_64-unknown-linux-gnu.tar.gz
 }
 

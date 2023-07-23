@@ -547,6 +547,7 @@
         ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
         "--pretty")))
 
+  (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
 
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
