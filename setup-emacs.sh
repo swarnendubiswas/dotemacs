@@ -162,8 +162,8 @@ install_node() {
         Ubuntu_20.04 | Ubuntu_22.04) ;;
     esac
 
-    curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
-    apt install -y nodejs
+    # curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
+    # apt install -y nodejs
 
     # Setup Node packages
 
@@ -181,8 +181,8 @@ install_node() {
     # Add the following to $HOME/.bashrc
     # echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
 
-    cmdline=$"\n\nexport NODE_PATH=\$HOME/tmp/node_modules\n"
-    printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
+    # cmdline=$"\n\nexport NODE_PATH=\$HOME/tmp/node_modules\n"
+    # printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
 # Install Texlab. The language server can be feature-incomplete and slow, so I still prefer AuCTeX.
@@ -288,11 +288,12 @@ install_shellcheck() {
 }
 
 install_shfmt() {
-    SHFMT_VER="3.6.0"
+    SHFMT_VER="3.7.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
     mv shfmt_v"${SHFMT_VER}"_linux_amd64 ${USER_HOME}/.local/bin/shfmt
+    chmod a+x ${USER_HOME}/.local/bin/shfmt
 }
 
 install_ripgrep() {
@@ -314,7 +315,7 @@ install_cppcheck() {
     fi
 
     cd cppcheck || echo "Failed: cd cppcheck"
-    git checkout 2.10.3
+    git checkout 2.11
     mkdir -p build
     cd build || echo "Failed: cd build"
     cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON -DUSE_THREADS=ON ..
@@ -472,7 +473,7 @@ install_difft() {
     DIFFT_VER="0.48.0"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
-    tar xz difft-x86_64-unknown-linux-gnu.tar.gz
+    tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
     mv difft "${USER_HOME}/.local/bin/"
     rm difft-x86_64-unknown-linux-gnu.tar.gz
 }
@@ -577,11 +578,11 @@ cleanup() {
 
 # is_sudo
 
-if command_exists emacs; then
-    echo "emacs found"
-else
-    echo "emacs not found"
-fi
+# if command_exists emacs; then
+#     echo "emacs found"
+# else
+#     echo "emacs not found"
+# fi
 
 # install_ubuntu_packages
 # install_gcc

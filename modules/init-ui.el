@@ -433,6 +433,12 @@ PAD can be left (`l') or right (`r')."
         (set-face-attribute 'mode-line nil :height 110)
         (set-face-attribute 'mode-line-inactive nil :height 110)))
 
+    ((string= (system-name) "DESKTOP-LDLQMCO")
+      (progn
+        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
+        (set-face-attribute 'mode-line nil :height 110)
+        (set-face-attribute 'mode-line-inactive nil :height 110)))
+
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
         (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 160)

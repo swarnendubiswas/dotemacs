@@ -39,7 +39,7 @@
         (setq
           ispell-program-name "aspell"
           ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))))
-    (((and (symbol-value 'sb/IS-WINDOWS) (executable-find "hunspell")))
+    ((and (symbol-value 'sb/IS-WINDOWS) (executable-find "hunspell"))
       (progn
         (setenv "LANG" "en_US")
         (setenv "DICTIONARY" "en_US")
@@ -212,6 +212,7 @@
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.
 (use-package jinx
+  :when (symbol-value 'sb/IS-LINUX)
   :hook (text-mode-hook . jinx-mode)
   :custom (jinx-languages "en_US")
   :bind ([remap ispell-word] . jinx-correct)
