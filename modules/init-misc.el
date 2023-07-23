@@ -343,7 +343,8 @@
   ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
   )
 
-;; The contents of ".projectile" are ignored when using the `alien' project indexing.
+;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
+;; indexing.
 (use-package projectile
   :preface
   (defun sb/projectile-do-not-visit-tags-table ()
@@ -371,11 +372,10 @@
   (projectile-file-exists-remote-cache-expire nil)
   (projectile-mode-line-prefix "" "Save modeline space")
   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
-  ;; No sorting should be faster. Files are not sorted if `projectile-indexing-method' is set to
-  ;; `alien'.
+  ;; No sorting is faster. Files are not sorted if `projectile-indexing-method' is set to `alien'.
   (projectile-sort-order 'recently-active)
   (projectile-verbose nil)
-  ;; The topmost file has precedence
+  ;; The topmost file in a hierarchy has precedence
   (projectile-project-root-files
     '
     ("GTAGS"
@@ -581,7 +581,9 @@
   :custom (vc-follow-symlinks t "No need to ask")
   ;; Disabling vc is said to improve performance. However, I find it useful to show branch
   ;; information on the modeline and highlight modifications in the current file.
-  (vc-handled-backends '(Git)))
+  (vc-handled-backends '(Git))
+  ;; Disable version control for remote files to improve performance
+  (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
 
 (use-package magit
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
@@ -600,8 +602,9 @@
     magit-diff-highlight-trailing nil))
 
 (use-package git-modes
-  :commands (gitignore-mode gitattributes-mode gitconfig-mode)
-  :mode ("dotgitconfig" . gitconfig-mode))
+  :mode ("dotgitconfig" . gitconfig-mode)
+  :mode ("/\\.gitignore\\'" . gitignore-mode)
+  :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
@@ -648,28 +651,7 @@
         (goto-char (point-min))
         (when (re-search-forward "^<<<<<<< " nil t)
           (smerge-mode 1)))))
-
-  (defun sb/enable-smerge-maybe-without-vc ()
-    "Enable `smerge-mode' automatically based on conflict markers."
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^<<<<<<< " nil t)
-        (smerge-mode 1))))
   :straight (:type built-in)
-  :commands
-  (smerge-next
-    smerge-prev
-    smerge-auto-leave
-    smerge-keep-base
-    smerge-keep-upper
-    smerge-keep-lower
-    smerge-keep-all
-    smerge-diff-base-lower
-    smerge-diff-base-upper
-    smerge-diff-upper-lower
-    smerge-refine
-    smerge-combine-with-next
-    smerge-resolve)
   :init
   (add-hook 'find-file-hook #'sb/enable-smerge-maybe-with-vc :append)
   (add-hook 'after-revert-hook #'sb/enable-smerge-maybe-with-vc :append)

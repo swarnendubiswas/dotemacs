@@ -62,7 +62,7 @@
 (unbind-key "C-j")
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
-(bind-key "C-x s" #'sb/switch-to-scratch)
+(bind-key "C-x s" #'scratch-buffer)
 
 (unless sb/tab-bar-handler
   (global-set-key [remap next-buffer] #'sb/next-buffer)

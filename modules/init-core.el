@@ -380,21 +380,35 @@
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
 ;; prefix argument is given. Then it will find file at point.
-
 (use-package ffap
   :straight (:type built-in)
+  ;; Vertico does not provide intelligent file lookup, unlike `counsel'.
   :if (eq sb/minibuffer-completion 'vertico)
-  :demand t
-  :defer 2
-  :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names")
-  :config (ffap-bindings)
-  ;; Vertico does not seem to provide intelligent file lookup, unlike `counsel' and `ffap'.
-  (bind-key "<f2>" #'ffap))
+  :bind
+  (("<f2>" . ffap)
+    ([remap find-file] . find-file-at-point)
+    ([remap find-file-read-only] . ffap-read-only)
+    ([remap find-alternate-file] . ffap-alternate-file)
+    ([remap dired] . dired-at-point)
+    ([remap list-directory] . ffap-list-directory))
+  :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names"))
 
-;; (use-package doc-view
-;;   :custom
-;;   (doc-view-continuous t)
-;;   (doc-view-resolution 120))
+(use-package doc-view
+  :straight (:type built-in)
+  :bind
+  (:map
+    doc-view-mode-map
+    ("=" . doc-view-enlarge)
+    ("-" . doc-view-shrink)
+    ("n" . doc-view-next-page)
+    ("p" . doc-view-previous-page)
+    ("0" . doc-view-scale-reset)
+    ("M-<" . doc-view-first-page)
+    ("M->" . doc-view-last-page)
+    ("C-l" . doc-view-goto-page))
+  :custom
+  (doc-view-continuous t)
+  (doc-view-resolution 120))
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
 (use-package goto-addr
@@ -441,47 +455,35 @@
 (defvar tramp-ssh-controlmaster-options)
 (defvar sb/minibuffer-completion)
 
-(setq
-  tramp-default-user user-login-name
+(use-package tramp
+  :straight (:type built-in)
+  :bind ("C-S-q" . tramp-cleanup-connection)
+  :custom (tramp-default-user user-login-name)
   ;; Tramp uses SSH when connecting and when viewing a directory, but it will use SCP to copy
   ;; files which is faster than SSH.
-  ;; tramp-default-method "ssh"
-  tramp-default-remote-shell "/usr/bin/bash"
-  remote-file-name-inhibit-cache nil ; Remote files are not updated outside of Tramp
+  ;; (tramp-default-method "ssh")
+  (tramp-default-remote-shell "/usr/bin/bash")
+  (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   ;; Disable default options, reuse SSH connections by reading "~/.ssh/config" control master
   ;; settings
   ;; https://emacs.stackexchange.com/questions/22306/working-with-tramp-mode-on-slow-connection-emacs-does-network-trip-when-i-start
   ;; https://puppet.com/blog/speed-up-ssh-by-reusing-connections
-  tramp-ssh-controlmaster-options ""
-  tramp-verbose 1
-  ;; Disable version control for remote files to improve performance
-  vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
+  (tramp-ssh-controlmaster-options "")
+  (tramp-verbose 1)
+  :config (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
+  ;; Disable backup
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
 
-(defalias 'exit-tramp 'tramp-cleanup-all-buffers)
-
-;; Disable backup
-(add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
-
-(with-eval-after-load "tramp"
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   ;; https://stackoverflow.com/questions/26630640/tramp-ignores-tramp-remote-path#26649558
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
   ;; Recommended to connect with Bash
-  (setenv "SHELL" shell-file-name))
+  (setenv "SHELL" shell-file-name)
 
-;; https://www.gnu.org/software/tramp/
-(setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
-
-(declare-function tramp-cleanup-connection "tramp")
-(bind-key "C-S-q" #'tramp-cleanup-connection)
-
-;; TODO: SSH into Gcloud
-;; https://gist.github.com/jackrusher/36c80a2fd6a8fe8ddf46bc7e408ae1f9
-;; Make sure you have set your default project with:
-;; "gcloud config set project <project-name>"
-;; "C-x C-f /gcssh:compute-instance:/path/to/filename.clj"
+  ;; https://www.gnu.org/software/tramp/
+  (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 ;; LATER: Can we shorten long Tramp file names? This does not work with Tramp.
 ;; (add-to-list 'directory-abbrev-alist

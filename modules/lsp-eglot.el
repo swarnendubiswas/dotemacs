@@ -1,4 +1,4 @@
-;;; init-lsp.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
+;;; lsp-eglot.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -138,6 +138,25 @@
   (lsp-enable-symbol-highlighting nil)
   ;; https://github.com/emacs-lsp/lsp-mode/issues/2831
   (lsp-enable-snippet t "Annoying to overwrite the snippet placeholders")
+  (lsp-pylsp-configuration-sources ["setup.cfg"])
+  (lsp-pylsp-plugins-mccabe-enabled nil)
+  ;; We can also set this per-project
+  (lsp-pylsp-plugins-preload-modules ["numpy" , "csv" , "pandas" , "statistics" , "json"])
+  (lsp-pylsp-plugins-pycodestyle-enabled nil)
+  (lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column)
+  (lsp-pylsp-plugins-pydocstyle-convention "pep257")
+  (lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
+  (lsp-pylsp-plugins-pyflakes-enabled nil)
+  (lsp-pylsp-plugins-pylint-enabled t)
+  (lsp-pylsp-plugins-yapf-enabled t)
+  (lsp-pylsp-plugins-flake8-enabled nil)
+  (lsp-pylsp-plugins-black-enabled nil)
+  (lsp-pylsp-plugins-jedi-use-pyenv-environment nil)
+  (lsp-pylsp-plugins-pylint-args
+    (vconcat
+      (list
+        "-j 2"
+        (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
   :config
   (when (display-graphic-p)
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -586,6 +605,6 @@
       (eglot-ensure)
       (eglot-java-mode))))
 
-(provide 'init-lsp)
+(provide 'lsp-eglot)
 
-;;; init-lsp.el ends here
+;;; lsp-eglot.el ends here

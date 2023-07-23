@@ -209,7 +209,6 @@
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict) 'append)
   :custom
   (cape-dabbrev-min-length 3)
@@ -235,7 +234,7 @@
     'text-mode-hook
     (lambda ()
       (setq-local completion-at-point-functions
-        (list #'cape-file #'cape-abbrev (cape-super-capf #'cape-dabbrev #'cape-dict)))))
+        (list #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 
   (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
     (add-hook

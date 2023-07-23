@@ -1,4 +1,4 @@
-;;; init-ivy.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
+;;; ivy-counsel.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -389,4 +389,4 @@
 
 (provide 'ivy-counsel)
 
-;;; init-ivy.el ends here
+;;; ivy-counsel.el ends here

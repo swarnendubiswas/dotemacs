@@ -90,6 +90,9 @@
 (use-package rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
+;; Tree-sitter provides advanced syntax highlighting features. Run
+;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
+;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
 (cond
   ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
   ;; https://github.com/renzmann/treesit-auto
@@ -160,9 +163,6 @@
       ))
 
   (t
-    ;; Tree-sitter provides advanced syntax highlighting features. Run
-    ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for
-    ;; tree-sitter. Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
     (use-package tree-sitter
       :when (executable-find "tree-sitter")
       :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
@@ -322,51 +322,11 @@
   (python-indent-guess-indent-offset nil)
   (python-indent-offset 4)
   (python-shell-exec-path "python3")
-  (python-shell-interpreter "python3")
-  :config
-  (with-eval-after-load "lsp-mode"
-    (defvar lsp-pylsp-configuration-sources)
-    (defvar lsp-pylsp-plugins-autopep8-enable)
-    (defvar lsp-pylsp-plugins-mccabe-enabled)
-    (defvar lsp-pylsp-plugins-pycodestyle-enabled)
-    (defvar lsp-pylsp-plugins-pycodestyle-max-line-length)
-    (defvar lsp-pylsp-plugins-pydocstyle-convention)
-    (defvar lsp-pylsp-plugins-pydocstyle-enabled)
-    (defvar lsp-pylsp-plugins-pydocstyle-ignore)
-    (defvar lsp-pylsp-plugins-pyflakes-enabled)
-    (defvar lsp-pylsp-plugins-pylint-args)
-    (defvar lsp-pylsp-plugins-pylint-enabled)
-    (defvar lsp-pylsp-plugins-yapf-enabled)
-    (defvar lsp-pyright-langserver-command-args)
-    (defvar lsp-pylsp-plugins-preload-modules)
-    (defvar lsp-pylsp-plugins-flake8-enabled)
-    (defvar lsp-pylsp-plugins-jedi-use-pyenv-environment)
-
-    (setq
-      lsp-pylsp-configuration-sources ["setup.cfg"]
-      lsp-pylsp-plugins-mccabe-enabled nil
-      ;; We can also set this per-project
-      lsp-pylsp-plugins-preload-modules ["numpy" , "csv" , "pandas" , "statistics" , "json"]
-      lsp-pylsp-plugins-pycodestyle-enabled nil
-      lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column
-      lsp-pylsp-plugins-pydocstyle-convention "pep257"
-      lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213"))
-      lsp-pylsp-plugins-pyflakes-enabled nil
-      lsp-pylsp-plugins-pylint-args
-      (vconcat
-        (list
-          "-j 2"
-          (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory))))
-      lsp-pylsp-plugins-pylint-enabled t
-      lsp-pylsp-plugins-yapf-enabled t
-      lsp-pylsp-plugins-flake8-enabled nil
-      lsp-pylsp-plugins-black-enabled nil
-      lsp-pylsp-plugins-jedi-use-pyenv-environment nil)))
+  (python-shell-interpreter "python3"))
 
 (use-package python-docstring
   :after python-mode
   :demand t
-  :commands (python-docstring-mode python-docstring-install)
   :config (python-docstring-install)
   :diminish)
 
@@ -374,7 +334,6 @@
   :commands (pip-requirements-mode))
 
 (use-package pyvenv
-  :commands (pyvenv-tracking-mode)
   :hook ((python-mode-hook python-ts-mode-hook) . pyvenv-mode)
   :custom
   (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:" pyvenv-virtual-env-name "] ")))
@@ -397,7 +356,6 @@
 ;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with `pyright' since it does not
 ;; support document formatting. So, we have to use yapf with pyright. Yapfify works on the original
 ;; file, so that any project settings supported by YAPF itself are used.
-
 (use-package yapfify
   :if (and (executable-find "yapf") (eq sb/python-langserver 'pyright))
   :hook ((python-mode-hook python-ts-mode-hook) . yapf-mode)
@@ -445,6 +403,7 @@
   )
 
 (use-package ant
+  :after java-mode
   :commands (ant ant-clean ant-compile ant-test))
 
 ;; (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
@@ -481,7 +440,6 @@
 (use-package fish-mode
   :mode "\\.fish\\'"
   :interpreter "fish"
-  :commands (fish-mode fish_indent-before-save)
   :hook (fish-mode-hook . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 ;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
@@ -523,7 +481,6 @@
 
 (use-package yaml-mode
   :defines (lsp-ltex-enabled lsp-disabled-clients)
-  :commands (yaml-mode)
   :mode
   (("\\.yml\\'" . yaml-ts-mode)
     ("\\.yaml\\'" . yaml-ts-mode)
@@ -701,7 +658,7 @@
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
 ;; -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
-  :commands (pandoc-load-default-settings pandoc-mode)
+  :commands pandoc-load-default-settings
   :hook (markdown-mode-hook . pandoc-mode)
   :config (pandoc-load-default-settings)
   :diminish)
@@ -719,7 +676,6 @@
 ;;    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
-  :commands (web-mode)
   :mode "\\.html?\\'"
   :hook
   (web-mode-hook
@@ -761,7 +717,6 @@
 
 (use-package nxml-mode
   :straight (:type built-in)
-  :commands (nxml-mode)
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
   (nxml-mode-hook
@@ -796,7 +751,7 @@
   )
 
 (use-package json-mode
-  :commands (json-mode jsonc-mode json-mode-beautify)
+  :commands json-mode-beautify
   :mode
   (("\\.json\\'" . json-ts-mode)
     ("pyrightconfig.json" . jsonc-mode)
@@ -1364,6 +1319,7 @@ Fallback to `xref-go-back'."
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-capf-integration nil)
+  ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
   (citre-enable-imenu-integration nil)
   (citre-enable-xref-integration t)
   (citre-edit-cmd-buf-default-cmd

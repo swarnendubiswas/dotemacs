@@ -1,4 +1,4 @@
-;;; init-vertico.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
+;;; vertico-consult.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -313,4 +313,4 @@
 
 (provide 'vertico-consult)
 
-;;; init-vertico.el ends here
+;;; vertico-consult.el ends here
