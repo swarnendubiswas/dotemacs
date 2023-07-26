@@ -415,7 +415,7 @@ PAD can be left (`l') or right (`r')."
         (set-face-attribute 'mode-line nil :height 140)
         (set-face-attribute 'mode-line-inactive nil :height 140)))
 
-    ((string= (system-name) "DESKTOP-4T8O69V")
+    ((string= (system-name) "DESKTOP-4T8O69V") ; Inspiron 7572 Windows
       (progn
         (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 140)
         (set-face-attribute 'mode-line nil :height 100)
@@ -433,7 +433,7 @@ PAD can be left (`l') or right (`r')."
         (set-face-attribute 'mode-line nil :height 110)
         (set-face-attribute 'mode-line-inactive nil :height 110)))
 
-    ((string= (system-name) "DESKTOP-LDLQMCO")
+    ((string= (system-name) "DESKTOP-LDLQMCO") ; CSE Desktop Windows
       (progn
         (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
         (set-face-attribute 'mode-line nil :height 110)
