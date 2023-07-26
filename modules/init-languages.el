@@ -93,85 +93,84 @@
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
 ;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
-(cond
-  ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
-  ;; https://github.com/renzmann/treesit-auto
-  ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
-  ((featurep 'treesit)
-    (use-package treesit
-      :straight (:type built-in)
-      :demand t
-      :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-      :custom (treesit-font-lock-level 4 "Increase default font locking")
-      :config
-      (setq treesit-language-source-alist
-        '
-        ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-          (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-          (c "https://github.com/tree-sitter/tree-sitter-c")
-          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-          (cmake "https://github.com/uyha/tree-sitter-cmake")
-          (css "https://github.com/tree-sitter/tree-sitter-css")
-          (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-          (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
-          (html "https://github.com/tree-sitter/tree-sitter-html")
-          (java "https://github.com/tree-sitter/tree-sitter-java")
-          (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-          (json "https://github.com/tree-sitter/tree-sitter-json")
-          (latex "https://github.com/latex-lsp/tree-sitter-latex")
-          (make "https://github.com/alemuller/tree-sitter-make")
-          (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-          (org "https://github.com/milisims/tree-sitter-org")
-          (python "https://github.com/tree-sitter/tree-sitter-python")
-          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-      (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
-      ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
-      (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
+;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
+;; https://github.com/renzmann/treesit-auto
+;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
+(use-package treesit
+  :straight (:type built-in)
+  :disabled
+  :demand t
+  :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+  :custom (treesit-font-lock-level 4 "Increase default font locking")
+  :config
+  (setq treesit-language-source-alist
+    '
+    ((bash "https://github.com/tree-sitter/tree-sitter-bash")
+      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+      (c "https://github.com/tree-sitter/tree-sitter-c")
+      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+      (cmake "https://github.com/uyha/tree-sitter-cmake")
+      (css "https://github.com/tree-sitter/tree-sitter-css")
+      (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+      (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
+      (html "https://github.com/tree-sitter/tree-sitter-html")
+      (java "https://github.com/tree-sitter/tree-sitter-java")
+      (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+      (json "https://github.com/tree-sitter/tree-sitter-json")
+      (latex "https://github.com/latex-lsp/tree-sitter-latex")
+      (make "https://github.com/alemuller/tree-sitter-make")
+      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+      (org "https://github.com/milisims/tree-sitter-org")
+      (python "https://github.com/tree-sitter/tree-sitter-python")
+      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-      ;;   (setq
-      ;;     bash-ts-mode-hook bash-mode-hook
-      ;;     c-ts-mode-hook c-mode-hook
-      ;;     cpp-ts-mode-hook c++-mode-hook
-      ;;     cmake-ts-mode-hook cmake-mode-hook
-      ;;     css-ts-mode-hook css-mode-hook
-      ;;     html-ts-mode-hook html-mode-hook
-      ;;     java-ts-mode-hook java-mode-hook
-      ;;     json-ts-mode-hook json-mode-hook
-      ;;     make-ts-mode-hook make-mode-hook
-      ;;     markdown-ts-mode-hook markdown-mode-hook
-      ;;     org-ts-mode-hook org-mode-hook
-      ;;     python-ts-mode-hook python-mode-hook
-      ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
-      ))
+  ;; (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
+  ;; ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
+  ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
+  ;; ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
+  ;; ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
+  ;; ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+  ;; ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
 
-  (t
-    (use-package tree-sitter
-      :when (executable-find "tree-sitter")
-      :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
-      :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
-      :config
-      (use-package tree-sitter-langs
-        :demand t
-        :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
-      :diminish tree-sitter-mode)))
+  ;;   (setq
+  ;;     bash-ts-mode-hook bash-mode-hook
+  ;;     c-ts-mode-hook c-mode-hook
+  ;;     cpp-ts-mode-hook c++-mode-hook
+  ;;     cmake-ts-mode-hook cmake-mode-hook
+  ;;     css-ts-mode-hook css-mode-hook
+  ;;     html-ts-mode-hook html-mode-hook
+  ;;     java-ts-mode-hook java-mode-hook
+  ;;     json-ts-mode-hook json-mode-hook
+  ;;     make-ts-mode-hook make-mode-hook
+  ;;     markdown-ts-mode-hook markdown-mode-hook
+  ;;     org-ts-mode-hook org-mode-hook
+  ;;     python-ts-mode-hook python-mode-hook
+  ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
+  )
+
+(use-package tree-sitter
+  :when (executable-find "tree-sitter")
+  :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
+  :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
+  :config
+  (use-package tree-sitter-langs
+    :demand t
+    :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
+  :diminish tree-sitter-mode)
 
 (use-package eldoc
   :straight (:type built-in)
@@ -209,9 +208,9 @@
   :straight (:type built-in)
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
-  :mode (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
+  :mode (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
   :hook
-  ((c++-mode-hook c++-ts-mode-hook)
+  ((c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook)
     .
     (lambda ()
       (setq-local
@@ -246,7 +245,7 @@
 
 (use-package cuda-mode
   :commands cuda-mode
-  :mode (("\\.cu\\'" . c++-ts-mode) ("\\.cuh\\'" . c++-ts-mode)))
+  :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-mode
   :mode "\\.cl\\'")

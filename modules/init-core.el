@@ -111,6 +111,17 @@
     next-error-message-highlight t
     read-minibuffer-restore-windows t))
 
+(when (boundp 'help-window-keep-selected)
+  (setq help-window-keep-selected t))
+
+(when (boundp 'find-sibling-rules)
+  (setq find-sibling-rules
+    '
+    (("\\([^/]+\\)\\.c\\'" "\\1.h")
+      ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
+      ("\\([^/]+\\)\\.h\\'" "\\1.c")
+      ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
+
 (when (symbol-value 'sb/IS-WINDOWS)
   (setq w32-get-true-file-attributes nil))
 

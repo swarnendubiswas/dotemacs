@@ -104,8 +104,9 @@
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode-hook . corfu-terminal-mode)
-  ;; :custom (corfu-terminal-position-right-margin 10)
-  )
+  :custom
+  ;; TODO: This is supposedly a bug, report to the maintainer.
+  (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
 
 ;; (use-package kind-icon
 ;;   :if (or (eq sb/corfu-icons 'kind-icon) (eq sb/corfu-icons 'nerd-icons))

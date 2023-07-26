@@ -92,15 +92,17 @@
       "--header-insertion=never"
       "--header-insertion-decorators=0"
       "--log=error"
-      ;; Unsupported option with Clangd 10
+      ;; Unsupported option with Clangd 10: malloc-trim and enable-config
       ;; "--malloc-trim" ; Release memory periodically
-      "--enable-config"
-      ;;"--pch-storage=memory" ; Increases memory usage but can improve performance
+      ;; "--enable-config"
+      "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty"))
+  ;; I am explicitly setting company backends and cape capfs for corfu
+  (lsp-completion-enable nil)
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
   (lsp-completion-show-detail nil "Disable completion metadata, e.g., java.util.ArrayList")
-  (lsp-completion-show-kind t "Show completion kind, e.g., interface/class")
-  (lsp-completion-show-label-description t "Show description of completion candidates")
+  (lsp-completion-show-kind nil "Show completion kind, e.g., interface/class")
+  (lsp-completion-show-label-description nil "Show description of completion candidates")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
@@ -541,9 +543,9 @@
         "--header-insertion=never"
         "--header-insertion-decorators=0"
         "--log=error"
-        ;; Unsupported option with Clangd 10
+        ;; Unsupported option with Clangd 10: malloc-trim and enable-config
         ;; "--malloc-trim" ; Release memory periodically
-        "--enable-config"
+        ;; "--enable-config"
         ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
         "--pretty")))
 

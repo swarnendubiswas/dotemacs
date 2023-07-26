@@ -126,6 +126,10 @@
 (use-package minibuffer
   :straight (:type built-in)
   :after orderless
+  :bind
+  (("M-p" . minibuffer-previous-completion)
+    ("M-n" . minibuffer-next-completion)
+    ("M-RET" . minibuffer-choose-completion))
   :custom
   (completions-format 'vertical)
   (read-file-name-completion-ignore-case t "Ignore case when reading a file name")

@@ -360,14 +360,14 @@
     ([remap project-find-dir] . projectile-find-dir)
     ([remap project-dired] . projectile-dired)
     ([remap project-find-file] . projectile-find-file)
-    ([remap project-or-external-find-file] . projectile-find-other-file)
     ([remap project-kill-buffers] . projectile-kill-buffers)
     ([remap project-switch-project] . projectile-switch-project)
     ([remap project-vc-dir] . projectile-vc)
     ([remap project-forget-project] . projectile-remove-known-project)
     :map
     projectile-command-map
-    ("A" . projectile-add-known-project))
+    ("A" . projectile-add-known-project)
+    ("F" . projectile-find-other-file))
   :custom
   (projectile-file-exists-remote-cache-expire nil)
   (projectile-mode-line-prefix "" "Save modeline space")
