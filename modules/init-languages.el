@@ -99,7 +99,6 @@
 ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 (use-package treesit
   :straight (:type built-in)
-  :disabled
   :demand t
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom (treesit-font-lock-level 4 "Increase default font locking")
@@ -125,7 +124,9 @@
       (python "https://github.com/tree-sitter/tree-sitter-python")
       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-  ;; (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
+  ;; Old language servers do not support tree-sitter yet.
+
+  (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
@@ -137,14 +138,14 @@
   ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
 
   ;;   (setq
   ;;     bash-ts-mode-hook bash-mode-hook
@@ -164,7 +165,9 @@
 
 (use-package tree-sitter
   :when (executable-find "tree-sitter")
-  :hook ((tree-sitter-after-on-hook . tree-sitter-hl-mode) (prog-mode-hook . global-tree-sitter-mode))
+  :hook
+  ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
+    ((c-mode-hook c++-mode-hook) . global-tree-sitter-mode))
   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
   :config
   (use-package tree-sitter-langs
@@ -545,6 +548,7 @@
   :straight (:type built-in)
   :mode
   (("\\Makefile\\'" . make-ts-mode)
+    ("\\Makefile.common\\'" . make-ts-mode)
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
     ("makefile\\.rules\\'" . make-ts-mode))
   :hook ((makefile-mode-hook make-ts-mode-hook) . (lambda () (setq-local indent-tabs-mode t))))

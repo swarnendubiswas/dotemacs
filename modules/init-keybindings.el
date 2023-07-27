@@ -53,7 +53,9 @@
   ("C-<right>" . forward-word)
 
   ("M-\\" . delete-horizontal-space)
-  ("M-#" . cycle-spacing))
+  ("M-#" . cycle-spacing)
+
+  ("<escape>" . keyboard-escape-quit))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 
