@@ -26,7 +26,6 @@
       (display-fill-column-indicator-mode 1))))
 
 (use-package which-func
-  :hook (prog-mode-hook . which-function-mode)
   :custom
   (which-func-modes
     '
@@ -167,7 +166,7 @@
   :when (executable-find "tree-sitter")
   :hook
   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
-    ((c-mode-hook c++-mode-hook) . global-tree-sitter-mode))
+    ((c-mode-hook c++-mode-hook) . tree-sitter-mode))
   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
   :config
   (use-package tree-sitter-langs

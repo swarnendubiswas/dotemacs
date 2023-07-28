@@ -205,13 +205,18 @@
   :demand t)
 
 (use-package company-org-block
-  :after company
+  :after (company org)
   :demand t)
 
 (use-package company-c-headers
-  :after company
+  :after (company cc-mode)
   :demand t
   :config (setq company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
+
+(use-package company-makefile
+  :straight (:host github :repo "nverno/company-makefile")
+  :after (company make-mode)
+  :demand t)
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -258,7 +263,7 @@
       (company-capf :with company-dabbrev-code company-yasnippet)
       ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
       ;; ignored.
-      company-dict company-ispell company-dabbrev)
+      company-ispell company-dict company-dabbrev)
     company-transformers
     '
     (delete-dups ; company-sort-by-backend-importance
@@ -280,6 +285,7 @@
       ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
       ;; `company-auctex-bibs'.
 
+      ;; `company-capf' does not pass to later backends with Texlab, so we have it last
       (setq company-backends
         '
         (company-dirfiles
@@ -294,7 +300,7 @@
             company-auctex-symbols
             ;; company-bibtex
             :separate)
-          company-dict company-ispell company-dabbrev company-capf)))
+          company-ispell company-dict company-dabbrev company-capf)))
 
     (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
       (add-hook
@@ -312,7 +318,7 @@
       "Add backends for org completion in company mode."
       (set
         (make-local-variable 'company-backends)
-        '(company-dirfiles company-org-block company-dict company-ispell company-dabbrev)))
+        '(company-dirfiles company-org-block company-ispell company-dict company-dabbrev)))
 
     (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
 
@@ -324,7 +330,7 @@
       (defvar company-backends)
       (set
         (make-local-variable 'company-backends)
-        '(company-dirfiles company-dict company-ispell company-dabbrev)))
+        '(company-dirfiles company-ispell company-dict company-dabbrev)))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook

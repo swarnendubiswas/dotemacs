@@ -714,6 +714,7 @@
 
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 (use-package smartparens
+  :disabled
   :commands
   (sp-local-pairs
     sp-raise-sexp

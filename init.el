@@ -58,7 +58,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '
@@ -132,12 +132,12 @@ This location is used for temporary installations and files.")
 ;; Company works better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is
 ;; configurable, and we can set up a custom file containing completions with `company-dict'.
 
-(defcustom sb/capf 'corfu
+(defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/corfu-icons 'none
+(defcustom sb/corfu-icons 'nerd-icons
   "Choose the provider for Corfu icons."
   :type
   '

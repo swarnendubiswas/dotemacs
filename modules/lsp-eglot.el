@@ -110,16 +110,13 @@
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
   ;; Do not customize breadcrumb faces based on errors
   (lsp-headerline-breadcrumb-enable-diagnostics nil)
-  (lsp-diagnostics-provider :auto "Prefer flycheck, otherwise use flymake")
+  (lsp-diagnostics-provider :auto "Prefer Flycheck, otherwise use Flymake")
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
   (lsp-lens-enable nil "Lenses are intrusive")
-  ;; We have `flycheck' error summary listed on the modeline, but the `lsp' server may report
-  ;; additional errors. The downside is that the modeline gets congested. Powerline does not support
-  ;; lsp.
-  (lsp-modeline-diagnostics-enable t)
+  (lsp-modeline-diagnostics-enable nil "We have Flycheck, and the modeline gets congested")
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
   (lsp-modeline-code-actions-enable t "Useful to show code actions on the modeline")
   (lsp-modeline-workspace-status-enable t)
