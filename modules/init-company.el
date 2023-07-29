@@ -18,8 +18,6 @@
   :preface
   ;; https://stackoverflow.com/questions/56382840/is-there-a-way-to-automatically-add-a-whitespace-upon-completion-in-company-mode
   (defun sb/company-after-completion-hook (&rest _ignored)
-    ;; This would be called with the completion candidate, so you could modify it to insert spaces
-    ;; based on the candidate.
     (just-one-space))
   :defines
   (company-dabbrev-downcase
@@ -68,10 +66,10 @@
   (company-show-quick-access t "Speed up completion")
   ;; Align additional metadata, like type signatures, to the right-hand side if non-nil.
   (company-tooltip-align-annotations nil)
-  ;; Choices are: "company-pseudo-tooltip-unless-just-one-frontend" shows popup unless there is only
-  ;; one candidate, "company-preview-frontend" shows the preview in-place which is too intrusive,
-  ;; "company-preview-if-just-one-frontend" shows in-place preview if there is only choice,
-  ;; "company-echo-metadata-frontend" shows selected candidate docs in echo area, and
+  ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there is only
+  ;; one candidate, `company-preview-frontend' shows the preview in-place which is too intrusive,
+  ;; `company-preview-if-just-one-frontend' shows in-place preview if there is only choice,
+  ;; `company-echo-metadata-frontend' shows selected candidate docs in echo area, and
   ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
   (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (company-global-modes
@@ -89,7 +87,7 @@
       shell-mode
       csv-mode
       minibuffer-inactive-mode))
-  (company-format-margin-function nil "Disable icons")
+  ;; (company-format-margin-function nil "Disable icons")
   (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
   ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
   :config
@@ -99,9 +97,11 @@
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
-  (push
-    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
-    company-transformers)
+
+  ;; (push
+  ;;   (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+  ;;   company-transformers)
+
   (add-to-list 'company-transformers 'delete-dups)
   (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix))
@@ -115,13 +115,13 @@
   :hook (company-mode . company-posframe-mode)
   :custom
   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-  (company-posframe-show-indicator nil "The backend display in the posframe modeline is not great")
+  (company-posframe-show-indicator nil "The backend display in the posframe modeline gets cut")
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
   :diminish)
 
 (use-package company-quickhelp
   :after company
-  :if (display-graphic-p)
+  :when (display-graphic-p)
   :hook (prog-mode-hook . company-quickhelp-mode))
 
 (use-package company-quickhelp-terminal
@@ -194,29 +194,34 @@
 (use-package company-dict
   :after company
   :demand t
+  :commands company-dict
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
-  (company-dict-enable-fuzzy t)
+  (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
 
 (use-package company-dirfiles ; Better replacement for `company-files'
   :straight (:host codeberg :repo "cwfoo/company-dirfiles")
   :after company
-  :demand t)
+  :demand t
+  :commands company-dirfiles)
 
 (use-package company-org-block
   :after (company org)
-  :demand t)
+  :demand t
+  :commands company-org-block)
 
 (use-package company-c-headers
   :after (company cc-mode)
   :demand t
-  :config (setq company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
+  :commands company-c-headers
+  :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 (use-package company-makefile
   :straight (:host github :repo "nverno/company-makefile")
   :after (company make-mode)
-  :demand t)
+  :demand t
+  :commands company-makefile-capf)
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
