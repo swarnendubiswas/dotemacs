@@ -82,7 +82,6 @@
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
-  :straight (:host codeberg :repo "ideasman42/emacs-fancy-compilation")
   :after compile
   :init (fancy-compilation-mode 1))
 
@@ -854,7 +853,7 @@
   (org-src-window-setup 'current-window)
   ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
   ;; feels better with the mode disabled.
-  (org-startup-indented t "Indentation looks nice")
+  (org-startup-indented nil "Indentation looks nice, but is sometimes misaligned")
   (org-startup-truncated nil)
   ;; https://orgmode.org/manual/Initial-visibility.html
   (org-startup-folded 'showeverything)
