@@ -1521,6 +1521,7 @@
     ("heterogenous" "Heterogeneous" nil :count 0)
     ("identfiying" "identifying" nil :count 0)
     ("implementationss" "implementations" nil :count 0)
+    ("initialted" "initiated" nil :count 0)
     ("initital" "initial" nil :count 0)
     ("ipmpact" "impact" nil :count 0)
     ("maintainance" "Maintenance" nil :count 0)

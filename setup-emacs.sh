@@ -32,7 +32,7 @@ command_exists() {
 
 install_emacs() {
     # Download GNU Emacs source
-    EMACS_VERSION="28.2"
+    EMACS_VERSION="29.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     EMACS_NAME="emacs-${EMACS_VERSION}"
@@ -53,11 +53,12 @@ install_emacs() {
     make distclean
     ./autogen.sh
 
-    ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --with-dbus --without-pop --with-dbus --with-tree-sitter CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer -funroll-loops -floop-parallelize-all" prefix=/usr/local
+    ./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --with-dbus --without-pop --with-dbus --with-tree-sitter=ifavailable CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer -funroll-loops -floop-parallelize-all" prefix=/usr/local
 
     # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the
     # Emacs distribution instead of after startup
-    make -j"$(nproc)" NATIVE_FULL_AOT=1
+    # make -j"$(nproc)" NATIVE_FULL_AOT=1
+    make -j"$(nproc)"
     make install
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -68,13 +69,13 @@ install_emacs() {
 install_ubuntu_packages() {
     case "${DIST_VERSION}" in
         Ubuntu_18.04)
-            apt install -y aspell hunspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip imagemagick fonts-powerline pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg
+            apt install -y aspell hunspell libxml2-utils chktex ruby-dev tidy python-pygments python-pip python3-pip imagemagick libmagick++-dev fonts-powerline pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev gnutls-bin libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg
             ;;
         Ubuntu_20.04)
-            apt install -y aspell hunspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick fonts-powerline pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg libenchant-2-dev
+            apt install -y aspell hunspell libxml2-utils chktex ruby-dev tidy python-pygments python3-pip composer imagemagick libmagick++-dev fonts-powerline pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev gnutls-bin libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg libenchant-2-dev libwebp-dev webp libxft-dev libxft2
             ;;
         Ubuntu_22.04)
-            apt install -y aspell hunspell libxml2-utils chktex ruby-dev tidy python3-pip imagemagick fonts-powerline pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg libtree-sitter-dev libenchant-2-dev
+            apt install -y aspell hunspell libxml2-utils chktex ruby-dev tidy python3-pip imagemagick libmagick++-dev fonts-powerline pkg-config autoconf automake python3-docutils libseccomp-dev libjansson-dev libyaml-dev libxml2-dev autojump texinfo x11-utils ttf-ancient-fonts libmagickwand-dev cpanminus libjpeg-dev libtiff-dev libgif-dev libxpm-dev libgtk-3-dev libncurses5-dev libxt-dev htop unifont xfonts-terminus ttf-anonymous-pro libperl-dev libpng-dev libx11-dev libgtk2.0-dev librsvg2-dev gcc libtiff5-dev gnutls-bin libgnutls28-dev libharfbuzz-dev libharfbuzz-bin libwebkit2gtk-4.0-dev libxaw7-dev libc6-dev xaw3dg-dev zlib1g-dev libice-dev libsm-dev libxext-dev libxi-dev libxmu-dev libxmuu-dev libxrandr-dev libxtst-dev libxv-dev curl libssl-dev wget gpg libtree-sitter-dev libenchant-2-dev libwebp-dev webp libxft-dev libxft2
             ;;
         *)
             echo "Distribution '$DISTRO' in version '$VERSION' is not supported by this script (${DIST_VERSION})."
@@ -148,7 +149,8 @@ if [ ! -d "$GITHUB" ]; then
 fi
 
 install_python_packages() {
-    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave semgrep ruff-lsp pyright --user
+    # semgrep, ruff-lsp, python-lsp-ruff
+    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave pyright --user
 }
 
 install_node() {
@@ -181,7 +183,6 @@ install_node() {
     # printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
-# Install Texlab.
 install_texlab() {
     TEXLAB_VER="5.7.0"
 
@@ -441,7 +442,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.48.0"
+    DIFFT_VER="0.49.0"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
@@ -468,7 +469,7 @@ install_bat() {
 }
 
 install_marksman() {
-    MK_VER="2023-07-01"
+    MK_VER="2023-07-25"
 
     wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
     mv marksman-linux $USER_HOME/.local/bin/marksman

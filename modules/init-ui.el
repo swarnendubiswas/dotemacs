@@ -459,12 +459,11 @@ PAD can be left (`l') or right (`r')."
   :hook (emacs-startup-hook . disable-mouse-global-mode)
   :diminish disable-mouse-global-mode)
 
-;; TODO: This package is probably causing the jumping behavior with `corfu-terminal-mode'.
-(use-package olivetti
-  :hook
-  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
-  :custom (olivetti-body-width 108)
-  :diminish)
+;; (use-package olivetti
+;;   :hook
+;;   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
+;;   :custom (olivetti-body-width 108)
+;;   :diminish)
 
 (provide 'init-ui)
 

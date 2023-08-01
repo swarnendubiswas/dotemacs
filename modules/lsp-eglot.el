@@ -97,8 +97,6 @@
       ;; "--enable-config"
       "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty"))
-  ;; I am explicitly setting company backends and cape capfs for corfu
-  (lsp-completion-enable nil)
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
   (lsp-completion-show-detail nil "Disable completion metadata, e.g., java.util.ArrayList")
   (lsp-completion-show-kind nil "Show completion kind, e.g., interface/class")
@@ -157,6 +155,13 @@
         "-j 2"
         (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
   :config
+  ;; I am explicitly setting company backends and cape capfs for corfu
+  (cond
+    ((eq sb/capf 'company)
+      (setq lsp-completion-enable t))
+    ((eq sb/capf 'corfu)
+      (setq lsp-completion-enable nil)))
+
   (when (display-graphic-p)
     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
@@ -364,7 +369,7 @@
     (eq sb/python-langserver 'pyright)
     (executable-find "pyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-  :hook (python-mode-hook . (lambda () (require 'lsp-pyright)))
+  :hook ((python-mode-hook python-ts-mode-hook) . (lambda () (require 'lsp-pyright)))
   :custom
   (lsp-pyright-python-executable-cmd "python3")
   (lsp-pyright-typechecking-mode "basic")
@@ -465,10 +470,14 @@
   ( ;; (eglot-managed-mode-hook . eglot-inlay-hints-mode) ; Inlay hints are distracting
     (
       (c-mode-hook
+        c-ts-mode-hook
         c++-mode-hook
+        c++-ts-mode-hook
         python-mode-hook
+        python-ts-mode-hook
         markdown-mode-hook
         sh-mode-hook
+        bash-ts-mode-hook
         LaTeX-mode-hook
         bibtex-mode-hook
         html-mode-hook

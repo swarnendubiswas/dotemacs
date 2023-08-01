@@ -97,6 +97,7 @@
 ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 (use-package treesit
   :straight (:type built-in)
+  :when (executable-find "tree-sitter")
   :demand t
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom (treesit-font-lock-level 4 "Increase default font locking")
@@ -119,6 +120,7 @@
       (make "https://github.com/alemuller/tree-sitter-make")
       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
       (org "https://github.com/milisims/tree-sitter-org")
+      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
       (python "https://github.com/tree-sitter/tree-sitter-python")
       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
@@ -128,20 +130,20 @@
   ;; ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
   (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
   (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
   (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
 

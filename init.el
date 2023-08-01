@@ -113,7 +113,6 @@ This location is used for temporary installations and files.")
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow.
 ;; Furthermore, candidate `pylsp' versions depend on the OS version, and capf sometimes does not
 ;; work consistently.
-
 (defcustom sb/python-langserver 'pyright
   "Choose the Python Language Server implementation."
   :type '(radio (const :tag "pylsp" pylsp) (const :tag "pyright" pyright) (const :tag "none" none))
@@ -127,11 +126,10 @@ This location is used for temporary installations and files.")
 ;; Corfu is easy to configure, integrates nicely with `orderless' and provides better completion for
 ;; elisp symbols. However, I prefer to use TUI Emacs, and `corfu-terminal-mode' has a rendering
 ;; problem for the completion popup at the right edges. The completion entries wrap around, and
-;; sometimes messes up the completion. Corfu does not work well with LaTeX for me.
-
-;; Company works better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is
-;; configurable, and we can set up a custom file containing completions with `company-dict'.
-
+;; sometimes messes up the completion. Corfu does not work well with LaTeX for me. Company works
+;; better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is configurable, and
+;; we can set up a custom file containing completions with `company-dict'. However, `company-ispell'
+;; does not keep prefix case when used as a grouped backend.
 (defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))

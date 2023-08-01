@@ -264,12 +264,16 @@
             (flycheck-select-checker 'grammarly)
             (flycheck-add-next-checker 'grammarly 'languagetool)))))))
 
-(use-package highlight-indentation
-  :hook
-  ((yaml-mode-hook yaml-ts-mode-hook python-mode-hook python-ts-mode-hook)
-    .
-    highlight-indentation-mode)
-  :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
+;; (use-package highlight-indentation
+;;   :hook
+;;   ((yaml-mode-hook yaml-ts-mode-hook python-mode-hook python-ts-mode-hook)
+;;     .
+;;     highlight-indentation-mode)
+;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
+
+(use-package indent-bars
+  :straight (:host github :repo "jdtsmith/indent-bars")
+  :hook ((python-mode-hook python-ts-mode-hook yaml-mode-hook yaml-ts-mode-hook) . indent-bars-mode))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
