@@ -417,9 +417,9 @@ PAD can be left (`l') or right (`r')."
 
     ((string= (system-name) "DESKTOP-4T8O69V") ; Inspiron 7572 Windows
       (progn
-        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 140)
-        (set-face-attribute 'mode-line nil :height 100)
-        (set-face-attribute 'mode-line-inactive nil :height 100)))
+        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
+        (set-face-attribute 'mode-line nil :height 110)
+        (set-face-attribute 'mode-line-inactive nil :height 110)))
 
     ((string= (system-name) "dell-7506")
       (progn

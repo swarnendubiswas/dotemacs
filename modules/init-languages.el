@@ -111,7 +111,7 @@
       (cmake "https://github.com/uyha/tree-sitter-cmake")
       (css "https://github.com/tree-sitter/tree-sitter-css")
       (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-      (emacs-lisp "https://github.com/Wilfred/tree-sitter-elisp")
+      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
       (html "https://github.com/tree-sitter/tree-sitter-html")
       (java "https://github.com/tree-sitter/tree-sitter-java")
       (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")

@@ -223,6 +223,14 @@
   :demand t
   :commands company-makefile-capf)
 
+(use-package company-spell
+  :straight (:host github :repo "enzuru/company-spell")
+  :after company
+  :demand t
+  :commands company-spell
+  :config
+  (setf company-aspell-command "hunspell"))
+
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
