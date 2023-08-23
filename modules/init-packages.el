@@ -65,31 +65,31 @@
 
   (straight-use-package 'use-package))
 
-(unless (bound-and-true-p sb/disable-package.el)
-  (with-eval-after-load 'package
-    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-    (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
+;; (unless (bound-and-true-p sb/disable-package.el)
+;;   (with-eval-after-load 'package
+;;     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;;     (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
+;;     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
-  ;; Initialise the package management system. Another option is to construct the `load-path'
-  ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-  (package-initialize)
+;;   ;; Initialise the package management system. Another option is to construct the `load-path'
+;;   ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
+;;   (package-initialize)
 
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+;;   (unless (package-installed-p 'use-package)
+;;     (package-refresh-contents)
+;;     (package-install 'use-package))
 
-  (defvar use-package-always-ensure)
+;;   (defvar use-package-always-ensure)
 
-  ;; Avoid manual installations whenever I modify package installations
-  (setq
-    use-package-always-ensure t
-    ;; These variables need to be set before loading `use-package'
-    use-package-enable-imenu-support t
-    use-package-hook-name-suffix nil)
+;;   ;; Avoid manual installations whenever I modify package installations
+;;   (setq
+;;     use-package-always-ensure t
+;;     ;; These variables need to be set before loading `use-package'
+;;     use-package-enable-imenu-support t
+;;     use-package-hook-name-suffix nil)
 
-  (eval-when-compile
-    (require 'use-package)))
+;;   (eval-when-compile
+;;     (require 'use-package)))
 
 ;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
 ;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
@@ -150,10 +150,10 @@
   :functions bind-key--remove
   :bind ("C-c d k" . describe-personal-keybindings))
 
-(use-package benchmark-init
-  :when (and (eq sb/op-mode 'standalone) (bound-and-true-p sb/debug-init-file))
-  :init (benchmark-init/activate)
-  :hook (emacs-startup-hook . benchmark-init/deactivate))
+;; (use-package benchmark-init
+;;   :when (and (eq sb/op-mode 'standalone) (bound-and-true-p sb/debug-init-file))
+;;   :init (benchmark-init/activate)
+;;   :hook (emacs-startup-hook . benchmark-init/deactivate))
 
 (use-package no-littering
   :demand t
@@ -161,12 +161,12 @@
   (setq auto-save-file-name-transforms
     `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-(use-package package
-  :unless (bound-and-true-p sb/disable-package.el)
-  ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
-  :after no-littering
-  :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
-  :custom (package-quickstart t))
+;; (use-package package
+;;   :unless (bound-and-true-p sb/disable-package.el)
+;;   ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
+;;   :after no-littering
+;;   :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
+;;   :custom (package-quickstart t))
 
 (defcustom sb/custom-file (no-littering-expand-var-file-name "custom.el")
   "File to write Emacs customizations."

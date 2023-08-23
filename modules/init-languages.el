@@ -127,7 +127,7 @@
   ;; Old language servers do not support tree-sitter yet.
 
   (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
-  ;; ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
   (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
@@ -137,14 +137,14 @@
   (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
   ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
   (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-  ;; ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
   (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
   (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
-  ;; ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
-  ;; ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
   (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
-  ;; ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
   (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
 
   ;;   (setq
@@ -1397,6 +1397,16 @@ used in `company-backends'."
 
     (citre-backend-to-company-backend tags))
   :diminish)
+
+(use-package treesitter-context
+  :straight (:host github :repo "zbelial/treesitter-context.el")
+  :init
+  (use-package posframe-plus
+    :straight (:host github :type git :repo "zbelial/posframe-plus"))
+  :hook
+  ((c-ts-mode-hook c++-ts-mode-hook python-ts-mode-hook java-ts-mode-hook json-ts-mode-hook)
+    .
+    treesitter-context-mode))
 
 (provide 'init-languages)
 

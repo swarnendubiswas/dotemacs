@@ -25,7 +25,7 @@
     ("<f3>" . ivy-switch-buffer)
     :map
     ivy-minibuffer-map
-    ("<RET>" . ivy-alt-done) ; Continue completion
+    ("RET" . ivy-alt-done) ; Continue completion
     ("<left>" . ivy-previous-line)
     ("<right>" . ivy-next-line)
     ([escape] . minibuffer-keyboard-quit))

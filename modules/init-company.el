@@ -13,7 +13,8 @@
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
 
-(use-package company
+(use-package
+  company
   :if (eq sb/capf 'company)
   :preface
   ;; https://stackoverflow.com/questions/56382840/is-there-a-way-to-automatically-add-a-whitespace-upon-completion-in-company-mode
@@ -42,11 +43,11 @@
     ("C-M-/" . company-other-backend)
     ("C-s" . company-search-candidates)
     ("C-M-s" . company-filter-candidates)
-    ("C-n" . company-select-next)
-    ("C-p" . company-select-previous)
-    ("<tab>" . company-complete-common)
-    ("TAB" . company-complete-common)
-    ([escape] . company-abort)
+    ;; ("C-n" . company-select-next)
+    ;; ("C-p" . company-select-previous)
+    ;; ("<tab>" . company-complete-common)
+    ;; ("TAB" . company-complete-common)
+    ;; ([escape] . company-abort)
     ("M-." . company-show-location)
     ("C-h" . company-show-doc-buffer)
     :map
@@ -55,9 +56,8 @@
     ("C-r" . company-search-repeat-backward)
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
-  :custom
-  (company-idle-delay 0.05 "Start autocompletion faster")
-  (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
+  :custom (company-idle-delay 0.05 "Start autocompletion faster")
+  ;; (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
   ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
   ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
@@ -71,7 +71,7 @@
   ;; `company-preview-if-just-one-frontend' shows in-place preview if there is only choice,
   ;; `company-echo-metadata-frontend' shows selected candidate docs in echo area, and
   ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
-  (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
+  ;; (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (company-global-modes
     '
     (not dired-mode
@@ -102,15 +102,17 @@
   ;;   (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
   ;;   company-transformers)
 
-  (add-to-list 'company-transformers 'delete-dups)
-  (add-to-list 'company-transformers 'company-sort-by-backend-importance)
-  (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix))
+  ;; (add-to-list 'company-transformers 'delete-dups)
+  ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
+  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+  )
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
 ;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
-(use-package company-posframe
+(use-package
+  company-posframe
   :when (display-graphic-p)
   :hook (company-mode . company-posframe-mode)
   :custom
@@ -119,17 +121,20 @@
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
   :diminish)
 
-(use-package company-quickhelp
+(use-package
+  company-quickhelp
   :after company
   :when (display-graphic-p)
   :hook (prog-mode-hook . company-quickhelp-mode))
 
-(use-package company-quickhelp-terminal
+(use-package
+  company-quickhelp-terminal
   :after company
   :unless (display-graphic-p)
   :hook (prog-mode-hook . company-quickhelp-terminal-mode))
 
-(use-package company-statistics
+(use-package
+  company-statistics
   :after company
   :commands company-statistics-mode
   :init (company-statistics-mode 1))
@@ -150,7 +155,8 @@
 ;;   ;; Disabling the requirement may help with performance.
 ;;   (company-fuzzy-prefix-on-top t))
 
-(use-package company-auctex
+(use-package
+  company-auctex
   :after (tex-mode company)
   :demand t
   :commands
@@ -161,11 +167,10 @@
     company-auctex-environments))
 
 ;; Required by `ac-math' and `company-math'
-(use-package math-symbols
-  :after (tex-mode company)
-  :demand t)
+(use-package math-symbols :after (tex-mode company) :demand t)
 
-(use-package company-math
+(use-package
+  company-math
   :after (tex-mode company)
   :demand t
   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
@@ -173,7 +178,8 @@
 ;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
 ;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
 ;; citations across documents.
-(use-package company-reftex
+(use-package
+  company-reftex
   :after (tex-mode company)
   :demand t
   :commands (company-reftex-labels company-reftex-citations)
@@ -181,17 +187,16 @@
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-(use-package company-bibtex
-  :after (tex-mode company)
-  :demand t
-  :commands company-bibtex)
+(use-package company-bibtex :after (tex-mode company) :demand t :commands company-bibtex)
 
-(use-package company-anywhere ; Complete in the middle of words
+(use-package
+  company-anywhere ; Complete in the middle of words
   :straight (:host github :repo "zk-phi/company-anywhere")
   :after company
   :demand t)
 
-(use-package company-dict
+(use-package
+  company-dict
   :after company
   :demand t
   :commands company-dict
@@ -200,36 +205,36 @@
   (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
 
-(use-package company-dirfiles ; Better replacement for `company-files'
+(use-package
+  company-dirfiles ; Better replacement for `company-files'
   :straight (:host codeberg :repo "cwfoo/company-dirfiles")
   :after company
   :demand t
   :commands company-dirfiles)
 
-(use-package company-org-block
-  :after (company org)
-  :demand t
-  :commands company-org-block)
+(use-package company-org-block :after (company org) :demand t :commands company-org-block)
 
-(use-package company-c-headers
+(use-package
+  company-c-headers
   :after (company cc-mode)
   :demand t
   :commands company-c-headers
   :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
-(use-package company-makefile
+(use-package
+  company-makefile
   :straight (:host github :repo "nverno/company-makefile")
   :after (company make-mode)
   :demand t
   :commands company-makefile-capf)
 
-(use-package company-spell
+(use-package
+  company-spell
   :straight (:host github :repo "enzuru/company-spell")
   :after company
   :demand t
   :commands company-spell
-  :config
-  (setf company-aspell-command "hunspell"))
+  :config (setf company-aspell-command "hunspell"))
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))

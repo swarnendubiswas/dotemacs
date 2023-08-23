@@ -404,27 +404,28 @@
     ([remap list-directory] . ffap-list-directory))
   :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names"))
 
-(use-package doc-view
-  :straight (:type built-in)
-  :bind
-  (:map
-    doc-view-mode-map
-    ("=" . doc-view-enlarge)
-    ("-" . doc-view-shrink)
-    ("n" . doc-view-next-page)
-    ("p" . doc-view-previous-page)
-    ("0" . doc-view-scale-reset)
-    ("M-<" . doc-view-first-page)
-    ("M->" . doc-view-last-page)
-    ("C-l" . doc-view-goto-page))
-  :custom
-  (doc-view-continuous t)
-  (doc-view-resolution 120))
+;; (use-package doc-view
+;;   :straight (:type built-in)
+;;   :bind
+;;   (:map
+;;     doc-view-mode-map
+;;     ("=" . doc-view-enlarge)
+;;     ("-" . doc-view-shrink)
+;;     ("n" . doc-view-next-page)
+;;     ("p" . doc-view-previous-page)
+;;     ("0" . doc-view-scale-reset)
+;;     ("M-<" . doc-view-first-page)
+;;     ("M->" . doc-view-last-page)
+;;     ("C-l" . doc-view-goto-page))
+;;   :custom
+;;   (doc-view-continuous t)
+;;   (doc-view-resolution 120))
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
 (use-package goto-addr
   :straight (:type built-in)
-  :hook ((prog-mode-hook . goto-address-prog-mode) (text-mode-hook . goto-address-mode)))
+  :hook ((prog-mode-hook . goto-address-prog-mode) (text-mode-hook . goto-address-mode))
+  :bind ("C-c RET" . goto-address-at-point))
 
 (use-package ediff
   :straight (:type built-in)
@@ -506,32 +507,32 @@
 ;;   :after tramp
 ;;   :custom (password-cache-expiry nil))
 
-(use-package whitespace
-  :hook
-  (markdown-mode-hook
-    .
-    (lambda ()
-      (setq
-        show-trailing-whitespace t
-        whitespace-style
-        '
-        (face ; Visualize using faces
-          ;; tabs
-          ;; spaces
-          trailing ; Trailing whitespace
-          ;; newline
-          ;; tab-mark ; Mark any tabs
-          ;; empty ; Empty lines at beginning or end of buffer
-          ;; lines ; Lines that extend beyond `whitespace-line-column'
-          ;; space-mark ; Wrong kind of indentation (e.g., tab when spaces)
-          ;; space-before-tab ; Mixture of space and tab on the same line
-          ;; space-after-tab ; Mixture of space and tab on the same line
-          ;; empty
-          ;; newline-mark
-          missing-newline-at-eof))
-      (whitespace-mode 1)))
-  :custom (whitespace-line-column sb/fill-column)
-  :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
+;; (use-package whitespace
+;;   :hook
+;;   (markdown-mode-hook
+;;     .
+;;     (lambda ()
+;;       (setq
+;;         show-trailing-whitespace t
+;;         whitespace-style
+;;         '
+;;         (face ; Visualize using faces
+;;           ;; tabs
+;;           ;; spaces
+;;           trailing ; Trailing whitespace
+;;           ;; newline
+;;           ;; tab-mark ; Mark any tabs
+;;           ;; empty ; Empty lines at beginning or end of buffer
+;;           ;; lines ; Lines that extend beyond `whitespace-line-column'
+;;           ;; space-mark ; Wrong kind of indentation (e.g., tab when spaces)
+;;           ;; space-before-tab ; Mixture of space and tab on the same line
+;;           ;; space-after-tab ; Mixture of space and tab on the same line
+;;           ;; empty
+;;           ;; newline-mark
+;;           missing-newline-at-eof))
+;;       (whitespace-mode 1)))
+;;   :custom (whitespace-line-column sb/fill-column)
+;;   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 ;; "M-x delete-trailing-whitespace" deletes trailing lines. This is different from
 ;; `whitespace-cleanup-mode' since this is unconditional.

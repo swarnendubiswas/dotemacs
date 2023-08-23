@@ -123,12 +123,13 @@
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `before-save-hook' and `after-save-hook' and leads to auto-formatters being invoked more
 ;; frequently.
-(use-package super-save
-  :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
-  :hook (emacs-startup-hook . super-save-mode)
-  :custom (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
-  :config (add-to-list 'super-save-triggers 'ace-window)
-  :diminish)
+
+;; (use-package super-save
+;;   :defines (super-save-remote-files super-save-triggers super-save-hook-triggers)
+;;   :hook (emacs-startup-hook . super-save-mode)
+;;   :custom (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
+;;   :config (add-to-list 'super-save-triggers 'ace-window)
+;;   :diminish)
 
 (use-package dired
   :preface

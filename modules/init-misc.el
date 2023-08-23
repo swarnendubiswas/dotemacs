@@ -47,9 +47,9 @@
 (use-package expand-region ; Expand region by semantic units
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
-(use-package expand-line
-  :bind ("M-i" . turn-on-expand-line-mode)
-  :diminish)
+;; (use-package expand-line
+;;   :bind ("M-i" . turn-on-expand-line-mode)
+;;   :diminish)
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
@@ -172,9 +172,10 @@
   :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
-(use-package define-word
-  :commands define-word
-  :bind ("C-c w" . define-word-at-point))
+
+;; (use-package define-word
+;;   :commands define-word
+;;   :bind ("C-c w" . define-word-at-point))
 
 ;; (use-package esup
 ;;   :if (bound-and-true-p sb/debug-init-file)
@@ -300,48 +301,48 @@
 
 ;; Both project.el and projectile are unable to remember remote projects.
 
-(use-package project
-  :if (eq sb/project-handler 'project)
-  :commands
-  (project-switch-project
-    project-current
-    project-find-file
-    project-execute-extended-command
-    project-known-project-roots
-    project-remove-known-project
-    project-forget-project
-    project-remember-project
-    project-kill-buffers
-    project-switch-to-buffer
-    project-search
-    project-compile)
-  :bind-keymap ("C-c p" . project-prefix-map)
-  :bind
-  (("<f5>" . project-switch-project)
-    ("<f6>" . project-find-file)
-    :map
-    project-prefix-map
-    ("f" . project-find-file)
-    ("F" . project-or-external-find-file)
-    ("b" . project-switch-to-buffer)
-    ("d" . project-dired)
-    ("v" . project-vc-dir)
-    ("c" . project-compile)
-    ("k" . project-kill-buffers)
-    ("p" . project-switch-project)
-    ("g" . project-find-regexp)
-    ("r" . project-query-replace-regexp)
-    ("m" . magit-project-status)
-    ("C" . recompile))
-  ;; :config
-  ;; (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
-  ;; (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
-  ;; (setq project-switch-commands
-  ;;   (delete '(project-find-regexp "Find regexp") project-switch-commands))
-  ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
-  ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
-  ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
-  )
+;; (use-package project
+;;   :if (eq sb/project-handler 'project)
+;;   :commands
+;;   (project-switch-project
+;;     project-current
+;;     project-find-file
+;;     project-execute-extended-command
+;;     project-known-project-roots
+;;     project-remove-known-project
+;;     project-forget-project
+;;     project-remember-project
+;;     project-kill-buffers
+;;     project-switch-to-buffer
+;;     project-search
+;;     project-compile)
+;;   :bind-keymap ("C-c p" . project-prefix-map)
+;;   :bind
+;;   (("<f5>" . project-switch-project)
+;;     ("<f6>" . project-find-file)
+;;     :map
+;;     project-prefix-map
+;;     ("f" . project-find-file)
+;;     ("F" . project-or-external-find-file)
+;;     ("b" . project-switch-to-buffer)
+;;     ("d" . project-dired)
+;;     ("v" . project-vc-dir)
+;;     ("c" . project-compile)
+;;     ("k" . project-kill-buffers)
+;;     ("p" . project-switch-project)
+;;     ("g" . project-find-regexp)
+;;     ("r" . project-query-replace-regexp)
+;;     ("m" . magit-project-status)
+;;     ("C" . recompile))
+;;   ;; :config
+;;   ;; (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
+;;   ;; (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
+;;   ;; (setq project-switch-commands
+;;   ;;   (delete '(project-find-regexp "Find regexp") project-switch-commands))
+;;   ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+;;   ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
+;;   ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
+;;   )
 
 ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
 ;; indexing.
@@ -562,8 +563,8 @@
   ([remap query-replace] . vr/query-replace)
   ([remap replace-regex] . vr/replace))
 
-(use-package ripgrep
-  :commands (ripgrep-regexp projectile-ripgrep))
+;; (use-package ripgrep
+;;   :commands (ripgrep-regexp projectile-ripgrep))
 
 (use-package rg
   :commands
@@ -641,9 +642,10 @@
       (git-commit-turn-on-flyspell)))
   :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
-;; Use the minor mode `smerge-mode' to move between conflicts and resolve them
+;; Use the minor mode `smerge-mode' to move between conflicts and resolve them.
 (use-package smerge-mode
   :preface
+  ;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
   (defun sb/enable-smerge-maybe-with-vc ()
     "Enable `smerge-mode' automatically based on conflict markers."
     (when (and buffer-file-name (vc-backend buffer-file-name))
@@ -652,9 +654,11 @@
         (when (re-search-forward "^<<<<<<< " nil t)
           (smerge-mode 1)))))
   :straight (:type built-in)
-  :init
-  (add-hook 'find-file-hook #'sb/enable-smerge-maybe-with-vc :append)
-  (add-hook 'after-revert-hook #'sb/enable-smerge-maybe-with-vc :append)
+  ;; :init
+  ;; Since Emacs 25.1, `vc-git-find-file-hook' enables smerge for files with conflicts.
+  ;; (add-hook 'find-file-hook #'sb/enable-smerge-maybe-with-vc :append)
+  ;; (add-hook 'after-revert-hook #'sb/enable-smerge-maybe-with-vc :append)
+  ;; (add-hook 'buffer-list-update-hook #'sb/enable-smerge-maybe-with-vc :append)
   :bind
   (:map
     smerge-mode-map
@@ -684,7 +688,6 @@
 
 (use-package elec-pair
   :straight (:type built-in)
-  :disabled t
   :hook (emacs-startup-hook . electric-pair-mode)
   :config
   ;; https://emacs.stackexchange.com/questions/2538/how-to-define-additional-mode-specific-pairs-for-electric-pair-mode

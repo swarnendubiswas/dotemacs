@@ -25,7 +25,7 @@
 (setq suggest-key-bindings t)
 
 (bind-keys
-  ("RET" . newline-and-indent)
+  ;; ("RET" . newline-and-indent)
   ("C-l" . goto-line)
 
   ("C-c z" . repeat)
@@ -64,19 +64,19 @@
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
 
-(unless sb/tab-bar-handler
-  (global-set-key [remap next-buffer] #'sb/next-buffer)
-  (global-set-key [remap previous-buffer] #'sb/previous-buffer)
+;; (unless sb/tab-bar-handler
+;;   (global-set-key [remap next-buffer] #'sb/next-buffer)
+;;   (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
-  (bind-keys
-    ("M-<left>" . sb/previous-buffer)
-    ("C-S-<iso-lefttab>" . sb/previous-buffer)
-    ("M-<right>" . sb/next-buffer)
-    ("C-<tab>" . sb/next-buffer)))
+;;   (bind-keys
+;;     ("M-<left>" . sb/previous-buffer)
+;;     ("C-S-<iso-lefttab>" . sb/previous-buffer)
+;;     ("M-<right>" . sb/next-buffer)
+;;     ("C-<tab>" . sb/next-buffer)))
 
-(use-package default-text-scale
-  :if (display-graphic-p)
-  :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
+;; (use-package default-text-scale
+;;   :if (display-graphic-p)
+;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
   :commands free-keys)
@@ -605,7 +605,8 @@
   :hook (emacs-startup-hook . term-keys-mode)
   :config (require 'term-keys-alacritty)
   ;; https://github.com/alacritty/alacritty/issues/3569#issuecomment-610558110
-  (add-to-list 'term-file-aliases '("alacritty" . "xterm")))
+  ;; (add-to-list 'term-file-aliases '("alacritty" . "xterm"))
+  )
 
 ;; (with-eval-after-load "transient"
 ;;   (transient-define-prefix sb/help-transient ()

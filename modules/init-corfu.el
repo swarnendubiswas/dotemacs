@@ -274,23 +274,21 @@
     (add-hook
       lsp-prog-mode
       (lambda ()
-        (setq-local completion-at-point-functions
-          (list
-            #'cape-file
-            (cape-super-capf #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
-            (cape-super-capf #'cape-dabbrev #'cape-dict))
-
-          ;; (append
-          ;;   completion-at-point-functions
-          ;;   (list #'cape-keyword #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))
-          )
-
-        ;; (progn
-        ;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-        ;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-        ;;   (add-to-list 'completion-at-point-functions (cape-super-capf #'cape-dabbrev #'cape-dict)
-        ;;     'append))
-        ))))
+        (when (bound-and-true-p lsp-managed-mode)
+          (setq-local completion-at-point-functions
+            (list
+              #'cape-file
+              (cape-super-capf #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
+              (cape-super-capf #'cape-dabbrev #'cape-dict))))
+        (when (bound-and-true-p eglot--managed-mode)
+          (setq-local completion-at-point-functions
+            (list
+              #'cape-file
+              (cape-super-capf
+                #'eglot-completion-at-point
+                #'citre-completion-at-point
+                #'cape-keyword)
+              (cape-super-capf #'cape-dabbrev #'cape-dict))))))))
 
 (provide 'init-corfu)
 

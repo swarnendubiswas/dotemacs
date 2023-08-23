@@ -100,19 +100,20 @@
 ;; sorted first. Only commands that have never been used before will be sorted by length. Vertico
 ;; does its own sorting based on recency, and Corfu has corfu-history. Company has
 ;; company-statistics. Ivy is not actively supported with prescient.
-(use-package prescient
-  :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
-  :hook (emacs-startup-hook . prescient-persist-mode)
-  :custom (prescient-sort-full-matches-first t)
-  :config
-  (with-eval-after-load "corfu"
-    (corfu-prescient-mode 1))
-  (with-eval-after-load "vertico"
-    (vertico-prescient-mode 1))
-  (with-eval-after-load "company"
-    (company-prescient-mode 1))
-  (with-eval-after-load "counsel"
-    (ivy-prescient-mode 1)))
+
+;; (use-package prescient
+;;   :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+;;   :hook (emacs-startup-hook . prescient-persist-mode)
+;;   :custom (prescient-sort-full-matches-first t)
+;;   :config
+;;   (with-eval-after-load "corfu"
+;;     (corfu-prescient-mode 1))
+;;   (with-eval-after-load "vertico"
+;;     (vertico-prescient-mode 1))
+;;   (with-eval-after-load "company"
+;;     (company-prescient-mode 1))
+;;   (with-eval-after-load "counsel"
+;;     (ivy-prescient-mode 1)))
 
 ;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".

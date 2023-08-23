@@ -178,7 +178,7 @@
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
     ;; Formatting LaTeX files with latexindent is very slow
-    ((markdown-mode-hook markdown-ts-mode-hook) . format-all-mode))
+    ((markdown-mode-hook markdown-ts-mode-hook LaTeX-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters
     '
@@ -203,7 +203,7 @@
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
 (use-package flycheck-grammarly
-  :after flycheck
+  :after (flycheck persistent-scratch)
   :defines flycheck-grammarly-check-time
   :init (flycheck-grammarly-setup)
   :custom (flycheck-grammarly-check-time 3)
@@ -240,7 +240,7 @@
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
 (use-package flycheck-languagetool
-  :after flycheck
+  :after (flycheck persistent-scratch)
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :init (flycheck-languagetool-setup)
   :custom
@@ -254,7 +254,7 @@
 ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
 ;; support. We enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
 (run-with-idle-timer
-  5 nil
+  3 nil
   (lambda ()
     (add-hook
       'text-mode-hook

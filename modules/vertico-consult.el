@@ -20,8 +20,9 @@
     ("M-<" . vertico-first)
     ("M->" . vertico-last)
     ("C-M-j" . vertico-exit-input)
-    ;; https://emacs.stackexchange.com/questions/77036/how-can-i-bind-vertico-insert-to-toggle-in-the-list
-    ("TAB" . vertico-insert))
+    ;; ;; https://emacs.stackexchange.com/questions/77036/how-can-i-bind-vertico-insert-to-toggle-in-the-list
+    ;; ("TAB" . vertico-insert)
+    )
   :custom
   (vertico-cycle t)
   (vertico-resize nil)
@@ -36,8 +37,8 @@
   (when sb/EMACS28+
     (setq read-extended-command-predicate #'command-completion-default-include-p))
 
-  (when (display-graphic-p)
-    (bind-key "[escape]" #'minibuffer-keyboard-quit vertico-map))
+  ;; (when (display-graphic-p)
+  ;;   (bind-key "[escape]" #'minibuffer-keyboard-quit vertico-map))
 
   ;; (cond
   ;;  ;;  ((eq sb/theme 'modus-vivendi)
