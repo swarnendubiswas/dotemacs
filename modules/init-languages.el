@@ -25,7 +25,8 @@
     (when (display-graphic-p)
       (display-fill-column-indicator-mode 1))))
 
-(use-package which-func
+(use-package
+  which-func
   :custom
   (which-func-modes
     '
@@ -40,10 +41,7 @@
       java-mode
       java-ts-mode)))
 
-(use-package subword
-  :straight (:type built-in)
-  :hook (prog-mode-hook . subword-mode)
-  :diminish)
+(use-package subword :straight (:type built-in) :hook (prog-mode-hook . subword-mode) :diminish)
 
 ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
 ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
@@ -59,17 +57,18 @@
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
 
-(use-package symbol-overlay ; Highlight symbol under point
+(use-package
+  symbol-overlay ; Highlight symbol under point
   :commands (transient-define-prefix)
   :hook (prog-mode-hook . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
 
-(use-package highlight-escape-sequences
-  :hook (prog-mode-hook . hes-mode))
+(use-package highlight-escape-sequences :hook (prog-mode-hook . hes-mode))
 
-(use-package compile
+(use-package
+  compile
   :straight (:type built-in)
   :bind
   ;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
@@ -81,11 +80,10 @@
   ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first error.
   (compilation-scroll-output 'first-error))
 
-(use-package fancy-compilation
-  :after compile
-  :init (fancy-compilation-mode 1))
+(use-package fancy-compilation :after compile :init (fancy-compilation-mode 1))
 
-(use-package rainbow-delimiters
+(use-package
+  rainbow-delimiters
   :hook ((prog-mode-hook latex-mode-hook LaTeX-mode-hook org-src-mode-hook) . rainbow-delimiters-mode))
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
@@ -95,7 +93,8 @@
 ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
 ;; https://github.com/renzmann/treesit-auto
 ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
-(use-package treesit
+(use-package
+  treesit
   :straight (:type built-in)
   :when (executable-find "tree-sitter")
   :demand t
@@ -163,19 +162,22 @@
   ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
   )
 
-(use-package tree-sitter
+(use-package
+  tree-sitter
   :when (executable-find "tree-sitter")
   :hook
   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
     ((c-mode-hook c++-mode-hook) . tree-sitter-mode))
   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
   :config
-  (use-package tree-sitter-langs
+  (use-package
+    tree-sitter-langs
     :demand t
     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
   :diminish tree-sitter-mode)
 
-(use-package eldoc
+(use-package
+  eldoc
   :straight (:type built-in)
   :hook (prog-mode-hook . turn-on-eldoc-mode)
   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
@@ -207,7 +209,8 @@
 ;;   "java": The default style for java-mode (see below)
 ;;   "user": When you want to define your own style
 
-(use-package cc-mode
+(use-package
+  cc-mode
   :straight (:type built-in)
   :defines (c-electric-brace c-enable-auto-newline c-set-style)
   :commands (c-fill-paragraph c-end-of-defun c-beginning-of-defun c++-mode)
@@ -246,14 +249,12 @@
 ;;   :hook (c++-mode-hook . modern-c++-font-lock-mode)
 ;;   :diminish modern-c++-font-lock-mode)
 
-(use-package cuda-mode
-  :commands cuda-mode
-  :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
+(use-package cuda-mode :commands cuda-mode :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
 
-(use-package opencl-mode
-  :mode "\\.cl\\'")
+(use-package opencl-mode :mode "\\.cl\\'")
 
-(use-package cmake-mode
+(use-package
+  cmake-mode
   :if (executable-find "cmake")
   :mode ("\(CMakeLists\.txt|\.cmake\)$" . cmake-ts-mode)
   :hook
@@ -288,7 +289,8 @@
 ;; (use-package rmsbolt
 ;;   :commands rmsbolt-mode)
 
-(use-package python
+(use-package
+  python
   :straight (:type built-in)
   :mode
   (("SCon\(struct\|script\)$" . python-ts-mode)
@@ -326,16 +328,17 @@
   (python-shell-exec-path "python3")
   (python-shell-interpreter "python3"))
 
-(use-package python-docstring
+(use-package
+  python-docstring
   :after python-mode
   :demand t
   :config (python-docstring-install)
   :diminish)
 
-(use-package pip-requirements
-  :commands (pip-requirements-mode))
+(use-package pip-requirements :commands (pip-requirements-mode))
 
-(use-package pyvenv
+(use-package
+  pyvenv
   :hook ((python-mode-hook python-ts-mode-hook) . pyvenv-mode)
   :custom
   (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:" pyvenv-virtual-env-name "] ")))
@@ -343,7 +346,8 @@
     (list (lambda () (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python")))))
   (pyvenv-post-deactivate-hooks (list (lambda () (setq python-shell-interpreter "python3")))))
 
-(use-package python-isort
+(use-package
+  python-isort
   :straight (:host github :repo "wyuenho/emacs-python-isort")
   :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :hook ((python-mode-hook python-ts-mode-hook) . python-isort-on-save-mode)
@@ -358,12 +362,14 @@
 ;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with `pyright' since it does not
 ;; support document formatting. So, we have to use yapf with pyright. Yapfify works on the original
 ;; file, so that any project settings supported by YAPF itself are used.
-(use-package yapfify
+(use-package
+  yapfify
   :if (and (executable-find "yapf") (eq sb/python-langserver 'pyright))
   :hook ((python-mode-hook python-ts-mode-hook) . yapf-mode)
   :diminish yapf-mode)
 
-(use-package cperl-mode
+(use-package
+  cperl-mode
   :mode "latexmkrc\\'"
   :hook
   (cperl-mode-hook
@@ -404,14 +410,13 @@
   ;;       :server-id 'perlls-r)))
   )
 
-(use-package ant
-  :after java-mode
-  :commands (ant ant-clean ant-compile ant-test))
+(use-package ant :after java-mode :commands (ant ant-clean ant-compile ant-test))
 
 ;; (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
 ;;   :mode "\\.class\\'")
 
-(use-package sh-script ; Shell script mode
+(use-package
+  sh-script ; Shell script mode
   :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
   :hook
@@ -439,20 +444,24 @@
   ;;       :server-id 'bashls-r)))
   )
 
-(use-package fish-mode
+(use-package
+  fish-mode
   :mode "\\.fish\\'"
   :interpreter "fish"
   :hook (fish-mode-hook . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 ;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
-(use-package executable
+(use-package
+  executable
   :hook (after-save-hook . executable-make-buffer-file-executable-if-script-p))
 
-(use-package highlight-doxygen
+(use-package
+  highlight-doxygen
   :commands (highlight-doxygen-global-mode)
   :hook ((c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook) . highlight-doxygen-mode))
 
-(use-package lisp-mode
+(use-package
+  lisp-mode
   :straight (:type built-in)
   :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode)
   :hook
@@ -462,7 +471,8 @@
       (when buffer-file-name
         (add-hook 'after-save-hook #'check-parens nil t)))))
 
-(use-package elisp-mode
+(use-package
+  elisp-mode
   :straight (:type built-in)
   :mode ("\\.el\\'" . emacs-lisp-mode)
   :hook
@@ -472,16 +482,12 @@
       (when buffer-file-name
         (add-hook 'after-save-hook #'check-parens nil t)))))
 
-(use-package ini-mode
-  :commands (ini-mode))
+(use-package ini-mode :commands (ini-mode))
 
-(use-package conf-mode
-  :straight (:type built-in)
-  :mode
-  "\\.cfg\\'"
-  "\\.conf\\'")
+(use-package conf-mode :straight (:type built-in) :mode "\\.cfg\\'" "\\.conf\\'")
 
-(use-package yaml-mode
+(use-package
+  yaml-mode
   :defines (lsp-ltex-enabled lsp-disabled-clients)
   :mode
   (("\\.yml\\'" . yaml-ts-mode)
@@ -519,10 +525,10 @@
   ;;       :server-id 'yamlls-r)))
   )
 
-(use-package yaml-imenu
-  :hook (yaml-mode-hook . yaml-imenu-enable))
+(use-package yaml-imenu :hook (yaml-mode-hook . yaml-imenu-enable))
 
-(use-package css-mode
+(use-package
+  css-mode
   :commands css-mode
   :hook
   ((css-mode-hook css-ts-mode-hook)
@@ -544,7 +550,8 @@
   ;;       :server-id 'cssls-r)))
   )
 
-(use-package make-mode
+(use-package
+  make-mode
   :straight (:type built-in)
   :mode
   (("\\Makefile\\'" . make-ts-mode)
@@ -553,11 +560,13 @@
     ("makefile\\.rules\\'" . make-ts-mode))
   :hook ((makefile-mode-hook make-ts-mode-hook) . (lambda () (setq-local indent-tabs-mode t))))
 
-(use-package makefile-executor
+(use-package
+  makefile-executor
   :hook ((makefile-mode-hook make-ts-mode-hook) . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
-(use-package csv-mode
+(use-package
+  csv-mode
   :defines (lsp-disabled-clients)
   :commands (csv-mode)
   :hook
@@ -574,11 +583,10 @@
         (jinx-mode -1))))
   :custom (csv-separators '("," ";" "|" " ")))
 
-(use-package antlr-mode
-  :straight (:type built-in)
-  :mode "\\.g4\\'")
+(use-package antlr-mode :straight (:type built-in) :mode "\\.g4\\'")
 
-(use-package bison-mode
+(use-package
+  bison-mode
   :mode ("\\.flex\\'" . flex-mode)
   :mode ("\\.bison\\'" . bison-mode)
   :hook
@@ -610,7 +618,8 @@
 ;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
 ;; more shortcuts.
 ;; https://jblevins.org/projects/markdown-mode/
-(use-package markdown-mode
+(use-package
+  markdown-mode
   :commands
   (markdown-mode
     gfm-mode
@@ -660,7 +669,8 @@
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
 ;; -f markdown -t org -o output-file.org input-file.md"
-(use-package pandoc-mode
+(use-package
+  pandoc-mode
   :commands pandoc-load-default-settings
   :hook (markdown-mode-hook . pandoc-mode)
   :config (pandoc-load-default-settings)
@@ -678,7 +688,8 @@
 ;;   (("\\.bat\\'" . bat-mode)
 ;;    ("\\.cmd\\'" . bat-mode)))
 
-(use-package web-mode
+(use-package
+  web-mode
   :mode "\\.html?\\'"
   :hook
   (web-mode-hook
@@ -713,12 +724,14 @@
   ;;       :server-id 'htmlls-r)))
   )
 
-(use-package emmet-mode
+(use-package
+  emmet-mode
   :defines (emmet-move-cursor-between-quote)
   :hook ((web-mode-hook css-mode-hook css-ts-mode-hook html-mode-hook html-ts-mode-hook) . emmet-mode)
   :custom (emmet-move-cursor-between-quote t))
 
-(use-package nxml-mode
+(use-package
+  nxml-mode
   :straight (:type built-in)
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
   :hook
@@ -753,7 +766,8 @@
   ;;       :server-id 'xmlls-r)))
   )
 
-(use-package json-mode
+(use-package
+  json-mode
   :commands json-mode-beautify
   :mode
   (("\\.json\\'" . json-ts-mode)
@@ -782,7 +796,8 @@
   ;;       :server-id 'jsonls-r)))
   )
 
-(use-package json-reformat
+(use-package
+  json-reformat
   :after (:any json-mode jsonc-mode json-ts-mode)
   :demand t
   :custom
@@ -815,10 +830,10 @@
 ;; (use-package dotenv-mode
 ;;   :mode "\\.env\\'")
 
-(use-package apt-sources-list
-  :commands apt-sources-list-mode)
+(use-package apt-sources-list :commands apt-sources-list-mode)
 
-(use-package ssh-config-mode
+(use-package
+  ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
   :mode ("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
@@ -834,7 +849,8 @@
 ;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
 
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
-(use-package org
+(use-package
+  org
   :defer 2
   :defines
   (org-hide-leading-stars-before-indent-mode
@@ -926,7 +942,8 @@
 ;;   :disabled t
 ;;   :hook (org-mode-hook . org-bullets-mode))
 
-(use-package org-appear ; Make invisible parts of Org elements appear visible
+(use-package
+  org-appear ; Make invisible parts of Org elements appear visible
   :straight (:host github :repo "awth13/org-appear")
   :hook (org-mode-hook . org-appear-mode)
   :custom
@@ -936,11 +953,10 @@
   (org-appear-autoemphasis t)
   (org-appear-autokeywords t))
 
-(use-package ox-gfm
-  :after org
-  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
+(use-package ox-gfm :after org :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
-(use-package ox-pandoc
+(use-package
+  ox-pandoc
   :after org
   :commands
   (org-pandoc-export-to-markdown
@@ -976,7 +992,8 @@
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
 
-(use-package tex
+(use-package
+  tex
   :straight auctex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :defines
@@ -1051,7 +1068,8 @@
     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
 
-(use-package bibtex
+(use-package
+  bibtex
   :straight (:type built-in)
   :hook
   ((bibtex-mode-hook . turn-on-auto-revert-mode)
@@ -1071,7 +1089,8 @@
 ;; Reftex is useful to view ToC even with LSP support
 ;; http://stackoverflow.com/questions/9682592/setting-up-reftex-tab-completion-in-emacs/11660493#11660493
 
-(use-package reftex
+(use-package
+  reftex
   :preface
   (defun sb/get-bibtex-keys (file)
     (with-current-buffer (find-file-noselect file)
@@ -1190,7 +1209,8 @@ Ignore if no file is found."
 ;;   (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
 ;;   :diminish bib-cite-minor-mode)
 
-(use-package auctex-latexmk
+(use-package
+  auctex-latexmk
   :after tex-mode
   :when (executable-find "latexmk")
   :demand t
@@ -1218,7 +1238,8 @@ Ignore if no file is found."
 ;; TODO: Try pcakages like `bibtex-capf' and `citar'
 ;; https://github.com/emacs-citar/citar
 
-(use-package bibtex-capf
+(use-package
+  bibtex-capf
   :straight (:type git :host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/capf 'corfu)
   :hook ((org-mode markdown-mode tex-mode latex-mode reftex-mode) . bibtex-capf-mode))
@@ -1232,7 +1253,8 @@ Ignore if no file is found."
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
-(use-package xref
+(use-package
+  xref
   :bind
   (("M-." . xref-find-definitions)
     ("M-?" . xref-find-references)
@@ -1247,7 +1269,8 @@ Ignore if no file is found."
   (xref-search-program 'ripgrep)
   (xref-show-definitions-function #'xref-show-definitions-completing-read))
 
-(use-package dumb-jump
+(use-package
+  dumb-jump
   :after xref
   :commands dumb-jump-xref-activate
   :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
@@ -1258,7 +1281,8 @@ Ignore if no file is found."
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 
-(use-package citre
+(use-package
+  citre
   :preface
   (defun sb/citre-jump+ ()
     "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
@@ -1398,15 +1422,32 @@ used in `company-backends'."
     (citre-backend-to-company-backend tags))
   :diminish)
 
-(use-package treesitter-context
+(use-package
+  treesitter-context
   :straight (:host github :repo "zbelial/treesitter-context.el")
-  :init
-  (use-package posframe-plus
-    :straight (:host github :type git :repo "zbelial/posframe-plus"))
+  :init (use-package posframe-plus :straight (:host github :repo "zbelial/posframe-plus"))
   :hook
   ((c-ts-mode-hook c++-ts-mode-hook python-ts-mode-hook java-ts-mode-hook json-ts-mode-hook)
     .
     treesitter-context-mode))
+
+(use-package
+  symbols-outline
+  :bind ("C-c i" . symbols-outline-show)
+  :custom (symbols-outline-window-position 'right)
+  :config
+  ;; By default the ctags backend is selected
+  (unless (executable-find "ctags")
+    ;; Use lsp-mode or eglot as backend
+    (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))
+  (symbols-outline-follow-mode 1))
+
+;; This is independent of LSP support and is more flexible. On the other hand, `which-func-mode'
+;; consumes less vertical space.
+(use-package
+  breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb")
+  :hook (emacs-startup-hook . breadcrumb-mode))
 
 (provide 'init-languages)
 

@@ -16,7 +16,8 @@
 (declare-function sb/smerge-hydra/body "init-keybindings")
 (declare-function consult--customize-put "consult")
 
-(use-package transient
+(use-package
+  transient
   :commands transient-bind-q-to-quit
   :custom (transient-semantic-coloring t)
   :config
@@ -25,7 +26,8 @@
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is
 ;; functions only, so we use `helpful-callable' as a drop-in replacement.
-(use-package helpful
+(use-package
+  helpful
   :bind
   (([remap describe-function] . helpful-callable) ; "C-h f"
     ([remap describe-variable] . helpful-variable) ; "C-h v"
@@ -35,16 +37,19 @@
     :map helpful-mode-map ("q" . helpful-kill-buffers)))
 
 ;; Erase all consecutive white space characters in a given direction
-(use-package hungry-delete
+(use-package
+  hungry-delete
   :hook
   ((minibuffer-setup-hook . (lambda () (hungry-delete-mode -1)))
     (emacs-startup-hook . global-hungry-delete-mode))
   :diminish)
 
-(use-package move-text ; Move lines with "M-<up>" and "M-<down>"
+(use-package
+  move-text ; Move lines with "M-<up>" and "M-<down>"
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
-(use-package expand-region ; Expand region by semantic units
+(use-package
+  expand-region ; Expand region by semantic units
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
 ;; (use-package expand-line
@@ -52,27 +57,28 @@
 ;;   :diminish)
 
 ;; Restore point to the initial location with "C-g" after marking a region
-(use-package smart-mark
-  :hook (emacs-startup-hook . smart-mark-mode))
+(use-package smart-mark :hook (emacs-startup-hook . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
-(use-package whole-line-or-region
+(use-package
+  whole-line-or-region
   :commands (whole-line-or-region-local-mode)
   :hook (emacs-startup-hook . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
-(use-package goto-last-change
-  :bind ("C-x C-\\" . goto-last-change))
+(use-package goto-last-change :bind ("C-x C-\\" . goto-last-change))
 
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
-(use-package beginend
+(use-package
+  beginend
   :hook (emacs-startup-hook . beginend-global-mode)
   :config
   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
     (diminish mode)))
 
-(use-package vundo
+(use-package
+  vundo
   :straight (:host github :repo "casouri/vundo")
   :bind
   (([remap undo] . vundo)
@@ -83,10 +89,12 @@
     ;; These are for vertical movements.
     ("C-n" . vundo-next) ("C-p" . vundo-previous)))
 
-(use-package iedit ; Edit multiple regions in the same way simultaneously
+(use-package
+  iedit ; Edit multiple regions in the same way simultaneously
   :bind* ("C-." . iedit-mode))
 
-(use-package hl-todo
+(use-package
+  hl-todo
   :hook (emacs-startup-hook . global-hl-todo-mode)
   :config
   (setq
@@ -103,13 +111,15 @@
         ("REFACTOR" . "#cc9393"))
       hl-todo-keyword-faces)))
 
-(use-package highlight-numbers
+(use-package
+  highlight-numbers
   :hook
   ((prog-mode-hook yaml-mode-hook conf-mode-hook css-mode-hook html-mode-hook)
     .
     highlight-numbers-mode))
 
-(use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
+(use-package
+  page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
   :commands page-break-lines-mode
   :hook (emacs-startup-hook . global-page-break-lines-mode)
   :diminish)
@@ -168,8 +178,7 @@
 ;;   :after (pdf-tools saveplace)
 ;;   :demand t)
 
-(use-package wc-mode
-  :commands wc-mode)
+(use-package wc-mode :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 
@@ -188,7 +197,8 @@
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
 
-(use-package bm
+(use-package
+  bm
   :preface
   (defun sb/bm-setup ()
     "Wrapper function to help call with a timer."
@@ -225,43 +235,46 @@
     (find-file-hook . bm-buffer-restore)
     (emacs-startup-hook . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
-  :custom
-  (bm-buffer-persistence t "Save bookmarks")
-  (bm-highlight-style 'bm-highlight-only-fringe))
+  :custom (bm-buffer-persistence t "Save bookmarks") (bm-highlight-style 'bm-highlight-only-fringe))
 
-(use-package crux
+(use-package
+  crux
   :bind
   (("C-c d i" . crux-ispell-word-then-abbrev)
     ("<f12>" . crux-kill-other-buffers)
     ("C-c d s" . crux-sudo-edit))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-(use-package rainbow-mode
+(use-package
+  rainbow-mode
   :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode)
   :diminish)
 
-(use-package volatile-highlights
+(use-package
+  volatile-highlights
   :hook (emacs-startup-hook . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
 
-(use-package unfill
-  :commands (unfill-region unfill-paragraph unfill-toggle))
+(use-package unfill :commands (unfill-region unfill-paragraph unfill-toggle))
 
-(use-package xclip
+(use-package
+  xclip
   :if (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup-hook . xclip-mode))
 
-(use-package fix-word
+(use-package
+  fix-word
   :bind (("M-u" . fix-word-upcase) ("M-l" . fix-word-downcase) ("M-c" . fix-word-capitalize)))
 
-(use-package string-inflection
-  :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
+(use-package string-inflection :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
-(use-package gcmh ; Allow GC to happen after a period of idle time
+(use-package
+  gcmh ; Allow GC to happen after a period of idle time
   :hook (emacs-startup-hook . gcmh-mode)
   :diminish)
 
-(use-package kill-file-path
+(use-package
+  kill-file-path
   :straight (:host github :repo "chyla/kill-file-path")
   :commands
   (kill-file-path-basename
@@ -269,23 +282,16 @@
     kill-file-path-dirname
     kill-file-path))
 
-(use-package change-inner
-  :commands (change-inner change-outer yank-inner yank-outer))
+(use-package change-inner :commands (change-inner change-outer yank-inner yank-outer))
 
 ;; (use-package link-hint
 ;;   :bind ("C-c C-l" . link-hint-open-link))
 
-;; This is independent of LSP support and is more flexible. On the other hand, `which-func-mode'
-;; consumes less vertical space.
-
-;; (use-package breadcrumb
-;;   :straight (:host github :repo "joaotavora/breadcrumb")
-;;   :hook (emacs-startup-hook . breadcrumb-mode))
-
 ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
 ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
 ;; to `t' in the `.dir-locals.el' file.
-(use-package whitespace-cleanup-mode
+(use-package
+  whitespace-cleanup-mode
   :defines whitespace-cleanup-mode-ignore-modes
   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
   :custom
@@ -295,9 +301,7 @@
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode-hook . ws-butler-mode)
-  :diminish)
+(use-package ws-butler :hook (prog-mode-hook . ws-butler-mode) :diminish)
 
 ;; Both project.el and projectile are unable to remember remote projects.
 
@@ -346,7 +350,8 @@
 
 ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
 ;; indexing.
-(use-package projectile
+(use-package
+  projectile
   :preface
   (defun sb/projectile-do-not-visit-tags-table ()
     "Do not visit the tags table automatically even if it is present."
@@ -472,7 +477,8 @@
     (bind-key "<f5>" #'projectile-switch-project)
     (bind-key "<f6>" #'projectile-find-file)))
 
-(use-package isearch
+(use-package
+  isearch
   :straight (:type built-in)
   :bind
   ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
@@ -485,7 +491,8 @@
   (isearch-lazy-highlight t)
   (isearch-lazy-count t))
 
-(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
+(use-package
+  isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
   :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
@@ -521,7 +528,8 @@
 
 ;; When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze Emacs for several
 ;; minutes.
-(use-package wgrep ; Writable grep
+(use-package
+  wgrep ; Writable grep
   ;; Allows you to edit a deadgrep buffer and apply those changes to the file buffer.
   :hook (deadgrep-finished-hook . wgrep-deadgrep-setup)
   :bind
@@ -533,13 +541,12 @@
     ("C-x C-q" . wgrep-exit))
   :custom (wgrep-auto-save-buffer t))
 
-(use-package deadgrep
-  :bind ("C-c s d" . deadgrep)
-  :custom (deadgrep-max-buffers 1))
+(use-package deadgrep :bind ("C-c s d" . deadgrep) :custom (deadgrep-max-buffers 1))
 
 ;; `avy-setup-default' will bind `avy-isearch' to "C-'" in `isearch-mode-map', so that you can
 ;; select one of the currently visible `isearch' candidates using `avy'.
-(use-package avy
+(use-package
+  avy
   :bind
   (("C-\\" . avy-goto-word-1)
     ("C-'" . avy-goto-char-timer)
@@ -552,13 +559,12 @@
     ("C-'" . avy-isearch))
   :custom (avy-background t "Provides better contrast"))
 
-(use-package re-builder
-  :commands re-builder
-  :custom (reb-re-syntax 'string))
+(use-package re-builder :commands re-builder :custom (reb-re-syntax 'string))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
-(use-package visual-regexp
+(use-package
+  visual-regexp
   :bind
   ([remap query-replace] . vr/query-replace)
   ([remap replace-regex] . vr/replace))
@@ -566,7 +572,8 @@
 ;; (use-package ripgrep
 ;;   :commands (ripgrep-regexp projectile-ripgrep))
 
-(use-package rg
+(use-package
+  rg
   :commands
   (rg-menu
     rg-isearch-menu
@@ -577,7 +584,8 @@
     rg-dwim-current-dir
     rg-dwim-project-dir))
 
-(use-package vc-hooks
+(use-package
+  vc-hooks
   :straight (:type built-in)
   :custom (vc-follow-symlinks t "No need to ask")
   ;; Disabling vc is said to improve performance. However, I find it useful to show branch
@@ -586,7 +594,8 @@
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
 
-(use-package magit
+(use-package
+  magit
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
   :custom
   ;; Open the status buffer in a full frame
@@ -596,19 +605,20 @@
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist
     '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
-  :config
-  (require 'magit-diff)
+  :config (require 'magit-diff)
   (setq
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
 
-(use-package git-modes
+(use-package
+  git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'
-(use-package diff-hl
+(use-package
+  diff-hl
   :if (boundp 'vc-handled-backends)
   :hook
   (
@@ -632,7 +642,8 @@
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
 
 ;; Use "M-p/n" to cycle between older commit messages.
-(use-package git-commit
+(use-package
+  git-commit
   :hook
   (git-commit-setup-hook
     .
@@ -643,7 +654,8 @@
   :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them.
-(use-package smerge-mode
+(use-package
+  smerge-mode
   :preface
   ;; https://emacs.stackexchange.com/questions/16469/how-to-merge-git-conflicts-in-emacs
   (defun sb/enable-smerge-maybe-with-vc ()
@@ -676,17 +688,18 @@
 
 (use-package with-editor :diminish)
 
-(use-package paren
+(use-package
+  paren
   :straight (:type built-in)
   :hook (emacs-startup-hook . show-paren-mode)
   :custom
   (show-paren-style 'parenthesis) ; `mixed' may lead to performance problems
-  (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t))
+  (show-paren-when-point-inside-paren t) (show-paren-when-point-in-periphery t))
 
 ;; Enable autopairing
 
-(use-package elec-pair
+(use-package
+  elec-pair
   :straight (:type built-in)
   :hook (emacs-startup-hook . electric-pair-mode)
   :config
@@ -715,7 +728,8 @@
   (add-hook 'minibuffer-exit-hook (lambda () (electric-pair-mode 1))))
 
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
-(use-package smartparens
+(use-package
+  smartparens
   :disabled
   :commands
   (sp-local-pairs
