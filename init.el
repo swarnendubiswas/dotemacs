@@ -123,13 +123,13 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "vertico" vertico) (const :tag "ivy" ivy) (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Corfu is easy to configure, integrates nicely with `orderless' and provides better completion for
-;; elisp symbols. However, I prefer to use TUI Emacs, and `corfu-terminal-mode' has a rendering
+;; Corfu is easy to configure, integrates nicely with `orderless', and provides better completion
+;; for elisp symbols. However, I prefer to use TUI Emacs, and `corfu-terminal-mode' has a rendering
 ;; problem for the completion popup at the right edges. The completion entries wrap around, and
 ;; sometimes messes up the completion. Corfu does not work well with LaTeX for me. Company works
-;; better with TUI Emacs and has more extensive LaTeX support. `company-ispell' is configurable, and
-;; we can set up a custom file containing completions with `company-dict'. However, `company-ispell'
-;; does not keep prefix case when used as a grouped backend.
+;; better with Windows and TUI Emacs, and has more extensive LaTeX support. `company-ispell' is
+;; configurable, and we can set up a custom file containing completions with `company-dict'.
+;; However, `company-ispell' does not keep prefix case when used as a grouped backend.
 (defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))

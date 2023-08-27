@@ -78,10 +78,10 @@
 ;;   :if (display-graphic-p)
 ;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
-(use-package free-keys
-  :commands free-keys)
+(use-package free-keys :commands free-keys)
 
-(use-package which-key ; Show help popups for prefix keys
+(use-package
+  which-key ; Show help popups for prefix keys
   :commands which-key-setup-side-window-right-bottom
   :hook (emacs-startup-hook . which-key-mode)
   :custom (which-key-sort-order 'which-key-key-order-alpha)
@@ -599,7 +599,8 @@
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
 ;; Alacritty is my preferred terminal for customizing Emacs keybindings.
-(use-package term-keys
+(use-package
+  term-keys
   :straight (:host github :repo "CyberShadow/term-keys")
   :unless (display-graphic-p)
   :hook (emacs-startup-hook . term-keys-mode)

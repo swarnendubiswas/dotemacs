@@ -10,7 +10,8 @@
 (defvar sb/capf)
 
 ;; Corfu is not a completion framework, it is just a front-end for `completion-at-point'.
-(use-package corfu
+(use-package
+  corfu
   :straight
   (corfu
     :files (:defaults "extensions/*")
@@ -52,7 +53,8 @@
   ;; entries.
   (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
 
-(use-package corfu-info
+(use-package
+  corfu-info
   :straight nil
   :after corfu
   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
@@ -62,7 +64,8 @@
 ;;   :after corfu
 ;;   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
 
-(use-package corfu-quick-access
+(use-package
+  corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
   :if (eq sb/capf 'corfu)
   :hook
@@ -73,7 +76,8 @@
         (corfu-quick-access-mode)))))
 
 ;; We do not need this if we use prescient-based sorting.
-(use-package corfu-history
+(use-package
+  corfu-history
   :straight nil
   :if (eq sb/capf 'corfu)
   :hook (corfu-mode-hook . corfu-history-mode)
@@ -81,12 +85,14 @@
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'corfu-history)))
 
-(use-package corfu-echo
+(use-package
+  corfu-echo
   :straight nil
   :if (eq sb/capf 'corfu)
   :hook (corfu-mode-hook . corfu-echo-mode))
 
-(use-package corfu-popupinfo
+(use-package
+  corfu-popupinfo
   :straight nil
   :hook (corfu-mode-hook . corfu-popupinfo-mode)
   :bind
@@ -96,11 +102,13 @@
     ("M-p" . corfu-popupinfo-scroll-down)
     ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
 
-(use-package popon
+(use-package
+  popon
   :straight (:host codeberg :repo "akib/emacs-popon")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p))))
 
-(use-package corfu-terminal
+(use-package
+  corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode-hook . corfu-terminal-mode)
@@ -108,7 +116,8 @@
   ;; TODO: This is supposedly a bug, report to the maintainer.
   (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
 
-(use-package kind-icon
+(use-package
+  kind-icon
   :if (or (eq sb/corfu-icons 'kind-icon) (eq sb/corfu-icons 'nerd-icons))
   :after corfu
   :demand t
@@ -117,8 +126,7 @@
   ;; Prefer smaller icons and a more compact popup
   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
   ;; (kind-icon-blend-background nil)
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
+  :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
   (when (eq sb/corfu-icons 'nerd-icons)
     (with-eval-after-load "nerd-icons"
       (setq kind-icon-use-icons nil)
@@ -183,6 +191,40 @@
 ;;   :demand t
 ;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
+(use-package
+  company-auctex
+  :after tex-mode
+  :demand t
+  :commands
+  (company-auctex-labels
+    company-auctex-bibs
+    company-auctex-macros
+    company-auctex-symbols
+    company-auctex-environments))
+
+;; Required by `ac-math' and `company-math'
+(use-package math-symbols :after tex-mode :demand t)
+
+(use-package
+  company-math
+  :after tex-mode
+  :demand t
+  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+
+;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
+;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
+;; citations across documents.
+(use-package
+  company-reftex
+  :after tex-mode
+  :demand t
+  :commands (company-reftex-labels company-reftex-citations)
+  :custom
+  ;; https://github.com/TheBB/company-reftex/pull/13
+  (company-reftex-labels-parse-all nil))
+
+(use-package company-bibtex :after tex-mode :demand t :commands company-bibtex)
+
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
@@ -190,7 +232,8 @@
 
 ;; `cape-super-capf' works only well for static completion functions like `cape-dabbrev',
 ;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like `cape-file'.
-(use-package cape
+(use-package
+  cape
   :after corfu
   :demand t
   :commands
@@ -243,7 +286,21 @@
         (when (bound-and-true-p lsp-managed-mode)
           (setq-local completion-at-point-functions
             (list
-              #'cape-file #'lsp-completion-at-point #'cape-tex ; Leads to unwanted completions
+              #'cape-file
+              (cape-super-capf
+                (mapcar
+                  #'cape-company-to-capf
+                  (list
+                    #'company-math-symbols-latex
+                    #'company-latex-commands
+                    #'company-reftex-labels
+                    #'company-reftex-citations
+                    #'company-auctex-environments
+                    #'company-auctex-macros
+                    #'company-math-symbols-unicode
+                    #'company-auctex-symbols))
+                #'cape-tex ; Leads to unwanted completions
+                )
               (cape-super-capf #'cape-dabbrev #'cape-dict))))
         (when (bound-and-true-p eglot--managed-mode)
           (setq-local completion-at-point-functions

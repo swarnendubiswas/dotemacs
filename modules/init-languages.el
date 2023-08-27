@@ -648,9 +648,7 @@
   ;; (setq-default markdown-hide-markup t)
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'" . markdown-ts-mode)
-    ("\\.markdown\\'" . markdown-ts-mode)
-    ("README\\.md\\'" . gfm-mode))
+  (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
   :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j"))
   :custom
   (markdown-command

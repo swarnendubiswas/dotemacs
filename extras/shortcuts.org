@@ -504,10 +504,20 @@ The use case is to search all files in a file hierarchy for some regular express
 
 *** Batch rename multiple files in a directory
 
+**** Option 1
+
 - Turn on ~wdired~ mode (~Ctrl+x Ctrl+q~ by default)
 - Make changes to the ~dired~ listing which are reflected in the actual files. For example, use your favorite search-and-replace method to change the target file names.
 - Type ~Ctrl+c Ctrl+c~ to exit ~wdired~ mode and rename the files
 
+**** Option 2
+
+- ~dired-toggle-read-only~ (usually bound to "C-x C-q"), now the Dired buffer is editable — you can change the names of files and later choose to commit those changes to disk
+- use ~occur~ (usually bound to "M-s o") to narrow down the listed files in the Dired buffer, then use ~occur-edit-mode~ in the Occur buffer (bound to the "e" key) to make the occur buffer editable
+- Use any number of ~query-replace~ ("M-%") or ~query-replace-regexp~ ("C-M-%") to rename any of the files in the Occur buffer.
+- ~occur-cease-edit~ ("C-c C-c") to commit changes from the Occur buffer to the Dired buffer
+- ~wdired-finish-edit~ (also bound to "C-c C-c") to commit those changes in the Dired buffer to the file system.
+  
 *** Copy file path
 
 Start ~dired~, place the cursor on the desired file, and press ~C-0 w~. This calls ~dired-copy-filename-as-kill~ with the zero-prefix argument, and will copy the file path to the clipboard.

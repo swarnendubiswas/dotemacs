@@ -92,9 +92,7 @@
   :diminish yas-minor-mode)
 
 ;; YASnippet no longer bundles snippets directly
-(use-package yasnippet-snippets
-  :after yasnippet
-  :commands yasnippet-snippets-initialize)
+(use-package yasnippet-snippets :after yasnippet :commands yasnippet-snippets-initialize)
 
 ;; Prescient uses frecency (frequency + recency) for sorting. recently used commands should be
 ;; sorted first. Only commands that have never been used before will be sorted by length. Vertico
