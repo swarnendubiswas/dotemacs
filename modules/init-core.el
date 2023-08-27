@@ -109,7 +109,10 @@
 (when sb/EMACS28+
   (setq
     next-error-message-highlight t
-    read-minibuffer-restore-windows t))
+    read-minibuffer-restore-windows t)
+
+  ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
+  (setq read-extended-command-predicate #'command-completion-default-include-p))
 
 (when (boundp 'help-window-keep-selected)
   (setq help-window-keep-selected t))
@@ -210,7 +213,8 @@
 
 (diminish 'visual-line-mode)
 
-(use-package autorevert ; Auto-refresh all buffers
+(use-package
+  autorevert ; Auto-refresh all buffers
   :straight (:type built-in)
   :hook (emacs-startup-hook . global-auto-revert-mode)
   :custom (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
@@ -226,11 +230,13 @@
 
 ;; We may open a file immediately after starting Emacs, hence we are using a hook instead of a
 ;; timer.
-(use-package saveplace ; Remember cursor position in files
+(use-package
+  saveplace ; Remember cursor position in files
   :straight (:type built-in)
   :hook (emacs-startup-hook . save-place-mode))
 
-(use-package savehist ; Save minibuffer history across sessions
+(use-package
+  savehist ; Save minibuffer history across sessions
   :straight (:type built-in)
   :hook (emacs-startup-hook . savehist-mode)
   :custom
@@ -247,7 +253,8 @@
       compile-history))
   (savehist-autosave-interval 60))
 
-(use-package uniquify
+(use-package
+  uniquify
   :straight (:type built-in)
   :custom
   (uniquify-after-kill-buffer-p t)
@@ -256,7 +263,8 @@
   (uniquify-separator "/")
   (uniquify-strip-common-suffix t))
 
-(use-package abbrev
+(use-package
+  abbrev
   :straight (:type built-in)
   :hook (emacs-startup-hook . abbrev-mode)
   :custom
@@ -265,29 +273,30 @@
   :diminish)
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c"
-(use-package so-long
+(use-package
+  so-long
   :straight (:type built-in)
   :if sb/EMACS28+
   :hook (emacs-startup-hook . global-so-long-mode))
 
-(use-package imenu
+(use-package
+  imenu
   :straight (:type built-in)
   :after (:any markdown-mode org-mode yaml-mode prog-mode)
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-items 1000)
+  :custom (imenu-auto-rescan t) (imenu-max-items 1000)
   ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
   ;; mouse support enabled
   (imenu-use-popup-menu nil)
   ;; `nil' implies no sorting and will list by position in the buffer
   (imenu-sort-function nil))
 
-(use-package recentf
+(use-package
+  recentf
   :straight (:type built-in)
   :functions straight--emacs-dir
   :hook (emacs-startup-hook . recentf-mode)
-  :custom
-  (recentf-auto-cleanup 'never "Do not stat remote files")
+  :bind ("<f9>" . recentf-open-files)
+  :custom (recentf-auto-cleanup 'never "Do not stat remote files")
   (recentf-exclude
     '
     ("[/\\]elpa/"
@@ -391,7 +400,8 @@
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
 ;; prefix argument is given. Then it will find file at point.
-(use-package ffap
+(use-package
+  ffap
   :straight (:type built-in)
   ;; Vertico does not provide intelligent file lookup, unlike `counsel'.
   :if (eq sb/minibuffer-completion 'vertico)
@@ -422,12 +432,14 @@
 ;;   (doc-view-resolution 120))
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
-(use-package goto-addr
+(use-package
+  goto-addr
   :straight (:type built-in)
   :hook ((prog-mode-hook . goto-address-prog-mode) (text-mode-hook . goto-address-mode))
   :bind ("C-c RET" . goto-address-at-point))
 
-(use-package ediff
+(use-package
+  ediff
   :straight (:type built-in)
   :defines (ediff-window-setup-function)
   :commands (ediff ediff3)
@@ -467,7 +479,8 @@
 (defvar tramp-ssh-controlmaster-options)
 (defvar sb/minibuffer-completion)
 
-(use-package tramp
+(use-package
+  tramp
   :straight (:type built-in)
   :bind ("C-S-q" . tramp-cleanup-connection)
   :custom (tramp-default-user user-login-name)

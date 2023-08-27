@@ -63,27 +63,29 @@
 ;;   :init (all-the-icons-completion-mode 1)
 ;;   :hook (marginalia-mode-hook . all-the-icons-completion-marginalia-setup))
 
-(use-package nerd-icons
+(use-package
+  nerd-icons
   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   ;; `nerd-icons-ivy-rich' depends on this package
   :when (or (eq sb/icons-provider 'nerd-icons) (eq sb/minibuffer-completion 'ivy))
-  :custom
-  (nerd-icons-color-icons nil)
-  (nerd-icons-scale-factor 0.9))
+  :custom (nerd-icons-color-icons nil) (nerd-icons-scale-factor 0.9))
 
-(use-package nerd-icons-completion
+(use-package
+  nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
   :when (eq sb/icons-provider 'nerd-icons)
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode-hook . nerd-icons-completion-marginalia-setup))
 
-(use-package nerd-icons-dired
+(use-package
+  nerd-icons-dired
   :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
   :when (eq sb/icons-provider 'nerd-icons)
   :hook (dired-mode-hook . nerd-icons-dired-mode)
   :diminish)
 
-(use-package nerd-icons-ibuffer
+(use-package
+  nerd-icons-ibuffer
   :when (eq sb/icons-provider 'nerd-icons)
   :hook (ibuffer-mode-hook . nerd-icons-ibuffer-mode)
   :custom (nerd-icons-ibuffer-icon-size 1.0))
@@ -103,7 +105,8 @@
 ;; (setq resize-mini-windows nil
 ;;       max-mini-window-height 5)
 
-(use-package beacon ; Highlight the cursor position after the window scrolls
+(use-package
+  beacon ; Highlight the cursor position after the window scrolls
   :hook (emacs-startup-hook . beacon-mode)
   :diminish)
 
@@ -149,7 +152,8 @@
   ;; Use a blinking bar for the cursor style to help identify it easily.
   (blink-cursor-mode 1))
 
-(use-package centaur-tabs
+(use-package
+  centaur-tabs
   :if (eq sb/tab-bar-handler 'centaur-tabs)
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :bind*
@@ -167,7 +171,7 @@
   (centaur-tabs-style "bar")
   (centaur-tabs-set-bar 'under)
   (centaur-tabs-height 18)
-  (centaur-tabs-set-icons nil)
+  (centaur-tabs-set-icons t)
   (centaur-tabs-icon-type 'nerd-icons)
   (centaur-tabs-gray-out-icons t "Gray out icons for inactive tabs")
   (centaur-tabs-show-count t "Helpful to identify tab overflows")
@@ -231,8 +235,9 @@
 ;;   ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
 ;;   (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
-(use-package modus-themes
-  :if (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
+(use-package
+  modus-themes
+  :when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
   :defines
   (modus-themes-completions
     modus-themes-fringes
@@ -292,7 +297,8 @@
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
 
-(use-package powerline
+(use-package
+  powerline
   :preface
   (defun sb/powerline-raw (str &optional face pad)
     "Render STR as mode-line data using FACE and optionally PAD import.
@@ -357,7 +363,7 @@ PAD can be left (`l') or right (`r')."
               (powerline-render center)
               (powerline-fill nil (powerline-width rhs))
               (powerline-render rhs)))))))
-  :if (eq sb/modeline-theme 'powerline)
+  :when (eq sb/modeline-theme 'powerline)
   :commands powerline-default-theme
   :init
   (setq
@@ -369,8 +375,9 @@ PAD can be left (`l') or right (`r')."
 
   (sb/powerline-nano-theme))
 
-(use-package doom-modeline
-  :if (eq sb/modeline-theme 'doom-modeline)
+(use-package
+  doom-modeline
+  :when (eq sb/modeline-theme 'doom-modeline)
   :init
   (setq
     doom-modeline-buffer-encoding nil
@@ -455,15 +462,17 @@ PAD can be left (`l') or right (`r')."
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
 
-(use-package disable-mouse
+(use-package
+  disable-mouse
   :hook (emacs-startup-hook . disable-mouse-global-mode)
   :diminish disable-mouse-global-mode)
 
-;; (use-package olivetti
-;;   :hook
-;;   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
-;;   :custom (olivetti-body-width 108)
-;;   :diminish)
+(use-package
+  olivetti
+  :hook
+  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
+  :custom (olivetti-body-width 108)
+  :diminish)
 
 (provide 'init-ui)
 

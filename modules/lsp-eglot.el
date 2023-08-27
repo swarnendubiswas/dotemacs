@@ -14,14 +14,9 @@
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
-(use-package lsp-mode
-  :preface
-  ;; https://github.com/minad/corfu/wiki
-  (defun sb/lsp-mode-setup-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex))
-    (with-eval-after-load "orderless"
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(orderless))))
-  :if (eq sb/lsp-provider 'lsp-mode)
+(use-package
+  lsp-mode
+  :when (eq sb/lsp-provider 'lsp-mode)
   :defines
   (lsp-perl-language-server-path
     lsp-perl-language-server-port
@@ -155,7 +150,8 @@
         "-j 2"
         (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
   :config
-  ;; I am explicitly setting company backends and cape capfs for corfu
+  ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
+  ;; interfere with `completion-at-point-functions'
   (cond
     ((eq sb/capf 'company)
       (setq lsp-completion-enable t))
@@ -179,12 +175,17 @@
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
 
+  ;; https://github.com/minad/corfu/wiki
   (with-eval-after-load "corfu"
-    ;; (add-hook 'text-mode-hook (lambda () (setq-local lsp-completion-enable nil)))
+    (defun sb/lsp-mode-setup-completion ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex))
+      (with-eval-after-load "orderless"
+        (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(orderless))))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
   :diminish)
 
-(use-package lsp-ui
+(use-package
+  lsp-ui
   :after lsp-mode
   :defines lsp-ui-modeline-code-actions-enable
   :commands (lsp-ui-doc-mode lsp-ui-mode lsp-ui-peek-find-implementation lsp-ui-imenu)
@@ -226,7 +227,8 @@
 ;;     ("E" . lsp-treemacs-errors-list)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
-(use-package lsp-java
+(use-package
+  lsp-java
   :if (eq sb/lsp-provider 'lsp-mode)
   :commands
   (lsp-java-organize-imports
@@ -257,9 +259,7 @@
           (eglot-ensure))
         ((eq sb/lsp-provider 'lsp-mode)
           (lsp-deferred)))))
-  :custom
-  (lsp-java-save-actions-organize-imports t)
-  (lsp-java-format-settings-profile "Swarnendu")
+  :custom (lsp-java-save-actions-organize-imports t) (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url
     (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory))
   :config
@@ -271,7 +271,8 @@
 ;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 
 ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
-(use-package lsp-grammarly
+(use-package
+  lsp-grammarly
   :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-grammarly-active-modes lsp-grammarly-user-words)
   :hook ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
@@ -305,7 +306,8 @@
   )
 
 ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
-(use-package lsp-ltex
+(use-package
+  lsp-ltex
   :if (eq sb/lsp-provider 'lsp-mode)
   :defines (lsp-ltex-enabled lsp-ltex-check-frequency lsp-ltex-dictionary lsp-ltex-java-path)
   :hook ((text-mode-hook markdown-mode-hook org-mode-hook LaTeX-mode-hook) . lsp-deferred)
@@ -363,7 +365,8 @@
 ;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
 ;; --createstub pandas".
 
-(use-package lsp-pyright
+(use-package
+  lsp-pyright
   :if
   (and (eq sb/lsp-provider 'lsp-mode)
     (eq sb/python-langserver 'pyright)
@@ -406,7 +409,8 @@
   )
 
 ;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
-(use-package lsp-latex
+(use-package
+  lsp-latex
   :after lsp-mode
   :defines
   (lsp-latex-bibtex-formatter
@@ -453,7 +457,8 @@
   ;;     :server-id 'texlab-r))
   )
 
-(use-package eglot
+(use-package
+  eglot
   :when (eq sb/lsp-provider 'eglot)
   :commands (eglot)
   :bind
@@ -582,7 +587,8 @@
 ;;   )
 
 ;; FIXME: Fix issue with LTEX 16.0.0
-(use-package eglot-ltex
+(use-package
+  eglot-ltex
   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
   :when (eq sb/lsp-provider 'eglot)
   :init
@@ -595,7 +601,7 @@
       (require 'eglot-ltex)
       (eglot-ensure)))
   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-  :config
+  ;; :config
   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
   ;; (add-to-list
   ;;   'eglot-server-programs
@@ -605,7 +611,8 @@
   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
   )
 
-(use-package eglot-java
+(use-package
+  eglot-java
   :when (eq sb/lsp-provider 'eglot)
   :hook
   (java-mode-hook

@@ -2,21 +2,13 @@
 
 * GNU Emacs
 
-This repository lists my preferred setup for GNU Emacs, my primary editor. The customization and install instructions should work on a GNU/Linux platform and are not extensively tested on Windows. Most of the included customizations are from the internet. Suggestions and pull requests are welcome.
+This repository lists my configuration for GNU Emacs, my primary editor. The install instructions and customizations should work on a GNU/Linux platform and are not extensively tested on Windows. Suggestions and pull requests are welcome.
 
 ** Install GNU Emacs
 
-*** Ubuntu PPA
+The Emacs version on Ubuntu is outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but they do not include build flags that I need. So, I prefer to build from source [[[*Build GNU Emacs]]].
 
-The Emacs version on Ubuntu is usually outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but I prefer to build from source [[[*Build GNU Emacs]]].
-
-#+begin_src shell
-sudo add-apt-repository -y ppa:kelleyk/emacs
-sudo apt update
-sudo apt install emacs28-nativecomp
-#+end_src
-
-*** Build GNU Emacs from the source
+** Build GNU Emacs
 
 Add the following repository only if you are using Ubuntu 20.04.
 
@@ -29,26 +21,24 @@ sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjan
 Use the following instructions to configure and build GNU Emacs from the source (Ubuntu 20.04 or 22.04).
 
 #+begin_src shell
-wget https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz
-tar -xf emacs-28.2.tar.xz
+wget https://ftp.gnu.org/gnu/emacs/emacs-29.1.tar.xz
+tar -xf emacs-29.1.tar.xz
 
 # Use GCC 10 if you are on Ubuntu 20.04
 export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
 make distclean
 ./autogen.sh
-./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --with-dbus --without-pop --with-dbus --with-tree-sitter CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer -funroll-loops -floop-parallelize-all" prefix=/usr/local
+./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --with-dbus --without-pop --with-dbus --with-tree-sitter=ifavailable CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer -funroll-loops -floop-parallelize-all" prefix=/usr/local
 
-# Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the
-# Emacs distribution instead of after startup
+# Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the Emacs
+# distribution instead of after startup
 make -j"$(nproc)" NATIVE_FULL_AOT=1
 sudo make install
 #+end_src
 
 Try the [[https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html][following]] if the build fails: ~make bootstrap~ or ~rm lisp/loaddefs.el; make;~.
 
-You can check whether "NATIVE__COMP" is part of the ~system-configuration-features~ variable.
-
-Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=):
+You can check whether "NATIVE__COMP" is part of the ~system-configuration-features~ variable. Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=):
 ~(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)~
 
 ** Setup Emacs 
@@ -86,26 +76,35 @@ The following are examples of a few customization options defined in [[./modules
 
 We enable LSP support for the more popular languages supported with either =lsp-mode= or =eglot=. You may need to install the necessary language servers separately to complement the packages. Use =M-x lsp-install-server= or check =setup-emacs.sh=.
 
-**** Installing servers for Eglot
+*** Installing servers for Eglot
 
 #+begin_src shell
 npm install -save-dev @emacs-grammarly/grammarly-languageserver
 
+LTEX_VER="16.0.0"
 sudo apt-get install -y libslf4j-java liblog4j1.2-java
-wget https://github.com/valentjn/ltex-ls/releases/download/16.0.0/ltex-ls-16.0.0-linux-x64.tar.gz
-tar xf ltex-ls-16.0.0-linux-x64.tar.gz
+wget https://github.com/valentjn/ltex-ls/releases/download/${LTEX_VER}/ltex-ls-${LTEX_VER}-linux-x64.tar.gz
+tar xf ltex-ls-${LTEX_VER}-linux-x64.tar.gz
 
-wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v1.25.0.tar.gz
-tar xf v1.25.0.tar.gz
-cd eclipse.jdt.ls-1.25.0
+JDT_VER="1.26.0"
+wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v${JDT_VER}.tar.gz
+tar xf v${JDT_VER}.tar.gz
+cd eclipse.jdt.ls-${JDT_VER}
 ./mvnw clean verify -DskipTests=true
-# Add "eclipse.jdt.ls-1.25.0/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
-rm -rf eclipse.jdt.ls-1.25.0 
+# Add "eclipse.jdt.ls-${JDT_VER}/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
+rm -rf eclipse.jdt.ls-${JDT_VER} 
 #+end_src
 
 ** Support for Tags
 
-Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by =lsp-mode= and to understand complicated project structures which a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
+Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by =lsp-mode= and to understand complicated project structures that a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
+
+GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
+
+- [[https://github.com/rdbeni0/emacs.d/tree/main/ggtags]]
+- [[https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support][Compiling GNU Global with universal-ctags support]]
+- [[https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub][Tags for Emacs: Relationship between etags, ebrowse, cscope, GNU Global and exuberant ctags]]
+- [[https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html][GTags for Python in Emacs]]
 
 *** Universal Ctags
 
@@ -126,46 +125,17 @@ By default, Emacs expects a tag file by the name =TAGS= in the current directory
 
 For more commands, see the Tags topic in the Emacs info document.
 
-**** TensorFlow
-
 #+begin_src shell
-ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=bazel-* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt
-#+end_src
+ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=bazel-* --exclude=doc --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/'
 
-**** C/C++ projects
-
-#+begin_src shell
-ctags -eR --exclude=*.py --exclude=*.json --exclude=*.js --exclude=build* --exclude=*.sh --exclude=*.xml --exclude=*.java --exclude=*.html --exclude=*.md --exclude=*.pbtxt --exclude=*.png --exclude=*.css --exclude=*.rst --exclude=doc --exclude=PTRacer-solver
-#+end_src
-
-**** LaTeX projects
-
-#+begin_src shell
-find . -name "*.tex" | ctags -e -quiet -L -
-#+end_src
-
-**** Python files
-
-#+begin_src shell
-find src -name "*.py" | ctags -e -L -
-#+end_src
-
-**** Elisp files
-
-#+begin_src shell
 ctags -e -R --exclude=@.ctagsignore --languages=EmacsLisp .
-#+end_src
-
-**** Ignore directories and files
-
-#+begin_src shell
-ctags -eR --exclude=node_modules --exclude=.meteor --exclude='packages/*/.build/'
-#+end_src
-
-**** Use an ignore file
-
-#+begin_src shell
 ctags -eR -quiet=yes --exclude=@.ctagsignore .
+ctags -eR --languages=Python
+
+find . -name "*.tex" | ctags -e -quiet -L -
+find src -name "*.py" | ctags -e -L -
+
+find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.cu" | ctags -e -L -
 #+end_src
 
 #+begin_src shell
@@ -175,50 +145,17 @@ dir2
 dir3
 #+end_src
 
-~find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.cu" | ctags -e -L -~
-
-**** Parse only Python files
-
-#+begin_src shell
-ctags -eR --languages=Python
-#+end_src
-
 *** GNU Global
 
 Use GNU Global with =counsel-gtags=: ~gtags -cv --gtagslabel=new-ctags~
 
-**** C/C++
-
 #+begin_src shell
-find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" | gtags -cv --gtagslabel=new-ctags -f -
-#+end_src
+find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
 
-**** Python
-
-#+begin_src shell
 find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
-#+end_src
 
-**** LaTeX
-
-#+begin_src shell
 find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
 #+end_src
-
-**** TensorFlow
-
-#+begin_src shell
-find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
-#+end_src
-
-*** Use GNU Global with Universal Ctags support
-
-GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
-
-- [[https://github.com/rdbeni0/emacs.d/tree/main/ggtags]]
-- [[https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support][Compiling GNU Global with universal-ctags support]]
-- [[https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub][Tags for Emacs: Relationship between etags, ebrowse, cscope, GNU Global and exuberant ctags]]
-- [[https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html][GTags for Python in Emacs]]
 
 ** Configuring Emacs Daemon
 

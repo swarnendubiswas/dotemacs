@@ -58,7 +58,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '

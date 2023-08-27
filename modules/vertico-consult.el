@@ -9,7 +9,8 @@
 
 (defvar sb/minibuffer-completion)
 
-(use-package vertico
+(use-package
+  vertico
   :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
   :if (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
@@ -20,7 +21,7 @@
     ("M-<" . vertico-first)
     ("M->" . vertico-last)
     ("C-M-j" . vertico-exit-input)
-    ;; ;; https://emacs.stackexchange.com/questions/77036/how-can-i-bind-vertico-insert-to-toggle-in-the-list
+    ;; https://emacs.stackexchange.com/questions/77036/how-can-i-bind-vertico-insert-to-toggle-in-the-list
     ;; ("TAB" . vertico-insert)
     )
   :custom
@@ -28,14 +29,9 @@
   (vertico-resize nil)
   (vertico-preselect 'first)
   :config
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode. Vertico commands are
-  ;; hidden in normal buffers.
-  (when sb/EMACS28+
-    (setq read-extended-command-predicate #'command-completion-default-include-p))
+  ;; ;; Do not allow the cursor in the minibuffer prompt
+  ;; (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+  ;; (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
   ;; (when (display-graphic-p)
   ;;   (bind-key "[escape]" #'minibuffer-keyboard-quit vertico-map))
@@ -52,7 +48,8 @@
   )
 
 ;; More convenient directory navigation commands
-(use-package vertico-directory
+(use-package
+  vertico-directory
   :straight nil
   :after vertico
   :hook
@@ -69,7 +66,8 @@
     ("DEL" . vertico-directory-delete-char)
     ("M-DEL" . vertico-directory-delete-word)))
 
-(use-package vertico-repeat
+(use-package
+  vertico-repeat
   :straight nil
   :after vertico
   :hook (minibuffer-setup-hook . vertico-repeat-save)
@@ -84,7 +82,8 @@
 ;;   :commands vertico-indexed-mode
 ;;   :init (vertico-indexed-mode 1))
 
-(use-package vertico-quick
+(use-package
+  vertico-quick
   :straight nil
   :after vertico
   :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
@@ -113,7 +112,8 @@
 ;;       ;; (consult-ripgrep buffer)
 ;;       )))
 
-(use-package consult
+(use-package
+  consult
   :after vertico
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -126,14 +126,13 @@
     ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
     ;; will be shown again.
     ([remap switch-to-buffer] . consult-buffer)
-    ("C-x b" . consult-buffer)
     ("<f3>" . consult-buffer)
     ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
     ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
     ([remap bookmark-jump] . consult-bookmark)
     ([remap project-switch-to-buffer] . consult-project-buffer)
     ([remap yank-pop] . consult-yank-pop)
-    ("M-y" . consult-yank-pop)
+    ;; ("M-y" . consult-yank-pop)
     ([remap apropos] . consult-apropos)
     ("M-g e" . consult-compile-error)
     ([remap goto-line] . consult-goto-line)
@@ -161,10 +160,9 @@
     ("C-c s h" . consult-isearch-history)
     ([remap isearch-forward] . consult-line)
     ("<f4>" . consult-line)
+    ([remap multi-occur] . consult-multi-occur)
     ("M-s m" . consult-multi-occur)
     ([remap recentf-open-files] . consult-recent-file)
-    ("<f9>" . consult-recent-file)
-    ([remap multi-occur] . consult-multi-occur)
     :map
     isearch-mode-map
     ("M-s e" . consult-isearch-history)
@@ -213,13 +211,12 @@
     (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
     (bind-key [remap projectile-grep] #'consult-grep)))
 
-(use-package embark-consult
-  :after consult
-  :demand t)
+(use-package embark-consult :after consult :demand t)
 
 ;; Provide context-dependent actions similar to a content menu
 ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
-(use-package embark
+(use-package
+  embark
   :after vertico
   :defines (vertico-map which-key-use-C-h-commands)
   :commands embark-prefix-help-command
@@ -237,7 +234,8 @@
 
 ;; Enriches the completion display with annotations, e.g., documentation strings or file
 ;; information.
-(use-package marginalia
+(use-package
+  marginalia
   :after vertico
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
@@ -246,19 +244,21 @@
   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
-(use-package consult-tramp
+(use-package
+  consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
   :after consult
   :bind ("C-c d t" . consult-tramp))
 
-(use-package consult-eglot
-  :if (eq sb/lsp-provider 'eglot)
+(use-package
+  consult-eglot
+  :when (eq sb/lsp-provider 'eglot)
   :after (consult eglot)
   :commands consult-eglot-symbols)
 
-(use-package consult-project-extra
-  :if (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
-  :demand t
+(use-package
+  consult-project-extra
+  :after (project consult)
   :commands consult-project-extra-find-other-window
   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
   :config
@@ -266,8 +266,9 @@
   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
   (setq project-switch-commands 'consult-project-extra-find))
 
-(use-package consult-dir
-  :if (eq sb/minibuffer-completion 'vertico)
+(use-package
+  consult-dir
+  :after consult
   :bind
   (("C-x C-d" . consult-dir)
     :map
@@ -275,7 +276,8 @@
     ("C-x C-d" . consult-dir)
     ("C-x C-j" . consult-dir-jump-file)))
 
-(use-package consult-flyspell
+(use-package
+  consult-flyspell
   :after (consult flyspell)
   :defines consult-flyspell-select-function
   :bind ("C-c f l" . consult-flyspell)
@@ -285,22 +287,22 @@
       (flyspell-correct-at-point)
       (consult-flyspell))))
 
-(use-package consult-flycheck
+(use-package
+  consult-flycheck
   :after (flycheck consult)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
-(use-package consult-lsp
+(use-package
+  consult-lsp
   :after (consult lsp)
-  :commands (consult-lsp-diagnostics consult-lsp-symbols consult-lsp-file-symbols)
+  :commands (consult-lsp-diagnostics consult-lsp-file-symbols)
   :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
 
-(use-package consult-yasnippet
-  :after consult
-  :bind ("C-M-y" . consult-yasnippet))
+(use-package consult-yasnippet :after consult :bind ("C-M-y" . consult-yasnippet))
 
-(use-package consult-projectile
-  :if (eq sb/project-handler 'projectile)
-  :after projectile
+(use-package
+  consult-projectile
+  :after (consult projectile)
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
