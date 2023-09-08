@@ -137,8 +137,8 @@
   ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
   (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
   ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
@@ -244,6 +244,30 @@
   ;;       :remote? t
   ;;       :server-id 'clangd-r)))
   )
+
+(use-package
+  c-ts-mode
+  :straight (:type built-in)
+  :hook
+  ((c-ts-mode-hook c++-ts-mode-hook)
+    .
+    (lambda ()
+      (setq-local
+        c-ts-mode-indent-style 'linux
+        c-ts-mode-indent-offset 2
+        c-ts-mode-toggle-comment-style -1
+        ;; Disable electric indentation and on-type formatting
+        c-auto-newline nil
+        ;; c-electric-brace nil
+        c-electric-flag nil
+        ;; c-electric-indent nil
+        c-enable-auto-newline nil
+        c-syntactic-indentation nil)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred))))))
 
 ;; (use-package modern-cpp-font-lock ; Better highlight for modern C++
 ;;   :hook (c++-mode-hook . modern-c++-font-lock-mode)
@@ -554,11 +578,11 @@
   make-mode
   :straight (:type built-in)
   :mode
-  (("\\Makefile\\'" . make-ts-mode)
-    ("\\Makefile.common\\'" . make-ts-mode)
+  (("\\Makefile\\'" . make-mode)
+    ("\\Makefile.common\\'" . make-mode)
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-    ("makefile\\.rules\\'" . make-ts-mode))
-  :hook ((makefile-mode-hook make-ts-mode-hook) . (lambda () (setq-local indent-tabs-mode t))))
+    ("makefile\\.rules\\'" . make-mode))
+  :hook (makefile-mode-hook . (lambda () (setq-local indent-tabs-mode t))))
 
 (use-package
   makefile-executor
@@ -1238,9 +1262,14 @@ Ignore if no file is found."
 
 (use-package
   bibtex-capf
-  :straight (:type git :host github :repo "mclear-tools/bibtex-capf")
+  :straight (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/capf 'corfu)
   :hook ((org-mode markdown-mode tex-mode latex-mode reftex-mode) . bibtex-capf-mode))
+
+(use-package
+  latex-extra
+  :straight (:host github :repo "Malabarba/latex-extra")
+  :hook ((LaTeX-mode-hook . latex-extra-mode)))
 
 (setq
   large-file-warning-threshold (* 500 1024 1024) ; MB

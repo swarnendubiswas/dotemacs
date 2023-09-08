@@ -139,23 +139,21 @@
           use-package-compute-statistics nil
           use-package-verbose nil)))))
 
-(use-package diminish
-  :demand t)
+(use-package diminish :demand t)
 
 ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
 ;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
 ;; all the bindings available in a buffer, "C-h m" shows the keybindings for the major and the minor
 ;; modes.
-(use-package bind-key
-  :functions bind-key--remove
-  :bind ("C-c d k" . describe-personal-keybindings))
+(use-package bind-key :functions bind-key--remove :bind ("C-c d k" . describe-personal-keybindings))
 
 ;; (use-package benchmark-init
 ;;   :when (and (eq sb/op-mode 'standalone) (bound-and-true-p sb/debug-init-file))
 ;;   :init (benchmark-init/activate)
 ;;   :hook (emacs-startup-hook . benchmark-init/deactivate))
 
-(use-package no-littering
+(use-package
+  no-littering
   :demand t
   :config
   (setq auto-save-file-name-transforms
@@ -194,7 +192,8 @@
 ;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
 ;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
 
-(use-package exec-path-from-shell
+(use-package
+  exec-path-from-shell
   :if (symbol-value 'sb/IS-LINUX)
   :defer 2
   :defines exec-path-from-shell-check-startup-files

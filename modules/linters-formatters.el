@@ -51,7 +51,8 @@
 ;;     (cl-union writegood-weasel-words sb/weasel-words))
 ;;   :diminish)
 
-(use-package flycheck
+(use-package
+  flycheck
   :commands
   (flycheck-mode
     flycheck-previous-error
@@ -137,7 +138,7 @@
         (message (one-or-more (not "\"")))
         (one-or-more not-newline)
         line-end)))
-  (add-to-list 'flycheck-checkers 'tex-textidote)
+  ;; (add-to-list 'flycheck-checkers 'tex-textidote)
 
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
@@ -173,21 +174,25 @@
     (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map)))
 
 ;; Use for major modes which do not provide a formatter.
-(use-package format-all
+(use-package
+  format-all
   :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-    ;; Formatting LaTeX files with latexindent is very slow
-    ((markdown-mode-hook markdown-ts-mode-hook LaTeX-mode-hook) . format-all-mode))
+    ;; The cursor position is not saved in `LaTeX-mode-hook'
+    ((markdown-mode-hook markdown-ts-mode-hook) . format-all-mode))
   :custom
   (format-all-formatters
     '
     (("Assembly" asmfmt)
       ("Awk" gawk)
-      ("BibTeX" Emacs)
+      ("BibTeX" latexindent)
       ("C" clang-format)
       ("C++" clang-format)
+      ("CMake" cmake-format)
+      ("CSS" prettier)
       ("Cuda" clang-format)
+      ("Dockerfile" dockfmt)
       ("Emacs Lisp" emacs-lisp)
       ("Fish" fish-indent)
       ("HTML" tidy)
@@ -195,14 +200,16 @@
       ("Markdown" prettier "--print-width" "100")
       ("Perl" perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100")
       ("Python" (yapf "--style" "file") isort)
-      ("Shell script" shfmt "-i" "1" "-ci")
+      ("Shell" shfmt "-i" "1" "-ci")
+      ("XML" tidy)
       ("YAML" prettier "--print-width" "100")))
   :diminish)
 
 ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
 ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
 ;; account. We only need this package for checking text in "*scratch*" buffer.
-(use-package flycheck-grammarly
+(use-package
+  flycheck-grammarly
   :after (flycheck persistent-scratch)
   :defines flycheck-grammarly-check-time
   :init (flycheck-grammarly-setup)
@@ -239,7 +246,8 @@
 
 ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-(use-package flycheck-languagetool
+(use-package
+  flycheck-languagetool
   :after (flycheck persistent-scratch)
   :defines (flycheck-languagetool-commandline-jar flycheck-languagetool-check-time)
   :init (flycheck-languagetool-setup)
@@ -271,29 +279,39 @@
 ;;     highlight-indentation-mode)
 ;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
-(use-package indent-bars
+(use-package
+  indent-bars
   :straight (:host github :repo "jdtsmith/indent-bars")
   :hook ((python-mode-hook python-ts-mode-hook yaml-mode-hook yaml-ts-mode-hook) . indent-bars-mode))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
-(use-package elisp-autofmt
+(use-package
+  elisp-autofmt
   :commands (elisp-autofmt-buffer)
   :hook ((emacs-lisp-mode-hook lisp-data-mode-hook) . elisp-autofmt-mode)
   :custom
   (elisp-autofmt-style 'fixed)
   (elisp-autofmt-python-bin "python3"))
 
-(use-package flycheck-eglot
+(use-package
+  flycheck-eglot
   :straight (:host github :repo "intramurz/flycheck-eglot")
   :if (eq sb/lsp-provider 'eglot)
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
 
-(use-package shfmt
+(use-package
+  shfmt
   :hook ((sh-mode-hook bash-ts-mode-hook) . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
+
+(use-package
+  flycheck-hl-todo
+  :straight (:host github :repo "alvarogonzalezsotillo/flycheck-hl-todo")
+  :after (flycheck hl-todo)
+  :init (flycheck-hl-todo-setup))
 
 (provide 'linters-formatters)
 

@@ -113,7 +113,7 @@ This location is used for temporary installations and files.")
 ;; `pyls' and `mspyls' are not actively maintained, and improvements to `pylsp' is slow.
 ;; Furthermore, candidate `pylsp' versions depend on the OS version, and capf sometimes does not
 ;; work consistently.
-(defcustom sb/python-langserver 'pyright
+(defcustom sb/python-langserver 'pylsp
   "Choose the Python Language Server implementation."
   :type '(radio (const :tag "pylsp" pylsp) (const :tag "pyright" pyright) (const :tag "none" none))
   :group 'sb/emacs)

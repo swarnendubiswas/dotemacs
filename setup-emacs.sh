@@ -214,31 +214,31 @@ create_symlinks() {
     # HOME directory
     sfname="$DOTFILES/markdown/dotmarkdownlint.json"
     dfname="$USER_HOME/.markdownlint.json"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/dotprettierrc"
     dfname="$USER_HOME/.prettierrc"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/tidyrc"
     dfname="$USER_HOME/.tidyrc"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/dotripgreprc"
     dfname="$USER_HOME/.ripgreprc"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/tmux/tmux.conf"
     dfname="$USER_HOME/.tmux.conf"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/dotgitconfig"
     dfname="$USER_HOME/.gitconfig"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
-    sfname="$DOTFILES/latex/jabref.xml"
-    dfname="$USER_HOME/jabref.xml"
-    create_file_symlink $sfname, $dfname
+    # sfname="$DOTFILES/latex/jabref.xml"
+    # dfname="$USER_HOME/jabref.xml"
+    # create_file_symlink $sfname $dfname
 
     # if [ ! -d "${CONFIG_DIR}" ]; then
     #     mkdir -p "${CONFIG_DIR}"
@@ -248,27 +248,27 @@ create_symlinks() {
 
     sfname="$DOTFILES/python/pylintrc"
     dfname="$CONFIG_DIR/pylintrc"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/python/yapf"
     dfname="$CONFIG_DIR/yapf"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/yamllint"
     dfname="$CONFIG_DIR/yamllint"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/alacritty"
     dfname="$CONFIG_DIR/alacritty"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/ctags/dotctags.d"
     dfname="${CONFIG_DIR}/.ctags.d"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 
     sfname="$DOTFILES/bat"
     dfname="${CONFIG_DIR}/bat"
-    create_file_symlink $sfname, $dfname
+    create_file_symlink $sfname $dfname
 }
 
 install_shellcheck() {
@@ -374,7 +374,7 @@ install_bear() {
     fi
 
     cd bear || echo "Failed: cd bear"
-    git checkout 3.1.2
+    git checkout 3.1.3
     mkdir -p build && cd build || echo "Failed: cd bear/build"
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all
@@ -442,7 +442,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.50.0"
+    DIFFT_VER="0.51.1"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
@@ -451,7 +451,7 @@ install_difft() {
 }
 
 install_zoxide() {
-    curl -sS https://webinstall.dev/zoxide | bash
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
 
     # For bash, add this line to ~/.bashrc
     echo "eval \"$(zoxide init bash)\"" >>"$USER_HOME/.bashrc"

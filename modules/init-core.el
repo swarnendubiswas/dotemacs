@@ -522,7 +522,8 @@
 ;;   :after tramp
 ;;   :custom (password-cache-expiry nil))
 
-;; (use-package whitespace
+;; (use-package
+;;   whitespace
 ;;   :hook
 ;;   (markdown-mode-hook
 ;;     .
@@ -547,6 +548,19 @@
 ;;           missing-newline-at-eof))
 ;;       (whitespace-mode 1)))
 ;;   :custom (whitespace-line-column sb/fill-column)
+;;   :config (setq-default whitespace-action '(cleanup auto-cleanup))
+;;   (let*
+;;     (
+;;       (ws-lighten 30) ;; Amount in percentage to lighten up black.
+;;       (ws-color (color-lighten-name "#000000" ws-lighten)))
+;;     (custom-set-faces
+;;       `(whitespace-newline ((t (:foreground ,ws-color))))
+;;       `(whitespace-missing-newline-at-eof ((t (:foreground ,ws-color))))
+;;       `(whitespace-space ((t (:foreground ,ws-color))))
+;;       `(whitespace-space-after-tab ((t (:foreground ,ws-color))))
+;;       `(whitespace-space-before-tab ((t (:foreground ,ws-color))))
+;;       `(whitespace-tab ((t (:foreground ,ws-color))))
+;;       `(whitespace-trailing ((t (:foreground ,ws-color))))))
 ;;   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 ;; "M-x delete-trailing-whitespace" deletes trailing lines. This is different from
@@ -562,6 +576,13 @@
 ;; are at "~/Documents/notes/file.txt" and you want to go to "~/.emacs.d/init.el", type the latter
 ;; directly and Emacs will take you there.
 (file-name-shadow-mode 1)
+
+(use-package
+  files
+  :straight (:type built-in)
+  :bind
+  ("C-x C-v" . find-alternate-file)
+  ("C-x x g" . revert-buffer-quick))
 
 (provide 'init-core)
 

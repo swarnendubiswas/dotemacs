@@ -133,7 +133,7 @@
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
-  (lsp-pylsp-plugins-preload-modules ["numpy" , "csv" , "pandas" , "statistics" , "json"])
+  (lsp-pylsp-plugins-preload-modules ["numpy" "csv" "pandas" "statistics" "json"])
   (lsp-pylsp-plugins-pycodestyle-enabled nil)
   (lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")

@@ -1,4 +1,4 @@
-;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode: emacs-lisp; coding:utf-8;
+;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
 ;;; no-byte-compile: t; fill-column: 100 -*-
 
 ;; Swarnendu Biswas
@@ -44,7 +44,6 @@
 
 ;; The run-time load order is: (1) file described by `site-run-file' if non-nil, (2)
 ;; `user-init-file', and (3) `default.el'.
-
 (setq
   site-run-file nil ; Disable site-wide run-time initialization
   ;; Disable loading of `default.el' at startup
@@ -59,9 +58,10 @@
   inhibit-compacting-font-caches t ; Do not compact font caches during GC
   inhibit-startup-echo-area-message t
   inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
-  ;; *scratch* is in `lisp-interaction-mode' by default. `text-mode' is more expensive to start, but
-  ;; I use *scratch* for composing emails.
-  initial-major-mode 'text-mode
+  ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for composing emails, but
+  ;; `text-mode' is more expensive to start. Furthermore, lsp support is not enabled for the
+  ;; *scratch* buffer.
+  ;; initial-major-mode 'text-mode
   initial-scratch-message nil
   ;; Prefer new files to avoid loading stale bytecode
   load-prefer-newer t)
