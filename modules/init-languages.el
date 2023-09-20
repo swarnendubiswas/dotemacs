@@ -578,10 +578,10 @@
   make-mode
   :straight (:type built-in)
   :mode
-  (("\\Makefile\\'" . make-mode)
-    ("\\Makefile.common\\'" . make-mode)
+  (("\\Makefile\\'" . makefile-mode)
+    ("\\Makefile.common\\'" . makefile-mode)
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
-    ("makefile\\.rules\\'" . make-mode))
+    ("makefile\\.rules\\'" . makefile-mode))
   :hook (makefile-mode-hook . (lambda () (setq-local indent-tabs-mode t))))
 
 (use-package

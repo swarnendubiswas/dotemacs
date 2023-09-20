@@ -86,13 +86,13 @@ sudo apt-get install -y libslf4j-java liblog4j1.2-java
 wget https://github.com/valentjn/ltex-ls/releases/download/${LTEX_VER}/ltex-ls-${LTEX_VER}-linux-x64.tar.gz
 tar xf ltex-ls-${LTEX_VER}-linux-x64.tar.gz
 
-JDT_VER="1.26.0"
+JDT_VER="1.27.1"
 wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v${JDT_VER}.tar.gz
 tar xf v${JDT_VER}.tar.gz
 cd eclipse.jdt.ls-${JDT_VER}
 ./mvnw clean verify -DskipTests=true
 # Add "eclipse.jdt.ls-${JDT_VER}/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
-rm -rf eclipse.jdt.ls-${JDT_VER} 
+# rm -rf eclipse.jdt.ls-${JDT_VER} 
 #+end_src
 
 ** Support for Tags

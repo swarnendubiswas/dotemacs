@@ -179,8 +179,9 @@
   :commands (format-all-buffer)
   :hook
   ((format-all-mode-hook . format-all-ensure-formatter)
-    ;; The cursor position is not saved in `LaTeX-mode-hook'
+    ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
     ((markdown-mode-hook markdown-ts-mode-hook) . format-all-mode))
+  :bind ("C-x f" . format-all-buffer)
   :custom
   (format-all-formatters
     '

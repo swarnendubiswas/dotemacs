@@ -409,7 +409,9 @@
             '
             (company-dirfiles
               (company-capf
-                company-citre-tags company-c-headers
+                ;; TODO: I am guessing `company-citre-tags' is causing problems with the RETURN key
+                ;; company-citre-tags
+                company-c-headers
                 :with company-keywords
                 company-dabbrev-code ; Useful for variable names
                 company-yasnippet

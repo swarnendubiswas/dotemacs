@@ -10,14 +10,14 @@
 (defvar recentf-list)
 (defvar sb/minibuffer-completion)
 
-;; `amx-major-mode-commands' limits to commands that are relevant to the current major mode,
-;; `amx-show-unbound-commands' shows frequently used commands that have no key bindings.
+;; Sort most-used commands and show keyboard shortcuts. `amx-major-mode-commands' limits to commands
+;; that are relevant to the current major mode, `amx-show-unbound-commands' shows frequently used
+;; commands that have no key bindings.
+(use-package amx :hook (emacs-startup-hook . amx-mode))
 
-(use-package amx ; Sort most-used commands and show keyboard shortcuts
-  :hook (emacs-startup-hook . amx-mode))
-
-(use-package ivy
-  :if (eq sb/minibuffer-completion 'ivy)
+(use-package
+  ivy
+  :when (eq sb/minibuffer-completion 'ivy)
   :functions ivy-format-function-line
   :hook (emacs-startup-hook . ivy-mode)
   :bind
@@ -88,7 +88,8 @@
 ;;   :after ivy
 ;;   :hook (emacs-startup-hook . all-the-icons-ivy-setup))
 
-(use-package counsel
+(use-package
+  counsel
   :preface
   ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
   (defun sb/counsel-all-files-recursively (dir-name)
@@ -97,10 +98,10 @@
     (let*
       ((cands (split-string (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
       (ivy-read "File: " cands :action #'find-file :caller 'sb/counsel-all-files-recursively)))
-  :if (eq sb/minibuffer-completion 'ivy)
+  :when (eq sb/minibuffer-completion 'ivy)
   :hook (ivy-mode-hook . counsel-mode)
   :bind
-  ( ;; Counsel can use the sorting from `amx' or `smex' for `counsel-M-x'.
+  ( ;; Counsel can use the sorting from `amx' for `counsel-M-x'.
     ([remap execute-extended-command] . counsel-M-x)
     ("<f1>" . counsel-M-x)
     ([remap completion-at-point] . counsel-company)
@@ -208,14 +209,16 @@
 ;;             (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
 ;;         :delimiter "\t"))))
 
-(use-package nerd-icons-ivy-rich
+(use-package
+  nerd-icons-ivy-rich
+  :disabled ; Icons and columns are sometimes unaligned
   :hook (ivy-mode-hook . nerd-icons-ivy-rich-mode)
   :custom
   (nerd-icons-ivy-rich-icon
     (if (eq sb/icons-provider 'nerd-icons)
       t
       nil))
-  (nerd-icons-ivy-rich-icon-size 0.9)
+  (nerd-icons-ivy-rich-icon-size 1.0)
   :config
   (plist-put
     nerd-icons-ivy-rich-display-transformers-list 'counsel-recentf
@@ -271,7 +274,9 @@
 
   (nerd-icons-ivy-rich-reload))
 
-(use-package ivy-rich
+(use-package
+  ivy-rich
+  ;; :disabled ; Icons and columns are sometimes unaligned
   :preface
   ;; Adapted from https://github.com/tshu-w/.emacs.d/blob/master/lisp/editor-completion.el
   (defun sb/ivy-rich-file-size (candidate)
@@ -327,7 +332,9 @@
   ;;                         (ivy-rich-candidate (:width 0.75))))
   )
 
-(use-package counsel-fd ; Counsel interface for fd
+;; Counsel interface for fd
+(use-package
+  counsel-fd
   :when (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
   :bind
   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
@@ -335,32 +342,32 @@
     ("C-x f" . counsel-fd-file-jump)))
 
 ;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
-(use-package ivy-avy
-  :after ivy
-  :bind (:map ivy-minibuffer-map ("C-'" . ivy-avy)))
+(use-package ivy-avy :after ivy :bind (:map ivy-minibuffer-map ("C-'" . ivy-avy)))
 
-(use-package ivy-yasnippet
-  :if (eq sb/minibuffer-completion 'ivy)
+(use-package
+  ivy-yasnippet
+  :when (eq sb/minibuffer-completion 'ivy)
   :after (ivy yasnippet)
   :bind ("C-M-y" . ivy-yasnippet))
 
-(use-package lsp-ivy
+(use-package
+  lsp-ivy
   :after (lsp-mode ivy)
   :bind (:map lsp-command-map ("G" . lsp-ivy-global-workspace-symbol) ("W" . lsp-ivy-workspace-symbol)))
 
-(use-package ivy-xref
+(use-package
+  ivy-xref
   :after (ivy xref)
   :demand t
   :custom
   (xref-show-definitions-function #'ivy-xref-show-defs)
   (xref-show-xrefs-function #'ivy-xref-show-xrefs))
 
-(use-package counsel-tramp
-  :after counsel
-  :bind ("C-c d t" . counsel-tramp))
+(use-package counsel-tramp :after counsel :bind ("C-c d t" . counsel-tramp))
 
-(use-package ivy-bibtex
-  :if (eq sb/minibuffer-completion 'ivy)
+(use-package
+  ivy-bibtex
+  :when (eq sb/minibuffer-completion 'ivy)
   :after latex
   :defines
   (ivy-bibtex-default-action
@@ -380,8 +387,9 @@
 
 ;; "M-n" will search for the word under cursor, "C-s" will search for the next occurrence, "C-s"
 ;; will search for a previously searched string.
-(use-package swiper
-  :if (eq sb/minibuffer-completion 'ivy)
+(use-package
+  swiper
+  :when (eq sb/minibuffer-completion 'ivy)
   :commands (swiper swiper-isearch swiper-isearch-thing-at-point)
   :custom
   (swiper-action-recenter t)

@@ -225,6 +225,9 @@
 
 (use-package company-bibtex :after tex-mode :demand t :commands company-bibtex)
 
+;; FIXME: Add to capf
+(use-package yasnippet-capf :straight (:host github :repo "elken/yasnippet-capf"))
+
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
 ;; (fset #'cape-path (cape-company-to-capf #'company-files))
@@ -244,10 +247,11 @@
     cape-abbrev ; Complete abbreviation at point
     cape-dict ; Complete word from dictionary at point
     cape-line ; Complete current line from other lines in buffer
-    cape-symbol ; Elisp symbol
+    cape-elisp-symbol ; Elisp symbol
     cape-elisp-block ; Complete Elisp in Org or Markdown code block
-    ;; Complete with Dabbrev at point
-    cape-dabbrev)
+    cape-dabbrev ; Complete with Dabbrev at point
+    cape-emoji ; Complete emoji in Emacs 29+
+    )
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
@@ -270,7 +274,10 @@
         (setq-local completion-at-point-functions
           (list
             #'cape-file
-            (cape-super-capf #'elisp-completion-at-point #'citre-completion-at-point #'cape-symbol)
+            (cape-super-capf
+              #'elisp-completion-at-point
+              #'citre-completion-at-point
+              #'cape-elisp-symbol)
             (cape-super-capf #'cape-dabbrev #'cape-dict))))))
 
   (add-hook
@@ -279,6 +286,7 @@
       (setq-local completion-at-point-functions
         (list #'cape-file (cape-super-capf #'cape-dabbrev #'cape-dict)))))
 
+  ;; TODO: Support latex-mode better.
   (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
     (add-hook
       mode
@@ -308,36 +316,61 @@
               #'cape-file #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
               (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
 
-  (dolist
-    (lsp-prog-mode
-      '
-      (c-mode-hook
-        c-ts-mode-hook
-        c++-mode-hook
-        c++-ts-mode-hook
-        java-mode-hook
-        java-ts-mode-hook
-        python-mode-hook
-        python-ts-mode-hook
-        sh-mode-hook
-        bash-ts-mode-hook
-        cmake-mode-hook
-        cmake-ts-mode-hook
-        json-mode-hook
-        json-ts-mode-hook
-        jsonc-mode-hook
-        yaml-mode-hook
-        yaml-ts-mode-hook))
-    (add-hook
-      lsp-prog-mode
-      (lambda ()
-        (when (bound-and-true-p lsp-managed-mode)
+  ;; FIXME: Conditional for both `lsp-mode' and `eglot' is not working.
+  (with-eval-after-load "lsp-mode"
+    (dolist
+      (mode
+        '
+        (c-mode-hook
+          c-ts-mode-hook
+          c++-mode-hook
+          c++-ts-mode-hook
+          java-mode-hook
+          java-ts-mode-hook
+          python-mode-hook
+          python-ts-mode-hook
+          sh-mode-hook
+          bash-ts-mode-hook
+          cmake-mode-hook
+          cmake-ts-mode-hook
+          json-mode-hook
+          json-ts-mode-hook
+          jsonc-mode-hook
+          yaml-mode-hook
+          yaml-ts-mode-hook))
+      (add-hook
+        mode
+        (lambda ()
           (setq-local completion-at-point-functions
             (list
               #'cape-file
               (cape-super-capf #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
-              (cape-super-capf #'cape-dabbrev #'cape-dict))))
-        (when (bound-and-true-p eglot--managed-mode)
+              (cape-super-capf #'cape-dabbrev #'cape-dict)))))))
+
+  (with-eval-after-load "eglot"
+    (dolist
+      (mode
+        '
+        (c-mode-hook
+          c-ts-mode-hook
+          c++-mode-hook
+          c++-ts-mode-hook
+          java-mode-hook
+          java-ts-mode-hook
+          python-mode-hook
+          python-ts-mode-hook
+          sh-mode-hook
+          bash-ts-mode-hook
+          cmake-mode-hook
+          cmake-ts-mode-hook
+          json-mode-hook
+          json-ts-mode-hook
+          jsonc-mode-hook
+          yaml-mode-hook
+          yaml-ts-mode-hook))
+      (add-hook
+        mode
+        (lambda ()
           (setq-local completion-at-point-functions
             (list
               #'cape-file

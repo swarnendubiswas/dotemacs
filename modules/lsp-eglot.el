@@ -149,6 +149,7 @@
       (list
         "-j 2"
         (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
+  (lsp-pylsp-plugins-isort-enabled t)
   :config
   ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
   ;; interfere with `completion-at-point-functions'

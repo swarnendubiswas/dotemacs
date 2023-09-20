@@ -67,6 +67,7 @@
 
 (define-abbrev-table 'gfm-mode-abbrev-table
   '(
+    ("asnwer" "answer" nil :count 0)
     ("benchamrks" "Benchmarks" nil :count 0)
     ("debgging" "Debugging" nil :count 0)
     ("initialised" "initialized" nil :count 0)
@@ -234,6 +235,7 @@
     ("bcak" "back" nil :count 0)
     ("beacause" "because" nil :count 0)
     ("beacuse" "because" nil :count 0)
+    ("becase" "because" nil :count 0)
     ("becasue" "because" nil :count 0)
     ("becaumse" "because" nil :count 0)
     ("becaus" "because" nil :count 1)

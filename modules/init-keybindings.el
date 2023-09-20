@@ -53,7 +53,12 @@
   ("C-<right>" . forward-word)
 
   ("M-\\" . delete-horizontal-space)
-  ("M-#" . cycle-spacing))
+  ("M-#" . cycle-spacing)
+
+  ("C-M-b" . backward-sexp)
+  ("C-M-f" . forward-sexp)
+  ("C-M-k" . kill-sexp)
+  ("C-M-@" . mark-sexp))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 

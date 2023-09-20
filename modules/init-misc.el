@@ -70,12 +70,13 @@
 
 ;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
 ;; pressing the keys "M-<" and "M->" keys again.
-(use-package
-  beginend
-  :hook (emacs-startup-hook . beginend-global-mode)
-  :config
-  (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
-    (diminish mode)))
+
+;; (use-package
+;;   beginend
+;;   :hook (emacs-startup-hook . beginend-global-mode)
+;;   :config
+;;   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
+;;     (diminish mode)))
 
 (use-package
   vundo
