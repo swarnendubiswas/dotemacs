@@ -80,7 +80,7 @@
 ;;     ("C-<tab>" . sb/next-buffer)))
 
 ;; (use-package default-text-scale
-;;   :if (display-graphic-p)
+;;   :when (display-graphic-p)
 ;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys :commands free-keys)
@@ -99,20 +99,23 @@
 ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
 ;; blue" means exit.
 
-;; (use-package hydra
-;;   :commands
-;;   (hydra-default-pre hydra-keyboard-quit defhydra hydra-show-hint
-;;                      hydra-set-transient-map
-;;                      hydra--call-interactively-remap-maybe))
+(use-package
+  hydra
+  :commands
+  (hydra-default-pre
+    hydra-keyboard-quit
+    defhydra
+    hydra-show-hint
+    hydra-set-transient-map
+    hydra--call-interactively-remap-maybe))
 
-;; (use-package hydra-posframe
-;;   :straight
-;;   (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
-;;   :if (display-graphic-p)
-;;   :after hydra
-;;   :commands
-;;   (hydra-posframe-mode)
-;;   :init (hydra-posframe-mode 1))
+(use-package
+  hydra-posframe
+  :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
+  :when (display-graphic-p)
+  :after hydra
+  :commands (hydra-posframe-mode)
+  :init (hydra-posframe-mode 1))
 
 ;; (use-package ivy-hydra ; Additional keybindings for `ivy'
 ;;   :after (ivy hydra)
@@ -120,9 +123,7 @@
 ;;   :commands
 ;;   (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
 
-;; (use-package pretty-hydra
-;;   :after hydra
-;;   :commands pretty-hydra-define)
+(use-package pretty-hydra :after hydra :commands pretty-hydra-define)
 
 ;; (declare-function s-concat "s")
 ;; (declare-function all-the-icons-octicon "all-the-icons")
@@ -147,25 +148,26 @@
 ;;   "Displays an icon from the GitHub Octicons."
 ;;   (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
-;; (declare-function spell-fu-goto-next-error "spell-fu")
-;; (declare-function spell-fu-goto-previous-error "spell-fu")
-;; (declare-function spell-fu-word-add "spell-fu")
-;; (declare-function flyspell-correct-previous "flyspell")
-;; (declare-function flyspell-correct-next "flyspell")
+(declare-function spell-fu-goto-next-error "spell-fu")
+(declare-function spell-fu-goto-previous-error "spell-fu")
+(declare-function spell-fu-word-add "spell-fu")
+(declare-function flyspell-correct-previous "flyspell")
+(declare-function flyspell-correct-next "flyspell")
 
-;; (pretty-hydra-define sb/hydra-spelling
-;;   (:color amaranth :quit-key "q" :title (sb/with-faicon "magic" "Spell check" 1 -0.05)
-;;           :foreign-keys warn)
-;;   ("Action"
-;;    (("c" ispell "ispell")
-;;     ("f" flyspell-buffer "flyspell buffer"))
-;;    "Correct"
-;;    (("<" flyspell-correct-previous "correct previous error")
-;;     (">" flyspell-correct-next "correct next error"))
-;;    "Spell fu"
-;;    (("n" spell-fu-goto-next-error "next error")
-;;     ("p" spell-fu-goto-previous-error "previous error")
-;;     ("a" spell-fu-word-add "add word"))))
+(pretty-hydra-define
+  sb/hydra-spelling
+  (:color
+    amaranth
+    :quit-key "q"
+    :title (sb/with-faicon "magic" "Spell check" 1 -0.05)
+    :foreign-keys warn)
+  ("Action" (("c" ispell "ispell") ("f" flyspell-buffer "flyspell buffer")) "Correct"
+    (("<" flyspell-correct-previous "correct previous error")
+      (">" flyspell-correct-next "correct next error"))
+    "Spell fu"
+    (("n" spell-fu-goto-next-error "next error")
+      ("p" spell-fu-goto-previous-error "previous error")
+      ("a" spell-fu-word-add "add word"))))
 
 ;; (declare-function default-text-scale-decrease "default-text-scale")
 ;; (declare-function default-text-scale-increase "default-text-scale")
@@ -177,33 +179,32 @@
 ;;     ("o" default-text-scale-decrease "zoom out")
 ;;     ("r" default-text-scale-reset "reset"))))
 
-;; (pretty-hydra-define sb/hydra-error
-;;   (:color amaranth :quit-key "q" :title "Navigate errors" :foreign-keys warn)
-;;   (""
-;;    (("h" first-error "first error")
-;;     ("j" next-error "next error")
-;;     ("k" previous-error "previous error")
-;;     ("v" recenter-top-bottom "recenter"))))
+(pretty-hydra-define
+  sb/hydra-error
+  (:color amaranth :quit-key "q" :title "Navigate errors" :foreign-keys warn)
+  (""
+    (("h" first-error "first error")
+      ("j" next-error "next error")
+      ("k" previous-error "previous error")
+      ("v" recenter-top-bottom "recenter"))))
 
-;; ;; https://github.com/abo-abo/hydra/wiki/avy
-;; (pretty-hydra-define sb/hydra-avy
-;;   (:color red :title "Actions" :quit-key "q" :foreign-keys warn)
-;;   ("Line"
-;;    (("y" avy-copy-line "yank line")
-;;     ("m" avy-move-line "move line")
-;;     ("l" avy-goto-line "go to line")
-;;     ("L" avy-goto-end-of-line "go to end of line")
-;;     ("k" avy-kill-whole-line "kill whole line"))
-;;    "Region"
-;;    (("Y" avy-copy-region "copy region ")
-;;     ("M" avy-move-region "move region")
-;;     ("K" avy-kill-region "kill region"))
-;;    "Word"
-;;    (("w" avy-goto-word-1 "go to word")
-;;     ("W" avy-goto-word-0 "go to word"))
-;;    "Character"
-;;    (("c" avy-goto-char-timer "go to char with timer")
-;;     ("C" avy-goto-char "go to char"))))
+;; https://github.com/abo-abo/hydra/wiki/avy
+(pretty-hydra-define
+  sb/hydra-avy (:color red :title "Actions" :quit-key "q" :foreign-keys warn)
+  ("Line"
+    (("y" avy-copy-line "yank line")
+      ("m" avy-move-line "move line")
+      ("l" avy-goto-line "go to line")
+      ("L" avy-goto-end-of-line "go to end of line")
+      ("k" avy-kill-whole-line "kill whole line"))
+    "Region"
+    (("Y" avy-copy-region "copy region ")
+      ("M" avy-move-region "move region")
+      ("K" avy-kill-region "kill region"))
+    "Word"
+    (("w" avy-goto-word-1 "go to word") ("W" avy-goto-word-0 "go to word"))
+    "Character"
+    (("c" avy-goto-char-timer "go to char with timer") ("C" avy-goto-char "go to char"))))
 
 ;; (declare-function projectile-add-known-project "projectile")
 ;; (declare-function projectile-remove-known-project "projectile")
@@ -238,37 +239,40 @@
 ;;     ("o"   projectile-multi-occur "multi occur")
 ;;     ("m"   projectile-compile "compile"))))
 
-;; (pretty-hydra-define sb/hydra-move-text
-;;   (:quit-key "q" :title "Move text" :foreign-keys warn)
-;;   (""
-;;    (("u" move-text-up "up")
-;;     ("d" move-text-down "down"))))
+(pretty-hydra-define
+  sb/hydra-move-text
+  (:quit-key "q" :title "Move text" :foreign-keys warn)
+  ("" (("u" move-text-up "up") ("d" move-text-down "down"))))
 
-;; (declare-function flycheck-verify-setup "flycheck")
-;; (declare-function flycheck-previous-error "flycheck")
-;; (declare-function flycheck-next-error "flycheck")
-;; (declare-function flycheck-list-errors "flycheck")
-;; (declare-function flycheck-select-checker "flycheck")
-;; (declare-function flycheck-describe-checker "flycheck")
-;; (declare-function flycheck-disable-checker "flycheck")
-;; (declare-function flycheck-buffer "flycheck")
+(declare-function flycheck-verify-setup "flycheck")
+(declare-function flycheck-previous-error "flycheck")
+(declare-function flycheck-next-error "flycheck")
+(declare-function flycheck-list-errors "flycheck")
+(declare-function flycheck-select-checker "flycheck")
+(declare-function flycheck-describe-checker "flycheck")
+(declare-function flycheck-disable-checker "flycheck")
+(declare-function flycheck-buffer "flycheck")
 
-;; (pretty-hydra-define sb/hydra-flycheck
-;;   (:color blue :quit-key "q" :title (sb/with-faicon "plane" "Flycheck actions" 1 -0.05)
-;;           :foreign-keys warn)
-;;   ("Setup"
-;;    (("M" flycheck-manual "Manual")
-;;     ("m" flycheck-mode "enable mode")
-;;     ("v" flycheck-verify-setup "Verify setup"))
-;;    "Errors"
-;;    (("<" flycheck-previous-error :color pink "previous error")
-;;     (">" flycheck-next-error :color pink "next error")
-;;     ("f" flycheck-buffer "check buffer")
-;;     ("l" flycheck-list-errors "list"))
-;;    "Checker"
-;;    (("d" flycheck-disable-checker "disable")
-;;     ("s" flycheck-select-checker "select checker")
-;;     ("?" flycheck-describe-checker "describe checker"))))
+(pretty-hydra-define
+  sb/hydra-flycheck
+  (:color
+    blue
+    :quit-key "q"
+    :title (sb/with-faicon "plane" "Flycheck actions" 1 -0.05)
+    :foreign-keys warn)
+  ("Setup"
+    (("M" flycheck-manual "Manual")
+      ("m" flycheck-mode "enable mode")
+      ("v" flycheck-verify-setup "Verify setup"))
+    "Errors"
+    (("<" flycheck-previous-error :color pink "previous error")
+      (">" flycheck-next-error :color pink "next error")
+      ("f" flycheck-buffer "check buffer")
+      ("l" flycheck-list-errors "list"))
+    "Checker"
+    (("d" flycheck-disable-checker "disable")
+      ("s" flycheck-select-checker "select checker")
+      ("?" flycheck-describe-checker "describe checker"))))
 
 ;; (declare-function python-indent-shift-left "python")
 ;; (declare-function python-indent-shift-right "python")
@@ -284,45 +288,50 @@
 
 ;;   (bind-key "C-c" #'sb/hydra-python-indent/body python-mode-map))
 
-;; (declare-function smerge-keep-all "smerge-mode")
-;; (declare-function smerge-keep-base "smerge-mode")
-;; (declare-function smerge-keep-upper "smerge-mode")
-;; (declare-function smerge-keep-lower "smerge-mode")
-;; (declare-function smerge-keep-current "smerge-mode")
-;; (declare-function smerge-next "smerge-mode")
-;; (declare-function smerge-prev "smerge-mode")
-;; (declare-function smerge-auto-leave "smerge-mode")
-;; (declare-function smerge-diff-base-upper "smerge-mode")
-;; (declare-function smerge-diff-upper-lower "smerge-mode")
-;; (declare-function smerge-diff-base-lower "smerge-mode")
-;; (declare-function smerge-refine "smerge-mode")
-;; (declare-function smerge-resolve "smerge-mode")
-;; (declare-function smerge-combine-with-next "smerge-mode")
-;; (declare-function smerge-kill-current "smerge-mode")
+(declare-function smerge-keep-all "smerge-mode")
+(declare-function smerge-keep-base "smerge-mode")
+(declare-function smerge-keep-upper "smerge-mode")
+(declare-function smerge-keep-lower "smerge-mode")
+(declare-function smerge-keep-current "smerge-mode")
+(declare-function smerge-next "smerge-mode")
+(declare-function smerge-prev "smerge-mode")
+(declare-function smerge-auto-leave "smerge-mode")
+(declare-function smerge-diff-base-upper "smerge-mode")
+(declare-function smerge-diff-upper-lower "smerge-mode")
+(declare-function smerge-diff-base-lower "smerge-mode")
+(declare-function smerge-refine "smerge-mode")
+(declare-function smerge-resolve "smerge-mode")
+(declare-function smerge-combine-with-next "smerge-mode")
+(declare-function smerge-kill-current "smerge-mode")
 
-;; (pretty-hydra-define sb/hydra-smerge
-;;   (:color pink :hint nil :post (smerge-auto-leave) :quit-key "q"
-;;           :title (with-alltheicon "git" "Merge actions" 1 -0.05) :foreign-keys warn)
-;;   ("Conflict actions"
-;;    (("n" smerge-next "Next conflict")
-;;     ("p" smerge-prev "Previous conflict"))
-;;    "Keep actions"
-;;    (("b" smerge-keep-base "Keep base")
-;;     ("u" smerge-keep-upper "Keep upper")
-;;     ("l" smerge-keep-lower "Keep lower")
-;;     ("a" smerge-keep-all "Keep all")
-;;     ("RET" smerge-keep-current "Keep current")
-;;     ("\C-m" smerge-keep-current "Keep current"))
-;;    "Diff actions"
-;;    (("<" smerge-diff-base-upper "Diff base upper")
-;;     ("=" smerge-diff-upper-lower "Diff base lower")
-;;     (">" smerge-diff-base-lower "Diff base lower")
-;;     ("R" smerge-refine "Refine")
-;;     ("E" smerge-ediff "Ediff"))
-;;    "Others"
-;;    (("C" smerge-combine-with-next "Combine")
-;;     ("r" smerge-resolve "Resolve")
-;;     ("k" smerge-kill-current "Kill current"))))
+(pretty-hydra-define
+  sb/hydra-smerge
+  (:color
+    pink
+    :hint nil
+    :post (smerge-auto-leave)
+    :quit-key "q"
+    :title (with-alltheicon "git" "Merge actions" 1 -0.05)
+    :foreign-keys warn)
+  ("Conflict actions"
+    (("n" smerge-next "Next conflict") ("p" smerge-prev "Previous conflict"))
+    "Keep actions"
+    (("b" smerge-keep-base "Keep base")
+      ("u" smerge-keep-upper "Keep upper")
+      ("l" smerge-keep-lower "Keep lower")
+      ("a" smerge-keep-all "Keep all")
+      ("RET" smerge-keep-current "Keep current")
+      ("\C-m" smerge-keep-current "Keep current"))
+    "Diff actions"
+    (("<" smerge-diff-base-upper "Diff base upper")
+      ("=" smerge-diff-upper-lower "Diff base lower")
+      (">" smerge-diff-base-lower "Diff base lower")
+      ("R" smerge-refine "Refine")
+      ("E" smerge-ediff "Ediff"))
+    "Others"
+    (("C" smerge-combine-with-next "Combine")
+      ("r" smerge-resolve "Resolve")
+      ("k" smerge-kill-current "Kill current"))))
 
 ;; (declare-function mc/mark-previous-like-this "multiple-cursors")
 ;; (declare-function mc/mark-next-like-this "multiple-cursors")
@@ -500,40 +509,41 @@
 ;;     ("W" markdown-insert-wiki-link :color blue "Insert wiki link")
 ;;     ("R" markdown-insert-reference-link-dwim :color blue "Insert reference link"))))
 
-;; (declare-function straight-check-all "straight")
-;; (declare-function straight-check-package "straight")
-;; (declare-function straight-rebuild-all "straight")
-;; (declare-function straight-rebuild-package "straight")
-;; (declare-function straight-fetch-all "straight")
-;; (declare-function straight-fetch-package "straight")
-;; (declare-function straight-pull-all "straight")
-;; (declare-function straight-pull-package "straight")
-;; (declare-function straight-merge-all "straight")
-;; (declare-function straight-merge-package "straight")
-;; (declare-function straight-normalize-all "straight")
-;; (declare-function straight-normalize-package "straight")
-;; (declare-function straight-freeze-versions "straight")
-;; (declare-function straight-thaw-versions "straight")
-;; (declare-function straight-get-recipe "straight")
+(declare-function straight-check-all "straight")
+(declare-function straight-check-package "straight")
+(declare-function straight-rebuild-all "straight")
+(declare-function straight-rebuild-package "straight")
+(declare-function straight-fetch-all "straight")
+(declare-function straight-fetch-package "straight")
+(declare-function straight-pull-all "straight")
+(declare-function straight-pull-package "straight")
+(declare-function straight-merge-all "straight")
+(declare-function straight-merge-package "straight")
+(declare-function straight-normalize-all "straight")
+(declare-function straight-normalize-package "straight")
+(declare-function straight-freeze-versions "straight")
+(declare-function straight-thaw-versions "straight")
+(declare-function straight-get-recipe "straight")
 
-;; (pretty-hydra-define sb/hydra-straight
-;;   (:hint nil :quit-key "q" :title "Straight actions" :foreign-keys warn)
-;;   (""
-;;    (("c" straight-check-all "check all")
-;;     ("C" straight-check-package "check package")
-;;     ("r" straight-rebuild-all "rebuild all")
-;;     ("R" straight-rebuild-package "rebuild package")
-;;     ("f" straight-fetch-all "fetch all")
-;;     ("F" straight-fetch-package "fetch package")
-;;     ("p" straight-pull-all "pull all")
-;;     ("P" straight-pull-package "pull package")
-;;     ("m" straight-merge-all "merge all")
-;;     ("M" straight-merge-package "merge package")
-;;     ("n" straight-normalize-all "normalize all")
-;;     ("N" straight-normalize-package "normalize package")
-;;     ("v" straight-freeze-versions "freeze versions")
-;;     ("V" straight-thaw-versions "thaw versions")
-;;     ("g" straight-get-recipe "get recipe"))))
+(pretty-hydra-define
+  sb/hydra-straight
+  (:hint nil :quit-key "q" :title "Straight actions" :foreign-keys warn)
+  (""
+    (("c" straight-check-all "check all")
+      ("C" straight-check-package "check package")
+      ("r" straight-rebuild-all "rebuild all")
+      ("R" straight-rebuild-package "rebuild package")
+      ("f" straight-fetch-all "fetch all")
+      ("F" straight-fetch-package "fetch package")
+      ("p" straight-pull-all "pull all")
+      ("P" straight-pull-package "pull package")
+      ("m" straight-merge-all "merge all")
+      ("M" straight-merge-package "merge package")
+      ("n" straight-normalize-all "normalize all")
+      ("N" straight-normalize-package "normalize package")
+      ("v" straight-freeze-versions "freeze versions")
+      ("V" straight-thaw-versions "thaw versions")
+      ("g" straight-get-recipe "get recipe"))))
 
 ;; (pretty-hydra-define sb/hydra-comments
 ;;   (:hint nil :color teal :exit t :title "Commentary Actions" :foreign-keys warn)
@@ -565,19 +575,19 @@
 ;;     ("l" dumb-jump-quick-look "Quick look")
 ;;     ("b" dumb-jump-back "Back"))))
 
-;; (bind-key "C-c h a" #'sb/hydra-avy/body)
+(bind-key "C-c h a" #'sb/hydra-avy/body)
 ;; (bind-key "C-c h k" #'sb/hydra-markdown-mode/body)
-;; (bind-key "C-c h e" #'sb/hydra-error/body)
-;; (bind-key "C-c h f" #'sb/hydra-flycheck/body)
-;; (bind-key "C-c h g" #'sb/hydra-smerge/body)
+(bind-key "C-c h e" #'sb/hydra-error/body)
+(bind-key "C-c h f" #'sb/hydra-flycheck/body)
+(bind-key "C-c h g" #'sb/hydra-smerge/body)
 ;; (bind-key "C-c h j" #'sb/hydra-projectile/body)
 ;; (bind-key "C-c h l" #'sb/hydra-lsp/body)
 ;; (bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
 ;; (bind-key "C-c h p" #'sb/hydra-smartparens/body)
-;; (bind-key "C-c h s" #'sb/hydra-spelling/body)
-;; (bind-key "C-c h t" #'sb/hydra-move-text/body)
+(bind-key "C-c h s" #'sb/hydra-spelling/body)
+(bind-key "C-c h t" #'sb/hydra-move-text/body)
 ;; (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
-;; (bind-key "C-c h i" #'sb/hydra-straight/body)
+(bind-key "C-c h i" #'sb/hydra-straight/body)
 ;; (bind-key "C-c h v" #'sb/hydra-magit/body)
 ;; (bind-key "C-c h y" #'sb/hydra-python-indent/body)
 ;; (bind-key "C-c h d" #'sb/hydra-dumb-jump)

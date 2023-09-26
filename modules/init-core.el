@@ -582,7 +582,8 @@
   :straight (:type built-in)
   :bind
   ("C-x C-v" . find-alternate-file)
-  ("C-x x g" . revert-buffer-quick))
+  ("C-x x g" . revert-buffer-quick)
+  ("C-x r" . rename-file))
 
 (provide 'init-core)
 

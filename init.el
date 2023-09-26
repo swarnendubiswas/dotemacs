@@ -148,13 +148,13 @@ This location is used for temporary installations and files.")
 
 ;; I do not find any difference in terms of the features I require. However, packages like
 ;; `centaur-tabs' only support `projectile'.
-(defcustom sb/project-handler 'projectile
+(defcustom sb/project-handler 'project
   "Choose the handler for projects."
   :type '(radio (const :tag "project.el" project) (const :tag "projectile" projectile))
   :group 'sb/emacs)
 
 ;; `centaur-tabs' works more reliably for me.
-(defcustom sb/tab-bar-handler 'centaur-tabs
+(defcustom sb/tab-bar-handler nil
   "Choose the handler for tabs."
   :type
   '

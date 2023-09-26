@@ -15,11 +15,7 @@
 
 (use-package
   company
-  :if (eq sb/capf 'company)
-  :preface
-  ;; https://stackoverflow.com/questions/56382840/is-there-a-way-to-automatically-add-a-whitespace-upon-completion-in-company-mode
-  (defun sb/company-after-completion-hook (&rest _ignored)
-    (just-one-space))
+  :when (eq sb/capf 'company)
   :defines
   (company-dabbrev-downcase
     company-dabbrev-ignore-case
@@ -357,6 +353,8 @@
         (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
           (sb/company-text-mode)
 
+          ;; (defun sb/company-after-completion-hook (&rest _ignored)
+          ;;   (just-one-space))
           ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
           ))))
 

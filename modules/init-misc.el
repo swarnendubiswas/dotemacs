@@ -306,48 +306,49 @@
 
 ;; Both project.el and projectile are unable to remember remote projects.
 
-;; (use-package project
-;;   :if (eq sb/project-handler 'project)
-;;   :commands
-;;   (project-switch-project
-;;     project-current
-;;     project-find-file
-;;     project-execute-extended-command
-;;     project-known-project-roots
-;;     project-remove-known-project
-;;     project-forget-project
-;;     project-remember-project
-;;     project-kill-buffers
-;;     project-switch-to-buffer
-;;     project-search
-;;     project-compile)
-;;   :bind-keymap ("C-c p" . project-prefix-map)
-;;   :bind
-;;   (("<f5>" . project-switch-project)
-;;     ("<f6>" . project-find-file)
-;;     :map
-;;     project-prefix-map
-;;     ("f" . project-find-file)
-;;     ("F" . project-or-external-find-file)
-;;     ("b" . project-switch-to-buffer)
-;;     ("d" . project-dired)
-;;     ("v" . project-vc-dir)
-;;     ("c" . project-compile)
-;;     ("k" . project-kill-buffers)
-;;     ("p" . project-switch-project)
-;;     ("g" . project-find-regexp)
-;;     ("r" . project-query-replace-regexp)
-;;     ("m" . magit-project-status)
-;;     ("C" . recompile))
-;;   ;; :config
-;;   ;; (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
-;;   ;; (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
-;;   ;; (setq project-switch-commands
-;;   ;;   (delete '(project-find-regexp "Find regexp") project-switch-commands))
-;;   ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
-;;   ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
-;;   ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
-;;   )
+(use-package
+  project
+  :when (eq sb/project-handler 'project)
+  :commands
+  (project-switch-project
+    project-current
+    project-find-file
+    project-execute-extended-command
+    project-known-project-roots
+    project-remove-known-project
+    project-forget-project
+    project-remember-project
+    project-kill-buffers
+    project-switch-to-buffer
+    project-search
+    project-compile)
+  :bind-keymap ("C-c p" . project-prefix-map)
+  :bind
+  (("<f5>" . project-switch-project)
+    ("<f6>" . project-find-file)
+    :map
+    project-prefix-map
+    ("f" . project-find-file)
+    ("F" . project-or-external-find-file)
+    ("b" . project-switch-to-buffer)
+    ("d" . project-dired)
+    ("v" . project-vc-dir)
+    ("c" . project-compile)
+    ("k" . project-kill-buffers)
+    ("p" . project-switch-project)
+    ("g" . project-find-regexp)
+    ("r" . project-query-replace-regexp)
+    ("m" . magit-project-status)
+    ("C" . recompile))
+  ;; :config
+  ;; (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
+  ;; (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
+  ;; (setq project-switch-commands
+  ;;   (delete '(project-find-regexp "Find regexp") project-switch-commands))
+  ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+  ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
+  ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
+  )
 
 ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
 ;; indexing.
@@ -780,6 +781,9 @@
 ;;     ("C-M-k" . sp-splice-sexp) ; "(foo bar)" -> "foo bar"
 ;;     ;; "foo(2,3)" -> "foo[2,3]"
 ;;     ("C-M-r" . sp-rewrap-sexp))
+
+;; Discover key bindings and their meaning for the current Emacs major mode
+(use-package discover-my-major :bind ("C-h C-m" . discover-my-major))
 
 (provide 'init-misc)
 

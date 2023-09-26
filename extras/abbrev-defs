@@ -1545,6 +1545,7 @@
     ("paralllel" "parallel" nil :count 1)
     ("particpated" "participated" nil :count 0)
     ("pattersn" "Pattern" nil :count 0)
+    ("perforance" "Performance" nil :count 0)
     ("portablity" "portability" nil :count 0)
     ("prodcuer" "producer" nil :count 0)
     ("progrms" "programs" nil :count 0)

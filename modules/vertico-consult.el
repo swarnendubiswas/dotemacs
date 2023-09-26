@@ -12,7 +12,7 @@
 (use-package
   vertico
   :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
-  :if (eq sb/minibuffer-completion 'vertico)
+  :when (eq sb/minibuffer-completion 'vertico)
   :defines read-extended-command-predicate
   :hook (emacs-startup-hook . vertico-mode)
   :bind
@@ -147,7 +147,7 @@
     ([remap flymake-show-diagnostics-buffer] . consult-flymake)
     ([remap customize] . consult-customize)
     ([remap load-theme] . consult-theme)
-    ("C-c h" . consult-history)
+    ;; ("C-c h" . consult-history)
     ("C-c s f" . consult-find)
     ([remap locate] . consult-locate)
     ("C-c s l" . consult-locate)

@@ -16,10 +16,11 @@
 (declare-function s-ends-with? "s")
 (declare-function sb/inhibit-message-call-orig-fun "init-core.el")
 
-(use-package ibuffer
+(use-package
+  ibuffer
   :straight (:type built-in)
   :hook (ibuffer-hook . ibuffer-auto-mode)
-  :bind ("C-x C-b" . ibuffer-jump)
+  :bind (("C-x C-b" . ibuffer-jump) :map ibuffer-mode-map ("`" . ibuffer-switch-format))
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
@@ -46,7 +47,8 @@
 ;;   ;; Remote buffers will be grouped by protocol and host
 ;;   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-(use-package ibuffer-projectile ; Group buffers by Projectile project
+(use-package
+  ibuffer-projectile ; Group buffers by Projectile project
   :if (eq sb/project-handler 'projectile)
   :after projectile
   :hook (ibuffer-hook . ibuffer-projectile-set-filter-groups))
@@ -60,11 +62,11 @@
 ;;   (require 'vlf-setup))
 
 ;; When the *scratch* buffer is killed, immediately respawn it.
-(use-package immortal-scratch
-  :hook (emacs-startup-hook . immortal-scratch-mode))
+(use-package immortal-scratch :hook (emacs-startup-hook . immortal-scratch-mode))
 
 ;; Helps to make the data in the "*scratch*" buffer persist.
-(use-package persistent-scratch
+(use-package
+  persistent-scratch
   :hook
   (emacs-startup-hook
     .
@@ -73,7 +75,8 @@
         (persistent-scratch-setup-default))))
   :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
-(use-package popwin
+(use-package
+  popwin
   :hook (emacs-startup-hook . popwin-mode)
   :config (defvar popwin:special-display-config-backup popwin:special-display-config)
 
@@ -104,7 +107,8 @@
   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil)))
 
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
-(use-package ace-window
+(use-package
+  ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
   :custom (aw-minibuffer-flag t)
   :config
@@ -113,7 +117,8 @@
 
 ;; The keybinding will be hidden if we use tmux with its default prefix key, and we will need to
 ;; press twice.
-(use-package ace-jump-buffer
+(use-package
+  ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
   :custom
   (ajb-bs-configuration "files-and-scratch")
@@ -131,7 +136,8 @@
 ;;   :config (add-to-list 'super-save-triggers 'ace-window)
 ;;   :diminish)
 
-(use-package dired
+(use-package
+  dired
   :preface
   (defun sb/dired-go-home ()
     (interactive)
@@ -178,7 +184,8 @@
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
-(use-package dired-x
+(use-package
+  dired-x
   :straight (:type built-in)
   :defines dired-cleanup-buffers-too
   :hook
@@ -222,7 +229,8 @@
     (diminish 'dired-omit-mode)
     dired-mode-map))
 
-(use-package dired-narrow ; Narrow `dired' to match filter
+(use-package
+  dired-narrow ; Narrow `dired' to match filter
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
@@ -255,17 +263,17 @@
 ;;   :after dired
 ;;   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
 
-(use-package dired-rsync-transient
-  :after dired
-  :bind (:map dired-mode-map ("C-c C-x" . dired-rsync-transient)))
+;; (use-package
+;;   dired-rsync-transient
+;;   :after dired
+;;   :bind (:map dired-mode-map ("C-c C-x" . dired-rsync-transient)))
 
-(use-package diredfl
-  :hook (dired-mode-hook . diredfl-mode))
+;; (use-package diredfl :hook (dired-mode-hook . diredfl-mode))
 
-(use-package dired-hist
-  :straight (:host github :repo "karthink/dired-hist")
-  :hook (dired-mode-hook . dired-hist-mode)
-  :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+;; (use-package dired-hist
+;;   :straight (:host github :repo "karthink/dired-hist")
+;;   :hook (dired-mode-hook . dired-hist-mode)
+;;   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 (provide 'buffer-dired)
 

@@ -30,14 +30,56 @@
   (exts '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
   (add-to-list 'completion-ignored-extensions exts))
 
+;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
+;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
+;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
+;; "/u/s/l" for "/usr/share/local". While "partial-completion" matches search terms must match in
+;; order, "orderless" can match search terms in any order.
+
+;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
+;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
+
+(use-package
+  minibuffer
+  :straight (:type built-in)
+  :bind
+  (("M-p" . minibuffer-previous-completion)
+    ("M-n" . minibuffer-next-completion)
+    ("M-RET" . minibuffer-choose-completion))
+  :custom
+  (completions-format 'vertical)
+  (read-file-name-completion-ignore-case t "Ignore case when reading a file name")
+  (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
+  (completion-category-defaults nil)
+  :config
+  ;; Show docstring description for completion candidates in commands like `describe-function'.
+  (when sb/EMACS28+
+    (setq completions-detailed t))
+
+  (with-eval-after-load "orderless"
+    ;; substring is needed to complete common prefix, orderless does not
+    (setq
+      completion-styles '(orderless substring basic)
+      ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+      ;; work. I also want substring matching for file names.
+      completion-category-overrides
+      '
+      ((file (styles basic substring partial-completion))
+        ;; (buffer (styles basic substring flex))
+        ;; (project-file (styles basic substring flex))
+        ;; (minibuffer (orderless flex))
+        ))))
+
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
-(use-package dabbrev
+(use-package
+  dabbrev
   :straight (:type built-in)
   :bind ("C-M-;" . dabbrev-completion)
   :custom (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
-(use-package hippie-exp
+(use-package
+  hippie-exp
   :straight (:type built-in)
   :custom
   (hippie-expand-try-functions-list
@@ -56,11 +98,8 @@
   :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
 
 ;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
-(use-package orderless
-  :preface
-  (defun sb/just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
+(use-package
+  orderless
   :demand t
   :defines orderless-component-separator
   :commands orderless-escapable-split-on-space
@@ -77,10 +116,15 @@
       '(orderless-ivy-re-builder . orderless-ivy-highlight)))
 
   (with-eval-after-load "company"
+    (defun sb/just-one-face (fn &rest args)
+      (let ((orderless-match-faces [completions-common-part]))
+        (apply fn args)))
+
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 ;; It is recommended to load `yasnippet' before `eglot'
-(use-package yasnippet
+(use-package
+  yasnippet
   :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode-on)
@@ -112,45 +156,6 @@
 ;;     (company-prescient-mode 1))
 ;;   (with-eval-after-load "counsel"
 ;;     (ivy-prescient-mode 1)))
-
-;; NOTE: "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
-;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
-;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
-;; "/u/s/l" for "/usr/share/local". While "partial-completion" matches search terms must match in
-;; order, "orderless" can match search terms in any order.
-
-;; https://www.reddit.com/r/emacs/comments/y4sec4/how_to_get_corfu_completions_that_include/
-;; https://www.reddit.com/r/emacs/comments/nichkl/how_to_use_different_completion_styles_in_the/
-
-(use-package minibuffer
-  :straight (:type built-in)
-  :after orderless
-  :bind
-  (("M-p" . minibuffer-previous-completion)
-    ("M-n" . minibuffer-next-completion)
-    ("M-RET" . minibuffer-choose-completion))
-  :custom
-  (completions-format 'vertical)
-  (read-file-name-completion-ignore-case t "Ignore case when reading a file name")
-  (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
-  ;; substring is needed to complete common prefix, orderless does not
-  (completion-styles '(orderless substring basic))
-  (completion-category-defaults nil)
-  :config
-  ;; Show docstring description for completion candidates in commands like `describe-function'.
-  (when sb/EMACS28+
-    (setq completions-detailed t))
-
-  (setq
-    ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-    ;; work. I also want substring matching for file names.
-    completion-category-overrides
-    '
-    ((file (styles basic substring partial-completion))
-      ;; (buffer (styles basic substring flex))
-      ;; (project-file (styles basic substring flex))
-      ;; (minibuffer (orderless flex))
-      )))
 
 (provide 'init-completion)
 

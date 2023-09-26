@@ -105,10 +105,10 @@
 ;; (setq resize-mini-windows nil
 ;;       max-mini-window-height 5)
 
-(use-package
-  beacon ; Highlight the cursor position after the window scrolls
-  :hook (emacs-startup-hook . beacon-mode)
-  :diminish)
+;; (use-package
+;;   beacon ; Highlight the cursor position after the window scrolls
+;;   :hook (emacs-startup-hook . beacon-mode)
+;;   :diminish)
 
 ;; vertical - Split the selected window into two windows (e.g., `split-window-below'), one above the
 ;; other.

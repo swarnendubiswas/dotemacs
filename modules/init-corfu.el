@@ -9,14 +9,14 @@
 
 (defvar sb/capf)
 
-;; Corfu is not a completion framework, it is just a front-end for `completion-at-point'.
+;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
 (use-package
   corfu
   :straight
   (corfu
     :files (:defaults "extensions/*")
     :includes (corfu-echo corfu-popupinfo corfu-history corfu-info))
-  :if (eq sb/capf 'corfu)
+  :when (eq sb/capf 'corfu)
   :hook (emacs-startup-hook . global-corfu-mode)
   :bind
   (:map
@@ -67,7 +67,7 @@
 (use-package
   corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
-  :if (eq sb/capf 'corfu)
+  :when (eq sb/capf 'corfu)
   :hook
   (corfu-mode-hook
     .
@@ -79,7 +79,7 @@
 (use-package
   corfu-history
   :straight nil
-  :if (eq sb/capf 'corfu)
+  :when (eq sb/capf 'corfu)
   :hook (corfu-mode-hook . corfu-history-mode)
   :config
   (with-eval-after-load "savehist"
@@ -88,12 +88,13 @@
 (use-package
   corfu-echo
   :straight nil
-  :if (eq sb/capf 'corfu)
+  :when (eq sb/capf 'corfu)
   :hook (corfu-mode-hook . corfu-echo-mode))
 
 (use-package
   corfu-popupinfo
   :straight nil
+  :when (eq sb/capf 'corfu)
   :hook (corfu-mode-hook . corfu-popupinfo-mode)
   :bind
   (:map
@@ -105,12 +106,12 @@
 (use-package
   popon
   :straight (:host codeberg :repo "akib/emacs-popon")
-  :if (and (eq sb/capf 'corfu) (not (display-graphic-p))))
+  :when (and (eq sb/capf 'corfu) (not (display-graphic-p))))
 
 (use-package
   corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
-  :if (and (eq sb/capf 'corfu) (not (display-graphic-p)))
+  :when (and (eq sb/capf 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode-hook . corfu-terminal-mode)
   :custom
   ;; TODO: This is supposedly a bug, report to the maintainer.
@@ -118,7 +119,7 @@
 
 (use-package
   kind-icon
-  :if (or (eq sb/corfu-icons 'kind-icon) (eq sb/corfu-icons 'nerd-icons))
+  :when (eq sb/corfu-icons 'kind-icon)
   :after corfu
   :demand t
   :commands kind-icon-margin-formatter
@@ -127,103 +128,114 @@
   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
   ;; (kind-icon-blend-background nil)
   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-  (when (eq sb/corfu-icons 'nerd-icons)
-    (with-eval-after-load "nerd-icons"
-      (setq kind-icon-use-icons nil)
-      (setq kind-icon-mapping
-        `
-        ((array ,(nerd-icons-codicon "nf-cod-symbol_array") :face font-lock-type-face)
-          (boolean ,(nerd-icons-codicon "nf-cod-symbol_boolean") :face font-lock-builtin-face)
-          (class ,(nerd-icons-codicon "nf-cod-symbol_class") :face font-lock-type-face)
-          (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
-          (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-          (constant ,(nerd-icons-codicon "nf-cod-symbol_constant") :face font-lock-constant-face)
-          (constructor
-            ,(nerd-icons-codicon "nf-cod-triangle_right")
-            :face font-lock-function-name-face)
-          (enummember
-            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-            :face font-lock-builtin-face)
-          (enum-member
-            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-            :face font-lock-builtin-face)
-          (enum ,(nerd-icons-codicon "nf-cod-symbol_enum") :face font-lock-builtin-face)
-          (event ,(nerd-icons-codicon "nf-cod-symbol_event") :face font-lock-warning-face)
-          (field ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-variable-name-face)
-          (file ,(nerd-icons-codicon "nf-cod-symbol_file") :face font-lock-string-face)
-          (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
-          (interface ,(nerd-icons-codicon "nf-cod-symbol_interface") :face font-lock-type-face)
-          (keyword ,(nerd-icons-codicon "nf-cod-symbol_keyword") :face font-lock-keyword-face)
-          (macro ,(nerd-icons-codicon "nf-cod-symbol_misc") :face font-lock-keyword-face)
-          (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
-          (method ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
-          (function ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
-          (module ,(nerd-icons-codicon "nf-cod-file_submodule") :face font-lock-preprocessor-face)
-          (numeric ,(nerd-icons-codicon "nf-cod-symbol_numeric") :face font-lock-builtin-face)
-          (operator
-            ,(nerd-icons-codicon "nf-cod-symbol_operator")
-            :face font-lock-comment-delimiter-face)
-          (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
-          (property
-            ,(nerd-icons-codicon "nf-cod-symbol_property")
-            :face font-lock-variable-name-face)
-          (reference ,(nerd-icons-codicon "nf-cod-references") :face font-lock-variable-name-face)
-          (snippet ,(nerd-icons-codicon "nf-cod-symbol_snippet") :face font-lock-string-face)
-          (string ,(nerd-icons-codicon "nf-cod-symbol_string") :face font-lock-string-face)
-          (struct
-            ,(nerd-icons-codicon "nf-cod-symbol_structure")
-            :face font-lock-variable-name-face)
-          (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
-          (typeparameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
-          (type-parameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
-          (unit ,(nerd-icons-codicon "nf-cod-symbol_ruler") :face font-lock-constant-face)
-          (value ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-builtin-face)
-          (variable
-            ,(nerd-icons-codicon "nf-cod-symbol_variable")
-            :face font-lock-variable-name-face)
-          (group ,(nerd-icons-codicon "nf-cod-variable_group") :face font-lock-variable-name-face)
-          (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face))))))
+
+  ;; (when (eq sb/corfu-icons 'nerd-icons)
+  ;;   (with-eval-after-load "nerd-icons"
+  ;;     (setq kind-icon-use-icons nil)
+  ;;     (setq kind-icon-mapping
+  ;;       `
+  ;;       ((array ,(nerd-icons-codicon "nf-cod-symbol_array") :face font-lock-type-face)
+  ;;         (boolean ,(nerd-icons-codicon "nf-cod-symbol_boolean") :face font-lock-builtin-face)
+  ;;         (class ,(nerd-icons-codicon "nf-cod-symbol_class") :face font-lock-type-face)
+  ;;         (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+  ;;         (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+  ;;         (constant ,(nerd-icons-codicon "nf-cod-symbol_constant") :face font-lock-constant-face)
+  ;;         (constructor
+  ;;           ,(nerd-icons-codicon "nf-cod-triangle_right")
+  ;;           :face font-lock-function-name-face)
+  ;;         (enummember
+  ;;           ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+  ;;           :face font-lock-builtin-face)
+  ;;         (enum-member
+  ;;           ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+  ;;           :face font-lock-builtin-face)
+  ;;         (enum ,(nerd-icons-codicon "nf-cod-symbol_enum") :face font-lock-builtin-face)
+  ;;         (event ,(nerd-icons-codicon "nf-cod-symbol_event") :face font-lock-warning-face)
+  ;;         (field ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-variable-name-face)
+  ;;         (file ,(nerd-icons-codicon "nf-cod-symbol_file") :face font-lock-string-face)
+  ;;         (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
+  ;;         (interface ,(nerd-icons-codicon "nf-cod-symbol_interface") :face font-lock-type-face)
+  ;;         (keyword ,(nerd-icons-codicon "nf-cod-symbol_keyword") :face font-lock-keyword-face)
+  ;;         (macro ,(nerd-icons-codicon "nf-cod-symbol_misc") :face font-lock-keyword-face)
+  ;;         (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
+  ;;         (method ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
+  ;;         (function ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
+  ;;         (module ,(nerd-icons-codicon "nf-cod-file_submodule") :face font-lock-preprocessor-face)
+  ;;         (numeric ,(nerd-icons-codicon "nf-cod-symbol_numeric") :face font-lock-builtin-face)
+  ;;         (operator
+  ;;           ,(nerd-icons-codicon "nf-cod-symbol_operator")
+  ;;           :face font-lock-comment-delimiter-face)
+  ;;         (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
+  ;;         (property
+  ;;           ,(nerd-icons-codicon "nf-cod-symbol_property")
+  ;;           :face font-lock-variable-name-face)
+  ;;         (reference ,(nerd-icons-codicon "nf-cod-references") :face font-lock-variable-name-face)
+  ;;         (snippet ,(nerd-icons-codicon "nf-cod-symbol_snippet") :face font-lock-string-face)
+  ;;         (string ,(nerd-icons-codicon "nf-cod-symbol_string") :face font-lock-string-face)
+  ;;         (struct
+  ;;           ,(nerd-icons-codicon "nf-cod-symbol_structure")
+  ;;           :face font-lock-variable-name-face)
+  ;;         (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
+  ;;         (typeparameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
+  ;;         (type-parameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
+  ;;         (unit ,(nerd-icons-codicon "nf-cod-symbol_ruler") :face font-lock-constant-face)
+  ;;         (value ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-builtin-face)
+  ;;         (variable
+  ;;           ,(nerd-icons-codicon "nf-cod-symbol_variable")
+  ;;           :face font-lock-variable-name-face)
+  ;;         (group ,(nerd-icons-codicon "nf-cod-variable_group") :face font-lock-variable-name-face)
+  ;;         (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face)))))
+  )
+
+(use-package
+  nerd-icons-corfu
+  :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+  :when (eq sb/corfu-icons 'nerd-icons)
+  :after corfu
+  :demand t
+  :commands kind-icon-margin-formatter
+  :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 ;; (use-package kind-all-the-icons
 ;;   :straight (:host github :repo "Hirozy/kind-all-the-icons")
-;;   :if (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
+;;   :when (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
 ;;   :after corfu
 ;;   :demand t
 ;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
-(use-package
-  company-auctex
-  :after tex-mode
-  :demand t
-  :commands
-  (company-auctex-labels
-    company-auctex-bibs
-    company-auctex-macros
-    company-auctex-symbols
-    company-auctex-environments))
+;; (use-package
+;;   company-auctex
+;;   :after tex-mode
+;;   :demand t
+;;   :commands
+;;   (company-auctex-labels
+;;     company-auctex-bibs
+;;     company-auctex-macros
+;;     company-auctex-symbols
+;;     company-auctex-environments))
 
-;; Required by `ac-math' and `company-math'
-(use-package math-symbols :after tex-mode :demand t)
+;; ;; Required by `ac-math' and `company-math'
+;; (use-package math-symbols :after tex-mode :demand t)
 
-(use-package
-  company-math
-  :after tex-mode
-  :demand t
-  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+;; (use-package
+;;   company-math
+;;   :after tex-mode
+;;   :demand t
+;;   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
 
-;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
-;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
-;; citations across documents.
-(use-package
-  company-reftex
-  :after tex-mode
-  :demand t
-  :commands (company-reftex-labels company-reftex-citations)
-  :custom
-  ;; https://github.com/TheBB/company-reftex/pull/13
-  (company-reftex-labels-parse-all nil))
+;; ;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
+;; ;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
+;; ;; citations across documents.
+;; (use-package
+;;   company-reftex
+;;   :after tex-mode
+;;   :demand t
+;;   :commands (company-reftex-labels company-reftex-citations)
+;;   :custom
+;;   ;; https://github.com/TheBB/company-reftex/pull/13
+;;   (company-reftex-labels-parse-all nil))
 
-(use-package company-bibtex :after tex-mode :demand t :commands company-bibtex)
+;; (use-package company-bibtex :after tex-mode :demand t :commands company-bibtex)
 
 ;; FIXME: Add to capf
 (use-package yasnippet-capf :straight (:host github :repo "elken/yasnippet-capf"))
