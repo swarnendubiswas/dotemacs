@@ -30,7 +30,7 @@
     (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -185,7 +185,7 @@ This location is used for temporary installations and files.")
 ;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
 ;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
 ;; improvements now that it is in the Emacs core.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
@@ -934,7 +934,8 @@ This location is used for temporary installations and files.")
   (find-file-suppress-same-file-warnings t)
   ;; ISSUE: There is a known bug with Emacs upstream.
   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52292
-  (find-file-visit-truename nil "Show true name, useful in case of symlinks"))
+  (find-file-visit-truename nil "Show true name, useful in case of symlinks")
+  (large-file-warning-threshold (* 500 1024 1024) "MB"))
 
 (use-package ibuffer
   :straight (:type built-in)
@@ -1783,6 +1784,7 @@ This location is used for temporary installations and files.")
   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
+;; ":after consult" will prevent `consult-tramp' keybinding from being registered
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
   :after consult
@@ -1834,7 +1836,7 @@ This location is used for temporary installations and files.")
   :bind ("C-M-y" . consult-yasnippet))
 
 (use-package consult-projectile
-  :after (consult projectile)
+  ;; :after (consult projectile) ; Allow binding `consult-projectile-switch-project'
   :commands consult-projectile-recentf
   :bind
   (("<f5>" . consult-projectile-switch-project)
@@ -2253,7 +2255,7 @@ This location is used for temporary installations and files.")
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
   :custom
   (bm-buffer-persistence t "Save bookmarks")
-  (bm-highlight-style 'bm-highlight-only-fringe))
+  (bm-highlight-style 'bm-highlight-line-and-fringe))
 
 (use-package crux
   :bind
@@ -2368,7 +2370,7 @@ This location is used for temporary installations and files.")
   :when (eq sb/project-handler 'projectile)
   ;; We can open a project file without enabling projectile via `bind-keys'
   :hook (emacs-startup-hook . projectile-mode)
-  :bind-keymap ("C-c p" . projectile-command-map)
+  :bind-keymap ("C-c x" . projectile-command-map)
   :bind
   (([remap project-switch-to-buffer] . projectile-switch-to-buffer)
     ([remap project-compile] . projectile-compile-project)
@@ -3205,9 +3207,9 @@ This location is used for temporary installations and files.")
   :hook (emacs-startup-hook . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
-    :map
-    company-mode-map
-    ("<tab>" . company-complete)
+    ;; :map
+    ;; company-mode-map
+    ;; ("<tab>" . company-complete)
     :map
     company-active-map
     ("C-M-/" . company-other-backend)
@@ -4525,28 +4527,28 @@ This location is used for temporary installations and files.")
 ;;   )
 
 ;; FIXME: Fix issue with LTEX 16.0.0
-(use-package eglot-ltex
-  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-  :when (eq sb/lsp-provider 'eglot)
-  :init
-  (setq eglot-languagetool-server-path
-    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
-  :hook
-  ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
-    .
-    (lambda ()
-      (require 'eglot-ltex)
-      (eglot-ensure)))
-  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-  ;; :config
-  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-  ;; (add-to-list
-  ;;   'eglot-server-programs
-  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-  ;;   'append)
-  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-  )
+;; (use-package eglot-ltex
+;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :init
+;;   (setq eglot-languagetool-server-path
+;;     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
+;;   :hook
+;;   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
+;;     .
+;;     (lambda ()
+;;       (require 'eglot-ltex)
+;;       (eglot-ensure)))
+;;   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+;;   ;; :config
+;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+;;   ;; (add-to-list
+;;   ;;   'eglot-server-programs
+;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+;;   ;;   'append)
+;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+;;   )
 
 (use-package eglot-java
   :when (eq sb/lsp-provider 'eglot)
@@ -5772,10 +5774,9 @@ Ignore if no file is found."
 
 (use-package latex-extra
   :straight (:host github :repo "Malabarba/latex-extra")
-  :hook ((LaTeX-mode-hook . latex-extra-mode)))
+  :hook (LaTeX-mode-hook . latex-extra-mode))
 
 (setq
-  large-file-warning-threshold (* 500 1024 1024) ; MB
   tags-add-tables nil
   tags-case-fold-search nil ; "t"=case-insensitive, "nil"=case-sensitive
   ;; Do not ask before rereading the "TAGS" files if they have changed
