@@ -184,7 +184,7 @@ install_node() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.10.0"
+    TEXLAB_VER="5.10.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -461,7 +461,7 @@ install_zoxide() {
 }
 
 install_bat() {
-    BAT_VER="0.23.0"
+    BAT_VER="0.24.0"
 
     wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
     dpkg -i bat_"$BAT_VER"_amd64.deb
@@ -487,7 +487,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.42.0"
+    FZF_VER="0.43.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git

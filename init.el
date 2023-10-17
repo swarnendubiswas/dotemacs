@@ -1787,7 +1787,6 @@ This location is used for temporary installations and files.")
 ;; ":after consult" will prevent `consult-tramp' keybinding from being registered
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
-  :after consult
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-eglot
@@ -2265,7 +2264,7 @@ This location is used for temporary installations and files.")
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 (use-package rainbow-mode
-  :hook ((css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode)
+  :hook ((LaTeX-mode-hook css-mode-hook html-mode-hook web-mode-hook help-mode-hook) . rainbow-mode)
   :diminish)
 
 (use-package volatile-highlights
@@ -2381,6 +2380,8 @@ This location is used for temporary installations and files.")
     ([remap project-switch-project] . projectile-switch-project)
     ([remap project-vc-dir] . projectile-vc)
     ([remap project-forget-project] . projectile-remove-known-project)
+    ("C-x p A" . projectile-add-known-project)
+    ("C-x p F" . projectile-find-other-file)
     :map
     projectile-command-map
     ("A" . projectile-add-known-project)
@@ -3232,6 +3233,7 @@ This location is used for temporary installations and files.")
   ;; (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
   ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
   ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow typing input characters that do not match candidates")
