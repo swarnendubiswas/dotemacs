@@ -44,34 +44,25 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'none
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
   (radio
-    (const :tag "modus-operandi" modus-operandi)
-    (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "ef-trio-dark" ef-trio-dark)
-    ;; Greenish tinge
-    (const :tag "ef-bio" ef-bio)
-    ;; Tries to mirror the default Emacs colors
-    (const :tag "standard-light" standard-light)
-    (const :tag "standard-dark" standard-dark)
+    (const :tag "modus-operandi" modus-operandi) (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '
   (radio
     ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show
     ;; lsp status and flycheck information.
-    (const :tag "powerline" powerline)
-    (const :tag "doom-modeline" doom-modeline)
-    (const :tag "awesome-tray" awesome-tray)
+    (const :tag "powerline" powerline) (const :tag "doom-modeline" doom-modeline)
     ;; No customization
     (const :tag "none" none))
   :group 'sb/emacs)
@@ -161,12 +152,7 @@ This location is used for temporary installations and files.")
 ;; `centaur-tabs' works more reliably for me, but improvements and bug fixes are slow.
 (defcustom sb/tab-bar-handler nil
   "Choose the handler for tabs."
-  :type
-  '
-  (radio
-    (const :tag "awesome-tab" awesome-tab)
-    (const :tag "centaur-tabs" centaur-tabs)
-    (const :tag "none" nil))
+  :type '(radio (const :tag "centaur-tabs" centaur-tabs) (const :tag "none" nil))
   :group 'sb/emacs)
 
 ;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI. Using icons
@@ -217,12 +203,6 @@ This location is used for temporary installations and files.")
 ;;   (push (expand-file-name dir user-emacs-directory) load-path))
 
 ;; Bootstrap `straight.el'
-
-;; To update packages with `straight', run `straight-pull-package' to get the latest version of a
-;; given package or `straight-pull-all' to update everything, and then `straight-freeze-versions' to
-;; persist the on-disk versions to a lockfile. Run `straight-thaw-versions' to reset on-disk
-;; packages to their locked versions, making the config totally reproducible across environments.
-
 (when (bound-and-true-p sb/disable-package.el)
   (setf straight-profiles `((nil . "straight.lockfile.el")))
 
@@ -233,8 +213,7 @@ This location is used for temporary installations and files.")
     straight-check-for-modifications '(check-on-save find-when-checking)
     straight-use-package-by-default t
     ;; There is no need to download the whole Git history, and a single branch often suffices.
-    straight-vc-git-default-clone-depth '(1 single-branch)
-    straight-disable-native-compile nil)
+    straight-vc-git-default-clone-depth '(1 single-branch))
 
   (let
     (
@@ -259,9 +238,7 @@ This location is used for temporary installations and files.")
   (straight-use-package
     '
     (use-package :source
-      melpa))
-  ;; (add-to-list 'load-path "/home/swarnendu/github/dotemacs/straight/repos/use-package")
-  )
+      melpa)))
 
 ;; (unless (bound-and-true-p sb/disable-package.el)
 ;;   (with-eval-after-load 'package
@@ -287,22 +264,8 @@ This location is used for temporary installations and files.")
 ;;   (eval-when-compile
 ;;     (require 'use-package)))
 
-;; If we omit `:defer', `:hook', `:commands', or `:after', then the package is loaded immediately.
-;; We do not need `:commands' with `:hook' or `:bind'. The setting `use-package-always-defer'
-;; implies always load features lazily unless told otherwise. This implies we should use
-;; `after-init' hook or `:init' instead of `:config', since otherwise packages may not be loaded. Be
-;; careful about using `:after' and always deferring loading, because then we will need to specifiy
-;; alternate ways of loading the package.
-
-;; Hooks in the `:hook' section run in reverse order.
-
-;; (use-package package-name
-;;   :hook
-;;   ((x-mode-hook . last)
-;;    (x-mode-hook . second)
-;;    (x-mode-hook . first)))
-
 ;; Check "use-package-keywords.org" for a suggested order of `use-package' keywords.
+
 (cond
   ((eq sb/op-mode 'daemon)
     (setq
@@ -344,9 +307,7 @@ This location is used for temporary installations and files.")
 
 (use-package no-littering
   :demand t
-  :config
-  (setq auto-save-file-name-transforms
-    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
+  :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
 ;; (use-package package
 ;;   :unless (bound-and-true-p sb/disable-package.el)
@@ -408,8 +369,7 @@ This location is used for temporary installations and files.")
   blink-matching-paren t
   bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
   case-fold-search t ; Searches and matches should ignore case
-  ;; Useful in `prog-mode'
-  comment-auto-fill-only-comments t
+  comment-auto-fill-only-comments t ; Useful in `prog-mode'
   confirm-kill-emacs nil
   confirm-kill-processes nil ; Prevent "Active processes exist" when you quit Emacs
   confirm-nonexistent-file-or-buffer t
@@ -451,8 +411,7 @@ This location is used for temporary installations and files.")
   ;; can paste it with `yank-pop'.
   save-interprogram-paste-before-kill t
   save-silently t ; Error messages will still be printed
-  ;; Enable use of system clipboard across Emacs and other applications, does not work on the
-  ;; TUI
+  ;; Enable use of system clipboard across Emacs and other applications, does not work on the TUI
   select-enable-clipboard t
   sentence-end-double-space nil
   shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
@@ -1025,6 +984,20 @@ This location is used for temporary installations and files.")
   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t))
   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil)))
 
+(add-to-list 'display-buffer-alist '("\\magit:" (display-buffer-same-window)))
+(add-to-list 'display-buffer-alist '("\\*Help" (display-buffer-same-window)))
+(add-to-list 'display-buffer-alist '("\\*helpful" (display-buffer-same-window)))
+
+(add-to-list
+  'display-buffer-alist
+  '
+  ("\\*\\(Backtrace\\|Compile-log\\|Messages\\|Warnings\\)\\*"
+    (display-buffer-in-side-window)
+    (side . bottom)
+    (slot . 0)
+    (window-height . 0.33)
+    (window-parameters (no-delete-other-windows . nil))))
+
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
@@ -1260,7 +1233,7 @@ This location is used for temporary installations and files.")
   :diminish)
 
 ;; (use-package all-the-icons-ivy
-;;   :if (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
+;;   :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
 ;;   :after ivy
 ;;   :hook (emacs-startup-hook . all-the-icons-ivy-setup))
 
@@ -2275,7 +2248,7 @@ This location is used for temporary installations and files.")
   :commands (unfill-region unfill-paragraph unfill-toggle))
 
 (use-package xclip
-  :if (or (executable-find "xclip") (executable-find "xsel"))
+  :when (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup-hook . xclip-mode))
 
 (use-package fix-word
@@ -2626,7 +2599,7 @@ This location is used for temporary installations and files.")
 
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
-  :if (boundp 'vc-handled-backends)
+  :when (boundp 'vc-handled-backends)
   :hook
   (
     (diff-hl-mode-on-hook
@@ -2691,6 +2664,7 @@ This location is used for temporary installations and files.")
 ;; Enable auto-pairing
 (use-package elec-pair
   :straight (:type built-in)
+  :disabled
   :hook
   ((emacs-startup-hook . electric-pair-mode)
     ;; Disable pairs when entering minibuffer
@@ -2954,7 +2928,7 @@ This location is used for temporary installations and files.")
       ("Markdown" prettier "--print-width" "100")
       ("Perl" perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100")
       ("Python" (yapf "--style" "file") isort)
-      ("Shell" shfmt "-i" "1" "-ci")
+      ("Shell" (shfmt "-i" "4" "-ci"))
       ("XML" tidy)
       ("YAML" prettier "--print-width" "100")))
   :diminish)
@@ -3043,7 +3017,7 @@ This location is used for temporary installations and files.")
 
 (use-package flycheck-eglot
   :straight (:host github :repo "intramurz/flycheck-eglot")
-  :if (eq sb/lsp-provider 'eglot)
+  :when (eq sb/lsp-provider 'eglot)
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
 
@@ -3157,7 +3131,7 @@ This location is used for temporary installations and files.")
 (use-package yasnippet
   :commands (snippet-mode yas-hippie-try-expand yas-reload-all)
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((prog-mode-hook org-mode-hook LaTeX-mode-hook latex-mode-hook) . yas-minor-mode-on)
+  :hook (emacs-startup-hook . yas-global-mode)
   :custom (yas-verbosity 0)
   :config
   (with-eval-after-load "hippie-expand"
@@ -3168,7 +3142,9 @@ This location is used for temporary installations and files.")
 ;; YASnippet no longer bundles snippets directly
 (use-package yasnippet-snippets
   :after yasnippet
-  :commands yasnippet-snippets-initialize)
+  :demand t
+  :commands yasnippet-snippets-initialize
+  :init (yasnippet-snippets-initialize))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. recently used commands should be
 ;; sorted first. Only commands that have never been used before will be sorted by length. Vertico
@@ -3208,9 +3184,6 @@ This location is used for temporary installations and files.")
   :hook (emacs-startup-hook . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
-    ;; :map
-    ;; company-mode-map
-    ;; ("<tab>" . company-complete)
     :map
     company-active-map
     ("C-M-/" . company-other-backend)
@@ -4169,7 +4142,7 @@ This location is used for temporary installations and files.")
 ;; Sync workspace folders and treemacs projects
 
 ;; (use-package lsp-treemacs
-;;   :if (eq sb/lsp-provider 'lsp-mode)
+;;   :when (eq sb/lsp-provider 'lsp-mode)
 ;;   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
 ;;   :config (lsp-treemacs-sync-mode 1)
 ;;   :bind
@@ -4822,7 +4795,7 @@ This location is used for temporary installations and files.")
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
-  :if (executable-find "cmake")
+  :when (executable-find "cmake")
   :mode ("\(CMakeLists\.txt|\.cmake\)$" . cmake-ts-mode)
   :hook
   ((cmake-mode-hook cmake-ts-mode-hook)
@@ -4913,7 +4886,7 @@ This location is used for temporary installations and files.")
 
 (use-package python-isort
   :straight (:host github :repo "wyuenho/emacs-python-isort")
-  :if (and (executable-find "isort") (eq sb/python-langserver 'pyright))
+  :when (and (executable-find "isort") (eq sb/python-langserver 'pyright))
   :hook ((python-mode-hook python-ts-mode-hook) . python-isort-on-save-mode)
   :custom
   (python-isort-arguments
@@ -4927,7 +4900,7 @@ This location is used for temporary installations and files.")
 ;; support document formatting. So, we have to use yapf with pyright. Yapfify works on the original
 ;; file, so that any project settings supported by YAPF itself are used.
 (use-package yapfify
-  :if (and (executable-find "yapf") (eq sb/python-langserver 'pyright))
+  :when (and (executable-find "yapf") (eq sb/python-langserver 'pyright))
   :hook ((python-mode-hook python-ts-mode-hook) . yapf-mode)
   :diminish yapf-mode)
 
@@ -5354,7 +5327,7 @@ This location is used for temporary installations and files.")
   (js-indent-level 2))
 
 ;; (use-package bazel
-;;   :if (executable-find "bazel")
+;;   :when (executable-find "bazel")
 ;;   :commands
 ;;   (bazel-mode bazelrc-mode bazel-buildifier)
 ;;   :hook
@@ -6381,7 +6354,7 @@ Use the filename relative to the current VC root directory."
   (blink-cursor-mode 1))
 
 (use-package centaur-tabs
-  :if (eq sb/tab-bar-handler 'centaur-tabs)
+  :when (eq sb/tab-bar-handler 'centaur-tabs)
   :hook (emacs-startup-hook . centaur-tabs-mode)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
@@ -6446,7 +6419,7 @@ Use the filename relative to the current VC root directory."
 ;;         (t
 ;;           (awesome-tab-get-group-name (current-buffer))))))
 ;;   :straight (:host github :repo "manateelazycat/awesome-tab")
-;;   :if (eq sb/tab-bar-handler 'awesome-tab)
+;;   :when (eq sb/tab-bar-handler 'awesome-tab)
 ;;   :hook (emacs-startup-hook . awesome-tab-mode)
 ;;   :bind
 ;;   (("M-<right>" . awesome-tab-forward-tab)
@@ -6494,7 +6467,7 @@ Use the filename relative to the current VC root directory."
 
 ;; (use-package ef-themes
 ;;   :straight (:host github :repo "protesilaos/ef-themes")
-;;   :if (or (eq sb/theme 'ef-trio-dark) (eq sb/theme 'ef-bio))
+;;   :when (or (eq sb/theme 'ef-trio-dark) (eq sb/theme 'ef-bio))
 ;;   :init
 ;;   (cond
 ;;     ((eq sb/theme 'ef-trio-dark)
@@ -6607,7 +6580,7 @@ PAD can be left (`l') or right (`r')."
 
 ;; (use-package awesome-tray ; Minimal modeline information
 ;;   :straight (:host github :repo "manateelazycat/awesome-tray")
-;;   :if (eq sb/modeline-theme 'awesome-tray)
+;;   :when (eq sb/modeline-theme 'awesome-tray)
 ;;   :hook (emacs-startup-hook . awesome-tray-mode)
 ;;   :custom
 ;;   (awesome-tray-active-modules
@@ -6683,6 +6656,7 @@ PAD can be left (`l') or right (`r')."
   :diminish disable-mouse-global-mode)
 
 (use-package olivetti
+  :disabled
   :hook
   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
   :custom (olivetti-body-width 108)
@@ -6756,8 +6730,7 @@ PAD can be left (`l') or right (`r')."
 (use-package free-keys
   :commands free-keys)
 
-(use-package
-  which-key ; Show help popups for prefix keys
+(use-package which-key ; Show help popups for prefix keys
   :commands which-key-setup-side-window-right-bottom
   :hook (emacs-startup-hook . which-key-mode)
   :custom (which-key-sort-order 'which-key-key-order-alpha)
@@ -7148,10 +7121,7 @@ PAD can be left (`l') or right (`r')."
   :straight (:host github :repo "CyberShadow/term-keys")
   :unless (display-graphic-p)
   :hook (emacs-startup-hook . term-keys-mode)
-  :config (require 'term-keys-alacritty)
-  ;; https://github.com/alacritty/alacritty/issues/3569#issuecomment-610558110
-  ;; (add-to-list 'term-file-aliases '("alacritty" . "xterm"))
-  )
+  :config (require 'term-keys-alacritty))
 
 ;; (with-eval-after-load "transient"
 ;;   (transient-define-prefix sb/help-transient ()

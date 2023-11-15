@@ -48,8 +48,8 @@ install_emacs() {
     # Build the source
     cd "${EMACS_SOURCE}" || echo "Failed: cd ${EMACS_SOURCE}"
 
-    # Use GCC 10 if you are on Ubuntu 20.04
-    export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
+    # Use GCC 10 if you are on Ubuntu 20.04, not required for Ubuntu 22.04+
+    export CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10
     make distclean
     ./autogen.sh
 
@@ -184,7 +184,7 @@ install_node() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.10.1"
+    TEXLAB_VER="5.11.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -442,7 +442,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.51.1"
+    DIFFT_VER="0.52.0"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
@@ -469,7 +469,7 @@ install_bat() {
 }
 
 install_marksman() {
-    MK_VER="2023-07-25"
+    MK_VER="2023-10-30"
 
     wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
     mv marksman-linux $USER_HOME/.local/bin/marksman
@@ -477,7 +477,7 @@ install_marksman() {
 }
 
 install_fd() {
-    FD_VER="8.7.0"
+    FD_VER="8.7.1"
 
     wget https://github.com/sharkdp/fd/releases/download/v"$FD_VER"/fd_"$FD_VER"_amd64.deb
     dpkg -i fd_"$FD_VER"_amd64.deb
@@ -487,7 +487,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.43.0"
+    FZF_VER="0.44.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git
