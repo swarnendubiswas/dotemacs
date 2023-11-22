@@ -44,12 +44,15 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI.
-(defcustom sb/theme 'none
+(defcustom sb/theme 'modus-operandi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
   (radio
-    (const :tag "modus-operandi" modus-operandi) (const :tag "modus-vivendi" modus-vivendi)
+    (const :tag "modus-operandi" modus-operandi)
+    (const :tag "modus-vivendi" modus-vivendi)
+    (const :tag "leuven" leuven)
+    (const :tag "leuven-dark" leuven-dark)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
@@ -1171,7 +1174,6 @@ This location is used for temporary installations and files.")
   :hook (emacs-startup-hook . ivy-mode)
   :bind
   (("C-c r" . ivy-resume)
-    ("<f3>" . ivy-switch-buffer)
     :map
     ivy-minibuffer-map
     ("RET" . ivy-alt-done) ; Continue completion
@@ -1181,17 +1183,9 @@ This location is used for temporary installations and files.")
   :custom
   (ivy-count-format "(%d/%d) " "Helps identify wrap around")
   (ivy-extra-directories nil "Hide . and ..")
-  (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
   ;; Make the height of the minibuffer proportionate to the screen
   ;; (ivy-height-alist '((t lambda (_caller) (/ (frame-height) 2))))
-  (ivy-height-alist
-    '
-    ((counsel-M-x . 15)
-      (counsel-switch-buffer . 10)
-      (counsel-yank-pop . 15)
-      (swiper . 15)
-      (swiper-isearch . 15)
-      (counsel-recentf . 15)))
+  (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
   (ivy-truncate-lines t) ; NOTE: `counsel-flycheck' output gets truncated
   (ivy-wrap t "Easy to navigate")
   (ivy-initial-inputs-alist nil "Do not start searches with ^")
@@ -1205,13 +1199,13 @@ This location is used for temporary installations and files.")
       '
       ("TAGS" "magit-process" "*emacs*" "*xref*" "^\\*.+Completions\\*$" "^\\*Compile-Log\\*$"
         ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
-        ;;   "^\\*Backtrace\\*$"
+        ;; "^\\*Backtrace\\*$"
         ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
         ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
         ))
     (add-to-list 'ivy-ignore-buffers buffer))
 
-  ;; ;; Other options: ivy--regex-ignore-order
+  ;; Other options: ivy--regex-ignore-order
   ;; (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
   ;;                               (counsel-M-x       . ivy--regex-fuzzy)
   ;;                               (counsel-find-file . ivy--regex-fuzzy)
@@ -1220,13 +1214,14 @@ This location is used for temporary installations and files.")
   ;; Ignore `dired' buffers from `ivy-switch-buffer'
   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
 
-  (defun sb/ignore-dired-buffers (str)
-    "Return non-nil if STR names a Dired buffer.
-  This function is intended for use with `ivy-ignore-buffers'."
-    (let ((buf (get-buffer str)))
-      (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
+  ;; (progn
+  ;;   (defun sb/ignore-dired-buffers (str)
+  ;;     "Return non-nil if STR names a Dired buffer.
+  ;; This function is intended for use with `ivy-ignore-buffers'."
+  ;;     (let ((buf (get-buffer str)))
+  ;;       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
 
-  ;; (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers)
+  ;;   (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers))
 
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'ivy-views))
@@ -1270,7 +1265,7 @@ This location is used for temporary installations and files.")
     ("M-y" . counsel-yank-pop)
     ("C-c C-m" . counsel-mark-ring)
     ("<f3>" . counsel-switch-buffer)
-    ("S-<f3>" . counsel-switch-buffer)
+    ;; ("S-<f3>" . counsel-switch-buffer)
     ([remap imenu] . counsel-imenu)
     ("C-c C-j" . counsel-imenu)
     ([remap bookmark-jump] . counsel-bookmark)
@@ -1293,6 +1288,14 @@ This location is used for temporary installations and files.")
   (counsel-switch-buffer-preview-virtual-buffers nil)
   (counsel-yank-pop-preselect-last t)
   (counsel-yank-pop-separator "\n---------------------------------------------------\n")
+  (ivy-height-alist
+    '
+    ((counsel-M-x . 15)
+      (counsel-switch-buffer . 15)
+      (counsel-yank-pop . 15)
+      (swiper . 15)
+      (swiper-isearch . 15)
+      (counsel-recentf . 15)))
   :config
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'counsel-compile-history))
@@ -1518,7 +1521,8 @@ This location is used for temporary installations and files.")
 (use-package ivy-bibtex
   :when (eq sb/minibuffer-completion 'ivy)
   :after latex
-  :bind ("C-c x b" . ivy-bibtex)
+  :commands ivy-bibtex
+  ;; :bind ("C-c x b" . ivy-bibtex)
   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 
@@ -2122,7 +2126,7 @@ This location is used for temporary installations and files.")
 
 (use-package highlight-numbers
   :hook
-  ((prog-mode-hook yaml-mode-hook conf-mode-hook css-mode-hook html-mode-hook)
+  ((prog-mode-hook yaml-mode-hook conf-mode-hook css-mode-hook html-mode-hook web-mode-hook)
     .
     highlight-numbers-mode))
 
@@ -3189,8 +3193,6 @@ This location is used for temporary installations and files.")
     ("C-M-/" . company-other-backend)
     ("C-s" . company-search-candidates)
     ("C-M-s" . company-filter-candidates)
-    ;; ("C-n" . company-select-next)
-    ;; ("C-p" . company-select-previous)
     ;; ("<tab>" . company-complete-common)
     ;; ("TAB" . company-complete-common)
     ;; ([escape] . company-abort)
@@ -3258,14 +3260,14 @@ This location is used for temporary installations and files.")
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
 ;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
 
-(use-package company-posframe
-  :when (display-graphic-p)
-  :hook (company-mode . company-posframe-mode)
-  :custom
-  (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-  (company-posframe-show-indicator nil "The backend display in the posframe modeline gets cut")
-  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-  :diminish)
+;; (use-package company-posframe
+;;   :when (display-graphic-p)
+;;   :hook (company-mode . company-posframe-mode)
+;;   :custom
+;;   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
+;;   (company-posframe-show-indicator nil "The backend display in the posframe modeline gets cut")
+;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+;;   :diminish)
 
 (use-package company-quickhelp
   :after company
@@ -4613,86 +4615,104 @@ This location is used for temporary installations and files.")
 ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
 ;; https://github.com/renzmann/treesit-auto
 ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
-(use-package treesit
-  :straight (:type built-in)
+
+(use-package treesit-auto
   :when (executable-find "tree-sitter")
   :demand t
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-  :custom (treesit-font-lock-level 4 "Increase default font locking")
+  :custom (treesit-auto-install 'prompt)
   :config
-  (setq treesit-language-source-alist
-    '
-    ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-      (c "https://github.com/tree-sitter/tree-sitter-c")
-      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-      (cmake "https://github.com/uyha/tree-sitter-cmake")
-      (css "https://github.com/tree-sitter/tree-sitter-css")
-      (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-      (html "https://github.com/tree-sitter/tree-sitter-html")
-      (java "https://github.com/tree-sitter/tree-sitter-java")
-      (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-      (json "https://github.com/tree-sitter/tree-sitter-json")
-      (latex "https://github.com/latex-lsp/tree-sitter-latex")
-      (make "https://github.com/alemuller/tree-sitter-make")
-      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-      (org "https://github.com/milisims/tree-sitter-org")
-      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-      (python "https://github.com/tree-sitter/tree-sitter-python")
-      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all)
 
-  ;; Old language servers do not support tree-sitter yet.
-
-  (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
-  ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
-
-  ;;   (setq
-  ;;     bash-ts-mode-hook bash-mode-hook
-  ;;     c-ts-mode-hook c-mode-hook
-  ;;     cpp-ts-mode-hook c++-mode-hook
-  ;;     cmake-ts-mode-hook cmake-mode-hook
-  ;;     css-ts-mode-hook css-mode-hook
-  ;;     html-ts-mode-hook html-mode-hook
-  ;;     java-ts-mode-hook java-mode-hook
-  ;;     json-ts-mode-hook json-mode-hook
-  ;;     make-ts-mode-hook make-mode-hook
-  ;;     markdown-ts-mode-hook markdown-mode-hook
-  ;;     org-ts-mode-hook org-mode-hook
-  ;;     python-ts-mode-hook python-mode-hook
-  ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
+  ;; (setq
+  ;;   css-ts-mode-hook css-mode-hook
+  ;;   java-ts-mode-hook java-mode-hook
+  ;;   make-ts-mode-hook make-mode-hook
+  ;;   markdown-ts-mode-hook markdown-mode-hook
+  ;;   org-ts-mode-hook org-mode-hook
   )
 
-;; FIXME: https://github.com/emacs-tree-sitter/elisp-tree-sitter/pull/249/files
-(use-package tree-sitter
-  :when (executable-find "tree-sitter")
-  :hook
-  ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
-    ((c-mode-hook c++-mode-hook) . tree-sitter-mode))
-  :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
-  :config
-  (use-package tree-sitter-langs
-    :demand t
-    :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
-  :diminish tree-sitter-mode)
+;; (use-package treesit
+;;   :straight (:type built-in)
+;;   :when (executable-find "tree-sitter")
+;;   :demand t
+;;   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+;;   :custom (treesit-font-lock-level 4 "Increase default font locking")
+;;   :config
+;;   (setq treesit-language-source-alist
+;;     '
+;;     ((bash "https://github.com/tree-sitter/tree-sitter-bash")
+;;       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+;;       (c "https://github.com/tree-sitter/tree-sitter-c")
+;;       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+;;       (cmake "https://github.com/uyha/tree-sitter-cmake")
+;;       (css "https://github.com/tree-sitter/tree-sitter-css")
+;;       (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+;;       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+;;       (html "https://github.com/tree-sitter/tree-sitter-html")
+;;       (java "https://github.com/tree-sitter/tree-sitter-java")
+;;       (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+;;       (json "https://github.com/tree-sitter/tree-sitter-json")
+;;       (latex "https://github.com/latex-lsp/tree-sitter-latex")
+;;       (make "https://github.com/alemuller/tree-sitter-make")
+;;       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+;;       (org "https://github.com/milisims/tree-sitter-org")
+;;       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+;;       (python "https://github.com/tree-sitter/tree-sitter-python")
+;;       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+;;   ;; Old language servers do not support tree-sitter yet.
+
+;;   (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+;;   (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
+;;   (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
+;;   (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
+;;   ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
+;;   (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
+;;   (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+;;   ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
+;;   (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
+
+;;   ;;   (setq
+;;   ;;     bash-ts-mode-hook bash-mode-hook
+;;   ;;     c-ts-mode-hook c-mode-hook
+;;   ;;     c++-ts-mode-hook c++-mode-hook
+;;   ;;     cmake-ts-mode-hook cmake-mode-hook
+;;   ;;     css-ts-mode-hook css-mode-hook
+;;   ;;     html-ts-mode-hook html-mode-hook
+;;   ;;     java-ts-mode-hook java-mode-hook
+;;   ;;     json-ts-mode-hook json-mode-hook
+;;   ;;     make-ts-mode-hook make-mode-hook
+;;   ;;     markdown-ts-mode-hook markdown-mode-hook
+;;   ;;     org-ts-mode-hook org-mode-hook
+;;   ;;     python-ts-mode-hook python-mode-hook
+;;   ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
+;;   )
+
+;; ;; FIXME: https://github.com/emacs-tree-sitter/elisp-tree-sitter/pull/249/files
+;; (use-package tree-sitter
+;;   :when (executable-find "tree-sitter")
+;;   :hook
+;;   ((tree-sitter-after-on-hook . tree-sitter-hl-mode)
+;;     ((c-mode-hook c++-mode-hook) . tree-sitter-mode))
+;;   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
+;;   :config
+;;   (use-package tree-sitter-langs
+;;     :demand t
+;;     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
+;;   :diminish tree-sitter-mode)
 
 (use-package eldoc
   :straight (:type built-in)
@@ -5092,7 +5112,7 @@ This location is used for temporary installations and files.")
     ("\\Makefile.common\\'" . makefile-mode)
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
     ("makefile\\.rules\\'" . makefile-mode))
-  :hook (makefile-mode-hook . (lambda () (setq-local indent-tabs-mode t))))
+  :hook ((makefile-mode-hook make-ts-mode-hook) . (lambda () (setq-local indent-tabs-mode t))))
 
 (use-package makefile-executor
   :hook ((makefile-mode-hook make-ts-mode-hook) . makefile-executor-mode))
@@ -5775,7 +5795,6 @@ Ignore if no file is found."
   (xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 (use-package dumb-jump
-  :after xref
   :commands dumb-jump-xref-activate
   :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
   :custom
@@ -6338,9 +6357,6 @@ Use the filename relative to the current VC root directory."
   ;; Show dividers on the right of each window, more prominent than the default
   (add-hook 'emacs-startup-hook #'window-divider-mode)
 
-  ;; Copying text from the TUI includes the line numbers, which is a nuisance.
-  (global-display-line-numbers-mode 1)
-
   ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
   ;; pointless.
   (fringe-mode '(10 . 0))
@@ -6352,6 +6368,11 @@ Use the filename relative to the current VC root directory."
   (set-cursor-color "#ffffff") ; Set cursor color to white
   ;; Use a blinking bar for the cursor style to help identify it easily.
   (blink-cursor-mode 1))
+
+;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
+;; numbers only for GUI and daemon.
+(when (or (display-graphic-p) (daemonp))
+  (global-display-line-numbers-mode 1))
 
 (use-package centaur-tabs
   :when (eq sb/tab-bar-handler 'centaur-tabs)
@@ -6443,7 +6464,7 @@ Use the filename relative to the current VC root directory."
       (load-theme 'modus-operandi t))
     ((eq sb/theme 'modus-vivendi)
       (load-theme 'modus-vivendi t)))
-  :custom (modus-themes-paren-match '(bold))
+  ;; :custom (modus-themes-paren-match '(bold))
   ;; (modus-themes-prompts '(intense bold gray background))
   ;; (modus-themes-org-blocks 'tinted-background)
   ;; (org-fontify-whole-block-delimiter-line nil)
@@ -6458,6 +6479,12 @@ Use the filename relative to the current VC root directory."
     (with-eval-after-load "hl-line"
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
+
+(when (eq sb/theme 'leuven)
+  (load-theme 'leuven t))
+
+(when (eq sb/theme 'leuven-dark)
+  (load-theme 'leuven-dark t))
 
 ;; Set `sb/theme' to `none' if you use this package
 
@@ -6646,7 +6673,7 @@ PAD can be left (`l') or right (`r')."
     ((string= (system-name) "inspiron-7572")
       (progn
         ;; (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17"))
-        (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))))))
+        (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
