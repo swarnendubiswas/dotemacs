@@ -44,11 +44,13 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme looks good on the TUI.
-(defcustom sb/theme 'modus-operandi
+(defcustom sb/theme 'doom-one
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
   (radio
+    (const :tag "doom-one" doom-one)
+    (const :tag "doom-nord" doom-nord)
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "leuven" leuven)
@@ -3246,15 +3248,15 @@ This location is used for temporary installations and files.")
 
   ;; Ignore matches that consist solely of numbers from `company-dabbrev'
   ;; https://github.com/company-mode/company-mode/issues/358
-
-  ;; (push
-  ;;   (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
-  ;;   company-transformers)
+  (push
+    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+    company-transformers)
 
   ;; (add-to-list 'company-transformers 'delete-dups)
   ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-  )
+
+  :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
@@ -5769,7 +5771,8 @@ Ignore if no file is found."
 
 (use-package latex-extra
   :straight (:host github :repo "Malabarba/latex-extra")
-  :hook (LaTeX-mode-hook . latex-extra-mode))
+  :hook (LaTeX-mode-hook . latex-extra-mode)
+  :diminish)
 
 (setq
   tags-add-tables nil
@@ -5958,7 +5961,8 @@ used in `company-backends'."
       java-ts-mode-hook
       json-ts-mode-hook
       yaml-ts-mode-hook)
-    . treesitter-context-mode))
+    . treesitter-context-mode)
+  :diminish)
 
 ;; (use-package
 ;;   symbols-outline
@@ -6456,6 +6460,19 @@ Use the filename relative to the current VC root directory."
 ;;   ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
 ;;   (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
+(use-package doom-themes
+  :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
+  :commands (doom-themes-org-config doom-themes-treemacs-config)
+  :init
+  (cond
+    ((eq sb/theme 'doom-one)
+      (load-theme 'doom-one t))
+    ((eq sb/theme 'doom-nord)
+      (load-theme 'doom-nord t)))
+  :config
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
 (use-package modus-themes
   :when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
   :init
@@ -6664,7 +6681,7 @@ PAD can be left (`l') or right (`r')."
 
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 160)
+        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 170)
         (set-face-attribute 'mode-line nil :height 120)
         (set-face-attribute 'mode-line-inactive nil :height 120)))))
 
@@ -6672,8 +6689,8 @@ PAD can be left (`l') or right (`r')."
   (cond
     ((string= (system-name) "inspiron-7572")
       (progn
-        ;; (add-to-list 'default-frame-alist '(font . "MesloLGSNF-17"))
-        (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))))))
+        ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
+        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)

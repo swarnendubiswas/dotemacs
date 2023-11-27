@@ -1667,6 +1667,7 @@
     ("inted" "intend" nil :count 0)
     ("intereseting" "interesting" nil :count 0)
     ("jioned" "joined" nil :count 0)
+    ("langugage" "language" nil :count 0)
     ("matchng" "Matching" nil :count 0)
     ("meagre" "meager" nil :count 0)
     ("medcines" "medicines" nil :count 0)

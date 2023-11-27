@@ -31,7 +31,6 @@ command_exists() {
 }
 
 install_emacs() {
-    # Download GNU Emacs source
     EMACS_VERSION="29.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -57,8 +56,7 @@ install_emacs() {
 
     # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the
     # Emacs distribution instead of after startup
-    # make -j"$(nproc)" NATIVE_FULL_AOT=1
-    make -j"$(nproc)"
+    make -j"$(nproc)" NATIVE_FULL_AOT=1
     make install
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
