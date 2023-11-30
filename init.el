@@ -6611,7 +6611,8 @@ Use the filename relative to the current VC root directory."
   (cond
     ((string= (system-name) "inspiron-7572")
       (progn
-        (add-to-list 'default-frame-alist '(font . "JetbrainsMono Nerd Font-19"))))))
+        ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
+        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))))
 
 ;; (use-package disable-mouse
 ;;   :hook (emacs-startup-hook . disable-mouse-global-mode)
