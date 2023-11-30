@@ -31,7 +31,6 @@ command_exists() {
 }
 
 install_emacs() {
-    # Download GNU Emacs source
     EMACS_VERSION="29.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -57,8 +56,7 @@ install_emacs() {
 
     # Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the
     # Emacs distribution instead of after startup
-    # make -j"$(nproc)" NATIVE_FULL_AOT=1
-    make -j"$(nproc)"
+    make -j"$(nproc)" NATIVE_FULL_AOT=1
     make install
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -150,7 +148,7 @@ fi
 
 install_python_packages() {
     # semgrep, ruff-lsp, python-lsp-ruff, pyright
-    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" pyls-isort pylsp-mypy pylsp-rope pyls-memestra isort yapf jedi pylint importmagic pydocstyle cpplint grip konsave --user
+    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" python-lsp-isort pylsp-mypy pylsp-rope pyls-memestra yapf jedi pylint importmagic pydocstyle cpplint grip konsave --user
 }
 
 install_node() {
@@ -164,17 +162,18 @@ install_node() {
         Ubuntu_20.04 | Ubuntu_22.04) ;;
     esac
 
-    # curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
-    # apt install -y nodejs
+    curl -fsSL https://deb.nodesource.com/setup_"${NODEJS_VER}".x | bash -
+    apt install -y nodejs
+}
 
-    # Setup Node packages
+install_npm_packages() {
     TMP_HOME="$USER_HOME/tmp"
     NPM_HOME="$TMP_HOME"
     mkdir -p "${NPM_HOME}"
     cd "${NPM_HOME}" || echo "Failed: cd ${NPM_HOME}"
 
     npm init --yes
-    npm install --save-dev less jsonlint bash-language-server markdownlint-cli markdownlint-cli2 yaml-language-server write-good htmlhint unified-language-server prettier @prettier/plugin-xml vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli prettier-plugin-awk
+    npm install --save-dev less jsonlint bash-language-server markdownlint-cli markdownlint-cli2 yaml-language-server write-good htmlhint prettier @prettier/plugin-xml vscode-langservers-extracted npm-check-updates dockerfile-language-server-nodejs awk-language-server tree-sitter-cli prettier-plugin-awk
 
     # Add the following to "$HOME/.bashrc"
     # echo "export NODE_PATH=$HOME/tmp/node_modules" >>"$HOME/.bashrc"
@@ -442,7 +441,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.52.0"
+    DIFFT_VER="0.53.1"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
@@ -469,7 +468,7 @@ install_bat() {
 }
 
 install_marksman() {
-    MK_VER="2023-10-30"
+    MK_VER="2023-11-26"
 
     wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
     mv marksman-linux $USER_HOME/.local/bin/marksman
@@ -487,7 +486,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.44.0"
+    FZF_VER="0.44.1"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git
@@ -574,9 +573,9 @@ cleanup() {
 # install_bat
 # install_fd
 # install_perl_server
+# install_node
 
 install_python_packages
-install_node
 install_texlab
 install_shellcheck
 install_shfmt
@@ -586,6 +585,7 @@ install_marksman
 install_nerd_fonts
 install_difft
 create_symlinks
+install_npm_packages
 
 # cleanup
 

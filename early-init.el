@@ -75,8 +75,8 @@
 (push '(tool-bar-lines . 0) default-frame-alist)
 
 ;; Set a hint of transparency, works with GUI frames
-(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
-(add-to-list 'default-frame-alist '(alpha . (95 . 95)))
+(set-frame-parameter (selected-frame) 'alpha '(97 . 97))
+(add-to-list 'default-frame-alist '(alpha . (97 . 97)))
 
 ;; Maximize Emacs on startup.
 
