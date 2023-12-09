@@ -864,7 +864,8 @@ This location is used for temporary installations and files.")
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (blink-matching-paren t)
   ;; TODO: What is the utility of this variable?
-  (kill-whole-line t))
+  (kill-whole-line t)
+  (suggest-key-bindings t))
 
 (use-package files
   :straight (:type built-in)
@@ -1620,6 +1621,7 @@ This location is used for temporary installations and files.")
 
 (use-package consult
   :after vertico
+  :commands consult-fd
   ;; Enable automatic preview at point in the *Completions* buffer. This is relevant when you use
   ;; the default completion UI.
   ;; :hook (completion-list-mode-hook . consult-preview-at-point-mode)
@@ -2085,9 +2087,10 @@ This location is used for temporary installations and files.")
 
 (use-package hl-todo
   :hook (emacs-startup-hook . global-hl-todo-mode)
-  :custom
-  (hl-todo-highlight-punctuation ":")
-  (hl-todo-keyword-faces
+  :config
+  (setq
+    hl-todo-highlight-punctuation ":"
+    hl-todo-keyword-faces
     (append
       '
       (("LATER" . "#d0bf8f")
@@ -3290,7 +3293,7 @@ This location is used for temporary installations and files.")
   (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
 
-(use-packagecompany-dirfiles ; Better replacement for `company-files'
+(use-package company-dirfiles ; Better replacement for `company-files'
   :straight (:host codeberg :repo "cwfoo/company-dirfiles")
   :after company
   :demand t
@@ -4538,22 +4541,22 @@ This location is used for temporary installations and files.")
 ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
 ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 
-;; (use-package treesit-auto
-;;   :when (executable-find "tree-sitter")
-;;   :demand t
-;;   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-;;   :custom (treesit-auto-install 'prompt)
-;;   :config
-;;   (global-treesit-auto-mode 1)
-;;   (treesit-auto-add-to-auto-mode-alist 'all)
+(use-package treesit-auto
+  :when (executable-find "tree-sitter")
+  :demand t
+  :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+  :custom (treesit-auto-install 'prompt)
+  :config
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all)
 
-;;   ;; (setq
-;;   ;;   css-ts-mode-hook css-mode-hook
-;;   ;;   java-ts-mode-hook java-mode-hook
-;;   ;;   make-ts-mode-hook make-mode-hook
-;;   ;;   markdown-ts-mode-hook markdown-mode-hook
-;;   ;;   org-ts-mode-hook org-mode-hook
-;;   )
+  ;; (setq
+  ;;   css-ts-mode-hook css-mode-hook
+  ;;   java-ts-mode-hook java-mode-hook
+  ;;   make-ts-mode-hook make-mode-hook
+  ;;   markdown-ts-mode-hook markdown-mode-hook
+  ;;   org-ts-mode-hook org-mode-hook
+  )
 
 ;; (use-package treesit
 ;;   :straight (:type built-in)
@@ -5573,13 +5576,6 @@ Ignore if no file is found."
       ;; (message "%s" bibfile-list)
       (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
   :straight (:type built-in)
-  :commands
-  (reftex-get-bibfile-list
-    bibtex-parse-keys
-    reftex-mode
-    reftex-toc-rescan
-    reftex-toc-Rescan
-    reftex-default-bibliography)
   :hook ((LaTeX-mode-hook latex-mode-hook) . turn-on-reftex)
   :bind
   (("C-c [" . reftex-citation)
@@ -5712,7 +5708,6 @@ Ignore if no file is found."
   (xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 (use-package dumb-jump
-  :commands dumb-jump-xref-activate
   :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
   :custom
   (dumb-jump-quiet t)
@@ -5881,8 +5876,7 @@ used in `company-backends'."
 ;;     . treesitter-context-mode)
 ;;   :diminish)
 
-;; (use-package
-;;   symbols-outline
+;; (use-package symbols-outline
 ;;   :bind ("C-c i" . symbols-outline-show)
 ;;   :custom (symbols-outline-window-position 'right)
 ;;   :config
@@ -6225,7 +6219,6 @@ Use the filename relative to the current VC root directory."
 ;;   :custom (nerd-icons-ibuffer-icon-size 1.0))
 
 ;; Decrease minibuffer font size
-;; https://stackoverflow.com/questions/7869429/altering-the-font-size-for-the-emacs-minibuffer-separately-from-default-emacs
 (progn
   (defun sb/decrease-minibuffer-font ()
     "Customize minibuffer font."
@@ -6235,12 +6228,10 @@ Use the filename relative to the current VC root directory."
 
 ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
 ;; useful information.
+(setq ;;resize-mini-windows nil
+  max-mini-window-height 0.35)
 
-;; (setq resize-mini-windows nil
-;;       max-mini-window-height 5)
-
-;; (use-package
-;;   beacon ; Highlight the cursor position after the window scrolls
+;; (use-package beacon ; Highlight the cursor position after the window scrolls
 ;;   :hook (emacs-startup-hook . beacon-mode)
 ;;   :diminish)
 
@@ -6372,7 +6363,6 @@ Use the filename relative to the current VC root directory."
 
 (use-package doom-themes
   :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
-  :commands (doom-themes-org-config doom-themes-treemacs-config)
   :init
   (cond
     ((eq sb/theme 'doom-one)
@@ -6558,10 +6548,10 @@ Use the filename relative to the current VC root directory."
 
 (defun sb/init-fonts-graphic ()
   (cond
-    ((string= (system-name) "inspiron-7572")
+    ((string= (system-name) "swarnendu-Inspiron-7572")
       (progn
-        ;; (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
-        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
+        ;; (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
         (set-face-attribute 'mode-line nil :height 140)
         (set-face-attribute 'mode-line-inactive nil :height 140)))
 
@@ -6609,7 +6599,7 @@ Use the filename relative to the current VC root directory."
 
 (when (daemonp)
   (cond
-    ((string= (system-name) "inspiron-7572")
+    ((string= (system-name) "swarnendu-Inspiron-7572")
       (progn
         ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
         (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))))
@@ -6618,18 +6608,15 @@ Use the filename relative to the current VC root directory."
 ;;   :hook (emacs-startup-hook . disable-mouse-global-mode)
 ;;   :diminish disable-mouse-global-mode)
 
-;; (use-package olivetti
-;;   :disabled
-;;   :hook
-;;   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
-;;   :custom (olivetti-body-width 108)
-;;   :diminish)
+(use-package olivetti
+  :hook
+  ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
+  :custom (olivetti-body-width 108)
+  :diminish)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
 ;; "C-<up>". Standalone special keys (and some combinations) can be written in square brackets, e.g.
 ;; [tab] instead of "<tab>".
-
-(setq suggest-key-bindings t)
 
 (bind-keys
   ;; ("RET" . newline-and-indent)
@@ -6676,15 +6663,15 @@ Use the filename relative to the current VC root directory."
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
 
-;; (unless sb/tab-bar-handler
-;;   (global-set-key [remap next-buffer] #'sb/next-buffer)
-;;   (global-set-key [remap previous-buffer] #'sb/previous-buffer)
+(unless sb/tab-bar-handler
+  (global-set-key [remap next-buffer] #'sb/next-buffer)
+  (global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
-;;   (bind-keys
-;;     ("M-<left>" . sb/previous-buffer)
-;;     ("C-S-<iso-lefttab>" . sb/previous-buffer)
-;;     ("M-<right>" . sb/next-buffer)
-;;     ("C-<tab>" . sb/next-buffer)))
+  (bind-keys
+    ("M-<left>" . sb/previous-buffer)
+    ("C-S-<iso-lefttab>" . sb/previous-buffer)
+    ("M-<right>" . sb/next-buffer)
+    ("C-<tab>" . sb/next-buffer)))
 
 ;; (use-package default-text-scale
 ;;   :when (display-graphic-p)

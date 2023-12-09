@@ -63,6 +63,12 @@ install_emacs() {
     rm "${EMACS_FILENAME}" || true
 }
 
+setup_emacs() {
+    # private.el, textidote, ltex, languagetool, autofmt
+    mkdir -p "~/.emacs.d/etc" && cd "~/.emacs.d/etc"
+    ln -s ~/github/dotfiles/emacs/private.el .
+}
+
 # Install important packages. There is nothing to do if a package is already installed.
 install_ubuntu_packages() {
     case "${DIST_VERSION}" in
@@ -148,7 +154,8 @@ fi
 
 install_python_packages() {
     # semgrep, ruff-lsp, python-lsp-ruff, pyright
-    sudo -u swarnendu python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" python-lsp-isort pylsp-mypy pylsp-rope pyls-memestra yapf jedi pylint importmagic pydocstyle cpplint grip konsave --user
+    #sudo -u swarnendu
+    python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" python-lsp-isort pylsp-mypy pylsp-rope pyls-memestra yapf jedi pylint importmagic pydocstyle cpplint grip konsave --user
 }
 
 install_node() {
@@ -358,8 +365,6 @@ install_global() {
 install_alacritty() {
     add-apt-repository ppa:aslatter/ppa -y
     apt install alacritty
-    # Setup 24bit terminal support
-    /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/emacs/xterm-24bit.terminfo"
 }
 
 install_bear() {
@@ -534,6 +539,11 @@ install_nerd_fonts() {
     done
 }
 
+setup_24bit() {
+    # Setup 24bit terminal support
+    /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/xterm-24bit.terminfo"
+}
+
 # echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
 
 # cmdline=$"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit\n"
@@ -575,6 +585,8 @@ cleanup() {
 # install_perl_server
 # install_node
 
+setup_emacs
+setup_24bit
 install_python_packages
 install_texlab
 install_shellcheck
