@@ -1545,6 +1545,7 @@
     ("mmeory" "Memory" nil :count 0)
     ("occassions" "occasions" nil :count 0)
     ("occuring" "occurring" nil :count 0)
+    ("optimzing" "optimizing" nil :count 0)
     ("organisation" "Organization" nil :count 0)
     ("paraggraph" "paragraph" nil :count 0)
     ("paralell" "parallel" nil :count 0)

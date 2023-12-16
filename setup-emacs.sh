@@ -66,7 +66,7 @@ install_emacs() {
 setup_emacs() {
     # private.el, textidote, ltex, languagetool, autofmt
     mkdir -p "~/.emacs.d/etc" && cd "~/.emacs.d/etc"
-    ln -s ~/github/dotfiles/emacs/private.el .
+    ln -s "$DOTFILES"/emacs/private.el .
 }
 
 # Install important packages. There is nothing to do if a package is already installed.
@@ -190,7 +190,7 @@ install_npm_packages() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.11.0"
+    TEXLAB_VER="5.12.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -473,7 +473,7 @@ install_bat() {
 }
 
 install_marksman() {
-    MK_VER="2023-11-26"
+    MK_VER="2023-12-09"
 
     wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
     mv marksman-linux $USER_HOME/.local/bin/marksman
@@ -530,7 +530,7 @@ install_font() {
 }
 
 install_nerd_fonts() {
-    NF_VER="3.0.2"
+    NF_VER="3.1.1"
 
     declare -a FONT_NAMES=("DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
 

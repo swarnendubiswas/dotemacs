@@ -59,7 +59,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'none
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '
@@ -1016,12 +1016,19 @@ This location is used for temporary installations and files.")
 ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
 ;; `before-save-hook' and `after-save-hook' and leads to auto-formatters being invoked more
 ;; frequently.
-
-;; (use-package super-save
-;;   :hook (emacs-startup-hook . super-save-mode)
-;;   :custom (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
-;;   :config (add-to-list 'super-save-triggers 'ace-window)
-;;   :diminish)
+(use-package super-save
+  :hook (emacs-startup-hook . super-save-mode)
+  :custom
+  (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
+  (super-save-silent t)
+  ;; Enable deleting trailing white spaces before saving
+  (super-save-delete-trailing-whitespace nil)
+  (super-save-exclude '(".gpg"))
+  (super-save-auto-save-when-idle t)
+  :config
+  (add-to-list 'super-save-triggers 'ace-window)
+  (add-to-list 'super-save-hook-triggers 'find-file-hook)
+  :diminish)
 
 (use-package dired
   :preface
@@ -1765,12 +1772,17 @@ This location is used for temporary installations and files.")
 ;;   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
 ;;   (setq project-switch-commands 'consult-project-extra-find))
 
+(use-package consult-jump-project
+  :straight (:host github :repo "jdtsmith/consult-jump-project")
+  :custom (consult-jump-direct-jump-modes '(dired-mode))
+  :bind ("C-x p j" . consult-jump-project))
+
 (use-package consult-dir
   :after consult
   :bind
   (("C-x C-d" . consult-dir)
     :map
-    minibuffer-local-completion-map
+    vertico-map
     ("C-x C-d" . consult-dir)
     ("C-x C-j" . consult-dir-jump-file)))
 
@@ -2456,7 +2468,7 @@ This location is used for temporary installations and files.")
   :custom
   (search-highlight t "Highlight incremental search")
   (isearch-lazy-highlight t)
-  (isearch-lazy-count t))
+  (isearch-lazy-count t "Show match count next to the minibuffer prompt"))
 
 (use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
   :after isearch
@@ -2718,6 +2730,10 @@ This location is used for temporary installations and files.")
 (use-package discover-my-major ; Discover key bindings for the current Emacs major mode
   :bind ("C-h C-m" . discover-my-major))
 
+(use-package mode-minder
+  :straight (:host github :repo "jdtsmith/mode-minder")
+  :commands mode-minder)
+
 ;; Identify weasel words, passive voice, and duplicate words.
 
 ;; (use-package writegood-mode
@@ -2883,8 +2899,8 @@ This location is used for temporary installations and files.")
     ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
     ((markdown-mode-hook markdown-ts-mode-hook) . format-all-mode))
   ;; :bind (:map markdown-mode-map ("C-x f" . format-all-buffer))
-  :custom
-  (format-all-formatters
+  :config
+  (setq-default format-all-formatters
     '
     (("Assembly" asmfmt)
       ("Awk" gawk)
@@ -2981,7 +2997,23 @@ This location is used for temporary installations and files.")
 
 (use-package indent-bars
   :straight (:host github :repo "jdtsmith/indent-bars")
-  :hook ((python-mode-hook python-ts-mode-hook yaml-mode-hook yaml-ts-mode-hook) . indent-bars-mode))
+  :hook ((python-mode-hook python-ts-mode-hook yaml-mode-hook yaml-ts-mode-hook) . indent-bars-mode)
+  :custom
+  (indent-bars-treesit-support t)
+  (indent-bars-no-descend-string t)
+  (indent-bars-treesit-ignore-blank-lines-types '("module"))
+  (indent-bars-treesit-wrap
+    '
+    (
+      (python
+        argument_list
+        parameters ; for python, as an example
+        list
+        list_comprehension
+        dictionary
+        dictionary_comprehension
+        parenthesized_expression
+        subscript))))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
@@ -3945,7 +3977,8 @@ This location is used for temporary installations and files.")
   :custom
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
   ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
-  ;; and parent paths of each source file.
+  ;; and parent paths of each source file. We can also use the environment variable CLANGD_FLAGS as
+  ;; "export CLANGD_FLAGS="--header-insertion=never"".
   (lsp-clients-clangd-args
     '
     ("-j=4"
@@ -4746,8 +4779,8 @@ This location is used for temporary installations and files.")
   ((cmake-mode-hook cmake-ts-mode-hook)
     .
     (lambda ()
-      (when (fboundp 'spell-fu-mode)
-        (spell-fu-mode -1))
+      ;; (when (fboundp 'spell-fu-mode)
+      ;;   (spell-fu-mode -1))
       (flyspell-mode -1)
       (cond
         ((eq sb/lsp-provider 'eglot)
@@ -4978,10 +5011,9 @@ This location is used for temporary installations and files.")
   ((yaml-mode-hook yaml-ts-mode-hook)
     .
     (lambda ()
-      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
-      ;; checking.
-      (when (fboundp 'spell-fu-mode)
-        (spell-fu-mode -1))
+      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
+      ;; (when (fboundp 'spell-fu-mode)
+      ;;   (spell-fu-mode -1))
       (when (fboundp 'flyspell-mode)
         (flyspell-mode -1))
       (when (fboundp 'jinx-mode)
@@ -5005,10 +5037,9 @@ This location is used for temporary installations and files.")
   )
 
 (use-package yaml-imenu
-  :hook (yaml-mode-hook . yaml-imenu-enable))
+  :hook ((yaml-mode-hook yaml-ts-mode-hook) . yaml-imenu-enable))
 
 (use-package css-mode
-  :commands css-mode
   :hook
   ((css-mode-hook css-ts-mode-hook)
     .
@@ -5038,20 +5069,19 @@ This location is used for temporary installations and files.")
     ("makefile\\.rules\\'" . makefile-mode))
   :hook ((makefile-mode-hook make-ts-mode-hook) . (lambda () (setq-local indent-tabs-mode t))))
 
-(use-package makefile-executor
-  :hook ((makefile-mode-hook make-ts-mode-hook) . makefile-executor-mode))
+;; (use-package makefile-executor
+;;   :hook ((makefile-mode-hook make-ts-mode-hook) . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
-  :commands (csv-mode)
   :hook
   (csv-mode-hook
     .
     (lambda ()
       (make-local-variable 'lsp-disabled-clients)
       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-      (when (fboundp 'spell-fu-mode)
-        (spell-fu-mode -1))
+      ;; (when (fboundp 'spell-fu-mode)
+      ;;   (spell-fu-mode -1))
       (when (fboundp 'flyspell-mode)
         (flyspell-mode -1))
       (when (fboundp 'jinx-mode)
@@ -5091,40 +5121,19 @@ This location is used for temporary installations and files.")
 ;;   :commands (autodisass-llvm-bitcode)
 ;;   :mode "\\.bc\\'")
 
-;; Enable live preview with "C-c C-c l" (`markdown-live-preview-mode'). The following page lists
-;; more shortcuts.
-;; https://jblevins.org/projects/markdown-mode/
+;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  :commands
-  (markdown-mode
-    gfm-mode
-    markdown-insert-bold
-    markdown-insert-italic
-    markdown-insert-blockquote
-    markdown-insert-pre
-    markdown-insert-code
-    markdown-move-up
-    markdown-insert-link
-    markdown-insert-wiki-link
-    markdown-demote
-    markdown-move-down
-    markdown-insert-header-dwim
-    markdown-insert-reference-link-dwim
-    markdown-insert-header-atx-1
-    markdown-insert-header-atx-2
-    markdown-insert-header-atx-3
-    markdown-insert-header-atx-4
-    markdown-promote
-    markdown-insert-list-item
-    markdown-insert-uri
-    markdown-insert-footnote)
   ;; :init
   ;; Looks good, but hiding markup makes it difficult to be consistent while editing
   ;; (setq-default markdown-hide-markup t)
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
   (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
-  :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j"))
+  :bind
+  (:map
+    markdown-mode-map ("C-c C-d") ("C-c C-j")
+    ;; Enable live preview
+    ("C-c C-c l" . markdown-live-preview-mode))
   :custom
   (markdown-command
     "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
@@ -5143,15 +5152,11 @@ This location is used for temporary installations and files.")
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
 ;; -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
-  :commands pandoc-load-default-settings
   :hook (markdown-mode-hook . pandoc-mode)
   :config (pandoc-load-default-settings)
   :diminish)
 
-;; Open preview of markdown file in a browser
-
-;; (use-package markdown-preview-mode
-;;   :disabled t
+;; (use-package markdown-preview-mode ; Open preview of markdown file in a browser
 ;;   :commands markdown-preview-mode)
 
 ;; (use-package bat-mode
@@ -5206,10 +5211,9 @@ This location is used for temporary installations and files.")
   (nxml-mode-hook
     .
     (lambda ()
-      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
-      ;; checking.
-      (when (fboundp 'spell-fu-mode)
-        (spell-fu-mode -1))
+      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+      ;; (when (fboundp 'spell-fu-mode)
+      ;;   (spell-fu-mode -1))
       (flyspell-mode -1)
       (cond
         ((eq sb/lsp-provider 'eglot)
@@ -5403,8 +5407,7 @@ This location is used for temporary installations and files.")
 ;;   :disabled t
 ;;   :hook (org-mode-hook . org-bullets-mode))
 
-(use-package
-  org-appear ; Make invisible parts of Org elements appear visible
+(use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (:host github :repo "awth13/org-appear")
   :hook (org-mode-hook . org-appear-mode)
   :custom
@@ -5429,10 +5432,9 @@ This location is used for temporary installations and files.")
 ;;   :disabled t
 ;;   :hook (org-mode-hook . org-modern-mode))
 
-;; (use-package org-modern-indent
-;;   :straight (:host github :repo "jdtsmith/org-modern-indent")
-;;   :disabled t
-;;   :hook (org-mode-hook . org-modern-indent-mode))
+(use-package org-modern-indent
+  :straight (:host github :repo "jdtsmith/org-modern-indent")
+  :hook (org-mode-hook . org-modern-indent-mode))
 
 ;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
 ;; https://orgmode.org/manual/Escape-Character.html
@@ -5649,7 +5651,7 @@ Ignore if no file is found."
 ;;   :diminish bib-cite-minor-mode)
 
 (use-package auctex-latexmk
-  :after tex-mode
+  :after tex
   :when (executable-find "latexmk")
   :demand t
   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
@@ -5683,6 +5685,11 @@ Ignore if no file is found."
   :straight (:host github :repo "Malabarba/latex-extra")
   :hook (LaTeX-mode-hook . latex-extra-mode)
   :diminish)
+
+(use-package math-delimiters
+  :straight (:host github :repo "oantolin/math-delimiters")
+  :after tex
+  :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
 (setq
   tags-add-tables nil
@@ -6431,83 +6438,82 @@ Use the filename relative to the current VC root directory."
 
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
+(use-package powerline
+  :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let*
+        (
+          (rendered-str (format-mode-line str))
+          (padded-str
+            (concat
+              (when (and (> (length rendered-str) 0) (eq pad 'l))
+                "")
+              (if (listp str)
+                rendered-str
+                str)
+              (when (and (> (length rendered-str) 0) (eq pad 'r))
+                ""))))
+        (if face
+          (pl/add-text-property padded-str 'face face)
+          padded-str))))
 
-;; (use-package powerline
-;;   :preface
-;;   (defun sb/powerline-raw (str &optional face pad)
-;;     "Render STR as mode-line data using FACE and optionally PAD import.
-;; PAD can be left (`l') or right (`r')."
-;;     (when str
-;;       (let*
-;;         (
-;;           (rendered-str (format-mode-line str))
-;;           (padded-str
-;;             (concat
-;;               (when (and (> (length rendered-str) 0) (eq pad 'l))
-;;                 "")
-;;               (if (listp str)
-;;                 rendered-str
-;;                 str)
-;;               (when (and (> (length rendered-str) 0) (eq pad 'r))
-;;                 ""))))
-;;         (if face
-;;           (pl/add-text-property padded-str 'face face)
-;;           padded-str))))
+  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+  (defun sb/powerline-nano-theme ()
+    "Setup a nano-like modeline"
+    (interactive)
+    (setq-default mode-line-format
+      '
+      ("%e"
+        (:eval
+          (let*
+            (
+              (active (powerline-selected-window-active))
+              (face0
+                (if active
+                  'powerline-active0
+                  'powerline-inactive0))
+              (lhs
+                (list
+                  (powerline-raw
+                    (concat
+                      "GNU Emacs "
+                      (number-to-string emacs-major-version)
+                      "."
+                      (number-to-string emacs-minor-version))
+                    nil 'l)))
+              (rhs
+                (list
+                  (when which-function-mode
+                    (sb/powerline-raw which-func-format nil 'l))
+                  (powerline-vc nil 'l)
+                  (powerline-raw "")
+                  (powerline-raw "%4l" nil 'l)
+                  (powerline-raw ",")
+                  (powerline-raw "%3c" nil 'r)
+                  (if (buffer-modified-p)
+                    (powerline-raw " ⠾" nil 'r)
+                    (powerline-raw "  " nil 'r))))
+              (center (list (powerline-raw "%b" nil 'r))))
+            (concat
+              (powerline-render lhs)
+              (powerline-fill-center nil (/ (powerline-width center) 2.0))
+              (powerline-render center)
+              (powerline-fill nil (powerline-width rhs))
+              (powerline-render rhs)))))))
+  :when (eq sb/modeline-theme 'powerline)
+  :commands powerline-default-theme
+  :init
+  (setq
+    powerline-display-hud nil ; Visualization of the buffer position is not useful
+    powerline-display-buffer-size nil
+    powerline-display-mule-info nil ; File encoding information is not useful
+    powerline-gui-use-vcs-glyph t
+    powerline-height 20)
 
-;;   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-;;   (defun sb/powerline-nano-theme ()
-;;     "Setup a nano-like modeline"
-;;     (interactive)
-;;     (setq-default mode-line-format
-;;       '
-;;       ("%e"
-;;         (:eval
-;;           (let*
-;;             (
-;;               (active (powerline-selected-window-active))
-;;               (face0
-;;                 (if active
-;;                   'powerline-active0
-;;                   'powerline-inactive0))
-;;               (lhs
-;;                 (list
-;;                   (powerline-raw
-;;                     (concat
-;;                       "GNU Emacs "
-;;                       (number-to-string emacs-major-version)
-;;                       "."
-;;                       (number-to-string emacs-minor-version))
-;;                     nil 'l)))
-;;               (rhs
-;;                 (list
-;;                   (when which-function-mode
-;;                     (sb/powerline-raw which-func-format nil 'l))
-;;                   (powerline-vc nil 'l)
-;;                   (powerline-raw "")
-;;                   (powerline-raw "%4l" nil 'l)
-;;                   (powerline-raw ",")
-;;                   (powerline-raw "%3c" nil 'r)
-;;                   (if (buffer-modified-p)
-;;                     (powerline-raw " ⠾" nil 'r)
-;;                     (powerline-raw "  " nil 'r))))
-;;               (center (list (powerline-raw "%b" nil 'r))))
-;;             (concat
-;;               (powerline-render lhs)
-;;               (powerline-fill-center nil (/ (powerline-width center) 2.0))
-;;               (powerline-render center)
-;;               (powerline-fill nil (powerline-width rhs))
-;;               (powerline-render rhs)))))))
-;;   :when (eq sb/modeline-theme 'powerline)
-;;   :commands powerline-default-theme
-;;   :init
-;;   (setq
-;;     powerline-display-hud nil ; Visualization of the buffer position is not useful
-;;     powerline-display-buffer-size nil
-;;     powerline-display-mule-info nil ; File encoding information is not useful
-;;     powerline-gui-use-vcs-glyph t
-;;     powerline-height 20)
-
-;;   (sb/powerline-nano-theme))
+  (sb/powerline-nano-theme))
 
 ;; (use-package doom-modeline
 ;;   :when (eq sb/modeline-theme 'doom-modeline)
@@ -6611,7 +6617,10 @@ Use the filename relative to the current VC root directory."
 (use-package olivetti
   :hook
   ((text-mode-hook prog-mode-hook) . olivetti-mode) ; `emacs-startup-hook' does not work
-  :custom (olivetti-body-width 108)
+  :custom
+  (olivetti-body-width 108)
+  (olivetti-min-body-width 70)
+  (olivetti-style 'fancy)
   :diminish)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
