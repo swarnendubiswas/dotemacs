@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'nano-dark
+(defcustom sb/theme 'nordic-night
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -55,6 +55,7 @@ Prefer the straight.el package manager instead."
     (const :tag "leuven" leuven)
     (const :tag "leuven-dark" leuven-dark)
     (const :tag "nano-dark" nano-dark)
+    (const :tag "nordic-night" nordic-night)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
@@ -2682,7 +2683,7 @@ This location is used for temporary installations and files.")
     tex-textidote
     "A LaTeX grammar/spelling checker using textidote.
   See https://github.com/sylvainhalle/textidote."
-    :modes (latex-mode LaTeX-mode)
+    :modes (LaTeX-mode)
     :command
     ("java"
       "-jar"
@@ -2877,7 +2878,7 @@ This location is used for temporary installations and files.")
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
-  :commands (elisp-autofmt-buffer elisp-autofmt-region)
+  :commands (elisp-autofmt-buffer)
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
   :custom
   (elisp-autofmt-style 'fixed)
@@ -2898,7 +2899,7 @@ This location is used for temporary installations and files.")
 
 (use-package flycheck-hl-todo
   :straight (:host github :repo "alvarogonzalezsotillo/flycheck-hl-todo")
-  :after (flycheck hl-todo)
+  :after flycheck
   :init (flycheck-hl-todo-setup))
 
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
@@ -2983,7 +2984,7 @@ This location is used for temporary installations and files.")
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
-  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
+  ;; :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (emacs-startup . yas-global-mode)
   :custom (yas-verbosity 0)
   :config
@@ -3041,10 +3042,11 @@ This location is used for temporary installations and files.")
     ("C-r" . company-search-repeat-backward)
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
-  :custom (company-idle-delay 0.05 "Start autocompletion faster")
+  :custom
   ;; (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
   ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
   ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  (company-idle-delay 0.05 "Start autocompletion faster")
   (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
@@ -3137,39 +3139,30 @@ This location is used for temporary installations and files.")
 ;;   (company-fuzzy-prefix-on-top t))
 
 (use-package company-auctex
-  :after (tex-mode company)
-  :demand t
-  :commands
-  (company-auctex-labels
-    company-auctex-bibs
-    company-auctex-macros
-    company-auctex-symbols
-    company-auctex-environments))
+  :after tex-mode
+  :demand t)
 
 (use-package math-symbols ; Required by `ac-math' and `company-math'
-  :after (tex-mode company)
+  :after tex-mode
   :demand t)
 
 (use-package company-math
-  :after (tex-mode company)
-  :demand t
-  :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
+  :after tex-mode
+  :demand t)
 
 ;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
 ;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
 ;; citations across documents.
 (use-package company-reftex
-  :after (tex-mode company)
+  :after tex-mode
   :demand t
-  :commands (company-reftex-labels company-reftex-citations)
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
 (use-package company-bibtex
-  :after (tex-mode company)
-  :demand t
-  :commands company-bibtex)
+  :after tex-mode
+  :demand t)
 
 (use-package company-anywhere ; Complete in the middle of words
   :straight (:host github :repo "zk-phi/company-anywhere")
@@ -3179,7 +3172,6 @@ This location is used for temporary installations and files.")
 (use-package company-dict
   :after company
   :demand t
-  :commands company-dict
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-fuzzy nil)
@@ -3188,31 +3180,26 @@ This location is used for temporary installations and files.")
 (use-package company-dirfiles ; Better replacement for `company-files'
   :straight (:host codeberg :repo "cwfoo/company-dirfiles")
   :after company
-  :demand t
-  :commands company-dirfiles)
+  :demand t)
 
 (use-package company-org-block
   :after (company org)
-  :demand t
-  :commands company-org-block)
+  :demand t)
 
 (use-package company-c-headers
   :after (company cc-mode)
   :demand t
-  :commands company-c-headers
   :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 ;; (use-package company-makefile
 ;;   :straight (:host github :repo "nverno/company-makefile")
 ;;   :after (company make-mode)
-;;   :demand t
-;;   :commands company-makefile-capf)
+;;   :demand t)
 
 ;; (use-package company-spell
 ;;   :straight (:host github :repo "enzuru/company-spell")
 ;;   :after company
 ;;   :demand t
-;;   :commands company-spell
 ;;   :config (setf company-aspell-command "hunspell"))
 
 ;; Try completion backends in order untill there is a non-empty completion list:
@@ -3297,16 +3284,15 @@ This location is used for temporary installations and files.")
             :separate)
           company-ispell company-dict company-dabbrev company-capf)))
 
-    (dolist (hook '(latex-mode-hook LaTeX-mode-hook))
-      (add-hook
-        hook
-        (lambda ()
-          (sb/company-latex-mode)
-          ;; `company-capf' does not pass to later backends with Texlab, so we use
-          ;; `company-fuzzy-mode' to merge results from all backends.
-          ;; (company-fuzzy-mode 1)
-          ;; (diminish 'company-fuzzy-mode)
-          ))))
+    (add-hook
+      'LaTeX-mode-hook
+      (lambda ()
+        (sb/company-latex-mode)
+        ;; `company-capf' does not pass to later backends with Texlab, so we use
+        ;; `company-fuzzy-mode' to merge results from all backends.
+        ;; (company-fuzzy-mode 1)
+        ;; (diminish 'company-fuzzy-mode)
+        )))
 
   (progn
     (defun sb/company-org-mode ()
@@ -3328,7 +3314,7 @@ This location is used for temporary installations and files.")
     (add-hook
       'text-mode-hook
       (lambda ()
-        (unless (or (derived-mode-p 'latex-mode) (derived-mode-p 'LaTeX-mode))
+        (unless (derived-mode-p 'LaTeX-mode)
           (sb/company-text-mode)
 
           ;; (defun sb/company-after-completion-hook (&rest _ignored)
@@ -3594,7 +3580,6 @@ This location is used for temporary installations and files.")
   :when (eq sb/corfu-icons 'nerd-icons)
   :after corfu
   :demand t
-  :commands kind-icon-margin-formatter
   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 ;; (use-package kind-all-the-icons
@@ -3649,19 +3634,6 @@ This location is used for temporary installations and files.")
 (use-package cape
   :after corfu
   :demand t
-  :commands
-  (cape-history ; Complete from Eshell, Comint, or minibuffer history
-    cape-file ; Complete file name at point
-    cape-keyword ; Complete programming language keyword
-    cape-tex ; Complete unicode char from TeX command, e.g. \hbar.
-    cape-abbrev ; Complete abbreviation at point
-    cape-dict ; Complete word from dictionary at point
-    cape-line ; Complete current line from other lines in buffer
-    cape-elisp-symbol ; Elisp symbol
-    cape-elisp-block ; Complete Elisp in Org or Markdown code block
-    cape-dabbrev ; Complete with Dabbrev at point
-    cape-emoji ; Complete emoji in Emacs 29+
-    )
   :init
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
@@ -3696,37 +3668,23 @@ This location is used for temporary installations and files.")
       (setq-local completion-at-point-functions
         (list #'cape-file (cape-capf-super #'cape-dabbrev #'cape-dict)))))
 
-  ;; TODO: Support latex-mode better.
-  (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook
-      mode
-      (lambda ()
-        (when (bound-and-true-p lsp-managed-mode)
-          (setq-local completion-at-point-functions
-            (list
-              #'cape-file
-              (cape-capf-super
-                (mapcar
-                  #'cape-company-to-capf
-                  (list
-                    #'company-math-symbols-latex
-                    #'company-latex-commands
-                    #'company-reftex-labels
-                    #'company-reftex-citations
-                    #'company-auctex-environments
-                    #'company-auctex-macros
-                    #'company-math-symbols-unicode
-                    #'company-auctex-symbols))
-                #'cape-tex ; Leads to unwanted completions
-                )
-              (cape-capf-super #'cape-dabbrev #'cape-dict))))
-        (when (bound-and-true-p eglot--managed-mode)
-          (setq-local completion-at-point-functions
-            (list
-              #'cape-file #'eglot-completion-at-point #'cape-tex ; Leads to unwanted completions
-              (cape-capf-super #'cape-dabbrev #'cape-dict)))))))
+  (add-hook
+    'LaTeX-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list
+          #'cape-file
+          (cape-company-to-capf #'company-math-symbols-latex)
+          (cape-company-to-capf #'company-latex-commands)
+          (cape-company-to-capf #'company-reftex-labels)
+          (cape-company-to-capf #'company-reftex-citations)
+          (cape-company-to-capf #'company-auctex-environments)
+          (cape-company-to-capf #'company-auctex-macros)
+          (cape-company-to-capf #'company-math-symbols-unicode)
+          (cape-company-to-capf #'company-auctex-symbols)
+          #'cape-tex ; Leads to unwanted completions
+          (cape-capf-super #'cape-dabbrev #'cape-dict)))))
 
-  ;; FIXME: Conditional for both `lsp-mode' and `eglot' is not working.
   (with-eval-after-load "lsp-mode"
     (dolist
       (mode
@@ -3886,8 +3844,7 @@ This location is used for temporary installations and files.")
   (lsp-semantic-tokens-enable nil)
   ;; I am using symbol-overlay for languages that do not have a server
   (lsp-enable-symbol-highlighting nil)
-  ;; https://github.com/emacs-lsp/lsp-mode/issues/2831
-  (lsp-enable-snippet t "Annoying to overwrite the snippet placeholders")
+  (lsp-enable-snippet t)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
@@ -3934,26 +3891,10 @@ This location is used for temporary installations and files.")
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
 
-  ;; https://github.com/minad/corfu/wiki
-  ;; (with-eval-after-load "corfu"
-  ;;   (defun sb/lsp-mode-setup-completion ()
-  ;;     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex))
-  ;;     (with-eval-after-load "orderless"
-  ;;       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(orderless))))
-  ;;   (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
   :diminish)
 
 (use-package lsp-ui
-  :after lsp-mode
   :hook (lsp-mode . lsp-ui-mode)
-  ;; :bind
-  ;; (:map
-  ;;   lsp-ui-mode-map
-  ;;   ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-  ;;   ([remap xref-find-references] . lsp-ui-peek-find-references)
-  ;;   :map
-  ;;   lsp-command-map
-  ;;   ("D" . lsp-ui-doc-show))
   :custom
   (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
   (lsp-ui-doc-include-signature t)
@@ -3985,13 +3926,6 @@ This location is used for temporary installations and files.")
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
   :when (eq sb/lsp-provider 'lsp-mode)
-  :commands
-  (lsp-java-organize-imports
-    lsp-java-build-project
-    lsp-java-update-project-configuration
-    lsp-java-update-server
-    lsp-java-type-hierarchy
-    lsp-java-add-import)
   :hook
   ((java-mode java-ts-mode)
     .
@@ -4008,16 +3942,11 @@ This location is used for temporary installations and files.")
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url
-    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory))
-  :config
-  (with-eval-after-load "dap-mode"
-    (require 'dap-java)))
+    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory)))
 
 ;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
 ;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
 ;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
-
-;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
 (use-package lsp-grammarly
   :when (eq sb/lsp-provider 'lsp-mode)
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
@@ -4154,7 +4083,7 @@ This location is used for temporary installations and files.")
 (use-package lsp-latex
   :after lsp-mode
   :hook
-  (latex-mode
+  (LaTeX-mode
     .
     (lambda ()
       (require 'lsp-latex)
@@ -4192,7 +4121,6 @@ This location is used for temporary installations and files.")
 ;; (use-package eglot
 ;;   :straight (:source (gnu-elpa-mirror))
 ;;   :when (eq sb/lsp-provider 'eglot)
-;;   :commands (eglot)
 ;;   :bind
 ;;   (("C-c l q" . eglot-shutdown)
 ;;     ("C-c l Q" . eglot-shutdown-all)
@@ -4420,7 +4348,7 @@ This location is used for temporary installations and files.")
   :init (fancy-compilation-mode 1))
 
 (use-package rainbow-delimiters
-  :hook ((prog-mode latex-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
+  :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
@@ -4454,7 +4382,7 @@ This location is used for temporary installations and files.")
       (make "https://github.com/alemuller/tree-sitter-make")
       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
       (org "https://github.com/milisims/tree-sitter-org")
-      ;; (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
       (python "https://github.com/tree-sitter/tree-sitter-python")
       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
   :config
@@ -4479,7 +4407,7 @@ This location is used for temporary installations and files.")
         (treesit-language-available-p 'make)
         (treesit-language-available-p 'markdown)
         (treesit-language-available-p 'org)
-        ;; (treesit-language-available-p 'perl)
+        (treesit-language-available-p 'perl)
         (treesit-language-available-p 'python)
         (treesit-language-available-p 'yaml)))
     (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
@@ -4489,7 +4417,7 @@ This location is used for temporary installations and files.")
   ;;   java-ts-mode-hook java-mode-hook
   ;;   make-ts-mode-hook make-mode-hook
   ;;   markdown-ts-mode-hook markdown-mode-hook
-  ;;   org-ts-mode-hook org-mode-hook
+  ;;   org-ts-mode-hook org-mode-hook)
   )
 
 ;; (use-package treesit
@@ -4680,7 +4608,10 @@ This location is used for temporary installations and files.")
     (lambda ()
       ;; (when (fboundp 'spell-fu-mode)
       ;;   (spell-fu-mode -1))
-      (flyspell-mode -1)
+      (when (fboundp 'flyspell-mode)
+        (flyspell-mode -1))
+      (when (fboundp 'jinx-mode)
+        (jinx-mode -1))
       (cond
         ((eq sb/lsp-provider 'eglot)
           (eglot-ensure))
@@ -4862,7 +4793,6 @@ This location is used for temporary installations and files.")
   :hook (fish-mode . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 ;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
-
 ;; (use-package executable
 ;;   :hook (after-save . executable-make-buffer-file-executable-if-script-p))
 
@@ -5098,9 +5028,9 @@ This location is used for temporary installations and files.")
   ;;       :server-id 'htmlls-r)))
   )
 
-;; (use-package emmet-mode
-;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-;;   :custom (emmet-move-cursor-between-quote t))
+(use-package emmet-mode
+  :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
+  :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
   :straight (:type built-in)
@@ -5112,7 +5042,10 @@ This location is used for temporary installations and files.")
       ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
       ;; (when (fboundp 'spell-fu-mode)
       ;;   (spell-fu-mode -1))
-      (flyspell-mode -1)
+      (when (fboundp 'flyspell-mode)
+        (flyspell-mode -1))
+      (when (fboundp 'jinx-mode)
+        (jinx-mode -1))
       (cond
         ((eq sb/lsp-provider 'eglot)
           (eglot-ensure))
@@ -5137,7 +5070,6 @@ This location is used for temporary installations and files.")
   )
 
 (use-package json-mode
-  :commands json-mode-beautify
   :mode
   (("\\.json\\'" . json-ts-mode)
     ("pyrightconfig.json" . jsonc-mode)
@@ -5187,7 +5119,6 @@ This location is used for temporary installations and files.")
 
 ;; (use-package mlir-mode
 ;;   :straight nil
-;;   :commands (mlir-mode)
 ;;   :load-path "extras"
 ;;   :mode "\\.mlir\\'")
 
@@ -5211,6 +5142,10 @@ This location is used for temporary installations and files.")
 ;; create new links (when your point is not on an existing link). (ii) You can convert the
 ;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
 ;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
+
+;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
 
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
@@ -5299,6 +5234,9 @@ This location is used for temporary installations and files.")
 ;; (use-package org-bullets
 ;;   :hook (org-mode . org-bullets-mode))
 
+;; (use-package org-superstar
+;;   :hook (org-mode . org-superstar-mode))
+
 (use-package org-appear ; Make invisible parts of Org elements appear visible
   :straight (:host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode)
@@ -5327,13 +5265,6 @@ This location is used for temporary installations and files.")
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
-;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
-;; https://orgmode.org/manual/Escape-Character.html
-;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
-
-;; (use-package org-superstar
-;;   :hook (org-mode . org-superstar-mode))
-
 ;; (use-package org-block-capf
 ;;   :straight (:host github :repo "xenodium/org-block-capf")
 ;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
@@ -5346,16 +5277,15 @@ This location is used for temporary installations and files.")
   :straight auctex
   :mode ("\\.tex\\'" . LaTeX-mode)
   :hook
-  (((latex-mode LaTeX-mode) . LaTeX-math-mode)
-    ((latex-mode LaTeX-mode) . TeX-PDF-mode) ; Use `pdflatex'
+  ((LaTeX-mode . LaTeX-math-mode)
+    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
     ;; Revert PDF buffer after TeX compilation has finished
     (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
     ;; Enable rainbow mode after applying styles to the buffer
     (TeX-update-style . rainbow-delimiters-mode)
     ;; Jump between editor and pdf viewer
-    ((latex-mode LaTeX-mode) . TeX-source-correlate-mode)
-    ((latex-mode LaTeX-mode) . turn-on-auto-fill)
-    ((latex-mode LaTeX-mode)
+    (LaTeX-mode . TeX-source-correlate-mode) (LaTeX-mode . turn-on-auto-fill)
+    (LaTeX-mode
       .
       (lambda ()
         (cond
@@ -5410,15 +5340,14 @@ This location is used for temporary installations and files.")
 (use-package bibtex
   :straight (:type built-in)
   :hook
-  ((bibtex-mode . turn-on-auto-revert-mode)
-    (bibtex-mode
-      .
-      (lambda ()
-        (cond
-          ((eq sb/lsp-provider 'eglot)
-            (eglot-ensure))
-          ((eq sb/lsp-provider 'lsp-mode)
-            (lsp-deferred))))))
+  (bibtex-mode
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
@@ -5426,46 +5355,46 @@ This location is used for temporary installations and files.")
 
 ;; Reftex is useful to view ToC even with LSP support
 (use-package reftex
-  :preface
-  (defun sb/get-bibtex-keys (file)
-    (with-current-buffer (find-file-noselect file)
-      (mapcar 'car (bibtex-parse-keys))))
+  ;;   :preface
+  ;;   (defun sb/get-bibtex-keys (file)
+  ;;     (with-current-buffer (find-file-noselect file)
+  ;;       (mapcar 'car (bibtex-parse-keys))))
 
-  (defun sb/reftex-add-all-bibitems-from-bibtex ()
-    (interactive)
-    (mapc
-      'LaTeX-add-bibitems
-      (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+  ;;   (defun sb/reftex-add-all-bibitems-from-bibtex ()
+  ;;     (interactive)
+  ;;     (mapc
+  ;;       'LaTeX-add-bibitems
+  ;;       (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
 
-  (defun sb/find-bibliography-file ()
-    "Try to find a bibliography file using RefTeX.
-      Returns a string with text properties (as expected by read-file-name) or
-empty string if no file can be found"
-    (interactive)
-    (let ((bibfile-list nil))
-      (condition-case nil
-        (setq bibfile-list (reftex-get-bibfile-list))
-        (error
-          (ignore-errors
-            (setq bibfile-list (reftex-default-bibliography)))))
-      (if bibfile-list
-        (car bibfile-list)
-        "")))
+  ;;   (defun sb/find-bibliography-file ()
+  ;;     "Try to find a bibliography file using RefTeX.
+  ;;       Returns a string with text properties (as expected by read-file-name) or
+  ;; empty string if no file can be found"
+  ;;     (interactive)
+  ;;     (let ((bibfile-list nil))
+  ;;       (condition-case nil
+  ;;         (setq bibfile-list (reftex-get-bibfile-list))
+  ;;         (error
+  ;;           (ignore-errors
+  ;;             (setq bibfile-list (reftex-default-bibliography)))))
+  ;;       (if bibfile-list
+  ;;         (car bibfile-list)
+  ;;         "")))
 
-  (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
-    "Try to find a bibliography file using RefTex and parse the bib keys.
-Ignore if no file is found."
-    (interactive)
-    (let ((bibfile-list nil))
-      (condition-case nil
-        (setq bibfile-list (reftex-get-bibfile-list))
-        (error
-          (ignore-errors
-            (setq bibfile-list (reftex-default-bibliography)))))
-      ;; (message "%s" bibfile-list)
-      (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+  ;;   (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
+  ;;     "Try to find a bibliography file using RefTex and parse the bib keys.
+  ;; Ignore if no file is found."
+  ;;     (interactive)
+  ;;     (let ((bibfile-list nil))
+  ;;       (condition-case nil
+  ;;         (setq bibfile-list (reftex-get-bibfile-list))
+  ;;         (error
+  ;;           (ignore-errors
+  ;;             (setq bibfile-list (reftex-default-bibliography)))))
+  ;;       ;; (message "%s" bibfile-list)
+  ;;       (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
   :straight (:type built-in)
-  :hook ((LaTeX-mode latex-mode) . turn-on-reftex)
+  :hook (LaTeX-mode . turn-on-reftex)
   :bind
   (("C-c [" . reftex-citation)
     ("C-c )" . reftex-reference)
@@ -5518,12 +5447,9 @@ Ignore if no file is found."
   :diminish)
 
 ;; Read document like a hypertext document, supports mouse highlighting
-
 ;; (use-package bib-cite
 ;;   :straight auctex
-;;   :hook
-;;   ((LaTeX-mode latex-mode) . (lambda()
-;;                                          (bib-cite-minor-mode 1)))
+;;   :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
 ;;   ;; :bind
 ;;   ;; (:map bib-cite-minor-mode-map
 ;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
@@ -5533,8 +5459,7 @@ Ignore if no file is found."
 ;;   ;;       ("C-c l t" . bib-etags)
 ;;   ;;       ("C-c l f" . bib-find)
 ;;   ;;       ("C-c l n" . bib-find-next))
-;;   :custom
-;;   (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+;;   :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
 ;;   :diminish bib-cite-minor-mode)
 
 (use-package auctex-latexmk
@@ -5566,7 +5491,7 @@ Ignore if no file is found."
 ;; (use-package bibtex-capf
 ;;   :straight (:host github :repo "mclear-tools/bibtex-capf")
 ;;   :when (eq sb/capf 'corfu)
-;;   :hook ((org-mode markdown-mode tex-mode latex-mode reftex-mode) . bibtex-capf-mode))
+;;   :hook ((org-mode markdown-mode LaTeX-mode reftex-mode) . bibtex-capf-mode))
 
 (use-package latex-extra
   :straight (:host github :repo "Malabarba/latex-extra")
@@ -5597,6 +5522,7 @@ Ignore if no file is found."
 
 (use-package dumb-jump
   :after xref
+  :demand t
   :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
   :custom
   (dumb-jump-quiet t)
@@ -6031,7 +5957,6 @@ Use the filename relative to the current VC root directory."
 ;; Configure appearance-related settings at the end
 
 ;; Install fonts with "M-x all-the-icons-install-fonts"
-
 ;; (use-package all-the-icons
 ;;   :preface
 ;;   ;; FIXME: This seems to work only with GUI Emacs.
@@ -6133,13 +6058,8 @@ Use the filename relative to the current VC root directory."
     split-width-threshold 0))
 
 ;; The color sometimes makes it difficult to distinguish text on terminals.
-
 ;; (use-package hl-line
-;;   :commands hl-line-highlight
 ;;   :hook (emacs-startup . global-hl-line-mode))
-
-;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
-;; we use TUI Emacs. Then, the terminal font setting will be used.
 
 (when (display-graphic-p)
   ;; Show dividers on the right of each window, more prominent than the default
@@ -6151,7 +6071,6 @@ Use the filename relative to the current VC root directory."
 
   ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
   ;; the terminal application.
-
   (setq-default cursor-type 'box)
   (set-cursor-color "#ffffff") ; Set cursor color to white
   ;; Use a blinking bar for the cursor style to help identify it easily.
@@ -6278,6 +6197,10 @@ Use the filename relative to the current VC root directory."
   :when (eq sb/theme 'nano-dark)
   :init (load-theme 'nano-dark t))
 
+(use-package nordic-night-theme
+  :when (eq sb/theme 'nordic-night)
+  :init (load-theme 'nordic-night t))
+
 (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
   (progn
     (set-foreground-color "#333333")
@@ -6385,7 +6308,6 @@ PAD can be left (`l') or right (`r')."
               (powerline-fill nil (powerline-width rhs))
               (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :commands powerline-default-theme
   :init
   (setq
     powerline-display-hud nil ; Visualization of the buffer position is not useful
@@ -6432,6 +6354,9 @@ PAD can be left (`l') or right (`r')."
 ;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
 ;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
 ;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+
+;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
+;; we use TUI Emacs. Then, the terminal font setting will be used.
 
 (defun sb/init-fonts-graphic ()
   (cond
@@ -6574,7 +6499,6 @@ PAD can be left (`l') or right (`r')."
 ;;   :commands free-keys)
 
 ;; (use-package which-key ; Show help popups for prefix keys
-;;   :commands which-key-setup-side-window-right-bottom
 ;;   :hook (emacs-startup . which-key-mode)
 ;;   :custom (which-key-sort-order 'which-key-key-order-alpha)
 ;;   :config (which-key-setup-side-window-right-bottom)
@@ -6586,31 +6510,21 @@ PAD can be left (`l') or right (`r')."
 ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
 ;; blue" means exit.
 
-;; (use-package hydra
-;;   :commands
-;;   (hydra-default-pre
-;;     hydra-keyboard-quit
-;;     defhydra
-;;     hydra-show-hint
-;;     hydra-set-transient-map
-;;     hydra--call-interactively-remap-maybe))
+;; (use-package hydra)
 
 ;; (use-package hydra-posframe
 ;;   :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
 ;;   :when (display-graphic-p)
 ;;   :after hydra
-;;   :commands (hydra-posframe-mode)
 ;;   :init (hydra-posframe-mode 1))
 
 ;; (use-package ivy-hydra ; Additional keybindings for `ivy'
 ;;   :after (ivy hydra)
-;;   :demand t
-;;   :commands
-;;   (ivy-dispatching-done-hydra ivy--matcher-desc ivy-hydra/body))
+;;   :demand t)
 
 ;; (use-package pretty-hydra
 ;;   :after hydra
-;;   :commands pretty-hydra-define)
+;;   :demand t)
 
 ;; ;; https://github.com/WalkerGriggs/dot-emacs/blob/master/configs/hydra.el
 ;; (defun sb/with-alltheicon (icon str &optional height v-adjust)

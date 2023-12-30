@@ -61,7 +61,7 @@
   ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for composing emails, but
   ;; `text-mode' is more expensive to start. Furthermore, lsp support is not enabled for the
   ;; *scratch* buffer.
-  ;; initial-major-mode 'text-mode
+  initial-major-mode 'fundamental-mode
   initial-scratch-message nil
   ;; Prefer new files to avoid loading stale bytecode
   load-prefer-newer t)
@@ -102,8 +102,8 @@
   (defvar native-comp-always-compile)
   (defvar native-comp-async-report-warnings-errors)
 
-  ;; Silence compiler warnings as they can be pretty disruptive
   (setq
+    ;; Silence compiler warnings as they can be pretty disruptive
     native-comp-async-report-warnings-errors nil
     package-native-compile t ; Enable ahead-of-time compilation when installing a package
     ;; Compile loaded packages asynchronously
