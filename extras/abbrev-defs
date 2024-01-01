@@ -1688,6 +1688,7 @@
     ("perfromed" "performed" nil :count 0)
     ("polydedral" "polyhedral" nil :count 0)
     ("preceedence" "precedence" nil :count 0)
+    ("prefered" "preferred" nil :count 0)
     ("prefernce" "preference" nil :count 0)
     ("profilign" "Profiling" nil :count 0)
     ("progess" "progress" nil :count 0)

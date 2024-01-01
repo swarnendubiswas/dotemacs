@@ -2236,15 +2236,7 @@ This location is used for temporary installations and files.")
     ("r" . project-query-replace-regexp)
     ("m" . magit-project-status)
     ("C" . recompile))
-  ;; :config
-  ;; (setq project-switch-commands (delete '(project-find-file "Find file") project-switch-commands))
-  ;; (setq project-switch-commands (delete '(project-eshell "Eshell") project-switch-commands))
-  ;; (setq project-switch-commands
-  ;;   (delete '(project-find-regexp "Find regexp") project-switch-commands))
-  ;; (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
-  ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
-  ;; (add-to-list 'project-switch-commands '(project-dired "Project Root") t)
-  )
+  :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
 
 ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
 ;; indexing.
@@ -2772,7 +2764,7 @@ This location is used for temporary installations and files.")
       ("Fish" fish-indent)
       ("HTML" tidy)
       ("LaTeX" latexindent)
-      ("Markdown" prettier "--print-width" "100")
+      ("Markdown" (prettier "--print-width" "100"))
       ("Perl" perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100")
       ("Python" (yapf "--style" "file") isort)
       ("Shell" (shfmt "-i" "4" "-ci"))
@@ -5864,7 +5856,8 @@ Increase line spacing by two line height."
     tags-table-mode
     compilation-mode
     flycheck-verify-mode
-    ibuffer-mode)
+    ibuffer-mode
+    bs-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string)
   :group 'sb/emacs)
