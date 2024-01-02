@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'nordic-night
+(defcustom sb/theme 'nano-dark
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -61,14 +61,16 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'nano-modeline
   "Specify the mode-line theme to use."
   :type
   '
   (radio
     ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show
     ;; lsp status and flycheck information.
-    (const :tag "powerline" powerline) (const :tag "doom-modeline" doom-modeline)
+    (const :tag "powerline" powerline)
+    (const :tag "doom-modeline" doom-modeline)
+    (const :tag "nano-modeline" nano-modeline)
     ;; No customization
     (const :tag "none" none))
   :group 'sb/emacs)
@@ -6175,15 +6177,7 @@ Use the filename relative to the current VC root directory."
     ((eq sb/theme 'modus-operandi)
       (load-theme 'modus-operandi t))
     ((eq sb/theme 'modus-vivendi)
-      (load-theme 'modus-vivendi t)))
-  ;; :custom (modus-themes-paren-match '(bold))
-  ;; (modus-themes-prompts '(intense bold gray background))
-  ;; (modus-themes-org-blocks 'tinted-background)
-  ;; (org-fontify-whole-block-delimiter-line nil)
-  ;; (modus-themes-completions '((matches . (extrabold underline)) (selection . (semibold))))
-  ;; (modus-themes-italic-constructs t)
-  ;; (modus-themes-bold-constructs t)
-  )
+      (load-theme 'modus-vivendi t))))
 
 (use-package nano-theme
   :straight (:host github :repo "rougier/nano-theme")
@@ -6194,6 +6188,14 @@ Use the filename relative to the current VC root directory."
   :when (eq sb/theme 'nordic-night)
   :init (load-theme 'nordic-night t))
 
+(use-package leuven
+  :when (eq sb/theme 'leuven)
+  :init (load-theme 'leuven t))
+
+(use-package leuven-dark
+  :when (eq sb/theme 'leuven-dark)
+  :init (load-theme 'leuven-dark t))
+
 (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
   (progn
     (set-foreground-color "#333333")
@@ -6201,14 +6203,7 @@ Use the filename relative to the current VC root directory."
       (set-face-attribute 'hl-line nil :background "light yellow"))
     (set-face-attribute 'region nil :background "gainsboro")))
 
-(when (eq sb/theme 'leuven)
-  (load-theme 'leuven t))
-
-(when (eq sb/theme 'leuven-dark)
-  (load-theme 'leuven-dark t))
-
 ;; Set `sb/theme' to `none' if you use this package
-
 ;; (use-package circadian
 ;;   :hook (emacs-startup . circadian-setup)
 ;;   :custom (circadian-themes '((:sunrise . modus-vivendi) (:sunset . modus-vivendi))))
@@ -6311,18 +6306,18 @@ PAD can be left (`l') or right (`r')."
 
   (sb/powerline-nano-theme))
 
-;; (use-package doom-modeline
-;;   :when (eq sb/modeline-theme 'doom-modeline)
-;;   :init
-;;   (setq
-;;     doom-modeline-buffer-encoding nil
-;;     doom-modeline-checker-simple-format nil
-;;     doom-modeline-indent-info nil
-;;     doom-modeline-lsp t
-;;     doom-modeline-minor-modes t
-;;     doom-modeline-buffer-file-name-style 'file-name ; Reduce space on the modeline
-;;     doom-modeline-unicode-fallback t)
-;;   :hook (emacs-startup . doom-modeline-mode))
+(use-package doom-modeline
+  :when (eq sb/modeline-theme 'doom-modeline)
+  :init
+  (setq
+    doom-modeline-buffer-encoding nil
+    doom-modeline-checker-simple-format nil
+    doom-modeline-indent-info nil
+    doom-modeline-lsp t
+    doom-modeline-minor-modes t
+    doom-modeline-buffer-file-name-style 'file-name ; Reduce space on the modeline
+    doom-modeline-unicode-fallback t)
+  :hook (emacs-startup . doom-modeline-mode))
 
 ;; (use-package awesome-tray ; Minimal modeline information
 ;;   :straight (:host github :repo "manateelazycat/awesome-tray")
@@ -6347,6 +6342,16 @@ PAD can be left (`l') or right (`r')."
 ;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
 ;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
 ;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
+
+(use-package nano-modeline
+  :when (eq sb/modeline-theme 'nano-modeline)
+  :hook
+  ((prog-mode . nano-modeline-prog-mode)
+    (text-mode . nano-modeline-text-mode)
+    (org-mode . nano-modeline-org-mode)
+    (pdf-view-mode . nano-modeline-pdf-mode)
+    (messages-buffer-mode . nano-modeline-message-mode))
+  :custom (nano-modeline-position #'nano-modeline-footer))
 
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
 ;; we use TUI Emacs. Then, the terminal font setting will be used.
@@ -6386,7 +6391,7 @@ PAD can be left (`l') or right (`r')."
 
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 170)
+        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)
         (set-face-attribute 'mode-line nil :height 120)
         (set-face-attribute 'mode-line-inactive nil :height 120)))))
 
@@ -6407,7 +6412,11 @@ PAD can be left (`l') or right (`r')."
     ((string= (system-name) "swarnendu-Inspiron-7572")
       (progn
         ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
-        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))))
+        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
+
+    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+      (progn
+        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
 
 ;; (use-package disable-mouse
 ;;   :hook (emacs-startup . disable-mouse-global-mode)
