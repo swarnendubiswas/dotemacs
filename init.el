@@ -2128,7 +2128,6 @@ This location is used for temporary installations and files.")
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
-;; FIXME: I am reusing the key "C-x r" for `rename-file'.
 (use-package bm
   :init
   ;; Must be set before `bm' is loaded
@@ -3360,9 +3359,7 @@ This location is used for temporary installations and files.")
             '
             (company-dirfiles
               (company-capf
-                ;; TODO: I am guessing `company-citre-tags' is causing problems with the RETURN key
-                ;; company-citre-tags
-                company-c-headers
+                company-citre-tags company-c-headers
                 :with company-keywords
                 company-dabbrev-code ; Useful for variable names
                 company-yasnippet
@@ -5479,17 +5476,29 @@ This location is used for temporary installations and files.")
 ;;   :commands (math-preview-all math-preview-at-point math-preview-region)
 ;;   :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
 
-;; TODO: Try packages like `bibtex-capf' and `citar'
-;; https://github.com/emacs-citar/citar
+;; TODO: Try `citar' https://github.com/emacs-citar/citar
 
-;; (use-package bibtex-capf
-;;   :straight (:host github :repo "mclear-tools/bibtex-capf")
-;;   :when (eq sb/capf 'corfu)
-;;   :hook ((org-mode markdown-mode LaTeX-mode reftex-mode) . bibtex-capf-mode))
+;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
+(use-package bibtex-capf
+  :straight (:host github :repo "mclear-tools/bibtex-capf")
+  :when (eq sb/capf 'corfu)
+  :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
 
 (use-package latex-extra
   :straight (:host github :repo "Malabarba/latex-extra")
   :hook (LaTeX-mode . latex-extra-mode)
+  :bind
+  (("C-c C-a" . latex/compile-commands-until-done)
+    ("C-c C-n" . latex/next-section)
+    ("C-c C-u" . latex/up-section)
+    ("C-c C-f" . latex/next-section-same-level)
+    ("C-M-f" . latex/forward-environment)
+    ("C-M-e" . latex/end-of-environment)
+    ("C-M-b" . latex/backward-environment)
+    ("C-M-a" . latex/beginning-of-environment)
+    ("C-c C-p" . latex/previous-section)
+    ("C-c C-b" . latex/previous-section-same-level)
+    ("C-c C-q" . latex/clean-fill-indent-environment))
   :diminish)
 
 (use-package math-delimiters
@@ -6188,13 +6197,14 @@ Use the filename relative to the current VC root directory."
   :when (eq sb/theme 'nordic-night)
   :init (load-theme 'nordic-night t))
 
-(use-package leuven
-  :when (eq sb/theme 'leuven)
-  :init (load-theme 'leuven t))
-
-(use-package leuven-dark
-  :when (eq sb/theme 'leuven-dark)
-  :init (load-theme 'leuven-dark t))
+(use-package leuven-theme
+  :when (or (eq sb/theme 'leuven) (eq sb/theme 'leuven-dark))
+  :init
+  (cond
+    ((eq sb/theme 'leuven)
+      (load-theme 'leuven t))
+    ((eq sb/theme 'leuven-dark)
+      (load-theme 'leuven-dark t))))
 
 (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
   (progn
@@ -6360,10 +6370,10 @@ PAD can be left (`l') or right (`r')."
   (cond
     ((string= (system-name) "swarnendu-Inspiron-7572")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
         ;; (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
-        (set-face-attribute 'mode-line nil :height 140)
-        (set-face-attribute 'mode-line-inactive nil :height 140)))
+        (set-face-attribute 'mode-line nil :height 120)
+        (set-face-attribute 'mode-line-inactive nil :height 120)))
 
     ((string= (system-name) "DESKTOP-4T8O69V") ; Inspiron 7572 Windows
       (progn
@@ -6391,9 +6401,9 @@ PAD can be left (`l') or right (`r')."
 
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)
-        (set-face-attribute 'mode-line nil :height 120)
-        (set-face-attribute 'mode-line-inactive nil :height 120)))))
+        (set-face-attribute 'default nil :font "Hack Nerd Font" :height 160)
+        (set-face-attribute 'mode-line nil :height 130)
+        (set-face-attribute 'mode-line-inactive nil :height 130)))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
@@ -6450,7 +6460,8 @@ PAD can be left (`l') or right (`r')."
 
   ("C-x C-v" . find-alternate-file)
   ("C-x x g" . revert-buffer-quick)
-  ("C-x r" . rename-file)
+  ("C-x x f" . rename-file)
+  ("C-x x r" . rename-buffer)
 
   ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
   ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
@@ -6497,8 +6508,8 @@ PAD can be left (`l') or right (`r')."
 ;;   :when (display-graphic-p)
 ;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
-;; (use-package free-keys
-;;   :commands free-keys)
+(use-package free-keys
+  :commands free-keys)
 
 ;; (use-package which-key ; Show help popups for prefix keys
 ;;   :hook (emacs-startup . which-key-mode)
