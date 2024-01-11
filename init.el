@@ -3,7 +3,7 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary: My configuration that is mostly targeted toward GNU Linux.
+;;; Commentary: My configuration is mostly targeted toward GNU Linux.
 
 ;;; Code:
 
@@ -30,7 +30,7 @@
     (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'nano-dark
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -61,7 +61,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'nano-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '
@@ -87,8 +87,8 @@ This depends on the orientation of the display."
     (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
 
-;; Large values make reading difficult when the window is split side-by-side,
-;; 100 is also a stretch for smaller screens.
+;; Large values make reading difficult when the window is split side-by-side, 100 is also a stretch
+;; for smaller screens.
 (defcustom sb/fill-column 100
   "Column beyond which lines should not extend."
   :type 'number
@@ -129,11 +129,12 @@ This location is used for temporary installations and files.")
 ;; Corfu is easy to configure, integrates nicely with `orderless', and provides better completion
 ;; for elisp symbols. But `corfu-terminal-mode' has a potential rendering problem with TUI Emacs,
 ;; for completion popups appearing near the right edges. The completion entries wrap around, and
-;; sometimes messes up the completion. Corfu does not work well with LaTeX for me. Company works
-;; better with Windows and TUI Emacs, and has more extensive LaTeX support. `company-ispell' is
-;; configurable, and we can set up a custom file containing completions with `company-dict'.
-;; However, `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/capf 'corfu
+;; sometimes messes up the completion. Corfu does not work as well as `company' with LaTeX for me.
+;; Company works better with Windows and TUI Emacs, and has more extensive LaTeX support.
+;; `company-ispell' is configurable, and we can set up a custom file containing completions with
+;; `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
+;; backend.
+(defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -180,7 +181,7 @@ This location is used for temporary installations and files.")
 ;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
 ;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
 ;; improvements now that it is in the Emacs core.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
@@ -351,112 +352,181 @@ This location is used for temporary installations and files.")
 
 (use-package exec-path-from-shell
   :when (symbol-value 'sb/IS-LINUX)
-  :after tramp
   :init
   (setq
     exec-path-from-shell-check-startup-files nil
-    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY")
+    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY" "LSP_USE_PLISTS")
     exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
-(setq
-  ad-redefinition-action 'accept ; Turn off warnings due to redefinitions
-  apropos-do-all t ; Make `apropos' search more extensively
-  auto-save-no-message t ; Allows for debugging frequent autosave triggers if `nil'
-  auto-save-interval 0 ; Disable autosaving based on number of characters typed
-  bookmark-save-flag 1 ; Save bookmark after every bookmark edit and also when Emacs is killed
-  case-fold-search t ; Searches and matches should ignore case
-  comment-auto-fill-only-comments t ; Useful in `prog-mode'
-  create-lockfiles nil
-  custom-safe-themes t
-  delete-by-moving-to-trash t ; Use system trash to deal with mistakes while deleting
-  ;; enable-local-variables :all ; Avoid "defvar" warnings
-  echo-keystrokes 0.1 ; Show current key-sequence in minibuffer
-  ;; Allow doing a command that requires candidate-selection when you are already in the middle
-  ;; of candidate-selection. But keeping track of the minibuffer nesting is difficult.
-  enable-recursive-minibuffers t
-  ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more
-  ;; information
-  eval-expression-print-length 500
+(use-package emacs
+  :custom
+  (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
+  (apropos-do-all t "Make `apropos' search more extensively")
+  (auto-save-no-message t "Allows for debugging frequent autosave triggers if `nil'")
+  (auto-save-interval 0 "Disable autosaving based on number of characters typed")
+  (bookmark-save-flag 1 "Save bookmark after every bookmark edit and also when Emacs is killed")
+  (case-fold-search t "Searches and matches should ignore case")
+  (comment-auto-fill-only-comments t "Autofill comments modes that define them")
+  (create-lockfiles nil)
+  (custom-safe-themes t)
+  (delete-by-moving-to-trash t "Use system trash to deal with mistakes while deleting")
+  ;; (enable-local-variables :all "Avoid `defvar' warnings")
+  (echo-keystrokes 0.1 "Show current key-sequence in minibuffer")
+  ;; Allow invoking a command that requires candidate-selection when are already in the middle of
+  ;; candidate-selection.
+  (enable-recursive-minibuffers t)
+  ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more information
+  (eval-expression-print-length 500)
+  (frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name))
+  (help-enable-symbol-autoload t)
   ;; Accelerate scrolling operations when non-nil. Only those portions of the buffer which are
   ;; actually going to be displayed get fontified.
-  fast-but-imprecise-scrolling t
-  frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name)
-  help-enable-symbol-autoload t
-  help-window-select t ; Makes it easy to close the window
-  history-delete-duplicates t
-  history-length 50 ; Reduce the state that is to be read
-  indicate-buffer-boundaries nil
-  message-log-max 5000
-  ;; mouse-drag-copy-region nil ; Mouse is disabled
-  ;; mouse-yank-at-point t ; Yank at point with mouse instead of at click
-  read-process-output-max (* 5 1024 1024) ; 5 MB, LSP suggests increasing it
-  remote-file-name-inhibit-locks t
-  ring-bell-function 'ignore ; Disable beeping sound
+  (fast-but-imprecise-scrolling t)
+  (help-window-select t "Makes it easy to close the window")
+  (history-delete-duplicates t)
+  (history-length 50 "Reduce the state that is to be read")
+  (indicate-buffer-boundaries nil)
+  (message-log-max 5000)
+  ;; (mouse-drag-copy-region nil "Mouse is disabled")
+  ;; (mouse-yank-at-point t "Yank at point with mouse instead of at click")
+  (read-process-output-max (* 5 1024 1024) "`lsp-mode' suggests increasing the value")
+  (remote-file-name-inhibit-locks t)
+  (ring-bell-function 'ignore "Disable beeping sound")
   ;; If you have something on the system clipboard, and then kill something in Emacs, then by
   ;; default whatever you had on the system clipboard is gone and there is no way to get it
   ;; back. Setting the following option makes it so that when you kill something in Emacs,
   ;; whatever was previously on the system clipboard is pushed into the kill ring. This way, you
   ;; can paste it with `yank-pop'.
-  save-interprogram-paste-before-kill t
-  save-silently t ; Error messages will still be printed
+  (save-interprogram-paste-before-kill t)
+  (save-silently t "Error messages will still be printed")
   ;; Enable use of system clipboard across Emacs and other applications, does not work on the TUI
-  select-enable-clipboard t
-  sentence-end-double-space nil
-  shift-select-mode nil ; Do not use `shift-select' for marking, use it for `windmove'
-  sort-fold-case nil ; Do not ignore case when sorting
-  standard-indent 2
-  switch-to-buffer-preserve-window-point t
-  use-dialog-box nil ; Do not use dialog boxes with mouse commands
-  use-file-dialog nil
-  view-read-only t ; View mode for read-only buffers
-  visible-bell nil
+  (select-enable-clipboard t)
+  (sentence-end-double-space nil)
+  (shift-select-mode nil "Do not use `shift-select' for marking, possibly use it for `windmove'")
+  (sort-fold-case nil "Do not ignore case when sorting")
+  (standard-indent 2)
+  (switch-to-buffer-preserve-window-point t)
+  (use-dialog-box nil "Do not use dialog boxes with mouse commands")
+  (use-file-dialog nil)
+  (view-read-only t "View mode for read-only buffers")
+  (visible-bell nil)
   ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
-  warning-minimum-level
-  :error
-  window-combination-resize t ; Resize windows proportionally
-  x-gtk-use-system-tooltips nil ; Do not use system tooltips
-  x-gtk-resize-child-frames 'resize-mode ; Always trigger an immediate resize of the child frame
-  ;; Underline looks a bit better when drawn lower
-  x-underline-at-descent-line t
-  completion-ignore-case t ; Ignore case when completing
-  ;; Ignore case when reading a buffer name
-  read-buffer-completion-ignore-case t
-  kill-do-not-save-duplicates t ; Do not save duplicates to kill ring
-  blink-matching-paren t
-  kill-whole-line t ; TODO: What is the utility of this variable?
-  suggest-key-bindings t
+  (warning-minimum-level :error)
+  (window-combination-resize t "Resize windows proportionally")
+  (x-gtk-use-system-tooltips nil "Do not use system tooltips")
+  (x-gtk-resize-child-frames 'resize-mode "Always trigger an immediate resize of the child frame")
+  (x-underline-at-descent-line t "Underline looks a bit better when drawn lower")
+  (completion-ignore-case t "Ignore case when completing")
+  (read-buffer-completion-ignore-case t "Ignore case when reading a buffer name")
+  (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
+  (blink-matching-paren t)
+  (suggest-key-bindings t)
+  (tags-add-tables nil)
+  (tags-case-fold-search nil "case-sensitive")
+  ;; Do not ask before rereading the "TAGS" files if they have changed
+  (tags-revert-without-query t)
   ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
   ;; useful information.
-  ;;resize-mini-windows nil
-  max-mini-window-height 0.35
-  tags-add-tables nil
-  tags-case-fold-search nil ; "t"=case-insensitive, "nil"=case-sensitive
-  ;; Do not ask before rereading the "TAGS" files if they have changed
-  tags-revert-without-query t
+  ;; (resize-mini-windows nil)
+  (max-mini-window-height 0.35)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
-  find-file-suppress-same-file-warnings t
+  (find-file-suppress-same-file-warnings t)
   ;; ISSUE: There is a known bug with Emacs upstream.
   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52292
-  find-file-visit-truename nil ; Show true name, useful in case of symlinks
-  large-file-warning-threshold (* 500 1024 1024) ; MB
-  auto-mode-case-fold nil ; Avoid a second pass through `auto-mode-alist'
+  (find-file-visit-truename nil "Show true name, useful in case of symlinks")
+  (large-file-warning-threshold (* 500 1024 1024))
+  (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
+  (backup-inhibited t "Disable backup for a per-file basis")
+  (confirm-nonexistent-file-or-buffer t)
+  (confirm-kill-emacs nil)
+  (confirm-kill-processes nil "Prevent 'Active processes exist' when you quit Emacs")
+  (make-backup-files nil "Stop making backup `~' files")
+  (require-final-newline t "Always end a file with a newline")
+  (scroll-error-top-bottom t)
+  ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
+  ;; variables. I edit remote files mostly via TUI+SSH instead of Tramp.
+  (enable-remote-dir-locals nil)
   ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
   ;; file and runs all save-related hooks. We disable `auto-save-mode' and prefer
   ;; `auto-save-visited-mode' instead.
-  auto-save-default nil
+  (auto-save-default nil)
   ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
   ;; it runs all the save-related hooks.
-  auto-save-visited-interval 30
-  backup-inhibited t ; Disable backup for a per-file basis
-  confirm-nonexistent-file-or-buffer t
-  confirm-kill-emacs nil
-  confirm-kill-processes nil ; Prevent 'Active processes exist' when you quit Emacs
-  ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
-  ;; variables. I edit remote files mostly via TUI+SSH instead of Tramp.
-  enable-remote-dir-locals nil
-  make-backup-files nil ; Stop making backup `~' files
-  require-final-newline t ; Always end a file with a newline
+  (auto-save-visited-interval 30)
+  :config
+  ;; Keep track of the minibuffer nesting
+  (when (bound-and-true-p enable-recursive-minibuffers)
+    (minibuffer-depth-indicate-mode 1))
+
+  (dolist
+    (exts '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
+    (add-to-list 'completion-ignored-extensions exts))
+
+  (when sb/EMACS28+
+    (setq
+      next-error-message-highlight t
+      read-minibuffer-restore-windows t
+      ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
+      read-extended-command-predicate #'command-completion-default-include-p
+      ;; Type "y/n" instead of "yes"/"no", although it is not recommended to prevent from wrong answers
+      ;; being typed in a hurry.
+      use-short-answers t))
+
+  (when sb/EMACS29+
+    (setq
+      help-window-keep-selected t
+      find-sibling-rules
+      '
+      (("\\([^/]+\\)\\.c\\'" "\\1.h")
+        ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
+        ("\\([^/]+\\)\\.h\\'" "\\1.c")
+        ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
+
+  (when sb/IS-WINDOWS
+    (setq w32-get-true-file-attributes nil))
+
+  (when (fboundp 'pixel-scroll-precision-mode)
+    (pixel-scroll-mode 1))
+
+  ;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
+  (dolist (mode '(tooltip-mode))
+    (when (fboundp mode)
+      (funcall mode -1)))
+
+  ;; Enable the following modes
+  (dolist
+    (mode
+      '
+      (auto-save-visited-mode ; Auto-save file-visiting buffers at idle time intervals
+        column-number-mode
+        delete-selection-mode ; Typing with the mark active will overwrite the marked region
+        global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
+        size-indication-mode
+        ;; When you call `find-file', you do not need to clear the existing file path before adding
+        ;; the new one. Just start typing the whole path and Emacs will "shadow" the current one. For
+        ;; example, you are at "~/Documents/notes/file.txt" and you want to go to
+        ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take you there.
+        file-name-shadow-mode))
+    (when (fboundp mode)
+      (funcall mode 1)))
+
+  ;; vertical - Split the selected window into two windows (e.g., `split-window-below'), one above the
+  ;; other.
+  (when (eq sb/window-split 'vertical)
+    (setq
+      split-width-threshold nil
+      split-height-threshold 0))
+
+  ;; horizontal - Split the selected window into two side-by-side windows (e.g.,
+  ;; `split-window-right').
+  (when (eq sb/window-split 'horizontal)
+    (setq
+      split-height-threshold nil
+      split-width-threshold 0)))
+
+(setq
+  kill-whole-line t ; TODO: What is the utility of this variable?
   ;; Scroll settings from Doom Emacs
   scroll-preserve-screen-position t
   scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
@@ -471,32 +541,6 @@ This location is used for temporary installations and files.")
   mouse-wheel-progressive-speed nil ; Do not accelerate scrolling
   mouse-wheel-scroll-amount '(5 ((shift) . 2)))
 
-(dolist
-  (exts '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
-  (add-to-list 'completion-ignored-extensions exts))
-
-(when sb/EMACS28+
-  (setq
-    next-error-message-highlight t
-    read-minibuffer-restore-windows t
-    ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
-    read-extended-command-predicate #'command-completion-default-include-p
-    ;; Type "y/n" instead of "yes"/"no", although it is not recommended to prevent from wrong answers
-    ;; being typed in a hurry.
-    use-short-answers t))
-
-(when sb/EMACS29+
-  (setq
-    help-window-keep-selected t
-    find-sibling-rules
-    '
-    (("\\([^/]+\\)\\.c\\'" "\\1.h")
-      ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
-      ("\\([^/]+\\)\\.h\\'" "\\1.c")
-      ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
-
-(when sb/IS-WINDOWS
-  (setq w32-get-true-file-attributes nil))
 
 ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
 ;; buffer-local variable's default value.
@@ -526,34 +570,6 @@ This location is used for temporary installations and files.")
 (set-keyboard-coding-system 'utf-8) ; Set coding system for keyboard input on TERMINAL
 (set-selection-coding-system 'utf-8)
 (set-terminal-coding-system 'utf-8) ; Set coding system of terminal output
-
-(when (fboundp 'pixel-scroll-precision-mode)
-  (pixel-scroll-mode 1))
-
-(when (bound-and-true-p enable-recursive-minibuffers)
-  (minibuffer-depth-indicate-mode 1))
-
-;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
-(dolist (mode '(tooltip-mode))
-  (when (fboundp mode)
-    (funcall mode -1)))
-
-;; Enable the following modes
-(dolist
-  (mode
-    '
-    (auto-save-visited-mode ; Auto-save file-visiting buffers at idle time intervals
-      column-number-mode
-      delete-selection-mode ; Typing with the mark active will overwrite the marked region
-      global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
-      size-indication-mode
-      ;; When you call `find-file', you do not need to clear the existing file path before adding
-      ;; the new one. Just start typing the whole path and Emacs will "shadow" the current one. For
-      ;; example, you are at "~/Documents/notes/file.txt" and you want to go to
-      ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take you there.
-      file-name-shadow-mode))
-  (when (fboundp mode)
-    (funcall mode 1)))
 
 (diminish 'visual-line-mode)
 ;; Not a library/file, so `eval-after-load' does not work
@@ -864,24 +880,22 @@ This location is used for temporary installations and files.")
 ;; `default-directory'.
 (use-package ibuffer-project
   :when (eq sb/project-handler 'project)
-  :after project
   :hook
   (ibuffer
     .
     (lambda ()
+      (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
       (unless (eq ibuffer-sorting-mode 'project-file-relative)
         (ibuffer-do-sort-by-project-file-relative))))
-  :custom
-  (ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
-  (ibuffer-project-use-cache t "Avoid calculating project root, use cache")
+  :custom (ibuffer-project-use-cache t "Avoid calculating project root, use cache")
   :config
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-;; (use-package ibuffer-projectile ; Group buffers by Projectile project
-;;   :when (eq sb/project-handler 'projectile)
-;;   :after projectile
-;;   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+(use-package ibuffer-projectile ; Group buffers by Projectile project
+  :when (eq sb/project-handler 'projectile)
+  :after projectile
+  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t
@@ -1698,10 +1712,10 @@ This location is used for temporary installations and files.")
   ;; :after consult ; Prevents `consult-tramp' keybinding from being registered
   :bind ("C-c d t" . consult-tramp))
 
-;; (use-package consult-eglot
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after (consult eglot)
-;;   :commands consult-eglot-symbols)
+(use-package consult-eglot
+  :when (eq sb/lsp-provider 'eglot)
+  :after (consult eglot)
+  :commands consult-eglot-symbols)
 
 ;; (use-package consult-project-extra
 ;;   :after (project consult)
@@ -1713,6 +1727,7 @@ This location is used for temporary installations and files.")
 
 (use-package consult-jump-project
   :straight (:host github :repo "jdtsmith/consult-jump-project")
+  :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
   :custom (consult-jump-direct-jump-modes '(dired-mode))
   :bind ("C-x p j" . consult-jump-project))
 
@@ -2504,6 +2519,7 @@ This location is used for temporary installations and files.")
   :when (boundp 'vc-handled-backends)
   :hook
   (
+    ;; Display in the margin since the fringe is unavailable in TTY
     (diff-hl-mode-on
       .
       (lambda ()
@@ -2513,9 +2529,10 @@ This location is used for temporary installations and files.")
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   (diff-hl-disable-on-remote t)
-  :config (diff-hl-flydiff-mode 1)
+  :config
+  (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
-  ;; Display margin since the fringe is unavailable in TTY
+  ;; Display in the margin since the fringe is unavailable in TTY
   ;; (unless (display-graphic-p)
   ;;   (diff-hl-margin-mode 1))
 
@@ -2562,27 +2579,28 @@ This location is used for temporary installations and files.")
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
-;; (use-package elec-pair
-;;   :straight (:type built-in)
-;;   :hook
-;;   ((emacs-startup . electric-pair-mode)
-;;     ;; Disable pairs when entering minibuffer
-;;     (minibuffer-setup . (lambda () (electric-pair-mode -1)))
-;;     ;; Re-enable pairs when existing minibuffer
-;;     (minibuffer-exit . (lambda () (electric-pair-mode 1))))
-;;   :custom
-;;   ;; Avoid balancing parentheses since they can be both irritating and slow
-;;   (electric-pair-preserve-balance nil)
-;;   :config
-;;   (defvar sb/markdown-pairs '((?` . ?`))
-;;     "Electric pairs for `markdown-mode'.")
+(use-package elec-pair
+  :straight (:type built-in)
+  :hook
+  ((emacs-startup . electric-pair-mode)
+    ;; Disable pairs when entering minibuffer
+    (minibuffer-setup . (lambda () (electric-pair-local-mode -1)))
+    ;; Re-enable pairs when existing minibuffer
+    ;; (minibuffer-exit . (lambda () (electric-pair-mode 1)))
+    )
+  :custom
+  ;; Avoid balancing parentheses since they can be both irritating and slow
+  (electric-pair-preserve-balance nil)
+  :config
+  (defvar sb/markdown-pairs '((?` . ?`))
+    "Electric pairs for `markdown-mode'.")
 
-;;   (defun sb/add-markdown-pairs ()
-;;     "Add custom pairs to `markdown-mode'."
-;;     (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
-;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
+  (defun sb/add-markdown-pairs ()
+    "Add custom pairs to `markdown-mode'."
+    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-;;   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs))
+  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs))
 
 ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 ;; (use-package smartparens
@@ -2829,7 +2847,7 @@ This location is used for temporary installations and files.")
 ;;   (add-to-list 'flycheck-checkers 'languagetool t))
 
 ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
-;; support. We enable `flycheck' support for the "*scratch*" buffer which is in `text-mode'.
+;; support. We enable `flycheck' support for the "*scratch*" buffer if it is in `text-mode'.
 
 ;; (run-with-idle-timer
 ;;   3 nil
@@ -2878,11 +2896,11 @@ This location is used for temporary installations and files.")
   (elisp-autofmt-python-bin "python3")
   :config (setq-default elisp-autofmt-load-packages-local '("use-package")))
 
-;; (use-package flycheck-eglot
-;;   :straight (:host github :repo "intramurz/flycheck-eglot")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after (flycheck eglot)
-;;   :init (global-flycheck-eglot-mode 1))
+(use-package flycheck-eglot
+  :straight (:host github :repo "intramurz/flycheck-eglot")
+  :when (eq sb/lsp-provider 'eglot)
+  :after (flycheck eglot)
+  :init (global-flycheck-eglot-mode 1))
 
 (use-package shfmt
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
@@ -3651,14 +3669,18 @@ This location is used for temporary installations and files.")
               #'elisp-completion-at-point
               #'citre-completion-at-point
               #'cape-elisp-symbol)
-            (cape-capf-super #'cape-dabbrev #'cape-dict))))))
+            (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t))))))
 
   (add-hook
     'text-mode-hook
     (lambda ()
       (setq-local completion-at-point-functions
-        (list #'cape-file (cape-capf-super #'cape-dabbrev #'cape-dict)))))
+        (list
+          #'cape-file
+          ;; Merge dabbrev and dict candidates
+          (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t)))))
 
+  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
   (add-hook
     'LaTeX-mode-hook
     (lambda ()
@@ -3758,6 +3780,7 @@ This location is used for temporary installations and files.")
     ("G")
     ("a")
     ("F")
+    ("l" . lsp)
     ("L" . lsp)
     ("q" . lsp-disconnect)
     ("Q" . lsp-workspace-shutdown)
@@ -3856,6 +3879,7 @@ This location is used for temporary installations and files.")
         "-j 2"
         (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
   (lsp-pylsp-plugins-isort-enabled t)
+  (lsp-use-plists t)
   :config
   ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
   ;; interfere with `completion-at-point-functions'
@@ -3885,6 +3909,7 @@ This location is used for temporary installations and files.")
   :diminish)
 
 (use-package lsp-ui
+  :when (eq sb/lsp-provider 'lsp-mode)
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
@@ -4072,7 +4097,7 @@ This location is used for temporary installations and files.")
 
 ;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
 (use-package lsp-latex
-  :after lsp-mode
+  :when (eq sb/lsp-provider 'lsp-mode)
   :hook
   (LaTeX-mode
     .
@@ -4109,166 +4134,176 @@ This location is used for temporary installations and files.")
   ;;     :server-id 'texlab-r))
   )
 
-;; (use-package eglot
-;;   :straight (:source (gnu-elpa-mirror))
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :bind
-;;   (("C-c l q" . eglot-shutdown)
-;;     ("C-c l Q" . eglot-shutdown-all)
-;;     ("C-c l d" . eglot-find-declaration)
-;;     ("C-c l i" . eglot-find-implementation)
-;;     ("C-c l t" . eglot-find-typeDefinition)
-;;     ("C-c l r" . eglot-rename)
-;;     ("C-c l f" . eglot-format)
-;;     ("C-c l F" . eglot-format-buffer)
-;;     ("C-c l x" . eglot-code-actions))
-;;   :hook
-;;   ( ;; (eglot-managed-mode . eglot-inlay-hints-mode) ; Inlay hints are distracting
-;;     (
-;;       (c-mode
-;;         c-ts-mode
-;;         c++-mode
-;;         c++-ts-mode
-;;         python-mode
-;;         python-ts-mode
-;;         markdown-mode
-;;         sh-mode
-;;         bash-ts-mode
-;;         LaTeX-mode
-;;         bibtex-mode
-;;         html-mode
-;;         json-mode
-;;         perl-mode)
-;;       . eglot-ensure))
-;;   :custom
-;;   (eglot-autoshutdown t)
-;;   (eglot-extend-to-xref t)
-;;   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
-;;   ;; Eglot overwrites `company-backends' to only include `company-capf'
-;;   (eglot-stay-out-of '(flymake company eldoc))
-;;   (eglot-ignored-server-capabilities
-;;     '
-;;     (:codeLensProvider
-;;       :executeCommandProvider
-;;       :hoverProvider ; Automatic documentation popups can be distracting
-;;       :foldingRangeProvider
-;;       :documentOnTypeFormattingProvider
-;;       :documentLinkProvider
-;;       ;; Inlay hints are distracting
-;;       :inlayHintProvider))
-;;   :config
-;;   ;; Show all of the available eldoc information when we want it. This way Flymake errors
-;;   ;; don't just get clobbered by docstrings.
-;;   (add-hook
-;;     'eglot-managed-mode-hook
-;;     (lambda ()
-;;       "Make sure Eldoc will show us all of the feedback at point."
-;;       (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
+(use-package eglot
+  :straight (:source (gnu-elpa-mirror))
+  :when (eq sb/lsp-provider 'eglot)
+  :init (put 'eglot-server-programs 'safe-local-variable 'listp)
+  :bind
+  (("C-c l l" . eglot)
+    ("C-c l q" . eglot-shutdown)
+    ("C-c l Q" . eglot-shutdown-all)
+    ("C-c l d" . eglot-find-declaration)
+    ("C-c l i" . eglot-find-implementation)
+    ("C-c l t" . eglot-find-typeDefinition)
+    ("C-c l r" . eglot-rename)
+    ("C-c l f" . eglot-format)
+    ("C-c l F" . eglot-format-buffer)
+    ("C-c l x" . eglot-code-actions))
+  :hook
+  ( ;; (eglot-managed-mode . eglot-inlay-hints-mode) ; Inlay hints are distracting
+    (
+      (c-mode
+        c-ts-mode
+        c++-mode
+        c++-ts-mode
+        python-mode
+        python-ts-mode
+        css-mode
+        css-ts-mode
+        markdown-mode
+        sh-mode
+        bash-ts-mode
+        LaTeX-mode
+        bibtex-mode
+        html-mode
+        html-ts-mode
+        json-mode
+        json-ts-mode
+        dockerfile-ts-mode
+        perl-mode)
+      . eglot-ensure))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-extend-to-xref t)
+  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
+  ;; Eglot overwrites `company-backends' to only include `company-capf'
+  (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
+  (eglot-ignored-server-capabilities
+    '
+    (:codeLensProvider
+      :executeCommandProvider
+      :hoverProvider ; Automatic documentation popups can be distracting
+      :foldingRangeProvider
+      :documentOnTypeFormattingProvider
+      :documentLinkProvider
+      ;; Inlay hints are distracting
+      :inlayHintProvider))
+  :config
+  ;; Show all of the available eldoc information when we want it. This way Flymake errors
+  ;; don't just get clobbered by docstrings.
+  (add-hook
+    'eglot-managed-mode-hook
+    (lambda ()
+      "Make sure Eldoc will show us all of the feedback at point."
+      (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
 
-;;   (advice-add 'jsonrpc--log-event :around (lambda (_orig-func &rest _)))
+  (advice-add 'jsonrpc--log-event :around (lambda (_orig-func &rest _)))
 
-;;   ;; (setq-default eglot-workspace-configuration
-;;   ;;   '
-;;   ;;   (
-;;   ;;     (:pylsp
-;;   ;;       .
-;;   ;;       (:configurationSources
-;;   ;;         ["setup.cfg"]
-;;   ;;         :plugins
-;;   ;;         (:jedi_completion
-;;   ;;           (:include_params t :fuzzy t)
-;;   ;;           :pycodestyle (:enabled :json-false)
-;;   ;;           :mccabe (:enabled :json-false)
-;;   ;;           :pyflakes (:enabled :json-false)
-;;   ;;           :flake8 (:enabled :json-false :maxLineLength 100)
-;;   ;;           :black (:enabled :json-false :line_length 100)
-;;   ;;           :yapf (:enabled t)
-;;   ;;           :pydocstyle (:enabled t :convention "numpy")
-;;   ;;           :autopep8 (:enabled :json-false)
-;;   ;;           :pylint (:enabled t)
-;;   ;;           :pylsp_isort (:enabled t)
-;;   ;;           :pylsp_mypy (:enabled t))))
-;;   ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
+  ;; (setq-default eglot-workspace-configuration
+  ;;   '
+  ;;   (
+  ;;     (:pylsp
+  ;;       .
+  ;;       (:configurationSources
+  ;;         ["setup.cfg"]
+  ;;         :plugins
+  ;;         (:jedi_completion
+  ;;           (:include_params t :fuzzy t)
+  ;;           :pycodestyle (:enabled :json-false)
+  ;;           :mccabe (:enabled :json-false)
+  ;;           :pyflakes (:enabled :json-false)
+  ;;           :flake8 (:enabled :json-false :maxLineLength 100)
+  ;;           :black (:enabled :json-false :line_length 100 :cache_config t)
+  ;;           :yapf (:enabled t)
+  ;;           :pydocstyle (:enabled t :convention "numpy")
+  ;;           :autopep8 (:enabled :json-false)
+  ;;           :pylint (:enabled t)
+  ;;           :ruff (:enabled :json-false :lineLength 100)
+  ;;           :pylsp_isort (:enabled t)
+  ;;           :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false))))
+  ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
 
-;;   (add-to-list
-;;     'eglot-server-programs
-;;     '
-;;     ((c++-mode c++-ts-mode c-mode c-ts-mode)
-;;       .
-;;       ("clangd"
-;;         "-j=4"
-;;         "--all-scopes-completion"
-;;         "--background-index"
-;;         "--clang-tidy"
-;;         "--completion-style=detailed"
-;;         "--fallback-style=LLVM"
-;;         "--header-insertion=never"
-;;         "--header-insertion-decorators=0"
-;;         "--log=error"
-;;         ;; Unsupported option with Clangd 10: malloc-trim and enable-config
-;;         ;; "--malloc-trim" ; Release memory periodically
-;;         ;; "--enable-config"
-;;         ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
-;;         "--pretty")))
+  (add-to-list
+    'eglot-server-programs
+    '
+    ((c++-mode c++-ts-mode c-mode c-ts-mode)
+      .
+      ("clangd"
+        "-j=4"
+        "--all-scopes-completion"
+        "--background-index"
+        "--clang-tidy"
+        "--completion-style=detailed"
+        "--fallback-style=LLVM"
+        "--header-insertion=never"
+        "--header-insertion-decorators=0"
+        "--log=error"
+        ;; Unsupported option with Clangd 10: malloc-trim and enable-config
+        ;; "--malloc-trim" ; Release memory periodically
+        ;; "--enable-config"
+        ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
+        "--pretty")))
 
-;;   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
-;;   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
+  (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
+
+(use-package eglot-hierarchy
+  :straight (:host github :repo "dolmens/eglot-hierarchy"))
 
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
-
-;; (use-package eglot-grammarly
-;;   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
-;;   :hook
-;;   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
-;;     .
-;;     (lambda ()
-;;       (require 'eglot-grammarly)
-;;       (eglot-ensure)))
-;;   :custom (eglot-grammarly-active-modes '(text-mode LaTeX-mode org-mode markdown-mode))
-;;   :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-grammarly-active-modes . ,(eglot-grammarly--server-command))
-;;   ;;   'append)
-;;   (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;; (add-to-list eglot-workspace-configuration
-;;   ;;              ((@emacs-grammarly/grammarly-languageserver
-;;   ;;                ((audience "knowledgeable")))))
-;;   )
+(use-package eglot-grammarly
+  :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
+  :hook
+  ((text-mode LaTeX-mode org-mode markdown-mode)
+    .
+    (lambda ()
+      (require 'eglot-grammarly)
+      (eglot-ensure)))
+  :custom (eglot-grammarly-active-modes '(text-mode LaTeX-mode org-mode markdown-mode))
+  ;; :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-grammarly-active-modes . ,(eglot-grammarly--server-command))
+  ;;   'append)
+  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+  ;; (add-to-list eglot-workspace-configuration
+  ;;              ((@emacs-grammarly/grammarly-languageserver
+  ;;                ((audience "knowledgeable")))))
+  )
 
 ;; FIXME: Fix issue with LTEX 16.0.0
-;; (use-package eglot-ltex
-;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :init
-;;   (setq eglot-languagetool-server-path
-;;     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
-;;   :hook
-;;   ((text-mode-hook LaTeX-mode-hook org-mode-hook markdown-mode-hook)
-;;     .
-;;     (lambda ()
-;;       (require 'eglot-ltex)
-;;       (eglot-ensure)))
-;;   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-;;   ;; :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-;;   ;;   'append)
-;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-;;   )
+(use-package eglot-ltex
+  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+  :when (eq sb/lsp-provider 'eglot)
+  :init
+  (setq eglot-languagetool-server-path
+    (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
+  :hook
+  ((text-mode LaTeX-mode org-mode markdown-mode)
+    .
+    (lambda ()
+      (require 'eglot-ltex)
+      (eglot-ensure)))
+  :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+  ;; :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+  ;;   'append)
+  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+  )
 
-;; (use-package eglot-java
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   (java-mode
-;;     .
-;;     (lambda ()
-;;       (eglot-ensure)
-;;       (eglot-java-mode))))
+(use-package eglot-java
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  (java-mode
+    .
+    (lambda ()
+      (eglot-ensure)
+      (eglot-java-mode))))
 
 (add-hook
   'prog-mode-hook
@@ -4375,6 +4410,7 @@ This location is used for temporary installations and files.")
       (org "https://github.com/milisims/tree-sitter-org")
       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
       (python "https://github.com/tree-sitter/tree-sitter-python")
+      (toml "https://github.com/tree-sitter/tree-sitter-toml")
       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
   :config
   (global-treesit-auto-mode 1)
@@ -4400,16 +4436,9 @@ This location is used for temporary installations and files.")
         (treesit-language-available-p 'org)
         (treesit-language-available-p 'perl)
         (treesit-language-available-p 'python)
+        (treesit-language-available-p 'toml)
         (treesit-language-available-p 'yaml)))
-    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
-
-  ;; (setq
-  ;;   css-ts-mode-hook css-mode-hook
-  ;;   java-ts-mode-hook java-mode-hook
-  ;;   make-ts-mode-hook make-mode-hook
-  ;;   markdown-ts-mode-hook markdown-mode-hook
-  ;;   org-ts-mode-hook org-mode-hook)
-  )
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
 
 ;; (use-package treesit
 ;;   :straight (:type built-in)
@@ -4609,8 +4638,8 @@ This location is used for temporary installations and files.")
         ((eq sb/lsp-provider 'lsp-mode)
           (progn
             ;; Disable text checkers
-            (make-local-variable 'lsp-disabled-clients)
-            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+            ;; (make-local-variable 'lsp-disabled-clients)
+            ;; (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
             (lsp-deferred))))))
   ;; :config
   ;; (with-eval-after-load "lsp-mode"
@@ -5486,9 +5515,12 @@ This location is used for temporary installations and files.")
 
 (use-package latex-extra
   :straight (:host github :repo "Malabarba/latex-extra")
+  :after tex
   :hook (LaTeX-mode . latex-extra-mode)
   :bind
-  (("C-c C-a" . latex/compile-commands-until-done)
+  (:map
+    TeX-mode-map
+    ("C-c C-a" . latex/compile-commands-until-done)
     ("C-c C-n" . latex/next-section)
     ("C-c C-u" . latex/up-section)
     ("C-c C-f" . latex/next-section-same-level)
@@ -5676,6 +5708,10 @@ used in `company-backends'."
     (citre-backend-to-company-backend tags))
   :diminish)
 
+;; (use-package window-stool
+;;   :straight (:host github :repo "jaszhe/window-stool")
+;;   :hook (prog-mode . window-stool-mode))
+
 ;; (use-package treesitter-context
 ;;   :straight (:host github :repo "zbelial/treesitter-context.el")
 ;;   :after treesit
@@ -5703,8 +5739,7 @@ used in `company-backends'."
 ;;     (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))
 ;;   (symbols-outline-follow-mode 1))
 
-;; This is independent of LSP support and is more flexible. On the other hand, `which-func-mode'
-;; consumes less vertical space.
+;; This is independent of LSP support and is more flexible.
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb")
   :hook (emacs-startup . breadcrumb-mode))
@@ -5790,24 +5825,19 @@ Increase line spacing by two line height."
       (and old-location (file-exists-p new-location) (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
-;; We can use the snap installation of "universal-ctags", but snap packages have poor performance. A
-;; better alternative is to build and install "ctags" locally. Check "setup-emacs.sh" for
-;; installation instructions.
+;; (defcustom sb/ctags-path "/usr/local/bin/ctags"
+;;   "Absolute path to Universal Ctags executable."
+;;   :type 'string
+;;   :group 'sb/emacs)
 
-(defcustom sb/ctags-path "/usr/local/bin/ctags"
-  "Absolute path to Universal Ctags executable."
-  :type 'string
-  :group 'sb/emacs)
-
-;; https://www.emacswiki.org/emacs/BuildTags
-(defun sb/create-ctags (dir-name)
-  "Create tags file with ctags in DIR-NAME."
-  (interactive "DDirectory: ")
-  (shell-command
-    (format
-      "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s"
-      sb/ctags-path
-      (directory-file-name dir-name))))
+;; (defun sb/create-ctags (dir-name)
+;;   "Create tags file with ctags in DIR-NAME."
+;;   (interactive "DDirectory: ")
+;;   (shell-command
+;;     (format
+;;       "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s"
+;;       sb/ctags-path
+;;       (directory-file-name dir-name))))
 
 ;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 ;; You need to check for either major modes or buffer names, since a few major modes are commonly
@@ -6047,43 +6077,29 @@ Use the filename relative to the current VC root directory."
 ;;   :hook (emacs-startup . beacon-mode)
 ;;   :diminish)
 
-;; vertical - Split the selected window into two windows (e.g., `split-window-below'), one above the
-;; other.
-(when (eq sb/window-split 'vertical)
-  (setq
-    split-width-threshold nil
-    split-height-threshold 0))
-
-;; horizontal - Split the selected window into two side-by-side windows (e.g.,
-;; `split-window-right').
-(when (eq sb/window-split 'horizontal)
-  (setq
-    split-height-threshold nil
-    split-width-threshold 0))
-
 ;; The color sometimes makes it difficult to distinguish text on terminals.
 ;; (use-package hl-line
 ;;   :hook (emacs-startup . global-hl-line-mode))
 
-(when (display-graphic-p)
-  ;; Show dividers on the right of each window, more prominent than the default
-  (add-hook 'emacs-startup-hook #'window-divider-mode)
+;; (when (display-graphic-p)
+;;   ;; Show dividers on the right of each window, more prominent than the default
+;;   (add-hook 'emacs-startup-hook #'window-divider-mode)
 
-  ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
-  ;; pointless.
-  (fringe-mode '(10 . 0))
+;;   ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
+;;   ;; pointless.
+;;   (fringe-mode '(10 . 0))
 
-  ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
-  ;; the terminal application.
-  (setq-default cursor-type 'box)
-  (set-cursor-color "#ffffff") ; Set cursor color to white
-  ;; Use a blinking bar for the cursor style to help identify it easily.
-  (blink-cursor-mode 1))
+;;   ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
+;;   ;; the terminal application.
+;;   (setq-default cursor-type 'box)
+;;   (set-cursor-color "#ffffff") ; Set cursor color to white
+;;   ;; Use a blinking bar for the cursor style to help identify it easily.
+;;   (blink-cursor-mode 1))
 
 ;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
 ;; numbers only for GUI and daemon.
-(when (or (display-graphic-p) (daemonp))
-  (global-display-line-numbers-mode 1))
+;; (when (or (display-graphic-p) (daemonp))
+;;   (global-display-line-numbers-mode 1))
 
 ;; (use-package centaur-tabs
 ;;   :when (eq sb/tab-bar-handler 'centaur-tabs)
@@ -6306,28 +6322,25 @@ PAD can be left (`l') or right (`r')."
               (powerline-fill nil (powerline-width rhs))
               (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :init
-  (setq
-    powerline-display-hud nil ; Visualization of the buffer position is not useful
-    powerline-display-buffer-size nil
-    powerline-display-mule-info nil ; File encoding information is not useful
-    powerline-gui-use-vcs-glyph t
-    powerline-height 20)
-
-  (sb/powerline-nano-theme))
+  :hook (emacs-startup . sb/powerline-nano-theme)
+  :custom
+  (powerline-display-hud nil "Visualization of the buffer position is not useful")
+  (powerline-display-buffer-size nil)
+  (powerline-display-mule-info nil "File encoding information is not useful")
+  (powerline-gui-use-vcs-glyph t)
+  (powerline-height 20))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
-  :init
-  (setq
-    doom-modeline-buffer-encoding nil
-    doom-modeline-checker-simple-format nil
-    doom-modeline-indent-info nil
-    doom-modeline-lsp t
-    doom-modeline-minor-modes t
-    doom-modeline-buffer-file-name-style 'file-name ; Reduce space on the modeline
-    doom-modeline-unicode-fallback t)
-  :hook (emacs-startup . doom-modeline-mode))
+  :hook (emacs-startup . doom-modeline-mode)
+  :custom
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-checker-simple-format nil)
+  (doom-modeline-indent-info nil)
+  (doom-modeline-lsp t)
+  (doom-modeline-minor-modes t)
+  (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
+  (doom-modeline-unicode-fallback t))
 
 ;; (use-package awesome-tray ; Minimal modeline information
 ;;   :straight (:host github :repo "manateelazycat/awesome-tray")
@@ -6435,10 +6448,7 @@ PAD can be left (`l') or right (`r')."
 (use-package olivetti
   :hook
   ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
-  :custom
-  (olivetti-body-width 108)
-  (olivetti-min-body-width 70)
-  (olivetti-style 'fancy)
+  :custom (olivetti-body-width 108)
   :diminish)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
@@ -6511,11 +6521,11 @@ PAD can be left (`l') or right (`r')."
 (use-package free-keys
   :commands free-keys)
 
-;; (use-package which-key ; Show help popups for prefix keys
-;;   :hook (emacs-startup . which-key-mode)
-;;   :custom (which-key-sort-order 'which-key-key-order-alpha)
-;;   :config (which-key-setup-side-window-right-bottom)
-;;   :diminish)
+(use-package which-key ; Show help popups for prefix keys
+  :hook (emacs-startup . which-key-mode)
+  :custom (which-key-sort-order 'which-key-key-order-alpha)
+  :config (which-key-setup-side-window-right-bottom)
+  :diminish)
 
 ;; Hydras, https://github.com/abo-abo/hydra
 
@@ -6886,70 +6896,20 @@ PAD can be left (`l') or right (`r')."
 
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
-;; Alacritty is my preferred terminal for customizing Emacs keybindings.
+;; Alacritty and Konsole are my preferred terminals for using Emacs.
 (use-package term-keys
   :straight (:host github :repo "CyberShadow/term-keys")
   :unless (display-graphic-p)
   :hook (emacs-startup . term-keys-mode)
-  :config (require 'term-keys-alacritty))
+  :config (require 'term-keys-konsole))
 
-;; (with-eval-after-load "transient"
-;;   (transient-define-prefix sb/help-transient ()
-;;     ["Help Commands"
-;;      ["Mode & Bindings"
-;;       ("m" "Mode" describe-mode)
-;;       ("b" "Major Bindings" which-key-show-full-major-mode)
-;;       ("B" "Minor Bindings" which-key-show-full-minor-mode-keymap)
-;;       ("d" "Descbinds" describe-bindings)
-;;       ]
-;;      ["Describe"
-;;       ("c" "Command" helpful-command)
-;;       ("f" "Function" helpful-callable)
-;;       ("o" "Symbol"  helpful-symbol)
-;;       ("v" "Variable" helpful-variable)
-;;       ("k" "Key" helpful-key)
-;;       ]
-;;      ["Info on"
-;;       ("C-c" "Emacs Command" Info-goto-emacs-command-node)
-;;       ("C-f" "Function" info-lookup-symbol)
-;;       ("C-v" "Variable" info-lookup-symbol)
-;;       ("C-k" "Emacs Key" Info-goto-emacs-key-command-node)
-;;       ]
-;;      ["Goto Source"
-;;       ("L" "Library" find-library)
-;;       ("F" "Function" find-function)
-;;       ("V" "Variable" find-variable)
-;;       ("K" "Key" find-function-on-key)
-;;       ]
-;;      ]
-;;     [
-;;      ["Internals"
-;;       ("e" "Echo Messages" view-echo-area-messages)
-;;       ("l" "Lossage" view-lossage)
-;;       ]
-;;      ["Describe"
-;;       ("s" "Symbol" helpful-symbol)
-;;       ("." "At Point   " helpful-at-point)
-;;       ("C-d" "Face" describe-face)
-;;       ("w" "Where Is" where-is)
-;;       ("=" "Position" what-cursor-position)
-;;       ]
-;;      ["Info Manuals"
-;;       ("C-i" "Info" info)
-;;       ("C-4" "Other Window " info-other-window)
-;;       ]
-;;      ["Exit"
-;;       ("q" "Quit" transient-quit-one)
-;;       ("<escape>" "Quit" transient-quit-one)
-;;       ]
-;;      ]
-;;     [
-;;      ["External"
-;;       ("W" "Dictionary" dictionary-lookup-definition)
-;;       ]
-;;      ]
-;;     )
-;;   (bind-key "M-H" #'sb/help-transient))
+(use-package pixel-scroll
+  :straight (:type built-in)
+  :bind
+  ([remap scroll-up-command] . pixel-scroll-interpolate-down)
+  ([remap scroll-down-command] . pixel-scroll-interpolate-up)
+  :custom (pixel-scroll-precision-interpolate-page t)
+  :init (pixel-scroll-precision-mode 1))
 
 ;; (use-package server
 ;;   :straight (:type built-in)
@@ -6974,11 +6934,10 @@ PAD can be left (`l') or right (`r')."
 
 (setq custom-file sb/custom-file)
 
-(let ((gc-cons-threshold most-positive-fixnum))
-  (when (file-exists-p custom-file)
-    (load custom-file 'noerror 'nomessage))
-  (when (file-exists-p sb/private-file)
-    (load sb/private-file 'noerror 'nomessage)))
+(when (file-exists-p custom-file)
+  (load custom-file 'noerror 'nomessage))
+(when (file-exists-p sb/private-file)
+  (load sb/private-file 'noerror 'nomessage))
 
 ;; Mark safe variables
 
