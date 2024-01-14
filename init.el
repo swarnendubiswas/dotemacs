@@ -61,7 +61,7 @@ Prefer the straight.el package manager instead."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '
@@ -181,7 +181,7 @@ This location is used for temporary installations and files.")
 ;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
 ;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
 ;; improvements now that it is in the Emacs core.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
@@ -3103,8 +3103,7 @@ This location is used for temporary installations and files.")
   ;; (add-to-list 'company-transformers 'delete-dups)
   ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
   ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-
-  :diminish)
+  )
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
@@ -4253,6 +4252,7 @@ This location is used for temporary installations and files.")
 ;; FIXME: Disable documentSymbol because otherwise imenu does not work
 (use-package eglot-grammarly
   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
+  :when (eq sb/lsp-provider 'eglot)
   :hook
   ((text-mode LaTeX-mode org-mode markdown-mode)
     .
@@ -6334,6 +6334,7 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (emacs-startup . doom-modeline-mode)
   :custom
+  (doom-modeline-height 28)
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-indent-info nil)
