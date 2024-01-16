@@ -111,6 +111,8 @@
 
 ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
 
+(setenv "LSP_USE_PLISTS" "true")
+
 (provide 'early-init)
 
 ;;; early-init.el ends here

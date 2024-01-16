@@ -3212,6 +3212,9 @@ This location is used for temporary installations and files.")
 ;;   :demand t
 ;;   :config (setf company-aspell-command "hunspell"))
 
+(use-package company-try-hard
+  :bind (:map company-active-map ("C-<tab>" . company-try-hard)))
+
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
@@ -4731,46 +4734,46 @@ This location is used for temporary installations and files.")
 ;;   :hook ((python-mode python-ts-mode) . yapf-mode)
 ;;   :diminish yapf-mode)
 
-;; (use-package cperl-mode
-;;   :mode "latexmkrc\\'"
-;;   :hook
-;;   (cperl-mode
-;;     .
-;;     (lambda ()
-;;       (cond
-;;         ((eq sb/lsp-provider 'eglot)
-;;           (eglot-ensure))
-;;         ((eq sb/lsp-provider 'lsp-mode)
-;;           (lsp-deferred)))))
-;;   :config
-;;   ;; Prefer CPerl mode to Perl mode
-;;   (fset 'perl-mode 'cperl-mode)
+(use-package cperl-mode
+  :mode "latexmkrc\\'"
+  :hook
+  (cperl-mode
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
+  :config
+  ;; Prefer CPerl mode to Perl mode
+  (fset 'perl-mode 'cperl-mode)
 
-;;   ;; (with-eval-after-load "lsp-mode"
-;;   ;;   (lsp-register-client
-;;   ;;     (make-lsp-client
-;;   ;;       :new-connection
-;;   ;;       (lsp-tramp-connection
-;;   ;;         (lambda ()
-;;   ;;           (list
-;;   ;;             lsp-perl-language-server-path
-;;   ;;             "-MPerl::LanguageServer"
-;;   ;;             "-e"
-;;   ;;             "Perl::LanguageServer::run"
-;;   ;;             "--"
-;;   ;;             (format "--port %d --version %s"
-;;   ;;               lsp-perl-language-server-port
-;;   ;;               lsp-perl-language-server-client-version))))
-;;   ;;       :major-modes '(perl-mode cperl-mode)
-;;   ;;       :remote? t
-;;   ;;       :initialized-fn
-;;   ;;       (lambda (workspace)
-;;   ;;         (with-lsp-workspace
-;;   ;;           workspace
-;;   ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
-;;   ;;       :priority -1
-;;   ;;       :server-id 'perlls-r)))
-;;   )
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection
+  ;;       (lsp-tramp-connection
+  ;;         (lambda ()
+  ;;           (list
+  ;;             lsp-perl-language-server-path
+  ;;             "-MPerl::LanguageServer"
+  ;;             "-e"
+  ;;             "Perl::LanguageServer::run"
+  ;;             "--"
+  ;;             (format "--port %d --version %s"
+  ;;               lsp-perl-language-server-port
+  ;;               lsp-perl-language-server-client-version))))
+  ;;       :major-modes '(perl-mode cperl-mode)
+  ;;       :remote? t
+  ;;       :initialized-fn
+  ;;       (lambda (workspace)
+  ;;         (with-lsp-workspace
+  ;;           workspace
+  ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
+  ;;       :priority -1
+  ;;       :server-id 'perlls-r)))
+  )
 
 ;; (use-package ant
 ;;   :after java-mode

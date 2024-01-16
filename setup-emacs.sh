@@ -158,8 +158,8 @@ install_python_packages() {
     python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" python-lsp-isort pylsp-mypy pylsp-rope pyls-memestra yapf jedi pylint importmagic pydocstyle cpplint grip konsave autotools-language-server libtmux argcomplete --user
 }
 
+# Ubuntu 18 supports node 16
 install_node() {
-    # Ubuntu 18 supports node 16
     NODEJS_VER="18"
 
     case "${DIST_VERSION}" in
@@ -242,16 +242,6 @@ create_symlinks() {
     dfname="$USER_HOME/.gitconfig"
     create_file_symlink $sfname $dfname
 
-    # sfname="$DOTFILES/latex/jabref.xml"
-    # dfname="$USER_HOME/jabref.xml"
-    # create_file_symlink $sfname $dfname
-
-    # if [ ! -d "${CONFIG_DIR}" ]; then
-    #     mkdir -p "${CONFIG_DIR}"
-    #     chown -R $USER:$USER "${CONFIG_DIR}"
-    # fi
-    # cd "${CONFIG_DIR}" || echo "Failed: cd ${CONFIG_DIR}"
-
     sfname="$DOTFILES/python/pylintrc"
     dfname="$CONFIG_DIR/pylintrc"
     create_file_symlink $sfname $dfname
@@ -299,7 +289,7 @@ install_shfmt() {
 }
 
 install_ripgrep() {
-    RG_VER="13.0.0"
+    RG_VER="14.1.0"
 
     wget https://github.com/BurntSushi/ripgrep/releases/download/"${RG_VER}/ripgrep_${RG_VER}"_amd64.deb
     dpkg -i ripgrep_"${RG_VER}"_amd64.deb
@@ -317,7 +307,7 @@ install_cppcheck() {
     fi
 
     cd cppcheck || echo "Failed: cd cppcheck"
-    git checkout 2.12.1
+    git checkout 2.13.0
     mkdir -p build
     cd build || echo "Failed: cd build"
     cmake -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=ON -DUSE_THREADS=ON ..
@@ -351,7 +341,7 @@ install_ctags() {
 }
 
 install_global() {
-    GLOBAL_VER="6.6.10"
+    GLOBAL_VER="6.6.11"
     wget http://tamacom.com/global/global-${GLOBAL_VER}.tar.gz
     tar -xzvf global-${GLOBAL_VER}.tar.gz
     cd global-${GLOBAL_VER} || exit
@@ -446,7 +436,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.53.1"
+    DIFFT_VER="0.54.0"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
@@ -491,7 +481,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.44.1"
+    FZF_VER="0.45.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git
@@ -543,8 +533,8 @@ install_nerd_fonts() {
     done
 }
 
+# Setup 24bit terminal support
 setup_24bit() {
-    # Setup 24bit terminal support
     /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/xterm-24bit.terminfo"
 }
 
