@@ -575,7 +575,8 @@ This location is used for temporary installations and files.")
 ;; Not a library/file, so `eval-after-load' does not work
 (diminish 'auto-fill-function)
 
-(use-package autorevert ; Auto-refresh all buffers
+;; Auto-refresh all buffers
+(use-package autorevert
   :straight (:type built-in)
   :hook (emacs-startup . global-auto-revert-mode)
   :custom
@@ -590,11 +591,13 @@ This location is used for temporary installations and files.")
   (revert-without-query '("\\.*") "Revert all (e.g., PDF) files without asking")
   :diminish auto-revert-mode)
 
-(use-package saveplace ; Remember cursor position in files
+;; Remember cursor position in files
+(use-package saveplace
   :straight (:type built-in)
   :hook (emacs-startup . save-place-mode))
 
-(use-package savehist ; Save minibuffer history across sessions
+;; Save minibuffer history across sessions
+(use-package savehist
   :straight (:type built-in)
   :hook (emacs-startup . savehist-mode)
   :custom
@@ -892,7 +895,8 @@ This location is used for temporary installations and files.")
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-(use-package ibuffer-projectile ; Group buffers by Projectile project
+;; Group buffers by Projectile project
+(use-package ibuffer-projectile
   :when (eq sb/project-handler 'projectile)
   :after projectile
   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
@@ -904,10 +908,12 @@ This location is used for temporary installations and files.")
 ;;   (setq vlf-application 'dont-ask)
 ;;   (require 'vlf-setup))
 
-(use-package immortal-scratch ; When the *scratch* buffer is killed, immediately respawn it
+;; When the *scratch* buffer is killed, immediately respawn it
+(use-package immortal-scratch
   :hook (emacs-startup . immortal-scratch-mode))
 
-(use-package persistent-scratch ; Helps to make the data in the "*scratch*" buffer persist
+;; Helps to make the data in the "*scratch*" buffer persist
+(use-package persistent-scratch
   :hook
   (emacs-startup
     .
@@ -944,8 +950,6 @@ This location is used for temporary installations and files.")
   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t))
   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil)))
-
-;; TODO: What is the utility of this variable?
 
 ;; (add-to-list 'display-buffer-alist '("\\magit:" (display-buffer-same-window)))
 ;; (add-to-list 'display-buffer-alist '("\\*Help" (display-buffer-same-window)))
@@ -1084,7 +1088,8 @@ This location is used for temporary installations and files.")
     (diminish 'dired-omit-mode)
     dired-mode-map))
 
-(use-package dired-narrow ; Narrow `dired' to match filter
+;; Narrow `dired' to match filter
+(use-package dired-narrow
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
@@ -1523,7 +1528,8 @@ This location is used for temporary installations and files.")
   ;;  )
   )
 
-(use-package vertico-directory ; More convenient directory navigation commands
+;; More convenient directory navigation commands
+(use-package vertico-directory
   :straight nil
   :after vertico
   :hook
@@ -1683,7 +1689,8 @@ This location is used for temporary installations and files.")
   :after consult
   :demand t)
 
-(use-package embark ; Provide context-dependent actions similar to a content menu
+;; Provide context-dependent actions similar to a content menu
+(use-package embark
   :after vertico
   :bind
   (([remap describe-bindings] . embark-bindings)
@@ -1996,16 +2003,19 @@ This location is used for temporary installations and files.")
     ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
     :map helpful-mode-map ("q" . helpful-kill-buffers)))
 
-(use-package hungry-delete ; Erase all consecutive white space characters in a given direction
+;; Erase all consecutive white space characters in a given direction
+(use-package hungry-delete
   :hook
   ((minibuffer-setup . (lambda () (hungry-delete-mode -1)))
     (emacs-startup . global-hungry-delete-mode))
   :diminish)
 
-(use-package move-text ; Move lines with "M-<up>" and "M-<down>"
+;; Move lines with "M-<up>" and "M-<down>"
+(use-package move-text 
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
-(use-package expand-region ; Expand region by semantic units
+;; Expand region by semantic units
+(use-package expand-region 
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
 ;; This does not seem to be useful given that I am also using whole-line-or-region.
@@ -2013,10 +2023,12 @@ This location is used for temporary installations and files.")
 ;;   :bind ("M-i" . turn-on-expand-line-mode)
 ;;   :diminish)
 
-(use-package smart-mark ; Restore point to the initial location with "C-g" after marking a region
+;; Restore point to the initial location with "C-g" after marking a region
+(use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
 
-(use-package whole-line-or-region ; Operate on the current line if no region is active
+;; Operate on the current line if no region is active
+(use-package whole-line-or-region
   :hook (emacs-startup . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
@@ -2042,7 +2054,8 @@ This location is used for temporary installations and files.")
     ;; These are for vertical movements.
     ("C-n" . vundo-next) ("C-p" . vundo-previous)))
 
-(use-package iedit ; Edit multiple regions in the same way simultaneously
+;; Edit multiple regions in the same way simultaneously
+(use-package iedit
   :bind* ("C-." . iedit-mode))
 
 (use-package hl-todo
@@ -2069,7 +2082,8 @@ This location is used for temporary installations and files.")
     .
     highlight-numbers-mode))
 
-(use-package page-break-lines ; Display ugly "^L" page breaks as tidy horizontal lines
+;; Display ugly "^L" page breaks as tidy horizontal lines
+(use-package page-break-lines
   :hook (emacs-startup . global-page-break-lines-mode)
   :diminish)
 
@@ -2196,7 +2210,8 @@ This location is used for temporary installations and files.")
 ;; (use-package string-inflection
 ;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
-(use-package gcmh ; Allow GC to happen after a period of idle time
+;; Allow GC to happen after a period of idle time
+(use-package gcmh
   :hook (emacs-startup . gcmh-mode)
   :diminish)
 
@@ -2226,7 +2241,8 @@ This location is used for temporary installations and files.")
 ;;   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
 ;;   :diminish)
 
-(use-package ws-butler ; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+(use-package ws-butler
   :hook (prog-mode . ws-butler-mode)
   :diminish)
 
@@ -2396,7 +2412,8 @@ This location is used for temporary installations and files.")
   (isearch-lazy-highlight t)
   (isearch-lazy-count t "Show match count next to the minibuffer prompt"))
 
-(use-package isearch-symbol-at-point ; Auto populate `isearch' with the symbol at point
+;; Auto populate `isearch' with the symbol at point
+(use-package isearch-symbol-at-point
   :after isearch
   :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
@@ -2515,7 +2532,8 @@ This location is used for temporary installations and files.")
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-(use-package diff-hl ; Diff-hl looks nicer than git-gutter, and is based on `vc'
+;; Diff-hl looks nicer than git-gutter, and is based on `vc'
+(use-package diff-hl
   :when (boundp 'vc-handled-backends)
   :hook
   (
@@ -2626,7 +2644,8 @@ This location is used for temporary installations and files.")
 ;;     ;; "foo(2,3)" -> "foo[2,3]"
 ;;     ("C-M-r" . sp-rewrap-sexp))
 
-(use-package discover-my-major ; Discover key bindings for the current Emacs major mode
+;; Discover key bindings for the current Emacs major mode
+(use-package discover-my-major
   :bind ("C-h C-m" . discover-my-major))
 
 (use-package mode-minder
@@ -2762,7 +2781,8 @@ This location is used for temporary installations and files.")
   (with-eval-after-load "counsel"
     (bind-key "C-c ! !" #'counsel-flycheck flycheck-mode-map)))
 
-(use-package format-all ; Use for major modes which do not provide a formatter.
+;; Use for major modes which do not provide a formatter.
+(use-package format-all
   :hook
   ((format-all-mode . format-all-ensure-formatter)
     ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
@@ -3042,8 +3062,8 @@ This location is used for temporary installations and files.")
     ("C-M-/" . company-other-backend)
     ("C-s" . company-search-candidates)
     ("C-M-s" . company-filter-candidates)
-    ;; ("<tab>" . company-complete-common)
-    ;; ("TAB" . company-complete-common)
+    ("<tab>" . company-complete-common-or-cycle)
+    ("TAB" . company-complete-common-or-cycle)
     ;; ([escape] . company-abort)
     ("M-." . company-show-location)
     ("C-h" . company-show-doc-buffer)
@@ -3152,7 +3172,8 @@ This location is used for temporary installations and files.")
   :after tex-mode
   :demand t)
 
-(use-package math-symbols ; Required by `ac-math' and `company-math'
+;; Required by `ac-math' and `company-math'
+(use-package math-symbols
   :after tex-mode
   :demand t)
 
@@ -3174,7 +3195,8 @@ This location is used for temporary installations and files.")
   :after tex-mode
   :demand t)
 
-(use-package company-anywhere ; Complete in the middle of words
+;; Complete in the middle of words
+(use-package company-anywhere
   :straight (:host github :repo "zk-phi/company-anywhere")
   :after company
   :demand t)
@@ -3187,7 +3209,8 @@ This location is used for temporary installations and files.")
   (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
 
-(use-package company-dirfiles ; Better replacement for `company-files'
+;; Better replacement for `company-files'
+(use-package company-dirfiles
   :straight (:host codeberg :repo "cwfoo/company-dirfiles")
   :after company
   :demand t)
@@ -3213,7 +3236,7 @@ This location is used for temporary installations and files.")
 ;;   :config (setf company-aspell-command "hunspell"))
 
 (use-package company-try-hard
-  :bind (:map company-active-map ("C-<tab>" . company-try-hard)))
+  :bind (("C-j" . company-try-hard) :map company-active-map ("C-j" . company-try-hard)))
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -3294,7 +3317,8 @@ This location is used for temporary installations and files.")
             company-math-symbols-unicode
             company-auctex-symbols
             ;; company-bibtex
-            :separate)
+            ;; :separate
+            )
           company-ispell company-dict company-dabbrev company-capf)))
 
     (add-hook
@@ -4351,7 +4375,8 @@ This location is used for temporary installations and files.")
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
 
-(use-package symbol-overlay ; Highlight symbol under point
+;; Highlight symbol under point
+(use-package symbol-overlay
   :hook (prog-mode . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
@@ -4511,7 +4536,6 @@ This location is used for temporary installations and files.")
 ;;   ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
 ;;   )
 
-;; ;; FIXME: https://github.com/emacs-tree-sitter/elisp-tree-sitter/pull/249/files
 ;; (use-package tree-sitter
 ;;   :when (executable-find "tree-sitter")
 ;;   :hook
@@ -4782,7 +4806,7 @@ This location is used for temporary installations and files.")
 ;; (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
 ;;   :mode "\\.class\\'")
 
-(use-package sh-script ; Shell script mode
+(use-package sh-script
   :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
   :hook
@@ -5260,7 +5284,8 @@ This location is used for temporary installations and files.")
 ;; (use-package org-superstar
 ;;   :hook (org-mode . org-superstar-mode))
 
-(use-package org-appear ; Make invisible parts of Org elements appear visible
+;; Make invisible parts of Org elements appear visible
+(use-package org-appear
   :straight (:host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode)
   :custom
@@ -5495,6 +5520,7 @@ This location is used for temporary installations and files.")
   (auctex-latexmk-setup))
 
 (with-eval-after-load "latex"
+  (unbind-key "C-j" LaTeX-mode-map)
   ;; Disable `LaTeX-insert-item' in favor of `imenu'
   (unbind-key "C-c C-j" LaTeX-mode-map)
 
@@ -6525,7 +6551,8 @@ PAD can be left (`l') or right (`r')."
 (use-package free-keys
   :commands free-keys)
 
-(use-package which-key ; Show help popups for prefix keys
+;; Show help popups for prefix keys
+(use-package which-key
   :hook (emacs-startup . which-key-mode)
   :custom (which-key-sort-order 'which-key-key-order-alpha)
   :config (which-key-setup-side-window-right-bottom)
