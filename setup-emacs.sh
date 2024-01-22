@@ -31,7 +31,7 @@ command_exists() {
 }
 
 install_emacs() {
-    EMACS_VERSION="29.1"
+    EMACS_VERSION="29.2"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     EMACS_NAME="emacs-${EMACS_VERSION}"
@@ -190,7 +190,7 @@ install_npm_packages() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.12.1"
+    TEXLAB_VER="5.12.2"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -503,6 +503,7 @@ install_perl_server() {
 
 install_cargo_packages() {
     cargo install asm-lsp
+    cargo install taplo-cli --features lsp
 }
 
 install_nerd_fonts_helper() {

@@ -134,7 +134,7 @@ This location is used for temporary installations and files.")
 ;; `company-ispell' is configurable, and we can set up a custom file containing completions with
 ;; `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
 ;; backend.
-(defcustom sb/capf 'company
+(defcustom sb/capf 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -486,9 +486,6 @@ This location is used for temporary installations and files.")
   (when sb/IS-WINDOWS
     (setq w32-get-true-file-attributes nil))
 
-  (when (fboundp 'pixel-scroll-precision-mode)
-    (pixel-scroll-mode 1))
-
   ;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
   (dolist (mode '(tooltip-mode))
     (when (fboundp mode)
@@ -756,7 +753,7 @@ This location is used for temporary installations and files.")
     ([remap find-file-read-only] . ffap-read-only)
     ([remap find-alternate-file] . ffap-alternate-file)
     ([remap dired] . dired-at-point)
-    ([remap list-directory] . ffap-list-directory))
+    ("C-x p o" . ff-find-other-file))
   :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names"))
 
 (use-package doc-view
@@ -2011,11 +2008,11 @@ This location is used for temporary installations and files.")
   :diminish)
 
 ;; Move lines with "M-<up>" and "M-<down>"
-(use-package move-text 
+(use-package move-text
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
 ;; Expand region by semantic units
-(use-package expand-region 
+(use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
 ;; This does not seem to be useful given that I am also using whole-line-or-region.
@@ -2078,9 +2075,17 @@ This location is used for temporary installations and files.")
 
 (use-package highlight-numbers
   :hook
-  ((prog-mode yaml-mode yaml-ts-mode conf-mode css-mode html-mode web-mode)
-    .
-    highlight-numbers-mode))
+  (
+    (prog-mode
+      yaml-mode
+      yaml-ts-mode
+      conf-mode
+      css-mode
+      css-ts-mode
+      html-mode
+      html-ts-mode
+      web-mode)
+    . highlight-numbers-mode))
 
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
@@ -2190,7 +2195,7 @@ This location is used for temporary installations and files.")
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 (use-package rainbow-mode
-  :hook ((LaTeX-mode css-mode html-mode web-mode help-mode) . rainbow-mode)
+  :hook ((LaTeX-mode css-mode css-mode-hook html-mode html-ts-mode web-mode help-mode) . rainbow-mode)
   :diminish)
 
 ;; (use-package volatile-highlights
@@ -2247,7 +2252,6 @@ This location is used for temporary installations and files.")
   :diminish)
 
 ;; Both project.el and projectile are unable to remember remote projects.
-
 (use-package project
   :when (eq sb/project-handler 'project)
   :bind-keymap ("C-c p" . project-prefix-map)
@@ -2287,8 +2291,8 @@ This location is used for temporary installations and files.")
     ([remap project-switch-project] . projectile-switch-project)
     ([remap project-vc-dir] . projectile-vc)
     ([remap project-forget-project] . projectile-remove-known-project)
-    ("C-x p A" . projectile-add-known-project)
-    ("C-x p F" . projectile-find-other-file)
+    ("C-c p A" . projectile-add-known-project)
+    ("C-c p F" . projectile-find-other-file)
     :map
     projectile-command-map
     ("A" . projectile-add-known-project)
@@ -3082,7 +3086,7 @@ This location is used for temporary installations and files.")
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow typing input characters that do not match candidates")
-  (company-show-quick-access t "Speed up completion")
+  (company-show-quick-access t "Speed up selecting a completion")
   ;; Align additional metadata, like type signatures, to the right-hand side if non-nil.
   (company-tooltip-align-annotations nil)
   ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there is only
@@ -3191,9 +3195,9 @@ This location is used for temporary installations and files.")
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-(use-package company-bibtex
-  :after tex-mode
-  :demand t)
+;; (use-package company-bibtex
+;;   :after tex-mode
+;;   :demand t)
 
 ;; Complete in the middle of words
 (use-package company-anywhere
@@ -3345,7 +3349,7 @@ This location is used for temporary installations and files.")
       "Add backends for `text-mode' completion in company mode."
       (set
         (make-local-variable 'company-backends)
-        '(company-dirfiles company-ispell company-dict company-dabbrev)))
+        '(company-dirfiles (company-ispell company-dict company-dabbrev))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -3623,37 +3627,6 @@ This location is used for temporary installations and files.")
 ;;   :after corfu
 ;;   :demand t
 ;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
-
-;; (use-package company-auctex
-;;   :after tex-mode
-;;   :demand t
-;;   :commands
-;;   (company-auctex-labels
-;;     company-auctex-bibs
-;;     company-auctex-macros
-;;     company-auctex-symbols
-;;     company-auctex-environments))
-
-;; ;; Required by `ac-math' and `company-math'
-;; (use-package math-symbols :after tex-mode :demand t)
-
-;; (use-package company-math
-;;   :after tex-mode
-;;   :demand t
-;;   :commands (company-math-symbols-latex company-math-symbols-unicode company-latex-commands))
-
-;; ;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
-;; ;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
-;; ;; citations across documents.
-;; (use-package company-reftex
-;;   :after tex-mode
-;;   :demand t
-;;   :commands (company-reftex-labels company-reftex-citations)
-;;   :custom
-;;   ;; https://github.com/TheBB/company-reftex/pull/13
-;;   (company-reftex-labels-parse-all nil))
-
-;; (use-package company-bibtex :after tex-mode :demand t :commands company-bibtex)
 
 ;; FIXME: Add to capf
 ;; (use-package yasnippet-capf
@@ -5081,7 +5054,7 @@ This location is used for temporary installations and files.")
 
 (use-package nxml-mode
   :straight (:type built-in)
-  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$")
+  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
   :hook
   (nxml-mode
     .
@@ -5854,21 +5827,6 @@ Increase line spacing by two line height."
       (and old-location (file-exists-p new-location) (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
-;; (defcustom sb/ctags-path "/usr/local/bin/ctags"
-;;   "Absolute path to Universal Ctags executable."
-;;   :type 'string
-;;   :group 'sb/emacs)
-
-;; (defun sb/create-ctags (dir-name)
-;;   "Create tags file with ctags in DIR-NAME."
-;;   (interactive "DDirectory: ")
-;;   (shell-command
-;;     (format
-;;       "%s -f TAGS -eR --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX --kinds-all=* --fields=* --extras=* --exclude=@./.ctagsignore %s"
-;;       sb/ctags-path
-;;       (directory-file-name dir-name))))
-
-;; https://emacs.stackexchange.com/questions/17687/make-previous-buffer-and-next-buffer-to-ignore-some-buffers
 ;; You need to check for either major modes or buffer names, since a few major modes are commonly
 ;; used.
 (defcustom sb/skippable-buffers
@@ -5877,7 +5835,7 @@ Increase line spacing by two line height."
     "*Messages*"
     "*Backtrace*"
     "*scratch*"
-    "*company-documentation*" ; Major mode is `python-mode'
+    "*company-documentation*"
     "*Help*"
     "*Packages*"
     "*prettier (local)*"
@@ -5958,15 +5916,6 @@ or the major mode is not in `sb/skippable-modes'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
 
-;; https://emacsredux.com/blog/2020/09/12/reinstalling-emacs-packages/
-(defun sb/reinstall-package (package)
-  "Reinstall PACKAGE without restarting Emacs."
-  (interactive)
-  (unload-feature package)
-  (package-reinstall package)
-  (require package))
-
-;; https://emacs.stackexchange.com/questions/58073/how-to-find-inheritance-of-modes
 (defun sb/get-derived-modes (mode)
   "Return a list of the ancestor modes that MODE is derived from."
   (interactive)
@@ -5987,35 +5936,6 @@ or the major mode is not in `sb/skippable-modes'."
       (linum-mode 1)
       (forward-line (read-number "Goto line: ")))
     (linum-mode -1)))
-
-;; (defun sb/compile-and-run-c-program ()
-;;   "Run C programs directly from within Emacs."
-;;   (interactive)
-;;   (defvar sb/foo)
-;;   (setq sb/foo (concat "gcc " (buffer-name) " && ./a.out" ))
-;;   (shell-command sb/foo))
-
-;; http://mbork.pl/2022-06-20_Copying_the_current_location
-(defun sb/current-location ()
-  "Show the current location and put it into the kill ring.
-Use the filename relative to the current VC root directory."
-  (interactive)
-  (let*
-    (
-      (file-name (file-relative-name buffer-file-name (vc-root-dir)))
-      (line-number (line-number-at-pos nil t))
-      (location (format "%s:%s" file-name line-number)))
-    (kill-new location)
-    (message location)))
-
-;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
-(defun sb/auto-create-missing-dirs ()
-  "Auto-create missing directories on a file create and save."
-  (let ((target-dir (file-name-directory buffer-file-name)))
-    (unless (file-exists-p target-dir)
-      (make-directory target-dir t))))
-
-;; (add-to-list 'find-file-not-found-functions #'sb/auto-create-missing-dirs)
 
 ;; Configure appearance-related settings at the end
 
@@ -6928,11 +6848,11 @@ PAD can be left (`l') or right (`r')."
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
 ;; Alacritty and Konsole are my preferred terminals for using Emacs.
-(use-package term-keys
-  :straight (:host github :repo "CyberShadow/term-keys")
-  :unless (display-graphic-p)
-  :hook (emacs-startup . term-keys-mode)
-  :config (require 'term-keys-konsole))
+;; (use-package term-keys
+;;   :straight (:host github :repo "CyberShadow/term-keys")
+;;   :unless (display-graphic-p)
+;;   :hook (emacs-startup . term-keys-mode)
+;;   :config (require 'term-keys-alacritty))
 
 (use-package pixel-scroll
   :straight (:type built-in)
@@ -6940,7 +6860,11 @@ PAD can be left (`l') or right (`r')."
   ([remap scroll-up-command] . pixel-scroll-interpolate-down)
   ([remap scroll-down-command] . pixel-scroll-interpolate-up)
   :custom (pixel-scroll-precision-interpolate-page t)
-  :init (pixel-scroll-precision-mode 1))
+  :init
+  (when (fboundp 'pixel-scroll-mode)
+    (pixel-scroll-mode 1))
+  (when (fboundp 'pixel-scroll-precision-mode)
+    (pixel-scroll-precision-mode 1)))
 
 ;; (use-package server
 ;;   :straight (:type built-in)
