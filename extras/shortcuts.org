@@ -150,7 +150,7 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~M-v~ - Scrolls down by ivy-height lines (~ivy-scroll-down-command~)
 - ~//~ - Switch to the root directory (~self-insert-command~)
 - ~~~ - Switch to the home directory (~self-insert-command~)
-- ~C-c C-o~ - Save the current completion session to a new read-only buffer and exits completion (~ivy-occur~)
+- ~C-c C-o~ - Save the current completion session to a new read-only buffer and exit completion (~ivy-occur~)
 - ~C-m~ - Calls the default action and exits minibuffer (~ivy-done~)
 - ~C-j~ - When completing file names, select the current directory candidate and start a new completion session there. Otherwise, it is the same as ~ivy-done~ (~ivy-alt-done~)
 - ~C-j~ - Exits with the current input instead of the current candidate (~ivy-immediate-done~). This is useful when copying/renaming files with names that match existing files
@@ -376,7 +376,7 @@ Use ~magit-status~ to display information about the current Git repository and ~
 - ~n~ - Move to next section
 - ~p~ - Move to previous section
 - ~M-n~ - Move to next sibling section
-- ~M-p~ - Move to previous sibling section
+- ~M-p~ - Move to the previous sibling section
 - ~s~ - Stage item (~magit-stage~)
 - ~S~ - Stage all changed files (~magit-stage-modified~)
 - ~u~ - Unstage item (~magit-unstage~)
@@ -406,7 +406,7 @@ Use ~magit-status~ to display information about the current Git repository and ~
 - =p= - Move to the previous difference
 - =a= - Copy the text from the left-hand file to the right-hand file
 - =b= - Copy text from the right-hand file to the left-hand file
-- =q= - Exit ediff
+- =q= - Exit Ediff
   
 ** SMerge
 
@@ -550,7 +550,8 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
 - Place the cursor in front of the first column in the first row, and invoke =set-mark-command=
 - Move the cursor to the end of the last column in the last row, and invoke ==kill-rectangle=
 
-*** Replace all occurrences of  in a file
+*** Replace all occurrences of 
+ in a file
 
 - Visit the file that has ^M chars
 - Go to the beginning of the file (M-<)

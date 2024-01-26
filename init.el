@@ -1978,8 +1978,8 @@ This location is used for temporary installations and files.")
 (use-package jinx
   :when (symbol-value 'sb/IS-LINUX)
   :hook (text-mode . jinx-mode)
+  :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
   :custom (jinx-languages "en_US")
-  :bind ([remap ispell-word] . jinx-correct)
   :diminish)
 
 ;; (use-package transient
@@ -2274,6 +2274,11 @@ This location is used for temporary installations and files.")
     ("C" . recompile))
   :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
 
+(use-package projection
+  :when (eq sb/project-handler 'project)
+  :after project
+  :init (global-projection-hook-mode 1))
+
 ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
 ;; indexing.
 (use-package projectile
@@ -2530,6 +2535,18 @@ This location is used for temporary installations and files.")
   (setq
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
+
+(use-package difftastic
+  :after magit
+  :demand t
+  :bind (:map magit-blame-read-only-mode-map ("D" . difftastic-magit-show) ("S" . difftastic-magit-show))
+  :config
+  (eval-after-load 'magit-diff
+    '
+    (transient-append-suffix
+      'magit-diff '(-1 -1)
+      [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
+        ("S" "Difftastic show" difftastic-magit-show)])))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -3628,9 +3645,10 @@ This location is used for temporary installations and files.")
 ;;   :demand t
 ;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
-;; FIXME: Add to capf
-;; (use-package yasnippet-capf
-;;   :straight (:host github :repo "elken/yasnippet-capf"))
+(use-package yasnippet-capf
+  :after corfu
+  :demand t
+  :straight (:host github :repo "elken/yasnippet-capf"))
 
 ;; Here is a snippet to show how to support `company' backends with `cape'.
 ;; https://github.com/minad/cape/issues/20
@@ -3663,7 +3681,7 @@ This location is used for temporary installations and files.")
       (lambda ()
         (setq-local completion-at-point-functions
           (list
-            #'cape-file
+            #'cape-file #'yasnippet-capf
             (cape-capf-super
               #'elisp-completion-at-point
               #'citre-completion-at-point
@@ -3686,16 +3704,19 @@ This location is used for temporary installations and files.")
       (setq-local completion-at-point-functions
         (list
           #'cape-file
-          (cape-company-to-capf #'company-math-symbols-latex)
-          (cape-company-to-capf #'company-latex-commands)
-          (cape-company-to-capf #'company-reftex-labels)
-          (cape-company-to-capf #'company-reftex-citations)
-          (cape-company-to-capf #'company-auctex-environments)
-          (cape-company-to-capf #'company-auctex-macros)
-          (cape-company-to-capf #'company-math-symbols-unicode)
-          (cape-company-to-capf #'company-auctex-symbols)
-          #'cape-tex ; Leads to unwanted completions
-          (cape-capf-super #'cape-dabbrev #'cape-dict)))))
+          (cape-capf-super
+            (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
+            (cape-company-to-capf #'company-latex-commands)
+            (cape-company-to-capf #'company-reftex-labels)
+            (cape-company-to-capf #'company-reftex-citations)
+            (cape-company-to-capf #'company-auctex-environments)
+            (cape-company-to-capf #'company-auctex-macros)
+            ;; Math unicode symbols and sub(super)scripts
+            (cape-company-to-capf #'company-math-symbols-unicode)
+            (cape-company-to-capf #'company-auctex-symbols)
+            #'cape-dabbrev
+            #'cape-dict)
+          #'yasnippet-capf))))
 
   (with-eval-after-load "lsp-mode"
     (dolist
@@ -3724,6 +3745,7 @@ This location is used for temporary installations and files.")
           (setq-local completion-at-point-functions
             (list
               #'cape-file
+              #'yasnippet-capf
               (cape-capf-super #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
               (cape-capf-super #'cape-dabbrev #'cape-dict)))))))
 
@@ -3753,7 +3775,7 @@ This location is used for temporary installations and files.")
         (lambda ()
           (setq-local completion-at-point-functions
             (list
-              #'cape-file
+              #'cape-file #'yasnippet-capf
               (cape-capf-super
                 #'eglot-completion-at-point
                 #'citre-completion-at-point
@@ -4136,7 +4158,7 @@ This location is used for temporary installations and files.")
 (use-package eglot
   :straight (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
-  :init (put 'eglot-server-programs 'safe-local-variable 'listp)
+  ;; :init (put 'eglot-server-programs 'safe-local-variable 'listp)
   :bind
   (("C-c l l" . eglot)
     ("C-c l q" . eglot-shutdown)
@@ -6364,7 +6386,7 @@ PAD can be left (`l') or right (`r')."
 
     ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
       (progn
-        (set-face-attribute 'default nil :font "Hack Nerd Font" :height 160)
+        (set-face-attribute 'default nil :font "Hack Nerd Font" :height 180)
         (set-face-attribute 'mode-line nil :height 130)
         (set-face-attribute 'mode-line-inactive nil :height 130)))))
 
