@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'doom-nord
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -360,6 +360,14 @@ This location is used for temporary installations and files.")
   (exec-path-from-shell-initialize))
 
 (use-package emacs
+  :hook
+  (prog-mode
+    .
+    (lambda ()
+      (auto-fill-mode 1) ; Autofill comments
+      ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
+      (when (or (display-graphic-p) (daemonp))
+        (display-fill-column-indicator-mode 1))))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -520,7 +528,23 @@ This location is used for temporary installations and files.")
   (when (eq sb/window-split 'horizontal)
     (setq
       split-height-threshold nil
-      split-width-threshold 0)))
+      split-width-threshold 0))
+
+  ;; (when (display-graphic-p)
+  ;;   ;; Show dividers on the right of each window, more prominent than the default
+  ;;   (add-hook 'emacs-startup-hook #'window-divider-mode)
+
+  ;;   ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
+  ;;   ;; pointless.
+  ;;   (fringe-mode '(10 . 0))
+
+  ;;   ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
+  ;;   ;; the terminal application.
+  ;;   (setq-default cursor-type 'box)
+  ;;   (set-cursor-color "#ffffff") ; Set cursor color to white
+  ;;   ;; Use a blinking bar for the cursor style to help identify it easily.
+  ;;   (blink-cursor-mode 1))
+  )
 
 (setq
   kill-whole-line t ; TODO: What is the utility of this variable?
@@ -1711,9 +1735,9 @@ This location is used for temporary installations and files.")
   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
+;; ":after consult" prevents `consult-tramp' keybinding from being registered
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
-  ;; :after consult ; Prevents `consult-tramp' keybinding from being registered
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-eglot
@@ -1733,7 +1757,7 @@ This location is used for temporary installations and files.")
   :straight (:host github :repo "jdtsmith/consult-jump-project")
   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
   :custom (consult-jump-direct-jump-modes '(dired-mode))
-  :bind ("C-x p j" . consult-jump-project))
+  :bind (("C-x p j" . consult-jump-project) ("<f6>" . consult-jump-project)))
 
 (use-package consult-dir
   :after consult
@@ -2257,7 +2281,7 @@ This location is used for temporary installations and files.")
   :bind-keymap ("C-c p" . project-prefix-map)
   :bind
   (("<f5>" . project-switch-project)
-    ("<f6>" . project-find-file)
+    ;; ("<f6>" . project-find-file)
     :map
     project-prefix-map
     ("f" . project-find-file)
@@ -3689,6 +3713,12 @@ This location is used for temporary installations and files.")
             (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t))))))
 
   (add-hook
+    'flex-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict))))
+
+  (add-hook
     'text-mode-hook
     (lambda ()
       (setq-local completion-at-point-functions
@@ -4327,15 +4357,6 @@ This location is used for temporary installations and files.")
       (eglot-ensure)
       (eglot-java-mode))))
 
-(add-hook
-  'prog-mode-hook
-  (lambda ()
-    (auto-fill-mode 1) ; Autofill comments
-
-    ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-    (when (or (display-graphic-p) (daemonp))
-      (display-fill-column-indicator-mode 1))))
-
 (use-package which-func
   :custom
   (which-func-modes
@@ -4383,7 +4404,7 @@ This location is used for temporary installations and files.")
 (use-package compile
   :straight (:type built-in)
   :bind
-  ;; "<f10>" and "<f11>" conflict with Gnome window manager keybindings
+  ;; "<f10>" and "<f11>" may conflict with Gnome window manager keybindings
   (("<f10>" . compile) ("<f11>" . recompile))
   :custom
   (compile-command (format "make -k -j%s " (num-processors)))
@@ -5490,20 +5511,20 @@ This location is used for temporary installations and files.")
   :diminish)
 
 ;; Read document like a hypertext document, supports mouse highlighting
-;; (use-package bib-cite
-;;   :straight auctex
-;;   :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
-;;   ;; :bind
-;;   ;; (:map bib-cite-minor-mode-map
-;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
-;;   ;;       ("C-c l a" . bib-apropos)
-;;   ;;       ("C-c l b" . bib-make-bibliography)
-;;   ;;       ("C-c l d" . bib-display)
-;;   ;;       ("C-c l t" . bib-etags)
-;;   ;;       ("C-c l f" . bib-find)
-;;   ;;       ("C-c l n" . bib-find-next))
-;;   :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
-;;   :diminish bib-cite-minor-mode)
+(use-package bib-cite
+  :straight (:type built-in)
+  :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
+  ;;   ;; :bind
+  ;;   ;; (:map bib-cite-minor-mode-map
+  ;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
+  ;;   ;;       ("C-c l a" . bib-apropos)
+  ;;   ;;       ("C-c l b" . bib-make-bibliography)
+  ;;   ;;       ("C-c l d" . bib-display)
+  ;;   ;;       ("C-c l t" . bib-etags)
+  ;;   ;;       ("C-c l f" . bib-find)
+  ;;   ;;       ("C-c l n" . bib-find-next))
+  :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+  :diminish bib-cite-minor-mode)
 
 (use-package auctex-latexmk
   :after tex
@@ -5768,13 +5789,11 @@ used in `company-backends'."
   :straight (:host github :repo "joaotavora/breadcrumb")
   :hook (emacs-startup . breadcrumb-mode))
 
-;; http://stackoverflow.com/questions/15254414/how-to-silently-save-all-buffers-in-emacs
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
   (interactive)
   (save-some-buffers t))
 
-;; http://endlessparentheses.com/implementing-comment-line.html
 (defun sb/comment-line (n)
   "Comment or uncomment current line and leave point after it.
 With positive prefix, apply to N lines including current one.
@@ -5788,7 +5807,6 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
-;; http://ergoemacs.org/emacs/emacs_toggle_line_spacing.html
 (defun sb/toggle-line-spacing ()
   "Toggle line spacing.  Increase the line spacing to help readability.
 Increase line spacing by two line height."
@@ -5803,13 +5821,11 @@ Increase line spacing by two line height."
   (interactive)
   (byte-compile-file buffer-file-name))
 
-;; http://emacsredux.com/blog/2013/06/25/boost-performance-by-leveraging-byte-compilation/
 (defun sb/byte-compile-init-dir ()
   "Byte-compile all elisp files in the user init directory."
   (interactive)
   (byte-recompile-directory user-emacs-directory 0))
 
-;; https://github.com/thomasf/dotfiles-thomasf-emacs/blob/e14a7e857a89b7488ba5bdae54877abdc77fa9e6/emacs.d/init.el
 (defun sb/switch-to-minibuffer ()
   "Switch to minibuffer window."
   (interactive)
@@ -5822,7 +5838,6 @@ Increase line spacing by two line height."
   (interactive)
   (switch-to-buffer "*scratch*"))
 
-;; https://www.emacswiki.org/emacs/InsertDate
 (defun sb/insert-date (arg)
   "Insert today's date.  With prefix argument ARG, use a different format."
   (interactive "P")
@@ -5831,7 +5846,6 @@ Increase line spacing by two line height."
       (format-time-string "%d.%m.%Y")
       (format-time-string "%\"Mmmm\" %d, %Y"))))
 
-;; http://zck.me/emacs-move-file
 (defun sb/move-file (new-location)
   "Write this file to NEW-LOCATION, and delete the old one."
   (interactive
@@ -5849,8 +5863,6 @@ Increase line spacing by two line height."
       (and old-location (file-exists-p new-location) (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
-;; You need to check for either major modes or buffer names, since a few major modes are commonly
-;; used.
 (defcustom sb/skippable-buffers
   '
   ("TAGS"
@@ -5885,7 +5897,6 @@ Increase line spacing by two line height."
   :type '(repeat string)
   :group 'sb/emacs)
 
-;; https://stackoverflow.com/questions/2238418/emacs-lisp-how-to-get-buffer-major-mode
 (defun sb/get-buffer-major-mode (buffer-or-string)
   "Return the major mode associated with BUFFER-OR-STRING."
   (with-current-buffer buffer-or-string
@@ -6051,21 +6062,6 @@ or the major mode is not in `sb/skippable-modes'."
 ;; The color sometimes makes it difficult to distinguish text on terminals.
 ;; (use-package hl-line
 ;;   :hook (emacs-startup . global-hl-line-mode))
-
-;; (when (display-graphic-p)
-;;   ;; Show dividers on the right of each window, more prominent than the default
-;;   (add-hook 'emacs-startup-hook #'window-divider-mode)
-
-;;   ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
-;;   ;; pointless.
-;;   (fringe-mode '(10 . 0))
-
-;;   ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
-;;   ;; the terminal application.
-;;   (setq-default cursor-type 'box)
-;;   (set-cursor-color "#ffffff") ; Set cursor color to white
-;;   ;; Use a blinking bar for the cursor style to help identify it easily.
-;;   (blink-cursor-mode 1))
 
 ;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
 ;; numbers only for GUI and daemon.
@@ -6870,11 +6866,11 @@ PAD can be left (`l') or right (`r')."
 ;; (bind-key "C-c h h" #'sb/hydra-help/body)
 
 ;; Alacritty and Konsole are my preferred terminals for using Emacs.
-;; (use-package term-keys
-;;   :straight (:host github :repo "CyberShadow/term-keys")
-;;   :unless (display-graphic-p)
-;;   :hook (emacs-startup . term-keys-mode)
-;;   :config (require 'term-keys-alacritty))
+(use-package term-keys
+  :straight (:host github :repo "CyberShadow/term-keys")
+  :unless (display-graphic-p)
+  :hook (emacs-startup . term-keys-mode)
+  :config (require 'term-keys-alacritty))
 
 (use-package pixel-scroll
   :straight (:type built-in)
