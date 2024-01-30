@@ -71,6 +71,7 @@
     ("benchamrks" "Benchmarks" nil :count 0)
     ("debgging" "Debugging" nil :count 0)
     ("initialised" "initialized" nil :count 0)
+    ("uanble" "unable" nil :count 0)
    ))
 
 (define-abbrev-table 'global-abbrev-table

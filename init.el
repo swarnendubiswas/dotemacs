@@ -782,6 +782,12 @@ This location is used for temporary installations and files.")
 
 (use-package doc-view
   :straight (:type built-in)
+  :hook
+  (doc-view-mode
+    .
+    (lambda ()
+      (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
+        (auto-revert-mode 1))))
   :bind
   (:map
     doc-view-mode-map
@@ -5578,10 +5584,10 @@ This location is used for temporary installations and files.")
     ("C-c C-q" . latex/clean-fill-indent-environment))
   :diminish)
 
-(use-package math-delimiters
-  :straight (:host github :repo "oantolin/math-delimiters")
-  :after tex
-  :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
+;; (use-package math-delimiters
+;;   :straight (:host github :repo "oantolin/math-delimiters")
+;;   :after tex
+;;   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.

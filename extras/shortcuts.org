@@ -402,11 +402,16 @@ Use ~magit-status~ to display information about the current Git repository and ~
 
 ** Ediff
 
-- =n= - Move to the next difference
-- =p= - Move to the previous difference
-- =a= - Copy the text from the left-hand file to the right-hand file
-- =b= - Copy text from the right-hand file to the left-hand file
-- =q= - Exit Ediff
+- ~n~ - Move to the next difference region 
+- ~p~ - Move to the previous difference region
+- ~a~ - Copy the text from the left-hand file A to the right-hand file B
+- ~b~ - Copy text from the right-hand file B to the left-hand file A
+- ~wa~ - Save buffer A if it was modified
+- ~wb~ - Save buffer B if it was modified
+- ~!~ - Recompute the difference regions, bringing them up to date
+- ~*~ - Forces refinement of the current difference region, which highlights the exact words of disagreement among the buffers
+- ~|~ - Toggles the horizontal/vertical split of the display
+- ~q~ - Exit Ediff
   
 ** SMerge
 
