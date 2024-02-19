@@ -490,6 +490,10 @@ find ~/.emacs.d/elpa -name "*.elc" -delete
 - ~M-p~ - Iterate backward through the search history
 - ~M-n~ - Iterate forward through the search history
 
+*** Search a string in files with specific names
+
+- Use ~consult-ripgrep~ with the following syntax: =#term -- -g filename#=
+
 *** Search in the current folder
 
 - ~<f8>~ - Search for a word in the current directory (~deadgrep~)
@@ -555,8 +559,7 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
 - Place the cursor in front of the first column in the first row, and invoke =set-mark-command=
 - Move the cursor to the end of the last column in the last row, and invoke ==kill-rectangle=
 
-*** Replace all occurrences of 
- in a file
+*** Replace all occurrences of ^M in a file
 
 - Visit the file that has ^M chars
 - Go to the beginning of the file (M-<)

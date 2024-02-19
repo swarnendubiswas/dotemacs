@@ -134,7 +134,7 @@ This location is used for temporary installations and files.")
 ;; `company-ispell' is configurable, and we can set up a custom file containing completions with
 ;; `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
 ;; backend.
-(defcustom sb/capf 'corfu
+(defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -1712,23 +1712,102 @@ This location is used for temporary installations and files.")
     (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
     (bind-key [remap projectile-grep] #'consult-grep)))
 
+;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
+;; `wgrep'
 (use-package embark-consult
   :after consult
   :demand t)
 
-;; Provide context-dependent actions similar to a content menu
+;; Provide context-dependent actions similar to a content menu. Embark is likely not required with
+;; ivy.
 (use-package embark
-  :after vertico
   :bind
   (([remap describe-bindings] . embark-bindings)
-    ("C-`" . embark-dwim)
+    ("C-`" . embark-act)
+    ;; ("C-`" . embark-dwim)
     :map
-    vertico-map
-    ("C-l" . embark-act)
-    ("C-c C-l" . embark-export))
+    minibuffer-local-map
+    ("C-`" . embark-act)
+    ("C-c C-;" . embark-export)
+    ("C-c C-l" . embark-collect)
+    :map
+    minibuffer-local-completion-map
+    ("C-`" . embark-act)
+    :map
+    embark-file-map
+    ("s" . sudo-edit)
+    ("l" . vlf))
   :custom
   ;; Replace the key help with a completing-read interface
-  (prefix-help-command #'embark-prefix-help-command))
+  (prefix-help-command #'embark-prefix-help-command)
+  :config (define-key embark-identifier-map "y" #'symbol-overlay-put)
+
+  (define-key embark-identifier-map "-" #'string-inflection-cycle)
+  (add-to-list 'embark-repeat-actions #'string-inflection-cycle)
+
+  (with-eval-after-load "vertico"
+    (bind-keys :map vertico-map ("M-o" . embark-act) ("C-c C-l" . embark-export)))
+
+  (defun embark-which-key-indicator ()
+    "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+    (lambda (&optional keymap targets prefix)
+      (if (null keymap)
+        (which-key--hide-popup-ignore-command)
+        (which-key--show-keymap
+          (if (eq (plist-get (car targets) :type) 'embark-become)
+            "Become"
+            (format "Act on %s '%s'%s"
+              (plist-get (car targets) :type)
+              (embark--truncate-target (plist-get (car targets) :target))
+              (if (cdr targets)
+                "…"
+                "")))
+          (if prefix
+            (pcase (lookup-key keymap prefix 'accept-default)
+              ((and (pred keymapp) km) km)
+              (_ (key-binding prefix 'accept-default)))
+            keymap)
+          nil nil t (lambda (binding) (not (string-suffix-p "-argument" (cdr binding))))))))
+
+  (setq embark-indicators
+    '(embark-which-key-indicator embark-highlight-indicator embark-isearch-highlight-indicator))
+
+  (defun embark-hide-which-key-indicator (fn &rest args)
+    "Hide the which-key indicator immediately when using the completing-read prompter."
+    (which-key--hide-popup-ignore-command)
+    (let ((embark-indicators (remq #'embark-which-key-indicator embark-indicators)))
+      (apply fn args)))
+
+  (advice-add #'embark-completing-read-prompter :around #'embark-hide-which-key-indicator)
+
+  (defvar embark--target-mode-timer nil)
+  (defvar embark--target-mode-string "")
+
+  (defun embark--target-mode-update ()
+    (setq embark--target-mode-string
+      (if-let
+        (
+          targets
+          (embark--targets))
+        (format "[%s%s] "
+          (propertize (symbol-name (plist-get (car targets) :type)) 'face 'bold)
+          (mapconcat (lambda (x) (format ", %s" (plist-get x :type))) (cdr targets) ""))
+        "")))
+
+  (define-minor-mode embark-target-mode
+    "Shows the current targets in the modeline."
+    :global
+    t
+    (setq mode-line-misc-info (assq-delete-all 'embark-target-mode mode-line-misc-info))
+    (when embark--target-mode-timer
+      (cancel-timer embark--target-mode-timer)
+      (setq embark--target-mode-timer nil))
+    (when embark-target-mode
+      (push '(embark-target-mode (:eval embark--target-mode-string)) mode-line-misc-info)
+      (setq embark--target-mode-timer (run-with-idle-timer 0.1 t #'embark--target-mode-update)))))
 
 ;; Enriches the completion display with annotations, e.g., documentation strings or file
 ;; information.
@@ -1796,9 +1875,9 @@ This location is used for temporary installations and files.")
   :after consult
   :bind ("C-M-y" . consult-yasnippet))
 
+;; ":after (consult projectile)" prevents binding `consult-projectile-switch-project'
 (use-package consult-projectile
   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'projectile))
-  ;; :after (consult projectile) ; Allow binding `consult-projectile-switch-project'
   :bind
   (("<f5>" . consult-projectile-switch-project)
     ("<f6>" . consult-projectile)
@@ -2242,8 +2321,9 @@ This location is used for temporary installations and files.")
 (use-package fix-word
   :bind (("M-u" . fix-word-upcase) ("M-l" . fix-word-downcase) ("M-c" . fix-word-capitalize)))
 
-;; (use-package string-inflection
-;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
+(use-package string-inflection
+  ;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle))
+  )
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -2565,6 +2645,11 @@ This location is used for temporary installations and files.")
   (setq
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
+
+(use-package magit-todos
+  :after magit
+  :demand t
+  :config (magit-todos-mode 1))
 
 (use-package difftastic
   :after magit
@@ -3369,8 +3454,10 @@ This location is used for temporary installations and files.")
             company-auctex-symbols
             ;; company-bibtex
             ;; :separate
-            )
-          company-ispell company-dict company-dabbrev company-capf)))
+            company-ispell
+            company-dict
+            company-dabbrev
+            company-capf))))
 
     (add-hook
       'LaTeX-mode-hook
@@ -6357,10 +6444,10 @@ PAD can be left (`l') or right (`r')."
   (cond
     ((string= (system-name) "swarnendu-Inspiron-7572")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 180)
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
         ;; (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
-        (set-face-attribute 'mode-line nil :height 120)
-        (set-face-attribute 'mode-line-inactive nil :height 120)))
+        (set-face-attribute 'mode-line nil :height 130)
+        (set-face-attribute 'mode-line-inactive nil :height 130)))
 
     ((string= (system-name) "DESKTOP-4T8O69V") ; Inspiron 7572 Windows
       (progn
@@ -6424,6 +6511,13 @@ PAD can be left (`l') or right (`r')."
   ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
   :custom (olivetti-body-width 108)
   :diminish)
+
+;; (use-package selected-window-accent-mode
+;;   :hook (emacs-startup . selected-window-accent-mode)
+;;   :custom
+;;   (selected-window-accent-fringe-thickness 10)
+;;   (selected-window-accent-custom-color nil)
+;;   (selected-window-accent-mode-style 'subtle))
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
 ;; "C-<up>". Standalone special keys (and some combinations) can be written in square brackets, e.g.
