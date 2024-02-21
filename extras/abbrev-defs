@@ -1,4 +1,9 @@
 ;;-*-coding: utf-8;-*-
+(define-abbrev-table 'LaTeX-mode-abbrev-table
+  '(
+    ("occurences" "occurrences" nil :count 0)
+   ))
+
 (define-abbrev-table 'Rd-mode-abbrev-table
   '(
     ("`ag" "\\arguments" nil :count 0)

@@ -2537,6 +2537,9 @@ targets."
   :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
 
+(use-package cc-isearch-menu
+  :bind (:map isearch-mode-map ("<f2>" . cc-isearch-menu-transient)))
+
 ;; (use-package anzu
 ;;   :init
 ;;   (setq
@@ -3200,6 +3203,10 @@ targets."
     ("C-M-s" . company-filter-candidates)
     ("<tab>" . company-complete-common-or-cycle)
     ("TAB" . company-complete-common-or-cycle)
+    ("<backtab>" .
+      (lambda ()
+        (interactive)
+        (company-complete-common-or-cycle -1)))
     ;; ([escape] . company-abort)
     ("M-." . company-show-location)
     ("C-h" . company-show-doc-buffer)
@@ -3374,6 +3381,16 @@ targets."
 (use-package company-try-hard
   :bind (("C-j" . company-try-hard) :map company-active-map ("C-j" . company-try-hard)))
 
+(use-package company-web
+  :after company
+  :demand t
+  :config (require 'company-web-html))
+
+(use-package company-wordfreq
+  :straight (:host github :repo "johannes-mueller/company-wordfreq.el")
+  :after company
+  :demand t)
+
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
@@ -3457,6 +3474,7 @@ targets."
             company-ispell
             company-dict
             company-dabbrev
+            company-wordfreq
             company-capf))))
 
     (add-hook
@@ -3483,7 +3501,7 @@ targets."
       "Add backends for `text-mode' completion in company mode."
       (set
         (make-local-variable 'company-backends)
-        '(company-dirfiles (company-ispell company-dict company-dabbrev))))
+        '(company-dirfiles (company-wordfreq company-ispell company-dict company-dabbrev))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -3513,6 +3531,23 @@ targets."
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode (lambda () (sb/company-yaml-mode)))))
+
+  (progn
+    (defun sb/company-html-mode ()
+      "Add backends for html completion in company mode."
+      (setq-local company-minimum-prefix-length 2)
+
+      (set
+        (make-local-variable 'company-backends)
+        '
+        (company-dirfiles
+          (company-capf company-web-html)
+          company-ispell
+          company-dict
+          company-dabbrev)))
+
+    (dolist (hook '(html-mode-hook html-ts-mode-hook))
+      (add-hook hook (lambda () (sb/company-html-mode)))))
 
   (progn
     (defun sb/company-prog-mode ()
