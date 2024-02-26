@@ -30,7 +30,7 @@
     (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file nil
+(defcustom sb/debug-init-file t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -1728,8 +1728,8 @@ This location is used for temporary installations and files.")
     :map
     minibuffer-local-map
     ("C-`" . embark-act)
-    ("C-c C-;" . embark-export)
-    ("C-c C-l" . embark-collect)
+    ("C-c C-c" . embark-collect)
+    ("C-c C-e" . embark-export)
     :map
     minibuffer-local-completion-map
     ("C-`" . embark-act)
@@ -1842,7 +1842,7 @@ targets."
   :straight (:host github :repo "jdtsmith/consult-jump-project")
   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
   :custom (consult-jump-direct-jump-modes '(dired-mode))
-  :bind (("C-x p j" . consult-jump-project) ("<f6>" . consult-jump-project)))
+  :bind ("C-x p j" . consult-jump-project))
 
 (use-package consult-dir
   :after consult
@@ -2367,7 +2367,7 @@ targets."
   :bind-keymap ("C-c p" . project-prefix-map)
   :bind
   (("<f5>" . project-switch-project)
-    ;; ("<f6>" . project-find-file)
+    ("<f6>" . project-find-file)
     :map
     project-prefix-map
     ("f" . project-find-file)
@@ -5688,6 +5688,7 @@ targets."
 
 (use-package latex-extra
   :straight (:host github :repo "Malabarba/latex-extra")
+  :disabled
   :after tex
   :hook (LaTeX-mode . latex-extra-mode)
   :bind
@@ -6479,7 +6480,7 @@ PAD can be left (`l') or right (`r')."
   (cond
     ((string= (system-name) "swarnendu-Inspiron-7572")
       (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 210)
         ;; (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
         (set-face-attribute 'mode-line nil :height 130)
         (set-face-attribute 'mode-line-inactive nil :height 130)))

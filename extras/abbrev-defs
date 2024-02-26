@@ -2,6 +2,7 @@
 (define-abbrev-table 'LaTeX-mode-abbrev-table
   '(
     ("occurences" "occurrences" nil :count 0)
+    ("tripes" "triples" nil :count 0)
    ))
 
 (define-abbrev-table 'Rd-mode-abbrev-table

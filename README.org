@@ -270,3 +270,5 @@ There are a few choices to evaluate the performance of the configuration.
 - Flickering with =corfu-terminal-mode=
 - Disable pairing = before at the beginning of a word in =smartparens=
 - Enable =flycheck-mode= for Elisp configuration files
+- Load custom snippets with ~yasnippet~
+- Disable prettifying of symbols on auto-completion in ~LaTeX-mode~

@@ -280,7 +280,7 @@ install_shellcheck() {
 }
 
 install_shfmt() {
-    SHFMT_VER="3.7.0"
+    SHFMT_VER="3.8.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
@@ -416,7 +416,7 @@ install_tmux() {
     chown -R $USER:$USER tmux
 
     cd tmux || echo "Failed: cd tmux"
-    git checkout 3.3a
+    git checkout 3.4
     ./autogen.sh
     ./configure
     make
@@ -536,7 +536,7 @@ install_nerd_fonts() {
 
 # Setup 24bit terminal support
 setup_24bit() {
-    /usr/bin/tic -x -o ~/.terminfo "${DOTFILES}/xterm-24bit.terminfo"
+    /usr/bin/tic -x -o "$HOME/.terminfo" "${DOTFILES}/xterm-24bit.terminfo"
 }
 
 # echo -e $"export LC_ALL=en_US.utf-8\nexport LANG=en_US.utf-8\nexport LANGUAGE=en_US.utf-8\nexport TERM=xterm-24bit" >>"$USER_HOME/.bashrc"
