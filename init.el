@@ -181,7 +181,7 @@ This location is used for temporary installations and files.")
 ;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
 ;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
 ;; improvements now that it is in the Emacs core.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
@@ -811,13 +811,14 @@ This location is used for temporary installations and files.")
 
 (use-package ediff
   :straight (:type built-in)
-  :commands (ediff)
+  :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
-  ;; Change default ediff style: do not start another frame with `ediff-setup-windows-default'
+  ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
-  ;; Split windows horizontally in ediff (instead of vertically)
+  ;; Split diffs side by side, i.e., show windows horizontally (instead of vertically)
   (ediff-split-window-function #'split-window-horizontally)
   (ediff-merge-split-window-function 'split-window-horizontally)
+  (ediff-keep-variants nil "Kill file variants upon quitting an Ediff session")
   :config (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 (advice-add 'risky-local-variable-p :override #'ignore)
@@ -1157,6 +1158,7 @@ This location is used for temporary installations and files.")
 
 (use-package dired-hist
   :straight (:host github :repo "karthink/dired-hist")
+  :disabled
   :hook (dired-mode . dired-hist-mode)
   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
@@ -1542,7 +1544,9 @@ This location is used for temporary installations and files.")
   :when (eq sb/minibuffer-completion 'vertico)
   :hook (emacs-startup . vertico-mode)
   :bind (:map vertico-map ("M-<" . vertico-first) ("M->" . vertico-last) ("C-M-j" . vertico-exit-input))
-  :custom (vertico-cycle t)
+  :custom
+  (vertico-cycle t)
+  (vertico-preselect 'first)
   ;; :config
   ;; (cond
   ;;  ;;  ((eq sb/theme 'modus-vivendi)
@@ -1839,6 +1843,7 @@ targets."
 ;;   (setq project-switch-commands 'consult-project-extra-find))
 
 (use-package consult-jump-project
+  :disabled
   :straight (:host github :repo "jdtsmith/consult-jump-project")
   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
   :custom (consult-jump-direct-jump-modes '(dired-mode))
@@ -2583,15 +2588,13 @@ targets."
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
 
-;; `avy-setup-default' will bind `avy-isearch' to "C-'" in `isearch-mode-map', so that you can
-;; select one of the currently visible `isearch' candidates using `avy'.
 (use-package avy
   :bind
   (("C-\\" . avy-goto-word-1)
     ("C-'" . avy-goto-char-timer)
     ("C-/" . avy-goto-line)
-    ("C-M-g" . avy-copy-line)
-    ("C-M-G" . avy-move-line)
+    ("C-M-c" . avy-copy-line)
+    ("C-M-m" . avy-move-line)
     :map isearch-mode-map
     ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
     ;; visible `isearch' candidates.
@@ -2872,7 +2875,7 @@ targets."
       "--replace"
       (eval (expand-file-name "~/.aspell.en.prepl"))
       "--ignore"
-      "lt:en:MORFOLOGIK_RULE_EN_US,lt:en:WORD_CONTAINS_UNDERSCORE"
+      "lt:en:MORFOLOGIK_RULE_EN_US:WANT:EN_QUOTES:EN_DIACRITICS_REPLACE,lt:en:WORD_CONTAINS_UNDERSCORE"
       ;; Using source ensures that a single temporary file in a different dir is created
       ;; such that textidote won't process other files. This serves as a hacky workaround for
       ;; https://github.com/sylvainhalle/textidote/issues/200.
@@ -3093,6 +3096,9 @@ targets."
   (when sb/EMACS28+
     (setq completions-detailed t))
 
+  (when (fboundp 'dabbrev-capf)
+    (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
+
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
     (setq
@@ -3226,8 +3232,8 @@ targets."
   (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow typing input characters that do not match candidates")
   (company-show-quick-access t "Speed up selecting a completion")
-  ;; Align additional metadata, like type signatures, to the right-hand side if non-nil.
-  (company-tooltip-align-annotations nil)
+  ;; Align additional metadata, like type signatures, to the right-hand side because it looks better
+  (company-tooltip-align-annotations t)
   ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there is only
   ;; one candidate, `company-preview-frontend' shows the preview in-place which is too intrusive,
   ;; `company-preview-if-just-one-frontend' shows in-place preview if there is only choice,
@@ -3249,24 +3255,10 @@ targets."
       shell-mode
       csv-mode
       minibuffer-inactive-mode))
-  ;; (company-format-margin-function nil "Disable icons")
+  (company-format-margin-function nil "Disable icons")
   (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
   ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
-  :config
-  ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
-  ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
-  ;; `delete-dups'.
-
-  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
-  ;; https://github.com/company-mode/company-mode/issues/358
-  (push
-    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
-    company-transformers)
-
-  ;; (add-to-list 'company-transformers 'delete-dups)
-  ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
-  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-  )
+  :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
 ;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
@@ -3297,19 +3289,18 @@ targets."
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
 ;; slows completions.
-
-;; (use-package company-fuzzy
-;;   :straight flx
-;;   :straight t
-;;   :after company
-;;   :commands (global-company-fuzzy-mode company-fuzzy-mode)
-;;   :custom
-;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
-;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
-;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
-;;   ;; Disabling the requirement may help with performance.
-;;   (company-fuzzy-prefix-on-top t))
+(use-package company-fuzzy
+  :straight flx
+  :straight t
+  :after company
+  :demand t
+  :custom
+  (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+  ;; (company-fuzzy-passthrough-backends '(company-capf))
+  (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+  ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
+  ;; Disabling the requirement may help with performance.
+  (company-fuzzy-prefix-on-top t))
 
 (use-package company-auctex
   :after tex-mode
@@ -3437,12 +3428,25 @@ targets."
       ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
       ;; ignored.
       company-ispell company-dict company-dabbrev)
+    ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
+    ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
+    ;; `delete-dups'.
     company-transformers
     '
     (delete-dups ; company-sort-by-backend-importance
       ; company-sort-by-occurrence
       company-sort-by-statistics
       company-sort-prefer-same-case-prefix))
+
+  ;; (add-to-list 'company-transformers 'delete-dups)
+  ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
+  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+
+  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
+  ;; https://github.com/company-mode/company-mode/issues/358
+  (push
+    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+    company-transformers)
 
   (progn
     (defun sb/company-latex-mode ()
@@ -3483,9 +3487,8 @@ targets."
         (sb/company-latex-mode)
         ;; `company-capf' does not pass to later backends with Texlab, so we use
         ;; `company-fuzzy-mode' to merge results from all backends.
-        ;; (company-fuzzy-mode 1)
-        ;; (diminish 'company-fuzzy-mode)
-        )))
+        (company-fuzzy-mode 1)
+        (diminish 'company-fuzzy-mode))))
 
   (progn
     (defun sb/company-org-mode ()
@@ -3612,7 +3615,11 @@ targets."
           company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-      (add-hook hook (lambda () (sb/company-elisp-mode))))))
+      (add-hook
+        hook
+        (lambda ()
+          (sb/company-elisp-mode)
+          (company-fuzzy-mode 1))))))
 
 ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
 (use-package corfu
@@ -4188,7 +4195,12 @@ targets."
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
   ;; Furthermore, we also use `flyspell' and `jinx'.
-  (setq lsp-ltex-disabled-rules #s(hash-table size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US"])))
+  (setq lsp-ltex-disabled-rules
+    #s(hash-table
+      size
+      30
+      data
+      ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
 
   ;; (setq lsp-ltex-disabled-rules
   ;;       (json-parse-string
@@ -4353,10 +4365,14 @@ targets."
       . eglot-ensure))
   :custom
   (eglot-autoshutdown t)
+  (eglot-sync-connect nil)
+  (eglot-connect-timeout nil)
+  (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
+  (fset #'jsonrpc--log-event #'ignore)
   (eglot-ignored-server-capabilities
     '
     (:codeLensProvider
@@ -4365,6 +4381,7 @@ targets."
       :foldingRangeProvider
       :documentOnTypeFormattingProvider
       :documentLinkProvider
+      :documentHighlightProvider
       ;; Inlay hints are distracting
       :inlayHintProvider))
   :config
@@ -4376,7 +4393,9 @@ targets."
       "Make sure Eldoc will show us all of the feedback at point."
       (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
 
-  (advice-add 'jsonrpc--log-event :around (lambda (_orig-func &rest _)))
+  ;; (let ((disabled-modes '(emacs-lisp-mode dockerfile-ts-mode)))
+  ;;   (unless (apply 'derived-mode-p disabled-modes)
+  ;;     (eglot-ensure)))
 
   ;; (setq-default eglot-workspace-configuration
   ;;   '
@@ -4425,6 +4444,12 @@ targets."
 
   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
+
+(use-package eglot-booster
+  :ensure t
+  :straight (:type git :host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config (eglot-booster-mode))
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy"))
@@ -4870,8 +4895,8 @@ targets."
   :hook (python-mode . python-docstring-mode)
   :diminish)
 
-(use-package pip-requirements
-  :commands (pip-requirements-mode))
+;; (use-package pip-requirements
+;;   :commands (pip-requirements-mode))
 
 (use-package pyvenv
   :hook ((python-mode python-ts-mode) . pyvenv-mode)
@@ -5093,6 +5118,7 @@ targets."
 
 ;; Align fields with "C-c C-a"
 (use-package csv-mode
+  :disabled
   :hook
   (csv-mode
     .
@@ -5109,6 +5135,7 @@ targets."
 
 (use-package antlr-mode
   :straight (:type built-in)
+  :disabled
   :mode "\\.g4\\'")
 
 (use-package bison-mode
@@ -5185,6 +5212,7 @@ targets."
 ;;    ("\\.cmd\\'" . bat-mode)))
 
 (use-package web-mode
+  :disabled
   :mode "\\.html?\\'"
   :hook
   (web-mode
@@ -5316,8 +5344,8 @@ targets."
 ;; (use-package dotenv-mode
 ;;   :mode "\\.env\\'")
 
-(use-package apt-sources-list
-  :commands apt-sources-list-mode)
+;; (use-package apt-sources-list
+;;   :commands apt-sources-list-mode)
 
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
@@ -5547,6 +5575,7 @@ targets."
 
 ;; Reftex is useful to view ToC even with LSP support
 (use-package reftex
+  :disabled
   ;;   :preface
   ;;   (defun sb/get-bibtex-keys (file)
   ;;     (with-current-buffer (find-file-noselect file)
@@ -5641,6 +5670,7 @@ targets."
 ;; Read document like a hypertext document, supports mouse highlighting
 (use-package bib-cite
   :straight (:type built-in)
+  :disabled
   :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
   ;;   ;; :bind
   ;;   ;; (:map bib-cite-minor-mode-map
@@ -5655,6 +5685,7 @@ targets."
   :diminish bib-cite-minor-mode)
 
 (use-package auctex-latexmk
+  :disabled
   :after tex
   :when (executable-find "latexmk")
   :demand t
@@ -5915,6 +5946,7 @@ used in `company-backends'."
 
 ;; This is independent of LSP support and is more flexible.
 (use-package breadcrumb
+  :disabled
   :straight (:host github :repo "joaotavora/breadcrumb")
   :hook (emacs-startup . breadcrumb-mode))
 
@@ -6047,7 +6079,8 @@ Increase line spacing by two line height."
     compilation-mode
     flycheck-verify-mode
     ibuffer-mode
-    bs-mode)
+    bs-mode
+    ediff-meta-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string)
   :group 'sb/emacs)

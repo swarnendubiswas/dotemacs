@@ -217,6 +217,7 @@
     ("asdvertising" "advertising" nil :count 0)
     ("aslo" "also" nil :count 1)
     ("assistent" "assistant" nil :count 0)
+    ("associa" "associate" nil :count 0)
     ("assuem" "assume" nil :count 1)
     ("assumign" "assuming" nil :count 0)
     ("asthe" "as the" nil :count 0)

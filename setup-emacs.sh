@@ -190,7 +190,7 @@ install_npm_packages() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.12.3"
+    TEXLAB_VER="5.12.4"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
