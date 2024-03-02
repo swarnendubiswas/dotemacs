@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'doom-nord
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -181,7 +181,7 @@ This location is used for temporary installations and files.")
 ;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
 ;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
 ;; improvements now that it is in the Emacs core.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
@@ -1156,11 +1156,10 @@ This location is used for temporary installations and files.")
 
 ;; (use-package diredfl :hook (dired-mode . diredfl-mode))
 
-(use-package dired-hist
-  :straight (:host github :repo "karthink/dired-hist")
-  :disabled
-  :hook (dired-mode . dired-hist-mode)
-  :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+;; (use-package dired-hist
+;;   :straight (:host github :repo "karthink/dired-hist")
+;;   :hook (dired-mode . dired-hist-mode)
+;;   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 ;; Sort most-used commands and show keyboard shortcuts. `amx-major-mode-commands' limits to commands
 ;; that are relevant to the current major mode, `amx-show-unbound-commands' shows frequently used
@@ -1842,12 +1841,11 @@ targets."
 ;;   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
 ;;   (setq project-switch-commands 'consult-project-extra-find))
 
-(use-package consult-jump-project
-  :disabled
-  :straight (:host github :repo "jdtsmith/consult-jump-project")
-  :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
-  :custom (consult-jump-direct-jump-modes '(dired-mode))
-  :bind ("C-x p j" . consult-jump-project))
+;; (use-package consult-jump-project
+;;   :straight (:host github :repo "jdtsmith/consult-jump-project")
+;;   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
+;;   :custom (consult-jump-direct-jump-modes '(dired-mode))
+;;   :bind ("C-x p j" . consult-jump-project))
 
 (use-package consult-dir
   :after consult
@@ -2258,8 +2256,8 @@ targets."
 ;;   :after (pdf-tools saveplace)
 ;;   :demand t)
 
-(use-package wc-mode
-  :commands wc-mode)
+;; (use-package wc-mode
+;;   :commands wc-mode)
 
 ;; Gets the definition of word or phrase at point from https://wordnik.com/
 ;; (use-package define-word
@@ -2326,22 +2324,21 @@ targets."
 (use-package fix-word
   :bind (("M-u" . fix-word-upcase) ("M-l" . fix-word-downcase) ("M-c" . fix-word-capitalize)))
 
-(use-package string-inflection
-  ;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle))
-  )
+;; (use-package string-inflection
+;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
   :diminish)
 
-(use-package kill-file-path
-  :straight (:host github :repo "chyla/kill-file-path")
-  :commands
-  (kill-file-path-basename
-    kill-file-path-basename-without-extension
-    kill-file-path-dirname
-    kill-file-path))
+;; (use-package kill-file-path
+;;   :straight (:host github :repo "chyla/kill-file-path")
+;;   :commands
+;;   (kill-file-path-basename
+;;     kill-file-path-basename-without-extension
+;;     kill-file-path-dirname
+;;     kill-file-path))
 
 ;; (use-package change-inner
 ;;   :commands (change-inner change-outer yank-inner yank-outer))
@@ -2389,10 +2386,17 @@ targets."
     ("C" . recompile))
   :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
 
-(use-package projection
-  :when (eq sb/project-handler 'project)
+(use-package project-x
+  :straight (:host github :repo "karthink/project-x")
   :after project
-  :init (global-projection-hook-mode 1))
+  :demand t
+  :custom (project-x-save-interval 600 "Save project state every 10 min")
+  :config (project-x-mode 1))
+
+;; (use-package projection
+;;   :when (eq sb/project-handler 'project)
+;;   :after project
+;;   :init (global-projection-hook-mode 1))
 
 ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
 ;; indexing.
@@ -2411,8 +2415,8 @@ targets."
     ([remap project-switch-project] . projectile-switch-project)
     ([remap project-vc-dir] . projectile-vc)
     ([remap project-forget-project] . projectile-remove-known-project)
-    ("C-c p A" . projectile-add-known-project)
-    ("C-c p F" . projectile-find-other-file)
+    ;; ("C-c p A" . projectile-add-known-project)
+    ;; ("C-c p F" . projectile-find-other-file)
     :map
     projectile-command-map
     ("A" . projectile-add-known-project)
@@ -2641,6 +2645,7 @@ targets."
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (magit-bury-buffer-function #'magit-restore-window-configuration)
   ;; Suppress the message "Turning on magit-auto-revert-mode" when loading Magit
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
   ;; https://irreal.org/blog/?p=8877
@@ -2652,10 +2657,10 @@ targets."
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
 
-(use-package magit-todos
-  :after magit
-  :demand t
-  :config (magit-todos-mode 1))
+;; (use-package magit-todos
+;;   :after magit
+;;   :demand t
+;;   :config (magit-todos-mode 1))
 
 (use-package difftastic
   :after magit
@@ -3227,6 +3232,7 @@ targets."
   ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
   ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-idle-delay 0.05 "Start autocompletion faster")
+  (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
   (company-minimum-prefix-length 3 "Small words can be faster to type")
@@ -3289,18 +3295,19 @@ targets."
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
 ;; slows completions.
-(use-package company-fuzzy
-  :straight flx
-  :straight t
-  :after company
-  :demand t
-  :custom
-  (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
-  ;; (company-fuzzy-passthrough-backends '(company-capf))
-  (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-  ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
-  ;; Disabling the requirement may help with performance.
-  (company-fuzzy-prefix-on-top t))
+;; (use-package company-fuzzy
+;;   :straight flx
+;;   :straight t
+;;   :after company
+;;   :demand t
+;;   :custom
+;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
+;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
+;;   ;; Disabling the requirement may help with performance.
+;;   (company-fuzzy-prefix-on-top t)
+;;   :diminish)
 
 (use-package company-auctex
   :after tex-mode
@@ -3487,8 +3494,9 @@ targets."
         (sb/company-latex-mode)
         ;; `company-capf' does not pass to later backends with Texlab, so we use
         ;; `company-fuzzy-mode' to merge results from all backends.
-        (company-fuzzy-mode 1)
-        (diminish 'company-fuzzy-mode))))
+        ;; (company-fuzzy-mode 1)
+        ;; (diminish 'company-fuzzy-mode)
+        )))
 
   (progn
     (defun sb/company-org-mode ()
@@ -3607,7 +3615,7 @@ targets."
         '
         (company-dirfiles
           (company-capf
-            company-elisp company-citre-tags
+            company-citre-tags
             :with company-keywords
             company-dabbrev-code ; Useful for variable names
             company-yasnippet
@@ -3619,7 +3627,8 @@ targets."
         hook
         (lambda ()
           (sb/company-elisp-mode)
-          (company-fuzzy-mode 1))))))
+          ;; (company-fuzzy-mode 1)
+          )))))
 
 ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
 (use-package corfu
@@ -3790,12 +3799,12 @@ targets."
 ;;   ;;         (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face)))))
 ;;   )
 
-(use-package nerd-icons-corfu
-  :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
-  :when (eq sb/corfu-icons 'nerd-icons)
-  :after corfu
-  :demand t
-  :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+;; (use-package nerd-icons-corfu
+;;   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+;;   :when (eq sb/corfu-icons 'nerd-icons)
+;;   :after corfu
+;;   :demand t
+;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 ;; (use-package kind-all-the-icons
 ;;   :straight (:host github :repo "Hirozy/kind-all-the-icons")
@@ -4092,6 +4101,37 @@ targets."
   (with-eval-after-load "lsp-lens"
     (diminish 'lsp-lens-mode))
 
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+      (when (equal (following-char) ?#)
+        (let ((bytecode (read (current-buffer))))
+          (when (byte-code-function-p bytecode)
+            (funcall bytecode))))
+      (apply old-fn args)))
+  (advice-add
+    (if
+      (progn
+        (require 'json)
+        (fboundp 'json-parse-buffer))
+      'json-parse-buffer
+      'json-read)
+    :around #'lsp-booster--advice-json-parse)
+
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if
+        (and (not test?) ;; for check lsp-server-present?
+          (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+          lsp-use-plists
+          (not (functionp 'json-rpc-connection)) ;; native json-rpc
+          (executable-find "emacs-lsp-booster"))
+        (progn
+          (message "Using emacs-lsp-booster for %s!" orig-result)
+          (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
   :diminish)
 
 (use-package lsp-ui
@@ -4446,9 +4486,9 @@ targets."
   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
 
 (use-package eglot-booster
-  :ensure t
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
   :after eglot
+  :demand t
   :config (eglot-booster-mode))
 
 (use-package eglot-hierarchy
@@ -4551,8 +4591,8 @@ targets."
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
 
-(use-package highlight-escape-sequences
-  :hook (prog-mode . hes-mode))
+;; (use-package highlight-escape-sequences
+;;   :hook (prog-mode . hes-mode))
 
 (use-package compile
   :straight (:type built-in)
@@ -4580,62 +4620,65 @@ targets."
 ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
 ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 
-(use-package treesit-auto
-  :when (executable-find "tree-sitter")
-  :demand t
-  :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-  :custom
-  (treesit-auto-install 'prompt)
-  (treesit-font-lock-level 4 "Increase default font locking")
-  (treesit-language-source-alist
-    '
-    ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-      (c "https://github.com/tree-sitter/tree-sitter-c")
-      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-      (cmake "https://github.com/uyha/tree-sitter-cmake")
-      (css "https://github.com/tree-sitter/tree-sitter-css")
-      ;; (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-      (html "https://github.com/tree-sitter/tree-sitter-html")
-      (java "https://github.com/tree-sitter/tree-sitter-java")
-      ;; (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-      (json "https://github.com/tree-sitter/tree-sitter-json")
-      (latex "https://github.com/latex-lsp/tree-sitter-latex")
-      (make "https://github.com/alemuller/tree-sitter-make")
-      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-      (org "https://github.com/milisims/tree-sitter-org")
-      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-      (python "https://github.com/tree-sitter/tree-sitter-python")
-      (toml "https://github.com/tree-sitter/tree-sitter-toml")
-      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  ;; Install grammars
-  (when
-    (unless
-      (and (treesit-language-available-p 'bash)
-        (treesit-language-available-p 'bibtex)
-        (treesit-language-available-p 'c)
-        (treesit-language-available-p 'cpp)
-        (treesit-language-available-p 'cmake)
-        (treesit-language-available-p 'css)
-        ;; (treesit-language-available-p 'docker)
-        (treesit-language-available-p 'elisp)
-        (treesit-language-available-p 'html)
-        (treesit-language-available-p 'java)
-        ;; (treesit-language-available-p 'js)
-        (treesit-language-available-p 'json)
-        (treesit-language-available-p 'latex)
-        (treesit-language-available-p 'make)
-        (treesit-language-available-p 'markdown)
-        (treesit-language-available-p 'org)
-        (treesit-language-available-p 'perl)
-        (treesit-language-available-p 'python)
-        (treesit-language-available-p 'toml)
-        (treesit-language-available-p 'yaml)))
-    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
+;; (use-package treesit-auto
+;;   :when (executable-find "tree-sitter")
+;;   :demand t
+;;   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+;;   :custom
+;;   (treesit-auto-install 'prompt)
+;;   (treesit-font-lock-level 4 "Increase default font locking")
+;;   (treesit-language-source-alist
+;;     '
+;;     ((bash "https://github.com/tree-sitter/tree-sitter-bash")
+;;       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+;;       (c "https://github.com/tree-sitter/tree-sitter-c")
+;;       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+;;       (cmake "https://github.com/uyha/tree-sitter-cmake")
+;;       (css "https://github.com/tree-sitter/tree-sitter-css")
+;;       (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+;;       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+;;       (html "https://github.com/tree-sitter/tree-sitter-html")
+;;       (java "https://github.com/tree-sitter/tree-sitter-java")
+;;       (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+;;       (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+;;       (json "https://github.com/tree-sitter/tree-sitter-json")
+;;       (latex "https://github.com/latex-lsp/tree-sitter-latex")
+;;       (make "https://github.com/alemuller/tree-sitter-make")
+;;       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+;;       (org "https://github.com/milisims/tree-sitter-org")
+;;       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+;;       (python "https://github.com/tree-sitter/tree-sitter-python")
+;;       (toml "https://github.com/tree-sitter/tree-sitter-toml")
+;;       (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
+;;       (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+;;       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+;;   :config
+;;   (global-treesit-auto-mode 1)
+;;   (treesit-auto-add-to-auto-mode-alist 'all)
+;;   ;; Install grammars
+;;   (when
+;;     (unless
+;;       (and (treesit-language-available-p 'bash)
+;;         (treesit-language-available-p 'bibtex)
+;;         (treesit-language-available-p 'c)
+;;         (treesit-language-available-p 'cpp)
+;;         (treesit-language-available-p 'cmake)
+;;         (treesit-language-available-p 'css)
+;;         ;; (treesit-language-available-p 'docker)
+;;         (treesit-language-available-p 'elisp)
+;;         (treesit-language-available-p 'html)
+;;         (treesit-language-available-p 'java)
+;;         ;; (treesit-language-available-p 'js)
+;;         (treesit-language-available-p 'json)
+;;         (treesit-language-available-p 'latex)
+;;         (treesit-language-available-p 'make)
+;;         (treesit-language-available-p 'markdown)
+;;         (treesit-language-available-p 'org)
+;;         (treesit-language-available-p 'perl)
+;;         (treesit-language-available-p 'python)
+;;         (treesit-language-available-p 'toml)
+;;         (treesit-language-available-p 'yaml)))
+;;     (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
 
 ;; (use-package treesit
 ;;   :straight (:type built-in)
@@ -4716,6 +4759,21 @@ targets."
 ;;     :demand t
 ;;     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
 ;;   :diminish tree-sitter-mode)
+
+;; (use-package combobulate
+;;   :straight (:host github :repo "mickeynp/combobulate")
+;;   :preface (setq combobulate-key-prefix "C-c o")
+;;   :hook
+;;   (
+;;     (python-ts-mode
+;;       js-ts-mode
+;;       html-ts-mode
+;;       css-ts-mode
+;;       yaml-ts-mode
+;;       typescript-ts-mode
+;;       json-ts-mode
+;;       tsx-ts-mode)
+;;     . combobulate-mode))
 
 (use-package eldoc
   :straight (:type built-in)
@@ -5117,26 +5175,26 @@ targets."
 ;;   :hook ((makefile-mode make-ts-mode) . makefile-executor-mode))
 
 ;; Align fields with "C-c C-a"
-(use-package csv-mode
-  :disabled
-  :hook
-  (csv-mode
-    .
-    (lambda ()
-      (make-local-variable 'lsp-disabled-clients)
-      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-      ;; (when (fboundp 'spell-fu-mode)
-      ;;   (spell-fu-mode -1))
-      (when (fboundp 'flyspell-mode)
-        (flyspell-mode -1))
-      (when (fboundp 'jinx-mode)
-        (jinx-mode -1))))
-  :custom (csv-separators '("," ";" "|" " ")))
+;; (use-package csv-mode
+;;   :disabled
+;;   :hook
+;;   (csv-mode
+;;     .
+;;     (lambda ()
+;;       (make-local-variable 'lsp-disabled-clients)
+;;       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+;;       ;; (when (fboundp 'spell-fu-mode)
+;;       ;;   (spell-fu-mode -1))
+;;       (when (fboundp 'flyspell-mode)
+;;         (flyspell-mode -1))
+;;       (when (fboundp 'jinx-mode)
+;;         (jinx-mode -1))))
+;;   :custom (csv-separators '("," ";" "|" " ")))
 
-(use-package antlr-mode
-  :straight (:type built-in)
-  :disabled
-  :mode "\\.g4\\'")
+;; (use-package antlr-mode
+;;   :straight (:type built-in)
+;;   :disabled
+;;   :mode "\\.g4\\'")
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -5211,45 +5269,45 @@ targets."
 ;;   (("\\.bat\\'" . bat-mode)
 ;;    ("\\.cmd\\'" . bat-mode)))
 
-(use-package web-mode
-  :disabled
-  :mode "\\.html?\\'"
-  :hook
-  (web-mode
-    .
-    (lambda ()
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
-  :bind ("C-c C-d")
-  :custom
-  (web-mode-enable-auto-closing t)
-  (web-mode-enable-auto-pairing nil)
-  (web-mode-enable-auto-quoting t)
-  (web-mode-enable-block-face t)
-  (web-mode-enable-css-colorization t)
-  (web-mode-enable-current-element-highlight t "Highlight the element under the cursor")
-  (web-mode-enable-current-column-highlight t)
-  (web-mode-markup-indent-offset 2) ; HTML
-  (web-mode-css-indent-offset 2) ; CSS
-  (web-mode-code-indent-offset 2) ; Script
-  (web-mode-style-padding 2) ; For <style> tag
-  (web-mode-script-padding 2) ; For <script> tag
-  ;; :config
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
-  ;;       :major-modes '(html-mode web-mode mhtml-mode)
-  ;;       :remote? t
-  ;;       :server-id 'htmlls-r)))
-  )
+;; (use-package web-mode
+;;   :disabled
+;;   :mode "\\.html?\\'"
+;;   :hook
+;;   (web-mode
+;;     .
+;;     (lambda ()
+;;       (cond
+;;         ((eq sb/lsp-provider 'eglot)
+;;           (eglot-ensure))
+;;         ((eq sb/lsp-provider 'lsp-mode)
+;;           (lsp-deferred)))))
+;;   :bind ("C-c C-d")
+;;   :custom
+;;   (web-mode-enable-auto-closing t)
+;;   (web-mode-enable-auto-pairing nil)
+;;   (web-mode-enable-auto-quoting t)
+;;   (web-mode-enable-block-face t)
+;;   (web-mode-enable-css-colorization t)
+;;   (web-mode-enable-current-element-highlight t "Highlight the element under the cursor")
+;;   (web-mode-enable-current-column-highlight t)
+;;   (web-mode-markup-indent-offset 2) ; HTML
+;;   (web-mode-css-indent-offset 2) ; CSS
+;;   (web-mode-code-indent-offset 2) ; Script
+;;   (web-mode-style-padding 2) ; For <style> tag
+;;   (web-mode-script-padding 2) ; For <script> tag
+;;   ;; :config
+;;   ;; (with-eval-after-load "lsp-mode"
+;;   ;;   (lsp-register-client
+;;   ;;     (make-lsp-client
+;;   ;;       :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
+;;   ;;       :major-modes '(html-mode web-mode mhtml-mode)
+;;   ;;       :remote? t
+;;   ;;       :server-id 'htmlls-r)))
+;;   )
 
-(use-package emmet-mode
-  :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-  :custom (emmet-move-cursor-between-quote t))
+;; (use-package emmet-mode
+;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
+;;   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
   :straight (:type built-in)
@@ -5316,12 +5374,12 @@ targets."
   ;;       :server-id 'jsonls-r)))
   )
 
-(use-package json-reformat
-  :after (:any json-mode jsonc-mode json-ts-mode)
-  :demand t
-  :custom
-  (json-reformat:indent-width 2)
-  (js-indent-level 2))
+;; (use-package json-reformat
+;;   :after (:any json-mode jsonc-mode json-ts-mode)
+;;   :demand t
+;;   :custom
+;;   (json-reformat:indent-width 2)
+;;   (js-indent-level 2))
 
 ;; (use-package bazel
 ;;   :when (executable-find "bazel")
@@ -5347,12 +5405,12 @@ targets."
 ;; (use-package apt-sources-list
 ;;   :commands apt-sources-list-mode)
 
-(use-package ssh-config-mode
-  :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-  :mode ("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-  :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
-  :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
-  :hook (ssh-config-mode . turn-on-font-lock))
+;; (use-package ssh-config-mode
+;;   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
+;;   :mode ("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
+;;   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
+;;   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
+;;   :hook (ssh-config-mode . turn-on-font-lock))
 
 ;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
 ;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
@@ -5456,34 +5514,34 @@ targets."
 ;; (use-package org-superstar
 ;;   :hook (org-mode . org-superstar-mode))
 
-;; Make invisible parts of Org elements appear visible
-(use-package org-appear
-  :straight (:host github :repo "awth13/org-appear")
-  :hook (org-mode . org-appear-mode)
-  :custom
-  (org-appear-autosubmarkers t)
-  (org-appear-autoentities t)
-  (org-appear-autolinks t)
-  (org-appear-autoemphasis t)
-  (org-appear-autokeywords t))
+;; ;; Make invisible parts of Org elements appear visible
+;; (use-package org-appear
+;;   :straight (:host github :repo "awth13/org-appear")
+;;   :hook (org-mode . org-appear-mode)
+;;   :custom
+;;   (org-appear-autosubmarkers t)
+;;   (org-appear-autoentities t)
+;;   (org-appear-autolinks t)
+;;   (org-appear-autoemphasis t)
+;;   (org-appear-autokeywords t))
 
-(use-package ox-gfm
-  :after org
-  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
+;; (use-package ox-gfm
+;;   :after org
+;;   :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
-(use-package ox-pandoc
-  :after org
-  :commands
-  (org-pandoc-export-to-markdown
-    org-pandoc-export-as-markdown
-    org-pandoc-export-to-markdown-and-open))
+;; (use-package ox-pandoc
+;;   :after org
+;;   :commands
+;;   (org-pandoc-export-to-markdown
+;;     org-pandoc-export-as-markdown
+;;     org-pandoc-export-to-markdown-and-open))
 
 ;; (use-package org-modern
 ;;   :hook (org-mode . org-modern-mode))
 
-(use-package org-modern-indent
-  :straight (:host github :repo "jdtsmith/org-modern-indent")
-  :hook (org-mode . org-modern-indent-mode))
+;; (use-package org-modern-indent
+;;   :straight (:host github :repo "jdtsmith/org-modern-indent")
+;;   :hook (org-mode . org-modern-indent-mode))
 
 ;; (use-package org-block-capf
 ;;   :straight (:host github :repo "xenodium/org-block-capf")
@@ -5493,213 +5551,237 @@ targets."
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
-(use-package tex
-  :straight auctex
-  :mode ("\\.tex\\'" . LaTeX-mode)
-  :hook
-  ((LaTeX-mode . LaTeX-math-mode)
-    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-    ;; Revert PDF buffer after TeX compilation has finished
-    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-    ;; Enable rainbow mode after applying styles to the buffer
-    (TeX-update-style . rainbow-delimiters-mode)
-    ;; Jump between editor and pdf viewer
-    (LaTeX-mode . TeX-source-correlate-mode) (LaTeX-mode . turn-on-auto-fill)
-    (LaTeX-mode
-      .
-      (lambda ()
-        (cond
-          ((eq sb/lsp-provider 'eglot)
-            (eglot-ensure))
-          ((eq sb/lsp-provider 'lsp-mode)
-            (lsp-deferred))))))
-  :bind
-  (:map
-    TeX-mode-map
-    ("C-c ;")
-    ("C-c C-d")
-    ("C-c C-c" . TeX-command-master)
-    ("$" . self-insert-command)
-    ("C-c x q" . TeX-insert-quote))
-  :custom
-  (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
-  (TeX-auto-untabify t "Remove all tabs before saving")
-  (TeX-clean-confirm nil)
-  ;; Automatically insert braces after typing ^ and _ in math mode
-  (TeX-electric-sub-and-superscript t)
-  (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
-  (TeX-parse-self t "Parse documents")
-  (TeX-quote-after-quote nil "Allow original LaTeX quotes")
-  (TeX-save-query nil "Save buffers automatically when compiling")
-  (TeX-source-correlate-method 'synctex)
-  ;; Do not start the Emacs server when correlating sources
-  (TeX-source-correlate-start-server t)
-  (TeX-syntactic-comment t)
-  (TeX-view-program-selection '((output-pdf "PDF Tools")))
-  (LaTeX-item-indent 0 "Indent lists by two spaces")
-  (LaTeX-syntactic-comments t)
-  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-  (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
-  ;; Avoid superscripts and subscripts from being displayed in a different font size
-  (font-latex-fontify-script nil)
-  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
-  :config
-  (when (executable-find "okular")
-    (setq
-      TeX-view-program-list
-      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-      TeX-view-program-selection '((output-pdf "Okular"))))
 
-  ;; Always query for the master file
-  (setq-default TeX-master nil)
-  (with-eval-after-load "auctex"
-    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
-    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
+;; (straight-use-package
+;;   `
+;;   (auctex
+;;     :type git
+;;     :host nil
+;;     :repo "https://git.savannah.gnu.org/git/auctex.git"
+;;     :pre-build
+;;     ,
+;;     (pcase system-type
+;;       (`berkeley-unix '("gmake"))
+;;       (_
+;;         '
+;;         (`("bash" "-c" "cd" ,(straight--repos-dir "auctex"))
+;;           ("./autogen.sh")
+;;           ("./configure" "--without-texmf-dir" "--with-lispdir=.")
+;;           ("make"))))))
 
-(use-package bibtex
-  :straight (:type built-in)
-  :hook
-  (bibtex-mode
-    .
-    (lambda ()
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
-  :custom
-  (bibtex-align-at-equal-sign t)
-  (bibtex-maintain-sorted-entries t)
-  (bibtex-comma-after-last-field nil))
+;; (use-package tex
+;;   :straight auctex
+;;   :mode ("\\.tex\\'" . LaTeX-mode)
+;;   :hook
+;;   ((LaTeX-mode . LaTeX-math-mode)
+;;     (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
+;;     ;; Revert PDF buffer after TeX compilation has finished
+;;     (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+;;     ;; Enable rainbow mode after applying styles to the buffer
+;;     (TeX-update-style . rainbow-delimiters-mode)
+;;     ;; Jump between editor and pdf viewer
+;;     (LaTeX-mode . TeX-source-correlate-mode) (LaTeX-mode . turn-on-auto-fill)
+;;     (LaTeX-mode
+;;       .
+;;       (lambda ()
+;;         (cond
+;;           ((eq sb/lsp-provider 'eglot)
+;;             (eglot-ensure))
+;;           ((eq sb/lsp-provider 'lsp-mode)
+;;             (lsp-deferred))))))
+;;   :bind
+;;   (:map
+;;     TeX-mode-map
+;;     ("C-c ;")
+;;     ("C-c C-d")
+;;     ("C-c C-c" . TeX-command-master)
+;;     ("$" . self-insert-command)
+;;     ("C-c x q" . TeX-insert-quote))
+;;   :custom
+;;   (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
+;;   (TeX-auto-untabify t "Remove all tabs before saving")
+;;   (TeX-clean-confirm nil)
+;;   ;; Automatically insert braces after typing ^ and _ in math mode
+;;   (TeX-electric-sub-and-superscript t)
+;;   (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
+;;   (TeX-parse-self t "Parse documents")
+;;   (TeX-quote-after-quote nil "Allow original LaTeX quotes")
+;;   (TeX-save-query nil "Save buffers automatically when compiling")
+;;   (TeX-source-correlate-method 'synctex)
+;;   ;; Do not start the Emacs server when correlating sources
+;;   (TeX-source-correlate-start-server t)
+;;   (TeX-syntactic-comment t)
+;;   (TeX-view-program-selection '((output-pdf "PDF Tools")))
+;;   (LaTeX-item-indent 0 "Indent lists by two spaces")
+;;   (LaTeX-syntactic-comments t)
+;;   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
+;;   (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
+;;   ;; Avoid superscripts and subscripts from being displayed in a different font size
+;;   (font-latex-fontify-script nil)
+;;   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
+;;   :config
+;;   (when (executable-find "okular")
+;;     (setq
+;;       TeX-view-program-list
+;;       '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+;;       TeX-view-program-selection '((output-pdf "Okular"))))
+
+;;   ;; Always query for the master file
+;;   (setq-default TeX-master nil)
+;;   (with-eval-after-load "auctex"
+;;     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
+;;     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
+;;     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
+
+;; (use-package bibtex
+;;   :straight (:type built-in)
+;;   :hook
+;;   (bibtex-mode
+;;     .
+;;     (lambda ()
+;;       (cond
+;;         ((eq sb/lsp-provider 'eglot)
+;;           (eglot-ensure))
+;;         ((eq sb/lsp-provider 'lsp-mode)
+;;           (lsp-deferred)))))
+;;   :custom
+;;   (bibtex-align-at-equal-sign t)
+;;   (bibtex-maintain-sorted-entries t)
+;;   (bibtex-comma-after-last-field nil))
 
 ;; Reftex is useful to view ToC even with LSP support
-(use-package reftex
-  :disabled
-  ;;   :preface
-  ;;   (defun sb/get-bibtex-keys (file)
-  ;;     (with-current-buffer (find-file-noselect file)
-  ;;       (mapcar 'car (bibtex-parse-keys))))
+;; (use-package reftex
+;;   :disabled
+;;   ;;   :preface
+;;   ;;   (defun sb/get-bibtex-keys (file)
+;;   ;;     (with-current-buffer (find-file-noselect file)
+;;   ;;       (mapcar 'car (bibtex-parse-keys))))
 
-  ;;   (defun sb/reftex-add-all-bibitems-from-bibtex ()
-  ;;     (interactive)
-  ;;     (mapc
-  ;;       'LaTeX-add-bibitems
-  ;;       (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
+;;   ;;   (defun sb/reftex-add-all-bibitems-from-bibtex ()
+;;   ;;     (interactive)
+;;   ;;     (mapc
+;;   ;;       'LaTeX-add-bibitems
+;;   ;;       (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
 
-  ;;   (defun sb/find-bibliography-file ()
-  ;;     "Try to find a bibliography file using RefTeX.
-  ;;       Returns a string with text properties (as expected by read-file-name) or
-  ;; empty string if no file can be found"
-  ;;     (interactive)
-  ;;     (let ((bibfile-list nil))
-  ;;       (condition-case nil
-  ;;         (setq bibfile-list (reftex-get-bibfile-list))
-  ;;         (error
-  ;;           (ignore-errors
-  ;;             (setq bibfile-list (reftex-default-bibliography)))))
-  ;;       (if bibfile-list
-  ;;         (car bibfile-list)
-  ;;         "")))
+;;   ;;   (defun sb/find-bibliography-file ()
+;;   ;;     "Try to find a bibliography file using RefTeX.
+;;   ;;       Returns a string with text properties (as expected by read-file-name) or
+;;   ;; empty string if no file can be found"
+;;   ;;     (interactive)
+;;   ;;     (let ((bibfile-list nil))
+;;   ;;       (condition-case nil
+;;   ;;         (setq bibfile-list (reftex-get-bibfile-list))
+;;   ;;         (error
+;;   ;;           (ignore-errors
+;;   ;;             (setq bibfile-list (reftex-default-bibliography)))))
+;;   ;;       (if bibfile-list
+;;   ;;         (car bibfile-list)
+;;   ;;         "")))
 
-  ;;   (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
-  ;;     "Try to find a bibliography file using RefTex and parse the bib keys.
-  ;; Ignore if no file is found."
-  ;;     (interactive)
-  ;;     (let ((bibfile-list nil))
-  ;;       (condition-case nil
-  ;;         (setq bibfile-list (reftex-get-bibfile-list))
-  ;;         (error
-  ;;           (ignore-errors
-  ;;             (setq bibfile-list (reftex-default-bibliography)))))
-  ;;       ;; (message "%s" bibfile-list)
-  ;;       (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
-  :straight (:type built-in)
-  :hook (LaTeX-mode . turn-on-reftex)
-  :bind
-  (("C-c [" . reftex-citation)
-    ("C-c )" . reftex-reference)
-    ("C-c (" . reftex-label)
-    ("C-c =" . reftex-toc)
-    ("C-c -" . reftex-toc-recenter)
-    ("C-c &" . reftex-view-crossref))
-  :custom
-  (reftex-plug-into-AUCTeX t)
-  (reftex-enable-partial-scans t)
-  (reftex-highlight-selection 'both)
-  (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
-  (reftex-revisit-to-follow t)
-  (reftex-auto-recenter-toc t "Center on the section currently being edited")
-  (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
-  (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
-  (reftex-toc-split-windows-horizontally t) ; Show reftex TOC on the left
-  (reftex-ref-macro-prompt nil) ; No unnecessary prompts
-  ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
-  (reftex-use-fonts t "Use nice fonts for TOC")
-  ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
-  (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
-  ;; Throw away buffers created for parsing, but keep the ones created for lookup
-  (reftex-keep-temporary-buffers 1)
-  (reftex-trust-label-prefix '("fn:" "eq:" "sec:" "fig:" "tab:"))
-  (reftex-allow-automatic-rescan nil)
-  (reftex-enable-partial-scans t)
-  :config
-  ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
-  ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
+;;   ;;   (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
+;;   ;;     "Try to find a bibliography file using RefTex and parse the bib keys.
+;;   ;; Ignore if no file is found."
+;;   ;;     (interactive)
+;;   ;;     (let ((bibfile-list nil))
+;;   ;;       (condition-case nil
+;;   ;;         (setq bibfile-list (reftex-get-bibfile-list))
+;;   ;;         (error
+;;   ;;           (ignore-errors
+;;   ;;             (setq bibfile-list (reftex-default-bibliography)))))
+;;   ;;       ;; (message "%s" bibfile-list)
+;;   ;;       (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
+;;   :straight (:type built-in)
+;;   :hook (LaTeX-mode . turn-on-reftex)
+;;   :bind
+;;   (("C-c [" . reftex-citation)
+;;     ("C-c )" . reftex-reference)
+;;     ("C-c (" . reftex-label)
+;;     ("C-c =" . reftex-toc)
+;;     ("C-c -" . reftex-toc-recenter)
+;;     ("C-c &" . reftex-view-crossref))
+;;   :custom
+;;   (reftex-plug-into-AUCTeX t)
+;;   (reftex-enable-partial-scans t)
+;;   (reftex-highlight-selection 'both)
+;;   (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
+;;   (reftex-revisit-to-follow t)
+;;   (reftex-auto-recenter-toc t "Center on the section currently being edited")
+;;   (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
+;;   (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
+;;   (reftex-toc-split-windows-horizontally t) ; Show reftex TOC on the left
+;;   (reftex-ref-macro-prompt nil) ; No unnecessary prompts
+;;   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
+;;   (reftex-use-fonts t "Use nice fonts for TOC")
+;;   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
+;;   (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
+;;   ;; Throw away buffers created for parsing, but keep the ones created for lookup
+;;   (reftex-keep-temporary-buffers 1)
+;;   (reftex-trust-label-prefix '("fn:" "eq:" "sec:" "fig:" "tab:"))
+;;   (reftex-allow-automatic-rescan nil)
+;;   (reftex-enable-partial-scans t)
+;;   :config
+;;   ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
+;;   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
 
-  (with-eval-after-load "reftex-toc"
-    (bind-keys
-      :package reftex-toc
-      :map
-      reftex-toc-mode-map
-      ("n" . reftex-toc-next)
-      ("p" . reftex-toc-previous)
-      ("r" . reftex-toc-rescan)
-      ("R" . reftex-toc-Rescan)
-      ("g" . revert-buffer)
-      ("q" . reftex-toc-quit)
-      ("z" . reftex-toc-jump)
-      (">" . reftex-toc-demote)
-      ("<" . reftex-toc-promote))
+;;   (with-eval-after-load "reftex-toc"
+;;     (bind-keys
+;;       :package reftex-toc
+;;       :map
+;;       reftex-toc-mode-map
+;;       ("n" . reftex-toc-next)
+;;       ("p" . reftex-toc-previous)
+;;       ("r" . reftex-toc-rescan)
+;;       ("R" . reftex-toc-Rescan)
+;;       ("g" . revert-buffer)
+;;       ("q" . reftex-toc-quit)
+;;       ("z" . reftex-toc-jump)
+;;       (">" . reftex-toc-demote)
+;;       ("<" . reftex-toc-promote))
 
-    ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
-    ;; but this is expensive.
-    (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
-  :diminish)
+;;     ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
+;;     ;; but this is expensive.
+;;     (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
+;;   :diminish)
 
-;; Read document like a hypertext document, supports mouse highlighting
-(use-package bib-cite
-  :straight (:type built-in)
-  :disabled
-  :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
-  ;;   ;; :bind
-  ;;   ;; (:map bib-cite-minor-mode-map
-  ;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
-  ;;   ;;       ("C-c l a" . bib-apropos)
-  ;;   ;;       ("C-c l b" . bib-make-bibliography)
-  ;;   ;;       ("C-c l d" . bib-display)
-  ;;   ;;       ("C-c l t" . bib-etags)
-  ;;   ;;       ("C-c l f" . bib-find)
-  ;;   ;;       ("C-c l n" . bib-find-next))
-  :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
-  :diminish bib-cite-minor-mode)
+;; (use-package consult-reftex
+;;   :straight (:host github :repo "karthink/consult-reftex")
+;;   :after consult
+;;   :demand t
+;;   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
-(use-package auctex-latexmk
-  :disabled
-  :after tex
-  :when (executable-find "latexmk")
-  :demand t
-  :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
-  :config
-  (setq-default TeX-command-default "LatexMk")
-  (auctex-latexmk-setup))
+;; ;; Read document like a hypertext document, supports mouse highlighting
+;; (use-package bib-cite
+;;   :straight (:type built-in)
+;;   :disabled
+;;   :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
+;;   ;; :bind
+;;   ;; (:map bib-cite-minor-mode-map
+;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
+;;   ;;       ("C-c l a" . bib-apropos)
+;;   ;;       ("C-c l b" . bib-make-bibliography)
+;;   ;;       ("C-c l d" . bib-display)
+;;   ;;       ("C-c l t" . bib-etags)
+;;   ;;       ("C-c l f" . bib-find)
+;;   ;;       ("C-c l n" . bib-find-next))
+;;   :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
+;;   :diminish bib-cite-minor-mode)
 
-(with-eval-after-load "latex"
-  (unbind-key "C-j" LaTeX-mode-map)
-  ;; Disable `LaTeX-insert-item' in favor of `imenu'
-  (unbind-key "C-c C-j" LaTeX-mode-map)
+;; (use-package auctex-latexmk
+;;   :disabled
+;;   :after tex
+;;   :when (executable-find "latexmk")
+;;   :demand t
+;;   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+;;   :config
+;;   (setq-default TeX-command-default "LatexMk")
+;;   (auctex-latexmk-setup))
 
-  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
+;; (with-eval-after-load "latex"
+;;   (unbind-key "C-j" LaTeX-mode-map)
+;;   ;; Disable `LaTeX-insert-item' in favor of `imenu'
+;;   (unbind-key "C-c C-j" LaTeX-mode-map)
+
+;;   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
 
 ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
 ;; in "$PATH".
@@ -5717,26 +5799,26 @@ targets."
   :when (eq sb/capf 'corfu)
   :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
 
-(use-package latex-extra
-  :straight (:host github :repo "Malabarba/latex-extra")
-  :disabled
-  :after tex
-  :hook (LaTeX-mode . latex-extra-mode)
-  :bind
-  (:map
-    TeX-mode-map
-    ("C-c C-a" . latex/compile-commands-until-done)
-    ("C-c C-n" . latex/next-section)
-    ("C-c C-u" . latex/up-section)
-    ("C-c C-f" . latex/next-section-same-level)
-    ("C-M-f" . latex/forward-environment)
-    ("C-M-e" . latex/end-of-environment)
-    ("C-M-b" . latex/backward-environment)
-    ("C-M-a" . latex/beginning-of-environment)
-    ("C-c C-p" . latex/previous-section)
-    ("C-c C-b" . latex/previous-section-same-level)
-    ("C-c C-q" . latex/clean-fill-indent-environment))
-  :diminish)
+;; (use-package latex-extra
+;;   :straight (:host github :repo "Malabarba/latex-extra")
+;;   :disabled
+;;   :after tex
+;;   :hook (LaTeX-mode . latex-extra-mode)
+;;   :bind
+;;   (:map
+;;     TeX-mode-map
+;;     ("C-c C-a" . latex/compile-commands-until-done)
+;;     ("C-c C-n" . latex/next-section)
+;;     ("C-c C-u" . latex/up-section)
+;;     ("C-c C-f" . latex/next-section-same-level)
+;;     ("C-M-f" . latex/forward-environment)
+;;     ("C-M-e" . latex/end-of-environment)
+;;     ("C-M-b" . latex/backward-environment)
+;;     ("C-M-a" . latex/beginning-of-environment)
+;;     ("C-c C-p" . latex/previous-section)
+;;     ("C-c C-b" . latex/previous-section-same-level)
+;;     ("C-c C-q" . latex/clean-fill-indent-environment))
+;;   :diminish)
 
 ;; (use-package math-delimiters
 ;;   :straight (:host github :repo "oantolin/math-delimiters")
@@ -5944,11 +6026,10 @@ used in `company-backends'."
 ;;     (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))
 ;;   (symbols-outline-follow-mode 1))
 
-;; This is independent of LSP support and is more flexible.
-(use-package breadcrumb
-  :disabled
-  :straight (:host github :repo "joaotavora/breadcrumb")
-  :hook (emacs-startup . breadcrumb-mode))
+;; (use-package breadcrumb
+;;   :straight (:host github :repo "joaotavora/breadcrumb")
+;;   :disabled
+;;   :hook (emacs-startup . breadcrumb-mode))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -6338,18 +6419,18 @@ or the major mode is not in `sb/skippable-modes'."
   :when (eq sb/theme 'nano-dark)
   :init (load-theme 'nano-dark t))
 
-(use-package nordic-night-theme
-  :when (eq sb/theme 'nordic-night)
-  :init (load-theme 'nordic-night t))
+;; (use-package nordic-night-theme
+;;   :when (eq sb/theme 'nordic-night)
+;;   :init (load-theme 'nordic-night t))
 
-(use-package leuven-theme
-  :when (or (eq sb/theme 'leuven) (eq sb/theme 'leuven-dark))
-  :init
-  (cond
-    ((eq sb/theme 'leuven)
-      (load-theme 'leuven t))
-    ((eq sb/theme 'leuven-dark)
-      (load-theme 'leuven-dark t))))
+;; (use-package leuven-theme
+;;   :when (or (eq sb/theme 'leuven) (eq sb/theme 'leuven-dark))
+;;   :init
+;;   (cond
+;;     ((eq sb/theme 'leuven)
+;;       (load-theme 'leuven t))
+;;     ((eq sb/theme 'leuven-dark)
+;;       (load-theme 'leuven-dark t))))
 
 (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
   (progn
@@ -6496,15 +6577,15 @@ PAD can be left (`l') or right (`r')."
 ;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
 ;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
 
-(use-package nano-modeline
-  :when (eq sb/modeline-theme 'nano-modeline)
-  :hook
-  ((prog-mode . nano-modeline-prog-mode)
-    (text-mode . nano-modeline-text-mode)
-    (org-mode . nano-modeline-org-mode)
-    (pdf-view-mode . nano-modeline-pdf-mode)
-    (messages-buffer-mode . nano-modeline-message-mode))
-  :custom (nano-modeline-position #'nano-modeline-footer))
+;; (use-package nano-modeline
+;;   :when (eq sb/modeline-theme 'nano-modeline)
+;;   :hook
+;;   ((prog-mode . nano-modeline-prog-mode)
+;;     (text-mode . nano-modeline-text-mode)
+;;     (org-mode . nano-modeline-org-mode)
+;;     (pdf-view-mode . nano-modeline-pdf-mode)
+;;     (messages-buffer-mode . nano-modeline-message-mode))
+;;   :custom (nano-modeline-position #'nano-modeline-footer))
 
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
 ;; we use TUI Emacs. Then, the terminal font setting will be used.
@@ -6575,11 +6656,12 @@ PAD can be left (`l') or right (`r')."
 ;;   :hook (emacs-startup . disable-mouse-global-mode)
 ;;   :diminish disable-mouse-global-mode)
 
-(use-package olivetti
-  :hook
-  ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
-  :custom (olivetti-body-width 108)
-  :diminish)
+;; (use-package olivetti
+;;   :disabled
+;;   :hook
+;;   ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
+;;   :custom (olivetti-body-width 108)
+;;   :diminish)
 
 ;; (use-package selected-window-accent-mode
 ;;   :hook (emacs-startup . selected-window-accent-mode)
