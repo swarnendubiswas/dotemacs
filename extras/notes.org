@@ -174,4 +174,5 @@ https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-ma
 - https://alhassy.github.io/emacs.d
 - [[https://github.com/xenodium/dotsies]]
 - [[https://github.com/skangas/dot-emacs]]
+- [[https://github.com/jeremyf/dotemacs]]
   

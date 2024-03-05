@@ -1718,14 +1718,13 @@ This location is used for temporary installations and files.")
 ;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
 ;; `wgrep'
 (use-package embark-consult
-  :after consult
-  :demand t)
+  :after (embark consult))
 
 ;; Provide context-dependent actions similar to a content menu. Embark is likely not required with
 ;; ivy.
 (use-package embark
   :bind
-  (([remap describe-bindings] . embark-bindings)
+  (([remap describe-bindings] . embark-bindings) ; "C-h b"
     ("C-`" . embark-act)
     ;; ("C-`" . embark-dwim)
     :map
@@ -2588,6 +2587,7 @@ targets."
     ("C-x C-q" . wgrep-exit))
   :custom (wgrep-auto-save-buffer t))
 
+;; `consult-rg' provides a live search feature, while `deadgrep' provides a resulting search buffer.
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
@@ -3477,9 +3477,11 @@ targets."
             company-reftex-citations
             company-auctex-environments
             company-auctex-macros
+            company-auctex-labels
             ;; Math unicode symbols and sub(super)scripts
             company-math-symbols-unicode
             company-auctex-symbols
+            company-auctex-bibs
             ;; company-bibtex
             ;; :separate
             company-ispell
@@ -3885,6 +3887,7 @@ targets."
             (cape-company-to-capf #'company-reftex-citations)
             (cape-company-to-capf #'company-auctex-environments)
             (cape-company-to-capf #'company-auctex-macros)
+            (cape-company-to-capf #'company-auctex-labels)
             ;; Math unicode symbols and sub(super)scripts
             (cape-company-to-capf #'company-math-symbols-unicode)
             (cape-company-to-capf #'company-auctex-symbols)
@@ -5552,86 +5555,69 @@ targets."
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
 
-;; (straight-use-package
-;;   `
-;;   (auctex
-;;     :type git
-;;     :host nil
-;;     :repo "https://git.savannah.gnu.org/git/auctex.git"
-;;     :pre-build
-;;     ,
-;;     (pcase system-type
-;;       (`berkeley-unix '("gmake"))
-;;       (_
-;;         '
-;;         (`("bash" "-c" "cd" ,(straight--repos-dir "auctex"))
-;;           ("./autogen.sh")
-;;           ("./configure" "--without-texmf-dir" "--with-lispdir=.")
-;;           ("make"))))))
+(use-package tex
+  :straight auctex
+  :mode ("\\.tex\\'" . LaTeX-mode)
+  :hook
+  ((LaTeX-mode . LaTeX-math-mode)
+    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
+    ;; Revert PDF buffer after TeX compilation has finished
+    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+    ;; Enable rainbow mode after applying styles to the buffer
+    (TeX-update-style . rainbow-delimiters-mode)
+    ;; Jump between editor and pdf viewer
+    (LaTeX-mode . TeX-source-correlate-mode) (LaTeX-mode . turn-on-auto-fill)
+    (LaTeX-mode
+      .
+      (lambda ()
+        (cond
+          ((eq sb/lsp-provider 'eglot)
+            (eglot-ensure))
+          ((eq sb/lsp-provider 'lsp-mode)
+            (lsp-deferred))))))
+  :bind
+  (:map
+    TeX-mode-map
+    ("C-c ;")
+    ("C-c C-d")
+    ("C-c C-c" . TeX-command-master)
+    ("$" . self-insert-command)
+    ("C-c x q" . TeX-insert-quote))
+  :custom
+  (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
+  (TeX-auto-untabify t "Remove all tabs before saving")
+  (TeX-clean-confirm nil)
+  ;; Automatically insert braces after typing ^ and _ in math mode
+  (TeX-electric-sub-and-superscript t)
+  (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
+  (TeX-parse-self t "Parse documents")
+  (TeX-quote-after-quote nil "Allow original LaTeX quotes")
+  (TeX-save-query nil "Save buffers automatically when compiling")
+  (TeX-source-correlate-method 'synctex)
+  ;; Do not start the Emacs server when correlating sources
+  (TeX-source-correlate-start-server t)
+  (TeX-syntactic-comment t)
+  (TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (LaTeX-item-indent 0 "Indent lists by two spaces")
+  (LaTeX-syntactic-comments t)
+  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
+  (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
+  ;; Avoid superscripts and subscripts from being displayed in a different font size
+  (font-latex-fontify-script nil)
+  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
+  :config
+  (when (executable-find "okular")
+    (setq
+      TeX-view-program-list
+      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+      TeX-view-program-selection '((output-pdf "Okular"))))
 
-;; (use-package tex
-;;   :straight auctex
-;;   :mode ("\\.tex\\'" . LaTeX-mode)
-;;   :hook
-;;   ((LaTeX-mode . LaTeX-math-mode)
-;;     (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-;;     ;; Revert PDF buffer after TeX compilation has finished
-;;     (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-;;     ;; Enable rainbow mode after applying styles to the buffer
-;;     (TeX-update-style . rainbow-delimiters-mode)
-;;     ;; Jump between editor and pdf viewer
-;;     (LaTeX-mode . TeX-source-correlate-mode) (LaTeX-mode . turn-on-auto-fill)
-;;     (LaTeX-mode
-;;       .
-;;       (lambda ()
-;;         (cond
-;;           ((eq sb/lsp-provider 'eglot)
-;;             (eglot-ensure))
-;;           ((eq sb/lsp-provider 'lsp-mode)
-;;             (lsp-deferred))))))
-;;   :bind
-;;   (:map
-;;     TeX-mode-map
-;;     ("C-c ;")
-;;     ("C-c C-d")
-;;     ("C-c C-c" . TeX-command-master)
-;;     ("$" . self-insert-command)
-;;     ("C-c x q" . TeX-insert-quote))
-;;   :custom
-;;   (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
-;;   (TeX-auto-untabify t "Remove all tabs before saving")
-;;   (TeX-clean-confirm nil)
-;;   ;; Automatically insert braces after typing ^ and _ in math mode
-;;   (TeX-electric-sub-and-superscript t)
-;;   (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
-;;   (TeX-parse-self t "Parse documents")
-;;   (TeX-quote-after-quote nil "Allow original LaTeX quotes")
-;;   (TeX-save-query nil "Save buffers automatically when compiling")
-;;   (TeX-source-correlate-method 'synctex)
-;;   ;; Do not start the Emacs server when correlating sources
-;;   (TeX-source-correlate-start-server t)
-;;   (TeX-syntactic-comment t)
-;;   (TeX-view-program-selection '((output-pdf "PDF Tools")))
-;;   (LaTeX-item-indent 0 "Indent lists by two spaces")
-;;   (LaTeX-syntactic-comments t)
-;;   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-;;   (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
-;;   ;; Avoid superscripts and subscripts from being displayed in a different font size
-;;   (font-latex-fontify-script nil)
-;;   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
-;;   :config
-;;   (when (executable-find "okular")
-;;     (setq
-;;       TeX-view-program-list
-;;       '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-;;       TeX-view-program-selection '((output-pdf "Okular"))))
-
-;;   ;; Always query for the master file
-;;   (setq-default TeX-master nil)
-;;   (with-eval-after-load "auctex"
-;;     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
-;;     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-;;     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
+  ;; Always query for the master file
+  (setq-default TeX-master nil)
+  (with-eval-after-load "auctex"
+    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
+    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
+    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
 
 ;; (use-package bibtex
 ;;   :straight (:type built-in)
@@ -5776,12 +5762,12 @@ targets."
 ;;   (setq-default TeX-command-default "LatexMk")
 ;;   (auctex-latexmk-setup))
 
-;; (with-eval-after-load "latex"
-;;   (unbind-key "C-j" LaTeX-mode-map)
-;;   ;; Disable `LaTeX-insert-item' in favor of `imenu'
-;;   (unbind-key "C-c C-j" LaTeX-mode-map)
+(with-eval-after-load "latex"
+  (unbind-key "C-j" LaTeX-mode-map)
+  ;; Disable `LaTeX-insert-item' in favor of `imenu'
+  (unbind-key "C-c C-j" LaTeX-mode-map)
 
-;;   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
+  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
 
 ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
 ;; in "$PATH".
