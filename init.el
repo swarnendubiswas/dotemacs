@@ -462,6 +462,7 @@ This location is used for temporary installations and files.")
   ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
   ;; it runs all the save-related hooks.
   (auto-save-visited-interval 30)
+  (inhibit-startup-buffer-menu nil)
   :config
   ;; Keep track of the minibuffer nesting
   (when (bound-and-true-p enable-recursive-minibuffers)
@@ -2691,6 +2692,7 @@ targets."
         (unless (display-graphic-p)
           (diff-hl-margin-local-mode 1))))
     (dired-mode . diff-hl-dired-mode-unless-remote) (emacs-startup . global-diff-hl-mode))
+  :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   (diff-hl-disable-on-remote t)
@@ -2834,7 +2836,7 @@ targets."
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
-  (flycheck-checker-error-threshold 1500)
+  (flycheck-checker-error-threshold nil)
   (flycheck-idle-buffer-switch-delay 2 "Increase the time (s) to allow for quick transitions")
   (flycheck-idle-change-delay 2 "Increase the time (s) to allow for transient edits")
   (flycheck-emacs-lisp-load-path 'inherit)
@@ -3285,7 +3287,7 @@ targets."
   :hook (prog-mode . company-quickhelp-mode))
 
 (use-package company-quickhelp-terminal
-  :after company
+  :after company-quickhelp
   :unless (display-graphic-p)
   :hook (prog-mode . company-quickhelp-terminal-mode))
 
@@ -4762,6 +4764,10 @@ targets."
 ;;     :demand t
 ;;     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
 ;;   :diminish tree-sitter-mode)
+
+(with-eval-after-load "treesit"
+  ;; Improves performance with large files without significantly diminishing highlight quality
+  (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
 ;; (use-package combobulate
 ;;   :straight (:host github :repo "mickeynp/combobulate")

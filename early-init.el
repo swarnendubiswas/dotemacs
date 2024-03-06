@@ -98,10 +98,6 @@
 (setq package-enable-at-startup nil)
 
 (when (featurep 'native-compile)
-  (defvar package-native-compile)
-  (defvar native-comp-always-compile)
-  (defvar native-comp-async-report-warnings-errors)
-
   (setq
     ;; Silence compiler warnings as they can be pretty disruptive
     native-comp-async-report-warnings-errors nil

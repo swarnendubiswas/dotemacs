@@ -1,6 +1,7 @@
 ;;-*-coding: utf-8;-*-
 (define-abbrev-table 'LaTeX-mode-abbrev-table
   '(
+    ("insturction" "instruction" nil :count 0)
     ("occurences" "occurrences" nil :count 0)
     ("tripes" "triples" nil :count 0)
    ))
