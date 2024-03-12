@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'none
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -1856,18 +1856,18 @@ This location is used for temporary installations and files.")
 ;;     ("C-x C-d" . consult-dir)
 ;;     ("C-x C-j" . consult-dir-jump-file)))
 
-;; (use-package consult-flyspell
-;;   :after (consult flyspell)
-;;   :bind ("C-c f l" . consult-flyspell)
-;;   :config
-;;   (setq consult-flyspell-select-function
-;;     (lambda ()
-;;       (flyspell-correct-at-point)
-;;       (consult-flyspell))))
+(use-package consult-flyspell
+  :after (consult flyspell)
+  :bind ("C-c f l" . consult-flyspell)
+  :config
+  (setq consult-flyspell-select-function
+    (lambda ()
+      (flyspell-correct-at-point)
+      (consult-flyspell))))
 
-;; (use-package consult-flycheck
-;;   :after (consult flycheck)
-;;   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
+(use-package consult-flycheck
+  :after (consult flycheck)
+  :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 ;; (use-package consult-lsp
 ;;   :after (consult lsp)
@@ -4786,23 +4786,23 @@ This location is used for temporary installations and files.")
 ;; ;;       tsx-ts-mode)
 ;; ;;     . combobulate-mode))
 
-;; (use-package eldoc
-;;   :straight (:type built-in)
-;;   :hook (prog-mode . turn-on-eldoc-mode)
-;;   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
-;;   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
-;;   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
-;;   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
-;;   ;; (eldoc-echo-area-use-multiline-p nil)
-;;   :config
-;;   ;; Allow eldoc to trigger after completions
-;;   (with-eval-after-load "company"
-;;     (eldoc-add-command
-;;       'company-complete-selection
-;;       'company-complete-common
-;;       'company-capf
-;;       'company-abort))
-;;   :diminish)
+(use-package eldoc
+  :straight (:type built-in)
+  ;;   :hook (prog-mode . turn-on-eldoc-mode)
+  ;;   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
+  ;;   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
+  ;;   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
+  ;;   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
+  ;;   ;; (eldoc-echo-area-use-multiline-p nil)
+  ;;   :config
+  ;;   ;; Allow eldoc to trigger after completions
+  ;;   (with-eval-after-load "company"
+  ;;     (eldoc-add-command
+  ;;       'company-complete-selection
+  ;;       'company-complete-common
+  ;;       'company-capf
+  ;;       'company-abort))
+  :diminish)
 
 ;; Available C styles: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
 ;;   "gnu": The default style for GNU projects
@@ -5843,149 +5843,149 @@ This location is used for temporary installations and files.")
 ;;   (dumb-jump-force-searcher 'rg)
 ;;   (dumb-jump-prefer-searcher 'rg))
 
-;; ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
-;; (use-package citre
-;;   :preface
-;;   (defun sb/citre-jump+ ()
-;;     "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
-;;     (interactive)
-;;     (condition-case _
-;;       (citre-jump)
-;;       (error
-;;         (let* ((xref-prompt-for-identifier nil))
-;;           (call-interactively #'xref-find-definitions)))))
+;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
+(use-package citre
+  :preface
+  (defun sb/citre-jump+ ()
+    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
+    (interactive)
+    (condition-case _
+      (citre-jump)
+      (error
+        (let* ((xref-prompt-for-identifier nil))
+          (call-interactively #'xref-find-definitions)))))
 
-;;   (defun sb/citre-jump-back+ ()
-;;     "Go back to the position before last `citre-jump'.
-;; Fallback to `xref-go-back'."
-;;     (interactive)
-;;     (condition-case _
-;;       (citre-jump-back)
-;;       (error
-;;         (if (fboundp #'xref-go-back)
-;;           (call-interactively #'xref-go-back)
-;;           (call-interactively #'xref-pop-marker-stack)))))
+  (defun sb/citre-jump-back+ ()
+    "Go back to the position before last `citre-jump'.
+Fallback to `xref-go-back'."
+    (interactive)
+    (condition-case _
+      (citre-jump-back)
+      (error
+        (if (fboundp #'xref-go-back)
+          (call-interactively #'xref-go-back)
+          (call-interactively #'xref-pop-marker-stack)))))
 
-;;   (defun sb/push-point-to-xref-marker-stack (&rest r)
-;;     (xref-push-marker-stack (point-marker)))
+  (defun sb/push-point-to-xref-marker-stack (&rest r)
+    (xref-push-marker-stack (point-marker)))
 
-;;   (defun sb/lsp-citre-capf-function ()
-;;     "A capf backend that tries lsp first, then Citre."
-;;     (let
-;;       (
-;;         (lsp-result
-;;           (cond
-;;             ((bound-and-true-p lsp-mode)
-;;               (and (fboundp #'lsp-completion-at-point) (lsp-completion-at-point)))
-;;             ((bound-and-true-p eglot--managed-mode)
-;;               (and (fboundp #'eglot-completion-at-point) (eglot-completion-at-point))))))
-;;       (if
-;;         (and lsp-result
-;;           (try-completion
-;;             (buffer-substring (nth 0 lsp-result) (nth 1 lsp-result))
-;;             (nth 2 lsp-result)))
-;;         lsp-result
-;;         (citre-completion-at-point))))
+  (defun sb/lsp-citre-capf-function ()
+    "A capf backend that tries lsp first, then Citre."
+    (let
+      (
+        (lsp-result
+          (cond
+            ((bound-and-true-p lsp-mode)
+              (and (fboundp #'lsp-completion-at-point) (lsp-completion-at-point)))
+            ((bound-and-true-p eglot--managed-mode)
+              (and (fboundp #'eglot-completion-at-point) (eglot-completion-at-point))))))
+      (if
+        (and lsp-result
+          (try-completion
+            (buffer-substring (nth 0 lsp-result) (nth 1 lsp-result))
+            (nth 2 lsp-result)))
+        lsp-result
+        (citre-completion-at-point))))
 
-;;   (defun sb/enable-lsp-citre-capf-backend ()
-;;     "Enable the lsp + Citre capf backend in current buffer."
-;;     (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
-;;   :hook
-;;   ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
-;;   ;; tags backend, which is not desired for plain text files.
-;;   (prog-mode . citre-mode)
-;;   :bind
-;;   (("C-x c j" . citre-jump)
-;;     ("M-'" . sb/citre-jump+)
-;;     ("C-x c b" . sb/citre-jump-back+)
-;;     ("C-x c p" . citre-peek)
-;;     ("C-x c c" . citre-create-tags-file)
-;;     ("C-x c u" . citre-update-this-tags-file)
-;;     ("C-x c U" . citre-update-tags-file)
-;;     ("C-x c e" . citre-edit-tags-file-recipe))
-;;   :custom
-;;   (citre-use-project-root-when-creating-tags t)
-;;   (citre-default-create-tags-file-location 'project-cache)
-;;   (citre-auto-enable-citre-mode-modes '(prog-mode))
-;;   (citre-enable-capf-integration nil)
-;;   ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
-;;   (citre-enable-imenu-integration nil)
-;;   (citre-enable-xref-integration t)
-;;   (citre-edit-cmd-buf-default-cmd
-;;     "ctags
-;; -o
-;; %TAGSFILE%
-;; ;; Edit the relevant programming languages to keep the tags file size reasonable
-;; --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
-;; --kinds-all=*
-;; --fields=*
-;; --extras=*
-;; -R
-;; ;; -e
-;; --exclude=@./.ctagsignore
-;; ;; add exclude by: --exclude=target
-;; ;; add dirs/files to scan here, one line per dir/file")
-;;   :config
-;;   ;; (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
+  (defun sb/enable-lsp-citre-capf-backend ()
+    "Enable the lsp + Citre capf backend in current buffer."
+    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
+  :hook
+  ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
+  ;; tags backend, which is not desired for plain text files.
+  (prog-mode . citre-mode)
+  :bind
+  (("C-x c j" . citre-jump)
+    ("M-'" . sb/citre-jump+)
+    ("C-x c b" . sb/citre-jump-back+)
+    ("C-x c p" . citre-peek)
+    ("C-x c c" . citre-create-tags-file)
+    ("C-x c u" . citre-update-this-tags-file)
+    ("C-x c U" . citre-update-tags-file)
+    ("C-x c e" . citre-edit-tags-file-recipe))
+  :custom
+  (citre-use-project-root-when-creating-tags t)
+  (citre-default-create-tags-file-location 'project-cache)
+  (citre-auto-enable-citre-mode-modes '(prog-mode))
+  (citre-enable-capf-integration nil)
+  ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
+  (citre-enable-imenu-integration nil)
+  (citre-enable-xref-integration t)
+  (citre-edit-cmd-buf-default-cmd
+    "ctags
+-o
+%TAGSFILE%
+;; Edit the relevant programming languages to keep the tags file size reasonable
+--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
+--kinds-all=*
+--fields=*
+--extras=*
+-R
+;; -e
+--exclude=@./.ctagsignore
+;; add exclude by: --exclude=target
+;; add dirs/files to scan here, one line per dir/file")
+  :config
+  ;; (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
 
-;;   (dolist
-;;     (func
-;;       '
-;;       (find-function ;counsel-imenu counsel-rg lsp-ivy-workspace-symbol
-;;         projectile-grep
-;;         citre-jump))
-;;     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
+  (dolist
+    (func
+      '
+      (find-function ;counsel-imenu counsel-rg lsp-ivy-workspace-symbol
+        projectile-grep
+        citre-jump))
+    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
 
-;;   ;; Try lsp first, then use Citre
-;;   (with-no-warnings
-;;     (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-;;       (let
-;;         (
-;;           (fetcher (apply -fn -args))
-;;           (citre-fetcher
-;;             (let ((xref-backend-functions '(citre-xref-backend t)))
-;;               (apply -fn -args))))
-;;         (lambda ()
-;;           (or
-;;             (with-demoted-errors "%s, fallback to citre"
-;;               (funcall fetcher))
-;;             (funcall citre-fetcher))))))
+  ;; Try lsp first, then use Citre
+  (with-no-warnings
+    (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+      (let
+        (
+          (fetcher (apply -fn -args))
+          (citre-fetcher
+            (let ((xref-backend-functions '(citre-xref-backend t)))
+              (apply -fn -args))))
+        (lambda ()
+          (or
+            (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher))))))
 
-;;   (with-eval-after-load "company"
-;;     (defmacro citre-backend-to-company-backend (backend)
-;;       "Create a company backend from Citre completion backend BACKEND.
-;; The result is a company backend called
-;; `company-citre-<backend>' (like `company-citre-tags') and can be
-;; used in `company-backends'."
-;;       (let
-;;         (
-;;           (backend-name (intern (concat "company-citre-" (symbol-name backend))))
-;;           (docstring
-;;             (concat
-;;               "`company-mode' backend from the `"
-;;               (symbol-name backend)
-;;               "' Citre backend.\n"
-;;               "`citre-mode' needs to be enabled to use this.")))
-;;         `
-;;         (defun ,backend-name (command &optional arg &rest ignored)
-;;           ,docstring
-;;           (pcase command
-;;             ('interactive (company-begin-backend ',backend-name))
-;;             ('prefix
-;;               (and (bound-and-true-p citre-mode)
-;;                 (citre-backend-usable-p ',backend)
-;;                 ;; We shouldn't use this as it's defined for getting definitions/references. But the
-;;                 ;; Citre completion backend design is not fully compliant with company's design so
-;;                 ;; there's no simple "right" solution, and this works for tags/global backends.
-;;                 (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
-;;             ('meta (citre-get-property 'signature arg))
-;;             ('annotation (citre-get-property 'annotation arg))
-;;             ('candidates
-;;               (let ((citre-completion-backends '(,backend)))
-;;                 (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+  (with-eval-after-load "company"
+    (defmacro citre-backend-to-company-backend (backend)
+      "Create a company backend from Citre completion backend BACKEND.
+The result is a company backend called
+`company-citre-<backend>' (like `company-citre-tags') and can be
+used in `company-backends'."
+      (let
+        (
+          (backend-name (intern (concat "company-citre-" (symbol-name backend))))
+          (docstring
+            (concat
+              "`company-mode' backend from the `"
+              (symbol-name backend)
+              "' Citre backend.\n"
+              "`citre-mode' needs to be enabled to use this.")))
+        `
+        (defun ,backend-name (command &optional arg &rest ignored)
+          ,docstring
+          (pcase command
+            ('interactive (company-begin-backend ',backend-name))
+            ('prefix
+              (and (bound-and-true-p citre-mode)
+                (citre-backend-usable-p ',backend)
+                ;; We shouldn't use this as it's defined for getting definitions/references. But the
+                ;; Citre completion backend design is not fully compliant with company's design so
+                ;; there's no simple "right" solution, and this works for tags/global backends.
+                (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
+            ('meta (citre-get-property 'signature arg))
+            ('annotation (citre-get-property 'annotation arg))
+            ('candidates
+              (let ((citre-completion-backends '(,backend)))
+                (all-completions arg (nth 2 (citre-completion-at-point)))))))))
 
-;;     (citre-backend-to-company-backend tags))
-;;   :diminish)
+    (citre-backend-to-company-backend tags))
+  :diminish)
 
 ;; ;; (use-package window-stool
 ;; ;;   :straight (:host github :repo "jaszhe/window-stool")
@@ -6397,14 +6397,14 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   ;; Corrects (and improves) org-mode's native fontification.
 ;;   (doom-themes-org-config))
 
-;; (use-package modus-themes
-;;   :when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
-;;   :init
-;;   (cond
-;;     ((eq sb/theme 'modus-operandi)
-;;       (load-theme 'modus-operandi t))
-;;     ((eq sb/theme 'modus-vivendi)
-;;       (load-theme 'modus-vivendi t))))
+(use-package modus-themes
+  :when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
+  :init
+  (cond
+    ((eq sb/theme 'modus-operandi)
+      (load-theme 'modus-operandi t))
+    ((eq sb/theme 'modus-vivendi)
+      (load-theme 'modus-vivendi t))))
 
 ;; (use-package nano-theme
 ;;   :straight (:host github :repo "rougier/nano-theme")
@@ -6456,94 +6456,94 @@ or the major mode is not in `sb/skippable-modes'."
 ;; ;;     ((eq sb/theme 'standard-dark)
 ;; ;;       (load-theme 'standard-dark t))))
 
-;; ;; Python virtualenv information is not shown on the modeline. The package is not being actively
-;; ;; maintained.
-;; (use-package powerline
-;;   :preface
-;;   (defun sb/powerline-raw (str &optional face pad)
-;;     "Render STR as mode-line data using FACE and optionally PAD import.
-;; PAD can be left (`l') or right (`r')."
-;;     (when str
-;;       (let*
-;;         (
-;;           (rendered-str (format-mode-line str))
-;;           (padded-str
-;;             (concat
-;;               (when (and (> (length rendered-str) 0) (eq pad 'l))
-;;                 "")
-;;               (if (listp str)
-;;                 rendered-str
-;;                 str)
-;;               (when (and (> (length rendered-str) 0) (eq pad 'r))
-;;                 ""))))
-;;         (if face
-;;           (pl/add-text-property padded-str 'face face)
-;;           padded-str))))
+;; Python virtualenv information is not shown on the modeline. The package is not being actively
+;; maintained.
+(use-package powerline
+  :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let*
+        (
+          (rendered-str (format-mode-line str))
+          (padded-str
+            (concat
+              (when (and (> (length rendered-str) 0) (eq pad 'l))
+                "")
+              (if (listp str)
+                rendered-str
+                str)
+              (when (and (> (length rendered-str) 0) (eq pad 'r))
+                ""))))
+        (if face
+          (pl/add-text-property padded-str 'face face)
+          padded-str))))
 
-;;   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-;;   (defun sb/powerline-nano-theme ()
-;;     "Setup a nano-like modeline"
-;;     (interactive)
-;;     (setq-default mode-line-format
-;;       '
-;;       ("%e"
-;;         (:eval
-;;           (let*
-;;             (
-;;               (active (powerline-selected-window-active))
-;;               (face0
-;;                 (if active
-;;                   'powerline-active0
-;;                   'powerline-inactive0))
-;;               (lhs
-;;                 (list
-;;                   (powerline-raw
-;;                     (concat
-;;                       "GNU Emacs "
-;;                       (number-to-string emacs-major-version)
-;;                       "."
-;;                       (number-to-string emacs-minor-version))
-;;                     nil 'l)))
-;;               (rhs
-;;                 (list
-;;                   (when which-function-mode
-;;                     (sb/powerline-raw which-func-format nil 'l))
-;;                   (powerline-vc nil 'l)
-;;                   (powerline-raw "")
-;;                   (powerline-raw "%4l" nil 'l)
-;;                   (powerline-raw ",")
-;;                   (powerline-raw "%3c" nil 'r)
-;;                   (if (buffer-modified-p)
-;;                     (powerline-raw " ⠾" nil 'r)
-;;                     (powerline-raw "  " nil 'r))))
-;;               (center (list (powerline-raw "%b" nil 'r))))
-;;             (concat
-;;               (powerline-render lhs)
-;;               (powerline-fill-center nil (/ (powerline-width center) 2.0))
-;;               (powerline-render center)
-;;               (powerline-fill nil (powerline-width rhs))
-;;               (powerline-render rhs)))))))
-;;   :when (eq sb/modeline-theme 'powerline)
-;;   :hook (emacs-startup . sb/powerline-nano-theme)
-;;   :custom
-;;   (powerline-display-hud nil "Visualization of the buffer position is not useful")
-;;   (powerline-display-buffer-size nil)
-;;   (powerline-display-mule-info nil "File encoding information is not useful")
-;;   (powerline-gui-use-vcs-glyph t)
-;;   (powerline-height 20))
+  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+  (defun sb/powerline-nano-theme ()
+    "Setup a nano-like modeline"
+    (interactive)
+    (setq-default mode-line-format
+      '
+      ("%e"
+        (:eval
+          (let*
+            (
+              (active (powerline-selected-window-active))
+              (face0
+                (if active
+                  'powerline-active0
+                  'powerline-inactive0))
+              (lhs
+                (list
+                  (powerline-raw
+                    (concat
+                      "GNU Emacs "
+                      (number-to-string emacs-major-version)
+                      "."
+                      (number-to-string emacs-minor-version))
+                    nil 'l)))
+              (rhs
+                (list
+                  (when which-function-mode
+                    (sb/powerline-raw which-func-format nil 'l))
+                  (powerline-vc nil 'l)
+                  (powerline-raw "")
+                  (powerline-raw "%4l" nil 'l)
+                  (powerline-raw ",")
+                  (powerline-raw "%3c" nil 'r)
+                  (if (buffer-modified-p)
+                    (powerline-raw " ⠾" nil 'r)
+                    (powerline-raw "  " nil 'r))))
+              (center (list (powerline-raw "%b" nil 'r))))
+            (concat
+              (powerline-render lhs)
+              (powerline-fill-center nil (/ (powerline-width center) 2.0))
+              (powerline-render center)
+              (powerline-fill nil (powerline-width rhs))
+              (powerline-render rhs)))))))
+  :when (eq sb/modeline-theme 'powerline)
+  :hook (emacs-startup . sb/powerline-nano-theme)
+  :custom
+  (powerline-display-hud nil "Visualization of the buffer position is not useful")
+  (powerline-display-buffer-size nil)
+  (powerline-display-mule-info nil "File encoding information is not useful")
+  (powerline-gui-use-vcs-glyph t)
+  (powerline-height 20))
 
-;; (use-package doom-modeline
-;;   :when (eq sb/modeline-theme 'doom-modeline)
-;;   :hook (emacs-startup . doom-modeline-mode)
-;;   :custom
-;;   (doom-modeline-height 28)
-;;   (doom-modeline-buffer-encoding nil)
-;;   (doom-modeline-checker-simple-format nil)
-;;   (doom-modeline-indent-info nil)
-;;   (doom-modeline-lsp t)
-;;   (doom-modeline-minor-modes t)
-;;   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
-;;   (doom-modeline-unicode-fallback t))
+(use-package doom-modeline
+  :when (eq sb/modeline-theme 'doom-modeline)
+  :hook (emacs-startup . doom-modeline-mode)
+  :custom
+  (doom-modeline-height 28)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-checker-simple-format nil)
+  (doom-modeline-indent-info nil)
+  (doom-modeline-lsp t)
+  (doom-modeline-minor-modes t)
+  (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
+  (doom-modeline-unicode-fallback t))
 
 ;; ;; (use-package awesome-tray ; Minimal modeline information
 ;; ;;   :straight (:host github :repo "manateelazycat/awesome-tray")
@@ -6735,12 +6735,12 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (use-package key-quiz
 ;;   :commands key-quiz)
 
-;; ;; Show help popups for prefix keys
-;; (use-package which-key
-;;   :hook (emacs-startup . which-key-mode)
-;;   :custom (which-key-sort-order 'which-key-key-order-alpha)
-;;   :config (which-key-setup-side-window-right-bottom)
-;;   :diminish)
+;; Show help popups for prefix keys
+(use-package which-key
+  :hook (emacs-startup . which-key-mode)
+  :custom (which-key-sort-order 'which-key-key-order-alpha)
+  :config (which-key-setup-side-window-right-bottom)
+  :diminish)
 
 ;; ;; Hydras, https://github.com/abo-abo/hydra
 
