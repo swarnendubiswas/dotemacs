@@ -2746,28 +2746,28 @@ This location is used for temporary installations and files.")
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
-;; (use-package elec-pair
-;;   :straight (:type built-in)
-;;   :hook
-;;   ((emacs-startup . electric-pair-mode)
-;;     ;; Disable pairs when entering minibuffer
-;;     (minibuffer-setup . (lambda () (electric-pair-local-mode -1)))
-;;     ;; Re-enable pairs when existing minibuffer
-;;     ;; (minibuffer-exit . (lambda () (electric-pair-mode 1)))
-;;     )
-;;   :custom
-;;   ;; Avoid balancing parentheses since they can be both irritating and slow
-;;   (electric-pair-preserve-balance nil)
-;;   :config
-;;   (defvar sb/markdown-pairs '((?` . ?`))
-;;     "Electric pairs for `markdown-mode'.")
+(use-package elec-pair
+  :straight (:type built-in)
+  :hook
+  ((emacs-startup . electric-pair-mode)
+    ;; Disable pairs when entering minibuffer
+    (minibuffer-setup . (lambda () (electric-pair-local-mode -1)))
+    ;; Re-enable pairs when existing minibuffer
+    ;; (minibuffer-exit . (lambda () (electric-pair-mode 1)))
+    )
+  :custom
+  ;; Avoid balancing parentheses since they can be both irritating and slow
+  (electric-pair-preserve-balance nil)
+  :config
+  (defvar sb/markdown-pairs '((?` . ?`))
+    "Electric pairs for `markdown-mode'.")
 
-;;   (defun sb/add-markdown-pairs ()
-;;     "Add custom pairs to `markdown-mode'."
-;;     (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
-;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
+  (defun sb/add-markdown-pairs ()
+    "Add custom pairs to `markdown-mode'."
+    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-;;   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs))
+  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs))
 
 ;; ;; `sp-cheat-sheet' will show you all the commands available, with examples.
 ;; ;; (use-package smartparens
@@ -2961,7 +2961,7 @@ This location is used for temporary installations and files.")
   (with-eval-after-load "markdown-mode"
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   (with-eval-after-load "auctex"
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+    (bind-key "C-x f" #'format-all-buffer latex-mode-map))
   :diminish)
 
 ;; ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
@@ -5558,6 +5558,8 @@ This location is used for temporary installations and files.")
 ;; ;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
 ;; ;;   :custom (org-block-capf-edit-style 'inline))
 
+(use-package auctex)
+
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
@@ -5621,9 +5623,9 @@ This location is used for temporary installations and files.")
   ;; Always query for the master file
   (setq-default TeX-master nil)
   (with-eval-after-load "auctex"
-    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
-    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
+    (bind-key "C-c C-e" LaTeX-environment latex-mode-map)
+    (bind-key "C-c C-s" LaTeX-section latex-mode-map)
+    (bind-key "C-c C-m" TeX-insert-macro latex-mode-map)))
 
 ;; ;; (use-package bibtex
 ;; ;;   :straight (:type built-in)
