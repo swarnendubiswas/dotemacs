@@ -190,7 +190,7 @@ install_npm_packages() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.12.4"
+    TEXLAB_VER="5.13.0"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -268,7 +268,7 @@ create_symlinks() {
 }
 
 install_shellcheck() {
-    SHELLCHECK_VER="0.9.0"
+    SHELLCHECK_VER="0.10.0"
     SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
@@ -436,7 +436,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.55.0"
+    DIFFT_VER="0.56.1"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
@@ -445,6 +445,8 @@ install_difft() {
 }
 
 install_zoxide() {
+    Z_VER="0.9.4"
+
     curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
 
     # For bash, add this line to ~/.bashrc
@@ -481,7 +483,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.46.1"
+    FZF_VER="0.48.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git

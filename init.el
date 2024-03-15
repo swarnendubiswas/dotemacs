@@ -925,10 +925,10 @@ This location is used for temporary installations and files.")
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
 ;; Group buffers by Projectile project
-(use-package ibuffer-projectile
-  :when (eq sb/project-handler 'projectile)
-  :after projectile
-  :hook (ibuffer . ibuffer-projectile-set-filter-groups))
+;; (use-package ibuffer-projectile
+;;   :when (eq sb/project-handler 'projectile)
+;;   :after projectile
+;;   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t
@@ -937,11 +937,11 @@ This location is used for temporary installations and files.")
 ;;   (setq vlf-application 'dont-ask)
 ;;   (require 'vlf-setup))
 
-;; When the *scratch* buffer is killed, immediately respawn it
+;; Immediately respawn the *scratch* buffer when it is killed
 (use-package immortal-scratch
   :hook (emacs-startup . immortal-scratch-mode))
 
-;; Helps to make the data in the "*scratch*" buffer persist
+;; Helps to make the data in the "*scratch*" buffer persistent
 (use-package persistent-scratch
   :hook
   (emacs-startup
@@ -951,34 +951,36 @@ This location is used for temporary installations and files.")
         (persistent-scratch-setup-default))))
   :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
-;; (use-package popwin
-;;   :hook (emacs-startup . popwin-mode)
-;;   :config
-;;   ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
-;;   ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
-;;   ;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
-;;   ;;   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
-;;   ;;   (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
-;;   ;;   (push '("*Selection Ring:")                  popwin:special-display-config)
-;;   ;;   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-;;   ;;   (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
-;;   ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
-;;   ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
-;;   ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
-;;   (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
-;;   ;;   (push "*Shell Command Output*"               popwin:special-display-config)
-;;   ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*Apropos*"))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-;;   ;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
-;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
-;;   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
-;;   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t))
-;;   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil)))
+;; Windows of temporary buffers are shown as a popup window, and we can close them by typing "C-g".
+(use-package popwin
+  :hook (emacs-startup . popwin-mode)
+  ;;   :config
+  ;;   ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
+  ;;   ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
+  ;;   ;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
+  ;;   ;;   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
+  ;;   ;;   (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
+  ;;   ;;   (push '("*Selection Ring:")                  popwin:special-display-config)
+  ;;   ;;   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+  ;;   ;;   (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
+  ;;   ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
+  ;;   ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
+  ;;   ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
+  ;;   (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
+  ;;   ;;   (push "*Shell Command Output*"               popwin:special-display-config)
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Apropos*"))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
+  ;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
+  ;;   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
+  ;;   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t))
+  ;;   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil))
+  )
 
 ;; ;; (add-to-list 'display-buffer-alist '("\\magit:" (display-buffer-same-window)))
 ;; ;; (add-to-list 'display-buffer-alist '("\\*Help" (display-buffer-same-window)))
@@ -1716,117 +1718,116 @@ This location is used for temporary installations and files.")
     (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
     (bind-key [remap projectile-grep] #'consult-grep)))
 
-;; ;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
-;; ;; `wgrep'
-;; (use-package embark-consult
-;;   :after (embark consult))
+;; Provide context-dependent actions similar to a content menu. Embark is likely not required with
+;; ivy.
+(use-package embark
+  :bind
+  (([remap describe-bindings] . embark-bindings) ; "C-h b"
+    ("C-`" . embark-act)
+    ;; ("C-`" . embark-dwim)
+    :map
+    minibuffer-local-map
+    ("C-`" . embark-act)
+    ("C-c C-c" . embark-collect)
+    ("C-c C-e" . embark-export)
+    :map
+    minibuffer-local-completion-map
+    ("C-`" . embark-act)
+    :map embark-file-map
+    ;; ("s" . sudo-edit)
+    ("l" . vlf))
+  :custom
+  ;; Replace the key help with a completing-read interface
+  (prefix-help-command #'embark-prefix-help-command)
+  :config (define-key embark-identifier-map "y" #'symbol-overlay-put)
 
-;; ;; Provide context-dependent actions similar to a content menu. Embark is likely not required with
-;; ;; ivy.
-;; (use-package embark
-;;   :bind
-;;   (([remap describe-bindings] . embark-bindings) ; "C-h b"
-;;     ("C-`" . embark-act)
-;;     ;; ("C-`" . embark-dwim)
-;;     :map
-;;     minibuffer-local-map
-;;     ("C-`" . embark-act)
-;;     ("C-c C-c" . embark-collect)
-;;     ("C-c C-e" . embark-export)
-;;     :map
-;;     minibuffer-local-completion-map
-;;     ("C-`" . embark-act)
-;;     :map
-;;     embark-file-map
-;;     ("s" . sudo-edit)
-;;     ("l" . vlf))
-;;   :custom
-;;   ;; Replace the key help with a completing-read interface
-;;   (prefix-help-command #'embark-prefix-help-command)
-;;   :config (define-key embark-identifier-map "y" #'symbol-overlay-put)
+  ;; (define-key embark-identifier-map "-" #'string-inflection-cycle)
+  ;; (add-to-list 'embark-repeat-actions #'string-inflection-cycle)
 
-;;   (define-key embark-identifier-map "-" #'string-inflection-cycle)
-;;   (add-to-list 'embark-repeat-actions #'string-inflection-cycle)
+  (with-eval-after-load "vertico"
+    (bind-keys :map vertico-map ("M-o" . embark-act) ("C-c C-l" . embark-export)))
 
-;;   (with-eval-after-load "vertico"
-;;     (bind-keys :map vertico-map ("M-o" . embark-act) ("C-c C-l" . embark-export)))
+  (defun embark-which-key-indicator ()
+    "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+    (lambda (&optional keymap targets prefix)
+      (if (null keymap)
+        (which-key--hide-popup-ignore-command)
+        (which-key--show-keymap
+          (if (eq (plist-get (car targets) :type) 'embark-become)
+            "Become"
+            (format "Act on %s '%s'%s"
+              (plist-get (car targets) :type)
+              (embark--truncate-target (plist-get (car targets) :target))
+              (if (cdr targets)
+                "…"
+                "")))
+          (if prefix
+            (pcase (lookup-key keymap prefix 'accept-default)
+              ((and (pred keymapp) km) km)
+              (_ (key-binding prefix 'accept-default)))
+            keymap)
+          nil nil t (lambda (binding) (not (string-suffix-p "-argument" (cdr binding))))))))
 
-;;   (defun embark-which-key-indicator ()
-;;     "An embark indicator that displays keymaps using which-key.
-;; The which-key help message will show the type and value of the
-;; current target followed by an ellipsis if there are further
-;; targets."
-;;     (lambda (&optional keymap targets prefix)
-;;       (if (null keymap)
-;;         (which-key--hide-popup-ignore-command)
-;;         (which-key--show-keymap
-;;           (if (eq (plist-get (car targets) :type) 'embark-become)
-;;             "Become"
-;;             (format "Act on %s '%s'%s"
-;;               (plist-get (car targets) :type)
-;;               (embark--truncate-target (plist-get (car targets) :target))
-;;               (if (cdr targets)
-;;                 "…"
-;;                 "")))
-;;           (if prefix
-;;             (pcase (lookup-key keymap prefix 'accept-default)
-;;               ((and (pred keymapp) km) km)
-;;               (_ (key-binding prefix 'accept-default)))
-;;             keymap)
-;;           nil nil t (lambda (binding) (not (string-suffix-p "-argument" (cdr binding))))))))
+  (setq embark-indicators
+    '(embark-which-key-indicator embark-highlight-indicator embark-isearch-highlight-indicator))
 
-;;   (setq embark-indicators
-;;     '(embark-which-key-indicator embark-highlight-indicator embark-isearch-highlight-indicator))
+  (defun embark-hide-which-key-indicator (fn &rest args)
+    "Hide the which-key indicator immediately when using the completing-read prompter."
+    (which-key--hide-popup-ignore-command)
+    (let ((embark-indicators (remq #'embark-which-key-indicator embark-indicators)))
+      (apply fn args)))
 
-;;   (defun embark-hide-which-key-indicator (fn &rest args)
-;;     "Hide the which-key indicator immediately when using the completing-read prompter."
-;;     (which-key--hide-popup-ignore-command)
-;;     (let ((embark-indicators (remq #'embark-which-key-indicator embark-indicators)))
-;;       (apply fn args)))
+  (advice-add #'embark-completing-read-prompter :around #'embark-hide-which-key-indicator)
 
-;;   (advice-add #'embark-completing-read-prompter :around #'embark-hide-which-key-indicator)
+  (defvar embark--target-mode-timer nil)
+  (defvar embark--target-mode-string "")
 
-;;   (defvar embark--target-mode-timer nil)
-;;   (defvar embark--target-mode-string "")
+  (defun embark--target-mode-update ()
+    (setq embark--target-mode-string
+      (if-let
+        (
+          targets
+          (embark--targets))
+        (format "[%s%s] "
+          (propertize (symbol-name (plist-get (car targets) :type)) 'face 'bold)
+          (mapconcat (lambda (x) (format ", %s" (plist-get x :type))) (cdr targets) ""))
+        "")))
 
-;;   (defun embark--target-mode-update ()
-;;     (setq embark--target-mode-string
-;;       (if-let
-;;         (
-;;           targets
-;;           (embark--targets))
-;;         (format "[%s%s] "
-;;           (propertize (symbol-name (plist-get (car targets) :type)) 'face 'bold)
-;;           (mapconcat (lambda (x) (format ", %s" (plist-get x :type))) (cdr targets) ""))
-;;         "")))
+  (define-minor-mode embark-target-mode
+    "Shows the current targets in the modeline."
+    :global
+    t
+    (setq mode-line-misc-info (assq-delete-all 'embark-target-mode mode-line-misc-info))
+    (when embark--target-mode-timer
+      (cancel-timer embark--target-mode-timer)
+      (setq embark--target-mode-timer nil))
+    (when embark-target-mode
+      (push '(embark-target-mode (:eval embark--target-mode-string)) mode-line-misc-info)
+      (setq embark--target-mode-timer (run-with-idle-timer 0.1 t #'embark--target-mode-update)))))
 
-;;   (define-minor-mode embark-target-mode
-;;     "Shows the current targets in the modeline."
-;;     :global
-;;     t
-;;     (setq mode-line-misc-info (assq-delete-all 'embark-target-mode mode-line-misc-info))
-;;     (when embark--target-mode-timer
-;;       (cancel-timer embark--target-mode-timer)
-;;       (setq embark--target-mode-timer nil))
-;;     (when embark-target-mode
-;;       (push '(embark-target-mode (:eval embark--target-mode-string)) mode-line-misc-info)
-;;       (setq embark--target-mode-timer (run-with-idle-timer 0.1 t #'embark--target-mode-update)))))
+;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
+;; `wgrep'
+(use-package embark-consult
+  :after (embark consult))
 
-;; ;; Enriches the completion display with annotations, e.g., documentation strings or file
-;; ;; information.
-;; (use-package marginalia
-;;   :after vertico
-;;   :init (marginalia-mode 1)
-;;   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
-;;   :config
-;;   (setq marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
-;;   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
-;;   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
+;; Enriches the completion display with annotations, e.g., documentation strings or file
+;; information.
+(use-package marginalia
+  :after vertico
+  :init (marginalia-mode 1)
+  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+  :config
+  (setq marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
+  (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
+  (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
-;; ;; ":after consult" prevents `consult-tramp' keybinding from being registered
-;; (use-package consult-tramp
-;;   :straight (:host github :repo "Ladicle/consult-tramp")
-;;   :bind ("C-c d t" . consult-tramp))
+;; ":after consult" prevents `consult-tramp' keybinding from being registered
+(use-package consult-tramp
+  :straight (:host github :repo "Ladicle/consult-tramp")
+  :bind ("C-c d t" . consult-tramp))
 
 ;; (use-package consult-eglot
 ;;   :when (eq sb/lsp-provider 'eglot)
@@ -1869,14 +1870,14 @@ This location is used for temporary installations and files.")
   :after (consult flycheck)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
-;; (use-package consult-lsp
-;;   :after (consult lsp)
-;;   :commands (consult-lsp-diagnostics consult-lsp-file-symbols)
-;;   :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
+(use-package consult-lsp
+  :after (consult lsp)
+  :commands (consult-lsp-diagnostics consult-lsp-file-symbols)
+  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
 
-;; (use-package consult-yasnippet
-;;   :after consult
-;;   :bind ("C-M-y" . consult-yasnippet))
+(use-package consult-yasnippet
+  :after consult
+  :bind ("C-M-y" . consult-yasnippet))
 
 ;; ;; ":after (consult projectile)" prevents binding `consult-projectile-switch-project'
 ;; (use-package consult-projectile
@@ -2101,16 +2102,16 @@ This location is used for temporary installations and files.")
 ;; ;;   ;; Allow using `q' to quit out of popups in addition to `C-g'
 ;; ;;   (transient-bind-q-to-quit))
 
-;; ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
-;; ;; for functions, so we use `helpful-callable' as a replacement.
-;; (use-package helpful
-;;   :bind
-;;   (([remap describe-function] . helpful-callable) ; "C-h f"
-;;     ([remap describe-variable] . helpful-variable) ; "C-h v"
-;;     ([remap describe-symbol] . helpful-symbol) ; "C-h o"
-;;     ([remap describe-key] . helpful-key) ; "C-h k"
-;;     ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
-;;     :map helpful-mode-map ("q" . helpful-kill-buffers)))
+;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
+;; for functions, so we use `helpful-callable' as a replacement.
+(use-package helpful
+  :bind
+  (([remap describe-function] . helpful-callable) ; "C-h f"
+    ([remap describe-variable] . helpful-variable) ; "C-h v"
+    ([remap describe-symbol] . helpful-symbol) ; "C-h o"
+    ([remap describe-key] . helpful-key) ; "C-h k"
+    ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
+    :map helpful-mode-map ("q" . helpful-kill-buffers)))
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
@@ -2167,23 +2168,23 @@ This location is used for temporary installations and files.")
 (use-package iedit
   :bind* ("C-." . iedit-mode))
 
-;; (use-package hl-todo
-;;   :hook (emacs-startup . global-hl-todo-mode)
-;;   :config
-;;   (setq
-;;     hl-todo-highlight-punctuation ":"
-;;     hl-todo-keyword-faces
-;;     (append
-;;       '
-;;       (("LATER" . "#d0bf8f")
-;;         ("IMP" . "#7cb8bb")
-;;         ("ISSUE" . "#ff8c00")
-;;         ("DEBUG" . "#ff8c00")
-;;         ("TEST" . "tomato")
-;;         ("WARNING" . "#cc0000")
-;;         ("BEWARE" . "#aa0000")
-;;         ("REFACTOR" . "#cc9393"))
-;;       hl-todo-keyword-faces)))
+(use-package hl-todo
+  :hook (emacs-startup . global-hl-todo-mode)
+  :config
+  (setq
+    hl-todo-highlight-punctuation ":"
+    hl-todo-keyword-faces
+    (append
+      '
+      (("LATER" . "#d0bf8f")
+        ("IMP" . "#7cb8bb")
+        ("ISSUE" . "#ff8c00")
+        ("DEBUG" . "#ff8c00")
+        ("TEST" . "tomato")
+        ("WARNING" . "#cc0000")
+        ("BEWARE" . "#aa0000")
+        ("REFACTOR" . "#cc9393"))
+      hl-todo-keyword-faces)))
 
 ;; (use-package highlight-numbers
 ;;   :hook
@@ -2306,9 +2307,9 @@ This location is used for temporary installations and files.")
     ("C-c d s" . crux-sudo-edit))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; (use-package rainbow-mode
-;;   :hook ((LaTeX-mode css-mode css-mode-hook html-mode html-ts-mode web-mode help-mode) . rainbow-mode)
-;;   :diminish)
+(use-package rainbow-mode
+  :hook ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode) . rainbow-mode)
+  :diminish)
 
 ;; ;; (use-package volatile-highlights
 ;; ;;   :hook (emacs-startup . volatile-highlights-mode)
@@ -2358,10 +2359,10 @@ This location is used for temporary installations and files.")
 ;; ;;   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
 ;; ;;   :diminish)
 
-;; ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-;; (use-package ws-butler
-;;   :hook (prog-mode . ws-butler-mode)
-;;   :diminish)
+;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+(use-package ws-butler
+  :hook (prog-mode . ws-butler-mode)
+  :diminish)
 
 ;; Both project.el and projectile are unable to remember remote projects.
 (use-package project
@@ -2558,21 +2559,21 @@ This location is used for temporary installations and files.")
 ;; ;;   :bind ([remap query-replace-regexp] . anzu-query-replace-regexp)
 ;; ;;   :diminish anzu-mode)
 
-;; (with-eval-after-load "grep"
-;;   (setq
-;;     grep-command "grep --color -irHn "
-;;     grep-highlight-matches t
-;;     grep-scroll-output t)
+(with-eval-after-load "grep"
+  (setq
+    grep-command "grep --color -irHn "
+    grep-highlight-matches t
+    grep-scroll-output t)
 
-;;   (when (executable-find "rg")
-;;     (setq grep-program "rg")
-;;     (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
+  (when (executable-find "rg")
+    (setq grep-program "rg")
+    (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
 
-;;   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
-;;     (add-to-list 'grep-find-ignored-directories dirs)))
+  (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
+    (add-to-list 'grep-find-ignored-directories dirs)))
 
-;; (when (executable-find "fd")
-;;   (setq find-program "fd"))
+(when (executable-find "fd")
+  (setq find-program "fd"))
 
 ;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze
 ;; Emacs for several minutes.
@@ -2610,12 +2611,12 @@ This location is used for temporary installations and files.")
 ;;   :commands re-builder
 ;;   :custom (reb-re-syntax 'string))
 
-;; ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
-;; ;; and replacements as you type.
-;; (use-package visual-regexp
-;;   :bind
-;;   ([remap query-replace] . vr/query-replace)
-;;   ([remap replace-regex] . vr/replace))
+;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
+;; and replacements as you type.
+(use-package visual-regexp
+  :bind
+  ([remap query-replace] . vr/query-replace)
+  ([remap replace-regex] . vr/replace))
 
 ;; ;; (use-package ripgrep
 ;; ;;   :commands (ripgrep-regexp projectile-ripgrep))
@@ -2631,15 +2632,15 @@ This location is used for temporary installations and files.")
 ;;     rg-dwim-current-dir
 ;;     rg-dwim-project-dir))
 
-;; (use-package vc-hooks
-;;   :straight (:type built-in)
-;;   :custom
-;;   ;; Disabling vc is said to improve performance. However, I find it useful to show branch
-;;   ;; information on the modeline and highlight modifications in the current file.
-;;   (vc-handled-backends '(Git))
-;;   (vc-follow-symlinks t "No need to ask")
-;;   ;; Disable version control for remote files to improve performance
-;;   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
+(use-package vc-hooks
+  :straight (:type built-in)
+  :custom
+  ;; Disabling vc is said to improve performance. However, I find it useful to show branch
+  ;; information on the modeline and highlight modifications in the current file.
+  (vc-handled-backends '(Git))
+  (vc-follow-symlinks t "No need to ask")
+  ;; Disable version control for remote files to improve performance
+  (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
 
 (use-package magit
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
@@ -2663,22 +2664,32 @@ This location is used for temporary installations and files.")
 ;; ;;   :demand t
 ;; ;;   :config (magit-todos-mode 1))
 
-;; (use-package difftastic
-;;   :after magit
-;;   :demand t
-;;   :bind (:map magit-blame-read-only-mode-map ("D" . difftastic-magit-show) ("S" . difftastic-magit-show))
-;;   :config
-;;   (eval-after-load 'magit-diff
-;;     '
-;;     (transient-append-suffix
-;;       'magit-diff '(-1 -1)
-;;       [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
-;;         ("S" "Difftastic show" difftastic-magit-show)])))
+(use-package difftastic
+  :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
+  :bind
+  (:map
+    difftastic-mode-map
+    ("e" . difftastic-leave)
+    ("g" . difftastic-rerun)
+    ("p" . difftastic-previous-chunk)
+    ("n" . difftastic-next-chunk)
+    ("q" . difftastic-quit)
+    :map
+    magit-blame-read-only-mode-map
+    ("D" . difftastic-magit-show)
+    ("S" . difftastic-magit-show))
+  :config
+  (eval-after-load 'magit-diff
+    '
+    (transient-append-suffix
+      'magit-diff '(-1 -1)
+      [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
+        ("S" "Difftastic show" difftastic-magit-show)])))
 
-;; (use-package git-modes
-;;   :mode ("dotgitconfig" . gitconfig-mode)
-;;   :mode ("/\\.gitignore\\'" . gitignore-mode)
-;;   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
+(use-package git-modes
+  :mode ("dotgitconfig" . gitconfig-mode)
+  :mode ("/\\.gitignore\\'" . gitignore-mode)
+  :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
@@ -2718,24 +2729,24 @@ This location is used for temporary installations and files.")
 ;;       (git-commit-turn-on-flyspell)))
 ;;   :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
-;; ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them. Since Emacs 25.1,
-;; ;; `vc-git-find-file-hook' enables smerge for files with conflicts.
-;; (use-package smerge-mode
-;;   :straight (:type built-in)
-;;   :bind
-;;   (:map
-;;     smerge-mode-map
-;;     ("M-g n" . smerge-next)
-;;     ("M-g p" . smerge-prev)
-;;     ("M-g c" . smerge-keep-current)
-;;     ("M-g u" . smerge-keep-upper)
-;;     ("M-g l" . smerge-keep-lower)
-;;     ("M-g b" . smerge-keep-base)
-;;     ("M-g a" . smerge-keep-all)
-;;     ("M-g e" . smerge-ediff)
-;;     ("M-g K" . smerge-kill-current)
-;;     ("M-g m" . smerge-context-menu)
-;;     ("M-g M" . smerge-popup-context-menu)))
+;; Use the minor mode `smerge-mode' to move between conflicts and resolve them. Since Emacs 25.1,
+;; `vc-git-find-file-hook' enables smerge for files with conflicts.
+(use-package smerge-mode
+  :straight (:type built-in)
+  :bind
+  (:map
+    smerge-mode-map
+    ("M-g n" . smerge-next)
+    ("M-g p" . smerge-prev)
+    ("M-g c" . smerge-keep-current)
+    ("M-g u" . smerge-keep-upper)
+    ("M-g l" . smerge-keep-lower)
+    ("M-g b" . smerge-keep-base)
+    ("M-g a" . smerge-keep-all)
+    ("M-g e" . smerge-ediff)
+    ("M-g K" . smerge-kill-current)
+    ("M-g m" . smerge-context-menu)
+    ("M-g M" . smerge-popup-context-menu)))
 
 ;; ;; (use-package with-editor :diminish)
 
@@ -2961,7 +2972,7 @@ This location is used for temporary installations and files.")
   (with-eval-after-load "markdown-mode"
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   (with-eval-after-load "auctex"
-    (bind-key "C-x f" #'format-all-buffer latex-mode-map))
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
   :diminish)
 
 ;; ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
@@ -3036,25 +3047,25 @@ This location is used for temporary installations and files.")
 ;; ;;     highlight-indentation-mode)
 ;; ;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
-;; (use-package indent-bars
-;;   :straight (:host github :repo "jdtsmith/indent-bars")
-;;   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-;;   :custom
-;;   (indent-bars-treesit-support t)
-;;   (indent-bars-no-descend-string t)
-;;   (indent-bars-treesit-ignore-blank-lines-types '("module"))
-;;   (indent-bars-treesit-wrap
-;;     '
-;;     (
-;;       (python
-;;         argument_list
-;;         parameters ; for python, as an example
-;;         list
-;;         list_comprehension
-;;         dictionary
-;;         dictionary_comprehension
-;;         parenthesized_expression
-;;         subscript))))
+(use-package indent-bars
+  :straight (:host github :repo "jdtsmith/indent-bars")
+  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :custom
+  (indent-bars-treesit-support t)
+  (indent-bars-no-descend-string t)
+  (indent-bars-treesit-ignore-blank-lines-types '("module"))
+  (indent-bars-treesit-wrap
+    '
+    (
+      (python
+        argument_list
+        parameters ; for python, as an example
+        list
+        list_comprehension
+        dictionary
+        dictionary_comprehension
+        parenthesized_expression
+        subscript))))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
@@ -4620,72 +4631,72 @@ This location is used for temporary installations and files.")
 (use-package rainbow-delimiters
   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
-;; ;; Tree-sitter provides advanced syntax highlighting features. Run
-;; ;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
-;; ;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
+;; Tree-sitter provides advanced syntax highlighting features. Run
+;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
+;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
 
-;; ;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
-;; ;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
+;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
+;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 
-;; ;; (use-package treesit-auto
-;; ;;   :when (executable-find "tree-sitter")
-;; ;;   :demand t
-;; ;;   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-;; ;;   :custom
-;; ;;   (treesit-auto-install 'prompt)
-;; ;;   (treesit-font-lock-level 4 "Increase default font locking")
-;; ;;   (treesit-language-source-alist
-;; ;;     '
-;; ;;     ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-;; ;;       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-;; ;;       (c "https://github.com/tree-sitter/tree-sitter-c")
-;; ;;       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-;; ;;       (cmake "https://github.com/uyha/tree-sitter-cmake")
-;; ;;       (css "https://github.com/tree-sitter/tree-sitter-css")
-;; ;;       (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-;; ;;       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-;; ;;       (html "https://github.com/tree-sitter/tree-sitter-html")
-;; ;;       (java "https://github.com/tree-sitter/tree-sitter-java")
-;; ;;       (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-;; ;;       (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-;; ;;       (json "https://github.com/tree-sitter/tree-sitter-json")
-;; ;;       (latex "https://github.com/latex-lsp/tree-sitter-latex")
-;; ;;       (make "https://github.com/alemuller/tree-sitter-make")
-;; ;;       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-;; ;;       (org "https://github.com/milisims/tree-sitter-org")
-;; ;;       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-;; ;;       (python "https://github.com/tree-sitter/tree-sitter-python")
-;; ;;       (toml "https://github.com/tree-sitter/tree-sitter-toml")
-;; ;;       (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
-;; ;;       (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
-;; ;;       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-;; ;;   :config
-;; ;;   (global-treesit-auto-mode 1)
-;; ;;   (treesit-auto-add-to-auto-mode-alist 'all)
-;; ;;   ;; Install grammars
-;; ;;   (when
-;; ;;     (unless
-;; ;;       (and (treesit-language-available-p 'bash)
-;; ;;         (treesit-language-available-p 'bibtex)
-;; ;;         (treesit-language-available-p 'c)
-;; ;;         (treesit-language-available-p 'cpp)
-;; ;;         (treesit-language-available-p 'cmake)
-;; ;;         (treesit-language-available-p 'css)
-;; ;;         ;; (treesit-language-available-p 'docker)
-;; ;;         (treesit-language-available-p 'elisp)
-;; ;;         (treesit-language-available-p 'html)
-;; ;;         (treesit-language-available-p 'java)
-;; ;;         ;; (treesit-language-available-p 'js)
-;; ;;         (treesit-language-available-p 'json)
-;; ;;         (treesit-language-available-p 'latex)
-;; ;;         (treesit-language-available-p 'make)
-;; ;;         (treesit-language-available-p 'markdown)
-;; ;;         (treesit-language-available-p 'org)
-;; ;;         (treesit-language-available-p 'perl)
-;; ;;         (treesit-language-available-p 'python)
-;; ;;         (treesit-language-available-p 'toml)
-;; ;;         (treesit-language-available-p 'yaml)))
-;; ;;     (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
+(use-package treesit-auto
+  :when (executable-find "tree-sitter")
+  :demand t
+  :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+  :custom
+  (treesit-auto-install 'prompt)
+  (treesit-font-lock-level 4 "Increase default font locking")
+  (treesit-language-source-alist
+    '
+    ((bash "https://github.com/tree-sitter/tree-sitter-bash")
+      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+      (c "https://github.com/tree-sitter/tree-sitter-c")
+      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+      (cmake "https://github.com/uyha/tree-sitter-cmake")
+      (css "https://github.com/tree-sitter/tree-sitter-css")
+      (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+      (html "https://github.com/tree-sitter/tree-sitter-html")
+      (java "https://github.com/tree-sitter/tree-sitter-java")
+      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+      (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+      (json "https://github.com/tree-sitter/tree-sitter-json")
+      (latex "https://github.com/latex-lsp/tree-sitter-latex")
+      (make "https://github.com/alemuller/tree-sitter-make")
+      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+      (org "https://github.com/milisims/tree-sitter-org")
+      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+      (python "https://github.com/tree-sitter/tree-sitter-python")
+      (toml "https://github.com/tree-sitter/tree-sitter-toml")
+      (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
+      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  :config
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  ;; Install grammars
+  (when
+    (unless
+      (and (treesit-language-available-p 'bash)
+        (treesit-language-available-p 'bibtex)
+        (treesit-language-available-p 'c)
+        (treesit-language-available-p 'cpp)
+        (treesit-language-available-p 'cmake)
+        (treesit-language-available-p 'css)
+        ;; (treesit-language-available-p 'docker)
+        (treesit-language-available-p 'elisp)
+        (treesit-language-available-p 'html)
+        (treesit-language-available-p 'java)
+        ;; (treesit-language-available-p 'js)
+        (treesit-language-available-p 'json)
+        (treesit-language-available-p 'latex)
+        (treesit-language-available-p 'make)
+        (treesit-language-available-p 'markdown)
+        (treesit-language-available-p 'org)
+        (treesit-language-available-p 'perl)
+        (treesit-language-available-p 'python)
+        (treesit-language-available-p 'toml)
+        (treesit-language-available-p 'yaml)))
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
 
 ;; ;; (use-package treesit
 ;; ;;   :straight (:type built-in)
@@ -5104,14 +5115,14 @@ This location is used for temporary installations and files.")
       (when buffer-file-name
         (add-hook 'after-save-hook #'check-parens nil t)))))
 
-;; (use-package ini-mode
-;;   :commands (ini-mode))
+(use-package ini-mode
+  :commands (ini-mode))
 
-;; (use-package conf-mode
-;;   :straight (:type built-in)
-;;   :mode
-;;   "\\.cfg\\'"
-;;   "\\.conf\\'")
+(use-package conf-mode
+  :straight (:type built-in)
+  :mode
+  "\\.cfg\\'"
+  "\\.conf\\'")
 
 (use-package yaml-mode
   :mode
@@ -5558,8 +5569,6 @@ This location is used for temporary installations and files.")
 ;; ;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
 ;; ;;   :custom (org-block-capf-edit-style 'inline))
 
-(use-package auctex)
-
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
@@ -5623,9 +5632,9 @@ This location is used for temporary installations and files.")
   ;; Always query for the master file
   (setq-default TeX-master nil)
   (with-eval-after-load "auctex"
-    (bind-key "C-c C-e" LaTeX-environment latex-mode-map)
-    (bind-key "C-c C-s" LaTeX-section latex-mode-map)
-    (bind-key "C-c C-m" TeX-insert-macro latex-mode-map)))
+    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
+    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
+    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
 
 ;; ;; (use-package bibtex
 ;; ;;   :straight (:type built-in)
@@ -6020,10 +6029,21 @@ used in `company-backends'."
 ;; ;;     (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))
 ;; ;;   (symbols-outline-follow-mode 1))
 
-;; ;; (use-package breadcrumb
-;; ;;   :straight (:host github :repo "joaotavora/breadcrumb")
-;; ;;   :disabled
-;; ;;   :hook (emacs-startup . breadcrumb-mode))
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb")
+  :hook
+  (
+    (c-mode
+      c-ts-mode
+      c++-mode
+      c++-ts-mode
+      python-mode
+      python-ts-mode
+      sh-mode
+      bash-ts-mode
+      java-mode
+      java-ts-mode)
+    . breadcrumb-mode))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -6387,17 +6407,17 @@ or the major mode is not in `sb/skippable-modes'."
 ;; ;;   ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
 ;; ;;   (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
-;; (use-package doom-themes
-;;   :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
-;;   :init
-;;   (cond
-;;     ((eq sb/theme 'doom-one)
-;;       (load-theme 'doom-one t))
-;;     ((eq sb/theme 'doom-nord)
-;;       (load-theme 'doom-nord t)))
-;;   :config
-;;   ;; Corrects (and improves) org-mode's native fontification.
-;;   (doom-themes-org-config))
+(use-package doom-themes
+  :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
+  :init
+  (cond
+    ((eq sb/theme 'doom-one)
+      (load-theme 'doom-one t))
+    ((eq sb/theme 'doom-nord)
+      (load-theme 'doom-nord t)))
+  :config
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 (use-package modus-themes
   :when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
@@ -6408,10 +6428,10 @@ or the major mode is not in `sb/skippable-modes'."
     ((eq sb/theme 'modus-vivendi)
       (load-theme 'modus-vivendi t))))
 
-;; (use-package nano-theme
-;;   :straight (:host github :repo "rougier/nano-theme")
-;;   :when (eq sb/theme 'nano-dark)
-;;   :init (load-theme 'nano-dark t))
+(use-package nano-theme
+  :straight (:host github :repo "rougier/nano-theme")
+  :when (eq sb/theme 'nano-dark)
+  :init (load-theme 'nano-dark t))
 
 ;; ;; (use-package nordic-night-theme
 ;; ;;   :when (eq sb/theme 'nordic-night)
