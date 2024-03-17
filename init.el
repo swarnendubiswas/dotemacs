@@ -30,7 +30,7 @@
     (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -120,21 +120,19 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "pylsp" pylsp) (const :tag "pyright" pyright) (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Ivy is no longer maintained
 (defcustom sb/minibuffer-completion 'vertico
   "Choose the framework to use for narrowing and selection."
-  :type '(radio (const :tag "vertico" vertico) (const :tag "ivy" ivy) (const :tag "none" none))
+  :type '(radio (const :tag "vertico" vertico) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Corfu is easy to configure, integrates nicely with `orderless', and provides better completion
 ;; for elisp symbols. But `corfu-terminal-mode' has a potential rendering problem with TUI Emacs,
 ;; for completion popups appearing near the right edges. The completion entries wrap around, and
-;; sometimes messes up the completion. Corfu does not work as well as `company' with LaTeX for me.
-;; Company works better with Windows and TUI Emacs, and has more extensive LaTeX support.
-;; `company-ispell' is configurable, and we can set up a custom file containing completions with
-;; `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
-;; backend.
-(defcustom sb/capf 'company
+;; sometimes messes up the completion. Company works better with Windows and TUI Emacs, and has more
+;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
+;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
+;; case when used as a grouped backend.
+(defcustom sb/capf 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -246,30 +244,6 @@ This location is used for temporary installations and files.")
     '
     (use-package :source
       melpa)))
-
-;; (unless (bound-and-true-p sb/disable-package.el)
-;;   (with-eval-after-load 'package
-;;     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;;     (add-to-list 'package-archives '("celpa" . "https://celpa.conao3.com/packages/") t)
-;;     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
-
-;;   ;; Initialise the package management system. Another option is to construct the `load-path'
-;;   ;; manually, e.g., "(add-to-list 'load-path (concat package-user-dir "magit-20170715.1731"))".
-;;   (package-initialize)
-
-;;   (unless (package-installed-p 'use-package)
-;;     (package-refresh-contents)
-;;     (package-install 'use-package))
-
-;;   ;; Avoid manual installations whenever I modify package installations
-;;   (setq
-;;     use-package-always-ensure t
-;;     ;; These variables need to be set before loading `use-package'
-;;     use-package-enable-imenu-support t
-;;     use-package-hook-name-suffix nil)
-
-;;   (eval-when-compile
-;;     (require 'use-package)))
 
 (cond
   ((eq sb/op-mode 'daemon)
@@ -975,7 +949,6 @@ This location is used for temporary installations and files.")
   ;;   ;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
   ;;   ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
   ;;   ;;   (add-to-list 'popwin:special-display-config '("*explain-pause-top*"))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '(ivy-occur-grep-mode))
   ;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
   ;;   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
   ;;   (add-to-list 'popwin:special-display-config '(comint-mode :noselect t))
@@ -1124,25 +1097,6 @@ This location is used for temporary installations and files.")
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
-;; Do not create multiple dired buffers
-
-;; (use-package dired+
-;;   :straight (:host github :repo "emacsmirror/dired-plus")
-;;   :commands diredp-toggle-find-file-reuse-dir
-;;   :init
-;;   ;; Set before the module is loaded
-;;   (setq diredp-bind-problematic-terminal-keys nil)
-;;   (setq-local font-lock-maximum-decoration nil)
-;;   :hook
-;;   (dired-mode
-;;     .
-;;     (lambda ()
-;;       (when sb/EMACS27
-;;         (diredp-toggle-find-file-reuse-dir 1))))
-;;   :custom
-;;   (diredp-hide-details-initially-flag nil)
-;;   (diredp-hide-details-propagate-flag nil))
-
 ;; (use-package dired-async
 ;;   :straight async
 ;;   :after (dired async)
@@ -1164,383 +1118,6 @@ This location is used for temporary installations and files.")
 ;;   :hook (dired-mode . dired-hist-mode)
 ;;   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
-;; Sort most-used commands and show keyboard shortcuts. `amx-major-mode-commands' limits to commands
-;; that are relevant to the current major mode, `amx-show-unbound-commands' shows frequently used
-;; commands that have no key bindings.
-;; (use-package amx
-;;   :when (eq sb/minibuffer-completion 'ivy) ; `amx' is not needed with `vertico'.
-;;   :hook (emacs-startup . amx-mode))
-
-;; ;; (use-package ivy
-;; ;;   :when (eq sb/minibuffer-completion 'ivy)
-;; ;;   :hook (emacs-startup . ivy-mode)
-;; ;;   :bind
-;; ;;   (("C-c r" . ivy-resume)
-;; ;;     :map
-;; ;;     ivy-minibuffer-map
-;; ;;     ("RET" . ivy-alt-done) ; Continue completion
-;; ;;     ("<left>" . ivy-previous-line)
-;; ;;     ("<right>" . ivy-next-line)
-;; ;;     ([escape] . minibuffer-keyboard-quit))
-;; ;;   :custom
-;; ;;   (ivy-count-format "(%d/%d) " "Helps identify wrap around")
-;; ;;   (ivy-extra-directories nil "Hide . and ..")
-;; ;;   ;; Make the height of the minibuffer proportionate to the screen
-;; ;;   ;; (ivy-height-alist '((t lambda (_caller) (/ (frame-height) 2))))
-;; ;;   (ivy-fixed-height-minibuffer t "Distracting if the height keeps changing")
-;; ;;   (ivy-truncate-lines t) ; `counsel-flycheck' output gets truncated
-;; ;;   (ivy-wrap t "Easy to navigate")
-;; ;;   (ivy-initial-inputs-alist nil "Do not start searches with ^")
-;; ;;   (ivy-use-virtual-buffers nil "Do not show recent files in `switch-buffer'")
-;; ;;   (ivy-use-selectable-prompt t "Easier to edit names with common prefixes")
-;; ;;   (ivy-sort-max-size 50000 "Increase the limit to allow sorting")
-;; ;;   (ivy-flx-limit 1500 "Increase the limit to allow flex sorting")
-;; ;;   :config
-;; ;;   (dolist
-;; ;;     (buffer
-;; ;;       '
-;; ;;       ("TAGS" "magit-process" "*emacs*" "*xref*" "^\\*.+Completions\\*$" "^\\*Compile-Log\\*$"
-;; ;;         ;; "*eldoc for use-package*" "^\\*Help\\*$" "^\\*Ibuffer\\*$" "*Warnings*"
-;; ;;         ;; "^\\*Backtrace\\*$"
-;; ;;         ;; "*flycheck-posframe-buffer*" "^\\*prettier" "^\\*json*" "^\\*texlab*"
-;; ;;         ;; "^\\*clangd*" "^\\*shfmt*" "*company-documentation*"
-;; ;;         ))
-;; ;;     (add-to-list 'ivy-ignore-buffers buffer))
-
-;; ;;   ;; Other options: ivy--regex-ignore-order
-;; ;;   ;; (setq ivy-re-builders-alist '((counsel-rg        . ivy--regex-plus)
-;; ;;   ;;                               (counsel-M-x       . ivy--regex-fuzzy)
-;; ;;   ;;                               (counsel-find-file . ivy--regex-fuzzy)
-;; ;;   ;;                               (t                 . ivy--regex-plus)))
-
-;; ;;   ;; Ignore `dired' buffers from `ivy-switch-buffer'
-;; ;;   ;; https://github.com/abo-abo/swiper/wiki/Hiding-dired-buffers
-
-;; ;;   ;; (progn
-;; ;;   ;;   (defun sb/ignore-dired-buffers (str)
-;; ;;   ;;     "Return non-nil if STR names a Dired buffer.
-;; ;;   ;; This function is intended for use with `ivy-ignore-buffers'."
-;; ;;   ;;     (let ((buf (get-buffer str)))
-;; ;;   ;;       (and buf (eq (buffer-local-value 'major-mode buf) 'dired-mode))))
-
-;; ;;   ;;   (add-to-list 'ivy-ignore-buffers #'sb/ignore-dired-buffers))
-
-;; ;;   (with-eval-after-load "savehist"
-;; ;;     (add-to-list 'savehist-additional-variables 'ivy-views))
-;; ;;   :diminish)
-
-;; ;; (use-package all-the-icons-ivy
-;; ;;   :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
-;; ;;   :after ivy
-;; ;;   :hook (emacs-startup . all-the-icons-ivy-setup))
-
-;; ;; (use-package counsel
-;; ;;   :preface
-;; ;;   ;; https://emacs.stackexchange.com/questions/33332/recursively-list-all-files-and-sub-directories
-;; ;;   (defun sb/counsel-all-files-recursively (dir-name)
-;; ;;     "List all files recursively in DIR-NAME."
-;; ;;     (interactive "DDirectory: ")
-;; ;;     (let*
-;; ;;       ((cands (split-string (shell-command-to-string (format "find %s -type f" dir-name)) "\n" t)))
-;; ;;       (ivy-read "File: " cands :action #'find-file :caller 'sb/counsel-all-files-recursively)))
-;; ;;   :when (eq sb/minibuffer-completion 'ivy)
-;; ;;   :hook (ivy-mode . counsel-mode)
-;; ;;   :bind
-;; ;;   ( ;; Counsel can use the sorting from `amx' for `counsel-M-x'.
-;; ;;     ([remap execute-extended-command] . counsel-M-x)
-;; ;;     ("<f1>" . counsel-M-x)
-;; ;;     ([remap completion-at-point] . counsel-company)
-;; ;;     ("C-M-i" . counsel-company)
-;; ;;     ([remap find-file] . counsel-find-file)
-;; ;;     ("<f2>" . counsel-find-file)
-;; ;;     ([remap dired] . counsel-dired)
-;; ;;     ([remap recentf-open-files] . counsel-recentf)
-;; ;;     ("<f9>" . counsel-recentf)
-;; ;;     ("C-c d m" . counsel-minor)
-;; ;;     ("C-c s g" . counsel-git)
-;; ;;     ("C-c s G" . counsel-git-grep)
-;; ;;     ("C-c s r" . counsel-rg)
-;; ;;     ("<f4>" . counsel-grep-or-swiper)
-;; ;;     ([remap locate] . counsel-locate)
-;; ;;     ("C-c s l" . counsel-locate)
-;; ;;     ([remap yank-pop] . counsel-yank-pop)
-;; ;;     ("M-y" . counsel-yank-pop)
-;; ;;     ("C-c C-m" . counsel-mark-ring)
-;; ;;     ("<f3>" . counsel-switch-buffer)
-;; ;;     ;; ("S-<f3>" . counsel-switch-buffer)
-;; ;;     ([remap imenu] . counsel-imenu)
-;; ;;     ("C-c C-j" . counsel-imenu)
-;; ;;     ([remap bookmark-jump] . counsel-bookmark)
-;; ;;     ([remap apropos] . counsel-apropos)
-;; ;;     ("M-g o" . counsel-outline)
-;; ;;     ([remap load-theme] . counsel-theme)
-;; ;;     ([remap load-library] . counsel-load-library)
-;; ;;     ("C-x j" . sb/counsel-all-files-recursively)
-;; ;;     ([remap compile] . counsel-compile)
-;; ;;     :map
-;; ;;     minibuffer-local-map
-;; ;;     ("C-c h" . counsel-minor-history))
-;; ;;   :custom
-;; ;;   (counsel-describe-function-function #'helpful-callable)
-;; ;;   (counsel-describe-variable-function #'helpful-variable)
-;; ;;   (counsel-find-file-at-point t "Identify file at point")
-;; ;;   (counsel-find-file-ignore-regexp (regexp-opt completion-ignored-extensions))
-;; ;;   (counsel-mode-override-describe-bindings t)
-;; ;;   (counsel-preselect-current-file t)
-;; ;;   (counsel-switch-buffer-preview-virtual-buffers nil)
-;; ;;   (counsel-yank-pop-preselect-last t)
-;; ;;   (counsel-yank-pop-separator "\n---------------------------------------------------\n")
-;; ;;   (ivy-height-alist
-;; ;;     '
-;; ;;     ((counsel-M-x . 15)
-;; ;;       (counsel-switch-buffer . 15)
-;; ;;       (counsel-yank-pop . 15)
-;; ;;       (swiper . 15)
-;; ;;       (swiper-isearch . 15)
-;; ;;       (counsel-recentf . 15)))
-;; ;;   :config
-;; ;;   (with-eval-after-load "savehist"
-;; ;;     (add-to-list 'savehist-additional-variables 'counsel-compile-history))
-;; ;;   :diminish)
-
-;; ;; Enable before `ivy-rich-mode' for better performance. The new transformers (file permissions)
-;; ;; seem an overkill, and it hides long file names.
-;; ;; (use-package all-the-icons-ivy-rich
-;; ;;   :hook (ivy-mode . all-the-icons-ivy-rich-mode)
-;; ;;   :custom
-;; ;;   (all-the-icons-ivy-rich-icon nil "Disable icons")
-;; ;;   (all-the-icons-ivy-rich-icon-size 0.9)
-;; ;;   :config
-;; ;;   (plist-put
-;; ;;     all-the-icons-ivy-rich-display-transformers-list 'counsel-recentf
-;; ;;     '
-;; ;;     (:columns
-;; ;;       ((all-the-icons-ivy-rich-file-icon)
-;; ;;         (all-the-icons-ivy-rich-file-name (:width 0.70))
-;; ;;         (all-the-icons-ivy-rich-file-id
-;; ;;           (:width 10 :face all-the-icons-ivy-rich-file-owner-face :align right))
-;; ;;         (ivy-rich-file-last-modified-time (:face all-the-icons-ivy-rich-time-face)))
-;; ;;       :delimiter "\t"))
-
-;; ;;   (plist-put
-;; ;;     all-the-icons-ivy-rich-display-transformers-list 'counsel-find-file
-;; ;;     '
-;; ;;     (:columns
-;; ;;       ((all-the-icons-ivy-rich-file-icon)
-;; ;;         (all-the-icons-ivy-rich-file-name (:width 0.4))
-;; ;;         (all-the-icons-ivy-rich-file-id
-;; ;;           (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
-;; ;;       :delimiter "\t"))
-
-;; ;;   (plist-put
-;; ;;     all-the-icons-ivy-rich-display-transformers-list 'ivy-switch-buffer
-;; ;;     '
-;; ;;     (:columns
-;; ;;       ((all-the-icons-ivy-rich-buffer-icon)
-;; ;;         (ivy-rich-candidate (:width 30))
-;; ;;         (ivy-rich-switch-buffer-indicators
-;; ;;           (:width 4 :face all-the-icons-ivy-rich-indicator-face :align right))
-;; ;;         (all-the-icons-ivy-rich-switch-buffer-major-mode
-;; ;;           (:width 18 :face all-the-icons-ivy-rich-major-mode-face))
-;; ;;         (ivy-rich-switch-buffer-project (:width 0.12 :face all-the-icons-ivy-rich-project-face))
-;; ;;         (ivy-rich-switch-buffer-path
-;; ;;           (:width
-;; ;;             (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3)))
-;; ;;             :face all-the-icons-ivy-rich-path-face)))
-;; ;;       :predicate (lambda (cand) (get-buffer cand))
-;; ;;       :delimiter "\t"))
-
-;; ;;   (with-eval-after-load "projectile"
-;; ;;     (plist-put
-;; ;;       all-the-icons-ivy-rich-display-transformers-list 'projectile-completing-read
-;; ;;       '
-;; ;;       (:columns
-;; ;;         ((all-the-icons-ivy-rich-file-icon)
-;; ;;           (all-the-icons-ivy-rich-project-find-file-transformer (:width 0.4))
-;; ;;           (all-the-icons-ivy-rich-project-file-id
-;; ;;             (:width 15 :face all-the-icons-ivy-rich-file-owner-face :align right)))
-;; ;;         :delimiter "\t"))))
-
-;; ;; Icons and columns are sometimes unaligned
-;; ;; (use-package nerd-icons-ivy-rich
-;; ;;   :hook (ivy-mode . nerd-icons-ivy-rich-mode)
-;; ;;   :custom
-;; ;;   (nerd-icons-ivy-rich-icon
-;; ;;     (if (eq sb/icons-provider 'nerd-icons)
-;; ;;       t
-;; ;;       nil))
-;; ;;   (nerd-icons-ivy-rich-icon-size 1.0)
-;; ;;   :config
-;; ;;   (plist-put
-;; ;;     nerd-icons-ivy-rich-display-transformers-list 'counsel-recentf
-;; ;;     '
-;; ;;     (:columns
-;; ;;       ((nerd-icons-ivy-rich-file-icon)
-;; ;;         (nerd-icons-ivy-rich-file-name (:width 0.75))
-;; ;;         (nerd-icons-ivy-rich-file-id
-;; ;;           (:width 10 :face nerd-icons-ivy-rich-file-owner-face :align right))
-;; ;;         (ivy-rich-file-last-modified-time (:face nerd-icons-ivy-rich-time-face)))
-;; ;;       :delimiter "\t"))
-
-;; ;;   (plist-put
-;; ;;     nerd-icons-ivy-rich-display-transformers-list 'counsel-find-file
-;; ;;     '
-;; ;;     (:columns
-;; ;;       ((nerd-icons-ivy-rich-file-icon)
-;; ;;         (nerd-icons-ivy-rich-file-name (:width 0.6))
-;; ;;         (nerd-icons-ivy-rich-file-id
-;; ;;           (:width 15 :face nerd-icons-ivy-rich-file-owner-face :align right))
-;; ;;         (ivy-rich-file-last-modified-time (:face nerd-icons-ivy-rich-time-face)))
-;; ;;       :delimiter "\t"))
-
-;; ;;   (plist-put
-;; ;;     nerd-icons-ivy-rich-display-transformers-list 'ivy-switch-buffer
-;; ;;     '
-;; ;;     (:columns
-;; ;;       ((nerd-icons-ivy-rich-buffer-icon)
-;; ;;         (ivy-rich-candidate (:width 30))
-;; ;;         (ivy-rich-switch-buffer-indicators
-;; ;;           (:width 4 :face nerd-icons-ivy-rich-indicator-face :align right))
-;; ;;         (nerd-icons-ivy-rich-switch-buffer-major-mode
-;; ;;           (:width 18 :face nerd-icons-ivy-rich-major-mode-face))
-;; ;;         (ivy-rich-switch-buffer-project (:width 0.12 :face nerd-icons-ivy-rich-project-face))
-;; ;;         (ivy-rich-switch-buffer-path
-;; ;;           (:width
-;; ;;             (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3)))
-;; ;;             :face nerd-icons-ivy-rich-path-face)))
-;; ;;       :predicate (lambda (cand) (get-buffer cand))
-;; ;;       :delimiter "\t"))
-
-;; ;;   (with-eval-after-load "projectile"
-;; ;;     (plist-put
-;; ;;       nerd-icons-ivy-rich-display-transformers-list 'projectile-completing-read
-;; ;;       '
-;; ;;       (:columns
-;; ;;         ((nerd-icons-ivy-rich-file-icon)
-;; ;;           (nerd-icons-ivy-rich-project-find-file-transformer (:width 0.6))
-;; ;;           (nerd-icons-ivy-rich-project-file-id
-;; ;;             (:width 15 :face nerd-icons-ivy-rich-file-owner-face :align right))
-;; ;;           (nerd-icons-ivy-rich-project-file-size (:width 7 :face nerd-icons-ivy-rich-size-face)))
-;; ;;         :delimiter "\t")))
-
-;; ;;   (nerd-icons-ivy-rich-reload))
-
-;; ;; (use-package ivy-rich
-;; ;;   :preface
-;; ;;   (defun sb/ivy-rich-file-size (candidate)
-;; ;;     "Displays the file size of the candidate for ivy-rich."
-;; ;;     (let ((candidate (expand-file-name candidate ivy--directory)))
-;; ;;       (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-;; ;;         ""
-;; ;;         (let ((size (file-attribute-size (file-attributes candidate))))
-;; ;;           (cond
-;; ;;             ((> size 1000000)
-;; ;;               (format "%.1fM " (/ size 1000000.0)))
-;; ;;             ((> size 1000)
-;; ;;               (format "%.1fk " (/ size 1000.0)))
-;; ;;             (t
-;; ;;               (format "%d " size)))))))
-
-;; ;;   (defun sb/ivy-rich-file-user (candidate)
-;; ;;     "Displays the file user of the candidate for ivy-rich."
-;; ;;     (let ((candidate (expand-file-name candidate ivy--directory)))
-;; ;;       (if (or (not (file-exists-p candidate)) (file-remote-p candidate))
-;; ;;         ""
-;; ;;         (let*
-;; ;;           (
-;; ;;             (user-id (file-attribute-user-id (file-attributes candidate)))
-;; ;;             (user-name (user-login-name user-id)))
-;; ;;           (format "%s" user-name)))))
-;; ;;   :after counsel
-;; ;;   :init (ivy-rich-mode 1)
-;; ;;   :custom (ivy-rich-parse-remote-buffer nil)
-;; ;;   :config (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow-line)
-
-;; ;;   (ivy-rich-project-root-cache-mode 1)
-
-;; ;;   (ivy-rich-set-columns
-;; ;;     'counsel-find-file
-;; ;;     '
-;; ;;     ((ivy-rich-candidate (:width 0.80))
-;; ;;       (sb/ivy-rich-file-size (:width 10 :align right :face font-lock-doc-face))))
-
-;; ;;   ;; Increase the width to see the major mode clearly
-;; ;;   (ivy-rich-modify-columns
-;; ;;     'ivy-switch-buffer
-;; ;;     '
-;; ;;     ((ivy-rich-switch-buffer-size (:align right))
-;; ;;       (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
-;; ;;       (ivy-rich-switch-buffer-project (:width 0.24 :face success))))
-
-;; ;;   ;; (ivy-rich-modify-columns
-;; ;;   ;;   'counsel-switch-buffer
-;; ;;   ;;   '
-;; ;;   ;;   ((ivy-rich-switch-buffer-size (:align right))
-;; ;;   ;;     (ivy-rich-switch-buffer-major-mode (:width 16 :face error))
-;; ;;   ;;     (ivy-rich-switch-buffer-project (:width 0.20 :face success))))
-
-;; ;;   (ivy-rich-set-columns
-;; ;;     'counsel-recentf
-;; ;;     '((file-name-nondirectory (:width 0.30)) (ivy-rich-candidate (:width 0.80)))))
-
-;; ;; (use-package counsel-fd
-;; ;;   :when (and (eq sb/minibuffer-completion 'ivy) (executable-find "fd"))
-;; ;;   :bind
-;; ;;   (("C-x d" . counsel-fd-dired-jump) ; Jump to a directory below the current directory
-;; ;;     ;; Jump to a file below the current directory
-;; ;;     ("C-x f" . counsel-fd-file-jump)))
-
-;; ;; This package adds a "C-'" binding to the Ivy minibuffer that uses Avy
-
-;; ;; (use-package ivy-avy
-;; ;;   :after ivy
-;; ;;   :bind (:map ivy-minibuffer-map ("C-'" . ivy-avy)))
-
-;; ;; (use-package ivy-yasnippet
-;; ;;   :when (eq sb/minibuffer-completion 'ivy)
-;; ;;   :after (ivy yasnippet)
-;; ;;   :bind ("C-M-y" . ivy-yasnippet))
-
-;; ;; (use-package lsp-ivy
-;; ;;   :after (lsp-mode ivy)
-;; ;;   :bind (:map lsp-command-map ("G" . lsp-ivy-global-workspace-symbol) ("W" . lsp-ivy-workspace-symbol)))
-
-;; ;; (use-package ivy-xref
-;; ;;   :after (ivy xref)
-;; ;;   :demand t
-;; ;;   :custom
-;; ;;   (xref-show-definitions-function #'ivy-xref-show-defs)
-;; ;;   (xref-show-xrefs-function #'ivy-xref-show-xrefs))
-
-;; ;; (use-package counsel-tramp
-;; ;;   :after counsel
-;; ;;   :bind ("C-c d t" . counsel-tramp))
-
-;; ;; (use-package ivy-bibtex
-;; ;;   :when (eq sb/minibuffer-completion 'ivy)
-;; ;;   :after latex
-;; ;;   :commands ivy-bibtex
-;; ;;   ;; :bind ("C-c x b" . ivy-bibtex)
-;; ;;   :custom (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-;; ;;   :config (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-
-;; ;;   (require 'bibtex-completion)
-
-;; ;;   (setq
-;; ;;     bibtex-completion-cite-default-as-initial-input t
-;; ;;     bibtex-completion-cite-prompt-for-optional-arguments nil
-;; ;;     bibtex-completion-display-formats '((t . "${author:24} ${title:*} ${=key=:16} ${=type=:12}"))))
-
-;; ;; "M-n" will search for the word under cursor, "C-s" will search for the next occurrence, "C-s"
-;; ;; will search for a previously searched string.
-
-;; ;; (use-package swiper
-;; ;;   :when (eq sb/minibuffer-completion 'ivy)
-;; ;;   :commands (swiper swiper-isearch swiper-isearch-thing-at-point)
-;; ;;   :custom
-;; ;;   (swiper-action-recenter t)
-;; ;;   (swiper-verbose nil))
-
 (use-package vertico
   :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
   :when (eq sb/minibuffer-completion 'vertico)
@@ -1548,18 +1125,7 @@ This location is used for temporary installations and files.")
   :bind (:map vertico-map ("M-<" . vertico-first) ("M->" . vertico-last) ("C-M-j" . vertico-exit-input))
   :custom
   (vertico-cycle t)
-  (vertico-preselect 'first)
-  ;; :config
-  ;; (cond
-  ;;  ;;  ((eq sb/theme 'modus-vivendi)
-  ;;  ;;   (set-face-attribute 'vertico-current nil :background "#384551" :inherit t))
-  ;;  ((eq sb/theme 'modus-operandi)
-  ;;   (set-face-attribute 'vertico-current nil :background "#E6F2FF" :inherit t))
-  ;;  ;;  ((eq sb/theme 'standard-light)
-  ;;  ;;   (set-face-attribute 'vertico-current nil :background "#9AB8C4" :inherit t))
-  ;;  (t (set-face-attribute 'vertico-current nil :background "#3A3F5A" :inherit t))
-  ;;  )
-  )
+  (vertico-preselect 'first))
 
 ;; More convenient directory navigation commands
 (use-package vertico-directory
@@ -1588,38 +1154,10 @@ This location is used for temporary installations and files.")
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
-;; (use-package vertico-indexed ; Select candidates by number with "C-u number RET"
-;;   :straight nil
-;;   :after vertico
-;;   :init (vertico-indexed-mode 1))
-
 (use-package vertico-quick
   :straight nil
   :after vertico
   :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
-
-;; (use-package vertico-multiform
-;;   :straight nil
-;;   :after vertico
-;;   :init (vertico-multiform-mode 1)
-;;   :custom
-;;   (vertico-multiform-categories '((embark-keybinding grid)))
-;;   (vertico-multiform-commands
-;;     '
-;;     ( ;; (execute-extended-command indexed)
-;;       ;; (completion-at-point vertical)
-;;       ;; (consult-imenu buffer indexed)
-;;       ;; (ffap flat (vertico-cycle . t))
-;;       ;; (consult-projectile-switch-project grid)
-;;       ;; (consult-yank-pop indexed)
-;;       ;; (embark-bindings buffer)
-;;       ;; (xref-find-references buffer)
-;;       ;; (find-file-at-point (vertico-sort-function . sort-directories-first))
-;;       ;; (consult-line buffer)
-;;       ;; (consult-grep buffer)
-;;       ;; (consult-git-grep buffer)
-;;       ;; (consult-ripgrep buffer)
-;;       )))
 
 ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
 ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
@@ -1988,103 +1526,6 @@ targets."
 
 ;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
-
-;; (use-package spell-fu
-;;   :when (or (executable-find "aspell") (executable-find "hunspell"))
-;;   :commands spell-fu-mode
-;;   :init
-;;   (add-hook
-;;     'text-mode-hook
-;;     (lambda ()
-;;       (setq spell-fu-faces-exclude
-;;         '
-;;         (hl-line
-;;           ;; `nxml-mode' is derived from `text-mode'
-;;           nxml-attribute-local-name))
-;;       (spell-fu-mode)))
-
-;;   (add-hook
-;;     'org-mode-hook
-;;     (lambda ()
-;;       (setq spell-fu-faces-exclude
-;;         '
-;;         (org-block
-;;           org-block-begin-line
-;;           org-block-end-line
-;;           org-cite
-;;           org-cite-key
-;;           org-code
-;;           org-date
-;;           org-footnote
-;;           org-formula
-;;           org-latex-and-related
-;;           org-link
-;;           org-meta-line
-;;           org-property-value
-;;           org-ref-cite-face
-;;           org-special-keyword
-;;           org-tag
-;;           org-todo
-;;           org-todo-keyword-done
-;;           org-todo-keyword-habt
-;;           org-todo-keyword-kill
-;;           org-todo-keyword-outd
-;;           org-todo-keyword-todo
-;;           org-todo-keyword-wait
-;;           org-verbatim
-;;           org-modern-tag
-;;           hl-line))
-;;       (spell-fu-mode)))
-
-;;   (add-hook
-;;     'markdown-mode-hook
-;;     (lambda ()
-;;       (setq spell-fu-faces-exclude
-;;         '
-;;         (markdown-blockquote-face
-;;           markdown-code-face
-;;           markdown-html-attr-name-face
-;;           markdown-html-attr-value-face
-;;           markdown-html-tag-name-face
-;;           markdown-inline-code-face
-;;           markdown-link-face
-;;           markdown-markup-face
-;;           markdown-plain-url-face
-;;           markdown-reference-face
-;;           markdown-url-face
-;;           pandoc-citation-key-face
-;;           hl-line))
-;;       (spell-fu-mode)))
-
-;;   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-;;     (add-hook
-;;       hook
-;;       (lambda ()
-;;         (setq spell-fu-faces-exclude
-;;           '
-;;           (font-latex-math-face
-;;             font-latex-sedate-face
-;;             font-lock-function-name-face
-;;             font-lock-keyword-face
-;;             font-lock-variable-name-face
-;;             hl-line))
-;;         (spell-fu-mode))))
-;;   :bind
-;;   (("C-c f n" . spell-fu-goto-next-error)
-;;     ("C-c f p" . spell-fu-goto-previous-error)
-;;     ("C-c f a" . spell-fu-word-add))
-;;   :custom (spell-fu-directory (expand-file-name "spell-fu" no-littering-var-directory))
-;;   :config
-;;   ;; https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/64
-;;   (add-to-list 'spell-fu-faces-include 'font-lock-string-face)
-;;   (add-to-list 'spell-fu-faces-include 'font-lock-doc-face)
-;;   (add-to-list 'spell-fu-faces-include 'font-lock-comment-face)
-;;   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:comment)
-;;   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:doc)
-;;   (add-to-list 'spell-fu-faces-include 'tree-sitter-hl-face:string)
-
-;;   ;; Ignore read-only buffers
-;;   (setq global-spell-fu-ignore-buffer (lambda (buf) (buffer-local-value 'buffer-read-only buf))))
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.
@@ -2644,6 +2085,7 @@ targets."
 
 (use-package magit
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
+  ;; :hook (magit-status-mode . magit-dispatch)
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
@@ -2762,10 +2204,7 @@ targets."
   :hook
   ((emacs-startup . electric-pair-mode)
     ;; Disable pairs when entering minibuffer
-    (minibuffer-setup . (lambda () (electric-pair-local-mode -1)))
-    ;; Re-enable pairs when existing minibuffer
-    ;; (minibuffer-exit . (lambda () (electric-pair-mode 1)))
-    )
+    (minibuffer-setup . (lambda () (electric-pair-local-mode -1))))
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
@@ -2778,68 +2217,25 @@ targets."
     (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs))
+  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-;; ;; `sp-cheat-sheet' will show you all the commands available, with examples.
-;; ;; (use-package smartparens
-;; ;;   :hook
-;; ;;   ((minibuffer-setup . turn-on-smartparens-strict-mode)
-;; ;;     (emacs-startup
-;; ;;       .
-;; ;;       (lambda ()
-;; ;;         (smartparens-global-mode 1)
-;; ;;         (show-smartparens-global-mode 1))))
-;; ;;   :bind
-;; ;;   (("C-M-a" . sp-beginning-of-sexp) ; "foo ba_r" -> "_foo bar"
-;; ;;     ("C-M-e" . sp-end-of-sexp) ; "f_oo bar" -> "foo bar_"
-;; ;;     ("C-M-u" . sp-up-sexp) ; "f_oo bar" -> "foo bar"_
-;; ;;     ("C-M-w" . sp-down-sexp) ; "foo ba_r" -> "_foo bar"
-;; ;;     ("C-M-f" . sp-forward-sexp) ; "foo ba_r" -> "foo bar"_
-;; ;;     ("C-M-b" . sp-backward-sexp) ; "foo ba_r" -> "_foo bar"
-;; ;;     ("C-M-n" . sp-next-sexp) ; ))" -> ((foo) (bar))"
-;; ;;     ("C-M-p" . sp-previous-sexp) ; "(foo (b|ar baz))" -> "(foo| (bar baz))"
-;; ;;     ("C-S-b" . sp-backward-symbol) ; "foo bar| baz" -> "foo |bar baz"
-;; ;;     ("C-S-f" . sp-forward-symbol) ; "|foo bar baz" -> "foo| bar baz"
-;; ;;     ("C-M-k" . sp-splice-sexp) ; "(foo bar)" -> "foo bar"
-;; ;;     ;; "foo(2,3)" -> "foo[2,3]"
-;; ;;     ("C-M-r" . sp-rewrap-sexp))
+  (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\)))
+    "Electric pairs for `LaTeX-mode'.")
 
-;; ;; Discover key bindings for the current Emacs major mode
-;; (use-package discover-my-major
-;;   :bind ("C-h C-m" . discover-my-major))
+  (defun sb/add-latex-pairs ()
+    "Add custom pairs to `LaTeX-mode'."
+    (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-;; (use-package mode-minder
-;;   :straight (:host github :repo "jdtsmith/mode-minder")
-;;   :commands mode-minder)
+  (add-hook 'LaTeX-mode-hook #'sb/add-latex-pairs))
 
-;; ;; Identify weasel words, passive voice, and duplicate words.
-;; ;; (use-package writegood-mode
-;; ;;   :when (executable-find "writegood")
-;; ;;   :hook (text-mode . writegood-duplicates-turn-on)
-;; ;;   :config
-;; ;;   (let
-;; ;;     (
-;; ;;       (sb/weasel-words
-;; ;;         '
-;; ;;         ("actionable"
-;; ;;           "actually"
-;; ;;           "basically"
-;; ;;           "clearly"
-;; ;;           "easily"
-;; ;;           "easy"
-;; ;;           "it turns out that"
-;; ;;           "In this regard"
-;; ;;           "In this sense"
-;; ;;           "With this in mind"
-;; ;;           "With the above in mind"
-;; ;;           "may have"
-;; ;;           "often"
-;; ;;           "simple"
-;; ;;           "probably"
-;; ;;           "simply"
-;; ;;           "specifically")))
-;; ;;     (cl-union writegood-weasel-words sb/weasel-words))
-;; ;;   :diminish)
+;; Discover key bindings for the current Emacs major mode
+(use-package discover-my-major
+  :bind ("C-h C-m" . discover-my-major))
+
+(use-package mode-minder
+  :straight (:host github :repo "jdtsmith/mode-minder")
+  :commands mode-minder)
 
 (use-package flycheck
   :hook (after-init . global-flycheck-mode)
@@ -2945,7 +2341,6 @@ targets."
 (use-package format-all
   :hook
   ((format-all-mode . format-all-ensure-formatter)
-    ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
     ((markdown-mode markdown-ts-mode) . format-all-mode))
   :config
   (setq-default format-all-formatters
@@ -2973,6 +2368,8 @@ targets."
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   (with-eval-after-load "auctex"
     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+  ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
+  (add-hook 'LaTeX-mode-hook (lambda () (run-with-idle-timer 30 t #'format-all-buffer)))
   :diminish)
 
 ;; ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
@@ -3047,25 +2444,26 @@ targets."
 ;; ;;     highlight-indentation-mode)
 ;; ;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
-(use-package indent-bars
-  :straight (:host github :repo "jdtsmith/indent-bars")
-  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-  :custom
-  (indent-bars-treesit-support t)
-  (indent-bars-no-descend-string t)
-  (indent-bars-treesit-ignore-blank-lines-types '("module"))
-  (indent-bars-treesit-wrap
-    '
-    (
-      (python
-        argument_list
-        parameters ; for python, as an example
-        list
-        list_comprehension
-        dictionary
-        dictionary_comprehension
-        parenthesized_expression
-        subscript))))
+;; (use-package
+;;   indent-bars
+;;   :straight (:host github :repo "jdtsmith/indent-bars")
+;;   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+;;   :custom
+;;   (indent-bars-treesit-support t)
+;;   (indent-bars-no-descend-string t)
+;;   (indent-bars-treesit-ignore-blank-lines-types '("module"))
+;;   (indent-bars-treesit-wrap
+;;     '
+;;     (
+;;       (python
+;;         argument_list
+;;         parameters ; for python, as an example
+;;         list
+;;         list_comprehension
+;;         dictionary
+;;         dictionary_comprehension
+;;         parenthesized_expression
+;;         subscript))))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
@@ -3163,13 +2561,6 @@ targets."
   ;; Allow escaping space with backslash
   (orderless-component-separator 'orderless-escapable-split-on-space)
   :config
-  ;; (with-eval-after-load "ivy"
-  ;;   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
-  ;;   ;; `counsel-rg' fails with `orderless'
-  ;;   (add-to-list
-  ;;     'ivy-highlight-functions-alist
-  ;;     '(orderless-ivy-re-builder . orderless-ivy-highlight)))
-
   (with-eval-after-load "company"
     (defun sb/just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
@@ -3178,7 +2569,6 @@ targets."
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
-  ;; :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (emacs-startup . yas-global-mode)
   :custom (yas-verbosity 0)
   :config
@@ -3192,29 +2582,9 @@ targets."
   :after yasnippet
   :init (yasnippet-snippets-initialize))
 
-;; ;; Prescient uses frecency (frequency + recency) for sorting. recently used commands should be
-;; ;; sorted first. Only commands that have never been used before will be sorted by length. Vertico
-;; ;; does its own sorting based on recency, and Corfu has corfu-history. Company has
-;; ;; company-statistics. Ivy is not actively supported with prescient.
-
-;; ;; (use-package prescient
-;; ;;   :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
-;; ;;   :hook (emacs-startup . prescient-persist-mode)
-;; ;;   :custom (prescient-sort-full-matches-first t)
-;; ;;   :config
-;; ;;   (with-eval-after-load "corfu"
-;; ;;     (corfu-prescient-mode 1))
-;; ;;   (with-eval-after-load "vertico"
-;; ;;     (vertico-prescient-mode 1))
-;; ;;   (with-eval-after-load "company"
-;; ;;     (company-prescient-mode 1))
-;; ;;   (with-eval-after-load "counsel"
-;; ;;     (ivy-prescient-mode 1)))
-
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used for the
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
-
 (use-package company
   :when (eq sb/capf 'company)
   :hook (emacs-startup . global-company-mode)
@@ -3645,337 +3015,279 @@ targets."
           ;; (company-fuzzy-mode 1)
           )))))
 
-;; ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
-;; (use-package corfu
-;;   :straight
-;;   (corfu
-;;     :files (:defaults "extensions/*")
-;;     :includes (corfu-echo corfu-popupinfo corfu-history corfu-info))
-;;   :when (eq sb/capf 'corfu)
-;;   :hook (emacs-startup . global-corfu-mode)
-;;   :bind
-;;   (:map
-;;     corfu-map
-;;     ("ESCAPE" . corfu-quit)
-;;     ([escape] . corfu-quit)
-;;     ("TAB" . corfu-next)
-;;     ([tab] . corfu-next)
-;;     ("S-TAB" . corfu-previous)
-;;     ([backtab] . corfu-previous))
-;;   :custom
-;;   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
-;;   (corfu-auto t "Enable auto completion")
-;;   (corfu-auto-delay 0.05 "Recommended to not use zero for performance reasons")
-;;   (corfu-exclude-modes
-;;     '
-;;     (dired-mode
-;;       erc-mode
-;;       message-mode
-;;       comint-mode
-;;       inferior-python-mode
-;;       vterm-mode
-;;       magit-status-mode
-;;       help-mode
-;;       gud-mode
-;;       eshell-mode
-;;       shell-mode
-;;       csv-mode
-;;       minibuffer-inactive-mode))
-;;   :config
-;;   ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
-;;   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
-;;   ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
-;;   ;; entries.
-;;   (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
+;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
+(use-package corfu
+  :straight
+  (corfu
+    :files (:defaults "extensions/*")
+    :includes (corfu-echo corfu-popupinfo corfu-history corfu-info))
+  :when (eq sb/capf 'corfu)
+  :hook (emacs-startup . global-corfu-mode)
+  :bind
+  (:map
+    corfu-map
+    ("ESCAPE" . corfu-quit)
+    ([escape] . corfu-quit)
+    ("TAB" . corfu-next)
+    ([tab] . corfu-next)
+    ("S-TAB" . corfu-previous)
+    ([backtab] . corfu-previous))
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-auto-delay 0.05 "Recommended to not use zero for performance reasons")
+  (corfu-exclude-modes
+    '
+    (dired-mode
+      erc-mode
+      message-mode
+      comint-mode
+      inferior-python-mode
+      vterm-mode
+      magit-status-mode
+      help-mode
+      gud-mode
+      eshell-mode
+      shell-mode
+      csv-mode
+      minibuffer-inactive-mode))
+  :config
+  ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
+  ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
+  ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
+  ;; entries.
+  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
 
-;; (use-package corfu-info
+(use-package corfu-info
+  :straight nil
+  :after corfu
+  :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
+
+;; (use-package corfu-quick
 ;;   :straight nil
 ;;   :after corfu
-;;   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
+;;   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
 
-;; ;; (use-package corfu-quick
-;; ;;   :straight nil
-;; ;;   :after corfu
-;; ;;   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
+(use-package corfu-quick-access
+  :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
+  :when (eq sb/capf 'corfu)
+  :hook
+  (corfu-mode
+    .
+    (lambda ()
+      (ignore-errors
+        (corfu-quick-access-mode)))))
 
-;; (use-package corfu-quick-access
-;;   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
-;;   :when (eq sb/capf 'corfu)
-;;   :hook
-;;   (corfu-mode
-;;     .
-;;     (lambda ()
-;;       (ignore-errors
-;;         (corfu-quick-access-mode)))))
+;; We do not need this if we use prescient-based sorting.
+(use-package corfu-history
+  :straight nil
+  :when (eq sb/capf 'corfu)
+  :hook (corfu-mode . corfu-history-mode)
+  :config
+  (with-eval-after-load "savehist"
+    (add-to-list 'savehist-additional-variables 'corfu-history)))
 
-;; ;; We do not need this if we use prescient-based sorting.
-;; (use-package corfu-history
-;;   :straight nil
-;;   :when (eq sb/capf 'corfu)
-;;   :hook (corfu-mode . corfu-history-mode)
-;;   :config
-;;   (with-eval-after-load "savehist"
-;;     (add-to-list 'savehist-additional-variables 'corfu-history)))
+(use-package corfu-echo
+  :straight nil
+  :when (eq sb/capf 'corfu)
+  :hook (corfu-mode . corfu-echo-mode))
 
-;; (use-package corfu-echo
-;;   :straight nil
-;;   :when (eq sb/capf 'corfu)
-;;   :hook (corfu-mode . corfu-echo-mode))
+(use-package corfu-popupinfo
+  :straight nil
+  :when (eq sb/capf 'corfu)
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :bind
+  (:map
+    corfu-map
+    ("M-n" . corfu-popupinfo-scroll-up)
+    ("M-p" . corfu-popupinfo-scroll-down)
+    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
 
-;; (use-package corfu-popupinfo
-;;   :straight nil
-;;   :when (eq sb/capf 'corfu)
-;;   :hook (corfu-mode . corfu-popupinfo-mode)
-;;   :bind
-;;   (:map
-;;     corfu-map
-;;     ("M-n" . corfu-popupinfo-scroll-up)
-;;     ("M-p" . corfu-popupinfo-scroll-down)
-;;     ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
+(use-package popon
+  :straight (:host codeberg :repo "akib/emacs-popon")
+  :when (and (eq sb/capf 'corfu) (not (display-graphic-p))))
 
-;; (use-package popon
-;;   :straight (:host codeberg :repo "akib/emacs-popon")
-;;   :when (and (eq sb/capf 'corfu) (not (display-graphic-p))))
+(use-package corfu-terminal
+  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
+  :when (and (eq sb/capf 'corfu) (not (display-graphic-p)))
+  :hook (corfu-mode . corfu-terminal-mode)
+  :custom
+  ;; TODO: This is supposedly a bug, report to the maintainer.
+  (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
 
-;; (use-package corfu-terminal
-;;   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
-;;   :when (and (eq sb/capf 'corfu) (not (display-graphic-p)))
-;;   :hook (corfu-mode . corfu-terminal-mode)
-;;   :custom
-;;   ;; TODO: This is supposedly a bug, report to the maintainer.
-;;   (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
-
-;; ;; (use-package kind-icon
-;; ;;   :when (eq sb/corfu-icons 'kind-icon)
-;; ;;   :after corfu
-;; ;;   :demand t
-;; ;;   :commands kind-icon-margin-formatter
-;; ;;   :custom (kind-icon-default-face 'corfu-default "Compute blended backgrounds correctly")
-;; ;;   ;; Prefer smaller icons and a more compact popup
-;; ;;   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
-;; ;;   ;; (kind-icon-blend-background nil)
-;; ;;   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-
-;; ;;   ;; (when (eq sb/corfu-icons 'nerd-icons)
-;; ;;   ;;   (with-eval-after-load "nerd-icons"
-;; ;;   ;;     (setq kind-icon-use-icons nil)
-;; ;;   ;;     (setq kind-icon-mapping
-;; ;;   ;;       `
-;; ;;   ;;       ((array ,(nerd-icons-codicon "nf-cod-symbol_array") :face font-lock-type-face)
-;; ;;   ;;         (boolean ,(nerd-icons-codicon "nf-cod-symbol_boolean") :face font-lock-builtin-face)
-;; ;;   ;;         (class ,(nerd-icons-codicon "nf-cod-symbol_class") :face font-lock-type-face)
-;; ;;   ;;         (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
-;; ;;   ;;         (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-;; ;;   ;;         (constant ,(nerd-icons-codicon "nf-cod-symbol_constant") :face font-lock-constant-face)
-;; ;;   ;;         (constructor
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-triangle_right")
-;; ;;   ;;           :face font-lock-function-name-face)
-;; ;;   ;;         (enummember
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-;; ;;   ;;           :face font-lock-builtin-face)
-;; ;;   ;;         (enum-member
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-;; ;;   ;;           :face font-lock-builtin-face)
-;; ;;   ;;         (enum ,(nerd-icons-codicon "nf-cod-symbol_enum") :face font-lock-builtin-face)
-;; ;;   ;;         (event ,(nerd-icons-codicon "nf-cod-symbol_event") :face font-lock-warning-face)
-;; ;;   ;;         (field ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-variable-name-face)
-;; ;;   ;;         (file ,(nerd-icons-codicon "nf-cod-symbol_file") :face font-lock-string-face)
-;; ;;   ;;         (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
-;; ;;   ;;         (interface ,(nerd-icons-codicon "nf-cod-symbol_interface") :face font-lock-type-face)
-;; ;;   ;;         (keyword ,(nerd-icons-codicon "nf-cod-symbol_keyword") :face font-lock-keyword-face)
-;; ;;   ;;         (macro ,(nerd-icons-codicon "nf-cod-symbol_misc") :face font-lock-keyword-face)
-;; ;;   ;;         (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
-;; ;;   ;;         (method ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
-;; ;;   ;;         (function ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
-;; ;;   ;;         (module ,(nerd-icons-codicon "nf-cod-file_submodule") :face font-lock-preprocessor-face)
-;; ;;   ;;         (numeric ,(nerd-icons-codicon "nf-cod-symbol_numeric") :face font-lock-builtin-face)
-;; ;;   ;;         (operator
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-symbol_operator")
-;; ;;   ;;           :face font-lock-comment-delimiter-face)
-;; ;;   ;;         (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
-;; ;;   ;;         (property
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-symbol_property")
-;; ;;   ;;           :face font-lock-variable-name-face)
-;; ;;   ;;         (reference ,(nerd-icons-codicon "nf-cod-references") :face font-lock-variable-name-face)
-;; ;;   ;;         (snippet ,(nerd-icons-codicon "nf-cod-symbol_snippet") :face font-lock-string-face)
-;; ;;   ;;         (string ,(nerd-icons-codicon "nf-cod-symbol_string") :face font-lock-string-face)
-;; ;;   ;;         (struct
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-symbol_structure")
-;; ;;   ;;           :face font-lock-variable-name-face)
-;; ;;   ;;         (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
-;; ;;   ;;         (typeparameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
-;; ;;   ;;         (type-parameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
-;; ;;   ;;         (unit ,(nerd-icons-codicon "nf-cod-symbol_ruler") :face font-lock-constant-face)
-;; ;;   ;;         (value ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-builtin-face)
-;; ;;   ;;         (variable
-;; ;;   ;;           ,(nerd-icons-codicon "nf-cod-symbol_variable")
-;; ;;   ;;           :face font-lock-variable-name-face)
-;; ;;   ;;         (group ,(nerd-icons-codicon "nf-cod-variable_group") :face font-lock-variable-name-face)
-;; ;;   ;;         (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face)))))
-;; ;;   )
-
-;; ;; (use-package nerd-icons-corfu
-;; ;;   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
-;; ;;   :when (eq sb/corfu-icons 'nerd-icons)
-;; ;;   :after corfu
-;; ;;   :demand t
-;; ;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
-;; ;; (use-package kind-all-the-icons
-;; ;;   :straight (:host github :repo "Hirozy/kind-all-the-icons")
-;; ;;   :when (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
-;; ;;   :after corfu
-;; ;;   :demand t
-;; ;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
-
-;; (use-package yasnippet-capf
+;; (use-package kind-icon
+;;   :when (eq sb/corfu-icons 'kind-icon)
 ;;   :after corfu
 ;;   :demand t
-;;   :straight (:host github :repo "elken/yasnippet-capf"))
+;;   :commands kind-icon-margin-formatter
+;;   :custom (kind-icon-default-face 'corfu-default "Compute blended backgrounds correctly")
+;;   ;; Prefer smaller icons and a more compact popup
+;;   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+;;   ;; (kind-icon-blend-background nil)
+;;   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-;; ;; Here is a snippet to show how to support `company' backends with `cape'.
-;; ;; https://github.com/minad/cape/issues/20
-;; ;; (fset #'cape-path (cape-company-to-capf #'company-files))
-;; ;; (add-hook 'completion-at-point-functions #'cape-path)
-
-;; ;; `cape-capf-super' works only well for static completion functions like `cape-dabbrev',
-;; ;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like `cape-file'.
-;; (use-package cape
+;; (use-package nerd-icons-corfu
+;;   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+;;   :when (eq sb/corfu-icons 'nerd-icons)
 ;;   :after corfu
 ;;   :demand t
-;;   :init
-;;   ;; Initialize for all generic languages that are not specifically handled
-;;   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-;;   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-;;   (add-to-list 'completion-at-point-functions (cape-capf-super #'cape-dabbrev #'cape-dict) 'append)
-;;   :custom
-;;   (cape-dabbrev-min-length 3)
-;;   (cape-dict-grep nil "Load the word files in memory for better performance")
-;;   (cape-dict-file
-;;     `
-;;     (,(expand-file-name "wordlist.5" sb/extras-directory)
-;;       ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-;;   (cape-dabbrev-check-other-buffers 'some)
-;;   :config
-;;   ;; Override CAPFS for specific major modes
-;;   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
-;;     (add-hook
-;;       mode
-;;       (lambda ()
-;;         (setq-local completion-at-point-functions
-;;           (list
-;;             #'cape-file #'yasnippet-capf
-;;             (cape-capf-super
-;;               #'elisp-completion-at-point
-;;               #'citre-completion-at-point
-;;               #'cape-elisp-symbol)
-;;             (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t))))))
+;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-;;   (add-hook
-;;     'flex-mode-hook
-;;     (lambda ()
-;;       (setq-local completion-at-point-functions
-;;         (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict))))
+;; (use-package kind-all-the-icons
+;;   :straight (:host github :repo "Hirozy/kind-all-the-icons")
+;;   :when (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
+;;   :after corfu
+;;   :demand t
+;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
-;;   (add-hook
-;;     'text-mode-hook
-;;     (lambda ()
-;;       (setq-local completion-at-point-functions
-;;         (list
-;;           #'cape-file
-;;           ;; Merge dabbrev and dict candidates
-;;           (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t)))))
+(use-package yasnippet-capf
+  :after corfu
+  :demand t
+  :straight (:host github :repo "elken/yasnippet-capf"))
 
-;;   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-;;   (add-hook
-;;     'LaTeX-mode-hook
-;;     (lambda ()
-;;       (setq-local completion-at-point-functions
-;;         (list
-;;           #'cape-file
-;;           (cape-capf-super
-;;             (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
-;;             (cape-company-to-capf #'company-latex-commands)
-;;             (cape-company-to-capf #'company-reftex-labels)
-;;             (cape-company-to-capf #'company-reftex-citations)
-;;             (cape-company-to-capf #'company-auctex-environments)
-;;             (cape-company-to-capf #'company-auctex-macros)
-;;             (cape-company-to-capf #'company-auctex-labels)
-;;             ;; Math unicode symbols and sub(super)scripts
-;;             (cape-company-to-capf #'company-math-symbols-unicode)
-;;             (cape-company-to-capf #'company-auctex-symbols)
-;;             #'cape-dabbrev
-;;             #'cape-dict)
-;;           #'yasnippet-capf))))
+;; Here is a snippet to show how to support `company' backends with `cape'.
+;; https://github.com/minad/cape/issues/20
+;; (fset #'cape-path (cape-company-to-capf #'company-files))
+;; (add-hook 'completion-at-point-functions #'cape-path)
 
-;;   (with-eval-after-load "lsp-mode"
-;;     (dolist
-;;       (mode
-;;         '
-;;         (c-mode-hook
-;;           c-ts-mode-hook
-;;           c++-mode-hook
-;;           c++-ts-mode-hook
-;;           java-mode-hook
-;;           java-ts-mode-hook
-;;           python-mode-hook
-;;           python-ts-mode-hook
-;;           sh-mode-hook
-;;           bash-ts-mode-hook
-;;           cmake-mode-hook
-;;           cmake-ts-mode-hook
-;;           json-mode-hook
-;;           json-ts-mode-hook
-;;           jsonc-mode-hook
-;;           yaml-mode-hook
-;;           yaml-ts-mode-hook))
-;;       (add-hook
-;;         mode
-;;         (lambda ()
-;;           (setq-local completion-at-point-functions
-;;             (list
-;;               #'cape-file
-;;               #'yasnippet-capf
-;;               (cape-capf-super #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
-;;               (cape-capf-super #'cape-dabbrev #'cape-dict)))))))
+;; `cape-capf-super' works only well for static completion functions like `cape-dabbrev',
+;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like `cape-file'.
+(use-package cape
+  :after corfu
+  :demand t
+  :init
+  ;; Initialize for all generic languages that are not specifically handled
+  (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
+  (add-to-list 'completion-at-point-functions #'cape-file 'append)
+  (add-to-list 'completion-at-point-functions (cape-capf-super #'cape-dabbrev #'cape-dict) 'append)
+  :custom
+  (cape-dabbrev-min-length 3)
+  (cape-dict-grep nil "Load the word files in memory for better performance")
+  (cape-dict-file
+    `
+    (,(expand-file-name "wordlist.5" sb/extras-directory)
+      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  (cape-dabbrev-check-other-buffers 'some)
+  :config
+  ;; Override CAPFS for specific major modes
+  (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
+    (add-hook
+      mode
+      (lambda ()
+        (setq-local completion-at-point-functions
+          (list
+            #'cape-file #'yasnippet-capf
+            (cape-capf-super
+              #'elisp-completion-at-point
+              #'citre-completion-at-point
+              #'cape-elisp-symbol)
+            (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t))))))
 
-;;   (with-eval-after-load "eglot"
-;;     (dolist
-;;       (mode
-;;         '
-;;         (c-mode-hook
-;;           c-ts-mode-hook
-;;           c++-mode-hook
-;;           c++-ts-mode-hook
-;;           java-mode-hook
-;;           java-ts-mode-hook
-;;           python-mode-hook
-;;           python-ts-mode-hook
-;;           sh-mode-hook
-;;           bash-ts-mode-hook
-;;           cmake-mode-hook
-;;           cmake-ts-mode-hook
-;;           json-mode-hook
-;;           json-ts-mode-hook
-;;           jsonc-mode-hook
-;;           yaml-mode-hook
-;;           yaml-ts-mode-hook))
-;;       (add-hook
-;;         mode
-;;         (lambda ()
-;;           (setq-local completion-at-point-functions
-;;             (list
-;;               #'cape-file #'yasnippet-capf
-;;               (cape-capf-super
-;;                 #'eglot-completion-at-point
-;;                 #'citre-completion-at-point
-;;                 #'cape-keyword)
-;;               (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
+  (add-hook
+    'flex-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict))))
 
-;; ;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
-;; ;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
-;; ;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
-;; ;; nice to have TexLab and Grammarly with LaTeX files.
+  (add-hook
+    'text-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list
+          #'cape-file
+          ;; Merge dabbrev and dict candidates
+          (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t)))))
+
+  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+  (add-hook
+    'LaTeX-mode-hook
+    (lambda ()
+      (setq-local completion-at-point-functions
+        (list
+          #'cape-file
+          (cape-capf-super
+            (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
+            (cape-company-to-capf #'company-latex-commands)
+            (cape-company-to-capf #'company-reftex-labels)
+            (cape-company-to-capf #'company-reftex-citations)
+            (cape-company-to-capf #'company-auctex-environments)
+            (cape-company-to-capf #'company-auctex-macros)
+            (cape-company-to-capf #'company-auctex-labels)
+            ;; Math unicode symbols and sub(super)scripts
+            (cape-company-to-capf #'company-math-symbols-unicode)
+            (cape-company-to-capf #'company-auctex-symbols)
+            #'cape-dabbrev
+            #'cape-dict)
+          #'yasnippet-capf))))
+
+  (with-eval-after-load "lsp-mode"
+    (dolist
+      (mode
+        '
+        (c-mode-hook
+          c-ts-mode-hook
+          c++-mode-hook
+          c++-ts-mode-hook
+          java-mode-hook
+          java-ts-mode-hook
+          python-mode-hook
+          python-ts-mode-hook
+          sh-mode-hook
+          bash-ts-mode-hook
+          cmake-mode-hook
+          cmake-ts-mode-hook
+          json-mode-hook
+          json-ts-mode-hook
+          jsonc-mode-hook
+          yaml-mode-hook
+          yaml-ts-mode-hook))
+      (add-hook
+        mode
+        (lambda ()
+          (setq-local completion-at-point-functions
+            (list
+              #'cape-file
+              #'yasnippet-capf
+              (cape-capf-super #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
+              (cape-capf-super #'cape-dabbrev #'cape-dict)))))))
+
+  (with-eval-after-load "eglot"
+    (dolist
+      (mode
+        '
+        (c-mode-hook
+          c-ts-mode-hook
+          c++-mode-hook
+          c++-ts-mode-hook
+          java-mode-hook
+          java-ts-mode-hook
+          python-mode-hook
+          python-ts-mode-hook
+          sh-mode-hook
+          bash-ts-mode-hook
+          cmake-mode-hook
+          cmake-ts-mode-hook
+          json-mode-hook
+          json-ts-mode-hook
+          jsonc-mode-hook
+          yaml-mode-hook
+          yaml-ts-mode-hook))
+      (add-hook
+        mode
+        (lambda ()
+          (setq-local completion-at-point-functions
+            (list
+              #'cape-file #'yasnippet-capf
+              (cape-capf-super
+                #'eglot-completion-at-point
+                #'citre-completion-at-point
+                #'cape-keyword)
+              (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
+
+;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
+;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
+;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
+;; nice to have TexLab and Grammarly with LaTeX files.
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
@@ -4026,6 +3338,7 @@ targets."
       "--clang-tidy"
       "--completion-style=detailed"
       "--fallback-style=LLVM"
+      ;; Do not automatically insert #include statements when editing C/C++ code
       "--header-insertion=never"
       "--header-insertion-decorators=0"
       "--log=error"
@@ -4168,21 +3481,6 @@ targets."
   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil))
 
-;; ;; Sync workspace folders and treemacs projects
-;; ;; (use-package lsp-treemacs
-;; ;;   :when (eq sb/lsp-provider 'lsp-mode)
-;; ;;   :commands (lsp-treemacs-errors-list lsp-treemacs-sync-mode)
-;; ;;   :config (lsp-treemacs-sync-mode 1)
-;; ;;   :bind
-;; ;;   (:map
-;; ;;     lsp-command-map
-;; ;;     ("S" . lsp-treemacs-symbols)
-;; ;;     ("F" . lsp-treemacs-references)
-;; ;;     ("Y" . lsp-treemacs-sync-mode)
-;; ;;     ("C" . lsp-treemacs-call-hierarchy)
-;; ;;     ("T" . lsp-treemacs-type-hierarchy)
-;; ;;     ("E" . lsp-treemacs-errors-list)))
-
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
   :when (eq sb/lsp-provider 'lsp-mode)
@@ -4287,17 +3585,6 @@ targets."
   ;;               (error "Error during the unzip process: tar"))))
   ;;         error-callback))))
   )
-
-;; ;; (use-package dap-mode
-;; ;;   :after lsp-mode
-;; ;;   :commands (dap-continue dap-debug)
-;; ;;   :init (dap-auto-configure-mode)
-;; ;;   :hook ((lsp-mode . dap-ui-mode) (lsp-mode . dap-mode))
-;; ;;   ;; :bind
-;; ;;   ;; ("<f7>" . dap-step-in)
-;; ;;   ;; ("<f8>" . dap-next)
-;; ;;   ;; ("<f9>" . dap-continue)
-;; ;;   )
 
 ;; ;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
 ;; ;; --createstub pandas".
@@ -4604,7 +3891,7 @@ targets."
 
 ;; Highlight symbol under point
 (use-package symbol-overlay
-  :hook (prog-mode . symbol-overlay-mode)
+  :hook ((prog-mode html-mode html-ts-mode yaml-ts-mode yaml-mode conf-mode) . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
@@ -4644,7 +3931,7 @@ targets."
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom
   (treesit-auto-install 'prompt)
-  (treesit-font-lock-level 4 "Increase default font locking")
+  (treesit-font-lock-level 3 "Increased default font locking may hurt performance")
   (treesit-language-source-alist
     '
     ((bash "https://github.com/tree-sitter/tree-sitter-bash")
@@ -4883,7 +4170,40 @@ targets."
         ((eq sb/lsp-provider 'eglot)
           (eglot-ensure))
         ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred))))))
+          (lsp-deferred)))))
+  :bind (:map c-ts-mode-map ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun)))
+
+(use-package c-ts-mode
+  :straight (:type built-in)
+  :hook
+  ((c-ts-mode c++-ts-mode)
+    .
+    (lambda ()
+      (setq-local
+        c-ts-mode-indent-style 'linux
+        c-ts-mode-indent-offset 2
+        c-ts-mode-toggle-comment-style -1
+        ;; Disable electric indentation and on-type formatting
+        c-auto-newline nil
+        ;; c-electric-brace nil
+        c-electric-flag nil
+        ;; c-electric-indent nil
+        c-enable-auto-newline nil
+        c-syntactic-indentation nil)
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
+  :bind
+  (:map
+    c-ts-mode-map
+    ("C-M-a" . treesit-beginning-of-defun)
+    ("C-M-e" . treesit-end-of-defun)
+    :map
+    c++-ts-mode-map
+    ("C-M-a" . treesit-beginning-of-defun)
+    ("C-M-e" . treesit-end-of-defun)))
 
 ;; (use-package modern-cpp-font-lock ; Better highlight for modern C++
 ;;   :hook (c++-mode . modern-c++-font-lock-mode)
@@ -5007,46 +4327,46 @@ targets."
 ;;   :hook ((python-mode python-ts-mode) . yapf-mode)
 ;;   :diminish yapf-mode)
 
-;; (use-package cperl-mode
-;;   :mode "latexmkrc\\'"
-;;   :hook
-;;   (cperl-mode
-;;     .
-;;     (lambda ()
-;;       (cond
-;;         ((eq sb/lsp-provider 'eglot)
-;;           (eglot-ensure))
-;;         ((eq sb/lsp-provider 'lsp-mode)
-;;           (lsp-deferred)))))
-;;   :config
-;;   ;; Prefer CPerl mode to Perl mode
-;;   (fset 'perl-mode 'cperl-mode)
+(use-package cperl-mode
+  :mode "latexmkrc\\'"
+  :hook
+  (cperl-mode
+    .
+    (lambda ()
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (lsp-deferred)))))
+  :config
+  ;; Prefer CPerl mode to Perl mode
+  (fset 'perl-mode 'cperl-mode)
 
-;;   ;; (with-eval-after-load "lsp-mode"
-;;   ;;   (lsp-register-client
-;;   ;;     (make-lsp-client
-;;   ;;       :new-connection
-;;   ;;       (lsp-tramp-connection
-;;   ;;         (lambda ()
-;;   ;;           (list
-;;   ;;             lsp-perl-language-server-path
-;;   ;;             "-MPerl::LanguageServer"
-;;   ;;             "-e"
-;;   ;;             "Perl::LanguageServer::run"
-;;   ;;             "--"
-;;   ;;             (format "--port %d --version %s"
-;;   ;;               lsp-perl-language-server-port
-;;   ;;               lsp-perl-language-server-client-version))))
-;;   ;;       :major-modes '(perl-mode cperl-mode)
-;;   ;;       :remote? t
-;;   ;;       :initialized-fn
-;;   ;;       (lambda (workspace)
-;;   ;;         (with-lsp-workspace
-;;   ;;           workspace
-;;   ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
-;;   ;;       :priority -1
-;;   ;;       :server-id 'perlls-r)))
-;;   )
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection
+  ;;       (lsp-tramp-connection
+  ;;         (lambda ()
+  ;;           (list
+  ;;             lsp-perl-language-server-path
+  ;;             "-MPerl::LanguageServer"
+  ;;             "-e"
+  ;;             "Perl::LanguageServer::run"
+  ;;             "--"
+  ;;             (format "--port %d --version %s"
+  ;;               lsp-perl-language-server-port
+  ;;               lsp-perl-language-server-client-version))))
+  ;;       :major-modes '(perl-mode cperl-mode)
+  ;;       :remote? t
+  ;;       :initialized-fn
+  ;;       (lambda (workspace)
+  ;;         (with-lsp-workspace
+  ;;           workspace
+  ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
+  ;;       :priority -1
+  ;;       :server-id 'perlls-r)))
+  )
 
 ;; ;; (use-package ant
 ;; ;;   :after java-mode
@@ -5284,11 +4604,11 @@ targets."
 ;; (use-package markdown-preview-mode ; Open preview of markdown file in a browser
 ;;   :commands markdown-preview-mode)
 
-;; ;; (use-package bat-mode
-;; ;;   :straight (:type built-in)
-;; ;;   :mode
-;; ;;   (("\\.bat\\'" . bat-mode)
-;; ;;    ("\\.cmd\\'" . bat-mode)))
+;; (use-package bat-mode
+;;   :straight (:type built-in)
+;;   :mode
+;;   (("\\.bat\\'" . bat-mode)
+;;    ("\\.cmd\\'" . bat-mode)))
 
 ;; ;; (use-package web-mode
 ;; ;;   :disabled
@@ -5330,42 +4650,42 @@ targets."
 ;; ;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
 ;; ;;   :custom (emmet-move-cursor-between-quote t))
 
-;; (use-package nxml-mode
-;;   :straight (:type built-in)
-;;   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
-;;   :hook
-;;   (nxml-mode
-;;     .
-;;     (lambda ()
-;;       ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
-;;       ;; (when (fboundp 'spell-fu-mode)
-;;       ;;   (spell-fu-mode -1))
-;;       (when (fboundp 'flyspell-mode)
-;;         (flyspell-mode -1))
-;;       (when (fboundp 'jinx-mode)
-;;         (jinx-mode -1))
-;;       (cond
-;;         ((eq sb/lsp-provider 'eglot)
-;;           (eglot-ensure))
-;;         ((eq sb/lsp-provider 'lsp-mode)
-;;           (progn
-;;             (make-local-variable 'lsp-disabled-clients)
-;;             (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-;;             (lsp-deferred))))))
-;;   :custom
-;;   (nxml-auto-insert-xml-declaration-flag t)
-;;   (nxml-slash-auto-complete-flag t)
-;;   (nxml-sexp-element-flag t)
-;;   :config (fset 'xml-mode 'nxml-mode)
+(use-package nxml-mode
+  :straight (:type built-in)
+  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
+  :hook
+  (nxml-mode
+    .
+    (lambda ()
+      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+      ;; (when (fboundp 'spell-fu-mode)
+      ;;   (spell-fu-mode -1))
+      (when (fboundp 'flyspell-mode)
+        (flyspell-mode -1))
+      (when (fboundp 'jinx-mode)
+        (jinx-mode -1))
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (eglot-ensure))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (progn
+            (make-local-variable 'lsp-disabled-clients)
+            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+            (lsp-deferred))))))
+  :custom
+  (nxml-auto-insert-xml-declaration-flag t)
+  (nxml-slash-auto-complete-flag t)
+  (nxml-sexp-element-flag t)
+  :config (fset 'xml-mode 'nxml-mode)
 
-;;   ;; (with-eval-after-load "lsp-mode"
-;;   ;;   (lsp-register-client
-;;   ;;     (make-lsp-client
-;;   ;;       :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
-;;   ;;       :major-modes '(xml-mode nxml-mode)
-;;   ;;       :remote? t
-;;   ;;       :server-id 'xmlls-r)))
-;;   )
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (lsp-register-client
+  ;;     (make-lsp-client
+  ;;       :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
+  ;;       :major-modes '(xml-mode nxml-mode)
+  ;;       :remote? t
+  ;;       :server-id 'xmlls-r)))
+  )
 
 (use-package json-mode
   :mode
@@ -5433,17 +4753,17 @@ targets."
 ;; ;;   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
 ;; ;;   :hook (ssh-config-mode . turn-on-font-lock))
 
-;; ;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
-;; ;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
-;; ;; There are two easy options: (i) press "C-c C-l" (`org-insert-link') while your point is within a
-;; ;; link and you will be prompted to edit its URL in the minibuffer. You can use the same command to
-;; ;; create new links (when your point is not on an existing link). (ii) You can convert the
-;; ;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
-;; ;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
+;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
+;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
+;; There are two easy options: (i) press "C-c C-l" (`org-insert-link') while your point is within a
+;; link and you will be prompted to edit its URL in the minibuffer. You can use the same command to
+;; create new links (when your point is not on an existing link). (ii) You can convert the
+;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
+;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
 
-;; ;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
-;; ;; https://orgmode.org/manual/Escape-Character.html
-;; ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
+;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
 
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
@@ -5746,11 +5066,11 @@ targets."
 ;; ;;     (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
 ;; ;;   :diminish)
 
-;; ;; (use-package consult-reftex
-;; ;;   :straight (:host github :repo "karthink/consult-reftex")
-;; ;;   :after consult
-;; ;;   :demand t
-;; ;;   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
+(use-package consult-reftex
+  :straight (:host github :repo "karthink/consult-reftex")
+  :after (consult tex-mode)
+  :demand t
+  :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
 ;; ;; ;; Read document like a hypertext document, supports mouse highlighting
 ;; ;; (use-package bib-cite
@@ -5769,15 +5089,15 @@ targets."
 ;; ;;   :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
 ;; ;;   :diminish bib-cite-minor-mode)
 
-;; ;; (use-package auctex-latexmk
-;; ;;   :disabled
-;; ;;   :after tex
-;; ;;   :when (executable-find "latexmk")
-;; ;;   :demand t
-;; ;;   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
-;; ;;   :config
-;; ;;   (setq-default TeX-command-default "LatexMk")
-;; ;;   (auctex-latexmk-setup))
+;; (use-package auctex-latexmk
+;;   :disabled
+;;   :after tex
+;;   :when (executable-find "latexmk")
+;;   :demand t
+;;   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+;;   :config
+;;   (setq-default TeX-command-default "LatexMk")
+;;   (auctex-latexmk-setup))
 
 ;; (with-eval-after-load "latex"
 ;;   (unbind-key "C-j" LaTeX-mode-map)
@@ -5785,14 +5105,6 @@ targets."
 ;;   (unbind-key "C-c C-j" LaTeX-mode-map)
 
 ;;   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
-
-;; ;; `math-preview' requires external nodejs program "math-preview". Make sure that "math-preview" is
-;; ;; in "$PATH".
-
-;; ;; (use-package math-preview
-;; ;;   :straight (:host gitlab :repo "matsievskiysv/math-preview")
-;; ;;   :commands (math-preview-all math-preview-at-point math-preview-region)
-;; ;;   :custom (math-preview-command (expand-file-name "node_modules/.bin/math-preview" sb/user-tmp-directory)))
 
 ;; ;; TODO: Try `citar' https://github.com/emacs-citar/citar
 
@@ -5844,15 +5156,6 @@ targets."
   :custom
   (xref-search-program 'ripgrep)
   (xref-show-definitions-function #'xref-show-definitions-completing-read))
-
-;; (use-package dumb-jump
-;;   :after xref
-;;   :demand t
-;;   :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
-;;   :custom
-;;   (dumb-jump-quiet t)
-;;   (dumb-jump-force-searcher 'rg)
-;;   (dumb-jump-prefer-searcher 'rg))
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 (use-package citre
@@ -6206,28 +5509,28 @@ or the major mode is not in `sb/skippable-modes'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
 
-;; (defun sb/get-derived-modes (mode)
-;;   "Return a list of the ancestor modes that MODE is derived from."
-;;   (interactive)
-;;   (let
-;;     (
-;;       (modes ())
-;;       (parent nil))
-;;     (while (setq parent (get mode 'derived-mode-parent))
-;;       (push parent modes)
-;;       (setq mode parent))
-;;     (setq modes (nreverse modes))))
+(defun sb/get-derived-modes (mode)
+  "Return a list of the ancestor modes that MODE is derived from."
+  (interactive)
+  (let
+    (
+      (modes ())
+      (parent nil))
+    (while (setq parent (get mode 'derived-mode-parent))
+      (push parent modes)
+      (setq mode parent))
+    (setq modes (nreverse modes))))
 
-;; (defun sb/goto-line-with-feedback ()
-;;   "Show line numbers temporarily, while prompting for the line number input."
-;;   (interactive)
-;;   (unwind-protect
-;;     (progn
-;;       (linum-mode 1)
-;;       (forward-line (read-number "Goto line: ")))
-;;     (linum-mode -1)))
+(defun sb/goto-line-with-feedback ()
+  "Show line numbers temporarily, while prompting for the line number input."
+  (interactive)
+  (unwind-protect
+    (progn
+      (linum-mode 1)
+      (forward-line (read-number "Goto line: ")))
+    (linum-mode -1)))
 
-;; ;; Configure appearance-related settings at the end
+;; Configure appearance-related settings at the end
 
 ;; ;; Install fonts with "M-x all-the-icons-install-fonts"
 ;; ;; (use-package all-the-icons
@@ -6431,20 +5734,23 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package nano-theme
   :straight (:host github :repo "rougier/nano-theme")
   :when (eq sb/theme 'nano-dark)
-  :init (load-theme 'nano-dark t))
+  :init (load-theme 'nano-dark t)
+  :custom
+  (nano-window-divider-show t)
+  (nano-fonts-use t))
 
 ;; ;; (use-package nordic-night-theme
 ;; ;;   :when (eq sb/theme 'nordic-night)
 ;; ;;   :init (load-theme 'nordic-night t))
 
-;; ;; (use-package leuven-theme
-;; ;;   :when (or (eq sb/theme 'leuven) (eq sb/theme 'leuven-dark))
-;; ;;   :init
-;; ;;   (cond
-;; ;;     ((eq sb/theme 'leuven)
-;; ;;       (load-theme 'leuven t))
-;; ;;     ((eq sb/theme 'leuven-dark)
-;; ;;       (load-theme 'leuven-dark t))))
+(use-package leuven-theme
+  :when (or (eq sb/theme 'leuven) (eq sb/theme 'leuven-dark))
+  :init
+  (cond
+    ((eq sb/theme 'leuven)
+      (load-theme 'leuven t))
+    ((eq sb/theme 'leuven-dark)
+      (load-theme 'leuven-dark t))))
 
 ;; (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
 ;;   (progn
@@ -6567,39 +5873,15 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
   (doom-modeline-unicode-fallback t))
 
-;; ;; (use-package awesome-tray ; Minimal modeline information
-;; ;;   :straight (:host github :repo "manateelazycat/awesome-tray")
-;; ;;   :when (eq sb/modeline-theme 'awesome-tray)
-;; ;;   :hook (emacs-startup . awesome-tray-mode)
-;; ;;   :custom
-;; ;;   (awesome-tray-active-modules
-;; ;;     '("file-path" "buffer-name" "mode-name" "location" "belong" "flymake" "git" "hostname"))
-;; ;;   (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
-;; ;;   (awesome-tray-file-path-full-dirname-levels 2)
-;; ;;   (awesome-tray-evil-show-mode nil)
-;; ;;   (awesome-tray-meow-show-mode nil)
-;; ;;   (awesome-tray-mode-line-active-color "lavender")
-;; ;;   :custom-face
-;; ;;   (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-;; ;;   (awesome-tray-module-awesome-tab-face ((t (:foreground "#b83059" :weight bold :height 0.8))))
-;; ;;   (awesome-tray-module-buffer-name-face ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-;; ;;   (awesome-tray-module-date-face ((t (:foreground "#717175" :weight bold :height 0.8))))
-;; ;;   (awesome-tray-module-file-path-face ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-;; ;;   (awesome-tray-module-git-face ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-;; ;;   (awesome-tray-module-last-command-face ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-;; ;;   (awesome-tray-module-location-face ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-;; ;;   (awesome-tray-module-mode-name-face ((t (:foreground "#00a400" :weight bold :height 0.8))))
-;; ;;   (awesome-tray-module-parent-dir-face ((t (:foreground "#5e8e2e" :weight bold :height 0.8)))))
-
-;; ;; (use-package nano-modeline
-;; ;;   :when (eq sb/modeline-theme 'nano-modeline)
-;; ;;   :hook
-;; ;;   ((prog-mode . nano-modeline-prog-mode)
-;; ;;     (text-mode . nano-modeline-text-mode)
-;; ;;     (org-mode . nano-modeline-org-mode)
-;; ;;     (pdf-view-mode . nano-modeline-pdf-mode)
-;; ;;     (messages-buffer-mode . nano-modeline-message-mode))
-;; ;;   :custom (nano-modeline-position #'nano-modeline-footer))
+(use-package nano-modeline
+  :when (eq sb/modeline-theme 'nano-modeline)
+  :hook
+  ((prog-mode . nano-modeline-prog-mode)
+    (text-mode . nano-modeline-text-mode)
+    (org-mode . nano-modeline-org-mode)
+    (pdf-view-mode . nano-modeline-pdf-mode)
+    (messages-buffer-mode . nano-modeline-message-mode))
+  :custom (nano-modeline-position #'nano-modeline-footer))
 
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
 ;; we use TUI Emacs. Then, the terminal font setting will be used.
@@ -6610,8 +5892,8 @@ PAD can be left (`l') or right (`r')."
       (progn
         (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
         ;; (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
-        (set-face-attribute 'mode-line nil :height 130)
-        (set-face-attribute 'mode-line-inactive nil :height 130)))
+        (set-face-attribute 'mode-line nil :height 150)
+        (set-face-attribute 'mode-line-inactive nil :height 150)))
 
     ((string= (system-name) "DESKTOP-4T8O69V") ; Inspiron 7572 Windows
       (progn
@@ -6716,17 +5998,16 @@ PAD can be left (`l') or right (`r')."
   ("C-S-s" . sb/save-all-buffers)
   ("C-x k" . kill-this-buffer)
 
-  ;;   ("C-<left>" . backward-word)
-  ;;   ("C-<right>" . forward-word)
+  ("C-<left>" . backward-word)
+  ("C-<right>" . forward-word)
 
-  ;;   ("M-\\" . delete-horizontal-space)
-  ;;   ("M-#" . cycle-spacing)
+  ("M-\\" . delete-horizontal-space)
+  ("M-#" . cycle-spacing)
 
-  ;;   ("C-M-b" . backward-sexp)
-  ;;   ("C-M-f" . forward-sexp)
-  ;;   ("C-M-k" . kill-sexp)
-  ;;   ("C-M-@" . mark-sexp)
-  )
+  ("C-M-b" . backward-sexp)
+  ("C-M-f" . forward-sexp)
+  ("C-M-k" . kill-sexp)
+  ("C-M-@" . mark-sexp))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 
@@ -6747,9 +6028,9 @@ PAD can be left (`l') or right (`r')."
     ("M-<right>" . sb/next-buffer)
     ("C-<tab>" . sb/next-buffer)))
 
-;; ;; (use-package default-text-scale
-;; ;;   :when (display-graphic-p)
-;; ;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
+;; (use-package default-text-scale
+;;   :when (display-graphic-p)
+;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
 ;; (use-package free-keys
 ;;   :commands free-keys)
@@ -6764,375 +6045,6 @@ PAD can be left (`l') or right (`r')."
   :config (which-key-setup-side-window-right-bottom)
   :diminish)
 
-;; ;; Hydras, https://github.com/abo-abo/hydra
-
-;; ;; ":exit nil" means the hydra state will continue, ":exit t" will quit the hydra. ":color red"
-;; ;; means continue the hydra on a valid key but stop when a foreign key has been pressed. ":color
-;; ;; blue" means exit.
-
-;; ;; (use-package hydra)
-
-;; ;; (use-package hydra-posframe
-;; ;;   :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
-;; ;;   :when (display-graphic-p)
-;; ;;   :after hydra
-;; ;;   :init (hydra-posframe-mode 1))
-
-;; ;; (use-package ivy-hydra ; Additional keybindings for `ivy'
-;; ;;   :after (ivy hydra)
-;; ;;   :demand t)
-
-;; ;; (use-package pretty-hydra
-;; ;;   :after hydra
-;; ;;   :demand t)
-
-;; ;; ;; https://github.com/WalkerGriggs/dot-emacs/blob/master/configs/hydra.el
-;; ;; (defun sb/with-alltheicon (icon str &optional height v-adjust)
-;; ;;   "Displays ICON from all-the-icon in STR."
-;; ;;   (s-concat (all-the-icons-alltheicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
-
-;; ;; (defun sb/with-faicon (icon str &optional height v-adjust)
-;; ;;   "Displays icon from Font Awesome icon in STR."
-;; ;;   (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
-
-;; ;; (defun sb/with-fileicon (icon str &optional height v-adjust)
-;; ;;   "Displays an icon from the Atom File Icons package."
-;; ;;   (s-concat (all-the-icons-fileicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
-
-;; ;; (defun sb/with-octicon (icon str &optional height v-adjust)
-;; ;;   "Displays an icon from the GitHub Octicons."
-;; ;;   (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-spelling
-;; ;;   (:color
-;; ;;     amaranth
-;; ;;     :quit-key "q"
-;; ;;     :title (sb/with-faicon "magic" "Spell check" 1 -0.05)
-;; ;;     :foreign-keys warn)
-;; ;;   ("Action" (("c" ispell "ispell") ("f" flyspell-buffer "flyspell buffer")) "Correct"
-;; ;;     (("<" flyspell-correct-previous "correct previous error")
-;; ;;       (">" flyspell-correct-next "correct next error"))
-;; ;;     "Spell fu"
-;; ;;     (("n" spell-fu-goto-next-error "next error")
-;; ;;       ("p" spell-fu-goto-previous-error "previous error")
-;; ;;       ("a" spell-fu-word-add "add word"))))
-
-;; ;; (pretty-hydra-define sb/hydra-text-scale-zoom
-;; ;;   (:color amaranth :quit-key "q" :title "Zoom action" :foreign-keys warn)
-;; ;;   (""
-;; ;;    (("i" default-text-scale-increase "zoom in")
-;; ;;     ("o" default-text-scale-decrease "zoom out")
-;; ;;     ("r" default-text-scale-reset "reset"))))
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-error
-;; ;;   (:color amaranth :quit-key "q" :title "Navigate errors" :foreign-keys warn)
-;; ;;   (""
-;; ;;     (("h" first-error "first error")
-;; ;;       ("j" next-error "next error")
-;; ;;       ("k" previous-error "previous error")
-;; ;;       ("v" recenter-top-bottom "recenter"))))
-
-;; ;; https://github.com/abo-abo/hydra/wiki/avy
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-avy (:color red :title "Actions" :quit-key "q" :foreign-keys warn)
-;; ;;   ("Line"
-;; ;;     (("y" avy-copy-line "yank line")
-;; ;;       ("m" avy-move-line "move line")
-;; ;;       ("l" avy-goto-line "go to line")
-;; ;;       ("L" avy-goto-end-of-line "go to end of line")
-;; ;;       ("k" avy-kill-whole-line "kill whole line"))
-;; ;;     "Region"
-;; ;;     (("Y" avy-copy-region "copy region ")
-;; ;;       ("M" avy-move-region "move region")
-;; ;;       ("K" avy-kill-region "kill region"))
-;; ;;     "Word"
-;; ;;     (("w" avy-goto-word-1 "go to word") ("W" avy-goto-word-0 "go to word"))
-;; ;;     "Character"
-;; ;;     (("c" avy-goto-char-timer "go to char with timer") ("C" avy-goto-char "go to char"))))
-
-;; ;; (pretty-hydra-define sb/hydra-projectile
-;; ;;   (:color teal :hint nil global-map "C-c p" :quit-key "q" :foreign-keys warn)
-;; ;;   ("PROJECTILE: %(projectile-project-root)"
-;; ;;    (("p"   projectile-switch-project "switch project")
-;; ;;     ("s"   projectile-switch-project "switch project")
-;; ;;     ("a"   projectile-add-known-project "add known project")
-;; ;;     ("x"   projectile-remove-known-project "remove known project")
-;; ;;     ("X"   projectile-cleanup-known-projects "clean up known projects"))
-;; ;;    "Files"
-;; ;;    (("f"   projectile-find-file "find file")
-;; ;;     ("F"   projectile-find-file-dwim "find file dwim")
-;; ;;     ("d"   projectile-find-dir "find directory")
-;; ;;     ("D"   projectile-find-file-in-directory "file file in directory"))
-;; ;;    "Buffers"
-;; ;;    (("i"   projectile-ibuffer "ibuffer")
-;; ;;     ("b"   projectile-switch-to-buffer "switch to buffer")
-;; ;;     ("r"   projectile-recentf "recent files")
-;; ;;     ("k"   projectile-kill-buffers "kill all buffers"))
-;; ;;    "Misc"
-;; ;;    (("c"   projectile-invalidate-cache "invalidate cache")
-;; ;;     ("z"   projectile-cache-current-file "cache current file")
-;; ;;     ("g"   projectile-find-tag "find tag")
-;; ;;     ("o"   projectile-multi-occur "multi occur")
-;; ;;     ("m"   projectile-compile "compile"))))
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-move-text
-;; ;;   (:quit-key "q" :title "Move text" :foreign-keys warn)
-;; ;;   ("" (("u" move-text-up "up") ("d" move-text-down "down"))))
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-flycheck
-;; ;;   (:color
-;; ;;     blue
-;; ;;     :quit-key "q"
-;; ;;     :title (sb/with-faicon "plane" "Flycheck actions" 1 -0.05)
-;; ;;     :foreign-keys warn)
-;; ;;   ("Setup"
-;; ;;     (("M" flycheck-manual "Manual")
-;; ;;       ("m" flycheck-mode "enable mode")
-;; ;;       ("v" flycheck-verify-setup "Verify setup"))
-;; ;;     "Errors"
-;; ;;     (("<" flycheck-previous-error :color pink "previous error")
-;; ;;       (">" flycheck-next-error :color pink "next error")
-;; ;;       ("f" flycheck-buffer "check buffer")
-;; ;;       ("l" flycheck-list-errors "list"))
-;; ;;     "Checker"
-;; ;;     (("d" flycheck-disable-checker "disable")
-;; ;;       ("s" flycheck-select-checker "select checker")
-;; ;;       ("?" flycheck-describe-checker "describe checker"))))
-
-;; ;; (pretty-hydra-define sb/hydra-python-indent
-;; ;;   (:quit-key "q" :title "Adjust Python indentation." :foreign-keys warn)
-;; ;;   (""
-;; ;;    ((">" python-indent-shift-right "right")
-;; ;;     ("<" python-indent-shift-left "left"))))
-
-;; ;; (with-eval-after-load "python-mode"
-;; ;;   (defvar python-mode-map)
-
-;; ;;   (bind-key "C-c" #'sb/hydra-python-indent/body python-mode-map))
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-smerge
-;; ;;   (:color
-;; ;;     pink
-;; ;;     :hint nil
-;; ;;     :post (smerge-auto-leave)
-;; ;;     :quit-key "q"
-;; ;;     :title (with-alltheicon "git" "Merge actions" 1 -0.05)
-;; ;;     :foreign-keys warn)
-;; ;;   ("Conflict actions"
-;; ;;     (("n" smerge-next "Next conflict") ("p" smerge-prev "Previous conflict"))
-;; ;;     "Keep actions"
-;; ;;     (("b" smerge-keep-base "Keep base")
-;; ;;       ("u" smerge-keep-upper "Keep upper")
-;; ;;       ("l" smerge-keep-lower "Keep lower")
-;; ;;       ("a" smerge-keep-all "Keep all")
-;; ;;       ("RET" smerge-keep-current "Keep current")
-;; ;;       ("\C-m" smerge-keep-current "Keep current"))
-;; ;;     "Diff actions"
-;; ;;     (("<" smerge-diff-base-upper "Diff base upper")
-;; ;;       ("=" smerge-diff-upper-lower "Diff base lower")
-;; ;;       (">" smerge-diff-base-lower "Diff base lower")
-;; ;;       ("R" smerge-refine "Refine")
-;; ;;       ("E" smerge-ediff "Ediff"))
-;; ;;     "Others"
-;; ;;     (("C" smerge-combine-with-next "Combine")
-;; ;;       ("r" smerge-resolve "Resolve")
-;; ;;       ("k" smerge-kill-current "Kill current"))))
-
-;; ;; (pretty-hydra-define sb/hydra-multiple-cursors
-;; ;;   (:hint nil :quit-key "q" :title "Multiple cursors" :foreign-keys warn)
-;; ;;   ("Up"
-;; ;;    (("p" mc/mark-previous-like-this "Up next")
-;; ;;     ("P" mc/skip-to-previous-like-this "Up skip")
-;; ;;     ("M-p" mc/unmark-previous-like-this "Unmark"))
-;; ;;    "Down"
-;; ;;    (("n" mc/mark-next-like-this "Down next")
-;; ;;     ("N" mc/skip-to-next-like-this "Down skip")
-;; ;;     ("M-n" mc/unmark-next-like-this "Down unmark"))
-;; ;;    "Others"
-;; ;;    (("l" mc/edit-lines :exit t "Edit lines")
-;; ;;     ("a" mc/mark-all-like-this :exit t "Mark all")
-;; ;;     ("r" mc/mark-all-in-region-regexp :exit t "Mark by regexp"))))
-
-;; ;; (pretty-hydra-define sb/hydra-smartparens
-;; ;;   (:hint nil :quit-key "q" :title "Smartparens" :foreign-keys warn)
-;; ;;   ("Moving"
-;; ;;    (("a" sp-beginning-of-sexp "Beginning")
-;; ;;     ("e" sp-end-of-sexp "End")
-;; ;;     ("f" sp-forward-sexp "Forward")
-;; ;;     ("b" sp-backward-sexp "Backward")
-;; ;;     ("n" sp-down-sexp "Down")
-;; ;;     ("N" sp-backward-down-sexp "Backward down")
-;; ;;     ("p" sp-up-sexp "Up")
-;; ;;     ("P" sp-backward-up-sexp "Backward up"))
-;; ;;    "Slurping & barfing"
-;; ;;    (("h" sp-backward-slurp-sexp "Backward slurp")
-;; ;;     ("H" sp-backward-barf-sexp "Backward barf")
-;; ;;     ("l" sp-forward-slurp-sexp "Slurp")
-;; ;;     ("L" sp-forward-barf-sexp "Forward barf"))
-;; ;;    "Wrapping"
-;; ;;    (("R" sp-rewrap-sexp "Rewrap")
-;; ;;     ("u" sp-unwrap-sexp "Unwrap")
-;; ;;     ("U" sp-backward-unwrap-sexp "Backward unwrap")
-;; ;;     ("(" sp-wrap-round "Wrap parenthesis")
-;; ;;     ("{" sp-wrap-curly "Wrap curly")
-;; ;;     ("[" sp-wrap-square "Wrap square"))
-;; ;;    "Sexp juggling"
-;; ;;    (("S" sp-split-sexp "Split")
-;; ;;     ("s" sp-splice-sexp "Splice")
-;; ;;     ("r" sp-raise-sexp "Raise")
-;; ;;     ("j" sp-join-sexp "Join")
-;; ;;     ("t" sp-transpose-sexp "Transpose")
-;; ;;     ("A" sp-absorb-sexp "Absorb")
-;; ;;     ("E" sp-emit-sexp "Emit")
-;; ;;     ("o" sp-convolute-sexp "Convolute"))
-;; ;;    "Destructive editing"
-;; ;;    (("c" sp-change-inner :exit t "Change inner")
-;; ;;     ("C" sp-change-enclosing :exit t "Change outer")
-;; ;;     ("k" sp-kill-sexp "Kill sexp")
-;; ;;     ("K" sp-backward-kill-sexp "Backward kill sexp")
-;; ;;     ("w" sp-copy-sexp "Copy sexp"))))
-
-;; ;; (pretty-hydra-define sb/hydra-lsp
-;; ;;   (:exit t :hint nil :quit-key "q" :title "LSP Mode" :foreign-keys warn)
-;; ;;   ("Buffer"
-;; ;;    (("f" lsp-format-buffer "Format buffer")
-;; ;;     ("m" lsp-ui-imenu "Imenu")
-;; ;;     ("x" lsp-execute-code-action "Execute code action"))
-;; ;;    "Server"
-;; ;;    (("M-s" lsp-describe-session "Describe session")
-;; ;;     ("M-r" lsp-workspace-restart "Restart language server")
-;; ;;     ("S" lsp-workspace-shutdown "Shutdown"))
-;; ;;    "Symbol"
-;; ;;    (("d" lsp-find-declaration "Find declaration")
-;; ;;     ("D" lsp-ui-peek-find-definitions "Find definitions")
-;; ;;     ("R" lsp-ui-peek-find-references "Find references")
-;; ;;     ("i" lsp-ui-peek-find-implementation "Find implementation")
-;; ;;     ("t" lsp-find-type-definition "Type definition")
-;; ;;     ("s" lsp-signature-help "Signature")
-;; ;;     ("o" lsp-describe-thing-at-point "Describe thing at point")
-;; ;;     ("r" lsp-rename "Rename"))))
-
-;; ;; (pretty-hydra-define sb/hydra-markdown-mode
-;; ;;   (:hint nil :title "Markdown mode" :quit-key "q" :foreign-keys warn)
-;; ;;   ("Formatting"
-;; ;;    (("s" markdown-insert-bold "Bold")
-;; ;;     ("e" markdown-insert-italic "Italic")
-;; ;;     ("b" markdown-insert-blockquote :color blue "Blockquote")
-;; ;;     ("p" markdown-insert-pre :color blue "Pre-formatted")
-;; ;;     ("c" markdown-insert-code "Code"))
-;; ;;    "Headings"
-;; ;;    (("h" markdown-insert-header-dwim "DWIM")
-;; ;;     ("1" markdown-insert-header-atx-1 "H1")
-;; ;;     ("2" markdown-insert-header-atx-2 "H2")
-;; ;;     ("3" markdown-insert-header-atx-3 "H3")
-;; ;;     ("4" markdown-insert-header-atx-4 "H4"))
-;; ;;    "Lists"
-;; ;;    (("m" markdown-insert-list-item "Insert list item"))
-;; ;;    "Promote/Demote"
-;; ;;    (("l" markdown-promote "Promote")
-;; ;;     ("r" markdown-demote "Demote")
-;; ;;     ("d" markdown-move-down "Move down")
-;; ;;     ("u" markdown-move-up "Move up"))
-;; ;;    "Links"
-;; ;;    (("L" markdown-insert-link :color blue "Insert link")
-;; ;;     ("U" markdown-insert-uri :color blue "Insert uri")
-;; ;;     ("F" markdown-insert-footnote :color blue "Insert footnote")
-;; ;;     ("W" markdown-insert-wiki-link :color blue "Insert wiki link")
-;; ;;     ("R" markdown-insert-reference-link-dwim :color blue "Insert reference link"))))
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-straight
-;; ;;   (:hint nil :quit-key "q" :title "Straight actions" :foreign-keys warn)
-;; ;;   (""
-;; ;;     (("c" straight-check-all "check all")
-;; ;;       ("C" straight-check-package "check package")
-;; ;;       ("r" straight-rebuild-all "rebuild all")
-;; ;;       ("R" straight-rebuild-package "rebuild package")
-;; ;;       ("f" straight-fetch-all "fetch all")
-;; ;;       ("F" straight-fetch-package "fetch package")
-;; ;;       ("p" straight-pull-all "pull all")
-;; ;;       ("P" straight-pull-package "pull package")
-;; ;;       ("m" straight-merge-all "merge all")
-;; ;;       ("M" straight-merge-package "merge package")
-;; ;;       ("n" straight-normalize-all "normalize all")
-;; ;;       ("N" straight-normalize-package "normalize package")
-;; ;;       ("v" straight-freeze-versions "freeze versions")
-;; ;;       ("V" straight-thaw-versions "thaw versions")
-;; ;;       ("g" straight-get-recipe "get recipe"))))
-
-;; ;; (pretty-hydra-define sb/hydra-comments
-;; ;;   (:hint nil :color teal :exit t :title "Commentary Actions" :foreign-keys warn)
-;; ;;   (""
-;; ;;    (("b" comment-box)
-;; ;;     ("c" comment-dwim)
-;; ;;     ("l" comment-line)
-;; ;;     ("r" comment-region))))
-
-;; ;; (pretty-hydra-define sb/hydra-magit
-;; ;;   (:hint nil :color teal :quit-key "q" :title (sb/with-faicon "code-fork" "Git" 1 -0.05)
-;; ;;          :foreign-keys warn)
-;; ;;   ("Action"
-;; ;;    (("b" magit-blame "blame")
-;; ;;     ("c" magit-commit "commit")
-;; ;;     ("i" magit-init "init")
-;; ;;     ("l" magit-log-buffer-file "commit log (current file)")
-;; ;;     ("L" magit-log-current "commit log (project)")
-;; ;;     ("s" magit-status "status"))))
-
-;; ;; (pretty-hydra-define sb/hydra-dumb-jump
-;; ;;   (:color blue :foreign-keys warn)
-;; ;;   ("Dumb Jump"
-;; ;;    (("j" dumb-jump-go "Go")
-;; ;;     ("o" dumb-jump-go-other-window "Other window")
-;; ;;     ("e" dumb-jump-go-prefer-external "Go external")
-;; ;;     ("x" dumb-jump-go-prefer-external-other-window "Go external other window")
-;; ;;     ("i" dumb-jump-go-prompt "Prompt")
-;; ;;     ("l" dumb-jump-quick-look "Quick look")
-;; ;;     ("b" dumb-jump-back "Back"))))
-
-;; ;; (bind-key "C-c h a" #'sb/hydra-avy/body)
-;; ;; (bind-key "C-c h k" #'sb/hydra-markdown-mode/body)
-;; ;; (bind-key "C-c h e" #'sb/hydra-error/body)
-;; ;; (bind-key "C-c h f" #'sb/hydra-flycheck/body)
-;; ;; (bind-key "C-c h g" #'sb/hydra-smerge/body)
-;; ;; (bind-key "C-c h j" #'sb/hydra-projectile/body)
-;; ;; (bind-key "C-c h l" #'sb/hydra-lsp/body)
-;; ;; (bind-key "C-c h m" #'sb/hydra-multiple-cursors/body)
-;; ;; (bind-key "C-c h p" #'sb/hydra-smartparens/body)
-;; ;; (bind-key "C-c h s" #'sb/hydra-spelling/body)
-;; ;; (bind-key "C-c h t" #'sb/hydra-move-text/body)
-;; ;; (bind-key "C-c h z" #'sb/hydra-text-scale-zoom/body)
-;; ;; (bind-key "C-c h i" #'sb/hydra-straight/body)
-;; ;; (bind-key "C-c h v" #'sb/hydra-magit/body)
-;; ;; (bind-key "C-c h y" #'sb/hydra-python-indent/body)
-;; ;; (bind-key "C-c h d" #'sb/hydra-dumb-jump)
-
-;; ;; (pretty-hydra-define
-;; ;;   sb/hydra-help (:color teal :title "Hydra Overview" :foreign-keys warn)
-;; ;;   ("Groups"
-;; ;;     (("a" sb/hydra-avy/body "+ avy")
-;; ;;       ("d" sb/hydra-markdown-mode/body "+ markdown")
-;; ;;       ("e" sb/hydra-error/body "+ error")
-;; ;;       ("f" sb/hydra-flycheck/body "+ flycheck")
-;; ;;       ("g" sb/hydra-smerge/body "+ smerge")
-;; ;;       ("j" sb/hydra-projectile/body "+ projectile")
-;; ;;       ("l" sb/hydra-lsp/body "+ lsp")
-;; ;;       ;; ("m" sb/hydra-multiple-cursors/body "+ multiple cursors")
-;; ;;       ("p" sb/hydra-smartparens/body "+ smartparens")
-;; ;;       ("s" sb/hydra-spelling/body "+ spelling")
-;; ;;       ("t" sb/hydra-move-text/body "+ move text")
-;; ;;       ("z" sb/hydra-text-scale-zoom/body "+ text scale")
-;; ;;       ("i" sb/hydra-straight/body "+ straight")
-;; ;;       ;; ("v" sb/hydra-magit/body "+ magit")
-;; ;;       ("y" sb/hydra-python-indent/body "+ python indent"))))
-
-;; ;; (bind-key "C-c h h" #'sb/hydra-help/body)
-
 ;; ;; Alacritty and Konsole are my preferred terminals for using Emacs.
 ;; (use-package term-keys
 ;;   :straight (:host github :repo "CyberShadow/term-keys")
@@ -7140,17 +6052,18 @@ PAD can be left (`l') or right (`r')."
 ;;   :hook (emacs-startup . term-keys-mode)
 ;;   :config (require 'term-keys-konsole))
 
-;; ;; (use-package pixel-scroll
-;; ;;   :straight (:type built-in)
-;; ;;   :bind
-;; ;;   ([remap scroll-up-command] . pixel-scroll-interpolate-down)
-;; ;;   ([remap scroll-down-command] . pixel-scroll-interpolate-up)
-;; ;;   :custom (pixel-scroll-precision-interpolate-page t)
-;; ;;   :init
-;; ;;   (when (fboundp 'pixel-scroll-mode)
-;; ;;     (pixel-scroll-mode 1))
-;; ;;   (when (fboundp 'pixel-scroll-precision-mode)
-;; ;;     (pixel-scroll-precision-mode 1)))
+(use-package pixel-scroll
+  :straight (:type built-in)
+  :bind
+  ([remap scroll-up-command] . pixel-scroll-interpolate-down)
+  ([remap scroll-down-command] . pixel-scroll-interpolate-up)
+  :custom (pixel-scroll-precision-interpolate-page t)
+  :init
+  (cond
+    ((fboundp 'pixel-scroll-precision-mode)
+      (pixel-scroll-precision-mode 1))
+    ((fboundp 'pixel-scroll-mode)
+      (pixel-scroll-mode 1))))
 
 ;; ;; (use-package server
 ;; ;;   :straight (:type built-in)
