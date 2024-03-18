@@ -43,7 +43,7 @@ Prefer the straight.el package manager instead."
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'none
+(defcustom sb/theme 'modus-operandi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -94,14 +94,6 @@ This depends on the orientation of the display."
   :type 'number
   :group 'sb/emacs)
 
-(defcustom sb/delete-trailing-whitespace-p nil
-  "Delete trailing whitespace.
-Control whether the trailing whitespace should be deleted or not.
-Sometimes we do not want to unnecessarily add differences due to
-  whitespaces."
-  :type 'boolean
-  :group 'sb/emacs)
-
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -149,19 +141,6 @@ This location is used for temporary installations and files.")
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; I do not find any difference in terms of the features I require. However, packages like
-;; `centaur-tabs' only support `projectile'.
-(defcustom sb/project-handler 'project
-  "Choose the handler for projects."
-  :type '(radio (const :tag "project.el" project) (const :tag "projectile" projectile))
-  :group 'sb/emacs)
-
-;; Improvements and bug fixes to `centaur-tabs' are slow.
-(defcustom sb/tab-bar-handler nil
-  "Choose the handler for tabs."
-  :type '(radio (const :tag "centaur-tabs" centaur-tabs) (const :tag "none" nil))
-  :group 'sb/emacs)
-
 ;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI. We keep icons
 ;; disabled for better performance and because using icons sometimes lead to visual misalignment in
 ;; lists.
@@ -173,15 +152,6 @@ This location is used for temporary installations and files.")
     (const :tag "all-the-icons" all-the-icons)
     (const :tag "nerd-icons" nerd-icons)
     (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; Eglot does not allow multiple servers to connect to a major mode. For example, I can use
-;; `texlab', `grammarly', and `lsp-ltex' together with LaTeX files. Eglot also does not support
-;; semantic tokens. However, configuring Eglot is simpler and I expect it to receive significant
-;; improvements now that it is in the Emacs core.
-(defcustom sb/lsp-provider 'lsp-mode
-  "Choose between Lsp-mode and Eglot."
-  :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Helper const variables
@@ -206,10 +176,6 @@ This location is used for temporary installations and files.")
 
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
-
-;; We are not using any packages in these paths.
-;; (dolist (dir '("extras" "modules"))
-;;   (push (expand-file-name dir user-emacs-directory) load-path))
 
 ;; Bootstrap `straight.el'
 (when (bound-and-true-p sb/disable-package.el)
@@ -283,21 +249,9 @@ This location is used for temporary installations and files.")
 (use-package bind-key
   :bind ("C-c d k" . describe-personal-keybindings))
 
-;; (use-package benchmark-init
-;;   :when (and (eq sb/op-mode 'standalone) (bound-and-true-p sb/debug-init-file))
-;;   :init (benchmark-init/activate)
-;;   :hook (emacs-startup . benchmark-init/deactivate))
-
 (use-package no-littering
   :demand t
   :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
-
-;; (use-package package
-;;   :unless (bound-and-true-p sb/disable-package.el)
-;;   ;; "no-littering" places "package-quickstart.el" in `no-littering-expand-var-file-name'.
-;;   :after no-littering
-;;   :bind (("C-c d p" . package-quickstart-refresh) ("C-c d l" . package-list-packages))
-;;   :custom (package-quickstart t))
 
 (defcustom sb/custom-file (no-littering-expand-var-file-name "custom.el")
   "File to write Emacs customizations."
@@ -309,13 +263,6 @@ This location is used for temporary installations and files.")
   "File to include private information."
   :type 'string
   :group 'sb/emacs)
-
-;; Asynchronously byte compile packages installed with `package.el'
-;; (use-package async
-;;   :straight (:host github :repo "jwiegley/emacs-async")
-;;   :unless (bound-and-true-p sb/disable-package.el)
-;;   :commands async-bytecomp-package-mode
-;;   :init (async-bytecomp-package-mode 1))
 
 ;; Get PATH with "(getenv "PATH")". Set PATH with "(setenv "PATH" (concat (getenv "PATH")
 ;; ":/home/swarnendu/bin"))".
@@ -503,23 +450,7 @@ This location is used for temporary installations and files.")
   (when (eq sb/window-split 'horizontal)
     (setq
       split-height-threshold nil
-      split-width-threshold 0))
-
-  ;; (when (display-graphic-p)
-  ;;   ;; Show dividers on the right of each window, more prominent than the default
-  ;;   (add-hook 'emacs-startup-hook #'window-divider-mode)
-
-  ;;   ;; Default is 8 pixels, fringes do not work on the TUI. Having a fringe on the RHS seems
-  ;;   ;; pointless.
-  ;;   (fringe-mode '(10 . 0))
-
-  ;;   ;; Cursor customizations do not work with TUI Emacs because the cursor style then is controlled by
-  ;;   ;; the terminal application.
-  ;;   (setq-default cursor-type 'box)
-  ;;   (set-cursor-color "#ffffff") ; Set cursor color to white
-  ;;   ;; Use a blinking bar for the cursor style to help identify it easily.
-  ;;   (blink-cursor-mode 1))
-  )
+      split-width-threshold 0)))
 
 (setq
   kill-whole-line t ; TODO: What is the utility of this variable?
@@ -828,12 +759,6 @@ This location is used for temporary installations and files.")
   (setenv "SHELL" shell-file-name)
   (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
-;; LATER: Can we shorten long Tramp file names? This does not work with Tramp.
-;; (add-to-list 'directory-abbrev-alist
-;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/data/swarnendu/" . "/vindhya/data/swarnendu/"))
-;; (add-to-list 'directory-abbrev-alist
-;;              '("/ssh:swarnendu@vindhya.cse.iitk.ac.in:/home/swarnendu/" . "/vindhya/home/swarnendu/"))
-
 (use-package whitespace
   :hook
   (markdown-mode
@@ -862,14 +787,6 @@ This location is used for temporary installations and files.")
   :config (setq-default whitespace-action '(cleanup auto-cleanup))
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
-;; "M-x delete-trailing-whitespace" deletes trailing lines. This is different
-;; from `whitespace-cleanup-mode' since this is unconditional.
-
-;; (when (bound-and-true-p sb/delete-trailing-whitespace-p)
-;;   (setq delete-trailing-lines t)
-;;   (add-hook 'write-file-functions #'delete-trailing-whitespace)
-;;   (add-hook 'before-save-hook #'delete-trailing-whitespace))
-
 (use-package ibuffer
   :straight (:type built-in)
   :hook (ibuffer . ibuffer-auto-mode)
@@ -885,7 +802,6 @@ This location is used for temporary installations and files.")
 ;; to `default-directory'. By default buffers are grouped by `project-current' or by
 ;; `default-directory'.
 (use-package ibuffer-project
-  :when (eq sb/project-handler 'project)
   :hook
   (ibuffer
     .
@@ -897,12 +813,6 @@ This location is used for temporary installations and files.")
   :config
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
-
-;; Group buffers by Projectile project
-;; (use-package ibuffer-projectile
-;;   :when (eq sb/project-handler 'projectile)
-;;   :after projectile
-;;   :hook (ibuffer . ibuffer-projectile-set-filter-groups))
 
 ;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 ;;   :demand t
@@ -955,19 +865,6 @@ This location is used for temporary installations and files.")
   ;;   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil))
   )
 
-;; ;; (add-to-list 'display-buffer-alist '("\\magit:" (display-buffer-same-window)))
-;; ;; (add-to-list 'display-buffer-alist '("\\*Help" (display-buffer-same-window)))
-;; ;; (add-to-list 'display-buffer-alist '("\\*helpful" (display-buffer-same-window)))
-;; ;; (add-to-list
-;; ;;   'display-buffer-alist
-;; ;;   '
-;; ;;   ("\\*\\(Backtrace\\|Compile-log\\|Messages\\|Warnings\\)\\*"
-;; ;;     (display-buffer-in-side-window)
-;; ;;     (side . bottom)
-;; ;;     (slot . 0)
-;; ;;     (window-height . 0.33)
-;; ;;     (window-parameters (no-delete-other-windows . nil))))
-
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
@@ -984,23 +881,6 @@ This location is used for temporary installations and files.")
   (ajb-bs-configuration "files-and-scratch")
   (ajb-max-window-height 30)
   (ajb-sort-function 'bs--sort-by-filename "Always predictable"))
-
-;; ;; Save buffers when Emacs loses focus. This causes additional saves which triggers the
-;; ;; `before-save-hook' and `after-save-hook' and leads to auto-formatters being invoked more
-;; ;; frequently.
-;; ;; (use-package super-save
-;; ;;   :hook (emacs-startup . super-save-mode)
-;; ;;   :custom
-;; ;;   (super-save-remote-files nil "Ignore remote files, can cause Emacs to hang")
-;; ;;   (super-save-silent t)
-;; ;;   (super-save-delete-trailing-whitespace nil)
-;; ;;   ;; Enable deleting trailing white spaces before saving
-;; ;;   (super-save-exclude '(".gpg"))
-;; ;;   (super-save-auto-save-when-idle t)
-;; ;;   :config
-;; ;;   (add-to-list 'super-save-triggers 'ace-window)
-;; ;;   (add-to-list 'super-save-hook-triggers 'find-file-hook)
-;; ;;   :diminish)
 
 (use-package dired
   :preface
@@ -1096,22 +976,6 @@ This location is used for temporary installations and files.")
 (use-package dired-narrow
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
-
-;; (use-package dired-async
-;;   :straight async
-;;   :after (dired async)
-;;   :hook (dired-mode . dired-async-mode)
-;;   :diminish)
-
-;; (use-package dired-rsync
-;;   :after dired
-;;   :bind (:map dired-mode-map ("C-c C-r" . dired-rsync)))
-
-;; (use-package dired-rsync-transient
-;;   :after dired
-;;   :bind (:map dired-mode-map ("C-c C-x" . dired-rsync-transient)))
-
-;; (use-package diredfl :hook (dired-mode . diredfl-mode))
 
 ;; (use-package dired-hist
 ;;   :straight (:host github :repo "karthink/dired-hist")
@@ -1366,25 +1230,6 @@ targets."
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
-
-;; (use-package consult-eglot
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after (consult eglot)
-;;   :commands consult-eglot-symbols)
-
-;; ;; (use-package consult-project-extra
-;; ;;   :after (project consult)
-;; ;;   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
-;; ;;   :config
-;; ;;   ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
-;; ;;   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
-;; ;;   (setq project-switch-commands 'consult-project-extra-find))
-
-;; ;; (use-package consult-jump-project
-;; ;;   :straight (:host github :repo "jdtsmith/consult-jump-project")
-;; ;;   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
-;; ;;   :custom (consult-jump-direct-jump-modes '(dired-mode))
-;; ;;   :bind ("C-x p j" . consult-jump-project))
 
 ;; (use-package consult-dir
 ;;   :after consult
@@ -1766,39 +1611,10 @@ targets."
 ;; (use-package fix-word
 ;;   :bind (("M-u" . fix-word-upcase) ("M-l" . fix-word-downcase) ("M-c" . fix-word-capitalize)))
 
-;; ;; (use-package string-inflection
-;; ;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
-
 ;; ;; Allow GC to happen after a period of idle time
 ;; (use-package gcmh
 ;;   :hook (emacs-startup . gcmh-mode)
 ;;   :diminish)
-
-;; ;; (use-package kill-file-path
-;; ;;   :straight (:host github :repo "chyla/kill-file-path")
-;; ;;   :commands
-;; ;;   (kill-file-path-basename
-;; ;;     kill-file-path-basename-without-extension
-;; ;;     kill-file-path-dirname
-;; ;;     kill-file-path))
-
-;; ;; (use-package change-inner
-;; ;;   :commands (change-inner change-outer yank-inner yank-outer))
-
-;; ;; (use-package link-hint
-;; ;;   :bind ("C-c C-l" . link-hint-open-link))
-
-;; ;; Call `whitespace-cleanup' only if the initial buffer was clean. This mode works on the entire
-;; ;; file unlike `ws-butler'. To enable the mode for an entire project, set `whitespace-cleanup-mode'
-;; ;; to `t' in the `.dir-locals.el' file.
-
-;; ;; (use-package whitespace-cleanup-mode
-;; ;;   :commands (global-whitespace-cleanup-mode whitespace-cleanup-mode)
-;; ;;   :custom
-;; ;;   (whitespace-cleanup-mode-preserve-point t)
-;; ;;   (whitespace-cleanup-mode-only-if-initially-clean t)
-;; ;;   :config (add-to-list 'whitespace-cleanup-mode-ignore-modes 'markdown-mode)
-;; ;;   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
@@ -1807,7 +1623,6 @@ targets."
 
 ;; Both project.el and projectile are unable to remember remote projects.
 (use-package project
-  :when (eq sb/project-handler 'project)
   :bind-keymap ("C-c p" . project-prefix-map)
   :bind
   (("<f5>" . project-switch-project)
@@ -1840,135 +1655,6 @@ targets."
 ;; ;;   :after project
 ;; ;;   :init (global-projection-hook-mode 1))
 
-;; ;; The contents of ".projectile" are ignored and files are not sorted when using the `alien' project
-;; ;; indexing.
-;; (use-package projectile
-;;   :when (eq sb/project-handler 'projectile)
-;;   ;; We can open a project file without enabling projectile via `bind-keys'
-;;   :hook (emacs-startup . projectile-mode)
-;;   :bind-keymap ("C-c p" . projectile-command-map)
-;;   :bind
-;;   (([remap project-switch-to-buffer] . projectile-switch-to-buffer)
-;;     ([remap project-compile] . projectile-compile-project)
-;;     ([remap project-find-dir] . projectile-find-dir)
-;;     ([remap project-dired] . projectile-dired)
-;;     ([remap project-find-file] . projectile-find-file)
-;;     ([remap project-kill-buffers] . projectile-kill-buffers)
-;;     ([remap project-switch-project] . projectile-switch-project)
-;;     ([remap project-vc-dir] . projectile-vc)
-;;     ([remap project-forget-project] . projectile-remove-known-project)
-;;     ;; ("C-c p A" . projectile-add-known-project)
-;;     ;; ("C-c p F" . projectile-find-other-file)
-;;     :map
-;;     projectile-command-map
-;;     ("A" . projectile-add-known-project)
-;;     ("F" . projectile-find-other-file))
-;;   :custom
-;;   (projectile-file-exists-remote-cache-expire nil)
-;;   (projectile-mode-line-prefix "" "Save modeline space")
-;;   (projectile-require-project-root t "Use only in desired directories, too much noise otherwise")
-;;   ;; No sorting is faster. Files are not sorted if `projectile-indexing-method' is set to `alien'.
-;;   (projectile-sort-order 'recently-active)
-;;   (projectile-verbose nil)
-;;   ;; The topmost file in a hierarchy has precedence
-;;   (projectile-project-root-files
-;;     '
-;;     ("GTAGS"
-;;       "TAGS"
-;;       "setup.py"
-;;       "requirements.txt"
-;;       "package.json"
-;;       "CMakeLists.txt"
-;;       "Makefile"
-;;       "meson.build"
-;;       "SConstruct"
-;;       "configure.ac"
-;;       "configure.in"))
-;;   (projectile-auto-discover nil "Disable auto-search for projects for faster startup")
-;;   ;; Caching will not watch for file system changes
-;;   (projectile-enable-caching (symbol-value 'sb/IS-WINDOWS))
-;;   :config
-;;   ;; Set the indexing method after checks on Windows platform since otherwise the following error
-;;   ;; shows up: "'tr' is not recognized as an internal or external command, operable program or batch
-;;   ;; file."
-;;   (when (and (symbol-value 'sb/IS-WINDOWS) (executable-find "tr"))
-;;     (setq projectile-indexing-method 'alien))
-
-;;   ;; Disable computing the project type that is shown on the modeline
-;;   (defun projectile-default-mode-line ()
-;;     "Report only the project name in the modeline."
-;;     (let ((project-name (projectile-project-name)))
-;;       (format " [%s]" (or project-name "-"))))
-
-;;   (defun sb/projectile-do-not-visit-tags-table ()
-;;     "Do not visit the tags table automatically even if it is present."
-;;     nil)
-;;   (advice-add
-;;     'projectile-visit-project-tags-table
-;;     :override #'sb/projectile-do-not-visit-tags-table)
-
-;;   (dolist
-;;     (prjs
-;;       (list
-;;         (expand-file-name sb/user-home-directory) ; Do not consider $HOME as a project
-;;         "~/" ; Do not consider $HOME as a project
-;;         (expand-file-name "/tmp")))
-;;     (add-to-list 'projectile-ignored-projects prjs))
-
-;;   ;; Filtering works with `alien' indexing
-;;   (dolist
-;;     (dirs
-;;       '
-;;       (".dropbox"
-;;         ".git"
-;;         ".hg"
-;;         ".metadata"
-;;         ".nx"
-;;         ".recommenders"
-;;         ".svn"
-;;         ".vscode"
-;;         "__pycache__"
-;;         "auto"
-;;         "elpa"
-;;         "node_modules"))
-;;     (add-to-list 'projectile-globally-ignored-directories dirs))
-
-;;   (dolist (items '("GPATH" "GRTAGS" "GTAGS" "GSYMS" "TAGS" "tags" ".tags" "__init__.py"))
-;;     (add-to-list 'projectile-globally-ignored-files items))
-
-;;   (dolist
-;;     (exts
-;;       '
-;;       (".a"
-;;         ".aux"
-;;         ".bak"
-;;         ".blg"
-;;         ".class"
-;;         ".deb"
-;;         ".doc"
-;;         ".docx"
-;;         "egg-info"
-;;         ".elc"
-;;         ".o"
-;;         ".odt"
-;;         ".ppt"
-;;         ".pptx"
-;;         ".pt"
-;;         ".pyc"
-;;         ".rel"
-;;         ".rip"
-;;         ".rpm"
-;;         ".so"
-;;         ".swp"
-;;         ".xls"
-;;         ".xlsx"
-;;         "~$"))
-;;     (add-to-list 'projectile-globally-ignored-file-suffixes exts))
-
-;;   (when (eq sb/minibuffer-completion 'ivy)
-;;     (bind-key "<f5>" #'projectile-switch-project)
-;;     (bind-key "<f6>" #'projectile-find-file)))
-
 (use-package isearch
   :straight (:type built-in)
   :bind
@@ -1987,18 +1673,6 @@ targets."
   :after isearch
   :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
-
-;; (use-package cc-isearch-menu
-;;   :bind (:map isearch-mode-map ("<f2>" . cc-isearch-menu-transient)))
-
-;; ;; (use-package anzu
-;; ;;   :init
-;; ;;   (setq
-;; ;;     anzu-search-threshold 10000
-;; ;;     anzu-minimum-input-length 2)
-;; ;;   (global-anzu-mode 1)
-;; ;;   :bind ([remap query-replace-regexp] . anzu-query-replace-regexp)
-;; ;;   :diminish anzu-mode)
 
 (with-eval-after-load "grep"
   (setq
@@ -2048,19 +1722,12 @@ targets."
     ("C-'" . avy-isearch))
   :custom (avy-background t "Provides better contrast"))
 
-;; (use-package re-builder
-;;   :commands re-builder
-;;   :custom (reb-re-syntax 'string))
-
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
 (use-package visual-regexp
   :bind
   ([remap query-replace] . vr/query-replace)
   ([remap replace-regex] . vr/replace))
-
-;; ;; (use-package ripgrep
-;; ;;   :commands (ripgrep-regexp projectile-ripgrep))
 
 ;; (use-package rg
 ;;   :commands
@@ -2100,11 +1767,6 @@ targets."
   (setq
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
-
-;; ;; (use-package magit-todos
-;; ;;   :after magit
-;; ;;   :demand t
-;; ;;   :config (magit-todos-mode 1))
 
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
@@ -2372,20 +2034,6 @@ targets."
   (add-hook 'LaTeX-mode-hook (lambda () (run-with-idle-timer 30 t #'format-all-buffer)))
   :diminish)
 
-;; ;; The advantage with `flycheck-grammarly' over `lsp-grammarly' is that you need not set up lsp
-;; ;; support, so you can use it anywhere. But `flycheck-grammarly' does not support a PRO Grammarly
-;; ;; account. We only need this package for checking text in "*scratch*" buffer.
-
-;; ;; (use-package flycheck-grammarly
-;; ;;   :after (flycheck persistent-scratch)
-;; ;;   :init (flycheck-grammarly-setup)
-;; ;;   :custom (flycheck-grammarly-check-time 3)
-;; ;;   :config
-;; ;;   ;; Remove from the beginning of the list and append to the end
-;; ;;   ;; (add-to-list 'flycheck-checkers (pop flycheck-checkers) 'append)
-;; ;;   (setq flycheck-checkers (delete 'grammarly flycheck-checkers))
-;; ;;   (add-to-list 'flycheck-checkers 'grammarly t))
-
 ;; ;; https://languagetool.org/download/LanguageTool-stable.zip
 ;; ;; The "languagetool" folder should include all files in addition to the ".jar" files.
 
@@ -2408,34 +2056,6 @@ targets."
 ;; ;;       ;; "OXFORD_SPELLING_ISE_VERBS"
 ;; ;;       ;; "OXFORD_SPELLING_NOUNS")
 ;; ;;       )))
-
-;; ;; https://languagetool.org/download/LanguageTool-stable.zip
-;; ;; The "languagetool" folder should include all files in addition to the ".jar" files.
-
-;; ;; (use-package flycheck-languagetool
-;; ;;   :after (flycheck persistent-scratch)
-;; ;;   :init (flycheck-languagetool-setup)
-;; ;;   :custom
-;; ;;   (flycheck-languagetool-server-jar
-;; ;;     (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar"))
-;; ;;   :config
-;; ;;   ;; (add-to-list 'flycheck-checkers (pop flycheck-checkers) t)
-;; ;;   (setq flycheck-checkers (delete 'languagetool flycheck-checkers))
-;; ;;   (add-to-list 'flycheck-checkers 'languagetool t))
-
-;; ;; Most likely, `text', `org', `markdown', and `latex' files will be in directories that can use LSP
-;; ;; support. We enable `flycheck' support for the "*scratch*" buffer if it is in `text-mode'.
-
-;; ;; (run-with-idle-timer
-;; ;;   3 nil
-;; ;;   (lambda ()
-;; ;;     (add-hook
-;; ;;       'text-mode-hook
-;; ;;       (lambda ()
-;; ;;         (when (string= (buffer-name) "*scratch*")
-;; ;;           (progn
-;; ;;             (flycheck-select-checker 'grammarly)
-;; ;;             (flycheck-add-next-checker 'grammarly 'languagetool)))))))
 
 ;; ;; (use-package highlight-indentation
 ;; ;;   :hook
@@ -2473,12 +2093,6 @@ targets."
   (elisp-autofmt-style 'fixed)
   (elisp-autofmt-python-bin "python3")
   :config (setq-default elisp-autofmt-load-packages-local '("use-package")))
-
-;; (use-package flycheck-eglot
-;;   :straight (:host github :repo "intramurz/flycheck-eglot")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after (flycheck eglot)
-;;   :init (global-flycheck-eglot-mode 1))
 
 (use-package shfmt
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
@@ -2649,19 +2263,6 @@ targets."
   ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
   :diminish)
 
-;; Posframes do not have unaligned rendering issues with variable `:height' unlike an overlay.
-;; However, posframes do not work with TUI, and the width of the frame popup is often not enough and
-;; the right side gets cut off. https://github.com/company-mode/company-mode/issues/1010
-
-;; (use-package company-posframe
-;;   :when (display-graphic-p)
-;;   :hook (company-mode . company-posframe-mode)
-;;   :custom
-;;   (company-posframe-show-metadata t "Difficult to distinguish the help text from completions")
-;;   (company-posframe-show-indicator nil "The backend display in the posframe modeline gets cut")
-;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-;;   :diminish)
-
 (use-package company-quickhelp
   :after company
   :when (display-graphic-p)
@@ -2739,25 +2340,10 @@ targets."
   :after company
   :demand t)
 
-;; (use-package company-org-block
-;;   :after (company org)
-;;   :demand t)
-
 (use-package company-c-headers
   :after (company cc-mode)
   :demand t
   :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
-
-;; (use-package company-makefile
-;;   :straight (:host github :repo "nverno/company-makefile")
-;;   :after (company make-mode)
-;;   :demand t)
-
-;; (use-package company-spell
-;;   :straight (:host github :repo "enzuru/company-spell")
-;;   :after company
-;;   :demand t
-;;   :config (setf company-aspell-command "hunspell"))
 
 (use-package company-try-hard
   :bind (("C-j" . company-try-hard) :map company-active-map ("C-j" . company-try-hard)))
@@ -2955,29 +2541,16 @@ targets."
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
 
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (setq company-backends
-            '
-            (company-dirfiles
-              (company-capf
-                company-c-headers
-                :with company-keywords
-                company-dabbrev-code ; Useful for variable names
-                company-yasnippet
-                :separate)
-              company-dict company-ispell company-dabbrev)))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (setq company-backends
-            '
-            (company-dirfiles
-              (company-capf
-                company-citre-tags company-c-headers
-                :with company-keywords
-                company-dabbrev-code ; Useful for variable names
-                company-yasnippet
-                :separate)
-              company-dict company-ispell company-dabbrev)))))
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-capf
+            company-citre-tags company-c-headers
+            :with company-keywords
+            company-dabbrev-code ; Useful for variable names
+            company-yasnippet
+            :separate)
+          company-dict company-ispell company-dabbrev)))
 
     (add-hook
       'prog-mode-hook
@@ -3284,15 +2857,9 @@ targets."
                 #'cape-keyword)
               (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
 
-;; I work a lot over SSH, and `lsp-mode' is poor over Tramp. The alternative I used was to use TUI
-;; Emacs. Eglot works better than `lsp-mode' over Tramp, which allows me to continue using GUI
-;; Emacs. However, Eglot does not support multiple servers for a major-mode. For example, it will be
-;; nice to have TexLab and Grammarly with LaTeX files.
-
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
-  :when (eq sb/lsp-provider 'lsp-mode)
   :init (setq lsp-keymap-prefix "C-c l")
   :bind-keymap ("C-c l" . lsp-command-map)
   :bind
@@ -3404,6 +2971,7 @@ targets."
         "-j 2"
         (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
   (lsp-pylsp-plugins-isort-enabled t)
+  (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
   :config
   ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
@@ -3467,7 +3035,6 @@ targets."
   :diminish)
 
 (use-package lsp-ui
-  :when (eq sb/lsp-provider 'lsp-mode)
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
@@ -3483,7 +3050,6 @@ targets."
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
-  :when (eq sb/lsp-provider 'lsp-mode)
   :hook
   ((java-mode java-ts-mode)
     .
@@ -3491,11 +3057,7 @@ targets."
       (setq-local
         c-basic-offset 4
         c-set-style "java")
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
+      (lsp-deferred)))
   :custom
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
@@ -3506,7 +3068,6 @@ targets."
 ;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
 ;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 (use-package lsp-grammarly
-  :when (eq sb/lsp-provider 'lsp-mode)
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
   (lsp-grammarly-suggestions-oxford-comma t)
@@ -3514,32 +3075,10 @@ targets."
   (lsp-grammarly-suggestions-informal-pronouns-academic t)
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t)
-  (lsp-grammarly-user-words '(Swarnendu Biswas))
-  ;; :config (defvar lsp-grammarly-active-modes)
-  ;; (lsp-register-client
-  ;;   (make-lsp-client
-  ;;     :new-connection (lsp-tramp-connection #'lsp-grammarly--server-command)
-  ;;     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-grammarly-active-modes))
-  ;;     :priority -1
-  ;;     :remote? t
-  ;;     :add-on? t
-  ;;     :server-id 'grammarly-r
-  ;;     :download-server-fn
-  ;;     (lambda (_client callback error-callback _update?)
-  ;;       (lsp-package-ensure 'grammarly-ls callback error-callback))
-  ;;     :after-open-fn #'lsp-grammarly--init
-  ;;     :async-request-handlers
-  ;;     (ht
-  ;;       ("$/getCredentials" #'lsp-grammarly--get-credentials)
-  ;;       ("$/getToken" #'lsp-grammarly--get-token)
-  ;;       ("$/storeToken" #'lsp-grammarly--store-token)
-  ;;       ("$/showError" #'lsp-grammarly--show-error)
-  ;;       ("$/updateDocumentState" #'lsp-grammarly--update-document-state))))
-  )
+  (lsp-grammarly-user-words '(Swarnendu Biswas)))
 
 ;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
 (use-package lsp-ltex
-  :when (eq sb/lsp-provider 'lsp-mode)
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
   ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
@@ -3561,79 +3100,10 @@ targets."
   ;; (setq lsp-ltex-disabled-rules
   ;;       (json-parse-string
   ;;        "{\"en-US\": [\"MORFOLOGIK_RULE_EN_US\"]}"))
-
-  ;; (defvar lsp-ltex-active-modes)
-
-  ;; (lsp-register-client
-  ;;   (make-lsp-client
-  ;;     :new-connection
-  ;;     (lsp-tramp-connection
-  ;;       (expand-file-name "lsp/server/ltex-ls/latest/bin/ltex-ls" no-littering-var-directory))
-  ;;     :activation-fn (lambda (&rest _) (apply #'derived-mode-p lsp-ltex-active-modes))
-  ;;     :priority -2
-  ;;     :add-on? t
-  ;;     :remote? t
-  ;;     :server-id 'ltex-r
-  ;;     :download-server-fn
-  ;;     (lambda (_client _callback error-callback _update?)
-  ;;       (lsp-package-ensure
-  ;;         'ltex-ls
-  ;;         (lambda ()
-  ;;           (let ((dest (f-dirname (lsp-ltex--downloaded-extension-path))))
-  ;;             (unless
-  ;;               (lsp-ltex--execute "tar" "-xvzf" (lsp-ltex--downloaded-extension-path) "-C" dest)
-  ;;               (error "Error during the unzip process: tar"))))
-  ;;         error-callback))))
   )
-
-;; ;; Install with "python3 -m pip install -U pyright --user". Create stubs for a package with "pyright
-;; ;; --createstub pandas".
-
-;; ;; (use-package lsp-pyright
-;; ;;   :when
-;; ;;   (and (eq sb/lsp-provider 'lsp-mode)
-;; ;;     (eq sb/python-langserver 'pyright)
-;; ;;     (executable-find "pyright"))
-;; ;;   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-;; ;;   :hook ((python-mode python-ts-mode) . (lambda () (require 'lsp-pyright)))
-;; ;;   :custom
-;; ;;   (lsp-pyright-python-executable-cmd "python3")
-;; ;;   (lsp-pyright-typechecking-mode "basic")
-;; ;;   (lsp-pyright-auto-import-completions t)
-;; ;;   (lsp-pyright-auto-search-paths t)
-;; ;;   ;; :config
-;; ;;   ;; (lsp-register-client
-;; ;;   ;;   (make-lsp-client
-;; ;;   ;;     :new-connection
-;; ;;   ;;     (lsp-tramp-connection
-;; ;;   ;;       (lambda () (cons "pyright-langserver" lsp-pyright-langserver-command-args)))
-;; ;;   ;;     :major-modes '(python-mode)
-;; ;;   ;;     :remote? t
-;; ;;   ;;     :server-id 'pyright-r
-;; ;;   ;;     :multi-root lsp-pyright-multi-root
-;; ;;   ;;     :priority 3
-;; ;;   ;;     :initialization-options
-;; ;;   ;;     (lambda ()
-;; ;;   ;;       (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))
-;; ;;   ;;     :initialized-fn
-;; ;;   ;;     (lambda (workspace)
-;; ;;   ;;       (with-lsp-workspace
-;; ;;   ;;         workspace
-;; ;;   ;;         (lsp--set-configuration
-;; ;;   ;;           (ht-merge (lsp-configuration-section "pyright") (lsp-configuration-section "python")))))
-;; ;;   ;;     :download-server-fn
-;; ;;   ;;     (lambda (_client callback error-callback _update?)
-;; ;;   ;;       (lsp-package-ensure 'pyright callback error-callback))
-;; ;;   ;;     :notification-handlers
-;; ;;   ;;     (lsp-ht
-;; ;;   ;;       ("pyright/beginProgress" 'lsp-pyright--begin-progress-callback)
-;; ;;   ;;       ("pyright/reportProgress" 'lsp-pyright--report-progress-callback)
-;; ;;   ;;       ("pyright/endProgress" 'lsp-pyright--end-progress-callback))))
-;; ;;   )
 
 ;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
 (use-package lsp-latex
-  :when (eq sb/lsp-provider 'lsp-mode)
   :hook
   (LaTeX-mode
     .
@@ -3660,234 +3130,12 @@ targets."
   (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
   :config
   (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc")
-
-  ;; (lsp-register-client
-  ;;   (make-lsp-client
-  ;;     :new-connection (lsp-tramp-connection "texlab")
-  ;;     :major-modes '(tex-mode latex-mode LaTeX-mode bibtex-mode)
-  ;;     :remote? t
-  ;;     :server-id 'texlab-r))
-  )
-
-;; (use-package eglot
-;;   :straight (:source (gnu-elpa-mirror))
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   ;; :init (put 'eglot-server-programs 'safe-local-variable 'listp)
-;;   :bind
-;;   (("C-c l l" . eglot)
-;;     ("C-c l q" . eglot-shutdown)
-;;     ("C-c l Q" . eglot-shutdown-all)
-;;     ("C-c l d" . eglot-find-declaration)
-;;     ("C-c l i" . eglot-find-implementation)
-;;     ("C-c l t" . eglot-find-typeDefinition)
-;;     ("C-c l r" . eglot-rename)
-;;     ("C-c l f" . eglot-format)
-;;     ("C-c l F" . eglot-format-buffer)
-;;     ("C-c l x" . eglot-code-actions))
-;;   :hook
-;;   ( ;; (eglot-managed-mode . eglot-inlay-hints-mode) ; Inlay hints are distracting
-;;     (
-;;       (c-mode
-;;         c-ts-mode
-;;         c++-mode
-;;         c++-ts-mode
-;;         python-mode
-;;         python-ts-mode
-;;         css-mode
-;;         css-ts-mode
-;;         markdown-mode
-;;         sh-mode
-;;         bash-ts-mode
-;;         LaTeX-mode
-;;         bibtex-mode
-;;         html-mode
-;;         html-ts-mode
-;;         json-mode
-;;         json-ts-mode
-;;         dockerfile-ts-mode
-;;         perl-mode)
-;;       . eglot-ensure))
-;;   :custom
-;;   (eglot-autoshutdown t)
-;;   (eglot-sync-connect nil)
-;;   (eglot-connect-timeout nil)
-;;   (eglot-send-changes-idle-time 3)
-;;   (eglot-extend-to-xref t)
-;;   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
-;;   ;; Eglot overwrites `company-backends' to only include `company-capf'
-;;   (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
-;;   (fset #'jsonrpc--log-event #'ignore)
-;;   (eglot-ignored-server-capabilities
-;;     '
-;;     (:codeLensProvider
-;;       :executeCommandProvider
-;;       :hoverProvider ; Automatic documentation popups can be distracting
-;;       :foldingRangeProvider
-;;       :documentOnTypeFormattingProvider
-;;       :documentLinkProvider
-;;       :documentHighlightProvider
-;;       ;; Inlay hints are distracting
-;;       :inlayHintProvider))
-;;   :config
-;;   ;; Show all of the available eldoc information when we want it. This way Flymake errors
-;;   ;; don't just get clobbered by docstrings.
-;;   (add-hook
-;;     'eglot-managed-mode-hook
-;;     (lambda ()
-;;       "Make sure Eldoc will show us all of the feedback at point."
-;;       (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
-
-;;   ;; (let ((disabled-modes '(emacs-lisp-mode dockerfile-ts-mode)))
-;;   ;;   (unless (apply 'derived-mode-p disabled-modes)
-;;   ;;     (eglot-ensure)))
-
-;;   ;; (setq-default eglot-workspace-configuration
-;;   ;;   '
-;;   ;;   (
-;;   ;;     (:pylsp
-;;   ;;       .
-;;   ;;       (:configurationSources
-;;   ;;         ["setup.cfg"]
-;;   ;;         :plugins
-;;   ;;         (:jedi_completion
-;;   ;;           (:include_params t :fuzzy t)
-;;   ;;           :pycodestyle (:enabled :json-false)
-;;   ;;           :mccabe (:enabled :json-false)
-;;   ;;           :pyflakes (:enabled :json-false)
-;;   ;;           :flake8 (:enabled :json-false :maxLineLength 100)
-;;   ;;           :black (:enabled :json-false :line_length 100 :cache_config t)
-;;   ;;           :yapf (:enabled t)
-;;   ;;           :pydocstyle (:enabled t :convention "numpy")
-;;   ;;           :autopep8 (:enabled :json-false)
-;;   ;;           :pylint (:enabled t)
-;;   ;;           :ruff (:enabled :json-false :lineLength 100)
-;;   ;;           :pylsp_isort (:enabled t)
-;;   ;;           :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false))))
-;;   ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
-
-;;   (add-to-list
-;;     'eglot-server-programs
-;;     '
-;;     ((c++-mode c++-ts-mode c-mode c-ts-mode)
-;;       .
-;;       ("clangd"
-;;         "-j=4"
-;;         "--all-scopes-completion"
-;;         "--background-index"
-;;         "--clang-tidy"
-;;         "--completion-style=detailed"
-;;         "--fallback-style=LLVM"
-;;         "--header-insertion=never"
-;;         "--header-insertion-decorators=0"
-;;         "--log=error"
-;;         ;; Unsupported option with Clangd 10: malloc-trim and enable-config
-;;         ;; "--malloc-trim" ; Release memory periodically
-;;         ;; "--enable-config"
-;;         ;; "--pch-storage=memory" ; Increases memory usage but can improve performance
-;;         "--pretty")))
-
-;;   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
-;;   (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
-
-;; (use-package eglot-booster
-;;   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
-;;   :after eglot
-;;   :demand t
-;;   :config (eglot-booster-mode))
-
-;; (use-package eglot-hierarchy
-;;   :straight (:host github :repo "dolmens/eglot-hierarchy"))
-
-;; ;; FIXME: Disable documentSymbol because otherwise imenu does not work
-;; (use-package eglot-grammarly
-;;   :straight (:host github :repo "emacs-grammarly/eglot-grammarly")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   ((text-mode LaTeX-mode org-mode markdown-mode)
-;;     .
-;;     (lambda ()
-;;       (require 'eglot-grammarly)
-;;       (eglot-ensure)))
-;;   :custom (eglot-grammarly-active-modes '(text-mode LaTeX-mode org-mode markdown-mode))
-;;   ;; :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-grammarly-active-modes . ,(eglot-grammarly--server-command))
-;;   ;;   'append)
-;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;; (add-to-list eglot-workspace-configuration
-;;   ;;              ((@emacs-grammarly/grammarly-languageserver
-;;   ;;                ((audience "knowledgeable")))))
-;;   )
-
-;; ;; FIXME: Fix issue with LTEX 16.0.0
-;; (use-package eglot-ltex
-;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :init
-;;   (setq eglot-languagetool-server-path
-;;     (expand-file-name "software/ltex-ls-16.0.0" sb/user-home-directory))
-;;   :hook
-;;   ((text-mode LaTeX-mode org-mode markdown-mode)
-;;     .
-;;     (lambda ()
-;;       (require 'eglot-ltex)
-;;       (eglot-ensure)))
-;;   :custom (eglot-languagetool-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-;;   ;; :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-;;   ;;   'append)
-;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-;;   )
-
-;; (use-package eglot-java
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   (java-mode
-;;     .
-;;     (lambda ()
-;;       (eglot-ensure)
-;;       (eglot-java-mode))))
-
-;; (use-package which-func
-;;   :custom
-;;   (which-func-modes
-;;     '
-;;     (c-mode
-;;       c-ts-mode
-;;       c++-mode
-;;       c++-ts-mode
-;;       python-mode
-;;       python-ts-mode
-;;       sh-mode
-;;       bash-ts-mode
-;;       java-mode
-;;       java-ts-mode)))
+  (add-to-list 'lsp-latex-build-args "-pvc"))
 
 (use-package subword
   :straight (:type built-in)
   :hook (prog-mode . subword-mode)
   :diminish)
-
-;; ;; Hide top-level code blocks. Enable code folding, which is useful for browsing large files. This
-;; ;; module is part of Emacs, and is better maintained than other alternatives like `origami'.
-
-;; ;; (use-package hideshow
-;; ;;   :straight (:type built-in)
-;; ;;   :commands (hs-hide-all hs-hide-initial-comment-block hs-show-all hs-show-block)
-;; ;;   :hook
-;; ;;   ;; Hideshow is not defined for `ini-mode'.
-;; ;;   ((python-mode c-mode c++-mode emacs-lisp-mode java-mode sh-mode)
-;; ;;     .
-;; ;;     hs-minor-mode)
-;; ;;   :custom (hs-isearch-open t "Open all folds while searching")
-;; ;;   :diminish hs-minor-mode)
 
 ;; Highlight symbol under point
 (use-package symbol-overlay
@@ -4133,21 +3381,8 @@ targets."
         ;; c-electric-indent nil
         c-enable-auto-newline nil
         c-syntactic-indentation nil)
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
-  :bind (:map c-mode-base-map ("C-c C-d"))
-  ;; :config
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection "clangd")
-  ;;       :major-modes '(c-mode c++-mode)
-  ;;       :remote? t
-  ;;       :server-id 'clangd-r)))
-  )
+      (lsp-deferred)))
+  :bind (:map c-mode-base-map ("C-c C-d")))
 
 (use-package c-ts-mode
   :straight (:type built-in)
@@ -4166,11 +3401,7 @@ targets."
         ;; c-electric-indent nil
         c-enable-auto-newline nil
         c-syntactic-indentation nil)
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
+      (lsp-deferred)))
   :bind (:map c-ts-mode-map ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun)))
 
 (use-package c-ts-mode
@@ -4190,11 +3421,7 @@ targets."
         ;; c-electric-indent nil
         c-enable-auto-newline nil
         c-syntactic-indentation nil)
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
+      (lsp-deferred)))
   :bind
   (:map
     c-ts-mode-map
@@ -4222,36 +3449,11 @@ targets."
   ((cmake-mode cmake-ts-mode)
     .
     (lambda ()
-      ;; (when (fboundp 'spell-fu-mode)
-      ;;   (spell-fu-mode -1))
       (when (fboundp 'flyspell-mode)
         (flyspell-mode -1))
       (when (fboundp 'jinx-mode)
         (jinx-mode -1))
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (progn
-            ;; Disable text checkers
-            ;; (make-local-variable 'lsp-disabled-clients)
-            ;; (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-            (lsp-deferred))))))
-  ;; :config
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection "cmake-language-server")
-  ;;       :major-modes '(cmake-mode)
-  ;;       :remote? t
-  ;;       :server-id 'cmakels-r)))
-  )
-
-;; ;; (use-package cmake-font-lock ; Advanced syntax coloring support for CMake scripts
-;; ;;   :hook (cmake-mode . cmake-font-lock-activate))
-
-;; ;; (use-package rmsbolt
-;; ;;   :commands rmsbolt-mode)
+      (lsp-deferred))))
 
 (use-package python
   :straight (:type built-in)
@@ -4259,15 +3461,7 @@ targets."
   (("SCon\(struct\|script\)$" . python-ts-mode)
     ("[./]flake8\\'" . conf-mode)
     ("/Pipfile\\'" . conf-mode))
-  :hook
-  ((python-mode python-ts-mode)
-    .
-    (lambda ()
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
+  :hook ((python-mode python-ts-mode) . lsp-deferred)
   :bind
   ;; Assigning a keybinding such as "C-[" is involved, "[" is treated as `meta'
   ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
@@ -4306,102 +3500,23 @@ targets."
     (list (lambda () (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python")))))
   (pyvenv-post-deactivate-hooks (list (lambda () (setq python-shell-interpreter "python3")))))
 
-;; (use-package python-isort
-;;   :straight (:host github :repo "wyuenho/emacs-python-isort")
-;;   :when (and (executable-find "isort") (eq sb/python-langserver 'pyright))
-;;   :hook ((python-mode python-ts-mode) . python-isort-on-save-mode)
-;;   :custom
-;;   (python-isort-arguments
-;;     '
-;;     ("--stdout" "--atomic" "-l 100"
-;;       "--up" ; Use parentheses
-;;       "--tc" ; Use a trailing comma on multiline imports
-;;       "-")))
-
-;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with `pyright' since it does not
-;; support document formatting. So, we have to use yapf with pyright. Yapfify works on the original
-;; file, so that any project settings supported by YAPF itself are used.
-
-;; (use-package yapfify
-;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'pyright))
-;;   :hook ((python-mode python-ts-mode) . yapf-mode)
-;;   :diminish yapf-mode)
-
 (use-package cperl-mode
   :mode "latexmkrc\\'"
-  :hook
-  (cperl-mode
-    .
-    (lambda ()
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
+  :hook (cperl-mode . lsp-deferred)
   :config
   ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode)
-
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection
-  ;;       (lsp-tramp-connection
-  ;;         (lambda ()
-  ;;           (list
-  ;;             lsp-perl-language-server-path
-  ;;             "-MPerl::LanguageServer"
-  ;;             "-e"
-  ;;             "Perl::LanguageServer::run"
-  ;;             "--"
-  ;;             (format "--port %d --version %s"
-  ;;               lsp-perl-language-server-port
-  ;;               lsp-perl-language-server-client-version))))
-  ;;       :major-modes '(perl-mode cperl-mode)
-  ;;       :remote? t
-  ;;       :initialized-fn
-  ;;       (lambda (workspace)
-  ;;         (with-lsp-workspace
-  ;;           workspace
-  ;;           (lsp--set-configuration (lsp-configuration-section "perl"))))
-  ;;       :priority -1
-  ;;       :server-id 'perlls-r)))
-  )
-
-;; ;; (use-package ant
-;; ;;   :after java-mode
-;; ;;   :commands (ant ant-clean ant-compile ant-test))
-
-;; ;; (use-package autodisass-java-bytecode ; Can disassemble ".class" files from within jars
-;; ;;   :mode "\\.class\\'")
+  (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
   :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
-  :hook
-  ((sh-mode bash-ts-mode)
-    .
-    (lambda ()
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
+  :hook ((sh-mode bash-ts-mode) . lsp-deferred)
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
   (sh-indentation 2)
   (sh-indent-after-continuation 'always)
-  (sh-indent-comment t "Indent comments as a regular line")
-  ;; :config
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection '("bash-language-server" "start"))
-  ;;       :major-modes '(sh-mode)
-  ;;       :remote? t
-  ;;       :server-id 'bashls-r)))
-  )
+  (sh-indent-comment t "Indent comments as a regular line"))
 
 (use-package fish-mode
   :mode "\\.fish\\'"
@@ -4456,29 +3571,13 @@ targets."
     .
     (lambda ()
       ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
-      ;; (when (fboundp 'spell-fu-mode)
-      ;;   (spell-fu-mode -1))
       (when (fboundp 'flyspell-mode)
         (flyspell-mode -1))
       (when (fboundp 'jinx-mode)
         (jinx-mode -1))
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (progn
-            (make-local-variable 'lsp-disabled-clients)
-            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-            (lsp-deferred))))))
-  ;; :config
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection '("yaml-language-server" "--stdio"))
-  ;;       :major-modes '(yaml-mode)
-  ;;       :remote? t
-  ;;       :server-id 'yamlls-r)))
-  )
+      (make-local-variable 'lsp-disabled-clients)
+      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+      (lsp-deferred))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
@@ -4494,14 +3593,6 @@ targets."
 ;;         ((eq sb/lsp-provider 'lsp-mode)
 ;;           (lsp-deferred)))))
 ;;   :custom (css-indent-offset 2)
-;;   ;; :config
-;;   ;; (with-eval-after-load "lsp-mode"
-;;   ;;   (lsp-register-client
-;;   ;;     (make-lsp-client
-;;   ;;       :new-connection (lsp-tramp-connection '("css-languageserver" "--stdio"))
-;;   ;;       :major-modes '(css-mode)
-;;   ;;       :remote? t
-;;   ;;       :server-id 'cssls-r)))
 ;;   )
 
 (use-package make-mode
@@ -4512,9 +3603,6 @@ targets."
     ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
     ("makefile\\.rules\\'" . makefile-mode))
   :hook ((makefile-mode make-ts-mode) . (lambda () (setq-local indent-tabs-mode t))))
-
-;; ;; (use-package makefile-executor
-;; ;;   :hook ((makefile-mode make-ts-mode) . makefile-executor-mode))
 
 ;; ;; Align fields with "C-c C-a"
 ;; ;; (use-package csv-mode
@@ -4553,19 +3641,6 @@ targets."
         c-enable-auto-newline nil
         c-syntactic-indentation nil))))
 
-;; ;; (use-package llvm-mode
-;; ;;   ;; :straight (llvm-mode :type git :host github
-;; ;;   ;;                      :repo "llvm/llvm-project"
-;; ;;   ;;                      :files "llvm/utils/emacs/llvm-mode.el")
-;; ;;   :straight nil
-;; ;;   :load-path "extras"
-;; ;;   :commands (llvm-mode)
-;; ;;   :mode "\\.ll\\'")
-
-;; ;; (use-package autodisass-llvm-bitcode
-;; ;;   :commands (autodisass-llvm-bitcode)
-;; ;;   :mode "\\.bc\\'")
-
 ;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
   ;; :init
@@ -4591,60 +3666,12 @@ targets."
   ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-hide-urls t))
 
-;; (use-package markdown-toc
-;;   :commands (markdown-toc-refresh-toc markdown-toc-generate-toc markdown-toc-generate-or-refresh-toc))
-
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
 ;; -f markdown -t org -o output-file.org input-file.md"
 (use-package pandoc-mode
   :hook (markdown-mode . pandoc-mode)
   :config (pandoc-load-default-settings)
   :diminish)
-
-;; (use-package markdown-preview-mode ; Open preview of markdown file in a browser
-;;   :commands markdown-preview-mode)
-
-;; (use-package bat-mode
-;;   :straight (:type built-in)
-;;   :mode
-;;   (("\\.bat\\'" . bat-mode)
-;;    ("\\.cmd\\'" . bat-mode)))
-
-;; ;; (use-package web-mode
-;; ;;   :disabled
-;; ;;   :mode "\\.html?\\'"
-;; ;;   :hook
-;; ;;   (web-mode
-;; ;;     .
-;; ;;     (lambda ()
-;; ;;       (cond
-;; ;;         ((eq sb/lsp-provider 'eglot)
-;; ;;           (eglot-ensure))
-;; ;;         ((eq sb/lsp-provider 'lsp-mode)
-;; ;;           (lsp-deferred)))))
-;; ;;   :bind ("C-c C-d")
-;; ;;   :custom
-;; ;;   (web-mode-enable-auto-closing t)
-;; ;;   (web-mode-enable-auto-pairing nil)
-;; ;;   (web-mode-enable-auto-quoting t)
-;; ;;   (web-mode-enable-block-face t)
-;; ;;   (web-mode-enable-css-colorization t)
-;; ;;   (web-mode-enable-current-element-highlight t "Highlight the element under the cursor")
-;; ;;   (web-mode-enable-current-column-highlight t)
-;; ;;   (web-mode-markup-indent-offset 2) ; HTML
-;; ;;   (web-mode-css-indent-offset 2) ; CSS
-;; ;;   (web-mode-code-indent-offset 2) ; Script
-;; ;;   (web-mode-style-padding 2) ; For <style> tag
-;; ;;   (web-mode-script-padding 2) ; For <script> tag
-;; ;;   ;; :config
-;; ;;   ;; (with-eval-after-load "lsp-mode"
-;; ;;   ;;   (lsp-register-client
-;; ;;   ;;     (make-lsp-client
-;; ;;   ;;       :new-connection (lsp-tramp-connection '("html-languageserver" "--stdio"))
-;; ;;   ;;       :major-modes '(html-mode web-mode mhtml-mode)
-;; ;;   ;;       :remote? t
-;; ;;   ;;       :server-id 'htmlls-r)))
-;; ;;   )
 
 ;; ;; (use-package emmet-mode
 ;; ;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
@@ -4658,34 +3685,18 @@ targets."
     .
     (lambda ()
       ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
-      ;; (when (fboundp 'spell-fu-mode)
-      ;;   (spell-fu-mode -1))
       (when (fboundp 'flyspell-mode)
         (flyspell-mode -1))
       (when (fboundp 'jinx-mode)
         (jinx-mode -1))
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (progn
-            (make-local-variable 'lsp-disabled-clients)
-            (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-            (lsp-deferred))))))
+      (make-local-variable 'lsp-disabled-clients)
+      (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+      (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
   (nxml-sexp-element-flag t)
-  :config (fset 'xml-mode 'nxml-mode)
-
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection '("java" "-jar" lsp-xml-jar-file))
-  ;;       :major-modes '(xml-mode nxml-mode)
-  ;;       :remote? t
-  ;;       :server-id 'xmlls-r)))
-  )
+  :config (fset 'xml-mode 'nxml-mode))
 
 (use-package json-mode
   :mode
@@ -4700,51 +3711,7 @@ targets."
     (lambda ()
       (make-local-variable 'js-indent-level)
       (setq js-indent-level 2)
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (eglot-ensure))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (lsp-deferred)))))
-  ;; :config
-  ;; (with-eval-after-load "lsp-mode"
-  ;;   (lsp-register-client
-  ;;     (make-lsp-client
-  ;;       :new-connection (lsp-tramp-connection '("vscode-json-languageserver" "--stdio"))
-  ;;       :major-modes '(json-mode jsonc-mode)
-  ;;       :remote? t
-  ;;       :server-id 'jsonls-r)))
-  )
-
-;; ;; (use-package json-reformat
-;; ;;   :after (:any json-mode jsonc-mode json-ts-mode)
-;; ;;   :demand t
-;; ;;   :custom
-;; ;;   (json-reformat:indent-width 2)
-;; ;;   (js-indent-level 2))
-
-;; ;; (use-package bazel
-;; ;;   :when (executable-find "bazel")
-;; ;;   :commands (bazel-mode bazelrc-mode bazel-buildifier)
-;; ;;   :hook
-;; ;;   ((bazel-mode . (lambda ()
-;; ;;                         (add-hook 'before-save-hook #'bazel-buildifier nil t)))
-;; ;;    (bazel-mode . flycheck-mode)))
-
-;; ;; (use-package protobuf-mode
-;; ;;   :commands (protobuf-mode)
-;; ;;   :mode "\\.proto$"
-;; ;;   :hook (protobuf-mode . flycheck-mode))
-
-;; ;; (use-package mlir-mode
-;; ;;   :straight nil
-;; ;;   :load-path "extras"
-;; ;;   :mode "\\.mlir\\'")
-
-;; ;; (use-package dotenv-mode
-;; ;;   :mode "\\.env\\'")
-
-;; ;; (use-package apt-sources-list
-;; ;;   :commands apt-sources-list-mode)
+      (lsp-deferred))))
 
 ;; ;; (use-package ssh-config-mode
 ;; ;;   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
@@ -4902,17 +3869,8 @@ targets."
     (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
     ;; Enable rainbow mode after applying styles to the buffer
     (TeX-update-style . rainbow-delimiters-mode)
-    ;; Jump between editor and pdf viewer
-    ;; (LaTeX-mode . TeX-source-correlate-mode)
     ;; (LaTeX-mode . turn-on-auto-fill)
-    (LaTeX-mode
-      .
-      (lambda ()
-        (cond
-          ((eq sb/lsp-provider 'eglot)
-            (eglot-ensure))
-          ((eq sb/lsp-provider 'lsp-mode)
-            (lsp-deferred))))))
+    (LaTeX-mode . lsp-deferred))
   :bind
   (:map
     TeX-mode-map
@@ -5301,37 +4259,6 @@ used in `company-backends'."
     (citre-backend-to-company-backend tags))
   :diminish)
 
-;; ;; (use-package window-stool
-;; ;;   :straight (:host github :repo "jaszhe/window-stool")
-;; ;;   :hook (prog-mode . window-stool-mode))
-
-;; ;; (use-package treesitter-context
-;; ;;   :straight (:host github :repo "zbelial/treesitter-context.el")
-;; ;;   :after treesit
-;; ;;   :init
-;; ;;   (use-package posframe-plus
-;; ;;     :straight (:host github :repo "zbelial/posframe-plus"))
-;; ;;   :hook
-;; ;;   (
-;; ;;     (c-ts-mode
-;; ;;       c++-ts-mode
-;; ;;       python-ts-mode
-;; ;;       java-ts-mode
-;; ;;       json-ts-mode
-;; ;;       yaml-ts-mode)
-;; ;;     . treesitter-context-mode)
-;; ;;   :diminish)
-
-;; ;; (use-package symbols-outline
-;; ;;   :bind ("C-c i" . symbols-outline-show)
-;; ;;   :custom (symbols-outline-window-position 'right)
-;; ;;   :config
-;; ;;   ;; By default the ctags backend is selected
-;; ;;   (unless (executable-find "ctags")
-;; ;;     ;; Use lsp-mode or eglot as backend
-;; ;;     (setq symbols-outline-fetch-fn #'symbols-outline-lsp-fetch))
-;; ;;   (symbols-outline-follow-mode 1))
-
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb")
   :hook
@@ -5366,61 +4293,6 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
-;; (defun sb/toggle-line-spacing ()
-;;   "Toggle line spacing.  Increase the line spacing to help readability.
-;; Increase line spacing by two line height."
-;;   (interactive)
-;;   (if (eq line-spacing nil)
-;;     (setq line-spacing 2)
-;;     (setq line-spacing nil))
-;;   (redraw-frame (selected-frame)))
-
-;; (defun sb/byte-compile-current-file ()
-;;   "Byte compile the current file."
-;;   (interactive)
-;;   (byte-compile-file buffer-file-name))
-
-;; (defun sb/byte-compile-init-dir ()
-;;   "Byte-compile all elisp files in the user init directory."
-;;   (interactive)
-;;   (byte-recompile-directory user-emacs-directory 0))
-
-;; (defun sb/switch-to-minibuffer ()
-;;   "Switch to minibuffer window."
-;;   (interactive)
-;;   (if (active-minibuffer-window)
-;;     (select-window (active-minibuffer-window))
-;;     (error "Minibuffer is not active")))
-
-;; (defun sb/switch-to-scratch ()
-;;   "Switch to the *scratch* buffer."
-;;   (interactive)
-;;   (switch-to-buffer "*scratch*"))
-
-;; (defun sb/insert-date (arg)
-;;   "Insert today's date.  With prefix argument ARG, use a different format."
-;;   (interactive "P")
-;;   (insert
-;;     (if arg
-;;       (format-time-string "%d.%m.%Y")
-;;       (format-time-string "%\"Mmmm\" %d, %Y"))))
-
-;; (defun sb/move-file (new-location)
-;;   "Write this file to NEW-LOCATION, and delete the old one."
-;;   (interactive
-;;     (list
-;;       (if buffer-file-name
-;;         (read-file-name "Move file to: ")
-;;         (read-file-name "Move file to: "
-;;           default-directory
-;;           (expand-file-name (file-name-nondirectory (buffer-name)) default-directory)))))
-;;   (when (file-exists-p new-location)
-;;     (delete-file new-location))
-;;   (let ((old-location (buffer-file-name)))
-;;     (write-file new-location t)
-;;     (when
-;;       (and old-location (file-exists-p new-location) (not (string-equal old-location new-location)))
-;;       (delete-file old-location))))
 
 (defcustom sb/skippable-buffers
   '
@@ -5615,100 +4487,10 @@ or the major mode is not in `sb/skippable-modes'."
 
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
-;; ;; (use-package beacon ; Highlight the cursor position after the window scrolls
-;; ;;   :hook (emacs-startup . beacon-mode)
-;; ;;   :diminish)
-
-;; ;; The color sometimes makes it difficult to distinguish text on terminals.
-;; ;; (use-package hl-line
-;; ;;   :hook (emacs-startup . global-hl-line-mode))
-
 ;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
 ;; numbers only for GUI and daemon.
 ;; (when (or (display-graphic-p) (daemonp))
 ;;   (global-display-line-numbers-mode 1))
-
-;; ;; (use-package centaur-tabs
-;; ;;   :when (eq sb/tab-bar-handler 'centaur-tabs)
-;; ;;   :hook (emacs-startup . centaur-tabs-mode)
-;; ;;   :bind*
-;; ;;   (("M-<right>" . centaur-tabs-forward-tab)
-;; ;;     ("M-<left>" . centaur-tabs-backward-tab)
-;; ;;     ("M-\"" . centaur-tabs-ace-jump))
-;; ;;   :custom
-;; ;;   (centaur-tabs-set-modified-marker t)
-;; ;;   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-;; ;;   (centaur-tabs-set-close-button nil "I do not use the mouse")
-;; ;;   (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
-;; ;;   (centaur-tabs-enable-ido-completion nil)
-;; ;;   ;; Other styles like "wave" are not rendered on the terminal, and also does not work well with
-;; ;;   ;; many themes
-;; ;;   (centaur-tabs-style "bar")
-;; ;;   (centaur-tabs-set-bar 'under)
-;; ;;   (centaur-tabs-height 18)
-;; ;;   (centaur-tabs-set-icons t)
-;; ;;   (centaur-tabs-icon-type 'nerd-icons)
-;; ;;   (centaur-tabs-gray-out-icons t "Gray out icons for inactive tabs")
-;; ;;   (centaur-tabs-show-count t "Helpful to identify tab overflows")
-;; ;;   :config
-;; ;;   ;; Unlike `awesome-tab', the icons do not blend well with all themes.
-
-;; ;;   ;; (let ((themes '("doom-one"
-;; ;;   ;;                 "doom-nord"
-;; ;;   ;;                 "doom-molokai")))
-;; ;;   ;;   (progn
-;; ;;   ;;     (if (-contains? themes (symbol-name sb/theme))
-;; ;;   ;;         (setq centaur-tabs-set-icons t)
-;; ;;   ;;       (setq centaur-tabs-set-icons nil))))
-
-;; ;;   ;; (centaur-tabs-headline-match)
-
-;; ;;   ;; Group tabs according to projectile's definition of projects
-;; ;;   (with-eval-after-load "projectile"
-;; ;;     (centaur-tabs-group-by-projectile-project)))
-
-;; ;; (use-package awesome-tab
-;; ;;   :preface
-;; ;;   (defun sb/awesome-tab-buffer-groups ()
-;; ;;     "`awesome-tab-buffer-groups' control buffers' group rules.
-;; ;;   Group awesome-tab with mode if buffer is derived from
-;; ;;   `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode'
-;; ;;   `magit-mode'. All buffer name start with * will group to
-;; ;;   \"Emacs\". Other buffer group by `awesome-tab-get-group-name'
-;; ;;   with project name."
-;; ;;     (list
-;; ;;       (cond
-;; ;;         (
-;; ;;           (or (string-equal "*" (substring (buffer-name) 0 1))
-;; ;;             (memq
-;; ;;               major-mode
-;; ;;               '
-;; ;;               (magit-process-mode
-;; ;;                 magit-status-mode
-;; ;;                 magit-diff-mode
-;; ;;                 magit-log-mode
-;; ;;                 magit-file-mode
-;; ;;                 magit-blob-mode
-;; ;;                 magit-blame-mode)))
-;; ;;           "Emacs")
-;; ;;         (t
-;; ;;           (awesome-tab-get-group-name (current-buffer))))))
-;; ;;   :straight (:host github :repo "manateelazycat/awesome-tab")
-;; ;;   :when (eq sb/tab-bar-handler 'awesome-tab)
-;; ;;   :hook (emacs-startup . awesome-tab-mode)
-;; ;;   :bind
-;; ;;   (("M-<right>" . awesome-tab-forward-tab)
-;; ;;     ("M-<left>" . awesome-tab-backward-tab)
-;; ;;     ("M-]" . awesome-tab-ace-jump))
-;; ;;   :custom-face
-;; ;;   (awesome-tab-selected-face ((t (:inherit default :height 1.0))))
-;; ;;   (awesome-tab-unselected-face ((t (:inherit default :height 0.8))))
-;; ;;   :custom
-;; ;;   (awesome-tab-label-fixed-length 14)
-;; ;;   (awesome-tab-cycle-scope 'tabs)
-;; ;;   :config
-;; ;;   ;; The variable is declared with a `defvar', so modifying it with `:custom' will not work.
-;; ;;   (setq awesome-tab-buffer-groups-function #'sb/awesome-tab-buffer-groups))
 
 (use-package doom-themes
   :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
@@ -5763,26 +4545,6 @@ or the major mode is not in `sb/skippable-modes'."
 ;; ;; (use-package circadian
 ;; ;;   :hook (emacs-startup . circadian-setup)
 ;; ;;   :custom (circadian-themes '((:sunrise . modus-vivendi) (:sunset . modus-vivendi))))
-
-;; ;; (use-package ef-themes
-;; ;;   :straight (:host github :repo "protesilaos/ef-themes")
-;; ;;   :when (or (eq sb/theme 'ef-trio-dark) (eq sb/theme 'ef-bio))
-;; ;;   :init
-;; ;;   (cond
-;; ;;     ((eq sb/theme 'ef-trio-dark)
-;; ;;       (load-theme 'ef-trio-dark t))
-;; ;;     ((eq sb/theme 'ef-bio)
-;; ;;       (load-theme 'ef-bio t))))
-
-;; ;; (use-package standard-themes
-;; ;;   :straight (:host github :repo "protesilaos/standard-themes")
-;; ;;   :if (or (eq sb/theme 'standard-light) (eq sb/theme 'standard-dark))
-;; ;;   :init
-;; ;;   (cond
-;; ;;     ((eq sb/theme 'standard-light)
-;; ;;       (load-theme 'standard-light t))
-;; ;;     ((eq sb/theme 'standard-dark)
-;; ;;       (load-theme 'standard-dark t))))
 
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
@@ -5948,22 +4710,11 @@ PAD can be left (`l') or right (`r')."
       (progn
         (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
 
-;; ;; (use-package disable-mouse
-;; ;;   :hook (emacs-startup . disable-mouse-global-mode)
-;; ;;   :diminish disable-mouse-global-mode)
-
 (use-package olivetti
   :hook
   ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
   :custom (olivetti-body-width 108)
   :diminish)
-
-;; ;; (use-package selected-window-accent-mode
-;; ;;   :hook (emacs-startup . selected-window-accent-mode)
-;; ;;   :custom
-;; ;;   (selected-window-accent-fringe-thickness 10)
-;; ;;   (selected-window-accent-custom-color nil)
-;; ;;   (selected-window-accent-mode-style 'subtle))
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
 ;; "C-<up>". Standalone special keys (and some combinations) can be written in square brackets, e.g.
@@ -6018,15 +4769,14 @@ PAD can be left (`l') or right (`r')."
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
 
-(unless sb/tab-bar-handler
-  (global-set-key [remap next-buffer] #'sb/next-buffer)
-  (global-set-key [remap previous-buffer] #'sb/previous-buffer)
+(global-set-key [remap next-buffer] #'sb/next-buffer)
+(global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
-  (bind-keys
-    ("M-<left>" . sb/previous-buffer)
-    ("C-S-<iso-lefttab>" . sb/previous-buffer)
-    ("M-<right>" . sb/next-buffer)
-    ("C-<tab>" . sb/next-buffer)))
+(bind-keys
+  ("M-<left>" . sb/previous-buffer)
+  ("C-S-<iso-lefttab>" . sb/previous-buffer)
+  ("M-<right>" . sb/next-buffer)
+  ("C-<tab>" . sb/next-buffer))
 
 ;; (use-package default-text-scale
 ;;   :when (display-graphic-p)
@@ -6065,26 +4815,15 @@ PAD can be left (`l') or right (`r')."
     ((fboundp 'pixel-scroll-mode)
       (pixel-scroll-mode 1))))
 
-;; ;; (use-package server
-;; ;;   :straight (:type built-in)
-;; ;;   :unless (string-equal "root" (getenv "USER")) ; Only start server if not root
-;; ;;   :hook
-;; ;;   (emacs-startup . (lambda ()
-;; ;;                          (unless (and (fboundp 'server-running-p) (server-running-p))
-;; ;;                            (server-start)))))
-;; ;;   :config
-;; ;;   ;; Hide "When done with a buffer, type C-x 5" message
-;; ;;   (when (boundp 'server-client-instructions)
-;; ;;     (setq server-client-instructions nil)))
+;; Hide "When done with a buffer, type C-x 5" message
+(when (boundp 'server-client-instructions)
+  (setq server-client-instructions nil))
 
-;; ;; (when (eq sb/op-mode 'server)
-;; ;;   ;; Start server if not root user
-;; ;;   (unless (string-equal "root" (getenv "USER"))
-;; ;;     (when (and (fboundp 'server-running-p) (not (server-running-p)))
-;; ;;       (server-mode))))
-
-;; ;; (when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
-;; ;;   (setq server-client-instructions nil))
+(when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
+  ;; Start server if not root user
+  (unless (string-equal "root" (getenv "USER"))
+    (when (and (fboundp 'server-running-p) (not (server-running-p)))
+      (server-start))))
 
 (setq custom-file sb/custom-file)
 
@@ -6096,24 +4835,6 @@ PAD can be left (`l') or right (`r')."
 ;; Mark safe variables
 
 (put 'compilation-read-command 'safe-local-variable #'stringp)
-
-;; (put 'bibtex-completion-bibliography          'safe-local-variable #'listp)
-;; (put 'company-bibtex-bibliography             'safe-local-variable #'listp)
-;; (put 'company-clang-arguments                 'safe-local-variable #'listp)
-;; (put 'counsel-find-file-ignore-regexp         'safe-local-variable #'stringp)
-;; (put 'flycheck-checker                        'safe-local-variable #'listp)
-;; (put 'flycheck-clang-include-path             'safe-local-variable #'listp)
-;; (put 'flycheck-gcc-include-path               'safe-local-variable #'listp)
-;; (put 'flycheck-python-pylint-executable       'safe-local-variable #'stringp)
-;; (put 'lsp-clients-clangd-args                 'safe-local-variable #'listp)
-;; (put 'lsp-latex-root-directory                'safe-local-variable #'stringp)
-;; (put 'lsp-pyright-extra-paths                 'safe-local-variable #'listp)
-;; (put 'projectile-enable-caching               'safe-local-variable #'stringp)
-;; (put 'projectile-globally-ignored-directories 'safe-local-variable #'listp)
-;; (put 'projectile-project-root                 'safe-local-variable #'stringp)
-;; (put 'pyvenv-activate                         'safe-local-variable #'stringp)
-;; (put 'reftex-default-bibliography             'safe-local-variable #'listp)
-;; (put 'tags-table-list                         'safe-local-variable #'listp)
 
 ;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook

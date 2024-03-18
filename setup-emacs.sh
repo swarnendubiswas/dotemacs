@@ -424,7 +424,7 @@ install_tmux() {
 }
 
 install_delta() {
-    DELTA_VER="0.16.5"
+    DELTA_VER="0.17.0"
     # Latest releases do not work with Ubuntu 18/20
     if [[ "${DIST_VERSION}" == Ubuntu_20.04 ]]; then
         DELTA_VER="0.14.0"
