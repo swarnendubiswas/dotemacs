@@ -35,13 +35,6 @@
   :type 'boolean
   :group 'sb/emacs)
 
-;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub.
-(defcustom sb/disable-package.el t
-  "Disable package.el.
-Prefer the straight.el package manager instead."
-  :type 'boolean
-  :group 'sb/emacs)
-
 ;; A dark theme has better contrast and looks good with the TUI.
 (defcustom sb/theme 'modus-operandi
   "Specify which Emacs theme to use, unless we are using `circadian'."
@@ -52,8 +45,6 @@ Prefer the straight.el package manager instead."
     (const :tag "doom-nord" doom-nord)
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "leuven" leuven)
-    (const :tag "leuven-dark" leuven-dark)
     (const :tag "nano-dark" nano-dark)
     (const :tag "nordic-night" nordic-night)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
@@ -129,31 +120,6 @@ This location is used for temporary installations and files.")
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Icons look good and help to distinguish completion categories.
-(defcustom sb/corfu-icons 'none
-  "Choose the provider for Corfu icons."
-  :type
-  '
-  (radio
-    (const :tag "kind-icon" kind-icon)
-    (const :tag "kind-all-the-icons" kind-all-the-icons)
-    (const :tag "nerd-icons" nerd-icons)
-    (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; `all-the-icons' only supports GUI, while `nerd-icons' supports both GUI and TUI. We keep icons
-;; disabled for better performance and because using icons sometimes lead to visual misalignment in
-;; lists.
-(defcustom sb/icons-provider 'none
-  "Choose the provider for icons."
-  :type
-  '
-  (radio
-    (const :tag "all-the-icons" all-the-icons)
-    (const :tag "nerd-icons" nerd-icons)
-    (const :tag "none" none))
-  :group 'sb/emacs)
-
 ;; Helper const variables
 
 (defconst sb/EMACS27 (= emacs-major-version 27)
@@ -177,39 +143,39 @@ This location is used for temporary installations and files.")
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
 
-;; Bootstrap `straight.el'
-(when (bound-and-true-p sb/disable-package.el)
-  (setq
-    straight-build-dir
-    (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
-    ;; Do not check packages on startup to reduce load time
-    straight-check-for-modifications '(check-on-save find-when-checking)
-    straight-use-package-by-default t
-    ;; There is no need to download the whole Git history, and a single branch often suffices.
-    straight-vc-git-default-clone-depth '(1 single-branch))
+;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub. Bootstrap
+;; `straight.el'.
+(setq
+  straight-build-dir
+  (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
+  ;; Do not check packages on startup to reduce load time
+  straight-check-for-modifications '(check-on-save find-when-checking)
+  straight-use-package-by-default t
+  ;; There is no need to download the whole Git history, and a single branch often suffices.
+  straight-vc-git-default-clone-depth '(1 single-branch))
 
-  (let
-    (
-      (bootstrap-file
-        (expand-file-name "straight/repos/straight.el/bootstrap.el"
-          (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
-      (bootstrap-version 7))
-    (unless (file-exists-p bootstrap-file)
-      (with-current-buffer
-        (url-retrieve-synchronously
-          "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-          'silent
-          'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage))
+(let
+  (
+    (bootstrap-file
+      (expand-file-name "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
+    (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+      (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+        'silent
+        'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-  ;; These variables need to be set before loading `use-package'.
-  (setq use-package-enable-imenu-support t)
-  (straight-use-package
-    '
-    (use-package :source
-      melpa)))
+;; These variables need to be set before loading `use-package'.
+(setq use-package-enable-imenu-support t)
+(straight-use-package
+  '
+  (use-package :source
+    melpa))
 
 (cond
   ((eq sb/op-mode 'daemon)
@@ -615,11 +581,9 @@ This location is used for temporary installations and files.")
     (exclude
       `
       (,(recentf-expand-file-name no-littering-etc-directory)
-        ,(recentf-expand-file-name no-littering-var-directory)))
+        ,(recentf-expand-file-name no-littering-var-directory)
+        ,(recentf-expand-file-name (straight--emacs-dir "straight"))))
     (add-to-list 'recentf-exclude exclude))
-
-  (when (bound-and-true-p sb/disable-package.el)
-    (add-to-list 'recentf-exclude `,(recentf-expand-file-name (straight--emacs-dir "straight"))))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
   ;; after idling for a few seconds.
@@ -652,10 +616,11 @@ This location is used for temporary installations and files.")
 
 ;; I use the "Shift+direction" keybindings for moving around windows in tmux which is okay because I
 ;; do not split Emacs frames often.
-;; (use-package windmove ; "Shift + direction" arrows
-;;   :straight (:type built-in)
-;;   :init (windmove-default-keybindings)
-;;   :custom (windmove-wrap-around t "Wrap around at edges"))
+(use-package windmove ; "Shift + direction" arrows
+  :straight (:type built-in)
+  :when (display-graphic-p)
+  :init (windmove-default-keybindings)
+  :custom (windmove-wrap-around t "Wrap around at edges"))
 
 ;; (use-package solar
 ;;   :straight (:type built-in)
@@ -663,13 +628,6 @@ This location is used for temporary installations and files.")
 ;;   (calendar-latitude 26.50)
 ;;   (calendar-location-name "Kanpur, UP, India")
 ;;   (calendar-longitude 80.23))
-
-;; `text-mode' is the parent mode for `LaTeX-mode' and `org-mode', and so any hooks defined
-;; will also get run for all modes derived from a basic mode such as `text-mode'.
-
-;; Enabling `autofill-mode' makes it difficult to include long instructions verbatim, since they get
-;; wrapped around automatically.
-;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
 ;; prefix argument is given. Then it will find file at point.
@@ -1113,15 +1071,9 @@ This location is used for temporary installations and files.")
     ;; Initialize search string with the highlighted region
     :initial
     (when (use-region-p)
-      (buffer-substring-no-properties (region-beginning) (region-end))))
+      (buffer-substring-no-properties (region-beginning) (region-end)))))
 
-  (with-eval-after-load "projectile"
-    (setq consult-project-function (lambda (_) (projectile-project-root)))
-    (bind-key [remap projectile-ripgrep] #'consult-ripgrep)
-    (bind-key [remap projectile-grep] #'consult-grep)))
-
-;; Provide context-dependent actions similar to a content menu. Embark is likely not required with
-;; ivy.
+;; Provide context-dependent actions similar to a content menu.
 (use-package embark
   :bind
   (([remap describe-bindings] . embark-bindings) ; "C-h b"
@@ -1262,19 +1214,6 @@ targets."
   :after consult
   :bind ("C-M-y" . consult-yasnippet))
 
-;; ;; ":after (consult projectile)" prevents binding `consult-projectile-switch-project'
-;; (use-package consult-projectile
-;;   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'projectile))
-;;   :bind
-;;   (("<f5>" . consult-projectile-switch-project)
-;;     ("<f6>" . consult-projectile)
-;;     ([remap projectile-recentf] . consult-projectile-recentf)
-;;     ([remap projectile-switch-to-buffer] . consult-projectile-switch-to-buffer)
-;;     ([remap projectile-find-file] . consult-projectile-find-file)
-;;     ([remap projectile-find-dir] . consult-projectile-find-dir)
-;;     ([remap projectile-switch-project] . consult-projectile-switch-project))
-;;   :config (consult-customize consult-projectile :preview-key nil))
-
 (use-package ispell
   :straight (:type built-in)
   :bind ("M-$" . ispell-word)
@@ -1340,13 +1279,6 @@ targets."
   ( ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
     ;; language-specific words. Furthermore, it is supposedly slow.
     (prog-mode . flyspell-prog-mode)
-    ;; `find-file-hook' will not work for buffers with no associated files. I have this commented
-    ;; because the `*scratch*' buffer is currently not using `text-mode'.
-    ;; (emacs-startup
-    ;;   .
-    ;;   (lambda ()
-    ;;     (when (string= (buffer-name) "*scratch*")
-    ;;       (flyspell-mode 1))))
     (text-mode . flyspell-mode))
   :bind (("C-c f f" . flyspell-mode) ("C-c f b" . flyspell-buffer))
   :custom
@@ -1357,17 +1289,6 @@ targets."
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
-
-;; (use-package flyspell-popup
-;;   :after flyspell
-;;   :bind
-;;   (:map flyspell-mode-map
-;;         ("C-;" . flyspell-popup-correct))
-;;   :custom (flyspell-popup-correct-delay 0.1))
-
-;; (use-package flyspell-correct
-;;   :after flyspell
-;;   :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point) ("C-," . flyspell-correct-previous)))
 
 ;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
@@ -1430,14 +1351,6 @@ targets."
 
 (use-package goto-last-change
   :bind ("C-x C-\\" . goto-last-change))
-
-;; The real beginning and end of buffers (i.e., `point-min' and `point-max') are accessible by
-;; pressing the keys "M-<" and "M->" keys again.
-;; (use-package beginend
-;;   :hook (emacs-startup . beginend-global-mode)
-;;   :config
-;;   (dolist (mode (cons 'beginend-global-mode (mapcar #'cdr beginend-modes)))
-;;     (diminish mode)))
 
 (use-package vundo
   :straight (:host github :repo "casouri/vundo")
@@ -1550,13 +1463,6 @@ targets."
 ;; ;; (use-package define-word
 ;; ;;   :commands define-word
 ;; ;;   :bind ("C-c w" . define-word-at-point))
-
-;; ;; (use-package esup
-;; ;;   :when (bound-and-true-p sb/debug-init-file)
-;; ;;   :commands (esup))
-
-;; ;; (use-package bug-hunter
-;; ;;   :commands (bug-hunter-init-file bug-hunter-file))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
@@ -2181,7 +2087,6 @@ targets."
         (apply fn args)))
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
-;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
   :hook (emacs-startup . yas-global-mode)
   :custom (yas-verbosity 0)
@@ -2636,11 +2541,6 @@ targets."
   :after corfu
   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
 
-;; (use-package corfu-quick
-;;   :straight nil
-;;   :after corfu
-;;   :bind (:map corfu-map ("C-'" . corfu-quick-insert)))
-
 (use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
   :when (eq sb/capf 'corfu)
@@ -2687,31 +2587,6 @@ targets."
   :custom
   ;; TODO: This is supposedly a bug, report to the maintainer.
   (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
-
-;; (use-package kind-icon
-;;   :when (eq sb/corfu-icons 'kind-icon)
-;;   :after corfu
-;;   :demand t
-;;   :commands kind-icon-margin-formatter
-;;   :custom (kind-icon-default-face 'corfu-default "Compute blended backgrounds correctly")
-;;   ;; Prefer smaller icons and a more compact popup
-;;   (kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
-;;   ;; (kind-icon-blend-background nil)
-;;   :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
-;; (use-package nerd-icons-corfu
-;;   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
-;;   :when (eq sb/corfu-icons 'nerd-icons)
-;;   :after corfu
-;;   :demand t
-;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
-;; (use-package kind-all-the-icons
-;;   :straight (:host github :repo "Hirozy/kind-all-the-icons")
-;;   :when (and (eq sb/corfu-icons 'kind-all-the-icons) (display-graphic-p))
-;;   :after corfu
-;;   :demand t
-;;   :config (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter))
 
 (use-package yasnippet-capf
   :after corfu
@@ -2822,39 +2697,6 @@ targets."
               #'cape-file
               #'yasnippet-capf
               (cape-capf-super #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
-              (cape-capf-super #'cape-dabbrev #'cape-dict)))))))
-
-  (with-eval-after-load "eglot"
-    (dolist
-      (mode
-        '
-        (c-mode-hook
-          c-ts-mode-hook
-          c++-mode-hook
-          c++-ts-mode-hook
-          java-mode-hook
-          java-ts-mode-hook
-          python-mode-hook
-          python-ts-mode-hook
-          sh-mode-hook
-          bash-ts-mode-hook
-          cmake-mode-hook
-          cmake-ts-mode-hook
-          json-mode-hook
-          json-ts-mode-hook
-          jsonc-mode-hook
-          yaml-mode-hook
-          yaml-ts-mode-hook))
-      (add-hook
-        mode
-        (lambda ()
-          (setq-local completion-at-point-functions
-            (list
-              #'cape-file #'yasnippet-capf
-              (cape-capf-super
-                #'eglot-completion-at-point
-                #'citre-completion-at-point
-                #'cape-keyword)
               (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
@@ -3233,86 +3075,6 @@ targets."
         (treesit-language-available-p 'yaml)))
     (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
 
-;; ;; (use-package treesit
-;; ;;   :straight (:type built-in)
-;; ;;   :when (executable-find "tree-sitter")
-;; ;;   :demand t
-;; ;;   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-;; ;;   :custom (treesit-font-lock-level 4 "Increase default font locking")
-;; ;;   :config
-;; ;;   (setq treesit-language-source-alist
-;; ;;     '
-;; ;;     ((bash "https://github.com/tree-sitter/tree-sitter-bash")
-;; ;;       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-;; ;;       (c "https://github.com/tree-sitter/tree-sitter-c")
-;; ;;       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-;; ;;       (cmake "https://github.com/uyha/tree-sitter-cmake")
-;; ;;       (css "https://github.com/tree-sitter/tree-sitter-css")
-;; ;;       (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
-;; ;;       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-;; ;;       (html "https://github.com/tree-sitter/tree-sitter-html")
-;; ;;       (java "https://github.com/tree-sitter/tree-sitter-java")
-;; ;;       (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-;; ;;       (json "https://github.com/tree-sitter/tree-sitter-json")
-;; ;;       (latex "https://github.com/latex-lsp/tree-sitter-latex")
-;; ;;       (make "https://github.com/alemuller/tree-sitter-make")
-;; ;;       (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-;; ;;       (org "https://github.com/milisims/tree-sitter-org")
-;; ;;       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-;; ;;       (python "https://github.com/tree-sitter/tree-sitter-python")
-;; ;;       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-
-;; ;;   ;; Old language servers do not support tree-sitter yet.
-
-;; ;;   (add-to-list 'major-mode-remap-alist '(sh-mode . bash-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(bibtex-mode . bibtex-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-;; ;;   (add-to-list 'major-mode-remap-alist '(cmake-mode . cmake-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(css-mode . css-ts-mode))
-;; ;;   (add-to-list 'major-mode-remap-alist '(dockerfile-mode . dockerfile-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(html-mode . html-ts-mode))
-;; ;;   (add-to-list 'major-mode-remap-alist '(java-mode . java-ts-mode))
-;; ;;   ;; ;; (add-to-list 'major-mode-remap-alist '(js2-mode . js-ts-mode))
-;; ;;   (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(latex-mode . latex-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(makefile-mode . make-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(makefile-gmake-mode . make-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(org-mode . org-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(perl-mode . perl-ts-mode))
-;; ;;   (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
-;; ;;   ;; (add-to-list 'major-mode-remap-alist '(typescript-mode . typescript-ts-mode))
-;; ;;   (add-to-list 'major-mode-remap-alist '(yaml-mode . yaml-ts-mode))
-
-;; ;;   ;;   (setq
-;; ;;   ;;     bash-ts-mode-hook bash-mode-hook
-;; ;;   ;;     c-ts-mode-hook c-mode-hook
-;; ;;   ;;     c++-ts-mode-hook c++-mode-hook
-;; ;;   ;;     cmake-ts-mode-hook cmake-mode-hook
-;; ;;   ;;     css-ts-mode-hook css-mode-hook
-;; ;;   ;;     html-ts-mode-hook html-mode-hook
-;; ;;   ;;     java-ts-mode-hook java-mode-hook
-;; ;;   ;;     json-ts-mode-hook json-mode-hook
-;; ;;   ;;     make-ts-mode-hook make-mode-hook
-;; ;;   ;;     markdown-ts-mode-hook markdown-mode-hook
-;; ;;   ;;     org-ts-mode-hook org-mode-hook
-;; ;;   ;;     python-ts-mode-hook python-mode-hook
-;; ;;   ;;     yaml-ts-mode-hook yaml-ts-mode-hook)
-;; ;;   )
-
-;; ;; (use-package tree-sitter
-;; ;;   :when (executable-find "tree-sitter")
-;; ;;   :hook
-;; ;;   ((tree-sitter-after-on . tree-sitter-hl-mode)
-;; ;;     ((c-mode c++-mode) . tree-sitter-mode))
-;; ;;   :init (advice-add 'tsc-dyn-get--log :around #'sb/inhibit-message-call-orig-fun)
-;; ;;   :config
-;; ;;   (use-package tree-sitter-langs
-;; ;;     :demand t
-;; ;;     :init (advice-add 'tree-sitter-langs-install-grammars :around #'sb/inhibit-message-call-orig-fun))
-;; ;;   :diminish tree-sitter-mode)
-
 ;; (with-eval-after-load "treesit"
 ;;   ;; Improves performance with large files without significantly diminishing highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
@@ -3583,17 +3345,8 @@ targets."
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
 ;; (use-package css-mode
-;;   :hook
-;;   ((css-mode css-ts-mode)
-;;     .
-;;     (lambda ()
-;;       (cond
-;;         ((eq sb/lsp-provider 'eglot)
-;;           (eglot-ensure))
-;;         ((eq sb/lsp-provider 'lsp-mode)
-;;           (lsp-deferred)))))
-;;   :custom (css-indent-offset 2)
-;;   )
+;;   :hook ((css-mode css-ts-mode) . lsp-deferred)
+;;   :custom (css-indent-offset 2))
 
 (use-package make-mode
   :straight (:type built-in)
@@ -3613,8 +3366,6 @@ targets."
 ;; ;;     (lambda ()
 ;; ;;       (make-local-variable 'lsp-disabled-clients)
 ;; ;;       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-;; ;;       ;; (when (fboundp 'spell-fu-mode)
-;; ;;       ;;   (spell-fu-mode -1))
 ;; ;;       (when (fboundp 'flyspell-mode)
 ;; ;;         (flyspell-mode -1))
 ;; ;;       (when (fboundp 'jinx-mode)
@@ -3712,13 +3463,6 @@ targets."
       (make-local-variable 'js-indent-level)
       (setq js-indent-level 2)
       (lsp-deferred))))
-
-;; ;; (use-package ssh-config-mode
-;; ;;   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-;; ;;   :mode ("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-;; ;;   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
-;; ;;   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
-;; ;;   :hook (ssh-config-mode . turn-on-font-lock))
 
 ;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
 ;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
@@ -3914,138 +3658,19 @@ targets."
     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
 
-;; ;; (use-package bibtex
-;; ;;   :straight (:type built-in)
-;; ;;   :hook
-;; ;;   (bibtex-mode
-;; ;;     .
-;; ;;     (lambda ()
-;; ;;       (cond
-;; ;;         ((eq sb/lsp-provider 'eglot)
-;; ;;           (eglot-ensure))
-;; ;;         ((eq sb/lsp-provider 'lsp-mode)
-;; ;;           (lsp-deferred)))))
-;; ;;   :custom
-;; ;;   (bibtex-align-at-equal-sign t)
-;; ;;   (bibtex-maintain-sorted-entries t)
-;; ;;   (bibtex-comma-after-last-field nil))
-
-;; ;; Reftex is useful to view ToC even with LSP support
-;; ;; (use-package reftex
-;; ;;   :disabled
-;; ;;   ;;   :preface
-;; ;;   ;;   (defun sb/get-bibtex-keys (file)
-;; ;;   ;;     (with-current-buffer (find-file-noselect file)
-;; ;;   ;;       (mapcar 'car (bibtex-parse-keys))))
-
-;; ;;   ;;   (defun sb/reftex-add-all-bibitems-from-bibtex ()
-;; ;;   ;;     (interactive)
-;; ;;   ;;     (mapc
-;; ;;   ;;       'LaTeX-add-bibitems
-;; ;;   ;;       (apply 'append (mapcar 'sb/get-bibtex-keys (reftex-get-bibfile-list)))))
-
-;; ;;   ;;   (defun sb/find-bibliography-file ()
-;; ;;   ;;     "Try to find a bibliography file using RefTeX.
-;; ;;   ;;       Returns a string with text properties (as expected by read-file-name) or
-;; ;;   ;; empty string if no file can be found"
-;; ;;   ;;     (interactive)
-;; ;;   ;;     (let ((bibfile-list nil))
-;; ;;   ;;       (condition-case nil
-;; ;;   ;;         (setq bibfile-list (reftex-get-bibfile-list))
-;; ;;   ;;         (error
-;; ;;   ;;           (ignore-errors
-;; ;;   ;;             (setq bibfile-list (reftex-default-bibliography)))))
-;; ;;   ;;       (if bibfile-list
-;; ;;   ;;         (car bibfile-list)
-;; ;;   ;;         "")))
-
-;; ;;   ;;   (defun sb/reftex-try-add-all-bibitems-from-bibtex ()
-;; ;;   ;;     "Try to find a bibliography file using RefTex and parse the bib keys.
-;; ;;   ;; Ignore if no file is found."
-;; ;;   ;;     (interactive)
-;; ;;   ;;     (let ((bibfile-list nil))
-;; ;;   ;;       (condition-case nil
-;; ;;   ;;         (setq bibfile-list (reftex-get-bibfile-list))
-;; ;;   ;;         (error
-;; ;;   ;;           (ignore-errors
-;; ;;   ;;             (setq bibfile-list (reftex-default-bibliography)))))
-;; ;;   ;;       ;; (message "%s" bibfile-list)
-;; ;;   ;;       (mapc 'LaTeX-add-bibitems (apply 'append (mapcar 'sb/get-bibtex-keys bibfile-list)))))
-;; ;;   :straight (:type built-in)
-;; ;;   :hook (LaTeX-mode . turn-on-reftex)
-;; ;;   :bind
-;; ;;   (("C-c [" . reftex-citation)
-;; ;;     ("C-c )" . reftex-reference)
-;; ;;     ("C-c (" . reftex-label)
-;; ;;     ("C-c =" . reftex-toc)
-;; ;;     ("C-c -" . reftex-toc-recenter)
-;; ;;     ("C-c &" . reftex-view-crossref))
-;; ;;   :custom
-;; ;;   (reftex-plug-into-AUCTeX t)
-;; ;;   (reftex-enable-partial-scans t)
-;; ;;   (reftex-highlight-selection 'both)
-;; ;;   (reftex-save-parse-info t "Save parse info to avoid reparsing every time a file is visited")
-;; ;;   (reftex-revisit-to-follow t)
-;; ;;   (reftex-auto-recenter-toc t "Center on the section currently being edited")
-;; ;;   (reftex-toc-follow-mode t "Other buffer follows the point in TOC buffer")
-;; ;;   (reftex-toc-split-windows-fraction 0.6 "Give TOC buffer more room")
-;; ;;   (reftex-toc-split-windows-horizontally t) ; Show reftex TOC on the left
-;; ;;   (reftex-ref-macro-prompt nil) ; No unnecessary prompts
-;; ;;   ;; (reftex-guess-label-type t "Try to guess the label type before prompting")
-;; ;;   (reftex-use-fonts t "Use nice fonts for TOC")
-;; ;;   ;; (reftex-revisit-to-follow t "Revisit files if necessary when browsing toc")
-;; ;;   (reftex-use-multiple-selection-buffers t "Cache selection buffers for faster access")
-;; ;;   ;; Throw away buffers created for parsing, but keep the ones created for lookup
-;; ;;   (reftex-keep-temporary-buffers 1)
-;; ;;   (reftex-trust-label-prefix '("fn:" "eq:" "sec:" "fig:" "tab:"))
-;; ;;   (reftex-allow-automatic-rescan nil)
-;; ;;   (reftex-enable-partial-scans t)
-;; ;;   :config
-;; ;;   ;; (sb/reftex-try-add-all-bibitems-from-bibtex)
-;; ;;   ;; (add-hook 'reftex-load-hook #'sb/reftex-add-all-bibitems-from-bibtex)
-
-;; ;;   (with-eval-after-load "reftex-toc"
-;; ;;     (bind-keys
-;; ;;       :package reftex-toc
-;; ;;       :map
-;; ;;       reftex-toc-mode-map
-;; ;;       ("n" . reftex-toc-next)
-;; ;;       ("p" . reftex-toc-previous)
-;; ;;       ("r" . reftex-toc-rescan)
-;; ;;       ("R" . reftex-toc-Rescan)
-;; ;;       ("g" . revert-buffer)
-;; ;;       ("q" . reftex-toc-quit)
-;; ;;       ("z" . reftex-toc-jump)
-;; ;;       (">" . reftex-toc-demote)
-;; ;;       ("<" . reftex-toc-promote))
-
-;; ;;     ;; Rescan the entire document, not only the current file (`reftex-toc-rescan'), to be consistent
-;; ;;     ;; but this is expensive.
-;; ;;     (add-hook 'reftex-toc-mode-hook #'reftex-toc-rescan))
-;; ;;   :diminish)
+(use-package bibtex
+  :straight (:type built-in)
+  :hook (bibtex-mode . lsp-deferred)
+  :custom
+  (bibtex-align-at-equal-sign t)
+  (bibtex-maintain-sorted-entries t)
+  (bibtex-comma-after-last-field nil))
 
 (use-package consult-reftex
   :straight (:host github :repo "karthink/consult-reftex")
   :after (consult tex-mode)
   :demand t
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
-
-;; ;; ;; Read document like a hypertext document, supports mouse highlighting
-;; ;; (use-package bib-cite
-;; ;;   :straight (:type built-in)
-;; ;;   :disabled
-;; ;;   :hook (LaTeX-mode . (lambda () (bib-cite-minor-mode 1)))
-;; ;;   ;; :bind
-;; ;;   ;; (:map bib-cite-minor-mode-map
-;; ;;   ;;       ("C-c b") ; We use `C-c b' for `comment-box'
-;; ;;   ;;       ("C-c l a" . bib-apropos)
-;; ;;   ;;       ("C-c l b" . bib-make-bibliography)
-;; ;;   ;;       ("C-c l d" . bib-display)
-;; ;;   ;;       ("C-c l t" . bib-etags)
-;; ;;   ;;       ("C-c l f" . bib-find)
-;; ;;   ;;       ("C-c l n" . bib-find-next))
-;; ;;   :custom (bib-cite-use-reftex-view-crossref t "Use RefTeX functions for finding bibliography files")
-;; ;;   :diminish bib-cite-minor-mode)
 
 ;; (use-package auctex-latexmk
 ;;   :disabled
@@ -4071,27 +3696,6 @@ targets."
 ;;   :straight (:host github :repo "mclear-tools/bibtex-capf")
 ;;   :when (eq sb/capf 'corfu)
 ;;   :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
-
-;; ;; (use-package latex-extra
-;; ;;   :straight (:host github :repo "Malabarba/latex-extra")
-;; ;;   :disabled
-;; ;;   :after tex
-;; ;;   :hook (LaTeX-mode . latex-extra-mode)
-;; ;;   :bind
-;; ;;   (:map
-;; ;;     TeX-mode-map
-;; ;;     ("C-c C-a" . latex/compile-commands-until-done)
-;; ;;     ("C-c C-n" . latex/next-section)
-;; ;;     ("C-c C-u" . latex/up-section)
-;; ;;     ("C-c C-f" . latex/next-section-same-level)
-;; ;;     ("C-M-f" . latex/forward-environment)
-;; ;;     ("C-M-e" . latex/end-of-environment)
-;; ;;     ("C-M-b" . latex/backward-environment)
-;; ;;     ("C-M-a" . latex/beginning-of-environment)
-;; ;;     ("C-c C-p" . latex/previous-section)
-;; ;;     ("C-c C-b" . latex/previous-section-same-level)
-;; ;;     ("C-c C-q" . latex/clean-fill-indent-environment))
-;; ;;   :diminish)
 
 ;; ;; (use-package math-delimiters
 ;; ;;   :straight (:host github :repo "oantolin/math-delimiters")
@@ -4147,10 +3751,9 @@ Fallback to `xref-go-back'."
       (
         (lsp-result
           (cond
-            ((bound-and-true-p lsp-mode)
-              (and (fboundp #'lsp-completion-at-point) (lsp-completion-at-point)))
-            ((bound-and-true-p eglot--managed-mode)
-              (and (fboundp #'eglot-completion-at-point) (eglot-completion-at-point))))))
+            (and
+              (fboundp #'lsp-completion-at-point)
+              (lsp-completion-at-point)))))
       (if
         (and lsp-result
           (try-completion
@@ -4204,7 +3807,6 @@ Fallback to `xref-go-back'."
     (func
       '
       (find-function ;counsel-imenu counsel-rg lsp-ivy-workspace-symbol
-        projectile-grep
         citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
 
@@ -4404,81 +4006,6 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; Configure appearance-related settings at the end
 
-;; ;; Install fonts with "M-x all-the-icons-install-fonts"
-;; ;; (use-package all-the-icons
-;; ;;   :preface
-;; ;;   ;; FIXME: This seems to work only with GUI Emacs.
-;; ;;   (defun sb/font-installed-p (font-name)
-;; ;;     "Check if font with FONT-NAME is available."
-;; ;;     (if (find-font (font-spec :name font-name))
-;; ;;       t
-;; ;;       nil))
-;; ;;   :when (or (eq sb/icons-provider 'all-the-icons) (eq sb/tab-bar-handler 'centaur-tabs))
-;; ;;   :commands all-the-icons-install-fonts
-;; ;;   :init
-;; ;;   (if (and (display-graphic-p) (not (sb/font-installed-p "all-the-icons")))
-;; ;;     (all-the-icons-install-fonts t))
-;; ;;   :custom
-;; ;;   ;; Small icons look nicer
-;; ;;   (all-the-icons-scale-factor 0.9)
-;; ;;   (all-the-icons-faicon-scale-factor 0.9)
-;; ;;   (all-the-icons-wicon-scale-factor 0.9)
-;; ;;   (all-the-icons-octicon-scale-factor 0.9)
-;; ;;   (all-the-icons-fileicon-scale-factor 0.9)
-;; ;;   (all-the-icons-material-scale-factor 0.9)
-;; ;;   (all-the-icons-alltheicon-scale-factor 0.9)
-;; ;;   (all-the-icons-color-icons t))
-
-;; ;; (use-package all-the-icons-dired
-;; ;;   :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p) (not (featurep 'dirvish)))
-;; ;;   :commands (all-the-icons-dired--refresh-advice)
-;; ;;   :hook
-;; ;;   (dired-mode
-;; ;;     .
-;; ;;     (lambda ()
-;; ;;       (unless (file-remote-p default-directory)
-;; ;;         (all-the-icons-dired-mode 1))))
-;; ;;   :custom (all-the-icons-dired-monochrome nil)
-;; ;;   :diminish)
-
-;; ;; ;; Display icons for all buffers in ibuffer
-;; ;; (use-package all-the-icons-ibuffer
-;; ;;   :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
-;; ;;   :hook (ibuffer-mode . all-the-icons-ibuffer-mode)
-;; ;;   :custom (all-the-icons-ibuffer-icon-size 0.8))
-
-;; ;; ;; Icons for minibuffer completion (e.g., `find-file-at-point')
-;; ;; (use-package all-the-icons-completion
-;; ;;   :when (and (eq sb/icons-provider 'all-the-icons) (display-graphic-p))
-;; ;;   :commands all-the-icons-completion-mode
-;; ;;   :init (all-the-icons-completion-mode 1)
-;; ;;   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup))
-
-;; ;; (use-package nerd-icons
-;; ;;   :straight (:host github :repo "rainstormstudio/nerd-icons.el")
-;; ;;   ;; `nerd-icons-ivy-rich' depends on this package
-;; ;;   :when (or (eq sb/icons-provider 'nerd-icons) (eq sb/minibuffer-completion 'ivy))
-;; ;;   :custom
-;; ;;   (nerd-icons-color-icons nil)
-;; ;;   (nerd-icons-scale-factor 0.9))
-
-;; ;; (use-package nerd-icons-completion
-;; ;;   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
-;; ;;   :when (eq sb/icons-provider 'nerd-icons)
-;; ;;   :init (nerd-icons-completion-mode 1)
-;; ;;   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
-
-;; ;; (use-package nerd-icons-dired
-;; ;;   :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
-;; ;;   :when (eq sb/icons-provider 'nerd-icons)
-;; ;;   :hook (dired-mode . nerd-icons-dired-mode)
-;; ;;   :diminish)
-
-;; ;; (use-package nerd-icons-ibuffer
-;; ;;   :when (eq sb/icons-provider 'nerd-icons)
-;; ;;   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
-;; ;;   :custom (nerd-icons-ibuffer-icon-size 1.0))
-
 ;; Decrease minibuffer font size
 (progn
   (defun sb/decrease-minibuffer-font ()
@@ -4524,27 +4051,6 @@ or the major mode is not in `sb/skippable-modes'."
 ;; ;; (use-package nordic-night-theme
 ;; ;;   :when (eq sb/theme 'nordic-night)
 ;; ;;   :init (load-theme 'nordic-night t))
-
-(use-package leuven-theme
-  :when (or (eq sb/theme 'leuven) (eq sb/theme 'leuven-dark))
-  :init
-  (cond
-    ((eq sb/theme 'leuven)
-      (load-theme 'leuven t))
-    ((eq sb/theme 'leuven-dark)
-      (load-theme 'leuven-dark t))))
-
-;; (when (and (eq sb/theme 'sb/customized) (display-graphic-p))
-;;   (progn
-;;     (set-foreground-color "#333333")
-;;     (with-eval-after-load "hl-line"
-;;       (set-face-attribute 'hl-line nil :background "light yellow"))
-;;     (set-face-attribute 'region nil :background "gainsboro")))
-
-;; ;; Set `sb/theme' to `none' if you use this package
-;; ;; (use-package circadian
-;; ;;   :hook (emacs-startup . circadian-setup)
-;; ;;   :custom (circadian-themes '((:sunrise . modus-vivendi) (:sunset . modus-vivendi))))
 
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
@@ -4836,25 +4342,14 @@ PAD can be left (`l') or right (`r')."
 
 (put 'compilation-read-command 'safe-local-variable #'stringp)
 
-;; https://blog.d46.us/advanced-emacs-startup/
 (add-hook
   'emacs-startup-hook
   (lambda ()
-    (if (bound-and-true-p sb/disable-package.el)
-      (let ((gc-time (float-time gc-elapsed)))
-        (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
-          (emacs-init-time)
-          gc-time
-          gcs-done))
-      (let
-        (
-          (packages (length package-activated-list))
-          (gc-time (float-time gc-elapsed)))
-        (message "Emacs ready (init time = %s, packages = %d, gc time = %.2fs, gc count = %d)."
-          (emacs-init-time)
-          packages
-          gc-time
-          gcs-done)))))
+    (let ((gc-time (float-time gc-elapsed)))
+      (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
+        (emacs-init-time)
+        gc-time
+        gcs-done))))
 
 ;;; init.el ends here
 
