@@ -483,7 +483,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.48.0"
+    FZF_VER="0.48.1"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git

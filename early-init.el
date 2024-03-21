@@ -105,9 +105,41 @@
     ;; Compile loaded packages asynchronously
     native-comp-deferred-compilation t))
 
+(setenv "LSP_USE_PLISTS" "true")
+
+;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
+;; we use TUI Emacs. Then, the terminal font setting will be used.
+
 ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
 
-(setenv "LSP_USE_PLISTS" "true")
+(defun sb/init-fonts-graphic ()
+  (cond
+    ((string= (system-name) "swarnendu-Inspiron-7572")
+      (progn
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
+        (set-face-attribute 'mode-line nil :height 150)
+        (set-face-attribute 'mode-line-inactive nil :height 150)))
+
+    ((string= (system-name) "dell-7506")
+      (progn
+        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
+        (set-face-attribute 'mode-line nil :height 120)
+        (set-face-attribute 'mode-line-inactive nil :height 120)))
+
+    ((string= (system-name) "swarnendu-Dell-XPS-L502X")
+      (progn
+        (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
+        (set-face-attribute 'mode-line nil :height 110)
+        (set-face-attribute 'mode-line-inactive nil :height 110)))
+
+    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+      (progn
+        ;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
+        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 190)
+        (set-face-attribute 'mode-line nil :height 130)
+        (set-face-attribute 'mode-line-inactive nil :height 130)))))
+
+(add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
 (provide 'early-init)
 

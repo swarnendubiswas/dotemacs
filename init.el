@@ -270,7 +270,7 @@ This location is used for temporary installations and files.")
   (echo-keystrokes 0.1 "Show current key-sequence in minibuffer")
   ;; Allow invoking a command that requires candidate-selection when are already in the middle of
   ;; candidate-selection.
-  (enable-recursive-minibuffers t)
+  (enable-recursive-minibuffers nil)
   ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more information
   (eval-expression-print-length 500)
   (frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name))
@@ -614,9 +614,10 @@ This location is used for temporary installations and files.")
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; I use the "Shift+direction" keybindings for moving around windows in tmux which is okay because I
-;; do not split Emacs frames often.
-(use-package windmove ; "Shift + direction" arrows
+;; Use "Shift + direction" arrows for moving around windows. I also use the "Shift+direction"
+;; keybindings for moving around windows in tmux which is okay because I do not split Emacs frames
+;; often.
+(use-package windmove
   :straight (:type built-in)
   :when (display-graphic-p)
   :init (windmove-default-keybindings)
@@ -935,10 +936,11 @@ This location is used for temporary installations and files.")
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
-;; (use-package dired-hist
-;;   :straight (:host github :repo "karthink/dired-hist")
-;;   :hook (dired-mode . dired-hist-mode)
-;;   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+;; Alternate: https://github.com/Anoncheg1/dired-hist
+(use-package dired-hist
+  :straight (:host github :repo "karthink/dired-hist")
+  :hook (dired-mode . dired-hist-mode)
+  :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 (use-package vertico
   :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
@@ -1335,11 +1337,6 @@ targets."
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
-;; This does not seem to be useful given that I am also using whole-line-or-region.
-;; (use-package expand-line
-;;   :bind ("M-i" . turn-on-expand-line-mode)
-;;   :diminish)
-
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
@@ -1404,58 +1401,6 @@ targets."
 ;;   :hook (emacs-startup . global-page-break-lines-mode)
 ;;   :diminish)
 
-;; ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
-;; ;; Use `isearch', `swiper' will not work
-
-;; ;; (use-package pdf-tools
-;; ;;   :when (display-graphic-p)
-;; ;;   :commands
-;; ;;   (pdf-tools-install
-;; ;;     pdf-loader-install
-;; ;;     pdf-view-mode
-;; ;;     pdf-annot-delete
-;; ;;     pdf-annot-add-highlight-markup-annotation
-;; ;;     pdf-annot-add-text-annotation)
-;; ;;   :mode ("\\.pdf\\'" . pdf-view-mode)
-;; ;;   ;; Register an autoloaded command for `pdf-view-mode', defer loading of `pdf-tools', and run
-;; ;;   ;; `pdf-view-mode' if the beginning of a buffer matches the string "%PDF".
-;; ;;   :magic ("%PDF" . pdf-view-mode)
-;; ;;   :bind
-;; ;;   (:map
-;; ;;     pdf-view-mode-map
-;; ;;     ("j" . pdf-view-next-line-or-next-page)
-;; ;;     ("k" . pdf-view-previous-line-or-previous-page)
-;; ;;     ("n" . pdf-view-next-page-command)
-;; ;;     ("p" . pdf-view-previous-page-command)
-;; ;;     ("a" . pdf-view-first-page)
-;; ;;     ("e" . pdf-view-last-page)
-;; ;;     ("l" . pdf-view-goto-page)
-;; ;;     ("P" . pdf-view-fit-page-to-window)
-;; ;;     ("W" . pdf-view-fit-width-to-window)
-;; ;;     ("H" . pdf-view-fit-height-to-window)
-;; ;;     ("+" . pdf-view-enlarge)
-;; ;;     ("-" . pdf-view-shrink)
-;; ;;     ("r" . pdf-view-revert-buffer)
-;; ;;     ("d" . pdf-annot-delete)
-;; ;;     ("h" . pdf-annot-add-highlight-markup-annotation)
-;; ;;     ("t" . pdf-annot-add-text-annotation)
-;; ;;     ("M" . pdf-view-midnight-minor-mode))
-;; ;;   :custom
-;; ;;   (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
-;; ;;   (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
-;; ;;   :config
-;; ;;   (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
-
-;; ;;   (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
-
-;; ;;   ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-;; ;;   (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
-
-;; ;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
-;; ;; (use-package saveplace-pdf-view
-;; ;;   :after (pdf-tools saveplace)
-;; ;;   :demand t)
-
 ;; ;; (use-package wc-mode
 ;; ;;   :commands wc-mode)
 
@@ -1468,6 +1413,7 @@ targets."
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
 (use-package bm
+  :disabled
   :init
   ;; Must be set before `bm' is loaded
   (setq
@@ -2876,19 +2822,19 @@ targets."
   ;; (add-to-list 'lsp-language-id-configuration '(flex-mode . "cpp"))
   :diminish)
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-imenu-auto-refresh 'after-save)
-  (lsp-ui-sideline-show-code-actions t "Enables understanding when to invoke code actions")
-  (lsp-ui-sideline-enable nil "Noisy to show symbol information in the sideline")
-  ;; Hide diagnostics when typing because they can be intrusive
-  (lsp-ui-sideline-show-diagnostics nil "Flycheck/flymake already highlights errors")
-  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-  (lsp-ui-peek-enable nil))
+;; (use-package lsp-ui
+;;   :hook (lsp-mode . lsp-ui-mode)
+;;   :custom
+;;   (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
+;;   (lsp-ui-doc-include-signature t)
+;;   (lsp-ui-imenu-auto-refresh 'after-save)
+;;   (lsp-ui-sideline-show-code-actions t "Enables understanding when to invoke code actions")
+;;   (lsp-ui-sideline-enable nil "Noisy to show symbol information in the sideline")
+;;   ;; Hide diagnostics when typing because they can be intrusive
+;;   (lsp-ui-sideline-show-diagnostics nil "Flycheck/flymake already highlights errors")
+;;   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+;;   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
+;;   (lsp-ui-peek-enable nil))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -3672,35 +3618,33 @@ targets."
   :demand t
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
-;; (use-package auctex-latexmk
-;;   :disabled
+(use-package auctex-latexmk
+  :after tex-mode
+  :when (executable-find "latexmk")
+  :demand t
+  :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  :config
+  (setq-default TeX-command-default "LatexMk")
+  (auctex-latexmk-setup))
+
+(with-eval-after-load "latex"
+  (unbind-key "C-j" LaTeX-mode-map)
+  ;; Disable `LaTeX-insert-item' in favor of `imenu'
+  (unbind-key "C-c C-j" LaTeX-mode-map)
+  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
+
+;; TODO: Try `citar' https://github.com/emacs-citar/citar
+
+;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
+(use-package bibtex-capf
+  :straight (:host github :repo "mclear-tools/bibtex-capf")
+  :when (eq sb/capf 'corfu)
+  :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
+
+;; (use-package math-delimiters
+;;   :straight (:host github :repo "oantolin/math-delimiters")
 ;;   :after tex
-;;   :when (executable-find "latexmk")
-;;   :demand t
-;;   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
-;;   :config
-;;   (setq-default TeX-command-default "LatexMk")
-;;   (auctex-latexmk-setup))
-
-;; (with-eval-after-load "latex"
-;;   (unbind-key "C-j" LaTeX-mode-map)
-;;   ;; Disable `LaTeX-insert-item' in favor of `imenu'
-;;   (unbind-key "C-c C-j" LaTeX-mode-map)
-
-;;   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
-
-;; ;; TODO: Try `citar' https://github.com/emacs-citar/citar
-
-;; ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
-;; (use-package bibtex-capf
-;;   :straight (:host github :repo "mclear-tools/bibtex-capf")
-;;   :when (eq sb/capf 'corfu)
-;;   :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
-
-;; ;; (use-package math-delimiters
-;; ;;   :straight (:host github :repo "oantolin/math-delimiters")
-;; ;;   :after tex
-;; ;;   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
+;;   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
@@ -4048,10 +3992,6 @@ or the major mode is not in `sb/skippable-modes'."
   (nano-window-divider-show t)
   (nano-fonts-use t))
 
-;; ;; (use-package nordic-night-theme
-;; ;;   :when (eq sb/theme 'nordic-night)
-;; ;;   :init (load-theme 'nordic-night t))
-
 ;; Python virtualenv information is not shown on the modeline. The package is not being actively
 ;; maintained.
 (use-package powerline
@@ -4132,14 +4072,13 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (emacs-startup . doom-modeline-mode)
   :custom
-  (doom-modeline-height 28)
+  (doom-modeline-height 28 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-indent-info nil)
-  (doom-modeline-lsp t)
   (doom-modeline-minor-modes t)
   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
-  (doom-modeline-unicode-fallback t))
+  (doom-modeline-unicode-fallback nil "Use Unicode instead of ASCII when not using icons"))
 
 (use-package nano-modeline
   :when (eq sb/modeline-theme 'nano-modeline)
@@ -4150,50 +4089,6 @@ PAD can be left (`l') or right (`r')."
     (pdf-view-mode . nano-modeline-pdf-mode)
     (messages-buffer-mode . nano-modeline-message-mode))
   :custom (nano-modeline-position #'nano-modeline-footer))
-
-;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
-;; we use TUI Emacs. Then, the terminal font setting will be used.
-
-(defun sb/init-fonts-graphic ()
-  (cond
-    ((string= (system-name) "swarnendu-Inspiron-7572")
-      (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
-        ;; (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 180)
-        (set-face-attribute 'mode-line nil :height 150)
-        (set-face-attribute 'mode-line-inactive nil :height 150)))
-
-    ((string= (system-name) "DESKTOP-4T8O69V") ; Inspiron 7572 Windows
-      (progn
-        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
-        (set-face-attribute 'mode-line nil :height 110)
-        (set-face-attribute 'mode-line-inactive nil :height 110)))
-
-    ((string= (system-name) "dell-7506")
-      (progn
-        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
-        (set-face-attribute 'mode-line nil :height 120)
-        (set-face-attribute 'mode-line-inactive nil :height 120)))
-
-    ((string= (system-name) "swarnendu-Dell-XPS-L502X")
-      (progn
-        (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
-        (set-face-attribute 'mode-line nil :height 110)
-        (set-face-attribute 'mode-line-inactive nil :height 110)))
-
-    ((string= (system-name) "DESKTOP-LDLQMCO") ; CSE Desktop Windows
-      (progn
-        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
-        (set-face-attribute 'mode-line nil :height 110)
-        (set-face-attribute 'mode-line-inactive nil :height 110)))
-
-    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-      (progn
-        (set-face-attribute 'default nil :font "Hack Nerd Font" :height 180)
-        (set-face-attribute 'mode-line nil :height 130)
-        (set-face-attribute 'mode-line-inactive nil :height 130)))))
-
-(add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
 ;; (defun sb/init-fonts-daemon (frame)
 ;;   (message "getting called")
@@ -4325,11 +4220,11 @@ PAD can be left (`l') or right (`r')."
 (when (boundp 'server-client-instructions)
   (setq server-client-instructions nil))
 
-(when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
-  ;; Start server if not root user
-  (unless (string-equal "root" (getenv "USER"))
-    (when (and (fboundp 'server-running-p) (not (server-running-p)))
-      (server-start))))
+;; (when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
+;;   ;; Start server if not root user
+;;   (unless (string-equal "root" (getenv "USER"))
+;;     (when (and (fboundp 'server-running-p) (not (server-running-p)))
+;;       (server-start))))
 
 (setq custom-file sb/custom-file)
 
@@ -4339,7 +4234,6 @@ PAD can be left (`l') or right (`r')."
   (load sb/private-file 'noerror 'nomessage))
 
 ;; Mark safe variables
-
 (put 'compilation-read-command 'safe-local-variable #'stringp)
 
 (add-hook
