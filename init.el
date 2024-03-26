@@ -36,7 +36,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-operandi
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '
@@ -117,7 +117,7 @@ This location is used for temporary installations and files.")
 ;; case when used as a grouped backend.
 (defcustom sb/capf 'corfu
   "Choose the framework to use for completion at point."
-  :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
+  :type '(radio (const :tag "corfu" corfu) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Helper const variables
@@ -416,7 +416,13 @@ This location is used for temporary installations and files.")
   (when (eq sb/window-split 'horizontal)
     (setq
       split-height-threshold nil
-      split-width-threshold 0)))
+      split-width-threshold 0))
+
+  ;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
+  ;; numbers only for GUI and daemon.
+  ;; (when (or (display-graphic-p) (daemonp))
+  ;;   (global-display-line-numbers-mode 1))
+  )
 
 (setq
   kill-whole-line t ; TODO: What is the utility of this variable?
@@ -795,9 +801,10 @@ This location is used for temporary installations and files.")
   :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 ;; Windows of temporary buffers are shown as a popup window, and we can close them by typing "C-g".
+;; It is useful because it does not split frames.
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
-  ;;   :config
+  :config
   ;;   ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
   ;;   ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
   ;;   ;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
@@ -809,7 +816,7 @@ This location is used for temporary installations and files.")
   ;;   ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
   ;;   ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
   ;;   ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
-  ;;   (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
+  (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
   ;;   ;;   (push "*Shell Command Output*"               popwin:special-display-config)
   ;;   ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
   ;;   ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
@@ -1449,9 +1456,10 @@ targets."
   :hook ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode) . rainbow-mode)
   :diminish)
 
-;; ;; (use-package volatile-highlights
-;; ;;   :hook (emacs-startup . volatile-highlights-mode)
-;; ;;   :diminish volatile-highlights-mode)
+;; Temporarily highlight the region involved in certain operations like `kill-line' and `yank'.
+(use-package volatile-highlights
+  :hook (emacs-startup . volatile-highlights-mode)
+  :diminish volatile-highlights-mode)
 
 ;; ;; (use-package unfill
 ;; ;;   :commands (unfill-region unfill-paragraph unfill-toggle))
@@ -1882,8 +1890,9 @@ targets."
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   (with-eval-after-load "auctex"
     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+
   ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
-  (add-hook 'LaTeX-mode-hook (lambda () (run-with-idle-timer 30 t #'format-all-buffer)))
+  ;; (add-hook 'LaTeX-mode-hook (lambda () (run-with-idle-timer 30 t #'format-all-buffer)))
   :diminish)
 
 ;; ;; https://languagetool.org/download/LanguageTool-stable.zip
@@ -2000,7 +2009,14 @@ targets."
 (use-package dabbrev
   :straight (:type built-in)
   :bind ("C-M-;" . dabbrev-completion)
-  :custom (dabbrev-completion-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+  :custom
+  (dabbrev-ignored-buffer-regexps
+    '
+    ("^ "
+      "\\.\\(?:jpe?g\\|png\\)\\'"
+      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
+  (dabbrev-upcase-means-case-search t)
+  :config (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode))
 
 (use-package hippie-exp
   :straight (:type built-in)
@@ -2025,13 +2041,7 @@ targets."
   :demand t
   :custom
   ;; Allow escaping space with backslash
-  (orderless-component-separator 'orderless-escapable-split-on-space)
-  :config
-  (with-eval-after-load "company"
-    (defun sb/just-one-face (fn &rest args)
-      (let ((orderless-match-faces [completions-common-part]))
-        (apply fn args)))
-    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
+  (orderless-component-separator 'orderless-escapable-split-on-space))
 
 (use-package yasnippet
   :hook (emacs-startup . yas-global-mode)
@@ -2047,121 +2057,24 @@ targets."
   :after yasnippet
   :init (yasnippet-snippets-initialize))
 
-;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used for the
-;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
-;; `complete-symbol' with regex search.
-(use-package company
-  :when (eq sb/capf 'company)
-  :hook (emacs-startup . global-company-mode)
-  :bind
-  (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
-    :map
-    company-active-map
-    ("C-M-/" . company-other-backend)
-    ("C-s" . company-search-candidates)
-    ("C-M-s" . company-filter-candidates)
-    ("<tab>" . company-complete-common-or-cycle)
-    ("TAB" . company-complete-common-or-cycle)
-    ("<backtab>" .
-      (lambda ()
-        (interactive)
-        (company-complete-common-or-cycle -1)))
-    ;; ([escape] . company-abort)
-    ("M-." . company-show-location)
-    ("C-h" . company-show-doc-buffer)
-    :map
-    company-search-map
-    ("C-s" . company-search-repeat-forward)
-    ("C-r" . company-search-repeat-backward)
-    ("C-g" . company-search-abort)
-    ("DEL" . company-search-delete-char))
-  :custom
-  ;; (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
-  ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
-  ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  (company-idle-delay 0.05 "Start autocompletion faster")
-  (company-dabbrev-code-ignore-case t)
-  (company-dabbrev-code-completion-styles '(basic flex))
-  (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
-  (company-minimum-prefix-length 3 "Small words can be faster to type")
-  (company-require-match nil "Allow typing input characters that do not match candidates")
-  (company-show-quick-access t "Speed up selecting a completion")
-  ;; Align additional metadata, like type signatures, to the right-hand side because it looks better
-  (company-tooltip-align-annotations t)
-  ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there is only
-  ;; one candidate, `company-preview-frontend' shows the preview in-place which is too intrusive,
-  ;; `company-preview-if-just-one-frontend' shows in-place preview if there is only choice,
-  ;; `company-echo-metadata-frontend' shows selected candidate docs in echo area, and
-  ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
-  ;; (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
-  (company-global-modes
-    '
-    (not dired-mode
-      erc-mode
-      message-mode
-      comint-mode
-      inferior-python-mode
-      vterm-mode
-      magit-status-mode
-      help-mode
-      gud-mode
-      eshell-mode
-      shell-mode
-      csv-mode
-      minibuffer-inactive-mode))
-  (company-format-margin-function nil "Disable icons")
-  (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
-  ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
-  :diminish)
-
-(use-package company-quickhelp
-  :after company
-  :when (display-graphic-p)
-  :hook (prog-mode . company-quickhelp-mode))
-
-(use-package company-quickhelp-terminal
-  :after company-quickhelp
-  :unless (display-graphic-p)
-  :hook (prog-mode . company-quickhelp-terminal-mode))
-
-(use-package company-statistics
-  :after company
-  :init (company-statistics-mode 1))
-
-;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
-;; slows completions.
-;; (use-package company-fuzzy
-;;   :straight flx
-;;   :straight t
-;;   :after company
-;;   :demand t
-;;   :custom
-;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
-;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
-;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
-;;   ;; Disabling the requirement may help with performance.
-;;   (company-fuzzy-prefix-on-top t)
-;;   :diminish)
-
 (use-package company-auctex
-  :after tex-mode
+  :after (tex-mode corfu)
   :demand t)
 
 ;; Required by `ac-math' and `company-math'
 (use-package math-symbols
-  :after tex-mode
+  :after (tex-mode corfu)
   :demand t)
 
 (use-package company-math
-  :after tex-mode
+  :after (tex-mode corfu)
   :demand t)
 
 ;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
 ;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
 ;; citations across documents.
 (use-package company-reftex
-  :after tex-mode
+  :after (tex-mode corfu)
   :demand t
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
@@ -2171,273 +2084,23 @@ targets."
 ;;   :after tex-mode
 ;;   :demand t)
 
-;; Complete in the middle of words
-(use-package company-anywhere
-  :straight (:host github :repo "zk-phi/company-anywhere")
-  :after company
-  :demand t)
-
 (use-package company-dict
-  :after company
+  :after corfu
   :demand t
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
 
-;; Better replacement for `company-files'
-(use-package company-dirfiles
-  :straight (:host codeberg :repo "cwfoo/company-dirfiles")
-  :after company
-  :demand t)
-
-(use-package company-c-headers
-  :after (company cc-mode)
-  :demand t
-  :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
-
-(use-package company-try-hard
-  :bind (("C-j" . company-try-hard) :map company-active-map ("C-j" . company-try-hard)))
-
 (use-package company-web
-  :after company
+  :after corfu
   :demand t
   :config (require 'company-web-html))
 
 (use-package company-wordfreq
   :straight (:host github :repo "johannes-mueller/company-wordfreq.el")
-  :after company
+  :after corfu
   :demand t)
-
-;; Try completion backends in order untill there is a non-empty completion list:
-;; (setq company-backends '(company-xxx company-yyy company-zzz))
-
-;; Merge completions of all the backends:
-;; (setq company-backends '((company-xxx company-yyy company-zzz)))
-
-;; Merge completions of all the backends but keep the candidates organized in accordance with the
-;; grouped backends order.
-;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
-
-;; Another keyword :with helps to make sure the results from major/minor mode agnostic backends
-;; (such as company-yasnippet, company-dabbrev-code) are returned without preventing results from
-;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
-;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
-;; :with, and only then put context agnostic backend(s).
-;; (setq company-backends '((company-capf :with company-yasnippet)))
-
-;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
-;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
-;; (e.g. outside of strings and comments), and pass on control to later backends when outside of
-;; that major mode or context.
-
-;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
-;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
-;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
-;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
-;; non-nil for following backends even when their ‘candidates’ list command is empty:
-;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
-
-;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
-;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
-;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
-;; `:separate', the candidates that come from different backends are sorted separately in the
-;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
-;; the order of completions just like the backends returned them.
-
-(with-eval-after-load "company"
-  ;; Override `company-backends' for unhandled major modes.
-  (setq
-    company-backends
-    '
-    (company-dirfiles
-      (company-capf :with company-dabbrev-code company-yasnippet)
-      ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
-      ;; ignored.
-      company-ispell company-dict company-dabbrev)
-    ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
-    ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
-    ;; `delete-dups'.
-    company-transformers
-    '
-    (delete-dups ; company-sort-by-backend-importance
-      ; company-sort-by-occurrence
-      company-sort-by-statistics
-      company-sort-prefer-same-case-prefix))
-
-  ;; (add-to-list 'company-transformers 'delete-dups)
-  ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
-  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-
-  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
-  ;; https://github.com/company-mode/company-mode/issues/358
-  (push
-    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
-    company-transformers)
-
-  (progn
-    (defun sb/company-latex-mode ()
-      "Add backends for `latex-mode' completion in company mode."
-      (make-local-variable 'company-backends)
-
-      ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
-
-      ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-      ;; labels and citations. `company-reftex-labels' is expected to be better than
-      ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
-      ;; `company-auctex-bibs'.
-
-      ;; `company-capf' does not pass to later backends with Texlab, so we have it last
-      (setq company-backends
-        '
-        (company-dirfiles
-          (company-math-symbols-latex ; Math latex tags
-            company-latex-commands
-            company-reftex-labels
-            company-reftex-citations
-            company-auctex-environments
-            company-auctex-macros
-            company-auctex-labels
-            ;; Math unicode symbols and sub(super)scripts
-            company-math-symbols-unicode
-            company-auctex-symbols
-            company-auctex-bibs
-            ;; company-bibtex
-            ;; :separate
-            company-ispell
-            company-dict
-            company-dabbrev
-            company-wordfreq
-            company-capf))))
-
-    (add-hook
-      'LaTeX-mode-hook
-      (lambda ()
-        (sb/company-latex-mode)
-        ;; `company-capf' does not pass to later backends with Texlab, so we use
-        ;; `company-fuzzy-mode' to merge results from all backends.
-        ;; (company-fuzzy-mode 1)
-        ;; (diminish 'company-fuzzy-mode)
-        )))
-
-  (progn
-    (defun sb/company-org-mode ()
-      "Add backends for org completion in company mode."
-      (set
-        (make-local-variable 'company-backends)
-        '(company-dirfiles company-org-block company-ispell company-dict company-dabbrev)))
-
-    (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
-
-  (progn
-    (defun sb/company-text-mode ()
-      "Add backends for `text-mode' completion in company mode."
-      (set
-        (make-local-variable 'company-backends)
-        '(company-dirfiles (company-wordfreq company-ispell company-dict company-dabbrev))))
-
-    ;; Extends to derived modes like `markdown-mode' and `org-mode'
-    (add-hook
-      'text-mode-hook
-      (lambda ()
-        (unless (derived-mode-p 'LaTeX-mode)
-          (sb/company-text-mode)
-
-          ;; (defun sb/company-after-completion-hook (&rest _ignored)
-          ;;   (just-one-space))
-          ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
-          ))))
-
-  (progn
-    (defun sb/company-yaml-mode ()
-      "Add backends for `yaml-mode' completion in company mode."
-      (make-local-variable 'company-backends)
-      (setq company-backends
-        '
-        (company-dirfiles
-          (company-capf
-            :with
-            company-dabbrev-code ; Useful for variable names
-            company-yasnippet
-            :separate)
-          company-dict company-ispell company-dabbrev)))
-
-    (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
-      (add-hook mode (lambda () (sb/company-yaml-mode)))))
-
-  (progn
-    (defun sb/company-html-mode ()
-      "Add backends for html completion in company mode."
-      (setq-local company-minimum-prefix-length 2)
-
-      (set
-        (make-local-variable 'company-backends)
-        '
-        (company-dirfiles
-          (company-capf company-web-html)
-          company-ispell
-          company-dict
-          company-dabbrev)))
-
-    (dolist (hook '(html-mode-hook html-ts-mode-hook))
-      (add-hook hook (lambda () (sb/company-html-mode)))))
-
-  (progn
-    (defun sb/company-prog-mode ()
-      "Add backends for `prog-mode' completion in company mode."
-      ;; Typing short prefixes help with faster completion and a more responsive UI
-      (setq-local company-minimum-prefix-length 2)
-
-      (make-local-variable 'company-backends)
-
-      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-
-      (setq company-backends
-        '
-        (company-dirfiles
-          (company-capf
-            company-citre-tags company-c-headers
-            :with company-keywords
-            company-dabbrev-code ; Useful for variable names
-            company-yasnippet
-            :separate)
-          company-dict company-ispell company-dabbrev)))
-
-    (add-hook
-      'prog-mode-hook
-      (lambda ()
-        (unless
-          (or (derived-mode-p 'emacs-lisp-mode)
-            (derived-mode-p 'flex-mode)
-            (derived-mode-p 'bison-mode))
-          (sb/company-prog-mode)))))
-
-  (progn
-    (defun sb/company-elisp-mode ()
-      "Add backends for `emacs-lisp-mode' completion in company mode."
-      ;; Typing short prefixes help with faster completion and a more responsive UI
-      (setq-local company-minimum-prefix-length 2)
-
-      (make-local-variable 'company-backends)
-
-      (setq company-backends
-        '
-        (company-dirfiles
-          (company-capf
-            company-citre-tags
-            :with company-keywords
-            company-dabbrev-code ; Useful for variable names
-            company-yasnippet
-            :separate)
-          company-dict company-ispell company-dabbrev)))
-
-    (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-      (add-hook
-        hook
-        (lambda ()
-          (sb/company-elisp-mode)
-          ;; (company-fuzzy-mode 1)
-          )))))
 
 ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
 (use-package corfu
@@ -2463,14 +2126,11 @@ targets."
   (corfu-exclude-modes
     '
     (dired-mode
-      erc-mode
       message-mode
       comint-mode
       inferior-python-mode
-      vterm-mode
       magit-status-mode
       help-mode
-      gud-mode
       eshell-mode
       shell-mode
       csv-mode
@@ -2535,7 +2195,7 @@ targets."
   (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
 
 (use-package yasnippet-capf
-  :after corfu
+  :after (yasnippet corfu)
   :demand t
   :straight (:host github :repo "elken/yasnippet-capf"))
 
@@ -2563,6 +2223,11 @@ targets."
       ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   (cape-dabbrev-check-other-buffers 'some)
   :config
+  ;; Make these capfs composable
+  (with-eval-after-load "lsp-mode"
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
+
   ;; Override CAPFS for specific major modes
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2574,8 +2239,9 @@ targets."
             (cape-capf-super
               #'elisp-completion-at-point
               #'citre-completion-at-point
-              #'cape-elisp-symbol)
-            (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t))))))
+              #'cape-elisp-symbol
+              (cape-company-to-capf #'company-yasnippet))
+            (cape-capf-super #'cape-dabbrev #'cape-dict))))))
 
   (add-hook
     'flex-mode-hook
@@ -2590,7 +2256,13 @@ targets."
         (list
           #'cape-file
           ;; Merge dabbrev and dict candidates
-          (cape-capf-properties (cape-capf-super #'cape-dabbrev #'cape-dict) :sort t)))))
+          (cape-capf-properties
+            (cape-capf-super
+              #'cape-dabbrev
+              #'cape-dict
+              (cape-company-to-capf #'company-ispell)
+              (cape-company-to-capf #'company-wordfreq))
+            :sort t)))))
 
   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
   (add-hook
@@ -2640,9 +2312,12 @@ targets."
         (lambda ()
           (setq-local completion-at-point-functions
             (list
-              #'cape-file
-              #'yasnippet-capf
-              (cape-capf-super #'lsp-completion-at-point #'citre-completion-at-point #'cape-keyword)
+              #'cape-file #'yasnippet-capf
+              (cape-capf-super
+                #'lsp-completion-at-point
+                #'citre-completion-at-point
+                #'cape-keyword
+                (cape-company-to-capf #'company-yasnippet))
               (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
@@ -2657,13 +2332,10 @@ targets."
     ("w")
     ("g")
     ("G")
-    ("a")
     ("F")
     ("l" . lsp)
-    ("L" . lsp)
     ("q" . lsp-disconnect)
     ("Q" . lsp-workspace-shutdown)
-    ("H" . lsp-describe-session)
     ("R" . lsp-workspace-restart)
     ("d" . lsp-find-declaration)
     ("e" . lsp-find-definition)
@@ -2764,11 +2436,12 @@ targets."
   :config
   ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
   ;; interfere with `completion-at-point-functions'
-  (cond
-    ((eq sb/capf 'company)
-      (setq lsp-completion-enable t))
-    ((eq sb/capf 'corfu)
-      (setq lsp-completion-enable nil)))
+  (when (eq sb/capf 'corfu)
+    ;; (setq lsp-completion-enable nil)
+
+    (defun sb/lsp-mode-setup-completion ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex)))
+    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
 
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -2905,14 +2578,6 @@ targets."
   (lsp-latex-chktex-on-open-and-save t)
   ;; Delay time in milliseconds before reporting diagnostics
   (lsp-latex-diagnostics-delay 2000)
-
-  ;; Support forward search with Evince. Inverse search is already configured with evince-synctex,
-  ;; use Ctrl+Click in the PDF document.
-  ;; (lsp-latex-forward-search-executable "evince-synctex")
-  ;; “%f” is replaced with "The path of the current TeX file", "%p" with "The path of the current
-  ;; PDF file", "%l" with "The current line number" by texlab
-  ;; (lsp-latex-forward-search-args '("-f" "%l" "%p" "\"emacsclient +%l %f\""))
-
   ;; Support forward search with Okular. Perform inverse search with Shift+Click in the PDF.
   (lsp-latex-forward-search-executable "okular")
   (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
@@ -2931,9 +2596,6 @@ targets."
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
-
-;; ;; (use-package highlight-escape-sequences
-;; ;;   :hook (prog-mode . hes-mode))
 
 (use-package compile
   :straight (:type built-in)
@@ -2954,13 +2616,7 @@ targets."
 (use-package rainbow-delimiters
   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
-;; Tree-sitter provides advanced syntax highlighting features. Run
-;; `tree-sitter-langs-install-grammars' to install the grammar files for languages for tree-sitter.
-;; Run `tree-sitter-langs-install-grammars' periodically to install new grammars.
-
-;; https://www.reddit.com/r/emacs/comments/10iuim1/getting_emacs_29_to_automatically_use_treesitter/
-;; https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
-
+;; Tree-sitter provides advanced syntax highlighting features.
 (use-package treesit-auto
   :when (executable-find "tree-sitter")
   :demand t
@@ -3019,7 +2675,11 @@ targets."
         (treesit-language-available-p 'python)
         (treesit-language-available-p 'toml)
         (treesit-language-available-p 'yaml)))
-    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))))
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
+
+  (with-eval-after-load "c++-ts-mode"
+    (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
+    (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map)))
 
 ;; (with-eval-after-load "treesit"
 ;;   ;; Improves performance with large files without significantly diminishing highlight quality
@@ -3048,14 +2708,6 @@ targets."
   ;;   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
   ;;   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
   ;;   ;; (eldoc-echo-area-use-multiline-p nil)
-  ;;   :config
-  ;;   ;; Allow eldoc to trigger after completions
-  ;;   (with-eval-after-load "company"
-  ;;     (eldoc-add-command
-  ;;       'company-complete-selection
-  ;;       'company-complete-common
-  ;;       'company-capf
-  ;;       'company-abort))
   :diminish)
 
 ;; Available C styles: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
@@ -3140,10 +2792,6 @@ targets."
     ("C-M-a" . treesit-beginning-of-defun)
     ("C-M-e" . treesit-end-of-defun)))
 
-;; (use-package modern-cpp-font-lock ; Better highlight for modern C++
-;;   :hook (c++-mode . modern-c++-font-lock-mode)
-;;   :diminish modern-c++-font-lock-mode)
-
 (use-package cuda-mode
   :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
 
@@ -3197,9 +2845,6 @@ targets."
   :hook (python-mode . python-docstring-mode)
   :diminish)
 
-;; (use-package pip-requirements
-;;   :commands (pip-requirements-mode))
-
 (use-package pyvenv
   :hook ((python-mode python-ts-mode) . pyvenv-mode)
   :custom
@@ -3231,12 +2876,8 @@ targets."
   :interpreter "fish"
   :hook (fish-mode . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
-;; ;; Files are given `+x' permissions when they are saved, if they contain a valid shebang line.
-;; ;; (use-package executable
-;; ;;   :hook (after-save . executable-make-buffer-file-executable-if-script-p))
-
-;; (use-package highlight-doxygen
-;;   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
+(use-package highlight-doxygen
+  :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
 
 (use-package lisp-mode
   :straight (:type built-in)
@@ -3541,10 +3182,11 @@ targets."
 ;; ;;   :straight (:host github :repo "jdtsmith/org-modern-indent")
 ;; ;;   :hook (org-mode . org-modern-indent-mode))
 
-;; ;; (use-package org-block-capf
-;; ;;   :straight (:host github :repo "xenodium/org-block-capf")
-;; ;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-;; ;;   :custom (org-block-capf-edit-style 'inline))
+;; Use "<" to trigger org block completion at point.
+(use-package org-block-capf
+  :straight (:host github :repo "xenodium/org-block-capf")
+  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+  :custom (org-block-capf-edit-style 'inline))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
@@ -3747,11 +3389,7 @@ Fallback to `xref-go-back'."
   :config
   ;; (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
 
-  (dolist
-    (func
-      '
-      (find-function ;counsel-imenu counsel-rg lsp-ivy-workspace-symbol
-        citre-jump))
+  (dolist (func '(find-function citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
 
   ;; Try lsp first, then use Citre
@@ -3768,41 +3406,6 @@ Fallback to `xref-go-back'."
             (with-demoted-errors "%s, fallback to citre"
               (funcall fetcher))
             (funcall citre-fetcher))))))
-
-  (with-eval-after-load "company"
-    (defmacro citre-backend-to-company-backend (backend)
-      "Create a company backend from Citre completion backend BACKEND.
-The result is a company backend called
-`company-citre-<backend>' (like `company-citre-tags') and can be
-used in `company-backends'."
-      (let
-        (
-          (backend-name (intern (concat "company-citre-" (symbol-name backend))))
-          (docstring
-            (concat
-              "`company-mode' backend from the `"
-              (symbol-name backend)
-              "' Citre backend.\n"
-              "`citre-mode' needs to be enabled to use this.")))
-        `
-        (defun ,backend-name (command &optional arg &rest ignored)
-          ,docstring
-          (pcase command
-            ('interactive (company-begin-backend ',backend-name))
-            ('prefix
-              (and (bound-and-true-p citre-mode)
-                (citre-backend-usable-p ',backend)
-                ;; We shouldn't use this as it's defined for getting definitions/references. But the
-                ;; Citre completion backend design is not fully compliant with company's design so
-                ;; there's no simple "right" solution, and this works for tags/global backends.
-                (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
-            ('meta (citre-get-property 'signature arg))
-            ('annotation (citre-get-property 'annotation arg))
-            ('candidates
-              (let ((citre-completion-backends '(,backend)))
-                (all-completions arg (nth 2 (citre-completion-at-point)))))))))
-
-    (citre-backend-to-company-backend tags))
   :diminish)
 
 (use-package breadcrumb
@@ -3856,7 +3459,6 @@ If region is active, apply to active region instead."
     "*pyright*"
     "*texlab::stderr*"
     "*texlab*"
-    "*Paradox Report*"
     "*perl-language-server*"
     "*perl-language-server::stderr*"
     "*json-ls*"
@@ -3885,7 +3487,6 @@ If region is active, apply to active region instead."
     fundamental-mode
     helpful-mode
     special-mode
-    paradox-menu-mode
     lsp-log-io-mode
     help-mode
     magit-status-mode
@@ -3939,15 +3540,6 @@ or the major mode is not in `sb/skippable-modes'."
       (setq mode parent))
     (setq modes (nreverse modes))))
 
-(defun sb/goto-line-with-feedback ()
-  "Show line numbers temporarily, while prompting for the line number input."
-  (interactive)
-  (unwind-protect
-    (progn
-      (linum-mode 1)
-      (forward-line (read-number "Goto line: ")))
-    (linum-mode -1)))
-
 ;; Configure appearance-related settings at the end
 
 ;; Decrease minibuffer font size
@@ -3957,11 +3549,6 @@ or the major mode is not in `sb/skippable-modes'."
     (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
 
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
-
-;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
-;; numbers only for GUI and daemon.
-;; (when (or (display-graphic-p) (daemonp))
-;;   (global-display-line-numbers-mode 1))
 
 (use-package doom-themes
   :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
@@ -4165,7 +3752,7 @@ PAD can be left (`l') or right (`r')."
 
 ;; This was bound to `electric-newline-and-maybe-indent'. However, this causes problems when
 ;; pressing "C-c C-j" quickly for `imenu'.
-(unbind-key "C-j")
+;; (unbind-key "C-j")
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
@@ -4200,21 +3787,20 @@ PAD can be left (`l') or right (`r')."
 ;; (use-package term-keys
 ;;   :straight (:host github :repo "CyberShadow/term-keys")
 ;;   :unless (display-graphic-p)
-;;   :hook (emacs-startup . term-keys-mode)
-;;   :config (require 'term-keys-konsole))
+;;   :hook (emacs-startup . term-keys-mode))
 
-(use-package pixel-scroll
-  :straight (:type built-in)
-  :bind
-  ([remap scroll-up-command] . pixel-scroll-interpolate-down)
-  ([remap scroll-down-command] . pixel-scroll-interpolate-up)
-  :custom (pixel-scroll-precision-interpolate-page t)
-  :init
-  (cond
-    ((fboundp 'pixel-scroll-precision-mode)
-      (pixel-scroll-precision-mode 1))
-    ((fboundp 'pixel-scroll-mode)
-      (pixel-scroll-mode 1))))
+;; (use-package pixel-scroll
+;;   :straight (:type built-in)
+;;   :bind
+;;   ([remap scroll-up-command] . pixel-scroll-interpolate-down)
+;;   ([remap scroll-down-command] . pixel-scroll-interpolate-up)
+;;   :custom (pixel-scroll-precision-interpolate-page t)
+;;   :init
+;;   (cond
+;;     ((fboundp 'pixel-scroll-precision-mode)
+;;       (pixel-scroll-precision-mode 1))
+;;     ((fboundp 'pixel-scroll-mode)
+;;       (pixel-scroll-mode 1))))
 
 ;; Hide "When done with a buffer, type C-x 5" message
 (when (boundp 'server-client-instructions)
