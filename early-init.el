@@ -141,6 +141,27 @@
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
+;; (defun sb/init-fonts-daemon (frame)
+;;   (message "getting called")
+;;   (cond
+;;     ((string= (system-name) "inspiron-7572")
+;;       (progn
+;;         ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
+;;         (add-to-list 'default-frame-alist '(font . "MesloLGSNF-20"))))))
+;; FIXME: The hook is not working.
+;; (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
+
+(when (daemonp)
+  (cond
+    ((string= (system-name) "swarnendu-Inspiron-7572")
+      (progn
+        ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
+        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
+
+    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+      (progn
+        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
+
 (provide 'early-init)
 
 ;;; early-init.el ends here

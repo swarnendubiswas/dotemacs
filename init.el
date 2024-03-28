@@ -1192,14 +1192,14 @@ targets."
   :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
 
-;; (use-package consult-dir
-;;   :after consult
-;;   :bind
-;;   (("C-x C-d" . consult-dir)
-;;     :map
-;;     vertico-map
-;;     ("C-x C-d" . consult-dir)
-;;     ("C-x C-j" . consult-dir-jump-file)))
+(use-package consult-dir
+  :after consult
+  :bind
+  (("C-x C-d" . consult-dir)
+    :map
+    vertico-map
+    ("C-x C-d" . consult-dir)
+    ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-flyspell
   :after (consult flyspell)
@@ -1730,6 +1730,8 @@ targets."
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
+  ;; Allow always pairing matching delimiters
+  (electric-pair-inhibit-predicate 'ignore)
   :config
   (defvar sb/markdown-pairs '((?` . ?`))
     "Electric pairs for `markdown-mode'.")
@@ -2243,11 +2245,12 @@ targets."
               (cape-company-to-capf #'company-yasnippet))
             (cape-capf-super #'cape-dabbrev #'cape-dict))))))
 
-  (add-hook
-    'flex-mode-hook
-    (lambda ()
-      (setq-local completion-at-point-functions
-        (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict))))
+  (dolist (mode '(flex-mode-hook bison-mode-hook))
+    (add-hook
+      mode
+      (lambda ()
+        (setq-local completion-at-point-functions
+          (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
 
   (add-hook
     'text-mode-hook
@@ -2585,6 +2588,12 @@ targets."
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc"))
 
+(use-package lsp-snippet-yasnippet
+  :straight (lsp-snippet-yasnippet :type git :host github :repo "svaante/lsp-snippet")
+  :after (lsp-mode yasnippet)
+  :demand t
+  :config (lsp-snippet-yasnippet-lsp-mode-init))
+
 (use-package subword
   :straight (:type built-in)
   :hook (prog-mode . subword-mode)
@@ -2710,20 +2719,6 @@ targets."
   ;;   ;; (eldoc-echo-area-use-multiline-p nil)
   :diminish)
 
-;; Available C styles: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
-;;   "gnu": The default style for GNU projects
-;;   "k&r": What Kernighan and Ritchie, the authors of C used in their book
-;;   "bsd": What BSD developers use, aka "Allman style" after Eric Allman.
-;;   "whitesmith": Popularized by the examples that came with Whitesmiths C, an early commercial C
-;;   compiler.
-;;   "stroustrup": What Stroustrup, the author of C++ used in his book
-;;   "ellemtel": Popular C++ coding standards as defined by "Programming in C++, Rules and
-;;   Recommendations," Erik Nyquist and Mats Henricson, Ellemtel
-;;   "linux": What the Linux developers use for kernel development
-;;   "python": What Python developers use for extension modules
-;;   "java": The default style for java-mode (see below)
-;;   "user": When you want to define your own style
-
 (use-package cc-mode
   :straight (:type built-in)
   :mode (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
@@ -2732,10 +2727,10 @@ targets."
     .
     (lambda ()
       (setq-local
+        ;; Available C styles: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
         c-set-style "cc-mode"
         c-basic-offset 2
-        ;; Disable electric indentation and on-type formatting
-        c-auto-newline nil
+        c-auto-newline nil ; Disable electric indentation and on-type formatting
         ;; c-electric-brace nil
         c-electric-flag nil
         ;; c-electric-indent nil
@@ -2754,28 +2749,7 @@ targets."
         c-ts-mode-indent-style 'linux
         c-ts-mode-indent-offset 2
         c-ts-mode-toggle-comment-style -1
-        ;; Disable electric indentation and on-type formatting
-        c-auto-newline nil
-        ;; c-electric-brace nil
-        c-electric-flag nil
-        ;; c-electric-indent nil
-        c-enable-auto-newline nil
-        c-syntactic-indentation nil)
-      (lsp-deferred)))
-  :bind (:map c-ts-mode-map ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun)))
-
-(use-package c-ts-mode
-  :straight (:type built-in)
-  :hook
-  ((c-ts-mode c++-ts-mode)
-    .
-    (lambda ()
-      (setq-local
-        c-ts-mode-indent-style 'linux
-        c-ts-mode-indent-offset 2
-        c-ts-mode-toggle-comment-style -1
-        ;; Disable electric indentation and on-type formatting
-        c-auto-newline nil
+        c-auto-newline nil ; Disable electric indentation and on-type formatting
         ;; c-electric-brace nil
         c-electric-flag nil
         ;; c-electric-indent nil
@@ -3677,27 +3651,6 @@ PAD can be left (`l') or right (`r')."
     (messages-buffer-mode . nano-modeline-message-mode))
   :custom (nano-modeline-position #'nano-modeline-footer))
 
-;; (defun sb/init-fonts-daemon (frame)
-;;   (message "getting called")
-;;   (cond
-;;     ((string= (system-name) "inspiron-7572")
-;;       (progn
-;;         ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
-;;         (add-to-list 'default-frame-alist '(font . "MesloLGSNF-20"))))))
-;; FIXME: The hook is not working.
-;; (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
-
-(when (daemonp)
-  (cond
-    ((string= (system-name) "swarnendu-Inspiron-7572")
-      (progn
-        ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
-        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
-
-    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-      (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
-
 (use-package olivetti
   :hook
   ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
@@ -3766,9 +3719,9 @@ PAD can be left (`l') or right (`r')."
   ("M-<right>" . sb/next-buffer)
   ("C-<tab>" . sb/next-buffer))
 
-;; (use-package default-text-scale
-;;   :when (display-graphic-p)
-;;   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
+(use-package default-text-scale
+  :when (display-graphic-p)
+  :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
 ;; (use-package free-keys
 ;;   :commands free-keys)
