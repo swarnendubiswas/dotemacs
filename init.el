@@ -1712,8 +1712,6 @@ targets."
     ("M-g m" . smerge-context-menu)
     ("M-g M" . smerge-popup-context-menu)))
 
-;; ;; (use-package with-editor :diminish)
-
 (use-package paren
   :straight (:type built-in)
   :custom
@@ -1897,35 +1895,35 @@ targets."
   ;; (add-hook 'LaTeX-mode-hook (lambda () (run-with-idle-timer 30 t #'format-all-buffer)))
   :diminish)
 
-;; ;; https://languagetool.org/download/LanguageTool-stable.zip
-;; ;; The "languagetool" folder should include all files in addition to the ".jar" files.
+;; https://languagetool.org/download/LanguageTool-stable.zip
+;; The "languagetool" folder should include all files in addition to the ".jar" files.
 
-;; ;; (use-package langtool
-;; ;;   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
-;; ;;   :init
-;; ;;   (setq
-;; ;;     langtool-default-language "en-US"
-;; ;;     languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-;; ;;     languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-;; ;;     languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
-;; ;;     langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-;; ;;     langtool-disabled-rules
-;; ;;     '
-;; ;;     ("MORFOLOGIK_RULE_EN_US"
-;; ;;       ;; "WHITESPACE_RULE"
-;; ;;       ;; "EN_QUOTES"
-;; ;;       ;; "DASH_RULE"
-;; ;;       ;; "COMMA_PARENTHESIS_WHITESPACE"
-;; ;;       ;; "OXFORD_SPELLING_ISE_VERBS"
-;; ;;       ;; "OXFORD_SPELLING_NOUNS")
-;; ;;       )))
+;; (use-package langtool
+;;   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
+;;   :init
+;;   (setq
+;;     langtool-default-language "en-US"
+;;     languagetool-java-arguments '("-Dfile.encoding=UTF-8")
+;;     languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
+;;     languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
+;;     langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
+;;     langtool-disabled-rules
+;;     '
+;;     ("MORFOLOGIK_RULE_EN_US"
+;;       ;; "WHITESPACE_RULE"
+;;       ;; "EN_QUOTES"
+;;       ;; "DASH_RULE"
+;;       ;; "COMMA_PARENTHESIS_WHITESPACE"
+;;       ;; "OXFORD_SPELLING_ISE_VERBS"
+;;       ;; "OXFORD_SPELLING_NOUNS")
+;;       )))
 
-;; ;; (use-package highlight-indentation
-;; ;;   :hook
-;; ;;   ((yaml-mode yaml-ts-mode python-mode python-ts-mode)
-;; ;;     .
-;; ;;     highlight-indentation-mode)
-;; ;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
+;; (use-package highlight-indentation
+;;   :hook
+;;   ((yaml-mode yaml-ts-mode python-mode python-ts-mode)
+;;     .
+;;     highlight-indentation-mode)
+;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
 ;; (use-package
 ;;   indent-bars
@@ -1963,10 +1961,10 @@ targets."
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
 
-;; (use-package flycheck-hl-todo
-;;   :straight (:host github :repo "alvarogonzalezsotillo/flycheck-hl-todo")
-;;   :after flycheck
-;;   :init (flycheck-hl-todo-setup))
+(use-package flycheck-hl-todo
+  :straight (:host github :repo "alvarogonzalezsotillo/flycheck-hl-todo")
+  :after flycheck
+  :init (flycheck-hl-todo-setup))
 
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
@@ -1994,17 +1992,14 @@ targets."
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setq
-      completion-styles '(orderless substring basic)
-      ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-      ;; work. I also want substring matching for file names.
-      completion-category-overrides
-      '
-      ((file (styles basic substring partial-completion))
-        ;; (buffer (styles basic substring flex))
-        ;; (project-file (styles basic substring flex))
-        ;; (minibuffer (orderless flex))
-        ))))
+    (setq completion-styles '(orderless substring basic)))
+
+  (with-eval-after-load "hotfuzz"
+    (setq completion-styles '(hotfuzz substring basic)))
+
+  ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
+  ;; work. I also want substring matching for file names.
+  (setq completion-category-overrides '((file (styles basic substring partial-completion)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
@@ -2039,11 +2034,15 @@ targets."
   :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
 
 ;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
-(use-package orderless
-  :demand t
-  :custom
-  ;; Allow escaping space with backslash
-  (orderless-component-separator 'orderless-escapable-split-on-space))
+;; (use-package orderless
+;;   :demand t
+;;   :custom
+;;   ;; Allow escaping space with backslash
+;;   (orderless-component-separator 'orderless-escapable-split-on-space))
+
+;; Smart(er) fuzzy completion matching
+(use-package hotfuzz
+  :demand t)
 
 (use-package yasnippet
   :hook (emacs-startup . yas-global-mode)
