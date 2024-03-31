@@ -575,3 +575,8 @@ Navigate to the file, press ~embark-act~ (~C-l~), and press ~i~ to insert the fi
 - Visit the file that has ^M chars
 - Go to the beginning of the file (M-<)
 - Invoke =M-x replace-string RET =C-q C-m RET RET=
+
+** Use the mark ring to navigate in a file
+
+- Press ~C-SPC C-SPC~ to enter the location in the mark ring buffer
+- Use ~C-u C-SPC~ to move to the position popped from the mark ring

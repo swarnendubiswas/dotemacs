@@ -115,9 +115,9 @@ This location is used for temporary installations and files.")
 ;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
 ;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
 ;; case when used as a grouped backend.
-(defcustom sb/capf 'corfu
+(defcustom sb/capf 'company
   "Choose the framework to use for completion at point."
-  :type '(radio (const :tag "corfu" corfu) (const :tag "none" none))
+  :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Helper const variables
@@ -629,13 +629,6 @@ This location is used for temporary installations and files.")
   :init (windmove-default-keybindings)
   :custom (windmove-wrap-around t "Wrap around at edges"))
 
-;; (use-package solar
-;;   :straight (:type built-in)
-;;   :custom
-;;   (calendar-latitude 26.50)
-;;   (calendar-location-name "Kanpur, UP, India")
-;;   (calendar-longitude 80.23))
-
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like `find-file' unless a
 ;; prefix argument is given. Then it will find file at point.
 (use-package ffap
@@ -778,13 +771,6 @@ This location is used for temporary installations and files.")
   :config
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
-
-;; (use-package vlf ; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-;;   :demand t
-;;   :commands vlf
-;;   :init
-;;   (setq vlf-application 'dont-ask)
-;;   (require 'vlf-setup))
 
 ;; Immediately respawn the *scratch* buffer when it is killed
 (use-package immortal-scratch
@@ -2034,11 +2020,17 @@ targets."
   :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
 
 ;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
-;; (use-package orderless
-;;   :demand t
-;;   :custom
-;;   ;; Allow escaping space with backslash
-;;   (orderless-component-separator 'orderless-escapable-split-on-space))
+(use-package orderless
+  :demand t
+  :custom
+  ;; Allow escaping space with backslash
+  (orderless-component-separator 'orderless-escapable-split-on-space)
+  :config
+  (with-eval-after-load "company"
+    (defun sb/just-one-face (fn &rest args)
+      (let ((orderless-match-faces [completions-common-part]))
+        (apply fn args)))
+    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 ;; Smart(er) fuzzy completion matching
 (use-package hotfuzz
@@ -2057,6 +2049,104 @@ targets."
 (use-package yasnippet-snippets
   :after yasnippet
   :init (yasnippet-snippets-initialize))
+
+;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used for the
+;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
+;; `complete-symbol' with regex search.
+
+(use-package company
+  :when (eq sb/capf 'company)
+  :hook (emacs-startup . global-company-mode)
+  :bind
+  (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
+    :map
+    company-active-map
+    ("C-M-/" . company-other-backend)
+    ("C-s" . company-search-candidates)
+    ("C-M-s" . company-filter-candidates)
+    ("<tab>" . company-complete-common-or-cycle)
+    ("TAB" . company-complete-common-or-cycle)
+    ("<backtab>" .
+      (lambda ()
+        (interactive)
+        (company-complete-common-or-cycle -1)))
+    ;; ([escape] . company-abort)
+    ("M-." . company-show-location)
+    ("C-h" . company-show-doc-buffer)
+    :map
+    company-search-map
+    ("C-s" . company-search-repeat-forward)
+    ("C-r" . company-search-repeat-backward)
+    ("C-g" . company-search-abort)
+    ("DEL" . company-search-delete-char))
+  :custom
+  ;; (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
+  ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
+  ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  (company-idle-delay 0.05 "Start autocompletion faster")
+  (company-dabbrev-code-ignore-case t)
+  (company-dabbrev-code-completion-styles '(basic flex))
+  (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
+  (company-minimum-prefix-length 3 "Small words can be faster to type")
+  (company-require-match nil "Allow typing input characters that do not match candidates")
+  (company-show-quick-access t "Speed up selecting a completion")
+  ;; Align additional metadata, like type signatures, to the right-hand side because it looks better
+  (company-tooltip-align-annotations t)
+  ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there is only
+  ;; one candidate, `company-preview-frontend' shows the preview in-place which is too intrusive,
+  ;; `company-preview-if-just-one-frontend' shows in-place preview if there is only choice,
+  ;; `company-echo-metadata-frontend' shows selected candidate docs in echo area, and
+  ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
+  ;; (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
+  (company-global-modes
+    '
+    (not dired-mode
+      erc-mode
+      message-mode
+      comint-mode
+      inferior-python-mode
+      vterm-mode
+      magit-status-mode
+      help-mode
+      gud-mode
+      eshell-mode
+      shell-mode
+      csv-mode
+      minibuffer-inactive-mode))
+  (company-format-margin-function nil "Disable icons")
+  (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
+  ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
+  :diminish)
+
+(use-package company-quickhelp
+  :after company
+  :when (display-graphic-p)
+  :hook (prog-mode . company-quickhelp-mode))
+
+(use-package company-quickhelp-terminal
+  :after company-quickhelp
+  :unless (display-graphic-p)
+  :hook (prog-mode . company-quickhelp-terminal-mode))
+
+(use-package company-statistics
+  :after company
+  :init (company-statistics-mode 1))
+
+;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
+;; slows completions.
+;; (use-package company-fuzzy
+;;   :straight flx
+;;   :straight t
+;;   :after company
+;;   :demand t
+;;   :custom
+;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
+;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
+;;   ;; Disabling the requirement may help with performance.
+;;   (company-fuzzy-prefix-on-top t)
+;;   :diminish)
 
 (use-package company-auctex
   :after (tex-mode corfu)
@@ -2085,6 +2175,12 @@ targets."
 ;;   :after tex-mode
 ;;   :demand t)
 
+;; Complete in the middle of words
+(use-package company-anywhere
+  :straight (:host github :repo "zk-phi/company-anywhere")
+  :after company
+  :demand t)
+
 (use-package company-dict
   :after corfu
   :demand t
@@ -2092,6 +2188,21 @@ targets."
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
+
+;; Better replacement for `company-files'
+(use-package company-dirfiles
+  :straight (:host codeberg :repo "cwfoo/company-dirfiles")
+  :after company
+  :demand t)
+
+;; (use-package company-org-block
+;;   :after (company org)
+;;   :demand t)
+
+(use-package company-c-headers
+  :after (company cc-mode)
+  :demand t
+  :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 (use-package company-web
   :after corfu
@@ -2102,6 +2213,249 @@ targets."
   :straight (:host github :repo "johannes-mueller/company-wordfreq.el")
   :after corfu
   :demand t)
+
+;; Try completion backends in order untill there is a non-empty completion list:
+;; (setq company-backends '(company-xxx company-yyy company-zzz))
+
+;; Merge completions of all the backends:
+;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+
+;; Merge completions of all the backends but keep the candidates organized in accordance with the
+;; grouped backends order.
+;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
+
+;; Another keyword :with helps to make sure the results from major/minor mode agnostic backends
+;; (such as company-yasnippet, company-dabbrev-code) are returned without preventing results from
+;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
+;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
+;; :with, and only then put context agnostic backend(s).
+;; (setq company-backends '((company-capf :with company-yasnippet)))
+
+;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
+;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
+;; (e.g. outside of strings and comments), and pass on control to later backends when outside of
+;; that major mode or context.
+
+;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
+;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
+;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
+;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
+;; non-nil for following backends even when their ‘candidates’ list command is empty:
+;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
+
+;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
+;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
+;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
+;; `:separate', the candidates that come from different backends are sorted separately in the
+;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
+;; the order of completions just like the backends returned them.
+
+(with-eval-after-load "company"
+  ;; Override `company-backends' for unhandled major modes.
+  (setq
+    company-backends
+    '
+    (company-dirfiles
+      (company-capf :with company-dabbrev-code company-yasnippet)
+      ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
+      ;; ignored.
+      company-ispell company-dict company-dabbrev)
+    ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
+    ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
+    ;; `delete-dups'.
+    company-transformers
+    '
+    (delete-dups ; company-sort-by-backend-importance
+      ; company-sort-by-occurrence
+      company-sort-by-statistics
+      company-sort-prefer-same-case-prefix))
+
+  ;; (add-to-list 'company-transformers 'delete-dups)
+  ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
+  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+
+  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
+  ;; https://github.com/company-mode/company-mode/issues/358
+  (push
+    (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+    company-transformers)
+
+  (progn
+    (defun sb/company-latex-mode ()
+      "Add backends for `latex-mode' completion in company mode."
+      (make-local-variable 'company-backends)
+
+      ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
+
+      ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
+      ;; labels and citations. `company-reftex-labels' is expected to be better than
+      ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
+      ;; `company-auctex-bibs'.
+
+      ;; `company-capf' does not pass to later backends with Texlab, so we have it last
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-math-symbols-latex ; Math latex tags
+            company-latex-commands
+            company-reftex-labels
+            company-reftex-citations
+            company-auctex-environments
+            company-auctex-macros
+            company-auctex-labels
+            ;; Math unicode symbols and sub(super)scripts
+            company-math-symbols-unicode
+            company-auctex-symbols
+            company-auctex-bibs
+            ;; company-bibtex
+            ;; :separate
+            company-ispell
+            company-dict
+            company-dabbrev
+            company-wordfreq
+            company-capf))))
+
+    (add-hook
+      'LaTeX-mode-hook
+      (lambda ()
+        (sb/company-latex-mode)
+        ;; `company-capf' does not pass to later backends with Texlab, so we use
+        ;; `company-fuzzy-mode' to merge results from all backends.
+        ;; (company-fuzzy-mode 1)
+        ;; (diminish 'company-fuzzy-mode)
+        )))
+
+  (progn
+    (defun sb/company-org-mode ()
+      "Add backends for org completion in company mode."
+      (set
+        (make-local-variable 'company-backends)
+        '(company-dirfiles company-org-block company-ispell company-dict company-dabbrev)))
+
+    (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
+
+  (progn
+    (defun sb/company-text-mode ()
+      "Add backends for `text-mode' completion in company mode."
+      (set
+        (make-local-variable 'company-backends)
+        '(company-dirfiles (company-wordfreq company-ispell company-dict company-dabbrev))))
+
+    ;; Extends to derived modes like `markdown-mode' and `org-mode'
+    (add-hook
+      'text-mode-hook
+      (lambda ()
+        (unless (derived-mode-p 'LaTeX-mode)
+          (sb/company-text-mode)
+
+          ;; (defun sb/company-after-completion-hook (&rest _ignored)
+          ;;   (just-one-space))
+          ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
+          ))))
+
+  (progn
+    (defun sb/company-yaml-mode ()
+      "Add backends for `yaml-mode' completion in company mode."
+      (make-local-variable 'company-backends)
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-capf
+            :with
+            company-dabbrev-code ; Useful for variable names
+            company-yasnippet
+            :separate)
+          company-dict company-ispell company-dabbrev)))
+
+    (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
+      (add-hook mode (lambda () (sb/company-yaml-mode)))))
+
+  (progn
+    (defun sb/company-html-mode ()
+      "Add backends for html completion in company mode."
+      (setq-local company-minimum-prefix-length 2)
+
+      (set
+        (make-local-variable 'company-backends)
+        '
+        (company-dirfiles
+          (company-capf company-web-html)
+          company-ispell
+          company-dict
+          company-dabbrev)))
+
+    (dolist (hook '(html-mode-hook html-ts-mode-hook))
+      (add-hook hook (lambda () (sb/company-html-mode)))))
+
+  (progn
+    (defun sb/company-prog-mode ()
+      "Add backends for `prog-mode' completion in company mode."
+      ;; Typing short prefixes help with faster completion and a more responsive UI
+      (setq-local company-minimum-prefix-length 2)
+
+      (make-local-variable 'company-backends)
+
+      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+
+      (cond
+        ((eq sb/lsp-provider 'eglot)
+          (setq company-backends
+            '
+            (company-dirfiles
+              (company-capf
+                company-c-headers
+                :with company-keywords
+                company-dabbrev-code ; Useful for variable names
+                company-yasnippet
+                :separate)
+              company-dict company-ispell company-dabbrev)))
+        ((eq sb/lsp-provider 'lsp-mode)
+          (setq company-backends
+            '
+            (company-dirfiles
+              (company-capf
+                company-citre-tags company-c-headers
+                :with company-keywords
+                company-dabbrev-code ; Useful for variable names
+                company-yasnippet
+                :separate)
+              company-dict company-ispell company-dabbrev)))))
+
+    (add-hook
+      'prog-mode-hook
+      (lambda ()
+        (unless
+          (or (derived-mode-p 'emacs-lisp-mode)
+            (derived-mode-p 'flex-mode)
+            (derived-mode-p 'bison-mode))
+          (sb/company-prog-mode)))))
+
+  (progn
+    (defun sb/company-elisp-mode ()
+      "Add backends for `emacs-lisp-mode' completion in company mode."
+      ;; Typing short prefixes help with faster completion and a more responsive UI
+      (setq-local company-minimum-prefix-length 2)
+
+      (make-local-variable 'company-backends)
+
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-capf
+            company-citre-tags
+            :with company-keywords
+            company-dabbrev-code ; Useful for variable names
+            company-yasnippet
+            :separate)
+          company-dict company-ispell company-dabbrev)))
+
+    (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
+      (add-hook
+        hook
+        (lambda ()
+          (sb/company-elisp-mode)
+          ;; (company-fuzzy-mode 1)
+          )))))
 
 ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
 (use-package corfu
@@ -2716,6 +3070,14 @@ targets."
   ;;   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
   ;;   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
   ;;   ;; (eldoc-echo-area-use-multiline-p nil)
+  :config
+  ;; Allow eldoc to trigger after completions
+  (with-eval-after-load "company"
+    (eldoc-add-command
+      'company-complete-selection
+      'company-complete-common
+      'company-capf
+      'company-abort))
   :diminish)
 
 (use-package cc-mode
@@ -3379,6 +3741,41 @@ Fallback to `xref-go-back'."
             (with-demoted-errors "%s, fallback to citre"
               (funcall fetcher))
             (funcall citre-fetcher))))))
+
+  (with-eval-after-load "company"
+    (defmacro citre-backend-to-company-backend (backend)
+      "Create a company backend from Citre completion backend BACKEND.
+The result is a company backend called
+`company-citre-<backend>' (like `company-citre-tags') and can be
+used in `company-backends'."
+      (let
+        (
+          (backend-name (intern (concat "company-citre-" (symbol-name backend))))
+          (docstring
+            (concat
+              "`company-mode' backend from the `"
+              (symbol-name backend)
+              "' Citre backend.\n"
+              "`citre-mode' needs to be enabled to use this.")))
+        `
+        (defun ,backend-name (command &optional arg &rest ignored)
+          ,docstring
+          (pcase command
+            ('interactive (company-begin-backend ',backend-name))
+            ('prefix
+              (and (bound-and-true-p citre-mode)
+                (citre-backend-usable-p ',backend)
+                ;; We shouldn't use this as it's defined for getting definitions/references. But the
+                ;; Citre completion backend design is not fully compliant with company's design so
+                ;; there's no simple "right" solution, and this works for tags/global backends.
+                (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
+            ('meta (citre-get-property 'signature arg))
+            ('annotation (citre-get-property 'annotation arg))
+            ('candidates
+              (let ((citre-completion-backends '(,backend)))
+                (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+
+    (citre-backend-to-company-backend tags))
   :diminish)
 
 (use-package breadcrumb
