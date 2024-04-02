@@ -248,13 +248,14 @@ This location is used for temporary installations and files.")
 
 (use-package emacs
   :hook
-  (prog-mode
-    .
-    (lambda ()
-      (auto-fill-mode 1) ; Autofill comments
-      ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-      (when (or (display-graphic-p) (daemonp))
-        (display-fill-column-indicator-mode 1))))
+  ((after-init . garbage-collect)
+    (prog-mode
+      .
+      (lambda ()
+        (auto-fill-mode 1) ; Autofill comments
+        ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
+        (when (or (display-graphic-p) (daemonp))
+          (display-fill-column-indicator-mode 1)))))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -1330,6 +1331,9 @@ targets."
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
+(use-package change-inner
+  :bind (("M-i" . change-inner) ("M-o" . change-outer)))
+
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
@@ -1406,7 +1410,6 @@ targets."
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
 (use-package bm
-  :disabled
   :init
   ;; Must be set before `bm' is loaded
   (setq
@@ -1566,7 +1569,8 @@ targets."
     ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
     ;; visible `isearch' candidates.
     ("C-'" . avy-isearch))
-  :custom (avy-background t "Provides better contrast"))
+  :custom (avy-background t "Provides better contrast")
+  :config (avy-setup-default))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
@@ -1978,7 +1982,7 @@ targets."
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setq completion-styles '(orderless substring basic)))
+    (setq completion-styles '(orderless-flex substring basic)))
 
   (with-eval-after-load "hotfuzz"
     (setq completion-styles '(hotfuzz substring basic)))
@@ -2032,13 +2036,16 @@ targets."
         (apply fn args)))
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
-;; Smart(er) fuzzy completion matching
-(use-package hotfuzz
-  :demand t)
+;; ;; Smart(er) fuzzy completion matching
+;; (use-package hotfuzz
+;;   :demand t)
 
 (use-package yasnippet
+  :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook (emacs-startup . yas-global-mode)
-  :custom (yas-verbosity 0)
+  :custom
+  (yas-verbosity 0)
+  (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config
   (with-eval-after-load "hippie-expand"
     (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
@@ -4119,8 +4126,8 @@ PAD can be left (`l') or right (`r')."
   :when (display-graphic-p)
   :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
 
-;; (use-package free-keys
-;;   :commands free-keys)
+(use-package free-keys
+  :commands free-keys)
 
 ;; (use-package key-quiz
 ;;   :commands key-quiz)
