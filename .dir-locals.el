@@ -113,12 +113,7 @@
       (eval .
         (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-      (eval .
-        (add-hook
-          'eglot-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
   (yaml-ts-mode
     .
@@ -126,12 +121,7 @@
       (eval .
         (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-      (eval .
-        (add-hook
-          'eglot-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
   (json-mode
     .
@@ -139,12 +129,7 @@
       (eval .
         (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-      (eval .
-        (add-hook
-          'eglot-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
   (json-ts-mode
     .
@@ -152,12 +137,7 @@
       (eval .
         (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-      (eval .
-        (add-hook
-          'eglot-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
   (jsonc-mode
     .
@@ -165,12 +145,7 @@
       (eval .
         (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-      (eval .
-        (add-hook
-          'eglot-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t)))))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))))
 
 
 ;; Local Variables:

@@ -1618,6 +1618,9 @@ targets."
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
 
+;; (use-package magit-delta
+;;   :hook (magit-mode . magit-delta-mode))
+
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
   :bind
@@ -1672,16 +1675,16 @@ targets."
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
 
-;; ;; Use "M-p/n" to cycle between older commit messages.
-;; (use-package git-commit
-;;   :hook
-;;   (git-commit-setup
-;;     .
-;;     (lambda ()
-;;       (git-commit-save-message)
-;;       (git-commit-turn-on-auto-fill)
-;;       (git-commit-turn-on-flyspell)))
-;;   :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
+;; Use "M-p/n" to cycle between older commit messages.
+(use-package git-commit
+  :hook
+  (git-commit-setup
+    .
+    (lambda ()
+      (git-commit-save-message)
+      (git-commit-turn-on-auto-fill)
+      (git-commit-turn-on-flyspell)))
+  :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them. Since Emacs 25.1,
 ;; `vc-git-find-file-hook' enables smerge for files with conflicts.
@@ -1982,7 +1985,7 @@ targets."
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setq completion-styles '(orderless-flex substring basic)))
+    (setq completion-styles '(orderless substring basic)))
 
   (with-eval-after-load "hotfuzz"
     (setq completion-styles '(hotfuzz substring basic)))
@@ -2403,30 +2406,16 @@ targets."
       (make-local-variable 'company-backends)
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
-
-      (cond
-        ((eq sb/lsp-provider 'eglot)
-          (setq company-backends
-            '
-            (company-dirfiles
-              (company-capf
-                company-c-headers
-                :with company-keywords
-                company-dabbrev-code ; Useful for variable names
-                company-yasnippet
-                :separate)
-              company-dict company-ispell company-dabbrev)))
-        ((eq sb/lsp-provider 'lsp-mode)
-          (setq company-backends
-            '
-            (company-dirfiles
-              (company-capf
-                company-citre-tags company-c-headers
-                :with company-keywords
-                company-dabbrev-code ; Useful for variable names
-                company-yasnippet
-                :separate)
-              company-dict company-ispell company-dabbrev)))))
+      (setq company-backends
+        '
+        (company-dirfiles
+          (company-capf
+            company-citre-tags company-c-headers
+            :with company-keywords
+            company-dabbrev-code ; Useful for variable names
+            company-yasnippet
+            :separate)
+          company-dict company-ispell company-dabbrev)))
 
     (add-hook
       'prog-mode-hook

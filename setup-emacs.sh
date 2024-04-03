@@ -190,7 +190,7 @@ install_npm_packages() {
 }
 
 install_texlab() {
-    TEXLAB_VER="5.13.0"
+    TEXLAB_VER="5.14.1"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
@@ -436,7 +436,7 @@ install_delta() {
 }
 
 install_difft() {
-    DIFFT_VER="0.56.1"
+    DIFFT_VER="0.57.0"
 
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
