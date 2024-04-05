@@ -7,10 +7,6 @@
 
 ;;; Code:
 
-;; Splitting the configuration across multiple files is much easier to maintain, and looks less
-;; cluttered. The downside is that more files need to be loaded during startup, affecting startup
-;; performance.
-
 (defgroup sb/emacs nil
   "Personal configuration for GNU Emacs."
   :group 'local)
@@ -46,7 +42,6 @@
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "nano-dark" nano-dark)
-    (const :tag "nordic-night" nordic-night)
     (const :tag "customized" sb/customized) ; Customizations over the default theme
     ;; No customization
     (const :tag "none" none))
@@ -64,6 +59,18 @@
     (const :tag "nano-modeline" nano-modeline)
     ;; No customization
     (const :tag "none" none))
+  :group 'sb/emacs)
+
+;; Corfu is easy to configure, integrates nicely with `orderless', and provides better completion
+;; for elisp symbols. But `corfu-terminal-mode' has a potential rendering problem with TUI Emacs,
+;; for completion popups appearing near the right edges. The completion entries wrap around, and
+;; sometimes messes up the completion. Company works better with Windows and TUI Emacs, and has more
+;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
+;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
+;; case when used as a grouped backend.
+(defcustom sb/capf 'company
+  "Choose the framework to use for completion at point."
+  :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
 (defcustom sb/window-split 'vertical
@@ -95,30 +102,6 @@ This depends on the orientation of the display."
 (defconst sb/user-tmp-directory (expand-file-name "tmp" sb/user-home-directory)
   "User temp directory.
 This location is used for temporary installations and files.")
-
-;; `pyls' and `mspyls' are not actively maintained. Improvements to `pylsp' is slow but I prefer it
-;; over `pyright'.
-(defcustom sb/python-langserver 'pylsp
-  "Choose the Python Language Server implementation."
-  :type '(radio (const :tag "pylsp" pylsp) (const :tag "pyright" pyright) (const :tag "none" none))
-  :group 'sb/emacs)
-
-(defcustom sb/minibuffer-completion 'vertico
-  "Choose the framework to use for narrowing and selection."
-  :type '(radio (const :tag "vertico" vertico) (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; Corfu is easy to configure, integrates nicely with `orderless', and provides better completion
-;; for elisp symbols. But `corfu-terminal-mode' has a potential rendering problem with TUI Emacs,
-;; for completion popups appearing near the right edges. The completion entries wrap around, and
-;; sometimes messes up the completion. Company works better with Windows and TUI Emacs, and has more
-;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
-;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
-;; case when used as a grouped backend.
-(defcustom sb/capf 'company
-  "Choose the framework to use for completion at point."
-  :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
-  :group 'sb/emacs)
 
 ;; Helper const variables
 
@@ -259,33 +242,18 @@ This location is used for temporary installations and files.")
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
-  (auto-save-no-message t "Allows for debugging frequent autosave triggers if `nil'")
+  (auto-save-no-message t "Do not print frequent autosave messages")
   (auto-save-interval 0 "Disable autosaving based on number of characters typed")
   (bookmark-save-flag 1 "Save bookmark after every bookmark edit and also when Emacs is killed")
-  (case-fold-search t "Searches and matches should ignore case")
-  (comment-auto-fill-only-comments t "Autofill comments modes that define them")
+  (comment-auto-fill-only-comments t "Autofill comments in modes that define them")
   (create-lockfiles nil)
   (custom-safe-themes t)
   (delete-by-moving-to-trash t "Use system trash to deal with mistakes while deleting")
-  ;; (enable-local-variables :all "Avoid `defvar' warnings")
-  (echo-keystrokes 0.1 "Show current key-sequence in minibuffer")
-  ;; Allow invoking a command that requires candidate-selection when are already in the middle of
-  ;; candidate-selection.
-  (enable-recursive-minibuffers nil)
-  ;; Expand truncated ellipsis:suspension points in the echo area, useful to see more information
-  (eval-expression-print-length 500)
-  (frame-title-format (list '(buffer-file-name "%f" "%b") " - " invocation-name))
-  (help-enable-symbol-autoload t)
   ;; Accelerate scrolling operations when non-nil. Only those portions of the buffer which are
   ;; actually going to be displayed get fontified.
   (fast-but-imprecise-scrolling t)
   (help-window-select t "Makes it easy to close the window")
   (history-delete-duplicates t)
-  (history-length 50 "Reduce the state that is to be read")
-  (indicate-buffer-boundaries nil)
-  (message-log-max 5000)
-  ;; (mouse-drag-copy-region nil "Mouse is disabled")
-  ;; (mouse-yank-at-point t "Yank at point with mouse instead of at click")
   (read-process-output-max (* 5 1024 1024) "`lsp-mode' suggests increasing the value")
   (remote-file-name-inhibit-locks t)
   (ring-bell-function 'ignore "Disable beeping sound")
@@ -313,11 +281,8 @@ This location is used for temporary installations and files.")
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
   (x-gtk-resize-child-frames 'resize-mode "Always trigger an immediate resize of the child frame")
   (x-underline-at-descent-line t "Underline looks a bit better when drawn lower")
-  (completion-ignore-case t "Ignore case when completing")
   (read-buffer-completion-ignore-case t "Ignore case when reading a buffer name")
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
-  (blink-matching-paren t)
-  (suggest-key-bindings t)
   (tags-add-tables nil)
   (tags-case-fold-search nil "case-sensitive")
   ;; Do not ask before rereading the "TAGS" files if they have changed
@@ -339,10 +304,6 @@ This location is used for temporary installations and files.")
   (confirm-kill-processes nil "Prevent 'Active processes exist' when you quit Emacs")
   (make-backup-files nil "Stop making backup `~' files")
   (require-final-newline t "Always end a file with a newline")
-  (scroll-error-top-bottom t)
-  ;; The Emacs documentation warns about performance slowdowns with enabling remote directory
-  ;; variables. I edit remote files mostly via TUI+SSH instead of Tramp.
-  (enable-remote-dir-locals nil)
   ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
   ;; file and runs all save-related hooks. We disable `auto-save-mode' and prefer
   ;; `auto-save-visited-mode' instead.
@@ -350,12 +311,7 @@ This location is used for temporary installations and files.")
   ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
   ;; it runs all the save-related hooks.
   (auto-save-visited-interval 30)
-  (inhibit-startup-buffer-menu nil)
   :config
-  ;; Keep track of the minibuffer nesting
-  (when (bound-and-true-p enable-recursive-minibuffers)
-    (minibuffer-depth-indicate-mode 1))
-
   (dolist
     (exts '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
     (add-to-list 'completion-ignored-extensions exts))
@@ -417,16 +373,9 @@ This location is used for temporary installations and files.")
   (when (eq sb/window-split 'horizontal)
     (setq
       split-height-threshold nil
-      split-width-threshold 0))
-
-  ;; Copying text from the TUI includes the line numbers, which is a nuisance. So, enable line
-  ;; numbers only for GUI and daemon.
-  ;; (when (or (display-graphic-p) (daemonp))
-  ;;   (global-display-line-numbers-mode 1))
-  )
+      split-width-threshold 0)))
 
 (setq
-  kill-whole-line t ; TODO: What is the utility of this variable?
   ;; Scroll settings from Doom Emacs
   scroll-preserve-screen-position t
   scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
@@ -447,17 +396,11 @@ This location is used for temporary installations and files.")
 (setq-default
   cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
   fill-column sb/fill-column
-  ;; electric-indent-inhibit nil
   indent-tabs-mode nil ; Spaces instead of tabs
-  indicate-empty-lines nil
-  ;; Major mode to use for files that do no specify a major mode. Setting this to
-  ;; `text-mode' causes LSP to run for unrelated files.
-  ;; major-mode 'text-mode
   tab-width 4
   ;; TAB first tries to indent the current line, and if the line was already indented,
   ;; then try to complete the thing at point.
   tab-always-indent 'complete
-  truncate-lines nil
   bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
   bidi-paragraph-direction 'left-to-right)
 
@@ -511,17 +454,13 @@ This location is used for temporary installations and files.")
       search-ring
       regexp-search-ring
       compile-command
-      compile-history))
-  (savehist-autosave-interval 60))
+      compile-history)))
 
 (use-package uniquify
   :straight (:type built-in)
   :custom
-  (uniquify-after-kill-buffer-p t)
-  (uniquify-buffer-name-style 'post-forward-angle-brackets)
   (uniquify-ignore-buffers-re "^\\*")
-  (uniquify-separator "/")
-  (uniquify-strip-common-suffix t))
+  (uniquify-separator "/"))
 
 (use-package abbrev
   :straight (:type built-in)
@@ -545,16 +484,14 @@ This location is used for temporary installations and files.")
   (imenu-max-items 1000)
   ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
   ;; mouse support enabled.
-  (imenu-use-popup-menu nil)
-  ;; `nil' implies no sorting and will list by position in the buffer
-  (imenu-sort-function nil))
+  (imenu-use-popup-menu nil))
 
 (use-package recentf
   :straight (:type built-in)
   :hook (emacs-startup . recentf-mode)
   :bind ("<f9>" . recentf-open-files)
   :custom
-  (recentf-auto-cleanup 'never "Do not stat remote files")
+  (recentf-auto-cleanup 60)
   (recentf-exclude
     '
     ("[/\\]elpa/"
@@ -572,8 +509,7 @@ This location is used for temporary installations and files.")
       "/.autosaves/"
       ".*/TAGS\\'"
       "*.cache"
-      "*[/\\]straight/repos/*"
-      ".*/treemacs/persist.org"))
+      "*[/\\]straight/repos/*"))
   ;; Keep remote file without testing if they still exist
   (recentf-keep '(file-remote-p file-readable-p))
   ;; Larger values help in lookup but takes more time to check if the files exist
@@ -594,11 +530,7 @@ This location is used for temporary installations and files.")
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
   ;; after idling for a few seconds.
-  (run-with-idle-timer 30 t #'recentf-save-list)
-
-  ;; Adding many functions to `kill-emacs-hook' slows down Emacs exit, hence we are only using idle
-  ;; timers.
-  (run-with-idle-timer 60 t #'recentf-cleanup))
+  (run-with-idle-timer 30 t #'recentf-save-list))
 
 (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
   "Hide messages appearing in ORIG-FUN, forward ARGS."
@@ -635,7 +567,6 @@ This location is used for temporary installations and files.")
 (use-package ffap
   :straight (:type built-in)
   ;; Consult does not provide intelligent file lookup, unlike `counsel'.
-  :when (eq sb/minibuffer-completion 'vertico)
   :bind
   (("<f2>" . ffap)
     ([remap find-file] . find-file-at-point)
@@ -704,8 +635,6 @@ This location is used for temporary installations and files.")
 (use-package tramp
   :straight (:type built-in)
   :custom
-  (tramp-default-user user-login-name)
-  (tramp-default-remote-shell "/usr/bin/bash")
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-verbose 1)
   :config (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
@@ -753,7 +682,6 @@ This location is used for temporary installations and files.")
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
-  (ibuffer-use-header-line t)
   (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
   :config (defalias 'list-buffers 'ibuffer))
 
@@ -892,9 +820,7 @@ This location is used for temporary installations and files.")
       (require 'dired-x)
       (dired-omit-mode)))
   :bind ("C-x C-j" . dired-jump)
-  :custom
-  (dired-cleanup-buffers-too t)
-  (dired-omit-verbose nil "Do not show messages when omitting files")
+  :custom (dired-omit-verbose nil "Do not show messages when omitting files")
   ;; Do not ask whether to kill buffers visiting deleted files
   (dired-clean-confirm-killing-deleted-buffers nil)
   :config
@@ -938,12 +864,9 @@ This location is used for temporary installations and files.")
 
 (use-package vertico
   :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
-  :when (eq sb/minibuffer-completion 'vertico)
   :hook (emacs-startup . vertico-mode)
   :bind (:map vertico-map ("M-<" . vertico-first) ("M->" . vertico-last) ("C-M-j" . vertico-exit-input))
-  :custom
-  (vertico-cycle t)
-  (vertico-preselect 'first))
+  :custom (vertico-cycle t))
 
 ;; More convenient directory navigation commands
 (use-package vertico-directory
@@ -988,8 +911,6 @@ This location is used for temporary installations and files.")
   ;; :hook (completion-list-mode . consult-preview-at-point-mode)
   :bind
   (("<f1>" . execute-extended-command)
-    ;; ("C-x M-:" . consult-complex-command)
-    ;; ([remap repeat-complex-command] . consult-complex-command)
     ([remap switch-to-buffer] . consult-buffer)
     ("<f3>" . consult-buffer)
     ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
@@ -1005,10 +926,6 @@ This location is used for temporary installations and files.")
     ("M-g k" . consult-global-mark)
     ([remap imenu] . consult-imenu) ; "M-g i"
     ("C-c C-j" . consult-imenu)
-    ;; ("M-g I" . consult-imenu-multi)
-    ;; ([remap flymake-show-diagnostic] . consult-flymake)
-    ;; ([remap flymake-show-buffer-diagnostics] . consult-flymake)
-    ;; ([remap flymake-show-diagnostics-buffer] . consult-flymake)
     ([remap customize] . consult-customize)
     ([remap load-theme] . consult-theme)
     ;; ("C-c h" . consult-history)
@@ -1022,7 +939,6 @@ This location is used for temporary installations and files.")
     ("C-c s G" . consult-git-grep)
     ("C-c s r" . consult-ripgrep)
     ("C-c s h" . consult-isearch-history)
-    ;; ([remap isearch-forward] . consult-line)
     ("<f4>" . consult-line)
     ([remap multi-occur] . consult-multi-occur)
     ;; ("M-s m" . consult-multi-occur)
@@ -1095,7 +1011,7 @@ This location is used for temporary installations and files.")
   ;; (add-to-list 'embark-repeat-actions #'string-inflection-cycle)
 
   (with-eval-after-load "vertico"
-    (bind-keys :map vertico-map ("M-o" . embark-act) ("C-c C-l" . embark-export)))
+    (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export)))
 
   (defun embark-which-key-indicator ()
     "An embark indicator that displays keymaps using which-key.
@@ -1180,7 +1096,6 @@ targets."
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-dir
-  :after consult
   :bind
   (("C-x C-d" . consult-dir)
     :map
@@ -1207,7 +1122,6 @@ targets."
   :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
 
 (use-package consult-yasnippet
-  :after consult
   :bind ("C-M-y" . consult-yasnippet))
 
 (use-package ispell
@@ -1227,7 +1141,6 @@ targets."
         (setenv "DICTIONARY" "en_US")
         (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
         (setq
-          ispell-local-dictionary "en_US"
           ispell-program-name "hunspell"
           ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
           ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
@@ -1243,7 +1156,6 @@ targets."
         (setenv "DICTIONARY" "en_US")
         (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
         (setq
-          ispell-local-dictionary "en_US"
           ispell-program-name "hunspell"
           ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
           ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
@@ -1298,12 +1210,12 @@ targets."
   :custom (jinx-languages "en_US")
   :diminish)
 
-;; ;; (use-package transient
-;; ;;   :commands transient-bind-q-to-quit
-;; ;;   :custom (transient-semantic-coloring t)
-;; ;;   :config
-;; ;;   ;; Allow using `q' to quit out of popups in addition to `C-g'
-;; ;;   (transient-bind-q-to-quit))
+;; (use-package transient
+;;   :commands transient-bind-q-to-quit
+;;   :custom (transient-semantic-coloring t)
+;;   :config
+;;   ;; Allow using `q' to quit out of popups in addition to `C-g'
+;;   (transient-bind-q-to-quit))
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
 ;; for functions, so we use `helpful-callable' as a replacement.
@@ -1332,7 +1244,7 @@ targets."
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
 (use-package change-inner
-  :bind (("M-i" . change-inner) ("M-o" . change-outer)))
+  :commands (change-inner change-outer))
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
@@ -1398,13 +1310,9 @@ targets."
 ;;   :hook (emacs-startup . global-page-break-lines-mode)
 ;;   :diminish)
 
-;; ;; (use-package wc-mode
-;; ;;   :commands wc-mode)
-
-;; ;; Gets the definition of word or phrase at point from https://wordnik.com/
-;; ;; (use-package define-word
-;; ;;   :commands define-word
-;; ;;   :bind ("C-c w" . define-word-at-point))
+(use-package wc-mode
+  :straight (:type built-in)
+  :commands wc-mode)
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
@@ -1413,7 +1321,6 @@ targets."
   :init
   ;; Must be set before `bm' is loaded
   (setq
-    bm-restore-repository-on-load t
     bm-verbosity-level 1
     bm-modeline-display-total t)
   :hook
@@ -1450,9 +1357,6 @@ targets."
   :hook (emacs-startup . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
 
-;; ;; (use-package unfill
-;; ;;   :commands (unfill-region unfill-paragraph unfill-toggle))
-
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup . xclip-mode))
@@ -1460,10 +1364,10 @@ targets."
 ;; (use-package fix-word
 ;;   :bind (("M-u" . fix-word-upcase) ("M-l" . fix-word-downcase) ("M-c" . fix-word-capitalize)))
 
-;; ;; Allow GC to happen after a period of idle time
-;; (use-package gcmh
-;;   :hook (emacs-startup . gcmh-mode)
-;;   :diminish)
+;; Allow GC to happen after a period of idle time
+(use-package gcmh
+  :hook (emacs-startup . gcmh-mode)
+  :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
 (use-package ws-butler
@@ -1496,13 +1400,7 @@ targets."
   :straight (:host github :repo "karthink/project-x")
   :after project
   :demand t
-  :custom (project-x-save-interval 600 "Save project state every 10 min")
   :config (project-x-mode 1))
-
-;; ;; (use-package projection
-;; ;;   :when (eq sb/project-handler 'project)
-;; ;;   :after project
-;; ;;   :init (global-projection-hook-mode 1))
 
 (use-package isearch
   :straight (:type built-in)
@@ -1512,10 +1410,7 @@ targets."
     ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
     ("C-f" . isearch-forward-regexp) ("C-r" . isearch-backward-regexp)
     :map isearch-mode-map ("C-s") ("C-f" . isearch-repeat-forward) ("C-c C-o" . isearch-occur))
-  :custom
-  (search-highlight t "Highlight incremental search")
-  (isearch-lazy-highlight t)
-  (isearch-lazy-count t "Show match count next to the minibuffer prompt"))
+  :custom (isearch-lazy-count t "Show match count"))
 
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
@@ -1579,22 +1474,9 @@ targets."
   ([remap query-replace] . vr/query-replace)
   ([remap replace-regex] . vr/replace))
 
-;; (use-package rg
-;;   :commands
-;;   (rg-menu
-;;     rg-isearch-menu
-;;     rg-project
-;;     rg
-;;     rg-literal
-;;     rg-dwim
-;;     rg-dwim-current-dir
-;;     rg-dwim-project-dir))
-
 (use-package vc-hooks
   :straight (:type built-in)
   :custom
-  ;; Disabling vc is said to improve performance. However, I find it useful to show branch
-  ;; information on the modeline and highlight modifications in the current file.
   (vc-handled-backends '(Git))
   (vc-follow-symlinks t "No need to ask")
   ;; Disable version control for remote files to improve performance
@@ -1617,9 +1499,6 @@ targets."
   (setq
     magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
     magit-diff-highlight-trailing nil))
-
-;; (use-package magit-delta
-;;   :hook (magit-mode . magit-delta-mode))
 
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
@@ -1663,7 +1542,7 @@ targets."
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
-  (diff-hl-disable-on-remote t)
+  (diff-hl-disable-on-remote t "Disable in remote buffers")
   :config
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
@@ -1708,7 +1587,6 @@ targets."
 (use-package paren
   :straight (:type built-in)
   :custom
-  (show-paren-style 'parenthesis) ; `mixed' may lead to performance problems
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
@@ -1763,7 +1641,6 @@ targets."
   (flycheck-idle-change-delay 2 "Increase the time (s) to allow for transient edits")
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-global-modes '(not csv-mode conf-mode))
-  (flycheck-indication-mode 'left-fringe)
   :config
   (dolist (checkers '(proselint textlint tex-chktex emacs-lisp-checkdoc))
     (delq checkers flycheck-checkers))
@@ -2063,7 +1940,6 @@ targets."
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used for the
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
-
 (use-package company
   :when (eq sb/capf 'company)
   :hook (emacs-startup . global-company-mode)
@@ -2090,14 +1966,10 @@ targets."
     ("C-g" . company-search-abort)
     ("DEL" . company-search-delete-char))
   :custom
-  ;; (company-dabbrev-other-buffers t "Search in other buffers with the same major mode")
-  ;; (company-dabbrev-ignore-case t "Ignore case when *collecting* completion candidates")
-  ;; (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-idle-delay 0.05 "Start autocompletion faster")
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
-  (company-minimum-prefix-length 3 "Small words can be faster to type")
   (company-require-match nil "Allow typing input characters that do not match candidates")
   (company-show-quick-access t "Speed up selecting a completion")
   ;; Align additional metadata, like type signatures, to the right-hand side because it looks better
@@ -2109,20 +1981,7 @@ targets."
   ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
   ;; (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (company-global-modes
-    '
-    (not dired-mode
-      erc-mode
-      message-mode
-      comint-mode
-      inferior-python-mode
-      vterm-mode
-      magit-status-mode
-      help-mode
-      gud-mode
-      eshell-mode
-      shell-mode
-      csv-mode
-      minibuffer-inactive-mode))
+    '(not dired-mode magit-status-mode help-mode csv-mode minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
   (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
   ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
@@ -2159,23 +2018,23 @@ targets."
 ;;   :diminish)
 
 (use-package company-auctex
-  :after (tex-mode corfu)
+  :after (:all tex-mode (:any company corfu))
   :demand t)
 
 ;; Required by `ac-math' and `company-math'
 (use-package math-symbols
-  :after (tex-mode corfu)
+  :after (:all tex-mode (:any company corfu))
   :demand t)
 
 (use-package company-math
-  :after (tex-mode corfu)
+  :after (:all tex-mode (:any company corfu))
   :demand t)
 
 ;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
 ;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
 ;; citations across documents.
 (use-package company-reftex
-  :after (tex-mode corfu)
+  :after (:all tex-mode (:any company corfu))
   :demand t
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
@@ -2192,11 +2051,10 @@ targets."
   :demand t)
 
 (use-package company-dict
-  :after corfu
+  :after (:any company corfu)
   :demand t
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
-  (company-dict-enable-fuzzy nil)
   (company-dict-enable-yasnippet nil))
 
 ;; Better replacement for `company-files'
@@ -2215,13 +2073,13 @@ targets."
   :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 (use-package company-web
-  :after corfu
+  :after (:any company corfu)
   :demand t
   :config (require 'company-web-html))
 
 (use-package company-wordfreq
   :straight (:host github :repo "johannes-mueller/company-wordfreq.el")
-  :after corfu
+  :after (:any company corfu)
   :demand t)
 
 ;; Try completion backends in order untill there is a non-empty completion list:
@@ -2477,13 +2335,9 @@ targets."
   (corfu-exclude-modes
     '
     (dired-mode
-      message-mode
-      comint-mode
       inferior-python-mode
       magit-status-mode
       help-mode
-      eshell-mode
-      shell-mode
       csv-mode
       minibuffer-inactive-mode))
   :config
@@ -2737,7 +2591,6 @@ targets."
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
   ;; Do not customize breadcrumb faces based on errors
   (lsp-headerline-breadcrumb-enable-diagnostics nil)
-  (lsp-diagnostics-provider :auto "Prefer Flycheck, otherwise use Flymake")
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2745,24 +2598,18 @@ targets."
   (lsp-lens-enable nil "Lenses are intrusive")
   (lsp-modeline-diagnostics-enable nil "We have Flycheck, and the modeline gets congested")
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
-  (lsp-modeline-code-actions-enable t "Useful to show code actions on the modeline")
   (lsp-modeline-workspace-status-enable t)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
   ;; request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
-  (lsp-signature-render-documentation t "Show the function documentation along with the prototype")
   (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
   (lsp-yaml-print-width sb/fill-column)
   (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
   (lsp-keep-workspace-alive nil)
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  ;; Useful to identify disabled code but not all language servers support this feature. Recent
-  ;; versions of clangd do.
-  (lsp-semantic-tokens-enable nil)
   ;; I am using symbol-overlay for languages that do not have a server
   (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-snippet t)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
@@ -2846,20 +2693,6 @@ targets."
 
   ;; (add-to-list 'lsp-language-id-configuration '(flex-mode . "cpp"))
   :diminish)
-
-;; (use-package lsp-ui
-;;   :hook (lsp-mode . lsp-ui-mode)
-;;   :custom
-;;   (lsp-ui-doc-enable nil "Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'")
-;;   (lsp-ui-doc-include-signature t)
-;;   (lsp-ui-imenu-auto-refresh 'after-save)
-;;   (lsp-ui-sideline-show-code-actions t "Enables understanding when to invoke code actions")
-;;   (lsp-ui-sideline-enable nil "Noisy to show symbol information in the sideline")
-;;   ;; Hide diagnostics when typing because they can be intrusive
-;;   (lsp-ui-sideline-show-diagnostics nil "Flycheck/flymake already highlights errors")
-;;   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-;;   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-;;   (lsp-ui-peek-enable nil))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -3043,6 +2876,13 @@ targets."
 ;;   ;; Improves performance with large files without significantly diminishing highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
+(use-package yasnippet-treesitter-shim
+  :straight (:host github :repo "fbrosda/yasnippet-treesitter-shim" :files ("snippets/*"))
+  :after (treesit-auto yasnippet)
+  :demand t
+  :no-require t
+  :config (add-to-list 'yas-snippet-dirs (straight--build-dir "yasnippet-treesitter-shim")))
+
 ;; ;; (use-package combobulate
 ;; ;;   :straight (:host github :repo "mickeynp/combobulate")
 ;; ;;   :preface (setq combobulate-key-prefix "C-c o")
@@ -3060,12 +2900,12 @@ targets."
 
 (use-package eldoc
   :straight (:type built-in)
-  ;;   :hook (prog-mode . turn-on-eldoc-mode)
-  ;;   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
-  ;;   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
-  ;;   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
-  ;;   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
-  ;;   ;; (eldoc-echo-area-use-multiline-p nil)
+  :hook (prog-mode . turn-on-eldoc-mode)
+  :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
+  ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
+  ;; is on a variable with a multiline docstring, but then it cuts of useful information.
+  ;; (eldoc-echo-area-use-multiline-p nil)
   :config
   ;; Allow eldoc to trigger after completions
   (with-eval-after-load "company"
@@ -3165,7 +3005,6 @@ targets."
     ("C-c >" . python-indent-shift-right))
   :custom
   (python-shell-completion-native-enable nil "Disable readline based native completion")
-  (python-fill-docstring-style 'django)
   (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
   (python-indent-guess-indent-offset nil)
   (python-indent-offset 4)
@@ -3198,7 +3037,6 @@ targets."
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
-  (sh-indentation 2)
   (sh-indent-after-continuation 'always)
   (sh-indent-comment t "Indent comments as a regular line"))
 
@@ -3342,9 +3180,9 @@ targets."
   :config (pandoc-load-default-settings)
   :diminish)
 
-;; ;; (use-package emmet-mode
-;; ;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-;; ;;   :custom (emmet-move-cursor-between-quote t))
+;; (use-package emmet-mode
+;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
+;;   :custom (emmet-move-cursor-between-quote t))
 
 (use-package nxml-mode
   :straight (:type built-in)
@@ -3908,10 +3746,9 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; Configure appearance-related settings at the end
 
-;; Decrease minibuffer font size
 (progn
   (defun sb/decrease-minibuffer-font ()
-    "Customize minibuffer font."
+    "Decrease minibuffer font size."
     (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
 
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
@@ -4028,10 +3865,8 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-height 28 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-checker-simple-format nil)
-  (doom-modeline-indent-info nil)
-  (doom-modeline-minor-modes t)
   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
-  (doom-modeline-unicode-fallback nil "Use Unicode instead of ASCII when not using icons"))
+  (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
 
 (use-package nano-modeline
   :when (eq sb/modeline-theme 'nano-modeline)
@@ -4117,9 +3952,6 @@ PAD can be left (`l') or right (`r')."
 
 (use-package free-keys
   :commands free-keys)
-
-;; (use-package key-quiz
-;;   :commands key-quiz)
 
 ;; Show help popups for prefix keys
 (use-package which-key
