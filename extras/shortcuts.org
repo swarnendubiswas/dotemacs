@@ -49,7 +49,9 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~C-x C-p~ - Move point to the beginning of the current page, and set a mark at the end (~mark-page~)
 - ~C-c C-m~ - Jump to a visited position in the current buffer (~counsel-mark-ring~)
 - ~C-x C-@~ - Jump to the buffer and position of the latest entry in the global mark ring (~pop-global-mark~)
-
+- ~C-x r SPC~ - Store a position in a register (~point-to-register~)
+- ~C-x r j~ - Jump to a position stored in a register (~jump-to-register~)
+  
 ** Key motion
 
 - ~C-M-n~ - Move forward over a parenthetical group (~forward-list~)
