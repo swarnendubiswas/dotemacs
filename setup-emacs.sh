@@ -31,7 +31,7 @@ command_exists() {
 }
 
 install_emacs() {
-    EMACS_VERSION="29.2"
+    EMACS_VERSION="29.3"
 
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
     EMACS_NAME="emacs-${EMACS_VERSION}"

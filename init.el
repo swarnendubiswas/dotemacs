@@ -29,7 +29,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'nano-dark
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '(radio
@@ -38,21 +38,16 @@
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "nano-dark" nano-dark)
-    (const :tag "customized" sb/customized) ; Customizations over the default theme
-    ;; No customization
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '(radio
-    ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show
-    ;; lsp status and flycheck information.
     (const :tag "powerline" powerline)
     (const :tag "doom-modeline" doom-modeline)
     (const :tag "nano-modeline" nano-modeline)
-    ;; No customization
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -302,6 +297,7 @@ This location is used for temporary installations and files.")
   ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
   ;; it runs all the save-related hooks.
   (auto-save-visited-interval 30)
+  (revert-without-query '("\\.*") "Revert all (e.g., PDF) files without asking")
   :config
   (dolist (exts
            '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
@@ -362,50 +358,39 @@ This location is used for temporary installations and files.")
   (when (eq sb/window-split 'horizontal)
     (setq
      split-height-threshold nil
-     split-width-threshold 0)))
+     split-width-threshold 0))
 
-(setq
- ;; Scroll settings from Doom Emacs
- scroll-preserve-screen-position t
- scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
- ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N lines
- ;; past window edges, where N is the setting of `scroll-conservatively'. This is especially slow
- ;; in larger files during large-scale scrolling commands. If kept over 100, the window is never
- ;; automatically recentered.
- scroll-conservatively 101
- ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
- auto-window-vscroll nil
- mouse-wheel-follow-mouse 't ; Scroll window under mouse
- mouse-wheel-progressive-speed nil ; Do not accelerate scrolling
- mouse-wheel-scroll-amount '(5 ((shift) . 2)))
+  (setq
+   ;; Scroll settings from Doom Emacs
+   scroll-preserve-screen-position t
+   scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
+   ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N lines
+   ;; past window edges, where N is the setting of `scroll-conservatively'. This is especially slow
+   ;; in larger files during large-scale scrolling commands. If kept over 100, the window is never
+   ;; automatically recentered.
+   scroll-conservatively 101
+   ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
+   auto-window-vscroll nil
+   mouse-wheel-follow-mouse 't ; Scroll window under mouse
+   mouse-wheel-progressive-speed nil ; Do not accelerate scrolling
+   mouse-wheel-scroll-amount '(5 ((shift) . 2)))
 
+  ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
+  ;; buffer-local variable's default value.
+  (setq-default
+   cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+   fill-column sb/fill-column
+   indent-tabs-mode nil ; Spaces instead of tabs
+   tab-width 4
+   ;; TAB first tries to indent the current line, and if the line was already indented,
+   ;; then try to complete the thing at point.
+   tab-always-indent 'complete
+   bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
+   bidi-paragraph-direction 'left-to-right)
 
-;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
-;; buffer-local variable's default value.
-(setq-default
- cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
- fill-column sb/fill-column
- indent-tabs-mode nil ; Spaces instead of tabs
- tab-width 4
- ;; TAB first tries to indent the current line, and if the line was already indented,
- ;; then try to complete the thing at point.
- tab-always-indent 'complete
- bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
- bidi-paragraph-direction 'left-to-right)
-
-;; Activate utf-8, these are needed (may not be all) for icons to work well in TUI
-(set-language-environment "UTF-8")
-(setq locale-coding-system 'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
-(prefer-coding-system 'utf-8) ; Add utf-8 at the front for automatic detection
-(set-default-coding-systems 'utf-8) ; Set default value of various coding systems
-(set-keyboard-coding-system 'utf-8) ; Set coding system for keyboard input on TERMINAL
-(set-selection-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8) ; Set coding system of terminal output
-
-(diminish 'visual-line-mode)
-;; Not a library/file, so `eval-after-load' does not work
-(diminish 'auto-fill-function)
+  (diminish 'visual-line-mode)
+  ;; Not a library/file, so `eval-after-load' does not work
+  (diminish 'auto-fill-function))
 
 ;; Auto-refresh all buffers
 (use-package autorevert
@@ -413,14 +398,10 @@ This location is used for temporary installations and files.")
   :hook (emacs-startup . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
-  (auto-revert-interval 5 "Faster (seconds) would mean less likely to use stale data")
-  ;; Emacs seems to hang with auto-revert and Tramp, disabling this should be okay if we only
-  ;; use Emacs. Enabling auto-revert is always safe.
   (auto-revert-remote-files t)
-  ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the
-  ;; contents of the directory changes
+  ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the contents
+  ;; of the directory changes
   (global-auto-revert-non-file-buffers t)
-  (revert-without-query '("\\.*") "Revert all (e.g., PDF) files without asking")
   :diminish auto-revert-mode)
 
 ;; Remember cursor position in files
@@ -473,8 +454,6 @@ This location is used for temporary installations and files.")
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 1000)
-  ;; `t' will use a popup menu rather than a minibuffer prompt, `on-mouse' might be useful with
-  ;; mouse support enabled.
   (imenu-use-popup-menu nil))
 
 (use-package recentf
@@ -560,7 +539,6 @@ This location is used for temporary installations and files.")
    ([remap find-file] . find-file-at-point)
    ([remap find-file-read-only] . ffap-read-only)
    ([remap find-alternate-file] . ffap-alternate-file)
-   ([remap dired] . dired-at-point)
    ("C-x p o" . ff-find-other-file))
   :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names"))
 
@@ -625,7 +603,7 @@ This location is used for temporary installations and files.")
   :custom
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-verbose 1)
-  :config (defalias 'exit-tramp 'tramp-cleanup-all-buffers)
+  :config
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include this directory in $PATH on remote
@@ -707,27 +685,25 @@ This location is used for temporary installations and files.")
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
   :config
-  ;;   ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
-  ;;   ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
-  ;;   ;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
-  ;;   ;;   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
-  ;;   ;;   (push '("*Paradox Report*"    :noselect t)   popwin:special-display-config)
-  ;;   ;;   (push '("*Selection Ring:")                  popwin:special-display-config)
-  ;;   ;;   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  ;;   ;;   (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
-  ;;   ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
-  ;;   ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
-  ;;   ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
+  ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
+  ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
+  ;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
+  ;;   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
+  ;;   (push '("*Selection Ring:")                  popwin:special-display-config)
+  ;;   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
+  ;;   (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
+  ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
+  ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
+  ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
   (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
-  ;;   ;;   (push "*Shell Command Output*"               popwin:special-display-config)
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
+  ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
+  ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
+  ;;   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
+  ;;   (add-to-list 'popwin:special-display-config '("*Apropos*"))
+  ;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
+  ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
   ;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
-  ;;   ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
+  ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
   ;;   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil))
   )
 
@@ -795,7 +771,6 @@ This location is used for temporary installations and files.")
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
-;; Load `dired-x' when `dired' is loaded
 (use-package dired-x
   :straight (:type built-in)
   :hook
@@ -848,7 +823,10 @@ This location is used for temporary installations and files.")
   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 (use-package vertico
-  :straight (vertico :files (:defaults "extensions/*") :includes (vertico-directory vertico-repeat))
+  :straight
+  (vertico
+   :files (:defaults "extensions/*")
+   :includes (vertico-directory vertico-repeat vertico-quick))
   :hook (emacs-startup . vertico-mode)
   :bind (:map vertico-map ("M-<" . vertico-first) ("M->" . vertico-last) ("C-M-j" . vertico-exit-input))
   :custom (vertico-cycle t))
@@ -1321,7 +1299,7 @@ targets."
 
 (use-package crux
   :bind
-  ( ;;("C-c d i" . crux-ispell-word-then-abbrev)
+  (("C-c d i" . crux-ispell-word-then-abbrev)
    ("<f12>" . crux-kill-other-buffers)
    ("C-c d s" . crux-sudo-edit))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
@@ -1369,9 +1347,7 @@ targets."
    ("k" . project-kill-buffers)
    ("p" . project-switch-project)
    ("g" . project-find-regexp)
-   ("r" . project-query-replace-regexp)
-   ("m" . magit-project-status)
-   ("C" . recompile))
+   ("r" . project-query-replace-regexp))
   :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
 
 (use-package project-x
@@ -1462,7 +1438,6 @@ targets."
 
 (use-package magit
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
-  ;; :hook (magit-status-mode . magit-dispatch)
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
@@ -1472,11 +1447,15 @@ targets."
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
+  (magit-save-repository-buffers 'dontask)
   :config
   (require 'magit-diff)
   (setq
    magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
-   magit-diff-highlight-trailing nil))
+   magit-diff-highlight-trailing nil)
+
+  (with-eval-after-load "project"
+    (define-key project-prefix-map "m" #'magit-project-status)))
 
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
@@ -1857,7 +1836,10 @@ targets."
      "\\.\\(?:jpe?g\\|png\\)\\'"
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
-  :config (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
 (use-package hippie-exp
   :straight (:type built-in)
@@ -1879,19 +1861,12 @@ targets."
 ;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
 (use-package orderless
   :demand t
-  :custom
-  ;; Allow escaping space with backslash
-  (orderless-component-separator 'orderless-escapable-split-on-space)
   :config
   (with-eval-after-load "company"
     (defun sb/just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
-
-;; ;; Smart(er) fuzzy completion matching
-;; (use-package hotfuzz
-;;   :demand t)
 
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
@@ -1974,32 +1949,13 @@ targets."
   :after company
   :init (company-statistics-mode 1))
 
-;; We should enable `company-fuzzy-mode' at the very end of configuring `company'. Nice feature but
-;; slows completions.
-;; (use-package company-fuzzy
-;;   :straight flx
-;;   :straight t
-;;   :after company
-;;   :demand t
-;;   :custom
-;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
-;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
-;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
-;;   ;; Disabling the requirement may help with performance.
-;;   (company-fuzzy-prefix-on-top t)
-;;   :diminish)
-
 (use-package company-auctex
   :after (:all tex-mode (:any company corfu))
   :demand t)
 
-;; Required by `ac-math' and `company-math'
-(use-package math-symbols
-  :after (:all tex-mode (:any company corfu))
-  :demand t)
-
 (use-package company-math
+  :straight math-symbols
+  :straight t
   :after (:all tex-mode (:any company corfu))
   :demand t)
 
@@ -2012,10 +1968,6 @@ targets."
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
-
-;; (use-package company-bibtex
-;;   :after tex-mode
-;;   :demand t)
 
 ;; Complete in the middle of words
 (use-package company-anywhere
@@ -2036,9 +1988,9 @@ targets."
   :after company
   :demand t)
 
-;; (use-package company-org-block
-;;   :after (company org)
-;;   :demand t)
+(use-package company-org-block
+  :after (company org)
+  :demand t)
 
 (use-package company-c-headers
   :after (company cc-mode)
@@ -2104,8 +2056,9 @@ targets."
    ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
    ;; `delete-dups'.
    company-transformers
-   '(delete-dups ; company-sort-by-backend-importance
-     ; company-sort-by-occurrence
+   '(delete-dups
+     ;; company-sort-by-backend-importance
+     ;; company-sort-by-occurrence
      company-sort-by-statistics
      company-sort-prefer-same-case-prefix))
 
@@ -2144,23 +2097,13 @@ targets."
                company-math-symbols-unicode
                company-auctex-symbols
                company-auctex-bibs
-               ;; company-bibtex
-               ;; :separate
                company-ispell
                company-dict
                company-dabbrev
                company-wordfreq
                company-capf))))
 
-    (add-hook
-     'LaTeX-mode-hook
-     (lambda ()
-       (sb/company-latex-mode)
-       ;; `company-capf' does not pass to later backends with Texlab, so we use
-       ;; `company-fuzzy-mode' to merge results from all backends.
-       ;; (company-fuzzy-mode 1)
-       ;; (diminish 'company-fuzzy-mode)
-       )))
+    (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
 
   (progn
     (defun sb/company-org-mode ()
@@ -2265,12 +2208,7 @@ targets."
               company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-      (add-hook
-       hook
-       (lambda ()
-         (sb/company-elisp-mode)
-         ;; (company-fuzzy-mode 1)
-         )))))
+      (add-hook hook (lambda () (sb/company-elisp-mode))))))
 
 ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
 (use-package corfu
@@ -2317,7 +2255,6 @@ targets."
      (ignore-errors
        (corfu-quick-access-mode)))))
 
-;; We do not need this if we use prescient-based sorting.
 (use-package corfu-history
   :straight nil
   :when (eq sb/capf 'corfu)
@@ -2482,7 +2419,6 @@ targets."
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :init (setq lsp-keymap-prefix "C-c l")
-  :bind-keymap ("C-c l" . lsp-command-map)
   :bind
   (:map
    lsp-command-map
@@ -2582,6 +2518,7 @@ targets."
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
+  (lsp-enable-snippet nil)
   :config
   ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
   ;; interfere with `completion-at-point-functions'
@@ -2713,11 +2650,11 @@ targets."
   (add-to-list 'lsp-latex-build-args "-c")
   (add-to-list 'lsp-latex-build-args "-pvc"))
 
-(use-package lsp-snippet-yasnippet
-  :straight (lsp-snippet-yasnippet :type git :host github :repo "svaante/lsp-snippet")
-  :after (lsp-mode yasnippet)
-  :demand t
-  :config (lsp-snippet-yasnippet-lsp-mode-init))
+;; (use-package lsp-snippet-yasnippet
+;;   :straight (lsp-snippet-yasnippet :type git :host github :repo "svaante/lsp-snippet")
+;;   :after (lsp-mode yasnippet)
+;;   :demand t
+;;   :config (lsp-snippet-yasnippet-lsp-mode-init))
 
 (use-package subword
   :straight (:type built-in)
@@ -2816,27 +2753,12 @@ targets."
 ;;   ;; Improves performance with large files without significantly diminishing highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
-(use-package yasnippet-treesitter-shim
-  :straight (:host github :repo "fbrosda/yasnippet-treesitter-shim" :files ("snippets/*"))
-  :after (treesit-auto yasnippet)
-  :demand t
-  :no-require t
-  :config (add-to-list 'yas-snippet-dirs (straight--build-dir "yasnippet-treesitter-shim")))
-
-;; ;; (use-package combobulate
-;; ;;   :straight (:host github :repo "mickeynp/combobulate")
-;; ;;   :preface (setq combobulate-key-prefix "C-c o")
-;; ;;   :hook
-;; ;;   (
-;; ;;     (python-ts-mode
-;; ;;       js-ts-mode
-;; ;;       html-ts-mode
-;; ;;       css-ts-mode
-;; ;;       yaml-ts-mode
-;; ;;       typescript-ts-mode
-;; ;;       json-ts-mode
-;; ;;       tsx-ts-mode)
-;; ;;     . combobulate-mode))
+;; (use-package yasnippet-treesitter-shim
+;;   :straight (:host github :repo "fbrosda/yasnippet-treesitter-shim" :files ("snippets/*"))
+;;   :after (treesit-auto yasnippet)
+;;   :demand t
+;;   :no-require t
+;;   :config (add-to-list 'yas-snippet-dirs (straight--build-dir "yasnippet-treesitter-shim")))
 
 (use-package eldoc
   :straight (:type built-in)
@@ -3696,8 +3618,9 @@ or the major mode is not in `sb/skippable-modes'."
   (nano-window-divider-show t)
   (nano-fonts-use t))
 
-;; Python virtualenv information is not shown on the modeline. The package is not being actively
-;; maintained.
+;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
+;; status, flycheck information, and Python virtualenv information on the modeline. The package is
+;; not being actively maintained.
 (use-package powerline
   :preface
   (defun sb/powerline-raw (str &optional face pad)
@@ -3804,7 +3727,6 @@ PAD can be left (`l') or right (`r')."
  ("C-z" . undo)
 
  ("C-<f11>" . delete-other-windows)
- ("C-c d f" . auto-fill-mode)
 
  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
  ("<f8>" . next-error) ; "M-g n" is the default keybinding
