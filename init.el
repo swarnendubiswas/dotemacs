@@ -29,7 +29,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'nano-dark
+(defcustom sb/theme 'doom-nord
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '(radio
@@ -370,10 +370,7 @@ This location is used for temporary installations and files.")
    ;; automatically recentered.
    scroll-conservatively 101
    ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
-   auto-window-vscroll nil
-   mouse-wheel-follow-mouse 't ; Scroll window under mouse
-   mouse-wheel-progressive-speed nil ; Do not accelerate scrolling
-   mouse-wheel-scroll-amount '(5 ((shift) . 2)))
+   auto-window-vscroll nil)
 
   ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
   ;; buffer-local variable's default value.
@@ -388,9 +385,8 @@ This location is used for temporary installations and files.")
    bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
    bidi-paragraph-direction 'left-to-right)
 
-  (diminish 'visual-line-mode)
-  ;; Not a library/file, so `eval-after-load' does not work
-  (diminish 'auto-fill-function))
+  (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
+  (diminish 'visual-line-mode))
 
 ;; Auto-refresh all buffers
 (use-package autorevert
@@ -3167,42 +3163,30 @@ targets."
    ("M-}" . org-forward-element)
    ("C-c C-," . org-insert-structure-template)))
 
-;; ;; Disable the package to get consistent styles across themes.
+;; Make invisible parts of Org elements appear visible
+(use-package org-appear
+  :straight (:host github :repo "awth13/org-appear")
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities t)
+  (org-appear-autolinks t)
+  (org-appear-autoemphasis t)
+  (org-appear-autokeywords t))
 
-;; ;; (use-package org-bullets
-;; ;;   :hook (org-mode . org-bullets-mode))
+(use-package ox-gfm
+  :after org
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
 
-;; ;; (use-package org-superstar
-;; ;;   :hook (org-mode . org-superstar-mode))
+(use-package ox-pandoc
+  :after org
+  :commands
+  (org-pandoc-export-to-markdown
+   org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
 
-;; ;; ;; Make invisible parts of Org elements appear visible
-;; ;; (use-package org-appear
-;; ;;   :straight (:host github :repo "awth13/org-appear")
-;; ;;   :hook (org-mode . org-appear-mode)
-;; ;;   :custom
-;; ;;   (org-appear-autosubmarkers t)
-;; ;;   (org-appear-autoentities t)
-;; ;;   (org-appear-autolinks t)
-;; ;;   (org-appear-autoemphasis t)
-;; ;;   (org-appear-autokeywords t))
-
-;; ;; (use-package ox-gfm
-;; ;;   :after org
-;; ;;   :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
-
-;; ;; (use-package ox-pandoc
-;; ;;   :after org
-;; ;;   :commands
-;; ;;   (org-pandoc-export-to-markdown
-;; ;;     org-pandoc-export-as-markdown
-;; ;;     org-pandoc-export-to-markdown-and-open))
-
-;; ;; (use-package org-modern
-;; ;;   :hook (org-mode . org-modern-mode))
-
-;; ;; (use-package org-modern-indent
-;; ;;   :straight (:host github :repo "jdtsmith/org-modern-indent")
-;; ;;   :hook (org-mode . org-modern-indent-mode))
+(use-package org-modern-indent
+  :straight (:host github :repo "jdtsmith/org-modern-indent")
+  :hook (org-mode . org-modern-indent-mode))
 
 ;; Use "<" to trigger org block completion at point.
 (use-package org-block-capf
@@ -3222,17 +3206,13 @@ targets."
    ;; Revert PDF buffer after TeX compilation has finished
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
-   (TeX-update-style . rainbow-delimiters-mode)
-   ;; (LaTeX-mode . turn-on-auto-fill)
-   (LaTeX-mode . lsp-deferred))
+   (TeX-update-style . rainbow-delimiters-mode) (LaTeX-mode . lsp-deferred))
   :bind
   (:map
-   TeX-mode-map
-   ("C-c ;")
-   ("C-c C-d")
-   ("C-c C-c" . TeX-command-master)
-   ("$" . self-insert-command)
-   ("C-c x q" . TeX-insert-quote))
+   TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master)
+   ;; ("$" . self-insert-command)
+   ;; ("C-c x q" . TeX-insert-quote)
+   )
   :custom
   (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
   (TeX-auto-untabify t "Remove all tabs before saving")
@@ -3241,14 +3221,8 @@ targets."
   (TeX-electric-sub-and-superscript t)
   (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
   (TeX-parse-self t "Parse documents")
-  (TeX-quote-after-quote nil "Allow original LaTeX quotes")
   (TeX-save-query nil "Save buffers automatically when compiling")
-  (TeX-source-correlate-method 'synctex)
-  ;; Do not start the Emacs server when correlating sources
-  ;; (TeX-source-correlate-start-server t)
-  ;; (TeX-view-program-selection '((output-pdf "PDF Tools")))
   (LaTeX-item-indent 0 "Indent lists by two spaces")
-  (LaTeX-syntactic-comments t)
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
   (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
   ;; Avoid superscripts and subscripts from being displayed in a different font size
@@ -3290,11 +3264,11 @@ targets."
   (setq-default TeX-command-default "LatexMk")
   (auctex-latexmk-setup))
 
-(with-eval-after-load "latex"
-  (unbind-key "C-j" LaTeX-mode-map)
-  ;; Disable `LaTeX-insert-item' in favor of `imenu'
-  (unbind-key "C-c C-j" LaTeX-mode-map)
-  (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
+;; (with-eval-after-load "latex"
+;;   (unbind-key "C-j" LaTeX-mode-map)
+;;   ;; Disable `LaTeX-insert-item' in favor of `imenu'
+;;   (unbind-key "C-c C-j" LaTeX-mode-map)
+;;   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
 
 ;; TODO: Try `citar' https://github.com/emacs-citar/citar
 
@@ -3304,10 +3278,10 @@ targets."
   :when (eq sb/capf 'corfu)
   :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
 
-;; (use-package math-delimiters
-;;   :straight (:host github :repo "oantolin/math-delimiters")
-;;   :after tex
-;;   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
+(use-package math-delimiters
+  :straight (:host github :repo "oantolin/math-delimiters")
+  :after tex
+  :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
@@ -3384,10 +3358,9 @@ Fallback to `xref-go-back'."
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
-  (citre-enable-capf-integration nil)
+  ;; (citre-enable-capf-integration nil)
   ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
   (citre-enable-imenu-integration nil)
-  (citre-enable-xref-integration t)
   (citre-edit-cmd-buf-default-cmd
    "ctags
 -o
@@ -3402,8 +3375,7 @@ Fallback to `xref-go-back'."
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  :config
-  ;; (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
+  :config (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
 
   (dolist (func '(find-function citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
@@ -3712,7 +3684,6 @@ PAD can be left (`l') or right (`r')."
 (use-package olivetti
   :hook
   ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
-  :custom (olivetti-body-width 108)
   :diminish)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
@@ -3720,7 +3691,7 @@ PAD can be left (`l') or right (`r')."
 ;; [tab] instead of "<tab>".
 
 (bind-keys
- ;; ("RET" . newline-and-indent)
+ ("RET" . newline-and-indent)
  ("C-l" . goto-line)
 
  ("C-c z" . repeat)
