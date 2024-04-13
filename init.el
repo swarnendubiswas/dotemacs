@@ -424,12 +424,6 @@ This location is used for temporary installations and files.")
      search-ring
      regexp-search-ring)))
 
-(use-package uniquify
-  :straight (:type built-in)
-  :custom
-  (uniquify-ignore-buffers-re "^\\*")
-  (uniquify-separator "/"))
-
 (use-package abbrev
   :straight (:type built-in)
   :hook (emacs-startup . abbrev-mode)
@@ -562,10 +556,10 @@ This location is used for temporary installations and files.")
   (doc-view-resolution 120))
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
-;; (use-package goto-addr
-;;   :straight (:type built-in)
-;;   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
-;;   :bind ("C-c RET" . goto-address-at-point))
+(use-package goto-addr
+  :straight (:type built-in)
+  :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
+  :bind ("C-c RET" . goto-address-at-point))
 
 (use-package ediff
   :straight (:type built-in)
@@ -3207,12 +3201,7 @@ targets."
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
    (TeX-update-style . rainbow-delimiters-mode) (LaTeX-mode . lsp-deferred))
-  :bind
-  (:map
-   TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master)
-   ;; ("$" . self-insert-command)
-   ;; ("C-c x q" . TeX-insert-quote)
-   )
+  :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
   (TeX-auto-untabify t "Remove all tabs before saving")
@@ -3229,13 +3218,7 @@ targets."
   (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
-  (when (executable-find "okular")
-    (setq
-     TeX-view-program-list '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-     TeX-view-program-selection '((output-pdf "Okular"))))
-
-  ;; Always query for the master file
-  (setq-default TeX-master nil)
+  (setq-default TeX-master nil) ; Always query for the master file
   (with-eval-after-load "auctex"
     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
@@ -3253,7 +3236,8 @@ targets."
   :straight (:host github :repo "karthink/consult-reftex")
   :after (consult tex-mode)
   :demand t
-  :commands (consult-reftex-insert-reference consult-reftex-goto-label))
+  :commands (consult-reftex-insert-reference consult-reftex-goto-label)
+  :bind (("C-c [" . consult-reftex-insert-reference) ("C-c )" . consult-reftex-goto-label)))
 
 (use-package auctex-latexmk
   :after tex-mode
@@ -3296,9 +3280,7 @@ targets."
    ("C-o" . xref-show-location-at-point)
    ("<tab>" . xref-quit-and-goto-xref)
    ("r" . xref-query-replace-in-results))
-  :custom
-  (xref-search-program 'ripgrep)
-  (xref-show-definitions-function #'xref-show-definitions-completing-read))
+  :custom (xref-search-program 'ripgrep))
 
 ;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 (use-package citre
@@ -3358,7 +3340,6 @@ Fallback to `xref-go-back'."
   (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
-  ;; (citre-enable-capf-integration nil)
   ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
   (citre-enable-imenu-integration nil)
   (citre-edit-cmd-buf-default-cmd
@@ -3682,8 +3663,7 @@ PAD can be left (`l') or right (`r')."
   :custom (nano-modeline-position #'nano-modeline-footer))
 
 (use-package olivetti
-  :hook
-  ((text-mode prog-mode) . olivetti-mode) ; `emacs-startup' does not work
+  :hook ((text-mode prog-mode) . olivetti-mode)
   :diminish)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
@@ -3757,15 +3737,7 @@ PAD can be left (`l') or right (`r')."
 ;; Show help popups for prefix keys
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
-  :custom (which-key-sort-order 'which-key-key-order-alpha)
-  :config (which-key-setup-side-window-right-bottom)
   :diminish)
-
-;; ;; Alacritty and Konsole are my preferred terminals for using Emacs.
-;; (use-package term-keys
-;;   :straight (:host github :repo "CyberShadow/term-keys")
-;;   :unless (display-graphic-p)
-;;   :hook (emacs-startup . term-keys-mode))
 
 ;; (use-package pixel-scroll
 ;;   :straight (:type built-in)
@@ -3799,6 +3771,7 @@ PAD can be left (`l') or right (`r')."
 
 ;; Mark safe variables
 (put 'compilation-read-command 'safe-local-variable #'stringp)
+(put 'reftex-default-bibliography 'safe-local-variable #'stringp)
 
 (add-hook
  'emacs-startup-hook
