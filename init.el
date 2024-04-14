@@ -18,9 +18,7 @@
 
 (defcustom sb/op-mode 'standalone
   "Specify the way you expect Emacs to be used."
-  :type
-  '(radio
-    (const :tag "server" server) (const :tag "daemon" daemon) (const :tag "standalone" standalone))
+  :type '(radio (const :tag "daemon" daemon) (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file nil
@@ -58,20 +56,9 @@
 ;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
 ;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
 ;; case when used as a grouped backend.
-(defcustom sb/capf 'company
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
-  :group 'sb/emacs)
-
-(defcustom sb/window-split 'vertical
-  "Specify the direction in which the windows should be split.
-This depends on the orientation of the display."
-  :type
-  '(radio
-    ;; Split into two windows one above the other (`split-window-below')
-    (const :tag "vertical" vertical)
-    ;; Split into two side-by-side windows (`split-window-right')
-    (const :tag "horizontal" horizontal))
   :group 'sb/emacs)
 
 ;; Large values make reading difficult when the window is split side-by-side, 100 is also a stretch
@@ -81,27 +68,10 @@ This depends on the orientation of the display."
   :type 'number
   :group 'sb/emacs)
 
-(defconst sb/user-home-directory (getenv "HOME")
-  "User HOME directory.")
-
-(defconst sb/user-config-directory
-  (or (getenv "XDG_CONFIG_HOME") (expand-file-name ".config" sb/user-home-directory))
-  "Path to user's local config store.")
-
-(defconst sb/user-tmp-directory (expand-file-name "tmp" sb/user-home-directory)
-  "User temp directory.
-This location is used for temporary installations and files.")
-
 ;; Helper const variables
 
-(defconst sb/EMACS27 (= emacs-major-version 27)
-  "Non-nil if Emacs version is 27.")
-
-(defconst sb/EMACS27+ (> emacs-major-version 26)
-  "Non-nil if Emacs version is 27 and above.")
-
-(defconst sb/EMACS28 (= emacs-major-version 28)
-  "Non-nil if Emacs version is 28.")
+(defconst sb/user-home-directory (getenv "HOME")
+  "User HOME directory.")
 
 (defconst sb/EMACS28+ (> emacs-major-version 27)
   "Non-nil if Emacs version is 28 and above.")
@@ -199,13 +169,6 @@ This location is used for temporary installations and files.")
   :type 'string
   :group 'sb/emacs)
 
-;; Get PATH with "(getenv "PATH")". Set PATH with "(setenv "PATH" (concat (getenv "PATH")
-;; ":/home/swarnendu/bin"))".
-
-;; These are alternative ways to manipulate the `exec-path'.
-;; "(setq exec-path (append exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory)))"
-;; "(add-to-list 'exec-path (expand-file-name "node_modules/.bin" sb/user-tmp-directory))"
-
 (use-package exec-path-from-shell
   :when (symbol-value 'sb/IS-LINUX)
   :init
@@ -244,11 +207,11 @@ This location is used for temporary installations and files.")
   (remote-file-name-inhibit-locks t)
   (ring-bell-function 'ignore "Disable beeping sound")
   ;; If you have something on the system clipboard, and then kill something in Emacs, then by
-  ;; default whatever you had on the system clipboard is gone and there is no way to get it
-  ;; back. Setting the following option makes it so that when you kill something in Emacs,
-  ;; whatever was previously on the system clipboard is pushed into the kill ring. This way, you
-  ;; can paste it with `yank-pop'.
-  (save-interprogram-paste-before-kill t)
+  ;; default whatever you had on the system clipboard is gone and there is no way to get it back.
+  ;; Setting the following option makes it so that when you kill something in Emacs, whatever was
+  ;; previously on the system clipboard is pushed into the kill ring. This way, you can paste it
+  ;; with `yank-pop'.
+  ;; (save-interprogram-paste-before-kill t)
   (save-silently t "Error messages will still be printed")
   ;; Enable use of system clipboard across Emacs and other applications, does not work on the TUI
   (select-enable-clipboard t)
@@ -346,20 +309,6 @@ This location is used for temporary installations and files.")
     (when (fboundp mode)
       (funcall mode 1)))
 
-  ;; vertical - Split the selected window into two windows (e.g., `split-window-below'), one above the
-  ;; other.
-  (when (eq sb/window-split 'vertical)
-    (setq
-     split-width-threshold nil
-     split-height-threshold 0))
-
-  ;; horizontal - Split the selected window into two side-by-side windows (e.g.,
-  ;; `split-window-right').
-  (when (eq sb/window-split 'horizontal)
-    (setq
-     split-height-threshold nil
-     split-width-threshold 0))
-
   (setq
    ;; Scroll settings from Doom Emacs
    scroll-preserve-screen-position t
@@ -386,7 +335,11 @@ This location is used for temporary installations and files.")
    bidi-paragraph-direction 'left-to-right)
 
   (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
-  (diminish 'visual-line-mode))
+  (diminish 'visual-line-mode)
+
+  ;; Hide "When done with a buffer, type C-x 5" message
+  (when (boundp 'server-client-instructions)
+    (setq server-client-instructions nil)))
 
 ;; Auto-refresh all buffers
 (use-package autorevert
@@ -961,66 +914,7 @@ This location is used for temporary installations and files.")
   ;; (add-to-list 'embark-repeat-actions #'string-inflection-cycle)
 
   (with-eval-after-load "vertico"
-    (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export)))
-
-  (defun embark-which-key-indicator ()
-    "An embark indicator that displays keymaps using which-key.
-The which-key help message will show the type and value of the
-current target followed by an ellipsis if there are further
-targets."
-    (lambda (&optional keymap targets prefix)
-      (if (null keymap)
-          (which-key--hide-popup-ignore-command)
-        (which-key--show-keymap
-         (if (eq (plist-get (car targets) :type) 'embark-become)
-             "Become"
-           (format "Act on %s '%s'%s"
-                   (plist-get (car targets) :type)
-                   (embark--truncate-target (plist-get (car targets) :target))
-                   (if (cdr targets)
-                       "…"
-                     "")))
-         (if prefix
-             (pcase (lookup-key keymap prefix 'accept-default)
-               ((and (pred keymapp) km) km)
-               (_ (key-binding prefix 'accept-default)))
-           keymap)
-         nil nil t (lambda (binding) (not (string-suffix-p "-argument" (cdr binding))))))))
-
-  (setq embark-indicators
-        '(embark-which-key-indicator embark-highlight-indicator embark-isearch-highlight-indicator))
-
-  (defun embark-hide-which-key-indicator (fn &rest args)
-    "Hide the which-key indicator immediately when using the completing-read prompter."
-    (which-key--hide-popup-ignore-command)
-    (let ((embark-indicators (remq #'embark-which-key-indicator embark-indicators)))
-      (apply fn args)))
-
-  (advice-add #'embark-completing-read-prompter :around #'embark-hide-which-key-indicator)
-
-  (defvar embark--target-mode-timer nil)
-  (defvar embark--target-mode-string "")
-
-  (defun embark--target-mode-update ()
-    (setq embark--target-mode-string
-          (if-let (targets
-                   (embark--targets))
-            (format "[%s%s] "
-                    (propertize (symbol-name (plist-get (car targets) :type)) 'face 'bold)
-                    (mapconcat (lambda (x) (format ", %s" (plist-get x :type))) (cdr targets) ""))
-            "")))
-
-  (define-minor-mode embark-target-mode
-    "Shows the current targets in the modeline."
-    :global
-    t
-    (setq mode-line-misc-info (assq-delete-all 'embark-target-mode mode-line-misc-info))
-    (when embark--target-mode-timer
-      (cancel-timer embark--target-mode-timer)
-      (setq embark--target-mode-timer nil))
-    (when embark-target-mode
-      (push '(embark-target-mode (:eval embark--target-mode-string)) mode-line-misc-info)
-      (setq embark--target-mode-timer (run-with-idle-timer 0.1 t #'embark--target-mode-update)))))
+    (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export))))
 
 ;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
 ;; `wgrep'
@@ -1223,6 +1117,7 @@ targets."
 
 (use-package hl-todo
   :hook (emacs-startup . global-hl-todo-mode)
+  :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setq
    hl-todo-highlight-punctuation ":"
@@ -1322,7 +1217,6 @@ targets."
 
 ;; Both project.el and projectile are unable to remember remote projects.
 (use-package project
-  :bind-keymap ("C-c p" . project-prefix-map)
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
@@ -1780,6 +1674,9 @@ targets."
   :after flycheck
   :init (flycheck-hl-todo-setup))
 
+(use-package consult-todo
+  :commands consult-todo)
+
 ;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
 ;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
 ;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
@@ -1879,7 +1776,7 @@ targets."
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
 (use-package company
-  :when (eq sb/capf 'company)
+  :when (eq sb/in-buffer-completion 'company)
   :hook (emacs-startup . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
@@ -2206,7 +2103,7 @@ targets."
   (corfu
    :files (:defaults "extensions/*")
    :includes (corfu-echo corfu-popupinfo corfu-history corfu-info))
-  :when (eq sb/capf 'corfu)
+  :when (eq sb/in-buffer-completion 'corfu)
   :hook (emacs-startup . global-corfu-mode)
   :bind
   (:map
@@ -2237,7 +2134,7 @@ targets."
 
 (use-package corfu-quick-access
   :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
-  :when (eq sb/capf 'corfu)
+  :when (eq sb/in-buffer-completion 'corfu)
   :hook
   (corfu-mode
    .
@@ -2247,7 +2144,7 @@ targets."
 
 (use-package corfu-history
   :straight nil
-  :when (eq sb/capf 'corfu)
+  :when (eq sb/in-buffer-completion 'corfu)
   :hook (corfu-mode . corfu-history-mode)
   :config
   (with-eval-after-load "savehist"
@@ -2255,12 +2152,12 @@ targets."
 
 (use-package corfu-echo
   :straight nil
-  :when (eq sb/capf 'corfu)
+  :when (eq sb/in-buffer-completion 'corfu)
   :hook (corfu-mode . corfu-echo-mode))
 
 (use-package corfu-popupinfo
   :straight nil
-  :when (eq sb/capf 'corfu)
+  :when (eq sb/in-buffer-completion 'corfu)
   :hook (corfu-mode . corfu-popupinfo-mode)
   :bind
   (:map
@@ -2271,11 +2168,11 @@ targets."
 
 (use-package popon
   :straight (:host codeberg :repo "akib/emacs-popon")
-  :when (and (eq sb/capf 'corfu) (not (display-graphic-p))))
+  :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p))))
 
 (use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
-  :when (and (eq sb/capf 'corfu) (not (display-graphic-p)))
+  :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode . corfu-terminal-mode)
   :custom
   ;; TODO: This is supposedly a bug, report to the maintainer.
@@ -2512,7 +2409,7 @@ targets."
   :config
   ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
   ;; interfere with `completion-at-point-functions'
-  (when (eq sb/capf 'corfu)
+  (when (eq sb/in-buffer-completion 'corfu)
     ;; (setq lsp-completion-enable nil)
 
     (defun sb/lsp-mode-setup-completion ()
@@ -3248,18 +3145,10 @@ targets."
   (setq-default TeX-command-default "LatexMk")
   (auctex-latexmk-setup))
 
-;; (with-eval-after-load "latex"
-;;   (unbind-key "C-j" LaTeX-mode-map)
-;;   ;; Disable `LaTeX-insert-item' in favor of `imenu'
-;;   (unbind-key "C-c C-j" LaTeX-mode-map)
-;;   (bind-key "C-c x q" #'TeX-insert-quote LaTeX-mode-map))
-
-;; TODO: Try `citar' https://github.com/emacs-citar/citar
-
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
   :straight (:host github :repo "mclear-tools/bibtex-capf")
-  :when (eq sb/capf 'corfu)
+  :when (eq sb/in-buffer-completion 'corfu)
   :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
 
 (use-package math-delimiters
@@ -3342,6 +3231,7 @@ Fallback to `xref-go-back'."
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
   (citre-enable-imenu-integration nil)
+  (citre-enable-capf-integration nil)
   (citre-edit-cmd-buf-default-cmd
    "ctags
 -o
@@ -3356,7 +3246,8 @@ Fallback to `xref-go-back'."
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
 ;; add dirs/files to scan here, one line per dir/file")
-  :config (add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
+  :config
+  ;;(add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
 
   (dolist (func '(find-function citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
@@ -3739,29 +3630,6 @@ PAD can be left (`l') or right (`r')."
   :hook (emacs-startup . which-key-mode)
   :diminish)
 
-;; (use-package pixel-scroll
-;;   :straight (:type built-in)
-;;   :bind
-;;   ([remap scroll-up-command] . pixel-scroll-interpolate-down)
-;;   ([remap scroll-down-command] . pixel-scroll-interpolate-up)
-;;   :custom (pixel-scroll-precision-interpolate-page t)
-;;   :init
-;;   (cond
-;;     ((fboundp 'pixel-scroll-precision-mode)
-;;       (pixel-scroll-precision-mode 1))
-;;     ((fboundp 'pixel-scroll-mode)
-;;       (pixel-scroll-mode 1))))
-
-;; Hide "When done with a buffer, type C-x 5" message
-(when (boundp 'server-client-instructions)
-  (setq server-client-instructions nil))
-
-;; (when (or (eq sb/op-mode 'server) (eq sb/op-mode 'daemon))
-;;   ;; Start server if not root user
-;;   (unless (string-equal "root" (getenv "USER"))
-;;     (when (and (fboundp 'server-running-p) (not (server-running-p)))
-;;       (server-start))))
-
 (setq custom-file sb/custom-file)
 
 (when (file-exists-p custom-file)
@@ -3783,7 +3651,3 @@ PAD can be left (`l') or right (`r')."
               gcs-done))))
 
 ;;; init.el ends here
-
-;; Local variables:
-;; elisp-autofmt-load-packages-local: ("use-package")
-;; End:
