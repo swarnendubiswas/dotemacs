@@ -337,6 +337,8 @@
   (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
   (diminish 'visual-line-mode)
 
+  ;; (advice-add 'risky-local-variable-p :override #'ignore)
+
   ;; Hide "When done with a buffer, type C-x 5" message
   (when (boundp 'server-client-instructions)
     (setq server-client-instructions nil)))
@@ -520,13 +522,9 @@
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
-  ;; Split diffs side by side, i.e., show windows horizontally (instead of vertically)
-  (ediff-split-window-function #'split-window-horizontally)
-  (ediff-merge-split-window-function 'split-window-horizontally)
+  (ediff-split-window-function #'split-window-horizontally "Split diffs side by side")
   (ediff-keep-variants nil "Kill file variants upon quitting an Ediff session")
   :config (ediff-set-diff-options 'ediff-diff-options "-w"))
-
-(advice-add 'risky-local-variable-p :override #'ignore)
 
 ;; To edit remote files, use "/method:user@host#port:filename". The shortcut "/ssh::" will connect
 ;; to default "user@host#port". To edit a local file with sudo, use "C-x C-f /sudo::/etc/hosts". To
@@ -543,6 +541,7 @@
 ;; with `R'.
 (use-package tramp
   :straight (:type built-in)
+  :bind ("C-S-q" . tramp-cleanup-all-buffers)
   :custom
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
   (tramp-verbose 1)
@@ -2363,8 +2362,6 @@
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
-  ;; Do not customize breadcrumb faces based on errors
-  (lsp-headerline-breadcrumb-enable-diagnostics nil)
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -2372,18 +2369,15 @@
   (lsp-lens-enable nil "Lenses are intrusive")
   (lsp-modeline-diagnostics-enable nil "We have Flycheck, and the modeline gets congested")
   (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
-  (lsp-modeline-workspace-status-enable t)
   ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
   ;; request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
   (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
-  (lsp-yaml-print-width sb/fill-column)
   (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
-  (lsp-keep-workspace-alive nil)
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
   ;; I am using symbol-overlay for languages that do not have a server
-  (lsp-enable-symbol-highlighting nil)
+  ;; (lsp-enable-symbol-highlighting nil)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
@@ -2392,12 +2386,9 @@
   (lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
   (lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
-  (lsp-pylsp-plugins-pyflakes-enabled nil)
   (lsp-pylsp-plugins-pylint-enabled t)
   (lsp-pylsp-plugins-yapf-enabled t)
   (lsp-pylsp-plugins-flake8-enabled nil)
-  (lsp-pylsp-plugins-black-enabled nil)
-  (lsp-pylsp-plugins-jedi-use-pyenv-environment nil)
   (lsp-pylsp-plugins-pylint-args
    (vconcat
     (list
@@ -2405,13 +2396,8 @@
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
-  (lsp-enable-snippet nil)
   :config
-  ;; I am explicitly setting company backends and cape capfs for corfu, and do not want lsp-mode to
-  ;; interfere with `completion-at-point-functions'
   (when (eq sb/in-buffer-completion 'corfu)
-    ;; (setq lsp-completion-enable nil)
-
     (defun sb/lsp-mode-setup-completion ()
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
@@ -2766,7 +2752,6 @@
 
 (use-package cperl-mode
   :mode "latexmkrc\\'"
-  :hook (cperl-mode . lsp-deferred)
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode))
@@ -3457,10 +3442,7 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package nano-theme
   :straight (:host github :repo "rougier/nano-theme")
   :when (eq sb/theme 'nano-dark)
-  :init (load-theme 'nano-dark t)
-  :custom
-  (nano-window-divider-show t)
-  (nano-fonts-use t))
+  :init (load-theme 'nano-dark t))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
 ;; status, flycheck information, and Python virtualenv information on the modeline. The package is
