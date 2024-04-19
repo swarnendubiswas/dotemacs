@@ -2876,9 +2876,7 @@
 
 ;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  ;; :init
-  ;; Looks good, but hiding markup makes it difficult to be consistent while editing
-  ;; (setq-default markdown-hide-markup t)
+  :init (setq-default markdown-hide-markup t)
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
   (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
@@ -3117,8 +3115,6 @@
 (use-package consult-reftex
   :straight (:host github :repo "karthink/consult-reftex")
   :after (consult tex-mode)
-  :demand t
-  :commands (consult-reftex-insert-reference consult-reftex-goto-label)
   :bind (("C-c [" . consult-reftex-insert-reference) ("C-c )" . consult-reftex-goto-label)))
 
 (use-package auctex-latexmk
@@ -3134,7 +3130,7 @@
 (use-package bibtex-capf
   :straight (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :hook ((LaTeX-mode reftex-mode) . bibtex-capf-mode))
+  :hook (LaTeX-mode . bibtex-capf-mode))
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
