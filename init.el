@@ -261,6 +261,7 @@
   ;; it runs all the save-related hooks.
   (auto-save-visited-interval 30)
   (revert-without-query '("\\.*") "Revert all (e.g., PDF) files without asking")
+  (custom-file sb/custom-file)
   :config
   (dolist (exts
            '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
@@ -341,7 +342,16 @@
 
   ;; Hide "When done with a buffer, type C-x 5" message
   (when (boundp 'server-client-instructions)
-    (setq server-client-instructions nil)))
+    (setq server-client-instructions nil))
+
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror 'nomessage))
+  (when (file-exists-p sb/private-file)
+    (load sb/private-file 'noerror 'nomessage))
+
+  ;; Mark safe variables
+  (put 'compilation-read-command 'safe-local-variable #'stringp)
+  (put 'reftex-default-bibliography 'safe-local-variable #'stringp))
 
 ;; Auto-refresh all buffers
 (use-package autorevert
@@ -465,7 +475,7 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; Use "Shift + direction" arrows for moving around windows. I also use the "Shift+direction"
+;; Use "Shift + direction" arrows for moving around windows. I also use the "Shift + direction"
 ;; keybindings for moving around windows in tmux which is okay because I do not split Emacs frames
 ;; often.
 (use-package windmove
@@ -626,28 +636,7 @@
 ;; It is useful because it does not split frames.
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
-  :config
-  ;;   (push '("*Help*"              :noselect t)   popwin:special-display-config)
-  ;;   (push '(compilation-mode      :noselect t)   popwin:special-display-config)
-  ;;   (push '("*Compile-Log*"       :noselect t)   popwin:special-display-config)
-  ;;   (push '("*manage-minor-mode*" :noselect t)   popwin:special-display-config)
-  ;;   (push '("*Selection Ring:")                  popwin:special-display-config)
-  ;;   (push '("*Flycheck checkers*" :noselect nil) popwin:special-display-config)
-  ;;   (push '(flycheck-error-list-mode :noselect nil) popwin:special-display-config)
-  ;;   (push '("*ripgrep-search*"    :noselect nil) popwin:special-display-config)
-  ;;   (push '("^\*magit:.+\*$"      :noselect nil) popwin:special-display-config)
-  ;;   (push '("*xref*"              :noselect nil) popwin:special-display-config)
-  (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config)
-  ;;   (add-to-list 'popwin:special-display-config '("*Completions*" :stick t :noselect t))
-  ;;   (add-to-list 'popwin:special-display-config '("*Occur*" :noselect nil))
-  ;;   (add-to-list 'popwin:special-display-config '("*Backtrace*"))
-  ;;   (add-to-list 'popwin:special-display-config '("*Apropos*"))
-  ;;   (add-to-list 'popwin:special-display-config '("*Warnings*"))
-  ;;   (add-to-list 'popwin:special-display-config '("*prettier errors*"))
-  ;;   (add-to-list 'popwin:special-display-config '(deadgrep-mode :noselect nil))
-  ;;   (add-to-list 'popwin:special-display-config '("*lsp session*"))
-  ;;   (add-to-list 'popwin:special-display-config '("*rg*" :noselect nil))
-  )
+  :config (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config))
 
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
@@ -693,8 +682,8 @@
    ("M-<down>" . sb/dired-jump-to-bottom)
    ("i" . find-file))
   :custom
-  ;; Guess a default target directory. When there are two dired buffers, Emacs will select another
-  ;; buffer as the target (e.g., target for copying files).
+  ;; When there are two dired buffer windows in the same frame, Emacs will select the other buffer
+  ;; as the target directory (e.g., for copying or renaming files).
   (dired-dwim-target t)
   (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
   ;; "A" is to avoid listing "." and "..", "B" is to avoid listing backup entries ending with "~",
@@ -1100,7 +1089,6 @@
   :bind ("C-x C-\\" . goto-last-change))
 
 (use-package vundo
-  :straight (:host github :repo "casouri/vundo")
   :bind
   (([remap undo] . vundo)
    ("C-z" . vundo)
@@ -1634,26 +1622,23 @@
 ;;     highlight-indentation-mode)
 ;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
 
-;; (use-package
-;;   indent-bars
-;;   :straight (:host github :repo "jdtsmith/indent-bars")
-;;   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-;;   :custom
-;;   (indent-bars-treesit-support t)
-;;   (indent-bars-no-descend-string t)
-;;   (indent-bars-treesit-ignore-blank-lines-types '("module"))
-;;   (indent-bars-treesit-wrap
-;;     '
-;;     (
-;;       (python
-;;         argument_list
-;;         parameters ; for python, as an example
-;;         list
-;;         list_comprehension
-;;         dictionary
-;;         dictionary_comprehension
-;;         parenthesized_expression
-;;         subscript))))
+(use-package indent-bars
+  :straight (:host github :repo "jdtsmith/indent-bars")
+  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :custom
+  (indent-bars-treesit-support t)
+  (indent-bars-no-descend-string t)
+  (indent-bars-treesit-ignore-blank-lines-types '("module"))
+  (indent-bars-treesit-wrap
+   '((python
+      argument_list
+      parameters ; for python, as an example
+      list
+      list_comprehension
+      dictionary
+      dictionary_comprehension
+      parenthesized_expression
+      subscript))))
 
 ;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
@@ -1669,7 +1654,6 @@
   (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
 
 (use-package flycheck-hl-todo
-  :straight (:host github :repo "alvarogonzalezsotillo/flycheck-hl-todo")
   :after flycheck
   :init (flycheck-hl-todo-setup))
 
@@ -1889,7 +1873,6 @@
   :config (require 'company-web-html))
 
 (use-package company-wordfreq
-  :straight (:host github :repo "johannes-mueller/company-wordfreq.el")
   :after (:any company corfu)
   :demand t)
 
@@ -2131,16 +2114,6 @@
   :after corfu
   :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
 
-(use-package corfu-quick-access
-  :straight (:host codeberg :repo "spike_spiegel/corfu-quick-access.el")
-  :when (eq sb/in-buffer-completion 'corfu)
-  :hook
-  (corfu-mode
-   .
-   (lambda ()
-     (ignore-errors
-       (corfu-quick-access-mode)))))
-
 (use-package corfu-history
   :straight nil
   :when (eq sb/in-buffer-completion 'corfu)
@@ -2164,10 +2137,6 @@
    ("M-n" . corfu-popupinfo-scroll-up)
    ("M-p" . corfu-popupinfo-scroll-down)
    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
-
-(use-package popon
-  :straight (:host codeberg :repo "akib/emacs-popon")
-  :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p))))
 
 (use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
@@ -2494,12 +2463,7 @@
   ;; Furthermore, we also use `flyspell' and `jinx'.
   (setq lsp-ltex-disabled-rules
         #s(hash-table
-           size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
-
-  ;; (setq lsp-ltex-disabled-rules
-  ;;       (json-parse-string
-  ;;        "{\"en-US\": [\"MORFOLOGIK_RULE_EN_US\"]}"))
-  )
+           size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
 ;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
 (use-package lsp-latex
@@ -2626,13 +2590,6 @@
 ;;   ;; Improves performance with large files without significantly diminishing highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
-;; (use-package yasnippet-treesitter-shim
-;;   :straight (:host github :repo "fbrosda/yasnippet-treesitter-shim" :files ("snippets/*"))
-;;   :after (treesit-auto yasnippet)
-;;   :demand t
-;;   :no-require t
-;;   :config (add-to-list 'yas-snippet-dirs (straight--build-dir "yasnippet-treesitter-shim")))
-
 (use-package eldoc
   :straight (:type built-in)
   :hook (prog-mode . turn-on-eldoc-mode)
@@ -2719,10 +2676,6 @@
   :bind
   ;; Assigning a keybinding such as "C-[" is involved, "[" is treated as `meta'
   ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
-
-  ;; TODO: Bind other functions suitably: python-nav-beginning-of-block, python-nav-end-of-block,
-  ;; python-nav-backward-defun, python-nav-forward-defun, python-nav-backward-statement,
-  ;; python-nav-forward-statement
   (:map
    python-mode-map
    ("C-c C-d")
@@ -2826,10 +2779,6 @@
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
-;; (use-package css-mode
-;;   :hook ((css-mode css-ts-mode) . lsp-deferred)
-;;   :custom (css-indent-offset 2))
-
 (use-package make-mode
   :straight (:type built-in)
   :mode
@@ -2838,25 +2787,6 @@
    ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-mode))
   :hook ((makefile-mode make-ts-mode) . (lambda () (setq-local indent-tabs-mode t))))
-
-;; ;; Align fields with "C-c C-a"
-;; ;; (use-package csv-mode
-;; ;;   :disabled
-;; ;;   :hook
-;; ;;   (csv-mode
-;; ;;     .
-;; ;;     (lambda ()
-;; ;;       (make-local-variable 'lsp-disabled-clients)
-;; ;;       (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
-;; ;;       (when (fboundp 'flyspell-mode)
-;; ;;         (flyspell-mode -1))
-;; ;;       (when (fboundp 'jinx-mode)
-;; ;;         (jinx-mode -1))))
-;; ;;   :custom (csv-separators '("," ";" "|" " ")))
-
-(use-package antlr-mode
-  :straight (:type built-in)
-  :mode "\\.g4\\'")
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -3065,6 +2995,7 @@
 ;; Use "<" to trigger org block completion at point.
 (use-package org-block-capf
   :straight (:host github :repo "xenodium/org-block-capf")
+  :after corfu
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
   :custom (org-block-capf-edit-style 'inline))
 
@@ -3280,7 +3211,6 @@ used in `company-backends'."
   :diminish)
 
 (use-package breadcrumb
-  :straight (:host github :repo "joaotavora/breadcrumb")
   :hook
   ((c-mode
     c-ts-mode
@@ -3311,7 +3241,6 @@ If region is active, apply to active region instead."
       (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
     (forward-line 1)
     (back-to-indentation)))
-
 
 (defcustom sb/skippable-buffers
   '("TAGS"
@@ -3607,17 +3536,6 @@ PAD can be left (`l') or right (`r')."
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
   :diminish)
-
-(setq custom-file sb/custom-file)
-
-(when (file-exists-p custom-file)
-  (load custom-file 'noerror 'nomessage))
-(when (file-exists-p sb/private-file)
-  (load sb/private-file 'noerror 'nomessage))
-
-;; Mark safe variables
-(put 'compilation-read-command 'safe-local-variable #'stringp)
-(put 'reftex-default-bibliography 'safe-local-variable #'stringp)
 
 (add-hook
  'emacs-startup-hook
