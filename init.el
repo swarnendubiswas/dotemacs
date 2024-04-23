@@ -27,7 +27,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'doom-nord
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '(radio
@@ -35,7 +35,6 @@
     (const :tag "doom-nord" doom-nord)
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "nano-dark" nano-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -147,10 +146,8 @@
 (use-package diminish
   :demand t)
 
-;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key' which provides a
-;; much prettier API for manipulating keymaps than `define-key' and `global-set-key'. "C-h b" lists
-;; all the bindings available in a buffer, "C-h m" shows the keybindings for the major and the minor
-;; modes.
+;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
+;; and the minor modes.
 (use-package bind-key
   :bind ("C-c d k" . describe-personal-keybindings))
 
@@ -314,10 +311,6 @@
    ;; Scroll settings from Doom Emacs
    scroll-preserve-screen-position t
    scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
-   ;; Emacs spends too much effort recentering the screen if you scroll the cursor more than N lines
-   ;; past window edges, where N is the setting of `scroll-conservatively'. This is especially slow
-   ;; in larger files during large-scale scrolling commands. If kept over 100, the window is never
-   ;; automatically recentered.
    scroll-conservatively 101
    ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
    auto-window-vscroll nil)
@@ -338,7 +331,7 @@
   (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
   (diminish 'visual-line-mode)
 
-  ;; (advice-add 'risky-local-variable-p :override #'ignore)
+  (advice-add 'risky-local-variable-p :override #'ignore)
 
   ;; Hide "When done with a buffer, type C-x 5" message
   (when (boundp 'server-client-instructions)
@@ -430,7 +423,6 @@
      ".*/recentf\\'"
      ".*/recentf-save.el\\'"
      "~$"
-     "/.autosaves/"
      ".*/TAGS\\'"
      "*.cache"
      "*[/\\]straight/repos/*"))
@@ -544,11 +536,6 @@
 ;; Multihop with sudo with custom user: "C-x C-f
 ;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
-
-;; Use bookmarks to speed up remote file access: upon visiting a location with Tramp, save it as a
-;; bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump' ("C-x r
-;; b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in `bookmark-bmenu-mode'
-;; with `R'.
 (use-package tramp
   :straight (:type built-in)
   :bind ("C-S-q" . tramp-cleanup-all-buffers)
@@ -747,7 +734,6 @@
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
-;; Alternate: https://github.com/Anoncheg1/dired-hist
 (use-package dired-hist
   :straight (:host github :repo "karthink/dired-hist")
   :hook (dired-mode . dired-hist-mode)
@@ -896,11 +882,7 @@
   :custom
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command)
-  :config (define-key embark-identifier-map "y" #'symbol-overlay-put)
-
-  ;; (define-key embark-identifier-map "-" #'string-inflection-cycle)
-  ;; (add-to-list 'embark-repeat-actions #'string-inflection-cycle)
-
+  :config
   (with-eval-after-load "vertico"
     (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export))))
 
@@ -1120,25 +1102,6 @@
       ("REFACTOR" . "#cc9393"))
     hl-todo-keyword-faces)))
 
-;; (use-package highlight-numbers
-;;   :hook
-;;   (
-;;     (prog-mode
-;;       yaml-mode
-;;       yaml-ts-mode
-;;       conf-mode
-;;       css-mode
-;;       css-ts-mode
-;;       html-mode
-;;       html-ts-mode
-;;       web-mode)
-;;     . highlight-numbers-mode))
-
-;; ;; Display ugly "^L" page breaks as tidy horizontal lines
-;; (use-package page-break-lines
-;;   :hook (emacs-startup . global-page-break-lines-mode)
-;;   :diminish)
-
 (use-package wc-mode
   :straight (:type built-in)
   :commands wc-mode)
@@ -1188,9 +1151,6 @@
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup . xclip-mode))
-
-;; (use-package fix-word
-;;   :bind (("M-u" . fix-word-upcase) ("M-l" . fix-word-downcase) ("M-c" . fix-word-capitalize)))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -1373,10 +1333,6 @@
   :config
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
-  ;; Display in the margin since the fringe is unavailable in TTY
-  ;; (unless (display-graphic-p)
-  ;;   (diff-hl-margin-mode 1))
-
   (with-eval-after-load "magit"
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
@@ -1483,68 +1439,11 @@
    flycheck-python-pylint-executable "python3"
    flycheck-shellcheck-follow-sources nil)
 
-  ;; Add support for textidote
-  (flycheck-define-checker
-   tex-textidote
-   "A LaTeX grammar/spelling checker using textidote.
-  See https://github.com/sylvainhalle/textidote."
-   :modes (LaTeX-mode)
-   :command
-   ("java"
-    "-jar"
-    (eval (expand-file-name (no-littering-expand-etc-file-name "textidote.jar")))
-    "--read-all"
-    "--output"
-    "singleline"
-    "--no-color"
-    "--check"
-    (eval
-     (if ispell-current-dictionary
-         (substring ispell-current-dictionary 0 2)
-       "en"))
-    ;; Try to honor local aspell dictionary and replacements if they exist
-    "--dict"
-    (eval (expand-file-name ispell-personal-dictionary))
-    "--replace"
-    (eval (expand-file-name "~/.aspell.en.prepl"))
-    "--ignore"
-    "lt:en:MORFOLOGIK_RULE_EN_US:WANT:EN_QUOTES:EN_DIACRITICS_REPLACE,lt:en:WORD_CONTAINS_UNDERSCORE"
-    ;; Using source ensures that a single temporary file in a different dir is created
-    ;; such that textidote won't process other files. This serves as a hacky workaround for
-    ;; https://github.com/sylvainhalle/textidote/issues/200.
-    source)
-   :error-patterns
-   ((warning
-     line-start
-     (file-name)
-     "(L"
-     line
-     "C"
-     column
-     "-"
-     (or (seq "L" end-line "C" end-column) "?")
-     "): "
-     (message (one-or-more (not "\"")))
-     (one-or-more not-newline)
-     line-end)))
-  ;; (add-to-list 'flycheck-checkers 'tex-textidote)
-
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Exclude directories and files from being checked
-  ;; https://github.com/flycheck/flycheck/issues/1745
-
-  ;; (defvar sb/excluded-directory-regexps '(".git" "elpa" ".cache" ".clangd"))
-  ;; (defun sb/flycheck-may-check-automatically (&rest _conditions)
-  ;;   (or (null buffer-file-name)
-  ;;     (let ((bufname (file-truename buffer-file-name)))
-  ;;       (not (seq-some (lambda (re) (string-match-p re bufname)) sb/excluded-directory-regexps)))))
-  ;; (advice-add 'flycheck-may-check-automatically :after-while #'sb/flycheck-may-check-automatically)
-
   ;; Chain flycheck checkers with lsp. We prefer to use per-project directory local variables
   ;; instead of defining here.
-
   ;; https://github.com/flycheck/flycheck/issues/1762
   (defvar-local sb/flycheck-local-checkers nil)
   (defun sb/flycheck-checker-get (fn checker property)
@@ -1588,32 +1487,7 @@
   (with-eval-after-load "auctex"
     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 
-  ;; The cursor position is not saved in `LaTeX-mode-hook', so we invoke explicitly.
-  ;; (add-hook 'LaTeX-mode-hook (lambda () (run-with-idle-timer 30 t #'format-all-buffer)))
   :diminish)
-
-;; https://languagetool.org/download/LanguageTool-stable.zip
-;; The "languagetool" folder should include all files in addition to the ".jar" files.
-
-;; (use-package langtool
-;;   :commands (langtool-check langtool-check-done langtool-show-message-at-point langtool-correct-buffer)
-;;   :init
-;;   (setq
-;;     langtool-default-language "en-US"
-;;     languagetool-java-arguments '("-Dfile.encoding=UTF-8")
-;;     languagetool-console-command (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-;;     languagetool-server-command (no-littering-expand-etc-file-name "languagetool/languagetool-server.jar")
-;;     langtool-language-tool-jar (no-littering-expand-etc-file-name "languagetool/languagetool-commandline.jar")
-;;     langtool-disabled-rules
-;;     '
-;;     ("MORFOLOGIK_RULE_EN_US"
-;;       ;; "WHITESPACE_RULE"
-;;       ;; "EN_QUOTES"
-;;       ;; "DASH_RULE"
-;;       ;; "COMMA_PARENTHESIS_WHITESPACE"
-;;       ;; "OXFORD_SPELLING_ISE_VERBS"
-;;       ;; "OXFORD_SPELLING_NOUNS")
-;;       )))
 
 ;; (use-package highlight-indentation
 ;;   :hook
@@ -1640,7 +1514,6 @@
       parenthesized_expression
       subscript))))
 
-;; `format-all-the-code' just runs Emacs' built-in `indent-region' for `emacs-lisp'.
 (use-package elisp-autofmt
   :commands (elisp-autofmt-buffer)
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
@@ -1687,9 +1560,6 @@
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
     (setq completion-styles '(orderless substring basic)))
-
-  (with-eval-after-load "hotfuzz"
-    (setq completion-styles '(hotfuzz substring basic)))
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
   ;; work. I also want substring matching for file names.
@@ -1829,9 +1699,6 @@
   :after (:all tex-mode (:any company corfu))
   :demand t)
 
-;; Uses RefTeX to complete label references and citations. When working with multi-file documents,
-;; ensure that the variable `TeX-master' is appropriately set in all files, so that RefTeX can find
-;; citations across documents.
 (use-package company-reftex
   :after (:all tex-mode (:any company corfu))
   :demand t
@@ -1872,46 +1739,6 @@
   :demand t
   :config (require 'company-web-html))
 
-(use-package company-wordfreq
-  :after (:any company corfu)
-  :demand t)
-
-;; Try completion backends in order untill there is a non-empty completion list:
-;; (setq company-backends '(company-xxx company-yyy company-zzz))
-
-;; Merge completions of all the backends:
-;; (setq company-backends '((company-xxx company-yyy company-zzz)))
-
-;; Merge completions of all the backends but keep the candidates organized in accordance with the
-;; grouped backends order.
-;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
-
-;; Another keyword :with helps to make sure the results from major/minor mode agnostic backends
-;; (such as company-yasnippet, company-dabbrev-code) are returned without preventing results from
-;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
-;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
-;; :with, and only then put context agnostic backend(s).
-;; (setq company-backends '((company-capf :with company-yasnippet)))
-
-;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
-;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
-;; (e.g. outside of strings and comments), and pass on control to later backends when outside of
-;; that major mode or context.
-
-;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
-;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
-;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
-;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
-;; non-nil for following backends even when their ‘candidates’ list command is empty:
-;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
-
-;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
-;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
-;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
-;; `:separate', the candidates that come from different backends are sorted separately in the
-;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
-;; the order of completions just like the backends returned them.
-
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
   (setq
@@ -1945,13 +1772,6 @@
       "Add backends for `latex-mode' completion in company mode."
       (make-local-variable 'company-backends)
 
-      ;; Example: company-backends: https://github.com/TheBB/company-reftex/issues/10
-
-      ;; `company-reftex' should be considerably more powerful than `company-auctex' backends for
-      ;; labels and citations. `company-reftex-labels' is expected to be better than
-      ;; `company-auctex-labels'. `company-reftex-citations' is better than `company-bibtex' and
-      ;; `company-auctex-bibs'.
-
       ;; `company-capf' does not pass to later backends with Texlab, so we have it last
       (setq company-backends
             '(company-dirfiles
@@ -1969,7 +1789,6 @@
                company-ispell
                company-dict
                company-dabbrev
-               company-wordfreq
                company-capf))))
 
     (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
@@ -1988,19 +1807,14 @@
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-dirfiles (company-wordfreq company-ispell company-dict company-dabbrev))))
+       '(company-dirfiles (company-ispell company-dict company-dabbrev))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
      'text-mode-hook
      (lambda ()
        (unless (derived-mode-p 'LaTeX-mode)
-         (sb/company-text-mode)
-
-         ;; (defun sb/company-after-completion-hook (&rest _ignored)
-         ;;   (just-one-space))
-         ;; (setq-local company-after-completion-hook #'sb/company-after-completion-hook)
-         ))))
+         (sb/company-text-mode)))))
 
   (progn
     (defun sb/company-yaml-mode ()
@@ -2147,17 +1961,10 @@
   (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
 
 (use-package yasnippet-capf
+  :straight (:host github :repo "elken/yasnippet-capf")
   :after (yasnippet corfu)
-  :demand t
-  :straight (:host github :repo "elken/yasnippet-capf"))
+  :demand t)
 
-;; Here is a snippet to show how to support `company' backends with `cape'.
-;; https://github.com/minad/cape/issues/20
-;; (fset #'cape-path (cape-company-to-capf #'company-files))
-;; (add-hook 'completion-at-point-functions #'cape-path)
-
-;; `cape-capf-super' works only well for static completion functions like `cape-dabbrev',
-;; `cape-keyword', `cape-dict', etc., but not for complex multi-step completions like `cape-file'.
 (use-package cape
   :after corfu
   :demand t
@@ -2210,10 +2017,7 @@
                   ;; Merge dabbrev and dict candidates
                   (cape-capf-properties
                    (cape-capf-super
-                    #'cape-dabbrev
-                    #'cape-dict
-                    (cape-company-to-capf #'company-ispell)
-                    (cape-company-to-capf #'company-wordfreq))
+                    #'cape-dabbrev #'cape-dict (cape-company-to-capf #'company-ispell))
                    :sort t)))))
 
   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
@@ -2465,34 +2269,6 @@
         #s(hash-table
            size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
-;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
-(use-package lsp-latex
-  :hook
-  (LaTeX-mode
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-  (lsp-latex-chktex-on-open-and-save t)
-  ;; Delay time in milliseconds before reporting diagnostics
-  (lsp-latex-diagnostics-delay 2000)
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
-  :config
-  (add-to-list 'lsp-latex-build-args "-c")
-  (add-to-list 'lsp-latex-build-args "-pvc"))
-
-;; (use-package lsp-snippet-yasnippet
-;;   :straight (lsp-snippet-yasnippet :type git :host github :repo "svaante/lsp-snippet")
-;;   :after (lsp-mode yasnippet)
-;;   :demand t
-;;   :config (lsp-snippet-yasnippet-lsp-mode-init))
-
 (use-package subword
   :straight (:type built-in)
   :hook (prog-mode . subword-mode)
@@ -2719,11 +2495,6 @@
   (sh-indent-after-continuation 'always)
   (sh-indent-comment t "Indent comments as a regular line"))
 
-(use-package fish-mode
-  :mode "\\.fish\\'"
-  :interpreter "fish"
-  :hook (fish-mode . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
-
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
 
@@ -2834,10 +2605,6 @@
   :config (pandoc-load-default-settings)
   :diminish)
 
-;; (use-package emmet-mode
-;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-;;   :custom (emmet-move-cursor-between-quote t))
-
 (use-package nxml-mode
   :straight (:type built-in)
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
@@ -2874,19 +2641,6 @@
      (setq js-indent-level 2)
      (lsp-deferred))))
 
-;; Links in org-mode by default are displayed as "descriptive" links, meaning they hide their target
-;; URLs. While this looks great, it makes it a bit tricky to figure out how you can edit their URL.
-;; There are two easy options: (i) press "C-c C-l" (`org-insert-link') while your point is within a
-;; link and you will be prompted to edit its URL in the minibuffer. You can use the same command to
-;; create new links (when your point is not on an existing link). (ii) You can convert the
-;; "descriptive" links to "literal" links by invoking the command "M-x org-toggle-link-display". You
-;; can also toggle between the two display modes for links via the mode's menu (under "Hyperlinks").
-
-;; Use zero-width space "C-x 8 zero width space" to treat Org markup as plain text.
-;; https://orgmode.org/manual/Escape-Character.html
-;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-unicode.el
-
-;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 (use-package org
   :defer 2
   :custom
@@ -3124,10 +2878,7 @@ Fallback to `xref-go-back'."
   (defun sb/enable-lsp-citre-capf-backend ()
     "Enable the lsp + Citre capf backend in current buffer."
     (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
-  :hook
-  ;; Using "(require citre-config)" will enable `citre-mode' for all files as long as it finds a
-  ;; tags backend, which is not desired for plain text files.
-  (prog-mode . citre-mode)
+  :hook (prog-mode . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
    ("M-'" . sb/citre-jump+)
@@ -3364,11 +3115,6 @@ or the major mode is not in `sb/skippable-modes'."
    ((eq sb/theme 'modus-vivendi)
     (load-theme 'modus-vivendi t))))
 
-(use-package nano-theme
-  :straight (:host github :repo "rougier/nano-theme")
-  :when (eq sb/theme 'nano-dark)
-  :init (load-theme 'nano-dark t))
-
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
 ;; status, flycheck information, and Python virtualenv information on the modeline. The package is
 ;; not being actively maintained.
@@ -3449,16 +3195,6 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
   (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
-
-(use-package nano-modeline
-  :when (eq sb/modeline-theme 'nano-modeline)
-  :hook
-  ((prog-mode . nano-modeline-prog-mode)
-   (text-mode . nano-modeline-text-mode)
-   (org-mode . nano-modeline-org-mode)
-   (pdf-view-mode . nano-modeline-pdf-mode)
-   (messages-buffer-mode . nano-modeline-message-mode))
-  :custom (nano-modeline-position #'nano-modeline-footer))
 
 (use-package olivetti
   :hook ((text-mode prog-mode) . olivetti-mode)
