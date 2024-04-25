@@ -55,7 +55,7 @@
 ;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
 ;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
 ;; case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -1654,20 +1654,14 @@
    ("C-g" . company-search-abort)
    ("DEL" . company-search-delete-char))
   :custom
-  (company-idle-delay 0.05 "Start autocompletion faster")
+  ;; (company-idle-delay 0.05 "Start autocompletion faster")
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
-  (company-require-match nil "Allow typing input characters that do not match candidates")
+  ;; (company-require-match nil "Allow typing input characters that do not match candidates")
   (company-show-quick-access t "Speed up selecting a completion")
   ;; Align additional metadata, like type signatures, to the right-hand side because it looks better
   (company-tooltip-align-annotations t)
-  ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there is only
-  ;; one candidate, `company-preview-frontend' shows the preview in-place which is too intrusive,
-  ;; `company-preview-if-just-one-frontend' shows in-place preview if there is only choice,
-  ;; `company-echo-metadata-frontend' shows selected candidate docs in echo area, and
-  ;; `company-pseudo-tooltip-frontend' which always shows the candidates in an overlay.
-  ;; (company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
   (company-global-modes
    '(not dired-mode magit-status-mode help-mode csv-mode minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
@@ -1898,9 +1892,11 @@
   :straight
   (corfu
    :files (:defaults "extensions/*")
-   :includes (corfu-echo corfu-popupinfo corfu-history corfu-info))
+   :includes (corfu-info corfu-history corfu-echo corfu-popupinfo corfu-indexed))
   :when (eq sb/in-buffer-completion 'corfu)
-  :hook (emacs-startup . global-corfu-mode)
+  :hook
+  ((emacs-startup . global-corfu-mode)
+   (corfu-mode . (lambda () (setq-local completion-styles '(basic)))))
   :bind
   (:map
    corfu-map
@@ -1952,6 +1948,11 @@
    ("M-p" . corfu-popupinfo-scroll-down)
    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
 
+(use-package corfu-indexed
+  :straight nil
+  :when (eq sb/in-buffer-completion 'corfu)
+  :hook (corfu-mode . corfu-indexed-mode))
+
 (use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
@@ -1972,7 +1973,7 @@
   ;; Initialize for all generic languages that are not specifically handled
   (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
   (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions (cape-capf-super #'cape-dabbrev #'cape-dict) 'append)
+  (add-to-list 'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev) 'append)
   :custom
   (cape-dabbrev-min-length 3)
   (cape-dict-grep nil "Load the word files in memory for better performance")
@@ -1999,14 +2000,14 @@
                      #'citre-completion-at-point
                      #'cape-elisp-symbol
                      (cape-company-to-capf #'company-yasnippet))
-                    (cape-capf-super #'cape-dabbrev #'cape-dict))))))
+                    (cape-capf-super #'cape-dict #'cape-dabbrev))))))
 
   (dolist (mode '(flex-mode-hook bison-mode-hook))
     (add-hook
      mode
      (lambda ()
        (setq-local completion-at-point-functions
-                   (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
+                   (list #'cape-file #'cape-keyword #'cape-dict #'cape-dabbrev)))))
 
   (add-hook
    'text-mode-hook
@@ -2015,10 +2016,7 @@
                  (list
                   #'cape-file
                   ;; Merge dabbrev and dict candidates
-                  (cape-capf-properties
-                   (cape-capf-super
-                    #'cape-dabbrev #'cape-dict (cape-company-to-capf #'company-ispell))
-                   :sort t)))))
+                  (cape-capf-properties (cape-capf-super #'cape-dict #'cape-dabbrev) :sort t)))))
 
   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
   (add-hook
@@ -2038,8 +2036,8 @@
                    ;; Math unicode symbols and sub(super)scripts
                    (cape-company-to-capf #'company-math-symbols-unicode)
                    (cape-company-to-capf #'company-auctex-symbols)
-                   #'cape-dabbrev
-                   #'cape-dict)
+                   #'cape-dict
+                   #'cape-dabbrev)
                   #'yasnippet-capf))))
 
   (with-eval-after-load "lsp-mode"
@@ -2581,11 +2579,7 @@
   :mode
   ;; The order is important to associate "README.md" with `gfm-mode'
   (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
-  :bind
-  (:map
-   markdown-mode-map ("C-c C-d") ("C-c C-j")
-   ;; Enable live preview
-   ("C-c C-c l" . markdown-live-preview-mode))
+  :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j") ("C-c C-c l" . markdown-live-preview-mode))
   :custom
   (markdown-command
    "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
@@ -2595,7 +2589,6 @@
   (markdown-indent-on-enter 'indent-and-new-item)
   (markdown-list-indent-width 2)
   (markdown-split-window-direction 'horizontal)
-  ;; (markdown-make-gfm-checkboxes-buttons nil)
   (markdown-hide-urls t))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
