@@ -64,9 +64,13 @@ install_emacs() {
 }
 
 setup_emacs() {
-    # private.el, textidote, ltex, languagetool, autofmt
+    # textidote, ltex, autofmt
     mkdir -p "$HOME/.emacs.d/etc" && cd "$HOME/.emacs.d/etc" || exit
+
     ln -s "$DOTFILES"/emacs/private.el .
+
+    wget https://languagetool.org/download/LanguageTool-stable.zip
+    unzip LanguageTool-stable.zip -d languagetool
 }
 
 # Install important packages. There is nothing to do if a package is already installed.
@@ -189,16 +193,6 @@ install_npm_packages() {
     # printf "%s" "$cmdline" >>"$USER_HOME/.bashrc"
 }
 
-install_texlab() {
-    TEXLAB_VER="5.14.1"
-
-    cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
-    wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
-    tar xzf texlab-x86_64-linux.tar.gz
-    mv texlab "${USER_HOME}/.local/bin"
-    rm texlab-x86_64-linux.tar.gz
-}
-
 # Update configurations of helper utilities
 
 # HOME Directory
@@ -265,27 +259,6 @@ create_symlinks() {
     sfname="$DOTFILES/bat"
     dfname="${CONFIG_DIR}/bat"
     create_file_symlink $sfname $dfname
-}
-
-install_shellcheck() {
-    SHELLCHECK_VER="0.10.0"
-    SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
-
-    cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
-    wget https://github.com/koalaman/shellcheck/releases/download/v"${SHELLCHECK_VER}/${SHELLCHECK_FILENAME}.tar.xz"
-    tar xf "${SHELLCHECK_FILENAME}.tar.xz"
-    cd "shellcheck-v${SHELLCHECK_VER}" || echo "Failed: cd shellcheck-v${SHELLCHECK_VER}"
-    mv shellcheck "${USER_HOME}/.local/bin"
-    rm -rf "${SHELLCHECK_FILENAME}.tar.xz*"
-}
-
-install_shfmt() {
-    SHFMT_VER="3.8.0"
-
-    cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
-    wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
-    mv shfmt_v"${SHFMT_VER}"_linux_amd64 ${USER_HOME}/.local/bin/shfmt
-    chmod a+x ${USER_HOME}/.local/bin/shfmt
 }
 
 install_ripgrep() {
@@ -435,15 +408,6 @@ install_delta() {
     rm git-delta_"$DELTA_VER"_amd64.deb
 }
 
-install_difft() {
-    DIFFT_VER="0.57.0"
-
-    wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
-    tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
-    mv difft "${USER_HOME}/.local/bin/."
-    rm difft-x86_64-unknown-linux-gnu.tar.gz
-}
-
 install_zoxide() {
     Z_VER="0.9.4"
 
@@ -462,14 +426,6 @@ install_bat() {
     wget https://github.com/sharkdp/bat/releases/download/v"$BAT_VER"/bat_"$BAT_VER"_amd64.deb
     dpkg -i bat_"$BAT_VER"_amd64.deb
     rm bat_"$BAT_VER"_amd64.deb
-}
-
-install_marksman() {
-    MK_VER="2023-12-09"
-
-    wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
-    mv marksman-linux $USER_HOME/.local/bin/marksman
-    chmod a+x $USER_HOME/.local/bin/marksman
 }
 
 install_fd() {
@@ -536,6 +492,41 @@ install_nerd_fonts() {
     done
 }
 
+install_local_binaries() {
+    cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
+
+    TEXLAB_VER="5.14.1"
+    wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
+    tar xzf texlab-x86_64-linux.tar.gz
+    mv texlab "${USER_HOME}/.local/bin"
+    rm texlab-x86_64-linux.tar.gz
+
+    SHELLCHECK_VER="0.10.0"
+    SHELLCHECK_FILENAME="shellcheck-v${SHELLCHECK_VER}.linux.x86_64"
+
+    wget https://github.com/koalaman/shellcheck/releases/download/v"${SHELLCHECK_VER}/${SHELLCHECK_FILENAME}.tar.xz"
+    tar xf "${SHELLCHECK_FILENAME}.tar.xz"
+    cd "shellcheck-v${SHELLCHECK_VER}" || echo "Failed: cd shellcheck-v${SHELLCHECK_VER}"
+    mv shellcheck "${USER_HOME}/.local/bin"
+    rm -rf "${SHELLCHECK_FILENAME}.tar.xz*"
+
+    SHFMT_VER="3.8.0"
+    wget https://github.com/mvdan/sh/releases/download/v"${SHFMT_VER}/shfmt_v${SHFMT_VER}"_linux_amd64
+    mv shfmt_v"${SHFMT_VER}"_linux_amd64 ${USER_HOME}/.local/bin/shfmt
+    chmod a+x ${USER_HOME}/.local/bin/shfmt
+
+    DIFFT_VER="0.57.0"
+    wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
+    tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
+    mv difft "${USER_HOME}/.local/bin/."
+    rm difft-x86_64-unknown-linux-gnu.tar.gz
+
+    MK_VER="2023-12-09"
+    wget https://github.com/artempyanykh/marksman/releases/download/"$MK_VER"/marksman-linux-x64
+    mv marksman-linux $USER_HOME/.local/bin/marksman
+    chmod a+x $USER_HOME/.local/bin/marksman
+}
+
 # Setup 24bit terminal support
 setup_24bit() {
     /usr/bin/tic -x -o "$HOME/.terminfo" "${DOTFILES}/xterm-24bit.terminfo"
@@ -585,16 +576,12 @@ cleanup() {
 setup_emacs
 setup_24bit
 install_python_packages
-install_texlab
-install_shellcheck
-install_shfmt
 install_zoxide
 install_fzf
-install_marksman
 install_nerd_fonts
-install_difft
 create_symlinks
 install_npm_packages
+install_local_binaries
 
 # cleanup
 

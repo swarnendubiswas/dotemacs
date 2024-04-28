@@ -27,7 +27,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'leuven-dark
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '(radio
@@ -35,10 +35,11 @@
     (const :tag "doom-nord" doom-nord)
     (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
+    (const :tag "leuven-dark" leuven-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -119,27 +120,20 @@
  ((eq sb/op-mode 'daemon)
   (setq
    use-package-always-demand t
-   use-package-expand-minimally nil
-   use-package-always-defer nil
    use-package-minimum-reported-time 0 ; Show everything
    use-package-verbose t))
  ((eq sb/op-mode 'standalone)
   (if (bound-and-true-p sb/debug-init-file)
-      (progn
-        (setq
-         debug-on-error nil
-         debug-on-event 'sigusr2
-         use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-         use-package-verbose t
-         use-package-minimum-reported-time 0 ; Show everything
-         use-package-always-demand t))
-    (progn
       (setq
-       use-package-always-defer t
-       ;; Disable error checks during macro expansion because the configuration just works
-       use-package-expand-minimally t
-       use-package-compute-statistics nil
-       use-package-verbose nil)))))
+       debug-on-error nil
+       debug-on-event 'sigusr2
+       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+       use-package-verbose t
+       use-package-minimum-reported-time 0 ; Show everything
+       use-package-always-demand t)
+    (setq
+     use-package-always-defer t
+     use-package-expand-minimally t))))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package' keywords.
 
@@ -154,11 +148,6 @@
 (use-package no-littering
   :demand t
   :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
-
-(defcustom sb/custom-file (no-littering-expand-var-file-name "custom.el")
-  "File to write Emacs customizations."
-  :type 'string
-  :group 'sb/emacs)
 
 ;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
 (defcustom sb/private-file (no-littering-expand-etc-file-name "private.el")
@@ -195,8 +184,8 @@
   (create-lockfiles nil)
   (custom-safe-themes t)
   (delete-by-moving-to-trash t "Use system trash to deal with mistakes while deleting")
-  ;; Accelerate scrolling operations when non-nil. Only those portions of the buffer which are
-  ;; actually going to be displayed get fontified.
+  ;; Accelerate scrolling operations by fontifying only those portions of the buffer which are
+  ;; actually going to be displayed.
   (fast-but-imprecise-scrolling t)
   (help-window-select t "Makes it easy to close the window")
   (history-delete-duplicates t)
@@ -208,7 +197,7 @@
   ;; Setting the following option makes it so that when you kill something in Emacs, whatever was
   ;; previously on the system clipboard is pushed into the kill ring. This way, you can paste it
   ;; with `yank-pop'.
-  ;; (save-interprogram-paste-before-kill t)
+  (save-interprogram-paste-before-kill t)
   (save-silently t "Error messages will still be printed")
   ;; Enable use of system clipboard across Emacs and other applications, does not work on the TUI
   (select-enable-clipboard t)
@@ -221,7 +210,6 @@
   (use-file-dialog nil)
   (view-read-only t "View mode for read-only buffers")
   (visible-bell nil)
-  ;; This is not a great idea, but I expect most warnings will arise from third-party packages.
   (warning-minimum-level :error)
   (window-combination-resize t "Resize windows proportionally")
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
@@ -242,7 +230,6 @@
   ;; ISSUE: There is a known bug with Emacs upstream.
   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52292
   (find-file-visit-truename nil "Show true name, useful in case of symlinks")
-  (large-file-warning-threshold (* 500 1024 1024))
   (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
   (backup-inhibited t "Disable backup for a per-file basis")
   (confirm-nonexistent-file-or-buffer t)
@@ -257,8 +244,8 @@
   ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
   ;; it runs all the save-related hooks.
   (auto-save-visited-interval 30)
-  (revert-without-query '("\\.*") "Revert all (e.g., PDF) files without asking")
-  (custom-file sb/custom-file)
+  (revert-without-query '("\\.*") "Revert all files without asking")
+  (custom-file (no-littering-expand-var-file-name "custom.el"))
   :config
   (dolist (exts
            '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
@@ -270,8 +257,8 @@
      read-minibuffer-restore-windows t
      ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
      read-extended-command-predicate #'command-completion-default-include-p
-     ;; Type "y/n" instead of "yes"/"no", although it is not recommended to prevent from wrong answers
-     ;; being typed in a hurry.
+     ;; Type "y/n" instead of "yes"/"no", although it is not recommended to prevent from wrong
+     ;; answers being typed in a hurry.
      use-short-answers t))
 
   (when sb/EMACS29+
@@ -329,12 +316,11 @@
    bidi-paragraph-direction 'left-to-right)
 
   (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
-  (diminish 'visual-line-mode)
 
   (advice-add 'risky-local-variable-p :override #'ignore)
 
   ;; Hide "When done with a buffer, type C-x 5" message
-  (when (boundp 'server-client-instructions)
+  (when (bound-and-true-p server-client-instructions)
     (setq server-client-instructions nil))
 
   (when (file-exists-p custom-file)
@@ -344,7 +330,8 @@
 
   ;; Mark safe variables
   (put 'compilation-read-command 'safe-local-variable #'stringp)
-  (put 'reftex-default-bibliography 'safe-local-variable #'stringp))
+  (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
+  :diminish visual-line-mode)
 
 ;; Auto-refresh all buffers
 (use-package autorevert
@@ -353,9 +340,6 @@
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
-  ;; Revert only file-visiting buffers, set to non-nil value to revert dired buffers if the contents
-  ;; of the directory changes
-  (global-auto-revert-non-file-buffers t)
   :diminish auto-revert-mode)
 
 ;; Remember cursor position in files
@@ -409,7 +393,7 @@
   :hook (emacs-startup . recentf-mode)
   :bind ("<f9>" . recentf-open-files)
   :custom
-  (recentf-auto-cleanup 60)
+  (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
   (recentf-exclude
    '("[/\\]elpa/"
      "[/\\]\\.git/"
@@ -446,17 +430,18 @@
   ;; after idling for a few seconds.
   (run-with-idle-timer 30 t #'recentf-save-list))
 
-(defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
-  "Hide messages appearing in ORIG-FUN, forward ARGS."
-  (let ((inhibit-message t))
-    (apply orig-fun args)))
+(progn
+  (defun sb/inhibit-message-call-orig-fun (orig-fun &rest args)
+    "Hide messages appearing in ORIG-FUN, forward ARGS."
+    (let ((inhibit-message t))
+      (apply orig-fun args)))
 
-;; Hide the "Wrote to recentf" message
-(advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
-;; Hide the "Cleaning up the recentf list...done" message
-(advice-add 'recentf-cleanup :around #'sb/inhibit-message-call-orig-fun)
-;; Hide the "Wrote ..." message
-(advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+  ;; Hide the "Wrote to recentf" message
+  (advice-add 'recentf-save-list :around #'sb/inhibit-message-call-orig-fun)
+  ;; Hide the "Cleaning up the recentf list...done" message
+  (advice-add 'recentf-cleanup :around #'sb/inhibit-message-call-orig-fun)
+  ;; Hide the "Wrote ..." message
+  (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun))
 
 (progn
   (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -473,8 +458,7 @@
 (use-package windmove
   :straight (:type built-in)
   :when (display-graphic-p)
-  :init (windmove-default-keybindings)
-  :custom (windmove-wrap-around t "Wrap around at edges"))
+  :init (windmove-default-keybindings))
 
 ;; Consult does not provide intelligent file lookup. `ffap' binds "C-x C-f" to `find-file-at-point'
 ;; which will continue to work like `find-file' unless a prefix argument is given. Then it will find
@@ -557,23 +541,7 @@
   (markdown-mode
    .
    (lambda ()
-     (setq
-      show-trailing-whitespace t
-      whitespace-style
-      '(face ; Visualize using faces
-        ;; tabs
-        ;; spaces
-        trailing ; Trailing whitespace
-        ;; newline
-        ;; tab-mark ; Mark any tabs
-        ;; empty ; Empty lines at beginning or end of buffer
-        ;; lines ; Lines that extend beyond `whitespace-line-column'
-        ;; space-mark ; Wrong kind of indentation (e.g., tab when spaces)
-        ;; space-before-tab ; Mixture of space and tab on the same line
-        ;; space-after-tab ; Mixture of space and tab on the same line
-        ;; empty
-        ;; newline-mark
-        missing-newline-at-eof))
+     (setq show-trailing-whitespace t)
      (whitespace-mode 1)))
   :custom (whitespace-line-column sb/fill-column)
   :config (setq-default whitespace-action '(cleanup auto-cleanup))
@@ -639,7 +607,6 @@
   :bind ("C-b" . ace-jump-buffer)
   :custom
   (ajb-bs-configuration "files-and-scratch")
-  (ajb-max-window-height 30)
   (ajb-sort-function 'bs--sort-by-filename "Always predictable"))
 
 (use-package dired
@@ -1248,9 +1215,7 @@
    :map isearch-mode-map
    ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
    ;; visible `isearch' candidates.
-   ("C-'" . avy-isearch))
-  :custom (avy-background t "Provides better contrast")
-  :config (avy-setup-default))
+   ("C-'" . avy-isearch)))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
@@ -1451,7 +1416,6 @@
         (funcall fn checker property)))
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get))
 
-;; Use for major modes which do not provide a formatter.
 (use-package format-all
   :hook
   ((format-all-mode . format-all-ensure-formatter)
@@ -1517,8 +1481,7 @@
 (use-package elisp-autofmt
   :commands (elisp-autofmt-buffer)
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
-  :custom (elisp-autofmt-python-bin "python3")
-  :config (setq-default elisp-autofmt-load-packages-local '("use-package")))
+  :custom (elisp-autofmt-python-bin "python3"))
 
 (use-package shfmt
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
@@ -2000,14 +1963,14 @@
                      #'citre-completion-at-point
                      #'cape-elisp-symbol
                      (cape-company-to-capf #'company-yasnippet))
-                    (cape-capf-super #'cape-dict #'cape-dabbrev))))))
+                    #'cape-dict #'cape-dabbrev)))))
 
   (dolist (mode '(flex-mode-hook bison-mode-hook))
     (add-hook
      mode
      (lambda ()
        (setq-local completion-at-point-functions
-                   (list #'cape-file #'cape-keyword #'cape-dict #'cape-dabbrev)))))
+                   (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
 
   (add-hook
    'text-mode-hook
@@ -2015,7 +1978,6 @@
      (setq-local completion-at-point-functions
                  (list
                   #'cape-file
-                  ;; Merge dabbrev and dict candidates
                   (cape-capf-properties (cape-capf-super #'cape-dict #'cape-dabbrev) :sort t)))))
 
   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
@@ -2070,7 +2032,7 @@
                        #'citre-completion-at-point
                        #'cape-keyword
                        (cape-company-to-capf #'company-yasnippet))
-                      (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
+                      #'cape-dabbrev #'cape-dict)))))))
 
 ;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
 ;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
@@ -2704,10 +2666,8 @@
    ("M-<down>")
    ("C-'")
    ("C-c C-d") ; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
-   ;; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
-   ("C-c C-j")
-   ;; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
-   ("M-e")
+   ("C-c C-j") ; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
+   ("M-e") ; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
    ("<tab>" . org-indent-item)
    ("<backtab>" . org-outdent-item)
    ("M-{" . org-backward-element)
@@ -2830,7 +2790,6 @@
    ("r" . xref-query-replace-in-results))
   :custom (xref-search-program 'ripgrep))
 
-;; https://github.com/universal-ctags/citre/wiki/Use-Citre-together-with-lsp-mode
 (use-package citre
   :preface
   (defun sb/citre-jump+ ()
@@ -3108,6 +3067,10 @@ or the major mode is not in `sb/skippable-modes'."
    ((eq sb/theme 'modus-vivendi)
     (load-theme 'modus-vivendi t))))
 
+(use-package leuven-theme
+  :when (eq sb/theme 'leuven-dark)
+  :init (load-theme 'leuven-dark t))
+
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
 ;; status, flycheck information, and Python virtualenv information on the modeline. The package is
 ;; not being actively maintained.
@@ -3237,10 +3200,6 @@ PAD can be left (`l') or right (`r')."
  ("C-M-@" . mark-sexp))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
-
-;; This was bound to `electric-newline-and-maybe-indent'. However, this causes problems when
-;; pressing "C-c C-j" quickly for `imenu'.
-;; (unbind-key "C-j")
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
