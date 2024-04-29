@@ -784,15 +784,12 @@
    ("C-c s h" . consult-isearch-history)
    ("<f4>" . consult-line)
    ([remap multi-occur] . consult-multi-occur)
-   ;; ("M-s m" . consult-multi-occur)
+   ("M-s m" . consult-multi-occur)
    ([remap recentf-open-files] . consult-recent-file)
    ("M-g r" . consult-register)
    :map
    isearch-mode-map
-   ("M-s e" . consult-isearch-history)
-   :map
-   minibuffer-local-map
-   ("M-s" . consult-history))
+   ("M-s e" . consult-isearch-history))
   :custom
   (consult-line-start-from-top t "Start search from the beginning")
   (xref-show-xrefs-function #'consult-xref)
@@ -854,7 +851,7 @@
     (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export))))
 
 ;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
-;; `wgrep'
+;; `wgrep'.
 (use-package embark-consult
   :after (embark consult))
 
@@ -874,14 +871,6 @@
   :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
 
-(use-package consult-dir
-  :bind
-  (("C-x C-d" . consult-dir)
-   :map
-   vertico-map
-   ("C-x C-d" . consult-dir)
-   ("C-x C-j" . consult-dir-jump-file)))
-
 (use-package consult-flyspell
   :after (consult flyspell)
   :bind ("C-c f l" . consult-flyspell)
@@ -894,11 +883,6 @@
 (use-package consult-flycheck
   :after (consult flycheck)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
-
-(use-package consult-lsp
-  :after (consult lsp)
-  :commands (consult-lsp-diagnostics consult-lsp-file-symbols)
-  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
 
 (use-package consult-yasnippet
   :bind ("C-M-y" . consult-yasnippet))
@@ -960,14 +944,12 @@
   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
+;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
+;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package flyspell
   :straight (:type built-in)
-  :hook
-  ( ;; Enabling `flyspell-prog-mode' does not seem to be very useful and highlights links and
-   ;; language-specific words. Furthermore, it is supposedly slow.
-   (prog-mode . flyspell-prog-mode)
-   (text-mode . flyspell-mode))
-  :bind (("C-c f f" . flyspell-mode) ("C-c f b" . flyspell-buffer))
+  :hook ((prog-mode . flyspell-prog-mode) (text-mode . flyspell-mode))
+  :bind ("C-c f b" . flyspell-buffer)
   :custom
   (flyspell-abbrev-p t "Add corrections to abbreviation table")
   (flyspell-issue-message-flag nil)
@@ -977,9 +959,6 @@
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
-;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
-;; Running `flyspell-buffer' on an entire buffer can be slow.
-
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.
 (use-package jinx
@@ -988,13 +967,6 @@
   :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
   :custom (jinx-languages "en_US")
   :diminish)
-
-;; (use-package transient
-;;   :commands transient-bind-q-to-quit
-;;   :custom (transient-semantic-coloring t)
-;;   :config
-;;   ;; Allow using `q' to quit out of popups in addition to `C-g'
-;;   (transient-bind-q-to-quit))
 
 ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
 ;; for functions, so we use `helpful-callable' as a replacement.
@@ -1069,10 +1041,6 @@
       ("REFACTOR" . "#cc9393"))
     hl-todo-keyword-faces)))
 
-(use-package wc-mode
-  :straight (:type built-in)
-  :commands wc-mode)
-
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
@@ -1095,9 +1063,7 @@
    (find-file . bm-buffer-restore)
    (emacs-startup . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
-  :custom
-  (bm-buffer-persistence t "Save bookmarks")
-  (bm-highlight-style 'bm-highlight-line-and-fringe))
+  :custom (bm-buffer-persistence t "Save bookmarks"))
 
 (use-package crux
   :bind
@@ -1166,7 +1132,6 @@
 
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
-  :after isearch
   :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
 
@@ -1200,7 +1165,7 @@
    ("C-x C-q" . wgrep-exit))
   :custom (wgrep-auto-save-buffer t))
 
-;; `consult-rg' provides a live search feature, while `deadgrep' provides a resulting search buffer.
+;; `consult-rg' provides live search, while `deadgrep' provides a resulting search buffer.
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
@@ -1279,7 +1244,6 @@
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-;; Diff-hl looks nicer than git-gutter, and is based on `vc'
 (use-package diff-hl
   :when (boundp 'vc-handled-backends)
   :hook
@@ -1292,9 +1256,6 @@
         (diff-hl-margin-local-mode 1))))
    (dired-mode . diff-hl-dired-mode-unless-remote) (emacs-startup . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
-  :custom
-  (diff-hl-draw-borders nil "Highlight without a border looks nicer")
-  (diff-hl-disable-on-remote t "Disable in remote buffers")
   :config
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
@@ -1310,11 +1271,9 @@
    (lambda ()
      (git-commit-save-message)
      (git-commit-turn-on-auto-fill)
-     (git-commit-turn-on-flyspell)))
-  :custom (git-commit-style-convention-checks '(overlong-summary-line non-empty-second-line)))
+     (git-commit-turn-on-flyspell))))
 
-;; Use the minor mode `smerge-mode' to move between conflicts and resolve them. Since Emacs 25.1,
-;; `vc-git-find-file-hook' enables smerge for files with conflicts.
+;; Use the minor mode `smerge-mode' to move between conflicts and resolve them.
 (use-package smerge-mode
   :straight (:type built-in)
   :bind
@@ -1347,8 +1306,7 @@
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
-  ;; Allow always pairing matching delimiters
-  (electric-pair-inhibit-predicate 'ignore)
+  (electric-pair-inhibit-predicate 'ignore "Allow always pairing matching delimiters")
   :config
   (defvar sb/markdown-pairs '((?` . ?`))
     "Electric pairs for `markdown-mode'.")
@@ -1463,23 +1421,21 @@
 (use-package indent-bars
   :straight (:host github :repo "jdtsmith/indent-bars")
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-  :custom
-  (indent-bars-treesit-support t)
-  (indent-bars-no-descend-string t)
-  (indent-bars-treesit-ignore-blank-lines-types '("module"))
-  (indent-bars-treesit-wrap
-   '((python
-      argument_list
-      parameters ; for python, as an example
-      list
-      list_comprehension
-      dictionary
-      dictionary_comprehension
-      parenthesized_expression
-      subscript))))
+  :config
+  (when (executable-find "tree-sitter")
+    (setq
+     indent-bars-treesit-support t
+     indent-bars-treesit-ignore-blank-lines-types '("module")
+     indent-bars-treesit-scope
+     '((python
+        function_definition
+        class_definition
+        for_statement
+        if_statement
+        with_statement
+        while_statement)))))
 
 (use-package elisp-autofmt
-  :commands (elisp-autofmt-buffer)
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
   :custom (elisp-autofmt-python-bin "python3"))
 
@@ -1508,10 +1464,8 @@
    ("M-n" . minibuffer-next-completion)
    ("M-RET" . minibuffer-choose-completion))
   :custom
-  (completions-format 'vertical)
   (read-file-name-completion-ignore-case t "Ignore case when reading a file name")
   (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
-  (completion-category-defaults nil)
   :config
   ;; Show docstring description for completion candidates in commands like `describe-function'.
   (when sb/EMACS28+
