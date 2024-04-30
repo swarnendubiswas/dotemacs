@@ -1630,12 +1630,6 @@
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-yasnippet nil))
 
-;; Better replacement for `company-files'
-(use-package company-dirfiles
-  :straight (:host codeberg :repo "cwfoo/company-dirfiles")
-  :after company
-  :demand t)
-
 (use-package company-org-block
   :after (company org)
   :demand t)
@@ -1650,11 +1644,47 @@
   :demand t
   :config (require 'company-web-html))
 
+;; Try completion backends in order untill there is a non-empty completion list:
+;; (setq company-backends '(company-xxx company-yyy company-zzz))
+
+;; Merge completions of all the backends:
+;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+
+;; Merge completions of all the backends but keep the candidates organized in accordance with the
+;; grouped backends order.
+;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
+
+;; Another keyword :with helps to make sure the results from major/minor mode agnostic backends
+;; (such as company-yasnippet, company-dabbrev-code) are returned without preventing results from
+;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
+;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
+;; :with, and only then put context agnostic backend(s).
+;; (setq company-backends '((company-capf :with company-yasnippet)))
+
+;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
+;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
+;; (e.g. outside of strings and comments), and pass on control to later backends when outside of
+;; that major mode or context.
+
+;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
+;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
+;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
+;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
+;; non-nil for following backends even when their ‘candidates’ list command is empty:
+;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
+
+;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
+;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
+;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
+;; `:separate', the candidates that come from different backends are sorted separately in the
+;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
+;; the order of completions just like the backends returned them.
+
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
   (setq
    company-backends
-   '(company-dirfiles
+   '(company-files
      (company-capf :with company-dabbrev-code company-yasnippet)
      ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
      ;; ignored.
@@ -1685,7 +1715,7 @@
 
       ;; `company-capf' does not pass to later backends with Texlab, so we have it last
       (setq company-backends
-            '(company-dirfiles
+            '(company-files
               (company-math-symbols-latex ; Math latex tags
                company-latex-commands
                company-reftex-labels
@@ -1709,7 +1739,7 @@
       "Add backends for org completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-dirfiles company-org-block company-ispell company-dict company-dabbrev)))
+       '(company-files company-org-block company-ispell company-dict company-dabbrev)))
 
     (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
 
@@ -1718,7 +1748,7 @@
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-dirfiles (company-ispell company-dict company-dabbrev))))
+       '(company-files (company-ispell company-dict company-dabbrev))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -1732,7 +1762,7 @@
       "Add backends for `yaml-mode' completion in company mode."
       (make-local-variable 'company-backends)
       (setq company-backends
-            '(company-dirfiles
+            '(company-files
               (company-capf
                :with
                company-dabbrev-code ; Useful for variable names
@@ -1750,7 +1780,7 @@
 
       (set
        (make-local-variable 'company-backends)
-       '(company-dirfiles
+       '(company-files
          (company-capf company-web-html) company-ispell company-dict company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
@@ -1766,7 +1796,7 @@
 
       ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends
-            '(company-dirfiles
+            '(company-files
               (company-capf
                company-citre-tags company-c-headers
                :with company-keywords
@@ -1792,7 +1822,7 @@
       (make-local-variable 'company-backends)
 
       (setq company-backends
-            '(company-dirfiles
+            '(company-files
               (company-capf
                company-citre-tags
                :with company-keywords
@@ -1826,7 +1856,6 @@
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-delay 0.05 "Recommended to not use zero for performance reasons")
   (corfu-exclude-modes
    '(dired-mode inferior-python-mode magit-status-mode help-mode csv-mode minibuffer-inactive-mode))
   :config
@@ -1893,11 +1922,9 @@
   (add-to-list 'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev) 'append)
   :custom
   (cape-dabbrev-min-length 3)
-  (cape-dict-grep nil "Load the word files in memory for better performance")
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-  (cape-dabbrev-check-other-buffers 'some)
   :config
   ;; Make these capfs composable
   (with-eval-after-load "lsp-mode"
