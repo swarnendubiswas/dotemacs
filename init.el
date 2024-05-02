@@ -45,7 +45,6 @@
   '(radio
     (const :tag "powerline" powerline)
     (const :tag "doom-modeline" doom-modeline)
-    (const :tag "nano-modeline" nano-modeline)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -537,14 +536,7 @@
   (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
-  :hook
-  (markdown-mode
-   .
-   (lambda ()
-     (setq show-trailing-whitespace t)
-     (whitespace-mode 1)))
   :custom (whitespace-line-column sb/fill-column)
-  :config (setq-default whitespace-action '(cleanup auto-cleanup))
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
@@ -958,6 +950,10 @@
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+
+(use-package flyspell-correct
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point) ("C-," . flyspell-correct-previous)))
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.
@@ -2015,8 +2011,6 @@
                        (cape-company-to-capf #'company-yasnippet))
                       #'cape-dabbrev #'cape-dict)))))))
 
-;; Registering `lsp-format-buffer' makes sense only if the server is active. We may not always want
-;; to format unrelated files and buffers (e.g., commented YAML files in out-of-project locations).
 (use-package lsp-mode
   :init (setq lsp-keymap-prefix "C-c l")
   :bind
@@ -2161,7 +2155,6 @@
         orig-result)))
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 
-  ;; (add-to-list 'lsp-language-id-configuration '(flex-mode . "cpp"))
   :diminish)
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
@@ -2180,9 +2173,6 @@
   (lsp-java-format-settings-url
    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory)))
 
-;; We need to enable lsp workspace to allow `lsp-grammarly' to work, which makes it ineffective for
-;; temporary text files. `lsp-grammarly' supports PRO Grammarly accounts. If there are failures,
-;; then try logging out of Grammarly and logging in again. Make sure to run "M-x keytar-install".
 (use-package lsp-grammarly
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
@@ -2193,11 +2183,9 @@
   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t)
   (lsp-grammarly-user-words '(Swarnendu Biswas)))
 
-;; The ":after" clause does not work with the ":hook", `lsp-mode' is not started automatically
 (use-package lsp-ltex
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
-  ;; https://valentjn.github.io/ltex/settings.html#ltexlanguage
   (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
   (lsp-ltex-check-frequency "save")
   (lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64")
@@ -2205,7 +2193,6 @@
   (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
-  ;; Furthermore, we also use `flyspell' and `jinx'.
   (setq lsp-ltex-disabled-rules
         #s(hash-table
            size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
@@ -2241,7 +2228,6 @@
 (use-package rainbow-delimiters
   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
-;; Tree-sitter provides advanced syntax highlighting features.
 (use-package treesit-auto
   :when (executable-find "tree-sitter")
   :demand t
@@ -2519,9 +2505,7 @@
 ;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
   :init (setq-default markdown-hide-markup t)
-  :mode
-  ;; The order is important to associate "README.md" with `gfm-mode'
-  (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
+  :mode (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
   :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j") ("C-c C-c l" . markdown-live-preview-mode))
   :custom
   (markdown-command
@@ -2692,7 +2676,6 @@
 ;; the tex package.
 (use-package tex
   :straight auctex
-  :mode ("\\.tex\\'" . LaTeX-mode)
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
@@ -2721,7 +2704,12 @@
   (with-eval-after-load "auctex"
     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map)))
+    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
+
+  (with-eval-after-load "latex"
+    (unbind-key "C-j" LaTeX-mode-map)
+    ;; Disable `LaTeX-insert-item' in favor of `imenu'
+    (unbind-key "C-c C-j" LaTeX-mode-map)))
 
 (use-package bibtex
   :straight (:type built-in)
@@ -3050,7 +3038,14 @@ or the major mode is not in `sb/skippable-modes'."
 
 (use-package leuven-theme
   :when (eq sb/theme 'leuven-dark)
-  :init (load-theme 'leuven-dark t))
+  :init (load-theme 'leuven-dark t)
+  :custom-face
+  (mode-line ((t (:inherit default :height 1.0 :foreground "white" :background "grey17"))))
+  (mode-line-inactive ((t (:inherit default :height 1.0 :foreground "white" :background "grey40"))))
+  (mode-line-buffer-id ((t (:height 1.0 :foreground "white"))))
+  (mode-line-emphasis ((t (:height 0.9 :foreground "white"))))
+  (mode-line-highlight ((t (:height 1.0 :foreground "white"))))
+  (paren-unmatched ((t (:foreground "#ffffff" :background "#065a64")))))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
 ;; status, flycheck information, and Python virtualenv information on the modeline. The package is
@@ -3155,8 +3150,7 @@ PAD can be left (`l') or right (`r')."
 
  ("C-x x a" . find-alternate-file)
  ("C-x x g" . revert-buffer-quick)
- ("C-x x f" . rename-file)
- ("C-x x r" . rename-buffer)
+ ("C-x x r" . rename-file)
 
  ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
  ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
@@ -3181,6 +3175,7 @@ PAD can be left (`l') or right (`r')."
  ("C-M-@" . mark-sexp))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
+(unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
@@ -3201,7 +3196,6 @@ PAD can be left (`l') or right (`r')."
 (use-package free-keys
   :commands free-keys)
 
-;; Show help popups for prefix keys
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
   :diminish)
