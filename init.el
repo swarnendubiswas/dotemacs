@@ -55,7 +55,7 @@
 ;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
 ;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
 ;; case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -964,12 +964,12 @@
   :custom (jinx-languages "en_US")
   :diminish)
 
-;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
-;; for functions, so we use `helpful-callable' as a replacement.
 (use-package helpful
   :bind
-  (([remap describe-function] . helpful-callable) ; "C-h f"
-   ([remap describe-variable] . helpful-variable) ; "C-h v"
+  (([remap describe-variable] . helpful-variable) ; "C-h v"
+   ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
+   ;; for functions, so we use `helpful-callable' as a replacement.
+   ([remap describe-function] . helpful-callable) ; "C-h f"
    ([remap describe-symbol] . helpful-symbol) ; "C-h o"
    ([remap describe-key] . helpful-key) ; "C-h k"
    ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
@@ -1042,7 +1042,6 @@
 ;; `bookmark-bmenu-mode' with `R'.
 (use-package bm
   :init
-  ;; Must be set before `bm' is loaded
   (setq
    bm-verbosity-level 1
    bm-modeline-display-total t)
@@ -1650,17 +1649,16 @@
 ;; grouped backends order.
 ;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
-;; Another keyword :with helps to make sure the results from major/minor mode agnostic backends
-;; (such as company-yasnippet, company-dabbrev-code) are returned without preventing results from
+;; The keyword :with helps to make sure the results from major/minor mode agnostic backends (such as
+;; company-yasnippet, company-dabbrev-code) are returned without preventing results from
 ;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
 ;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
 ;; :with, and only then put context agnostic backend(s).
 ;; (setq company-backends '((company-capf :with company-yasnippet)))
 
-;; Most backends will not pass control to the following backends (e.g., `company-yasnippet' and
-;; `company-tempo'). Only a few backends are specialized on certain major modes or certain contexts
-;; (e.g. outside of strings and comments), and pass on control to later backends when outside of
-;; that major mode or context.
+;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent backends . Only a
+;; few backends are specialized on certain major modes or certain contexts (e.g. outside of strings
+;; and comments), and pass on control to later backends when outside of that major mode or context.
 
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'

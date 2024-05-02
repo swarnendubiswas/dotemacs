@@ -149,13 +149,6 @@ install_llvm() {
     apt install -y clang-"${LLVM_VER}" lldb-"${LLVM_VER}" lld-"${LLVM_VER}" libllvm-"${LLVM_VER}"-ocaml-dev libllvm"${LLVM_VER}" llvm-"${LLVM_VER}" llvm-"${LLVM_VER}"-dev llvm-"${LLVM_VER}"-doc llvm-"${LLVM_VER}"-examples llvm-"${LLVM_VER}"-runtime clang-tools-"${LLVM_VER}" clang-"${LLVM_VER}"-doc libclang-common-"${LLVM_VER}"-dev libclang-"${LLVM_VER}"-dev libclang1-"${LLVM_VER}" clang-format-"${LLVM_VER}" python3-clang-"${LLVM_VER}" clangd-"${LLVM_VER}" clang-tidy-"${LLVM_VER}" libfuzzer-"${LLVM_VER}"-dev libc++-"${LLVM_VER}"-dev libc++abi-"${LLVM_VER}"-dev libomp-"${LLVM_VER}"-dev libclc-"${LLVM_VER}"-dev libunwind-"${LLVM_VER}"-dev libmlir-"${LLVM_VER}"-dev mlir-"${LLVM_VER}"-tools
 }
 
-cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
-
-if [ ! -d "$GITHUB" ]; then
-    mkdir -p "$GITHUB"
-    chown -R $USER:$USER "$GITHUB"
-fi
-
 # semgrep, ruff-lsp, python-lsp-ruff, pyright
 install_python_packages() {
     #sudo -u swarnendu
@@ -544,6 +537,13 @@ cleanup() {
     apt autoremove
     apt autoclean
 }
+
+cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
+
+if [ ! -d "$GITHUB" ]; then
+    mkdir -p "$GITHUB"
+    chown -R $USER:$USER "$GITHUB"
+fi
 
 # is_sudo
 
