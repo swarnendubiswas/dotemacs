@@ -131,7 +131,7 @@ install_cmake() {
 }
 
 install_llvm() {
-    LLVM_VER="16"
+    LLVM_VER="18"
 
     case "${DIST_VERSION}" in
         Ubuntu_18.04) REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic-${LLVM_VER}  main" ;;
@@ -149,7 +149,6 @@ install_llvm() {
     apt install -y clang-"${LLVM_VER}" lldb-"${LLVM_VER}" lld-"${LLVM_VER}" libllvm-"${LLVM_VER}"-ocaml-dev libllvm"${LLVM_VER}" llvm-"${LLVM_VER}" llvm-"${LLVM_VER}"-dev llvm-"${LLVM_VER}"-doc llvm-"${LLVM_VER}"-examples llvm-"${LLVM_VER}"-runtime clang-tools-"${LLVM_VER}" clang-"${LLVM_VER}"-doc libclang-common-"${LLVM_VER}"-dev libclang-"${LLVM_VER}"-dev libclang1-"${LLVM_VER}" clang-format-"${LLVM_VER}" python3-clang-"${LLVM_VER}" clangd-"${LLVM_VER}" clang-tidy-"${LLVM_VER}" libfuzzer-"${LLVM_VER}"-dev libc++-"${LLVM_VER}"-dev libc++abi-"${LLVM_VER}"-dev libomp-"${LLVM_VER}"-dev libclc-"${LLVM_VER}"-dev libunwind-"${LLVM_VER}"-dev libmlir-"${LLVM_VER}"-dev mlir-"${LLVM_VER}"-tools
 }
 
-# semgrep, ruff-lsp, python-lsp-ruff, pyright
 install_python_packages() {
     #sudo -u swarnendu
     python3 -m pip install --upgrade pip pygments setuptools yamllint cmake-language-server cmake-format "python-lsp-server[all]" python-lsp-isort pylsp-mypy pylsp-rope pyls-memestra yapf jedi pylint importmagic pydocstyle cpplint grip konsave autotools-language-server libtmux argcomplete --user
@@ -157,7 +156,7 @@ install_python_packages() {
 
 # Ubuntu 18 supports node 16
 install_node() {
-    NODEJS_VER="18"
+    NODEJS_VER="20"
 
     case "${DIST_VERSION}" in
         Ubuntu_18.04)
@@ -432,7 +431,7 @@ install_fd() {
 cd $GITHUB || exit
 
 install_fzf() {
-    FZF_VER="0.50.0"
+    FZF_VER="0.51.0"
 
     if [ ! -d fzf ]; then
         sudo -u swarnendu git clone https://github.com/junegunn/fzf.git
@@ -476,7 +475,7 @@ install_font() {
 }
 
 install_nerd_fonts() {
-    NF_VER="3.1.1"
+    NF_VER="3.2.1"
 
     declare -a FONT_NAMES=("DejaVuSansMono" "FiraCode" "Hack" "Inconsolata" "Iosevka" "Meslo" "Noto" "RobotoMono" "SourceCodePro" "Ubuntu" "UbuntuMono")
 
@@ -488,7 +487,7 @@ install_nerd_fonts() {
 install_local_binaries() {
     cd "${USER_HOME}" || echo "Failed: cd ${USER_HOME}"
 
-    TEXLAB_VER="5.14.1"
+    TEXLAB_VER="5.16.0"
     wget https://github.com/latex-lsp/texlab/releases/download/v"${TEXLAB_VER}"/texlab-x86_64-linux.tar.gz
     tar xzf texlab-x86_64-linux.tar.gz
     mv texlab "${USER_HOME}/.local/bin"

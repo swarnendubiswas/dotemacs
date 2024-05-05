@@ -27,13 +27,12 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'leuven-dark
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '(radio
     (const :tag "doom-one" doom-one)
     (const :tag "doom-nord" doom-nord)
-    (const :tag "modus-operandi" modus-operandi)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "leuven-dark" leuven-dark)
     (const :tag "none" none))
@@ -55,7 +54,7 @@
 ;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
 ;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
 ;; case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -791,6 +790,7 @@
   ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly
   ;; between only buffers, especially while wrapping around.
   (consult-buffer-sources '(consult--source-buffer))
+  (consult-narrow-key "<")
   :config
   (consult-customize
    consult-line
@@ -1251,6 +1251,7 @@
         (diff-hl-margin-local-mode 1))))
    (dired-mode . diff-hl-dired-mode-unless-remote) (emacs-startup . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
+  :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
@@ -1710,10 +1711,10 @@
       ;; `company-capf' does not pass to later backends with Texlab, so we have it last
       (setq company-backends
             '(company-files
+              company-reftex-citations
               (company-math-symbols-latex ; Math latex tags
                company-latex-commands
                company-reftex-labels
-               company-reftex-citations
                company-auctex-environments
                company-auctex-macros
                company-auctex-labels
@@ -1723,8 +1724,8 @@
                company-auctex-bibs
                company-ispell
                company-dict
-               company-dabbrev
-               company-capf))))
+               company-dabbrev)
+              company-capf)))
 
     (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
 
@@ -3026,13 +3027,9 @@ or the major mode is not in `sb/skippable-modes'."
   (doom-themes-org-config))
 
 (use-package modus-themes
-  :when (or (eq sb/theme 'modus-operandi) (eq sb/theme 'modus-vivendi))
-  :init
-  (cond
-   ((eq sb/theme 'modus-operandi)
-    (load-theme 'modus-operandi t))
-   ((eq sb/theme 'modus-vivendi)
-    (load-theme 'modus-vivendi t))))
+  :when (eq sb/theme 'modus-vivendi)
+  :init (load-theme 'modus-vivendi t)
+  :custom-face (show-paren-mismatch ((t (:foreground "#ffffff" :background "#2f7f9f")))))
 
 (use-package leuven-theme
   :when (eq sb/theme 'leuven-dark)
