@@ -1407,13 +1407,6 @@
 
   :diminish)
 
-;; (use-package highlight-indentation
-;;   :hook
-;;   ((yaml-mode yaml-ts-mode python-mode python-ts-mode)
-;;     .
-;;     highlight-indentation-mode)
-;;   :diminish (highlight-indentation-current-column-mode highlight-indentation-mode))
-
 (use-package indent-bars
   :straight (:host github :repo "jdtsmith/indent-bars")
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
@@ -2561,7 +2554,7 @@
      (lsp-deferred))))
 
 (use-package org
-  :defer 2
+  :mode "\\.org\\'"
   :custom
   (org-fontify-whole-heading-line nil)
   (org-fontify-emphasized-text t)
@@ -2759,126 +2752,32 @@
   :custom (xref-search-program 'ripgrep))
 
 (use-package citre
-  :preface
-  (defun sb/citre-jump+ ()
-    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
-    (interactive)
-    (condition-case _
-        (citre-jump)
-      (error
-       (let* ((xref-prompt-for-identifier nil))
-         (call-interactively #'xref-find-definitions)))))
-
-  (defun sb/citre-jump-back+ ()
-    "Go back to the position before last `citre-jump'.
-Fallback to `xref-go-back'."
-    (interactive)
-    (condition-case _
-        (citre-jump-back)
-      (error
-       (if (fboundp #'xref-go-back)
-           (call-interactively #'xref-go-back)
-         (call-interactively #'xref-pop-marker-stack)))))
-
-  (defun sb/push-point-to-xref-marker-stack (&rest r)
-    (xref-push-marker-stack (point-marker)))
-
-  (defun sb/lsp-citre-capf-function ()
-    "A capf backend that tries lsp first, then Citre."
-    (let ((lsp-result
-           (cond
-            (and (fboundp #'lsp-completion-at-point)
-                 (lsp-completion-at-point)))))
-      (if (and lsp-result
-               (try-completion
-                (buffer-substring (nth 0 lsp-result) (nth 1 lsp-result)) (nth 2 lsp-result)))
-          lsp-result
-        (citre-completion-at-point))))
-
-  (defun sb/enable-lsp-citre-capf-backend ()
-    "Enable the lsp + Citre capf backend in current buffer."
-    (add-hook 'completion-at-point-functions #'sb/lsp-citre-capf-function nil t))
   :hook (prog-mode . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
-   ("M-'" . sb/citre-jump+)
-   ("C-x c b" . sb/citre-jump-back+)
    ("C-x c p" . citre-peek)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-this-tags-file)
    ("C-x c U" . citre-update-tags-file)
    ("C-x c e" . citre-edit-tags-file-recipe))
   :custom
-  (citre-use-project-root-when-creating-tags t)
   (citre-default-create-tags-file-location 'project-cache)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
-  ;; Enabling this breaks imenu for Elisp files, it cannot identify `use-package' definitions
   (citre-enable-imenu-integration nil)
-  (citre-enable-capf-integration nil)
-  (citre-edit-cmd-buf-default-cmd
-   "ctags
--o
+  (citre-ctags-default-options
+   "-o
 %TAGSFILE%
-;; Edit the relevant programming languages to keep the tags file size reasonable
+-L
+%LISTFILE%
 --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
 --kinds-all=*
 --fields=*
 --extras=*
--R
-;; -e
+--recurse
 --exclude=@./.ctagsignore
 ;; add exclude by: --exclude=target
-;; add dirs/files to scan here, one line per dir/file")
-  :config
-  ;;(add-hook 'citre-mode-hook #'sb/enable-lsp-citre-capf-backend)
-
-  (dolist (func '(find-function citre-jump))
-    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
-
-  ;; Try lsp first, then use Citre
-  (with-no-warnings
-    (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-      (let ((fetcher (apply -fn -args))
-            (citre-fetcher
-             (let ((xref-backend-functions '(citre-xref-backend t)))
-               (apply -fn -args))))
-        (lambda ()
-          (or (with-demoted-errors "%s, fallback to citre"
-                (funcall fetcher))
-              (funcall citre-fetcher))))))
-
-  (with-eval-after-load "company"
-    (defmacro citre-backend-to-company-backend (backend)
-      "Create a company backend from Citre completion backend BACKEND.
-The result is a company backend called
-`company-citre-<backend>' (like `company-citre-tags') and can be
-used in `company-backends'."
-      (let ((backend-name (intern (concat "company-citre-" (symbol-name backend))))
-            (docstring
-             (concat
-              "`company-mode' backend from the `"
-              (symbol-name backend)
-              "' Citre backend.\n"
-              "`citre-mode' needs to be enabled to use this.")))
-        `(defun ,backend-name (command &optional arg &rest ignored)
-           ,docstring
-           (pcase command
-             ('interactive (company-begin-backend ',backend-name))
-             ('prefix
-              (and
-               (bound-and-true-p citre-mode)
-               (citre-backend-usable-p ',backend)
-               ;; We shouldn't use this as it's defined for getting definitions/references. But the
-               ;; Citre completion backend design is not fully compliant with company's design so
-               ;; there's no simple "right" solution, and this works for tags/global backends.
-               (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
-             ('meta (citre-get-property 'signature arg))
-             ('annotation (citre-get-property 'annotation arg))
-             ('candidates
-              (let ((citre-completion-backends '(,backend)))
-                (all-completions arg (nth 2 (citre-completion-at-point)))))))))
-
-    (citre-backend-to-company-backend tags))
+;; add dirs/files to scan here, one line per dir/file
+")
   :diminish)
 
 (use-package breadcrumb
