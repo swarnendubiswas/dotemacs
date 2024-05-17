@@ -83,8 +83,7 @@
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
 
-;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub. Bootstrap
-;; `straight.el'.
+;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub.
 (setq
  straight-build-dir
  (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
@@ -163,15 +162,7 @@
   (exec-path-from-shell-initialize))
 
 (use-package emacs
-  :hook
-  ((after-init . garbage-collect)
-   (prog-mode
-    .
-    (lambda ()
-      (auto-fill-mode 1) ; Autofill comments
-      ;; Native from Emacs 27+, disable in TUI since the line characters also get copied.
-      (when (or (display-graphic-p) (daemonp))
-        (display-fill-column-indicator-mode 1)))))
+  :hook ((after-init . garbage-collect) (prog-mode . (lambda () (auto-fill-mode 1))))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -536,6 +527,7 @@
 
 (use-package whitespace
   :custom (whitespace-line-column sb/fill-column)
+  ;; (whitespace-action '(cleanup auto-cleanup))
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
@@ -592,13 +584,11 @@
   (add-to-list 'aw-ignored-buffers "*toc*")
   (ace-window-display-mode 1))
 
-;; The keybinding will be hidden if we use Emacs with Tmux with its default prefix key, and we will
-;; need to press twice.
+;; The keybinding will be hidden if we use Emacs with Tmux with its default prefix key of "C-b", and
+;; we will need to press twice.
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
-  :custom
-  (ajb-bs-configuration "files-and-scratch")
-  (ajb-sort-function 'bs--sort-by-filename "Always predictable"))
+  :custom (ajb-bs-configuration "files-and-scratch"))
 
 (use-package dired
   :preface
@@ -1204,14 +1194,7 @@
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
-  :config
-  (require 'magit-diff)
-  (setq
-   magit-diff-refine-hunk t ; Show fine differences for the current diff hunk only
-   magit-diff-highlight-trailing nil)
-
-  (with-eval-after-load "project"
-    (define-key project-prefix-map "m" #'magit-project-status)))
+  (magit-diff-refine-hunk t "Show fine differences for the current diff hunk only"))
 
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
@@ -1222,17 +1205,7 @@
    ("g" . difftastic-rerun)
    ("p" . difftastic-previous-chunk)
    ("n" . difftastic-next-chunk)
-   ("q" . difftastic-quit)
-   :map
-   magit-blame-read-only-mode-map
-   ("D" . difftastic-magit-show)
-   ("S" . difftastic-magit-show))
-  :config
-  (eval-after-load 'magit-diff
-    '(transient-append-suffix
-      'magit-diff '(-1 -1)
-      [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
-       ("S" "Difftastic show" difftastic-magit-show)])))
+   ("q" . difftastic-quit)))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -2554,27 +2527,18 @@
      (lsp-deferred))))
 
 (use-package org
-  :mode "\\.org\\'"
+  :defer 2
   :custom
-  (org-fontify-whole-heading-line nil)
-  (org-fontify-emphasized-text t)
   (org-fontify-quote-and-verse-blocks t)
   (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
-  (org-hide-leading-stars nil "Show every star as it helps identify the indentation level")
   (org-hide-leading-stars-before-indent-mode nil)
-  ;; Code block fontification using the major-mode of the code
-  (org-src-fontify-natively t)
   (org-src-preserve-indentation t)
   (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
   (org-src-window-setup 'current-window)
-  ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance
-  ;; feels better with the mode disabled.
-  (org-startup-indented nil "Indentation looks nice, but is sometimes misaligned")
   (org-startup-truncated nil)
   ;; https://orgmode.org/manual/Initial-visibility.html
   (org-startup-folded 'showeverything)
   (org-startup-with-inline-images t)
-  (org-support-shift-select t)
   ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
   ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
   ;; blocks commands and their related keys.
@@ -2587,8 +2551,6 @@
   ;; Automatically sorted and renumbered whenever I insert a new one
   (org-footnote-auto-adjust t)
   (org-return-follows-link t)
-  (org-adapt-indentation nil)
-  (org-odd-levels-only t "Use odd levels to add more indentation")
   (org-export-with-smart-quotes t "#+OPTIONS ':t")
   (org-export-with-section-numbers nil "#+OPTIONS num:nil")
   ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a headline
@@ -2598,7 +2560,6 @@
   ;; nil just aborts the export process with an error message "Unable to resolve link: nil". This
   ;; doesn't give any hint on which line the broken link actually is.
   (org-export-with-broken-links 'mark)
-  (org-indent-indentation-per-level 1)
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   :config
   (require 'ox-latex)
@@ -2611,6 +2572,8 @@
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
+  ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance feels
+  ;; better with the mode disabled.
   (with-eval-after-load "org-indent"
     (diminish 'org-indent-mode))
   :bind-keymap ("C-c o" . org-mode-map)
@@ -2743,18 +2706,14 @@
   (("M-." . xref-find-definitions)
    ("M-?" . xref-find-references)
    ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
-   ("M-," . xref-go-back)
-   :map
-   xref--xref-buffer-mode-map
-   ("C-o" . xref-show-location-at-point)
-   ("<tab>" . xref-quit-and-goto-xref)
-   ("r" . xref-query-replace-in-results))
+   ("M-," . xref-go-back))
   :custom (xref-search-program 'ripgrep))
 
 (use-package citre
   :hook (prog-mode . citre-mode)
   :bind
   (("C-x c j" . citre-jump)
+   ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-this-tags-file)
@@ -2928,7 +2887,7 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t)
-  :custom-face (show-paren-mismatch ((t (:foreground "#ffffff" :background "#2f7f9f")))))
+  :custom-face (show-paren-mismatch ((t (:inherit 'default :foreground "#ffffff" :background "#2f7f9f")))))
 
 (use-package leuven-theme
   :when (eq sb/theme 'leuven-dark)
