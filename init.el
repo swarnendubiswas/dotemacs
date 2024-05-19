@@ -27,7 +27,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'doom-nord
   "Specify which Emacs theme to use, unless we are using `circadian'."
   :type
   '(radio
@@ -47,13 +47,13 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Corfu is easy to configure, integrates nicely with `orderless', and provides better completion
-;; for elisp symbols. But `corfu-terminal-mode' has a potential rendering problem with TUI Emacs,
-;; for completion popups appearing near the right edges. The completion entries wrap around, and
-;; sometimes messes up the completion. Company works better with Windows and TUI Emacs, and has more
-;; extensive LaTeX support than Corfu. `company-ispell' is configurable, and we can set up a custom
-;; file containing completions with `company-dict'. However, `company-ispell' does not keep prefix
-;; case when used as a grouped backend.
+;; Corfu integrates nicely with `orderless' and provides better completion for elisp symbols with
+;; `cape-symbol'. But `corfu-terminal-mode' has a potential rendering problem for completion popups
+;; appearing near the right edges with TUI Emacs. The completion entries wrap around, and sometimes
+;; messes up the completion. Company works better with both Windows and TUI Emacs, and has more
+;; extensive LaTeX support than Corfu. We can set up separate completion files with `company-ispell'
+;; and `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
+;; backend.
 (defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
@@ -1334,8 +1334,7 @@
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Chain flycheck checkers with lsp. We prefer to use per-project directory local variables
-  ;; instead of defining here.
+  ;; Chain flycheck checkers with lsp, using per-project directory local variables.
   ;; https://github.com/flycheck/flycheck/issues/1762
   (defvar-local sb/flycheck-local-checkers nil)
   (defun sb/flycheck-checker-get (fn checker property)
@@ -1364,11 +1363,7 @@
                   ("LaTeX" latexindent)
                   ("Markdown" (prettier "--print-width" "100"))
                   ("Perl"
-                   perltidy
-                   "--quiet"
-                   "--standard-error-output"
-                   "--perl-best-practices"
-                   "-l=100")
+                   (perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100"))
                   ("Python" (yapf "--style" "file") isort)
                   ("Shell" (shfmt "-i" "4" "-ci"))
                   ("XML" tidy)
@@ -2176,9 +2171,7 @@
 
 (use-package compile
   :straight (:type built-in)
-  :bind
-  ;; "<f10>" and "<f11>" may conflict with Gnome window manager keybindings
-  (("<f10>" . compile) ("<f11>" . recompile))
+  :bind (("<f10>" . compile) ("<f11>" . recompile))
   :custom
   (compile-command (format "make -k -j%s " (num-processors)))
   (compilation-always-kill t "Kill a compilation process before starting a new one")
@@ -2887,7 +2880,7 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t)
-  :custom-face (show-paren-mismatch ((t (:inherit 'default :foreground "#ffffff" :background "#2f7f9f")))))
+  :custom-face (show-paren-mismatch ((t (:inherit nil :foreground "#ffffff" :background "#2f7f9f")))))
 
 (use-package leuven-theme
   :when (eq sb/theme 'leuven-dark)
@@ -2898,7 +2891,7 @@ or the major mode is not in `sb/skippable-modes'."
   (mode-line-buffer-id ((t (:height 1.0 :foreground "white"))))
   (mode-line-emphasis ((t (:height 0.9 :foreground "white"))))
   (mode-line-highlight ((t (:height 1.0 :foreground "white"))))
-  (paren-unmatched ((t (:foreground "#ffffff" :background "#065a64")))))
+  (paren-unmatched ((t (:inherit nil :foreground "#ffffff" :background "#065a64")))))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
 ;; status, flycheck information, and Python virtualenv information on the modeline. The package is
@@ -2923,7 +2916,7 @@ PAD can be left (`l') or right (`r')."
             (pl/add-text-property padded-str 'face face)
           padded-str))))
 
-  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+  ;; Inspired by https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
   (defun sb/powerline-nano-theme ()
     "Setup a nano-like modeline"
     (interactive)

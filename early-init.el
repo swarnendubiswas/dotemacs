@@ -14,9 +14,8 @@
 
 ;; Defer GC during startup
 (setq
-  garbage-collection-messages nil
-  gc-cons-percentage 0.5 ; Portion of heap used for allocation
-  gc-cons-threshold most-positive-fixnum)
+ gc-cons-percentage 0.5 ; Portion of heap used for allocation
+ gc-cons-threshold most-positive-fixnum)
 
 ;; GC may happen after this many bytes are allocated since last GC. If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.
@@ -29,8 +28,8 @@
 (defun sb/restore-gc ()
   "Restore garbage collection threshold during execution."
   (setq
-    gc-cons-threshold sb/emacs-4MB
-    gc-cons-percentage 0.3))
+   gc-cons-threshold sb/emacs-4MB
+   gc-cons-percentage 0.3))
 
 (add-hook 'emacs-startup-hook #'sb/restore-gc)
 (add-hook 'minibuffer-setup-hook #'sb/defer-gc)
@@ -45,26 +44,23 @@
 ;; The run-time load order is: (1) file described by `site-run-file' if non-nil, (2)
 ;; `user-init-file', and (3) `default.el'.
 (setq
-  site-run-file nil ; Disable site-wide run-time initialization
-  ;; Disable loading of `default.el' at startup
-  inhibit-default-init t)
+ site-run-file nil ; Disable site-wide run-time initialization
+ ;; Disable loading of `default.el' at startup
+ inhibit-default-init t)
 
 ;; Do not resize the frame to preserve the number of columns or lines being displayed when setting
 ;; font, menu bar, tool bar, tab bar, internal borders, fringes, or scroll bars.
 (setq
-  frame-inhibit-implied-resize t
-  frame-resize-pixelwise t
-  window-resize-pixelwise t
-  inhibit-compacting-font-caches t ; Do not compact font caches during GC
-  inhibit-startup-echo-area-message t
-  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
-  ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for composing emails, but
-  ;; `text-mode' is more expensive to start. Furthermore, lsp support is not enabled for the
-  ;; *scratch* buffer.
-  initial-major-mode 'fundamental-mode
-  initial-scratch-message nil
-  ;; Prefer new files to avoid loading stale bytecode
-  load-prefer-newer t)
+ frame-inhibit-implied-resize t
+ frame-resize-pixelwise t
+ window-resize-pixelwise t
+ inhibit-startup-echo-area-message t
+ inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
+ ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for composing emails, but
+ ;; `text-mode' is more expensive to start. Furthermore, lsp support is not enabled for the
+ ;; *scratch* buffer.
+ initial-major-mode 'fundamental-mode
+ initial-scratch-message nil)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p' since `window-system'
 ;; is deprecated.
@@ -88,22 +84,22 @@
 (let ((file-name-handler-alist-orig file-name-handler-alist))
   (setq file-name-handler-alist nil)
   (add-hook 'emacs-startup-hook
-    (lambda ()
-      (setq file-name-handler-alist file-name-handler-alist-orig)
-      (garbage-collect))
-    t))
+            (lambda ()
+              (setq file-name-handler-alist file-name-handler-alist-orig)
+              (garbage-collect))
+            t))
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This is also useful if
 ;; we prefer "straight.el" over "package.el".
-(setq package-enable-at-startup nil)
+;; (setq package-enable-at-startup nil)
 
 (when (featurep 'native-compile)
   (setq
-    ;; Silence compiler warnings as they can be pretty disruptive
-    native-comp-async-report-warnings-errors nil
-    package-native-compile t ; Enable ahead-of-time compilation when installing a package
-    ;; Compile loaded packages asynchronously
-    native-comp-deferred-compilation t))
+   ;; Silence compiler warnings as they can be pretty disruptive
+   native-comp-async-report-warnings-errors nil
+   package-native-compile t ; Enable ahead-of-time compilation when installing a package
+   ;; Compile loaded packages asynchronously
+   native-comp-deferred-compilation t))
 
 (setenv "LSP_USE_PLISTS" "true")
 
@@ -114,30 +110,30 @@
 
 (defun sb/init-fonts-graphic ()
   (cond
-    ((string= (system-name) "swarnendu-Inspiron-7572")
-      (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
-        (set-face-attribute 'mode-line nil :height 150)
-        (set-face-attribute 'mode-line-inactive nil :height 150)))
+   ((string= (system-name) "swarnendu-Inspiron-7572")
+    (progn
+      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 210)
+      (set-face-attribute 'mode-line nil :height 160)
+      (set-face-attribute 'mode-line-inactive nil :height 160)))
 
-    ((string= (system-name) "dell-7506")
-      (progn
-        (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
-        (set-face-attribute 'mode-line nil :height 120)
-        (set-face-attribute 'mode-line-inactive nil :height 120)))
+   ((string= (system-name) "dell-7506")
+    (progn
+      (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
+      (set-face-attribute 'mode-line nil :height 120)
+      (set-face-attribute 'mode-line-inactive nil :height 120)))
 
-    ((string= (system-name) "swarnendu-Dell-XPS-L502X")
-      (progn
-        (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
-        (set-face-attribute 'mode-line nil :height 110)
-        (set-face-attribute 'mode-line-inactive nil :height 110)))
+   ((string= (system-name) "swarnendu-Dell-XPS-L502X")
+    (progn
+      (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
+      (set-face-attribute 'mode-line nil :height 110)
+      (set-face-attribute 'mode-line-inactive nil :height 110)))
 
-    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-      (progn
-        ;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
-        (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 190)
-        (set-face-attribute 'mode-line nil :height 130)
-        (set-face-attribute 'mode-line-inactive nil :height 130)))))
+   ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+    (progn
+      ;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
+      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 190)
+      (set-face-attribute 'mode-line nil :height 130)
+      (set-face-attribute 'mode-line-inactive nil :height 130)))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
@@ -153,14 +149,14 @@
 
 (when (daemonp)
   (cond
-    ((string= (system-name) "swarnendu-Inspiron-7572")
-      (progn
-        ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
-        (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
+   ((string= (system-name) "swarnendu-Inspiron-7572")
+    (progn
+      ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
+      (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
 
-    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-      (progn
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
+   ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+    (progn
+      (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
 
 (provide 'early-init)
 
