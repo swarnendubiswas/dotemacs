@@ -27,8 +27,8 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'doom-nord
-  "Specify which Emacs theme to use, unless we are using `circadian'."
+(defcustom sb/theme 'modus-vivendi
+  "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "doom-one" doom-one)
@@ -162,7 +162,7 @@
   (exec-path-from-shell-initialize))
 
 (use-package emacs
-  :hook ((after-init . garbage-collect) (prog-mode . (lambda () (auto-fill-mode 1))))
+  :hook ((after-init . garbage-collect) (prog-mode . auto-fill-mode) (emacs-startup . save-place-mode))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -208,11 +208,8 @@
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (tags-add-tables nil)
   (tags-case-fold-search nil "case-sensitive")
-  ;; Do not ask before rereading the "TAGS" files if they have changed
-  (tags-revert-without-query t)
-  ;; Changing height of the echo area is jarring, but limiting the height makes it difficult to see
-  ;; useful information.
-  ;; (resize-mini-windows nil)
+  (tags-revert-without-query
+   t "Do not ask before rereading the \"TAGS\" files after it has changed")
   (max-mini-window-height 0.35)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
@@ -331,11 +328,6 @@
   (auto-revert-remote-files t)
   :diminish auto-revert-mode)
 
-;; Remember cursor position in files
-(use-package saveplace
-  :straight (:type built-in)
-  :hook (emacs-startup . save-place-mode))
-
 ;; Save minibuffer history across sessions
 (use-package savehist
   :straight (:type built-in)
@@ -442,24 +434,17 @@
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
 ;; Use "Shift + direction" arrows for moving around windows. I also use the "Shift + direction"
-;; keybindings for moving around windows in tmux which is okay because I do not split Emacs frames
+;; keybindings for moving around windows in Tmux which is okay because I do not split Emacs frames
 ;; often.
 (use-package windmove
   :straight (:type built-in)
   :when (display-graphic-p)
   :init (windmove-default-keybindings))
 
-;; Consult does not provide intelligent file lookup. `ffap' binds "C-x C-f" to `find-file-at-point'
-;; which will continue to work like `find-file' unless a prefix argument is given. Then it will find
-;; file at point.
+;; Consult does not provide intelligent file lookup.
 (use-package ffap
   :straight (:type built-in)
-  :bind
-  (("<f2>" . ffap)
-   ([remap find-file] . find-file-at-point)
-   ([remap find-file-read-only] . ffap-read-only)
-   ([remap find-alternate-file] . ffap-alternate-file)
-   ("C-x p o" . ff-find-other-file))
+  :bind (("<f2>" . ffap) ([remap find-file] . find-file-at-point) ("C-x p o" . ff-find-other-file))
   :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names"))
 
 (use-package doc-view
@@ -493,13 +478,11 @@
 
 (use-package ediff
   :straight (:type built-in)
-  :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
   (ediff-split-window-function #'split-window-horizontally "Split diffs side by side")
-  (ediff-keep-variants nil "Kill file variants upon quitting an Ediff session")
-  :config (ediff-set-diff-options 'ediff-diff-options "-w"))
+  (ediff-keep-variants nil "Kill file variants upon quitting an Ediff session"))
 
 ;; To edit remote files, use "/method:user@host#port:filename". The shortcut "/ssh::" will connect
 ;; to default "user@host#port". To edit a local file with sudo, use "C-x C-f /sudo::/etc/hosts". To
@@ -692,41 +675,31 @@
   (vertico
    :files (:defaults "extensions/*")
    :includes (vertico-directory vertico-repeat vertico-quick))
-  :hook (emacs-startup . vertico-mode)
-  :bind (:map vertico-map ("M-<" . vertico-first) ("M->" . vertico-last) ("C-M-j" . vertico-exit-input))
-  :custom (vertico-cycle t))
-
-;; More convenient directory navigation commands
-(use-package vertico-directory
-  :straight nil
-  :after vertico
   :hook
-  ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
-  ;; the following fixes the path so the selected path does not have prepended junk left behind.
-  ;; This works with `file-name-shadow-mode' enabled. When you are in a sub-directory and use, say,
-  ;; `find-file' to go to your home '~/' or root '/' directory, Vertico will clear the old path to
-  ;; keep only your current input.
-  (rfn-eshadow-update-overlay . vertico-directory-tidy)
+  ((emacs-startup . vertico-mode)
+   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
+   ;; the following fixes the path so the selected path does not have prepended junk left behind.
+   ;; This works with `file-name-shadow-mode' enabled. When you are in a sub-directory and use, say,
+   ;; `find-file' to go to your home '~/' or root '/' directory, Vertico will clear the old path to
+   ;; keep only your current input.
+   (rfn-eshadow-update-overlay . vertico-directory-tidy) (minibuffer-setup . vertico-repeat-save))
   :bind
   (:map
    vertico-map
+   ("M-<" . vertico-first)
+   ("M->" . vertico-last)
+   ("C-M-j" . vertico-exit-input)
    ("RET" . vertico-directory-enter)
    ("DEL" . vertico-directory-delete-char)
-   ("M-DEL" . vertico-directory-delete-word)))
-
-(use-package vertico-repeat
-  :straight nil
-  :after vertico
-  :hook (minibuffer-setup . vertico-repeat-save)
-  :bind (("C-c r" . vertico-repeat-last) ("M-r" . vertico-repeat-select))
+   ("M-DEL" . vertico-directory-delete-word)
+   ("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)
+   ("C-c q" . vertico-quick-insert)
+   ("C-'" . vertico-quick-jump))
+  :custom (vertico-cycle t)
   :config
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
-
-(use-package vertico-quick
-  :straight nil
-  :after vertico
-  :bind (:map vertico-map ("C-c q" . vertico-quick-insert) ("C-'" . vertico-quick-jump)))
 
 ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
 ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
@@ -1799,7 +1772,14 @@
   :when (eq sb/in-buffer-completion 'corfu)
   :hook
   ((emacs-startup . global-corfu-mode)
-   (corfu-mode . (lambda () (setq-local completion-styles '(basic)))))
+   (corfu-mode
+    .
+    (lambda ()
+      (setq-local completion-styles '(basic))
+      (corfu-history-mode)
+      (corfu-echo-mode)
+      (corfu-popupinfo-mode)
+      (corfu-indexed-mode))))
   :bind
   (:map
    corfu-map
@@ -1808,7 +1788,12 @@
    ("TAB" . corfu-next)
    ([tab] . corfu-next)
    ("S-TAB" . corfu-previous)
-   ([backtab] . corfu-previous))
+   ([backtab] . corfu-previous)
+   ("M-d" . corfu-info-documentation)
+   ("M-l" . corfu-info-location)
+   ("M-n" . corfu-popupinfo-scroll-up)
+   ("M-p" . corfu-popupinfo-scroll-down)
+   ([remap corfu-show-documentation] . corfu-popupinfo-toggle))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -1819,49 +1804,16 @@
   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
   ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
   ;; entries.
-  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
+  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2)))
 
-(use-package corfu-info
-  :straight nil
-  :after corfu
-  :bind (:map corfu-map ("M-d" . corfu-info-documentation) ("M-l" . corfu-info-location)))
-
-(use-package corfu-history
-  :straight nil
-  :when (eq sb/in-buffer-completion 'corfu)
-  :hook (corfu-mode . corfu-history-mode)
-  :config
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'corfu-history)))
-
-(use-package corfu-echo
-  :straight nil
-  :when (eq sb/in-buffer-completion 'corfu)
-  :hook (corfu-mode . corfu-echo-mode))
-
-(use-package corfu-popupinfo
-  :straight nil
-  :when (eq sb/in-buffer-completion 'corfu)
-  :hook (corfu-mode . corfu-popupinfo-mode)
-  :bind
-  (:map
-   corfu-map
-   ("M-n" . corfu-popupinfo-scroll-up)
-   ("M-p" . corfu-popupinfo-scroll-down)
-   ([remap corfu-show-documentation] . corfu-popupinfo-toggle)))
-
-(use-package corfu-indexed
-  :straight nil
-  :when (eq sb/in-buffer-completion 'corfu)
-  :hook (corfu-mode . corfu-indexed-mode))
 
 (use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
   :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode . corfu-terminal-mode)
-  :custom
-  ;; TODO: This is supposedly a bug, report to the maintainer.
-  (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
+  :custom (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
 
 (use-package yasnippet-capf
   :straight (:host github :repo "elken/yasnippet-capf")
@@ -1873,9 +1825,9 @@
   :demand t
   :init
   ;; Initialize for all generic languages that are not specifically handled
-  (add-to-list 'completion-at-point-functions #'cape-keyword 'append)
-  (add-to-list 'completion-at-point-functions #'cape-file 'append)
-  (add-to-list 'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev) 'append)
+  (add-hook 'completion-at-point-functions #'cape-keyword)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev))
   :custom
   (cape-dabbrev-min-length 3)
   (cape-dict-file
@@ -2183,8 +2135,8 @@
   :after compile
   :init (fancy-compilation-mode 1))
 
-(use-package rainbow-delimiters
-  :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
+;; (use-package rainbow-delimiters
+;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
 (use-package treesit-auto
   :when (executable-find "tree-sitter")

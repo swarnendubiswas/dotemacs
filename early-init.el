@@ -128,12 +128,12 @@
       (set-face-attribute 'mode-line nil :height 110)
       (set-face-attribute 'mode-line-inactive nil :height 110)))
 
-   ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
+   ((string= (system-name) "cseiitk")
     (progn
       ;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
-      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 190)
-      (set-face-attribute 'mode-line nil :height 130)
-      (set-face-attribute 'mode-line-inactive nil :height 130)))))
+      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
+      (set-face-attribute 'mode-line nil :height 140)
+      (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
