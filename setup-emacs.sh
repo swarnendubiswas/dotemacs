@@ -333,7 +333,7 @@ install_bear() {
     fi
 
     cd bear || echo "Failed: cd bear"
-    git checkout 3.1.3
+    git checkout 3.1.4
     mkdir -p build && cd build || echo "Failed: cd bear/build"
     cmake -DENABLE_UNIT_TESTS=OFF -DENABLE_FUNC_TESTS=OFF ..
     make all

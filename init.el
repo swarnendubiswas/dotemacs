@@ -54,7 +54,7 @@
 ;; extensive LaTeX support than Corfu. We can set up separate completion files with `company-ispell'
 ;; and `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
 ;; backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -187,7 +187,6 @@
   ;; previously on the system clipboard is pushed into the kill ring. This way, you can paste it
   ;; with `yank-pop'.
   (save-interprogram-paste-before-kill t)
-  (save-silently t "Error messages will still be printed")
   ;; Enable use of system clipboard across Emacs and other applications, does not work on the TUI
   (select-enable-clipboard t)
   (sentence-end-double-space nil)
@@ -260,9 +259,7 @@
     (setq w32-get-true-file-attributes nil))
 
   ;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
-  (dolist (mode '(tooltip-mode))
-    (when (fboundp mode)
-      (funcall mode -1)))
+  (tooltip-mode -1)
 
   ;; Enable the following modes
   (dolist
@@ -1727,7 +1724,7 @@
       (setq company-backends
             '(company-files
               (company-capf
-               company-citre-tags company-c-headers
+               company-c-headers
                :with company-keywords
                company-dabbrev-code ; Useful for variable names
                company-yasnippet
@@ -1753,7 +1750,6 @@
       (setq company-backends
             '(company-files
               (company-capf
-               company-citre-tags
                :with company-keywords
                company-dabbrev-code ; Useful for variable names
                company-yasnippet
@@ -1928,11 +1924,6 @@
   :bind
   (:map
    lsp-command-map
-   ("=")
-   ("w")
-   ("g")
-   ("G")
-   ("F")
    ("l" . lsp)
    ("q" . lsp-disconnect)
    ("Q" . lsp-workspace-shutdown)
@@ -2092,16 +2083,13 @@
   (lsp-grammarly-suggestions-passive-voice t)
   (lsp-grammarly-suggestions-informal-pronouns-academic t)
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
-  (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t)
-  (lsp-grammarly-user-words '(Swarnendu Biswas)))
+  (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t))
 
 (use-package lsp-ltex
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
   (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
   (lsp-ltex-check-frequency "save")
-  (lsp-ltex-java-path "/usr/lib/jvm/java-17-openjdk-amd64")
-  (lsp-ltex-version "16.0.0")
   (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
@@ -2366,8 +2354,7 @@
 
 (use-package yaml-mode
   :mode
-  (("\\.yml\\'" . yaml-ts-mode)
-   ("\\.yaml\\'" . yaml-ts-mode)
+  (("\\.ya?ml\\'" . yaml-ts-mode)
    (".clang-format" . yaml-ts-mode)
    (".clang-tidy" . yaml-ts-mode)
    (".clangd" . yaml-ts-mode))
