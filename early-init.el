@@ -14,8 +14,8 @@
 
 ;; Defer GC during startup
 (setq
- gc-cons-percentage 0.5 ; Portion of heap used for allocation
- gc-cons-threshold most-positive-fixnum)
+ gc-cons-percentage 0.8 ; Portion of heap used for allocation
+ gc-cons-threshold sb/emacs-1GB)
 
 ;; GC may happen after this many bytes are allocated since last GC. If you experience freezing,
 ;; decrease this. If you experience stuttering, increase this.

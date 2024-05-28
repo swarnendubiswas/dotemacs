@@ -507,7 +507,7 @@ install_local_binaries() {
     mv shfmt_v"${SHFMT_VER}"_linux_amd64 ${USER_HOME}/.local/bin/shfmt
     chmod a+x ${USER_HOME}/.local/bin/shfmt
 
-    DIFFT_VER="0.57.0"
+    DIFFT_VER="0.58.0"
     wget https://github.com/Wilfred/difftastic/releases/download/"$DIFFT_VER"/difft-x86_64-unknown-linux-gnu.tar.gz
     tar xzf difft-x86_64-unknown-linux-gnu.tar.gz
     mv difft "${USER_HOME}/.local/bin/."

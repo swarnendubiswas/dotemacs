@@ -31,10 +31,8 @@
   "Specify which Emacs theme to use."
   :type
   '(radio
-    (const :tag "doom-one" doom-one)
     (const :tag "doom-nord" doom-nord)
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "leuven-dark" leuven-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -518,6 +516,19 @@
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
+  (ibuffer-never-show-predicates
+   (list
+    (rx
+     (or "magit*"
+         "*Flycheck*"
+         "*Help*"
+         "*Completions*"
+         "TAGS"
+         "*straight*"
+         "*tramp"
+         "*lsp-log*"
+         "*grammarly-ls"
+         "*ltex-ls"))))
   :config (defalias 'list-buffers 'ibuffer))
 
 ;; Provides ibuffer filtering and sorting functions to group buffers by function or regexp applied
@@ -698,18 +709,16 @@
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
-;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
-;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
-;; will be shown again.
 (use-package consult
   :after vertico
   :commands consult-fd
   :bind
   (("<f1>" . execute-extended-command)
+   ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by files,
+   ;; "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list will be
+   ;; shown again.
    ([remap switch-to-buffer] . consult-buffer)
    ("<f3>" . consult-buffer)
-   ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
-   ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame)
    ([remap bookmark-jump] . consult-bookmark)
    ([remap project-switch-to-buffer] . consult-project-buffer)
    ([remap yank-pop] . consult-yank-pop)
@@ -2060,6 +2069,11 @@
 
   :diminish)
 
+(use-package consult-lsp
+  :after (consult lsp)
+  :commands (consult-lsp-diagnostics consult-lsp-file-symbols)
+  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
+
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
   :hook
@@ -2795,8 +2809,6 @@ or the major mode is not in `sb/skippable-modes'."
       (setq mode parent))
     (setq modes (nreverse modes))))
 
-;; Configure appearance-related settings at the end
-
 (progn
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
@@ -2805,36 +2817,20 @@ or the major mode is not in `sb/skippable-modes'."
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
 (use-package doom-themes
-  :when (or (eq sb/theme 'doom-one) (eq sb/theme 'doom-nord))
-  :init
-  (cond
-   ((eq sb/theme 'doom-one)
-    (load-theme 'doom-one t))
-   ((eq sb/theme 'doom-nord)
-    (load-theme 'doom-nord t)))
+  :when (eq sb/theme 'doom-nord)
+  :init (load-theme 'doom-nord t)
   :config
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
-  :init (load-theme 'modus-vivendi t)
-  :custom-face (show-paren-mismatch ((t (:inherit nil :foreground "#ffffff" :background "#2f7f9f")))))
-
-(use-package leuven-theme
-  :when (eq sb/theme 'leuven-dark)
-  :init (load-theme 'leuven-dark t)
-  :custom-face
-  (mode-line ((t (:inherit default :height 1.0 :foreground "white" :background "grey17"))))
-  (mode-line-inactive ((t (:inherit default :height 1.0 :foreground "white" :background "grey40"))))
-  (mode-line-buffer-id ((t (:height 1.0 :foreground "white"))))
-  (mode-line-emphasis ((t (:height 0.9 :foreground "white"))))
-  (mode-line-highlight ((t (:height 1.0 :foreground "white"))))
-  (paren-unmatched ((t (:inherit nil :foreground "#ffffff" :background "#065a64")))))
+  :init (load-theme 'modus-vivendi t))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
 ;; status, flycheck information, and Python virtualenv information on the modeline. The package is
 ;; not being actively maintained.
+;; Inspired by https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
 (use-package powerline
   :preface
   (defun sb/powerline-raw (str &optional face pad)
@@ -2855,7 +2851,6 @@ PAD can be left (`l') or right (`r')."
             (pl/add-text-property padded-str 'face face)
           padded-str))))
 
-  ;; Inspired by https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
   (defun sb/powerline-nano-theme ()
     "Setup a nano-like modeline"
     (interactive)
@@ -2984,6 +2979,9 @@ PAD can be left (`l') or right (`r')."
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
   :diminish)
+
+(use-package kkp
+  :hook (emacs-startup . global-kkp-mode))
 
 (add-hook
  'emacs-startup-hook
