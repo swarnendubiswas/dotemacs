@@ -2,6 +2,7 @@
 (define-abbrev-table 'LaTeX-mode-abbrev-table
   '(
     ("insturction" "instruction" nil :count 0)
+    ("miscellenaouse" "miscellaneous" nil :count 0)
     ("occurences" "occurrences" nil :count 0)
     ("tripes" "triples" nil :count 0)
    ))
@@ -1698,6 +1699,7 @@
     ("intereseting" "interesting" nil :count 0)
     ("jioned" "joined" nil :count 0)
     ("langugage" "language" nil :count 0)
+    ("learnign" "learning" nil :count 0)
     ("matchng" "Matching" nil :count 0)
     ("meagre" "meager" nil :count 0)
     ("medcines" "medicines" nil :count 0)
@@ -1731,6 +1733,7 @@
     ("reules" "rules" nil :count 0)
     ("revisig" "revising" nil :count 0)
     ("schedulign" "scheduling" nil :count 0)
+    ("separte" "separate" nil :count 0)
     ("sepcialization" "specialization" nil :count 0)
     ("sharng" "sharing" nil :count 0)
     ("simplifcation" "simplification" nil :count 0)

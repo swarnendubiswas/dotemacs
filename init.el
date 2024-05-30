@@ -735,11 +735,14 @@
    ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
    ("C-c s l" . consult-locate)
-   ;; Prefix argument "C-u" allows to specify the directory
+   ;; Prefix argument "C-u" allows to specify the directory. You can pass additional grep flags to
+   ;; `consult-grep' with the "--" separator. E.g.: "foo bar -- -A3" to get matches with 3 lines of
+   ;; 'after' context.
    ([remap rgrep] . consult-grep)
    ("C-c s g" . consult-grep)
    ([remap vc-git-grep] . consult-git-grep)
    ("C-c s G" . consult-git-grep)
+   ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
    ("C-c s r" . consult-ripgrep)
    ("C-c s h" . consult-isearch-history)
    ("<f4>" . consult-line)
@@ -1030,10 +1033,7 @@
   :custom (bm-buffer-persistence t "Save bookmarks"))
 
 (use-package crux
-  :bind
-  (("C-c d i" . crux-ispell-word-then-abbrev)
-   ("<f12>" . crux-kill-other-buffers)
-   ("C-c d s" . crux-sudo-edit))
+  :bind (("<f12>" . crux-kill-other-buffers) ("C-c d s" . crux-sudo-edit))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 (use-package rainbow-mode
@@ -1066,14 +1066,12 @@
    ("<f6>" . project-find-file)
    :map
    project-prefix-map
-   ("f" . project-find-file)
-   ("F" . project-or-external-find-file)
+   ("f" . project-or-external-find-file)
    ("b" . project-switch-to-buffer)
    ("d" . project-dired)
    ("v" . project-vc-dir)
    ("c" . project-compile)
    ("k" . project-kill-buffers)
-   ("p" . project-switch-project)
    ("g" . project-find-regexp)
    ("r" . project-query-replace-regexp))
   :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
@@ -1087,7 +1085,6 @@
 (use-package isearch
   :straight (:type built-in)
   :bind
-  ;; Change the bindings for `isearch-forward-regexp' and `isearch-repeat-forward'
   (("C-s")
    ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
    ("C-f" . isearch-forward-regexp) ("C-r" . isearch-backward-regexp)
@@ -1325,6 +1322,7 @@
   :hook
   ((format-all-mode . format-all-ensure-formatter)
    ((markdown-mode markdown-ts-mode) . format-all-mode))
+  :bind (:map markdown-mode-map ("C-x f" . format-all-buffer))
   :config
   (setq-default format-all-formatters
                 '(("Assembly" asmfmt)
@@ -1347,11 +1345,6 @@
                   ("Shell" (shfmt "-i" "4" "-ci"))
                   ("XML" tidy)
                   ("YAML" prettier "--print-width" "100")))
-  (with-eval-after-load "markdown-mode"
-    (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
-  (with-eval-after-load "auctex"
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
-
   :diminish)
 
 (use-package indent-bars
@@ -2583,7 +2576,8 @@
    ;; Revert PDF buffer after TeX compilation has finished
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
-   (TeX-update-style . rainbow-delimiters-mode) (LaTeX-mode . lsp-deferred))
+   ;; (TeX-update-style . rainbow-delimiters-mode)
+   (LaTeX-mode . lsp-deferred))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
@@ -2610,7 +2604,9 @@
   (with-eval-after-load "latex"
     (unbind-key "C-j" LaTeX-mode-map)
     ;; Disable `LaTeX-insert-item' in favor of `imenu'
-    (unbind-key "C-c C-j" LaTeX-mode-map)))
+    (unbind-key "C-c C-j" LaTeX-mode-map)
+
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map)))
 
 (use-package bibtex
   :straight (:type built-in)
@@ -2959,9 +2955,6 @@ PAD can be left (`l') or right (`r')."
 
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
-
-(global-set-key [remap next-buffer] #'sb/next-buffer)
-(global-set-key [remap previous-buffer] #'sb/previous-buffer)
 
 (bind-keys
  ("M-<left>" . sb/previous-buffer)

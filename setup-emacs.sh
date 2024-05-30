@@ -421,7 +421,7 @@ install_bat() {
 }
 
 install_fd() {
-    FD_VER="9.0.0"
+    FD_VER="10.1.0"
 
     wget https://github.com/sharkdp/fd/releases/download/v"$FD_VER"/fd_"$FD_VER"_amd64.deb
     dpkg -i fd_"$FD_VER"_amd64.deb
