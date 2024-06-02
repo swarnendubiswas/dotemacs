@@ -64,13 +64,14 @@ install_emacs() {
 }
 
 setup_emacs() {
-    # textidote, ltex, autofmt
     mkdir -p "$HOME/.emacs.d/etc" && cd "$HOME/.emacs.d/etc" || exit
 
     ln -s "$DOTFILES"/emacs/private.el .
 
     wget https://languagetool.org/download/LanguageTool-stable.zip
     unzip LanguageTool-stable.zip -d languagetool
+
+    # textidote, ltex, autofmt
 }
 
 # Install important packages. There is nothing to do if a package is already installed.

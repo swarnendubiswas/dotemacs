@@ -52,7 +52,7 @@
 ;; extensive LaTeX support than Corfu. We can set up separate completion files with `company-ispell'
 ;; and `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
 ;; backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -231,7 +231,17 @@
   (custom-file (no-littering-expand-var-file-name "custom.el"))
   :config
   (dolist (exts
-           '(".dll" ".exe" ".fdb_latexmk" ".fls" ".lof" ".pyc" ".rel" ".rip" ".synctex.gz" "TAGS"))
+           '(".directory"
+             ".dll"
+             ".exe"
+             ".fdb_latexmk"
+             ".fls"
+             ".lof"
+             ".pyc"
+             ".rel"
+             ".rip"
+             ".synctex.gz"
+             "TAGS"))
     (add-to-list 'completion-ignored-extensions exts))
 
   (when sb/EMACS28+
@@ -700,7 +710,7 @@
    ("RET" . vertico-directory-enter)
    ("DEL" . vertico-directory-delete-char)
    ("M-DEL" . vertico-directory-delete-word)
-   ("C-c r" . vertico-repeat-last)
+   ("C-c r" . vertico-repeat)
    ("M-r" . vertico-repeat-select)
    ("C-c q" . vertico-quick-insert)
    ("C-'" . vertico-quick-jump))
@@ -709,6 +719,7 @@
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
+;; Useful search and navigation commands
 (use-package consult
   :after vertico
   :commands consult-fd
@@ -790,7 +801,7 @@
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end)))))
 
-;; Provide context-dependent actions similar to a content menu.
+;; Provide context-dependent minibuffer actions similar to a content menu.
 (use-package embark
   :bind
   (([remap describe-bindings] . embark-bindings) ; "C-h b"
@@ -814,13 +825,11 @@
   (with-eval-after-load "vertico"
     (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export))))
 
-;; Adds support for exporting a list of search results to a `grep-mode' buffer, on which you can use
-;; `wgrep'.
+;; Supports exporting search results to a `grep-mode' buffer, on which you can use `wgrep'.
 (use-package embark-consult
   :after (embark consult))
 
-;; Enriches the completion display with annotations, e.g., documentation strings or file
-;; information.
+;; Rich annotations in the minibuffer, e.g., documentation strings or file information.
 (use-package marginalia
   :after vertico
   :init (marginalia-mode 1)
@@ -1366,7 +1375,9 @@
 
 (use-package elisp-autofmt
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
-  :custom (elisp-autofmt-python-bin "python3"))
+  :custom
+  (elisp-autofmt-python-bin "python3")
+  (elisp-autofmt-on-save-p 'always))
 
 (use-package shfmt
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)

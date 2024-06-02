@@ -110,9 +110,9 @@
 
 (defun sb/init-fonts-graphic ()
   (cond
-   ((string= (system-name) "swarnendu-Inspiron-7572")
+   ((string= (system-name) "inspiron-7572")
     (progn
-      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 210)
+      (set-face-attribute 'default nil :font "CascadiaCode NF" :height 220)
       (set-face-attribute 'mode-line nil :height 160)
       (set-face-attribute 'mode-line-inactive nil :height 160)))
 
@@ -149,7 +149,7 @@
 
 (when (daemonp)
   (cond
-   ((string= (system-name) "swarnendu-Inspiron-7572")
+   ((string= (system-name) "inspiron-7572")
     (progn
       ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
       (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
