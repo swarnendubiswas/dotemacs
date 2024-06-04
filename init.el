@@ -52,7 +52,7 @@
 ;; extensive LaTeX support than Corfu. We can set up separate completion files with `company-ispell'
 ;; and `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
 ;; backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
@@ -2929,8 +2929,6 @@ PAD can be left (`l') or right (`r')."
 
  ("C-c z" . repeat)
  ("C-z" . undo)
-
- ("C-<f11>" . delete-other-windows)
 
  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
  ("<f8>" . next-error) ; "M-g n" is the default keybinding
