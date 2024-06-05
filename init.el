@@ -27,7 +27,7 @@
   :group 'sb/emacs)
 
 ;; A dark theme has better contrast and looks good with the TUI.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'doom-nord
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -483,11 +483,12 @@
 
 (use-package ediff
   :straight (:type built-in)
+  :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
   (ediff-split-window-function #'split-window-horizontally "Split diffs side by side")
-  (ediff-keep-variants nil "Kill file variants upon quitting an Ediff session"))
+  (ediff-keep-variants nil "Prompt and kill file variants on quitting an Ediff session"))
 
 ;; To edit remote files, use "/method:user@host#port:filename". The shortcut "/ssh::" will connect
 ;; to default "user@host#port". To edit a local file with sudo, use "C-x C-f /sudo::/etc/hosts". To
@@ -702,7 +703,9 @@
    ;; keep only your current input.
    (rfn-eshadow-update-overlay . vertico-directory-tidy) (minibuffer-setup . vertico-repeat-save))
   :bind
-  (:map
+  (("C-c r" . vertico-repeat-last)
+   ("M-r" . vertico-repeat-select)
+   :map
    vertico-map
    ("M-<" . vertico-first)
    ("M->" . vertico-last)
@@ -710,8 +713,6 @@
    ("RET" . vertico-directory-enter)
    ("DEL" . vertico-directory-delete-char)
    ("M-DEL" . vertico-directory-delete-word)
-   ("C-c r" . vertico-repeat)
-   ("M-r" . vertico-repeat-select)
    ("C-c q" . vertico-quick-insert)
    ("C-'" . vertico-quick-jump))
   :custom (vertico-cycle t)
@@ -1978,9 +1979,9 @@
      "--pch-storage=memory" ; Increases memory usage but can improve performance
      "--pretty"))
   (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
-  (lsp-completion-show-detail nil "Disable completion metadata, e.g., java.util.ArrayList")
-  (lsp-completion-show-kind nil "Show completion kind, e.g., interface/class")
-  (lsp-completion-show-label-description nil "Show description of completion candidates")
+  (lsp-completion-show-detail t "Disable completion metadata, e.g., java.util.ArrayList")
+  (lsp-completion-show-kind t "Show completion kind, e.g., interface/class")
+  (lsp-completion-show-label-description t "Show description of completion candidates")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
