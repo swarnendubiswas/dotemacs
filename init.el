@@ -50,8 +50,8 @@
 ;; appearing near the right edges with TUI Emacs. The completion entries wrap around, and sometimes
 ;; messes up the completion. Company works better with both Windows and TUI Emacs, and has more
 ;; extensive LaTeX support than Corfu. We can set up separate completion files with `company-ispell'
-;; and `company-dict'. However, `company-ispell' does not keep prefix case when used as a grouped
-;; backend.
+;; and `company-dict'. `company-anywhere' allows completion from inside a word/symbol. However,
+;; `company-ispell' does not keep prefix case when used as a grouped backend.
 (defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
@@ -736,10 +736,9 @@
    ([remap yank-pop] . consult-yank-pop)
    ([remap apropos] . consult-apropos)
    ([remap goto-line] . consult-goto-line)
-   ("M-g e" . consult-compile-error)
+   ([remap bookmark-jump] . consult-bookmark)
    ("M-g o" . consult-outline)
    ("C-c C-m" . consult-mark)
-   ("M-g k" . consult-global-mark)
    ([remap imenu] . consult-imenu) ; "M-g i"
    ("C-c C-j" . consult-imenu)
    ([remap customize] . consult-customize)
@@ -2339,6 +2338,11 @@
   (sh-indent-after-continuation 'always)
   (sh-indent-comment t "Indent comments as a regular line"))
 
+(use-package fish-mode
+  :mode "\\.fish\\'"
+  :interpreter "fish"
+  :hook (fish-mode . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
+
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
 
@@ -2962,7 +2966,7 @@ PAD can be left (`l') or right (`r')."
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
-
+(unbind-key "C-x f") ; Bound to `set-fill-column'
 (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key "C-x s" #'scratch-buffer)
 
