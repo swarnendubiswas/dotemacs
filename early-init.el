@@ -122,16 +122,11 @@
       (set-face-attribute 'mode-line nil :height 120)
       (set-face-attribute 'mode-line-inactive nil :height 120)))
 
-   ((string= (system-name) "swarnendu-Dell-XPS-L502X")
-    (progn
-      (set-face-attribute 'default nil :font "MesloLGS NF" :height 150)
-      (set-face-attribute 'mode-line nil :height 110)
-      (set-face-attribute 'mode-line-inactive nil :height 110)))
-
    ((string= (system-name) "cseiitk")
     (progn
       ;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
-      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 200)
+      ;;   (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 210)
+      (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 210)
       (set-face-attribute 'mode-line nil :height 140)
       (set-face-attribute 'mode-line-inactive nil :height 140)))))
 

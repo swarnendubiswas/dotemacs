@@ -503,7 +503,7 @@
   :bind ("C-S-q" . tramp-cleanup-all-buffers)
   :custom
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
-  (tramp-verbose 1)
+  (tramp-verbose 1 "Only errors and warnings")
   :config
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
@@ -731,7 +731,6 @@
    ;; shown again.
    ([remap switch-to-buffer] . consult-buffer)
    ("<f3>" . consult-buffer)
-   ([remap bookmark-jump] . consult-bookmark)
    ([remap project-switch-to-buffer] . consult-project-buffer)
    ([remap yank-pop] . consult-yank-pop)
    ([remap apropos] . consult-apropos)
@@ -1161,9 +1160,8 @@
 
 (use-package vc-hooks
   :straight (:type built-in)
-  :custom
-  (vc-handled-backends '(Git))
-  (vc-follow-symlinks t "No need to ask")
+  :custom (vc-handled-backends '(Git))
+  ;; (vc-follow-symlinks t "No need to ask")
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
 
@@ -2691,10 +2689,37 @@
 --fields=*
 --extras=*
 --recurse
---exclude=@./.ctagsignore
-;; add exclude by: --exclude=target
+;; add exclude by: --exclude=target or by --exclude=@./.ctagsignore
 ;; add dirs/files to scan here, one line per dir/file
 ")
+  :config
+  ;; Try LSP first, and then use Citre if the enabled xref backends cannot find a definition
+  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+    (let ((fetcher (apply -fn -args))
+          (citre-fetcher
+           (let ((xref-backend-functions '(citre-xref-backend t)))
+             (apply -fn -args))))
+      (lambda ()
+        (or (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher)))))
+
+  ;; This is a completion-at-point-function that tries lsp first, and if no completions are given,
+  ;; tries Citre.
+  (defun lsp-citre-capf-function ()
+    "A capf backend that tries lsp first, then Citre."
+    (let ((lsp-result (lsp-completion-at-point)))
+      (if (and lsp-result
+               (try-completion
+                (buffer-substring (nth 0 lsp-result) (nth 1 lsp-result)) (nth 2 lsp-result)))
+          lsp-result
+        (citre-completion-at-point))))
+
+  (defun enable-lsp-citre-capf-backend ()
+    "Enable the lsp + Citre capf backend in current buffer."
+    (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
+
+  (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
   :diminish)
 
 (use-package breadcrumb
@@ -2967,8 +2992,9 @@ PAD can be left (`l') or right (`r')."
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 (unbind-key "C-x f") ; Bound to `set-fill-column'
-(unbind-key "C-x s") ; Bound to `save-some-buffers'
-(bind-key "C-x s" #'scratch-buffer)
+
+;; (unbind-key "C-x s") ; Bound to `save-some-buffers'
+(bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
 
 (bind-keys
  ("M-<left>" . sb/previous-buffer)
