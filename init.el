@@ -2676,7 +2676,7 @@
    ("C-x c U" . citre-update-tags-file)
    ("C-x c e" . citre-edit-tags-file-recipe))
   :custom
-  (citre-default-create-tags-file-location 'project-cache)
+  (citre-default-create-tags-file-location 'in-dir)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-imenu-integration nil)
   (citre-ctags-default-options
@@ -2704,22 +2704,6 @@
               (funcall fetcher))
             (funcall citre-fetcher)))))
 
-  ;; This is a completion-at-point-function that tries lsp first, and if no completions are given,
-  ;; tries Citre.
-  (defun lsp-citre-capf-function ()
-    "A capf backend that tries lsp first, then Citre."
-    (let ((lsp-result (lsp-completion-at-point)))
-      (if (and lsp-result
-               (try-completion
-                (buffer-substring (nth 0 lsp-result) (nth 1 lsp-result)) (nth 2 lsp-result)))
-          lsp-result
-        (citre-completion-at-point))))
-
-  (defun enable-lsp-citre-capf-backend ()
-    "Enable the lsp + Citre capf backend in current buffer."
-    (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
-
-  (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
   :diminish)
 
 (use-package breadcrumb
@@ -2945,6 +2929,25 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
   (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
 
+(use-package centaur-tabs
+  :hook (emacs-startup . centaur-tabs-mode)
+  :bind*
+  (("M-<right>" . centaur-tabs-forward-tab)
+   ("C-<tab>" . centaur-tabs-forward-tab)
+   ("M-<left>" . centaur-tabs-backward-tab)
+   ("C-S-<iso-lefttab>" . centaur-tabs-backward-tab)
+   ("M-\"" . centaur-tabs-ace-jump))
+  :custom
+  (centaur-tabs-set-modified-marker t)
+  (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
+  (centaur-tabs-set-close-button nil "I do not use the mouse")
+  (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
+  (centaur-tabs-set-icons nil)
+  (centaur-tabs-set-bar 'under)
+  :config
+  ;; Make the headline face match `centaur-tabs-default' face for an uniform face
+  (centaur-tabs-headline-match))
+
 (use-package olivetti
   :hook ((text-mode prog-mode) . olivetti-mode)
   :diminish)
@@ -2995,12 +2998,6 @@ PAD can be left (`l') or right (`r')."
 
 ;; (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
-
-(bind-keys
- ("M-<left>" . sb/previous-buffer)
- ("C-S-<iso-lefttab>" . sb/previous-buffer)
- ("M-<right>" . sb/next-buffer)
- ("C-<tab>" . sb/next-buffer))
 
 (use-package default-text-scale
   :when (display-graphic-p)
