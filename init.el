@@ -1582,6 +1582,11 @@
   :demand t
   :config (require 'company-web-html))
 
+(use-package company-bibtex
+  :straight (:host github :repo "gbgar/company-bibtex")
+  :after (:all tex-mode (:any company corfu))
+  :demand t)
+
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
@@ -1653,7 +1658,7 @@
       ;; `company-capf' does not pass to later backends with Texlab, so we have it last
       (setq company-backends
             '(company-files
-              company-reftex-citations
+              company-bibtex company-reftex-citations
               (company-math-symbols-latex ; Math latex tags
                company-latex-commands
                company-reftex-labels
@@ -3012,6 +3017,10 @@ PAD can be left (`l') or right (`r')."
 
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode))
+
+(use-package kdl-mode
+  :straight (:host github :repo "bobuk/kdl-mode")
+  :mode ("\\.kdl\\'" . kdl-mode))
 
 (add-hook
  'emacs-startup-hook
