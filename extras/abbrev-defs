@@ -4,6 +4,8 @@
     ("insturction" "instruction" nil :count 0)
     ("miscellenaouse" "miscellaneous" nil :count 0)
     ("occurences" "occurrences" nil :count 0)
+    ("paralell" "Parallel" nil :count 0)
+    ("taleb" "table" nil :count 0)
     ("tripes" "triples" nil :count 0)
    ))
 

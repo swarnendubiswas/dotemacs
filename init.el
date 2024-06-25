@@ -331,6 +331,8 @@
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
+  ;; Revert dired buffers if the contents of the directory changes
+  (global-auto-revert-non-file-buffers t)
   :diminish auto-revert-mode)
 
 ;; Save minibuffer history across sessions
@@ -446,12 +448,6 @@
   :when (display-graphic-p)
   :init (windmove-default-keybindings))
 
-;; Consult does not provide intelligent file lookup.
-(use-package ffap
-  :straight (:type built-in)
-  :bind (("<f2>" . ffap) ([remap find-file] . find-file-at-point) ("C-x p o" . ff-find-other-file))
-  :custom (ffap-machine-p-known 'reject "Do not ping things that look like domain names"))
-
 (use-package doc-view
   :straight (:type built-in)
   :hook
@@ -527,20 +523,25 @@
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
-  (ibuffer-never-show-predicates
-   (list
-    (rx
-     (or "magit*"
-         "*Flycheck*"
-         "*Help*"
-         "*Completions*"
-         "TAGS"
-         "*straight*"
-         "*tramp"
-         "*lsp-log*"
-         "*grammarly-ls"
-         "*ltex-ls"))))
-  :config (defalias 'list-buffers 'ibuffer))
+  ;; (ibuffer-never-show-predicates
+  ;;  (list
+  ;;   (rx
+  ;;    (or "magit*"
+  ;;        "*Flycheck*"
+  ;;        "*Help*"
+  ;;        "*Completions*"
+  ;;        "TAGS"
+  ;;        "^\\*straight*"
+  ;;        "*tramp"
+  ;;        "*lsp-log*"
+  ;;        "^\\*bash-ls"
+  ;;        "*grammarly-ls*"
+  ;;        "*ltex-ls*"))))
+  (ibuffer-formats '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
+  :config
+  (require 'ibuf-ext)
+  (add-to-list 'ibuffer-never-show-predicates "^\\*")
+  (defalias 'list-buffers 'ibuffer))
 
 ;; Provides ibuffer filtering and sorting functions to group buffers by function or regexp applied
 ;; to `default-directory'. By default buffers are grouped by `project-current' or by
@@ -725,10 +726,9 @@
   :after vertico
   :commands consult-fd
   :bind
-  (("<f1>" . execute-extended-command)
-   ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by files,
-   ;; "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list will be
-   ;; shown again.
+  ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
+   ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
+   ;; will be shown again.
    ([remap switch-to-buffer] . consult-buffer)
    ("<f3>" . consult-buffer)
    ([remap project-switch-to-buffer] . consult-project-buffer)
@@ -1509,20 +1509,16 @@
    ("C-g" . company-search-abort)
    ("DEL" . company-search-delete-char))
   :custom
-  ;; (company-idle-delay 0.05 "Start autocompletion faster")
+  (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
-  ;; (company-require-match nil "Allow typing input characters that do not match candidates")
   (company-show-quick-access t "Speed up selecting a completion")
-  ;; Align additional metadata, like type signatures, to the right-hand side because it looks better
   (company-tooltip-align-annotations t)
   (company-global-modes
    '(not dired-mode magit-status-mode help-mode csv-mode minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
-  (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries")
-  ;; (company-tooltip-flip-when-above t "Flip the tooltip when it is close to the bottom")
-  :diminish)
+  (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries"))
 
 (use-package company-quickhelp
   :after company
@@ -1899,9 +1895,8 @@
                    ;; Math unicode symbols and sub(super)scripts
                    (cape-company-to-capf #'company-math-symbols-unicode)
                    (cape-company-to-capf #'company-auctex-symbols)
-                   #'cape-dict
                    #'cape-dabbrev)
-                  #'yasnippet-capf))))
+                  #'cape-dict #'yasnippet-capf))))
 
   (with-eval-after-load "lsp-mode"
     (dolist (mode
@@ -2427,7 +2422,6 @@
 
 ;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  :init (setq-default markdown-hide-markup t)
   :mode (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
   :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j") ("C-c C-c l" . markdown-live-preview-mode))
   :custom
@@ -2646,8 +2640,8 @@
   :demand t
   :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
   :config
-  (setq-default TeX-command-default "LatexMk")
-  (auctex-latexmk-setup))
+  (auctex-latexmk-setup)
+  (add-hook 'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
 
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
@@ -2930,6 +2924,7 @@ PAD can be left (`l') or right (`r')."
   :custom
   (doom-modeline-height 28 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
+  (doom-modeline-minor-modes t)
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
   (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
@@ -2967,6 +2962,9 @@ PAD can be left (`l') or right (`r')."
 
  ("C-c z" . repeat)
  ("C-z" . undo)
+
+ ("<f1>" . execute-extended-command)
+ ("<f2>" . find-file)
 
  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
  ("<f8>" . next-error) ; "M-g n" is the default keybinding
