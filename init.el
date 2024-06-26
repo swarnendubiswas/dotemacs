@@ -3020,6 +3020,46 @@ PAD can be left (`l') or right (`r')."
   :straight (:host github :repo "bobuk/kdl-mode")
   :mode ("\\.kdl\\'" . kdl-mode))
 
+(use-package pdf-tools
+  :when (display-graphic-p)
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :magic ("%PDF" . pdf-view-mode)
+  :bind
+  (:map
+   pdf-view-mode-map
+   ("j" . pdf-view-next-line-or-next-page)
+   ("k" . pdf-view-previous-line-or-previous-page)
+   ("n" . pdf-view-next-page-command)
+   ("p" . pdf-view-previous-page-command)
+   ("a" . pdf-view-first-page)
+   ("e" . pdf-view-last-page)
+   ("l" . pdf-view-goto-page)
+   ("P" . pdf-view-fit-page-to-window)
+   ("W" . pdf-view-fit-width-to-window)
+   ("H" . pdf-view-fit-height-to-window)
+   ("+" . pdf-view-enlarge)
+   ("-" . pdf-view-shrink)
+   ("r" . pdf-view-revert-buffer)
+   ("d" . pdf-annot-delete)
+   ("h" . pdf-annot-add-highlight-markup-annotation)
+   ("t" . pdf-annot-add-text-annotation)
+   ("M" . pdf-view-midnight-minor-mode))
+  :custom
+  (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
+  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
+  :config
+  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
+
+  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
+
+  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
+  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
+
+;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
+(use-package saveplace-pdf-view
+  :after (pdf-tools saveplace)
+  :demand t)
+
 (add-hook
  'emacs-startup-hook
  (lambda ()
