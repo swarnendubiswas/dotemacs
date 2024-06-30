@@ -45,18 +45,6 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Corfu integrates nicely with `orderless' and provides better completion for elisp symbols with
-;; `cape-symbol'. But `corfu-terminal-mode' has a potential rendering problem for completion popups
-;; appearing near the right edges with TUI Emacs. The completion entries wrap around, and sometimes
-;; messes up the completion. Company works better with both Windows and TUI Emacs, and has more
-;; extensive LaTeX support than Corfu. We can set up separate completion files with `company-ispell'
-;; and `company-dict'. `company-anywhere' allows completion from inside a word/symbol. However,
-;; `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
-  "Choose the framework to use for completion at point."
-  :type '(radio (const :tag "corfu" corfu) (const :tag "company" company) (const :tag "none" none))
-  :group 'sb/emacs)
-
 ;; Large values make reading difficult when the window is split side-by-side, 100 is also a stretch
 ;; for smaller screens.
 (defcustom sb/fill-column 100
@@ -1457,7 +1445,7 @@
   (hippie-expand-verbose nil)
   :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
 
-;; Use "M-SPC" for space-separated completion lookups, works with Corfu.
+;; Use "M-SPC" for space-separated completion lookups.
 (use-package orderless
   :demand t
   :config
@@ -1488,7 +1476,6 @@
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
 (use-package company
-  :when (eq sb/in-buffer-completion 'company)
   :hook (emacs-startup . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
@@ -1539,17 +1526,17 @@
   :init (company-statistics-mode 1))
 
 (use-package company-auctex
-  :after (:all tex-mode (:any company corfu))
+  :after (:all tex-mode company)
   :demand t)
 
 (use-package company-math
   :straight math-symbols
   :straight t
-  :after (:all tex-mode (:any company corfu))
+  :after (:all tex-mode company)
   :demand t)
 
 (use-package company-reftex
-  :after (:all tex-mode (:any company corfu))
+  :after (:all tex-mode company)
   :demand t
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
@@ -1562,7 +1549,7 @@
   :demand t)
 
 (use-package company-dict
-  :after (:any company corfu)
+  :after company
   :demand t
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
@@ -1578,13 +1565,13 @@
   :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 (use-package company-web
-  :after (:any company corfu)
+  :after company
   :demand t
   :config (require 'company-web-html))
 
 (use-package company-bibtex
   :straight (:host github :repo "gbgar/company-bibtex")
-  :after (:all tex-mode (:any company corfu))
+  :after (:all tex-mode company)
   :demand t)
 
 ;; Try completion backends in order untill there is a non-empty completion list:
@@ -1774,165 +1761,6 @@
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
 
-;; ;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
-;; (use-package corfu
-;;   :straight
-;;   (corfu
-;;    :files (:defaults "extensions/*")
-;;    :includes (corfu-info corfu-history corfu-echo corfu-popupinfo corfu-indexed))
-;;   :when (eq sb/in-buffer-completion 'corfu)
-;;   :hook
-;;   ((emacs-startup . global-corfu-mode)
-;;    (corfu-mode
-;;     .
-;;     (lambda ()
-;;       (setq-local completion-styles '(basic))
-;;       (corfu-history-mode)
-;;       (corfu-echo-mode)
-;;       (corfu-popupinfo-mode)
-;;       (corfu-indexed-mode))))
-;;   :bind
-;;   (:map
-;;    corfu-map
-;;    ("ESCAPE" . corfu-quit)
-;;    ([escape] . corfu-quit)
-;;    ("TAB" . corfu-next)
-;;    ([tab] . corfu-next)
-;;    ("S-TAB" . corfu-previous)
-;;    ([backtab] . corfu-previous)
-;;    ("M-d" . corfu-info-documentation)
-;;    ("M-l" . corfu-info-location)
-;;    ("M-n" . corfu-popupinfo-scroll-up)
-;;    ("M-p" . corfu-popupinfo-scroll-down)
-;;    ([remap corfu-show-documentation] . corfu-popupinfo-toggle))
-;;   :custom
-;;   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
-;;   (corfu-auto t "Enable auto completion")
-;;   (corfu-exclude-modes
-;;    '(dired-mode inferior-python-mode magit-status-mode help-mode csv-mode minibuffer-inactive-mode))
-;;   :config
-;;   ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
-;;   ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
-;;   ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
-;;   ;; entries.
-;;   (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2)))
-
-;;   (with-eval-after-load "savehist"
-;;     (add-to-list 'savehist-additional-variables 'corfu-history)))
-
-;; (use-package corfu-terminal
-;;   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
-;;   :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
-;;   :hook (corfu-mode . corfu-terminal-mode)
-;;   :custom (corfu-terminal-position-right-margin 5 "Prevent wraparound at the right edge"))
-
-;; (use-package yasnippet-capf
-;;   :straight (:host github :repo "elken/yasnippet-capf")
-;;   :after (yasnippet corfu)
-;;   :demand t)
-
-;; (use-package cape
-;;   :after corfu
-;;   :demand t
-;;   :init
-;;   ;; Initialize for all generic languages that are not specifically handled
-;;   (add-hook 'completion-at-point-functions #'cape-keyword)
-;;   (add-hook 'completion-at-point-functions #'cape-file)
-;;   (add-hook 'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev))
-;;   :custom
-;;   (cape-dabbrev-min-length 3)
-;;   (cape-dict-file
-;;    `(,(expand-file-name "wordlist.5" sb/extras-directory)
-;;      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-;;   :config
-;;   ;; Make these capfs composable
-;;   (with-eval-after-load "lsp-mode"
-;;     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
-;;     (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
-
-;;   ;; Override CAPFS for specific major modes
-;;   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
-;;     (add-hook
-;;      mode
-;;      (lambda ()
-;;        (setq-local completion-at-point-functions
-;;                    (list
-;;                     #'cape-file #'yasnippet-capf
-;;                     (cape-capf-super
-;;                      #'elisp-completion-at-point
-;;                      #'citre-completion-at-point
-;;                      #'cape-elisp-symbol
-;;                      (cape-company-to-capf #'company-yasnippet))
-;;                     #'cape-dict #'cape-dabbrev)))))
-
-;;   (dolist (mode '(flex-mode-hook bison-mode-hook))
-;;     (add-hook
-;;      mode
-;;      (lambda ()
-;;        (setq-local completion-at-point-functions
-;;                    (list #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
-
-;;   (add-hook
-;;    'text-mode-hook
-;;    (lambda ()
-;;      (setq-local completion-at-point-functions
-;;                  (list
-;;                   #'cape-file
-;;                   (cape-capf-properties (cape-capf-super #'cape-dict #'cape-dabbrev) :sort t)))))
-
-;;   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-;;   (add-hook
-;;    'LaTeX-mode-hook
-;;    (lambda ()
-;;      (setq-local completion-at-point-functions
-;;                  (list
-;;                   #'cape-file
-;;                   (cape-capf-super
-;;                    (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
-;;                    (cape-company-to-capf #'company-latex-commands)
-;;                    (cape-company-to-capf #'company-reftex-labels)
-;;                    (cape-company-to-capf #'company-reftex-citations)
-;;                    (cape-company-to-capf #'company-auctex-environments)
-;;                    (cape-company-to-capf #'company-auctex-macros)
-;;                    (cape-company-to-capf #'company-auctex-labels)
-;;                    ;; Math unicode symbols and sub(super)scripts
-;;                    (cape-company-to-capf #'company-math-symbols-unicode)
-;;                    (cape-company-to-capf #'company-auctex-symbols)
-;;                    #'cape-dabbrev)
-;;                   #'cape-dict #'yasnippet-capf))))
-
-;;   (with-eval-after-load "lsp-mode"
-;;     (dolist (mode
-;;              '(c-mode-hook
-;;                c-ts-mode-hook
-;;                c++-mode-hook
-;;                c++-ts-mode-hook
-;;                java-mode-hook
-;;                java-ts-mode-hook
-;;                python-mode-hook
-;;                python-ts-mode-hook
-;;                sh-mode-hook
-;;                bash-ts-mode-hook
-;;                cmake-mode-hook
-;;                cmake-ts-mode-hook
-;;                json-mode-hook
-;;                json-ts-mode-hook
-;;                jsonc-mode-hook
-;;                yaml-mode-hook
-;;                yaml-ts-mode-hook))
-;;       (add-hook
-;;        mode
-;;        (lambda ()
-;;          (setq-local completion-at-point-functions
-;;                      (list
-;;                       #'cape-file #'yasnippet-capf
-;;                       (cape-capf-super
-;;                        #'lsp-completion-at-point
-;;                        #'citre-completion-at-point
-;;                        #'cape-keyword
-;;                        (cape-company-to-capf #'company-yasnippet))
-;;                       #'cape-dabbrev #'cape-dict)))))))
-
 (use-package lsp-mode
   :init (setq lsp-keymap-prefix "C-c l")
   :bind
@@ -2022,11 +1850,6 @@
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
   :config
-  (when (eq sb/in-buffer-completion 'corfu)
-    (defun sb/lsp-mode-setup-completion ()
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults)) '(flex)))
-    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
-
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
@@ -2601,13 +2424,6 @@
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
-;; Use "<" to trigger org block completion at point.
-(use-package org-block-capf
-  :straight (:host github :repo "xenodium/org-block-capf")
-  :after corfu
-  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-  :custom (org-block-capf-edit-style 'inline))
-
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
@@ -2672,12 +2488,6 @@
   :config
   (auctex-latexmk-setup)
   (add-hook 'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
-
-;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
-(use-package bibtex-capf
-  :straight (:host github :repo "mclear-tools/bibtex-capf")
-  :when (eq sb/in-buffer-completion 'corfu)
-  :hook (LaTeX-mode . bibtex-capf-mode))
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
