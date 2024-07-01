@@ -69,35 +69,76 @@
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
 
-;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub.
-(setq
- straight-build-dir
- (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
- ;; Do not check packages on startup to reduce load time
- straight-check-for-modifications '(check-on-save find-when-checking)
- straight-use-package-by-default t
- ;; There is no need to download the whole Git history, and a single branch often suffices.
- straight-vc-git-default-clone-depth '(1 single-branch))
-
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el"
-                         (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
-      (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent
-         'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(defvar elpaca-installer-version 0.7)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order
+  '(elpaca
+    :repo "https://github.com/progfolio/elpaca.git"
+    :ref nil
+    :depth 1
+    :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+    :build (:not elpaca--activate-package)))
+(let* ((repo (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list
+   'load-path
+   (if (file-exists-p build)
+       build
+     repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28)
+      (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop
+                   (apply #'call-process
+                          `("git" nil ,buffer t "clone" ,@
+                            (when-let ((depth (plist-get order :depth)))
+                              (list (format "--depth=%d" depth) "--no-single-branch"))
+                            ,(plist-get order :repo) ,repo))))
+                 ((zerop
+                   (call-process "git" nil buffer t "checkout" (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop
+                   (call-process emacs
+                                 nil
+                                 buffer
+                                 nil
+                                 "-Q"
+                                 "-L"
+                                 "."
+                                 "--batch"
+                                 "--eval"
+                                 "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+          (progn
+            (message "%s" (buffer-string))
+            (kill-buffer buffer))
+          (error
+           "%s"
+           (with-current-buffer buffer
+             (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
 ;; These variables need to be set before loading `use-package'.
 (setq use-package-enable-imenu-support t)
-(straight-use-package
- '(use-package :source
-    melpa))
+
+(elpaca
+ elpaca-use-package
+ ;; Enable use-package :ensure support for Elpaca.
+ (elpaca-use-package-mode) (setq elpaca-use-package-by-default t))
 
 (cond
  ((eq sb/op-mode 'daemon)
@@ -118,19 +159,18 @@
      use-package-always-defer t
      use-package-expand-minimally t))))
 
+(elpaca-wait)
+
 ;; Check "use-package-keywords.org" for a suggested order of `use-package' keywords.
 
 (use-package diminish
   :demand t)
 
-;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the major
-;; and the minor modes.
-(use-package bind-key
-  :bind ("C-c d k" . describe-personal-keybindings))
-
 (use-package no-littering
   :demand t
   :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
+
+(elpaca-wait)
 
 ;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
 (defcustom sb/private-file (no-littering-expand-etc-file-name "private.el")
@@ -148,7 +188,11 @@
   (exec-path-from-shell-initialize))
 
 (use-package emacs
-  :hook ((after-init . garbage-collect) (prog-mode . auto-fill-mode) (emacs-startup . save-place-mode))
+  :ensure nil
+  :hook
+  ((elpaca-after-init . garbage-collect)
+   (prog-mode . auto-fill-mode)
+   (elpaca-after-init . save-place-mode))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -314,8 +358,8 @@
 
 ;; Auto-refresh all buffers
 (use-package autorevert
-  :straight (:type built-in)
-  :hook (emacs-startup . global-auto-revert-mode)
+  :ensure nil
+  :hook (elpaca-after-init . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
@@ -325,8 +369,8 @@
 
 ;; Save minibuffer history across sessions
 (use-package savehist
-  :straight (:type built-in)
-  :hook (emacs-startup . savehist-mode)
+  :ensure nil
+  :hook (elpaca-after-init . savehist-mode)
   :custom
   (savehist-additional-variables
    '(savehist-minibuffer-history-variables
@@ -343,8 +387,8 @@
      regexp-search-ring)))
 
 (use-package abbrev
-  :straight (:type built-in)
-  :hook (emacs-startup . abbrev-mode)
+  :ensure nil
+  :hook (elpaca-after-init . abbrev-mode)
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
   (save-abbrevs 'silently)
@@ -352,12 +396,12 @@
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c".
 (use-package so-long
-  :straight (:type built-in)
+  :ensure nil
   :when sb/EMACS28+
-  :hook (emacs-startup . global-so-long-mode))
+  :hook (elpaca-after-init . global-so-long-mode))
 
 (use-package imenu
-  :straight (:type built-in)
+  :ensure nil
   :after (:any markdown-mode org-mode yaml-mode yaml-ts-mode prog-mode)
   :custom
   (imenu-auto-rescan t)
@@ -365,8 +409,8 @@
   (imenu-use-popup-menu nil))
 
 (use-package recentf
-  :straight (:type built-in)
-  :hook (emacs-startup . recentf-mode)
+  :ensure nil
+  :hook (elpaca-after-init . recentf-mode)
   :bind ("<f9>" . recentf-open-files)
   :custom
   (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
@@ -399,7 +443,8 @@
   (dolist (exclude
            `(,(recentf-expand-file-name no-littering-etc-directory)
              ,(recentf-expand-file-name no-littering-var-directory)
-             ,(recentf-expand-file-name (straight--emacs-dir "straight"))))
+             ;; ,(recentf-expand-file-name (straight--emacs-dir "straight"))
+             ))
     (add-to-list 'recentf-exclude exclude))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
@@ -432,12 +477,12 @@
 ;; keybindings for moving around windows in Tmux which is okay because I do not split Emacs frames
 ;; often.
 (use-package windmove
-  :straight (:type built-in)
+  :ensure nil
   :when (display-graphic-p)
   :init (windmove-default-keybindings))
 
 (use-package doc-view
-  :straight (:type built-in)
+  :ensure nil
   :hook
   (doc-view-mode
    .
@@ -461,12 +506,12 @@
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
 (use-package goto-addr
-  :straight (:type built-in)
+  :ensure nil
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
   :bind ("C-c RET" . goto-address-at-point))
 
 (use-package ediff
-  :straight (:type built-in)
+  :ensure nil
   :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
   ;; Put the control panel in the same frame as the diff windows
@@ -483,7 +528,7 @@
 ;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 (use-package tramp
-  :straight (:type built-in)
+  :ensure nil
   :bind ("C-S-q" . tramp-cleanup-all-buffers)
   :custom
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
@@ -499,12 +544,13 @@
   (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
+  :ensure nil
   :custom (whitespace-line-column sb/fill-column)
   ;; (whitespace-action '(cleanup auto-cleanup))
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
-  :straight (:type built-in)
+  :ensure nil
   :hook (ibuffer . ibuffer-auto-mode)
   :bind (("C-x C-b" . ibuffer-jump) :map ibuffer-mode-map ("`" . ibuffer-switch-format))
   :custom
@@ -549,12 +595,12 @@
 
 ;; Immediately respawn the *scratch* buffer when it is killed
 (use-package immortal-scratch
-  :hook (emacs-startup . immortal-scratch-mode))
+  :hook (elpaca-after-init . immortal-scratch-mode))
 
 ;; Helps to make the data in the "*scratch*" buffer persistent
 (use-package persistent-scratch
   :hook
-  (emacs-startup
+  (elpaca-after-init
    .
    (lambda ()
      (ignore-errors
@@ -564,7 +610,7 @@
 ;; Windows of temporary buffers are shown as a popup window, and we can close them by typing "C-g".
 ;; It is useful because it does not split frames.
 (use-package popwin
-  :hook (emacs-startup . popwin-mode)
+  :hook (elpaca-after-init . popwin-mode)
   :config (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config))
 
 ;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
@@ -596,7 +642,7 @@
     (interactive)
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
-  :straight (:type built-in)
+  :ensure nil
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh dired when files change
    (dired-mode . dired-hide-details-mode))
@@ -629,7 +675,7 @@
     (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
-  :straight (:type built-in)
+  :ensure nil
   :hook
   (dired-mode
    .
@@ -674,17 +720,17 @@
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
 (use-package dired-hist
-  :straight (:host github :repo "karthink/dired-hist")
+  :ensure (:host github :repo "karthink/dired-hist")
   :hook (dired-mode . dired-hist-mode)
   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 (use-package vertico
-  :straight
+  :ensure
   (vertico
    :files (:defaults "extensions/*")
    :includes (vertico-directory vertico-repeat vertico-quick))
   :hook
-  ((emacs-startup . vertico-mode)
+  ((elpaca-after-init . vertico-mode)
    ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
    ;; the following fixes the path so the selected path does not have prepended junk left behind.
    ;; This works with `file-name-shadow-mode' enabled. When you are in a sub-directory and use, say,
@@ -828,7 +874,7 @@
 
 ;; ":after consult" prevents `consult-tramp' keybinding from being registered
 (use-package consult-tramp
-  :straight (:host github :repo "Ladicle/consult-tramp")
+  :ensure (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-flyspell
@@ -848,7 +894,7 @@
   :bind ("C-M-y" . consult-yasnippet))
 
 (use-package ispell
-  :straight (:type built-in)
+  :ensure nil
   :bind ("M-$" . ispell-word)
   :custom
   (ispell-dictionary "en_US")
@@ -907,7 +953,7 @@
 ;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; Running `flyspell-buffer' on an entire buffer can be slow.
 (use-package flyspell
-  :straight (:type built-in)
+  :ensure nil
   :hook ((prog-mode . flyspell-prog-mode) (text-mode . flyspell-mode))
   :bind ("C-c f b" . flyspell-buffer)
   :custom
@@ -947,7 +993,7 @@
 (use-package hungry-delete
   :hook
   ((minibuffer-setup . (lambda () (hungry-delete-mode -1)))
-   (emacs-startup . global-hungry-delete-mode))
+   (elpaca-after-init . global-hungry-delete-mode))
   :diminish)
 
 ;; Move lines with "M-<up>" and "M-<down>"
@@ -963,11 +1009,11 @@
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
-  :hook (emacs-startup . smart-mark-mode))
+  :hook (elpaca-after-init . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :hook (emacs-startup . whole-line-or-region-global-mode)
+  :hook (elpaca-after-init . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
 (use-package goto-last-change
@@ -988,7 +1034,8 @@
   :bind* ("C-." . iedit-mode))
 
 (use-package hl-todo
-  :hook (emacs-startup . global-hl-todo-mode)
+  :ensure (:depth nil)
+  :hook (elpaca-after-init . global-hl-todo-mode)
   :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setq
@@ -1024,7 +1071,7 @@
    (vc-before-checkin . bm-buffer-save)
    (after-revert . bm-buffer-restore)
    (find-file . bm-buffer-restore)
-   (emacs-startup . bm-repository-load))
+   (elpaca-after-init . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
   :custom (bm-buffer-persistence t "Save bookmarks"))
 
@@ -1042,16 +1089,16 @@
 
 ;; Temporarily highlight the region involved in certain operations like `kill-line' and `yank'.
 (use-package volatile-highlights
-  :hook (emacs-startup . volatile-highlights-mode)
+  :hook (elpaca-after-init . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
 
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
-  :hook (emacs-startup . xclip-mode))
+  :hook (elpaca-after-init . xclip-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
-  :hook (emacs-startup . gcmh-mode)
+  :hook (elpaca-after-init . gcmh-mode)
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -1077,13 +1124,13 @@
   :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
 
 (use-package project-x
-  :straight (:host github :repo "karthink/project-x")
+  :ensure (:host github :repo "karthink/project-x")
   :after project
   :demand t
   :config (project-x-mode 1))
 
 (use-package isearch
-  :straight (:type built-in)
+  :ensure nil
   :bind
   (("C-s")
    ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
@@ -1151,11 +1198,17 @@
   ([remap replace-regex] . vr/replace))
 
 (use-package vc-hooks
-  :straight (:type built-in)
+  :ensure nil
   :custom (vc-handled-backends '(Git))
   ;; (vc-follow-symlinks t "No need to ask")
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
+
+(use-package transient
+  :custom (transient-semantic-coloring t)
+  :config
+  ;; Allow using `q' to quit out of popups in addition to `C-g'
+  (transient-bind-q-to-quit))
 
 (use-package magit
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
@@ -1197,7 +1250,7 @@
     (lambda ()
       (unless (display-graphic-p)
         (diff-hl-margin-local-mode 1))))
-   (dired-mode . diff-hl-dired-mode-unless-remote) (emacs-startup . global-diff-hl-mode))
+   (dired-mode . diff-hl-dired-mode-unless-remote) (elpaca-after-init . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -1219,7 +1272,7 @@
 
 ;; Use the minor mode `smerge-mode' to move between conflicts and resolve them.
 (use-package smerge-mode
-  :straight (:type built-in)
+  :ensure nil
   :bind
   (:map
    smerge-mode-map
@@ -1236,15 +1289,15 @@
    ("M-g M" . smerge-popup-context-menu)))
 
 (use-package paren
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
 (use-package elec-pair
-  :straight (:type built-in)
+  :ensure nil
   :hook
-  ((emacs-startup . electric-pair-mode)
+  ((elpaca-after-init . electric-pair-mode)
    ;; Disable pairs when entering minibuffer
    (minibuffer-setup . (lambda () (electric-pair-local-mode -1))))
   :custom
@@ -1277,11 +1330,11 @@
   :bind ("C-h C-m" . discover-my-major))
 
 (use-package mode-minder
-  :straight (:host github :repo "jdtsmith/mode-minder")
+  :ensure (:host github :repo "jdtsmith/mode-minder")
   :commands mode-minder)
 
 (use-package flycheck
-  :hook (after-init . global-flycheck-mode)
+  :hook (elpaca-after-init . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
@@ -1347,7 +1400,7 @@
   :diminish)
 
 (use-package indent-bars
-  :straight (:host github :repo "jdtsmith/indent-bars")
+  :ensure (:host github :repo "jdtsmith/indent-bars")
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :config
   (when (executable-find "tree-sitter")
@@ -1388,7 +1441,7 @@
 ;; "/u/s/l" for "/usr/share/local". While "partial-completion" matches search terms must match in
 ;; order, "orderless" can match search terms in any order.
 (use-package minibuffer
-  :straight (:type built-in)
+  :ensure nil
   :bind
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion)
@@ -1415,7 +1468,7 @@
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
 (use-package dabbrev
-  :straight (:type built-in)
+  :ensure nil
   :bind ("C-M-;" . dabbrev-completion)
   :custom
   (dabbrev-ignored-buffer-regexps
@@ -1429,7 +1482,7 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
 (use-package hippie-exp
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (hippie-expand-try-functions-list
    '(try-expand-dabbrev
@@ -1457,7 +1510,7 @@
 
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (emacs-startup . yas-global-mode)
+  :hook (elpaca-after-init . yas-global-mode)
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -1476,7 +1529,7 @@
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
 (use-package company
-  :hook (emacs-startup . global-company-mode)
+  :hook (elpaca-after-init . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
    :map
@@ -1530,8 +1583,8 @@
   :demand t)
 
 (use-package company-math
-  :straight math-symbols
-  :straight t
+  ;; :ensure math-symbols
+  ;; :ensure t
   :after (:all tex-mode company)
   :demand t)
 
@@ -1542,9 +1595,8 @@
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-;; Complete in the middle of words
 (use-package company-anywhere
-  :straight (:host github :repo "zk-phi/company-anywhere")
+  :ensure (:host github :repo "zk-phi/company-anywhere")
   :after company
   :demand t)
 
@@ -1570,7 +1622,7 @@
   :config (require 'company-web-html))
 
 (use-package company-bibtex
-  :straight (:host github :repo "gbgar/company-bibtex")
+  :ensure (:host github :repo "gbgar/company-bibtex")
   :after (:all tex-mode company)
   :demand t)
 
@@ -1958,7 +2010,7 @@
   (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f")))
 
 (use-package subword
-  :straight (:type built-in)
+  :ensure nil
   :hook (prog-mode . subword-mode)
   :diminish)
 
@@ -1970,7 +2022,7 @@
   :diminish)
 
 (use-package compile
-  :straight (:type built-in)
+  :ensure nil
   :bind (("<f10>" . compile) ("<f11>" . recompile))
   :custom
   (compile-command (format "make -k -j%s " (num-processors)))
@@ -2052,7 +2104,7 @@
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
 (use-package eldoc
-  :straight (:type built-in)
+  :ensure nil
   :hook (prog-mode . turn-on-eldoc-mode)
   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
@@ -2067,7 +2119,7 @@
   :diminish)
 
 (use-package cc-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
   :hook
   ((c-mode c-ts-mode c++-mode c++-ts-mode)
@@ -2087,7 +2139,7 @@
   :bind (:map c-mode-base-map ("C-c C-d")))
 
 (use-package c-ts-mode
-  :straight (:type built-in)
+  :ensure nil
   :hook
   ((c-ts-mode c++-ts-mode)
    .
@@ -2111,7 +2163,8 @@
 (use-package cuda-mode
   :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
 
-(use-package opencl-mode
+(use-package opencl-c-mode
+  :ensure (:host github :repo "salmanebah/opencl-mode")
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
@@ -2128,7 +2181,7 @@
      (lsp-deferred))))
 
 (use-package python
-  :straight (:type built-in)
+  :ensure nil
   :mode
   (("SCon\(struct\|script\)$" . python-ts-mode)
    ("[./]flake8\\'" . conf-mode)
@@ -2165,13 +2218,14 @@
   (pyvenv-post-deactivate-hooks (list (lambda () (setq python-shell-interpreter "python3")))))
 
 (use-package cperl-mode
+  :ensure nil
   :mode "latexmkrc\\'"
   :config
   ;; Prefer CPerl mode to Perl mode
   (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
-  :straight (:type built-in)
+  :ensure nil
   :mode ("\\bashrc\\'" . bash-ts-mode)
   :hook ((sh-mode bash-ts-mode) . lsp-deferred)
   :bind (:map sh-mode-map ("C-c C-d"))
@@ -2189,7 +2243,7 @@
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
 
 (use-package lisp-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode)
   :hook
   (lisp-data-mode
@@ -2199,7 +2253,7 @@
        (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package elisp-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode ("\\.el\\'" . emacs-lisp-mode)
   :hook
   (emacs-lisp-mode
@@ -2212,7 +2266,7 @@
   :commands (ini-mode))
 
 (use-package conf-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode
   "\\.cfg\\'"
   "\\.conf\\'")
@@ -2240,6 +2294,7 @@
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
 (use-package css-mode
+  :ensure nil
   :hook ((css-mode css-ts-mode) . lsp-deferred)
   :custom (css-indent-offset 2))
 
@@ -2249,7 +2304,7 @@
   :config (emmet-preview-mode 1))
 
 (use-package make-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode
   (("\\Makefile\\'" . makefile-mode)
    ("\\Makefile.common\\'" . makefile-mode)
@@ -2296,7 +2351,7 @@
   :diminish)
 
 (use-package nxml-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
   :hook
   (nxml-mode
@@ -2401,7 +2456,7 @@
 
 ;; Make invisible parts of Org elements appear visible
 (use-package org-appear
-  :straight (:host github :repo "awth13/org-appear")
+  :ensure (:host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode)
   :custom
   (org-appear-autosubmarkers t)
@@ -2421,14 +2476,14 @@
    org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern-indent
-  :straight (:host github :repo "jdtsmith/org-modern-indent")
+  :ensure (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
 (use-package tex
-  :straight auctex
+  :ensure auctex
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
@@ -2468,7 +2523,7 @@
     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map)))
 
 (use-package bibtex
-  :straight (:type built-in)
+  :ensure nil
   :hook (bibtex-mode . lsp-deferred)
   :custom
   (bibtex-align-at-equal-sign t)
@@ -2476,7 +2531,7 @@
   (bibtex-comma-after-last-field nil))
 
 (use-package consult-reftex
-  :straight (:host github :repo "karthink/consult-reftex")
+  :ensure (:host github :repo "karthink/consult-reftex")
   :after (consult tex-mode)
   :bind (("C-c [" . consult-reftex-insert-reference) ("C-c )" . consult-reftex-goto-label)))
 
@@ -2490,7 +2545,7 @@
   (add-hook 'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
 
 (use-package math-delimiters
-  :straight (:host github :repo "oantolin/math-delimiters")
+  :ensure (:host github :repo "oantolin/math-delimiters")
   :after tex
   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
@@ -2750,7 +2805,7 @@ PAD can be left (`l') or right (`r')."
                         (powerline-fill nil (powerline-width rhs))
                         (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :hook (emacs-startup . sb/powerline-nano-theme)
+  :hook (elpaca-after-init . sb/powerline-nano-theme)
   :custom
   (powerline-display-hud nil "Visualization of the buffer position is not useful")
   (powerline-display-buffer-size nil)
@@ -2760,7 +2815,7 @@ PAD can be left (`l') or right (`r')."
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
-  :hook (emacs-startup . doom-modeline-mode)
+  :hook (elpaca-after-init . doom-modeline-mode)
   :custom
   (doom-modeline-height 28 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
@@ -2770,7 +2825,7 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
 
 (use-package centaur-tabs
-  :hook (emacs-startup . centaur-tabs-mode)
+  :hook (elpaca-after-init . centaur-tabs-mode)
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
    ("C-<tab>" . centaur-tabs-forward-tab)
@@ -2833,7 +2888,11 @@ PAD can be left (`l') or right (`r')."
  ("C-M-b" . backward-sexp)
  ("C-M-f" . forward-sexp)
  ("C-M-k" . kill-sexp)
- ("C-M-@" . mark-sexp))
+ ("C-M-@" . mark-sexp)
+
+ ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the
+ ;; major and the minor modes.
+ ("C-c d k" . describe-personal-keybindings))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
@@ -2850,14 +2909,14 @@ PAD can be left (`l') or right (`r')."
   :commands free-keys)
 
 (use-package which-key
-  :hook (emacs-startup . which-key-mode)
+  :hook (elpaca-after-init . which-key-mode)
   :diminish)
 
 (use-package kkp
-  :hook (emacs-startup . global-kkp-mode))
+  :hook (elpaca-after-init . global-kkp-mode))
 
 (use-package kdl-mode
-  :straight (:host github :repo "bobuk/kdl-mode")
+  :ensure (:host github :repo "bobuk/kdl-mode")
   :mode ("\\.kdl\\'" . kdl-mode))
 
 (use-package pdf-tools
@@ -2908,7 +2967,7 @@ PAD can be left (`l') or right (`r')."
   :hook (ssh-config-mode . turn-on-font-lock))
 
 (add-hook
- 'emacs-startup-hook
+ 'elpaca-after-init-hook
  (lambda ()
    (let ((gc-time (float-time gc-elapsed)))
      (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."

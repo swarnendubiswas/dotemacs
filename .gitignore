@@ -57,3 +57,5 @@ tramp
 /wordfreq-dicts/
 /project-window-list
 /.ctags.d/
+/elpaca/
+/init.el~
