@@ -557,20 +557,6 @@
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
-  ;; (ibuffer-never-show-predicates
-  ;;  (list
-  ;;   (rx
-  ;;    (or "magit*"
-  ;;        "*Flycheck*"
-  ;;        "*Help*"
-  ;;        "*Completions*"
-  ;;        "TAGS"
-  ;;        "^\\*straight*"
-  ;;        "*tramp"
-  ;;        "*lsp-log*"
-  ;;        "^\\*bash-ls"
-  ;;        "*grammarly-ls*"
-  ;;        "*ltex-ls*"))))
   (ibuffer-formats '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
   :config
   (require 'ibuf-ext)
@@ -2126,7 +2112,6 @@
    .
    (lambda ()
      (setq-local
-      ;; Available C styles: https://www.gnu.org/software/emacs/manual/html_mono/ccmode.html#Built_002din-Styles
       c-set-style "cc-mode"
       c-basic-offset 2
       c-auto-newline nil ; Disable electric indentation and on-type formatting
@@ -2188,8 +2173,6 @@
    ("/Pipfile\\'" . conf-mode))
   :hook ((python-mode python-ts-mode) . lsp-deferred)
   :bind
-  ;; Assigning a keybinding such as "C-[" is involved, "[" is treated as `meta'
-  ;; https://emacs.stackexchange.com/questions/64839/assign-a-keybinding-with-c
   (:map
    python-mode-map
    ("C-c C-d")
@@ -2396,7 +2379,6 @@
   (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
   (org-src-window-setup 'current-window)
   (org-startup-truncated nil)
-  ;; https://orgmode.org/manual/Initial-visibility.html
   (org-startup-folded 'showeverything)
   (org-startup-with-inline-images t)
   ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
@@ -2742,10 +2724,10 @@ or the major mode is not in `sb/skippable-modes'."
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t))
 
-;; Powerline theme for Nano looks great, and takes less space on the modeline. It does not show lsp
-;; status, flycheck information, and Python virtualenv information on the modeline. The package is
-;; not being actively maintained.
-;; Inspired by https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+;; Powerline theme for Nano looks great, and takes less space on the modeline. However, it does not
+;; show lsp status, flycheck information, and Python virtualenv information on the modeline. The
+;; package is not being actively maintained. Inspired by
+;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
 (use-package powerline
   :preface
   (defun sb/powerline-raw (str &optional face pad)
@@ -2898,7 +2880,6 @@ PAD can be left (`l') or right (`r')."
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 (unbind-key "C-x f") ; Bound to `set-fill-column'
 
-;; (unbind-key "C-x s") ; Bound to `save-some-buffers'
 (bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
 
 (use-package default-text-scale
