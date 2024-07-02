@@ -170,6 +170,23 @@
   :demand t
   :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
+(progn
+  (unload-feature 'eldoc t) ;; Unload built-in eldoc
+  (setq custom-delayed-init-variables '())
+  (defvar global-eldoc-mode nil)
+  (elpaca
+   eldoc (require 'eldoc) (global-eldoc-mode 1)
+   (setopt eldoc-area-prefer-doc-buffer t) ; Disable popups
+   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
+   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
+   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
+   ;; (setopt eldoc-echo-area-use-multiline-p nil)
+   ;; Allow eldoc to trigger after completions
+   (with-eval-after-load "company"
+     (eldoc-add-command
+      'company-complete-selection 'company-complete-common 'company-capf 'company-abort))
+   (diminish 'eldoc-mode)))
+
 (elpaca-wait)
 
 ;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
@@ -1289,8 +1306,13 @@
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
-  (electric-pair-inhibit-predicate 'ignore "Allow always pairing matching delimiters")
   :config
+  (setq electric-pair-inhibit-predicate
+        (lambda (c)
+          (if (char-equal c ?\")
+              t
+            (electric-pair-default-inhibit c))))
+
   (defvar sb/markdown-pairs '((?` . ?`))
     "Electric pairs for `markdown-mode'.")
 
@@ -2088,21 +2110,6 @@
 ;; (with-eval-after-load "treesit"
 ;;   ;; Improves performance with large files without significantly diminishing highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
-
-(use-package eldoc
-  :ensure nil
-  :hook (prog-mode . turn-on-eldoc-mode)
-  :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
-  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
-  ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
-  ;; is on a variable with a multiline docstring, but then it cuts of useful information.
-  ;; (eldoc-echo-area-use-multiline-p nil)
-  :config
-  ;; Allow eldoc to trigger after completions
-  (with-eval-after-load "company"
-    (eldoc-add-command
-     'company-complete-selection 'company-complete-common 'company-capf 'company-abort))
-  :diminish)
 
 (use-package cc-mode
   :ensure nil
