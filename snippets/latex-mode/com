@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: columns
+# key: com
+# --
+\begin{columns}[T]
+\column{0.49\textwidth}
+$0
+\column{0.49\textwidth}
+\end{columns}

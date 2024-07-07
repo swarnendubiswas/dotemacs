@@ -1562,6 +1562,7 @@
     ("insances" "instances" nil :count 0)
     ("ipmpact" "impact" nil :count 0)
     ("lenght" "length" nil :count 0)
+    ("machein" "Machine" nil :count 0)
     ("maintainance" "Maintenance" nil :count 0)
     ("maintainign" "maintaining" nil :count 0)
     ("makign" "making" nil :count 0)

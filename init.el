@@ -26,7 +26,6 @@
   :type 'boolean
   :group 'sb/emacs)
 
-;; A dark theme has better contrast and looks good with the TUI.
 (defcustom sb/theme 'doom-nord
   "Specify which Emacs theme to use."
   :type
@@ -133,31 +132,25 @@
 (elpaca `(,@elpaca-order))
 
 ;; These variables need to be set before loading `use-package'.
-(setq use-package-enable-imenu-support t)
+(setopt use-package-enable-imenu-support t)
 
-(elpaca
- elpaca-use-package
- ;; Enable use-package :ensure support for Elpaca.
- (elpaca-use-package-mode) (setq elpaca-use-package-by-default t))
+(elpaca elpaca-use-package (elpaca-use-package-mode) (setopt elpaca-use-package-by-default t))
 
 (cond
  ((eq sb/op-mode 'daemon)
-  (setq
+  (setopt
    use-package-always-demand t
    use-package-minimum-reported-time 0 ; Show everything
    use-package-verbose t))
  ((eq sb/op-mode 'standalone)
   (if (bound-and-true-p sb/debug-init-file)
-      (setq
-       debug-on-error nil
-       debug-on-event 'sigusr2
+      (setopt
+       debug-on-error nil debug-on-event 'sigusr2
        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
        use-package-verbose t
        use-package-minimum-reported-time 0 ; Show everything
        use-package-always-demand t)
-    (setq
-     use-package-always-defer t
-     use-package-expand-minimally t))))
+    (setopt use-package-always-defer t use-package-expand-minimally t))))
 
 (elpaca-wait)
 
@@ -198,10 +191,13 @@
 (use-package exec-path-from-shell
   :when (symbol-value 'sb/IS-LINUX)
   :init
-  (setq
-   exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY" "LSP_USE_PLISTS")
-   exec-path-from-shell-arguments nil)
+  (setopt
+   exec-path-from-shell-check-startup-files
+   nil
+   exec-path-from-shell-variables
+   '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY" "LSP_USE_PLISTS")
+   exec-path-from-shell-arguments
+   nil)
   (exec-path-from-shell-initialize))
 
 (use-package emacs
@@ -294,26 +290,21 @@
     (add-to-list 'completion-ignored-extensions exts))
 
   (when sb/EMACS28+
-    (setq
-     next-error-message-highlight t
-     read-minibuffer-restore-windows t
+    (setopt
+     next-error-message-highlight t read-minibuffer-restore-windows t
      ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
-     read-extended-command-predicate #'command-completion-default-include-p
-     ;; Type "y/n" instead of "yes"/"no", although it is not recommended to prevent from wrong
-     ;; answers being typed in a hurry.
-     use-short-answers t))
+     read-extended-command-predicate #'command-completion-default-include-p use-short-answers t))
 
   (when sb/EMACS29+
-    (setq
-     help-window-keep-selected t
-     find-sibling-rules
+    (setopt
+     help-window-keep-selected t find-sibling-rules
      '(("\\([^/]+\\)\\.c\\'" "\\1.h")
        ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
        ("\\([^/]+\\)\\.h\\'" "\\1.c")
        ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
 
   (when sb/IS-WINDOWS
-    (setq w32-get-true-file-attributes nil))
+    (setopt w32-get-true-file-attributes nil))
 
   ;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
   (tooltip-mode -1)
@@ -334,7 +325,7 @@
     (when (fboundp mode)
       (funcall mode 1)))
 
-  (setq
+  (setopt
    ;; Scroll settings from Doom Emacs
    scroll-preserve-screen-position t
    scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
@@ -361,7 +352,7 @@
 
   ;; Hide "When done with a buffer, type C-x 5" message
   (when (bound-and-true-p server-client-instructions)
-    (setq server-client-instructions nil))
+    (setopt server-client-instructions nil))
 
   (when (file-exists-p custom-file)
     (load custom-file 'noerror 'nomessage))
@@ -373,7 +364,6 @@
   (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
   :diminish visual-line-mode)
 
-;; Auto-refresh all buffers
 (use-package autorevert
   :ensure nil
   :hook (elpaca-after-init . global-auto-revert-mode)
@@ -384,7 +374,6 @@
   (global-auto-revert-non-file-buffers t)
   :diminish auto-revert-mode)
 
-;; Save minibuffer history across sessions
 (use-package savehist
   :ensure nil
   :hook (elpaca-after-init . savehist-mode)
@@ -419,7 +408,7 @@
 
 (use-package imenu
   :ensure nil
-  :after (:any markdown-mode org-mode yaml-mode yaml-ts-mode prog-mode)
+  :after (:any makefile-mode markdown-mode org-mode yaml-mode yaml-ts-mode prog-mode)
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 1000)
@@ -454,7 +443,7 @@
   :config
   ;; Abbreviate the home directory to "~/" to make it easy to read the actual file name.
   (unless sb/EMACS28+
-    (setq recentf-filename-handlers '(abbreviate-file-name)))
+    (setopt recentf-filename-handlers '(abbreviate-file-name)))
 
   ;; Use the true file name and not the symlink name
   (dolist (exclude
@@ -558,12 +547,11 @@
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   ;; Recommended to connect with Bash
   (setenv "SHELL" shell-file-name)
-  (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
+  (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
   :ensure nil
   :custom (whitespace-line-column sb/fill-column)
-  ;; (whitespace-action '(cleanup auto-cleanup))
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
@@ -588,7 +576,7 @@
   (ibuffer
    .
    (lambda ()
-     (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+     (setopt ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
      (unless (eq ibuffer-sorting-mode 'project-file-relative)
        (ibuffer-do-sort-by-project-file-relative))))
   :custom (ibuffer-project-use-cache t "Avoid calculating project root, use cache")
@@ -596,11 +584,9 @@
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-;; Immediately respawn the *scratch* buffer when it is killed
 (use-package immortal-scratch
   :hook (elpaca-after-init . immortal-scratch-mode))
 
-;; Helps to make the data in the "*scratch*" buffer persistent
 (use-package persistent-scratch
   :hook
   (elpaca-after-init
@@ -610,13 +596,10 @@
        (persistent-scratch-setup-default))))
   :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
-;; Windows of temporary buffers are shown as a popup window, and we can close them by typing "C-g".
-;; It is useful because it does not split frames.
 (use-package popwin
   :hook (elpaca-after-init . popwin-mode)
   :config (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config))
 
-;; `ace-window' replaces `other-window' by assigning each window a short, unique label.
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
   :custom (aw-minibuffer-flag t)
@@ -624,8 +607,6 @@
   (add-to-list 'aw-ignored-buffers "*toc*")
   (ace-window-display-mode 1))
 
-;; The keybinding will be hidden if we use Emacs with Tmux with its default prefix key of "C-b", and
-;; we will need to press twice.
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
   :custom (ajb-bs-configuration "files-and-scratch"))
@@ -675,7 +656,7 @@
   (dired-hide-details-hide-symlink-targets nil)
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
-    (setq dired-kill-when-opening-new-dired-buffer t)))
+    (setopt dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
   :ensure nil
@@ -692,32 +673,29 @@
   :config
   ;; Obsolete from Emacs 28+
   (unless sb/EMACS28+
-    (setq dired-bind-jump t))
+    (setopt dired-bind-jump t))
 
-  (setq dired-omit-files
-        (concat
-         dired-omit-files
-         "\\|^\\..*$" ; Hide all dotfiles
-         "\\|^.DS_Store\\'"
-         "\\|^.project\\(?:ile\\)?\\'"
-         "\\|^.\\(svn\\|git\\)\\'"
-         "\\|^.cache\\'"
-         "\\|^.ccls-cache\\'"
-         "\\|^__pycache__\\'"
-         "\\|^eln-cache\\'"
-         "\\|\\(?:\\.js\\)?\\.meta\\'"
-         "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+  (setopt
+   dired-omit-files
+   (concat
+    dired-omit-files
+    "\\|^\\..*$" ; Hide all dotfiles
+    "\\|^.DS_Store\\'"
+    "\\|^.project\\(?:ile\\)?\\'"
+    "\\|^.\\(svn\\|git\\)\\'"
+    "\\|^.cache\\'"
+    "\\|^.ccls-cache\\'"
+    "\\|^__pycache__\\'"
+    "\\|^eln-cache\\'"
+    "\\|\\(?:\\.js\\)?\\.meta\\'"
+    "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
-  ;; We can also configure `dired-omit-extensions'
-
-  ;; ":diminish dired-omit-mode" does not work
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
     "Remove 'Omit' from the modeline."
     (diminish 'dired-omit-mode)
     dired-mode-map))
 
-;; Narrow `dired' to match filter
 (use-package dired-narrow
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
@@ -837,7 +815,6 @@
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end)))))
 
-;; Provide context-dependent minibuffer actions similar to a content menu.
 (use-package embark
   :bind
   (([remap describe-bindings] . embark-bindings) ; "C-h b"
@@ -859,11 +836,19 @@
   (prefix-help-command #'embark-prefix-help-command)
   :config
   (with-eval-after-load "vertico"
-    (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export))))
+    (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export)))
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list
+   'display-buffer-alist
+   '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+     nil
+     (window-parameters (mode-line-format . none)))))
 
 ;; Supports exporting search results to a `grep-mode' buffer, on which you can use `wgrep'.
 (use-package embark-consult
-  :after (embark consult))
+  :after (embark consult)
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file information.
 (use-package marginalia
@@ -871,7 +856,7 @@
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  (setq marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
+  (setopt marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
@@ -884,10 +869,11 @@
   :after (consult flyspell)
   :bind ("C-c f l" . consult-flyspell)
   :config
-  (setq consult-flyspell-select-function
-        (lambda ()
-          (flyspell-correct-at-point)
-          (consult-flyspell))))
+  (setopt
+   consult-flyspell-select-function
+   (lambda ()
+     (flyspell-correct-at-point)
+     (consult-flyspell))))
 
 (use-package consult-flycheck
   :after (consult flycheck)
@@ -912,26 +898,36 @@
       (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-      (setq
-       ispell-program-name "hunspell"
-       ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
+      (setopt
+       ispell-program-name
+       "hunspell"
+       ispell-local-dictionary-alist
+       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+       ispell-hunspell-dictionary-alist
+       ispell-local-dictionary-alist
+       ispell-hunspell-dict-paths-alist
+       `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
    ((and (symbol-value 'sb/IS-LINUX) (executable-find "aspell"))
     (progn
-      (setq
-       ispell-program-name "aspell"
-       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))))
+      (setopt
+       ispell-program-name
+       "aspell"
+       ispell-extra-args
+       '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))))
    ((and (symbol-value 'sb/IS-WINDOWS) (executable-find "hunspell"))
     (progn
       (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-      (setq
-       ispell-program-name "hunspell"
-       ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))))
+      (setopt
+       ispell-program-name
+       "hunspell"
+       ispell-local-dictionary-alist
+       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+       ispell-hunspell-dictionary-alist
+       ispell-local-dictionary-alist
+       ispell-hunspell-dict-paths-alist
+       `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))))
 
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC"))
@@ -1041,9 +1037,8 @@
   :hook (elpaca-after-init . global-hl-todo-mode)
   :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
-  (setq
-   hl-todo-highlight-punctuation ":"
-   hl-todo-keyword-faces
+  (setopt
+   hl-todo-highlight-punctuation ":" hl-todo-keyword-faces
    (append
     '(("LATER" . "#d0bf8f")
       ("IMP" . "#7cb8bb")
@@ -1059,10 +1054,7 @@
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
 (use-package bm
-  :init
-  (setq
-   bm-verbosity-level 1
-   bm-modeline-display-total t)
+  :init (setopt bm-verbosity-level 1 bm-modeline-display-total t)
   :hook
   ((kill-emacs
     .
@@ -1147,20 +1139,17 @@
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
 
 (with-eval-after-load "grep"
-  (setq
-   grep-command "grep --color -irHn "
-   grep-highlight-matches t
-   grep-scroll-output t)
+  (setopt grep-command "grep --color -irHn " grep-highlight-matches t grep-scroll-output t)
 
   (when (executable-find "rg")
-    (setq grep-program "rg")
+    (setopt grep-program "rg")
     (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
 
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
 (when (executable-find "fd")
-  (setq find-program "fd"))
+  (setopt find-program "fd"))
 
 ;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze
 ;; Emacs for several minutes.
@@ -1307,11 +1296,12 @@
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
   :config
-  (setq electric-pair-inhibit-predicate
-        (lambda (c)
-          (if (char-equal c ?\")
-              t
-            (electric-pair-default-inhibit c))))
+  (setopt
+   electric-pair-inhibit-predicate
+   (lambda (c)
+     (if (char-equal c ?\")
+         t
+       (electric-pair-default-inhibit c))))
 
   (defvar sb/markdown-pairs '((?` . ?`))
     "Electric pairs for `markdown-mode'.")
@@ -1358,7 +1348,7 @@
 
   ;; These themes have their own styles for displaying flycheck info.
   (when (eq sb/modeline-theme 'doom-modeline)
-    (setq flycheck-mode-line nil))
+    (setopt flycheck-mode-line nil))
 
   (setq-default
    flycheck-markdown-markdownlint-cli-config
@@ -1412,9 +1402,11 @@
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :config
   (when (executable-find "tree-sitter")
-    (setq
-     indent-bars-treesit-support t
-     indent-bars-treesit-ignore-blank-lines-types '("module")
+    (setopt
+     indent-bars-treesit-support
+     t
+     indent-bars-treesit-ignore-blank-lines-types
+     '("module")
      indent-bars-treesit-scope
      '((python
         function_definition
@@ -1460,18 +1452,18 @@
   :config
   ;; Show docstring description for completion candidates in commands like `describe-function'.
   (when sb/EMACS28+
-    (setq completions-detailed t))
+    (setopt completions-detailed t))
 
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setq completion-styles '(orderless substring basic)))
+    (setopt completion-styles '(orderless substring basic)))
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
   ;; work. I also want substring matching for file names.
-  (setq completion-category-overrides '((file (styles basic substring partial-completion)))))
+  (setopt completion-category-overrides '((file (styles basic substring partial-completion)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
@@ -1591,8 +1583,6 @@
   :demand t)
 
 (use-package company-math
-  ;; :ensure math-symbols
-  ;; :ensure t
   :after (:all tex-mode company)
   :demand t)
 
@@ -1681,18 +1671,9 @@
    ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
    ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
    ;; `delete-dups'.
-   company-transformers
-   '(delete-dups
-     ;; company-sort-by-backend-importance
-     ;; company-sort-by-occurrence
-     company-sort-by-statistics
-     company-sort-prefer-same-case-prefix))
+   company-transformers '(delete-dups company-sort-by-statistics company-sort-prefer-same-case-prefix))
 
-  ;; (add-to-list 'company-transformers 'delete-dups)
-  ;; (add-to-list 'company-transformers 'company-sort-by-backend-importance)
-  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
-
-  ;; Ignore matches that consist solely of numbers from `company-dabbrev'
+  ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
   (push (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
@@ -1706,7 +1687,7 @@
       (setq company-backends
             '(company-files
               company-capf company-bibtex company-reftex-citations
-              (company-math-symbols-latex ; Math latex tags
+              company-math-symbols-latex ; Math latex tags
                company-latex-commands
                company-reftex-labels
                company-auctex-environments
@@ -1716,9 +1697,7 @@
                company-math-symbols-unicode
                company-auctex-symbols
                company-auctex-bibs
-               company-ispell
-               company-dict
-               company-dabbrev))))
+              company-ispell company-dict company-dabbrev)))
 
     (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
 
@@ -1782,7 +1761,6 @@
 
       (make-local-variable 'company-backends)
 
-      ;; https://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
       (setq company-backends
             '(company-files
               (company-capf
@@ -1911,7 +1889,7 @@
   (lsp-use-plists t)
   :config
   (when (or (display-graphic-p) (daemonp))
-    (setq lsp-modeline-code-actions-segments '(count icon name)))
+    (setopt lsp-modeline-code-actions-segments '(count icon name)))
 
   (dolist (ignore-dirs
            '("/build\\'"
@@ -2019,7 +1997,7 @@
 
 (use-package subword
   :ensure nil
-  :hook (prog-mode . subword-mode)
+  :hook ((LaTeX-mode prog-mode) . subword-mode)
   :diminish)
 
 ;; Highlight symbol under point
@@ -2122,9 +2100,7 @@
       c-set-style "cc-mode"
       c-basic-offset 2
       c-auto-newline nil ; Disable electric indentation and on-type formatting
-      ;; c-electric-brace nil
       c-electric-flag nil
-      ;; c-electric-indent nil
       c-enable-auto-newline nil
       c-syntactic-indentation nil)
      (lsp-deferred)))
@@ -2141,9 +2117,7 @@
       c-ts-mode-indent-offset 2
       c-ts-mode-toggle-comment-style -1
       c-auto-newline nil ; Disable electric indentation and on-type formatting
-      ;; c-electric-brace nil
       c-electric-flag nil
-      ;; c-electric-indent nil
       c-enable-auto-newline nil
       c-syntactic-indentation nil)
      (lsp-deferred)))
@@ -2210,9 +2184,7 @@
 (use-package cperl-mode
   :ensure nil
   :mode "latexmkrc\\'"
-  :config
-  ;; Prefer CPerl mode to Perl mode
-  (fset 'perl-mode 'cperl-mode))
+  :config (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
   :ensure nil
@@ -2277,7 +2249,7 @@
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
-     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setopt lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred))))
 
 (use-package yaml-imenu
@@ -2353,7 +2325,7 @@
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
-     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setopt lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
@@ -2373,7 +2345,7 @@
    .
    (lambda ()
      (make-local-variable 'js-indent-level)
-     (setq js-indent-level 2)
+     (setopt js-indent-level 2)
      (lsp-deferred))))
 
 (use-package org
@@ -2410,16 +2382,18 @@
   ;; doesn't give any hint on which line the broken link actually is.
   (org-export-with-broken-links 'mark)
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
+  (org-imenu-depth 4)
   :config
   (require 'ox-latex)
   (add-to-list 'org-latex-packages-alist '("" "listings"))
   (add-to-list 'org-latex-packages-alist '("" "color"))
   (add-to-list 'org-latex-packages-alist '("" "minted"))
 
-  (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setopt
+   org-latex-pdf-process
+   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
   ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance feels
   ;; better with the mode disabled.
@@ -2443,7 +2417,6 @@
    ("M-}" . org-forward-element)
    ("C-c C-," . org-insert-structure-template)))
 
-;; Make invisible parts of Org elements appear visible
 (use-package org-appear
   :ensure (:host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode)
@@ -2472,7 +2445,17 @@
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
 (use-package tex
-  :ensure auctex
+  :ensure
+  (auctex
+   :repo "https://git.savannah.gnu.org/git/auctex.git"
+   :branch "main"
+   :pre-build (("make" "elpa"))
+   :build (:not elpaca--compile-info) ;; Make will take care of this step
+   :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
+   :version
+   (lambda (_)
+     (require 'tex-site)
+     AUCTeX-version))
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
@@ -2508,7 +2491,6 @@
     (unbind-key "C-j" LaTeX-mode-map)
     ;; Disable `LaTeX-insert-item' in favor of `imenu'
     (unbind-key "C-c C-j" LaTeX-mode-map)
-
     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map)))
 
 (use-package bibtex
@@ -2555,8 +2537,7 @@
    ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c c" . citre-create-tags-file)
-   ("C-x c u" . citre-update-this-tags-file)
-   ("C-x c U" . citre-update-tags-file)
+   ("C-x c u" . citre-update-tags-file)
    ("C-x c e" . citre-edit-tags-file-recipe))
   :custom
   (citre-default-create-tags-file-location 'in-dir)
@@ -2731,6 +2712,13 @@ or the major mode is not in `sb/skippable-modes'."
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t))
 
+(use-package nerd-icons
+  :ensure (:host github :repo "rainstormstudio/nerd-icons.el")
+  :when (display-graphic-p)
+  :custom
+  (nerd-icons-color-icons nil)
+  (nerd-icons-scale-factor 0.9))
+
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. However, it does not
 ;; show lsp status, flycheck information, and Python virtualenv information on the modeline. The
 ;; package is not being actively maintained. Inspired by
@@ -2826,9 +2814,10 @@ PAD can be left (`l') or right (`r')."
   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
   (centaur-tabs-set-close-button nil "I do not use the mouse")
   (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
-  (centaur-tabs-set-icons nil)
   (centaur-tabs-set-bar 'under)
   :config
+  (when (display-graphic-p)
+    (setopt centaur-tab-style "wave" centaur-tabs-set-icons t centaur-tabs-icon-type 'nerd-icons))
   ;; Make the headline face match `centaur-tabs-default' face for an uniform face
   (centaur-tabs-headline-match))
 
