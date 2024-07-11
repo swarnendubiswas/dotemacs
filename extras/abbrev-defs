@@ -1,6 +1,8 @@
 ;;-*-coding: utf-8;-*-
 (define-abbrev-table 'LaTeX-mode-abbrev-table
   '(
+    ("aentored" "mentored" nil :count 0)
+    ("evaluted" "evaluated" nil :count 0)
     ("insturction" "instruction" nil :count 0)
     ("miscellenaouse" "miscellaneous" nil :count 0)
     ("occurences" "occurrences" nil :count 0)

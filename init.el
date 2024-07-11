@@ -1079,7 +1079,10 @@
 ;;   :diminish)
 
 (use-package colorful-mode
-  :hook ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode) . colorful-mode)
+  :hook
+  ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode helpful-mode)
+   .
+   colorful-mode)
   :diminish)
 
 ;; Temporarily highlight the region involved in certain operations like `kill-line' and `yank'.
@@ -1147,9 +1150,6 @@
 
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
-
-(when (executable-find "fd")
-  (setopt find-program "fd"))
 
 ;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze
 ;; Emacs for several minutes.
@@ -1680,30 +1680,32 @@
 
   (progn
     (defun sb/company-latex-mode ()
-      "Add backends for `latex-mode' completion in company mode."
       (make-local-variable 'company-backends)
 
-      ;; `company-capf' does not pass to later backends with Texlab, so we have it last
+      ;; `company-capf' does not pass to later backends with Texlab, so it makes it difficult to
+      ;; complete non-LaTeX commands (e.g. words) which is the majority. We therefore exclude it
+      ;; from `company-backends' and invoke it on demand.
       (setq company-backends
             '(company-files
-              company-capf company-bibtex company-reftex-citations
+              company-bibtex
+              company-reftex-citations
               company-math-symbols-latex ; Math latex tags
-               company-latex-commands
-               company-reftex-labels
-               company-auctex-environments
-               company-auctex-macros
-               company-auctex-labels
-               ;; Math unicode symbols and sub(super)scripts
-               company-math-symbols-unicode
-               company-auctex-symbols
-               company-auctex-bibs
-              company-ispell company-dict company-dabbrev)))
+              company-latex-commands
+              company-reftex-labels
+              company-auctex-environments
+              company-auctex-macros
+              company-auctex-labels
+              company-math-symbols-unicode ; Math unicode symbols and sub(super)scripts
+              company-auctex-symbols
+              company-auctex-bibs
+              company-ispell
+              company-dict
+              company-dabbrev)))
 
     (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
 
   (progn
     (defun sb/company-org-mode ()
-      "Add backends for org completion in company mode."
       (set
        (make-local-variable 'company-backends)
        '(company-files company-org-block company-ispell company-dict company-dabbrev)))
@@ -1726,7 +1728,6 @@
 
   (progn
     (defun sb/company-yaml-mode ()
-      "Add backends for `yaml-mode' completion in company mode."
       (make-local-variable 'company-backends)
       (setq company-backends
             '(company-files
@@ -1742,7 +1743,6 @@
 
   (progn
     (defun sb/company-html-mode ()
-      "Add backends for html completion in company mode."
       (setq-local company-minimum-prefix-length 2)
 
       (set
@@ -1755,7 +1755,6 @@
 
   (progn
     (defun sb/company-prog-mode ()
-      "Add backends for `prog-mode' completion in company mode."
       ;; Typing short prefixes help with faster completion and a more responsive UI
       (setq-local company-minimum-prefix-length 2)
 
@@ -1781,7 +1780,6 @@
 
   (progn
     (defun sb/company-elisp-mode ()
-      "Add backends for `emacs-lisp-mode' completion in company mode."
       ;; Typing short prefixes help with faster completion and a more responsive UI
       (setq-local company-minimum-prefix-length 2)
 
@@ -1957,6 +1955,7 @@
    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory)))
 
 (use-package lsp-grammarly
+  :after lsp-mode
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
   (lsp-grammarly-suggestions-oxford-comma t)
@@ -2000,9 +1999,9 @@
   :hook ((LaTeX-mode prog-mode) . subword-mode)
   :diminish)
 
-;; Highlight symbol under point
+;; Highlight symbol under point for non-LSP major modes, use LSP for others
 (use-package symbol-overlay
-  :hook ((prog-mode html-mode html-ts-mode yaml-ts-mode yaml-mode conf-mode) . symbol-overlay-mode)
+  :hook ((elisp-mode lisp-data-mode conf-mode) . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
@@ -2127,7 +2126,8 @@
    :map c++-ts-mode-map ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun)))
 
 (use-package cuda-mode
-  :mode (("\\.cu\\'" . c++-mode) ("\\.cuh\\'" . c++-mode)))
+  :mode ("\\.cu\\'" . cuda-mode)
+  :mode ("\\.cuh\\'" . cuda-mode))
 
 (use-package opencl-c-mode
   :ensure (:host github :repo "salmanebah/opencl-mode")
@@ -2581,7 +2581,10 @@
     sh-mode
     bash-ts-mode
     java-mode
-    java-ts-mode)
+    java-ts-mode
+    org-mode
+    markdown-mode
+    markdown-ts-mode)
    . breadcrumb-mode))
 
 (defun sb/save-all-buffers ()
@@ -2942,6 +2945,20 @@ PAD can be left (`l') or right (`r')."
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
   :hook (ssh-config-mode . turn-on-font-lock))
+
+(add-to-list 'display-buffer-alist '("\\*Warnings*" (display-buffer-at-bottom) (window-height . 8)))
+(add-to-list 'display-buffer-alist '("\\*Help" (display-buffer-same-window)))
+(add-to-list 'display-buffer-alist '("*Async Shell Command*" display-buffer-no-window (nil)))
+(add-to-list
+ 'display-buffer-alist
+ '("\\*Compilation\\*"
+   display-buffer-in-side-window
+   (side . bottom)
+   (slot . 0)
+   (window-height . fit-window-to-buffer)
+   (preserve-size . (nil . t))
+   (no-other-window . t)
+   (no-delete-other-windows . t)))
 
 (add-hook
  'elpaca-after-init-hook
