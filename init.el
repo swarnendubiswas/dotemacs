@@ -202,10 +202,7 @@
 
 (use-package emacs
   :ensure nil
-  :hook
-  ((elpaca-after-init . garbage-collect)
-   (prog-mode . auto-fill-mode)
-   (elpaca-after-init . save-place-mode))
+  :hook ((elpaca-after-init . garbage-collect) (elpaca-after-init . save-place-mode))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -2519,6 +2516,16 @@
   :ensure (:host github :repo "oantolin/math-delimiters")
   :after tex
   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
+
+(use-package citar
+  :hook (LaTeX-mode . citar-capf-setup)
+  :custom
+  (citar-bibliography
+   '((expand-file-name "prospar-workspace/references/references.bib" sb/user-home-directory))))
+
+(use-package citar-embark
+  :after (citar embark)
+  :config (citar-embark-mode))
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
