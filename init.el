@@ -21,7 +21,7 @@
   :type '(radio (const :tag "daemon" daemon) (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file nil
+(defcustom sb/debug-init-file t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -1369,7 +1369,6 @@
   :hook
   ((format-all-mode . format-all-ensure-formatter)
    ((markdown-mode markdown-ts-mode) . format-all-mode))
-  :bind (:map markdown-mode-map ("C-x f" . format-all-buffer))
   :config
   (setq-default format-all-formatters
                 '(("Assembly" asmfmt)
@@ -1392,6 +1391,8 @@
                   ("Shell" (shfmt "-i" "4" "-ci"))
                   ("XML" tidy)
                   ("YAML" prettier "--print-width" "100")))
+  (with-eval-after-load "markdown-mode"
+    (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   :diminish)
 
 (use-package indent-bars
@@ -1882,6 +1883,7 @@
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
+  (lsp-auto-register-remote-clients nil)
   :config
   (when (or (display-graphic-p) (daemonp))
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
@@ -2460,6 +2462,7 @@
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
    ;; (TeX-update-style . rainbow-delimiters-mode)
+   (LaTeX-mode . TeX-source-correlate-mode) ; Jump between editor and pdf viewer
    (LaTeX-mode . lsp-deferred))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
@@ -2488,7 +2491,12 @@
     (unbind-key "C-j" LaTeX-mode-map)
     ;; Disable `LaTeX-insert-item' in favor of `imenu'
     (unbind-key "C-c C-j" LaTeX-mode-map)
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map)))
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+
+  (when (executable-find "okular")
+    (setq
+     TeX-view-program-list '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+     TeX-view-program-selection '((output-pdf "Okular")))))
 
 (use-package bibtex
   :ensure nil
