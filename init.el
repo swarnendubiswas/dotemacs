@@ -862,16 +862,6 @@
   :ensure (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
 
-(use-package consult-flyspell
-  :after (consult flyspell)
-  :bind ("C-c f l" . consult-flyspell)
-  :config
-  (setopt
-   consult-flyspell-select-function
-   (lambda ()
-     (flyspell-correct-at-point)
-     (consult-flyspell))))
-
 (use-package consult-flycheck
   :after (consult flycheck)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
@@ -946,25 +936,10 @@
   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
-;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
-;; Running `flyspell-buffer' on an entire buffer can be slow.
-(use-package flyspell
-  :ensure nil
-  :hook ((prog-mode . flyspell-prog-mode) (text-mode . flyspell-mode))
-  :bind ("C-c f b" . flyspell-buffer)
-  :custom
-  (flyspell-abbrev-p t "Add corrections to abbreviation table")
-  (flyspell-issue-message-flag nil)
-  (flyspell-issue-welcome-flag nil)
-  :diminish)
-
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
-(use-package flyspell-correct
-  :after flyspell
-  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-at-point) ("C-," . flyspell-correct-previous)))
-
+;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
 ;; the entire buffer.
 (use-package jinx
@@ -1200,6 +1175,7 @@
   (transient-bind-q-to-quit))
 
 (use-package magit
+  :after transient
   :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
   :custom
   ;; Open the status buffer in a full frame
@@ -1393,6 +1369,8 @@
                   ("YAML" prettier "--print-width" "100")))
   (with-eval-after-load "markdown-mode"
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
+  (with-eval-after-load "latex"
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
   :diminish)
 
 (use-package indent-bars
@@ -2139,10 +2117,11 @@
   ((cmake-mode cmake-ts-mode)
    .
    (lambda ()
-     (when (fboundp 'flyspell-mode)
-       (flyspell-mode -1))
+     ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
+     (make-local-variable 'lsp-disabled-clients)
+     (setopt lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred))))
 
 (use-package python
@@ -2243,8 +2222,6 @@
    .
    (lambda ()
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
-     (when (fboundp 'flyspell-mode)
-       (flyspell-mode -1))
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
@@ -2319,8 +2296,6 @@
    .
    (lambda ()
      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
-     (when (fboundp 'flyspell-mode)
-       (flyspell-mode -1))
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
@@ -2490,8 +2465,7 @@
   (with-eval-after-load "latex"
     (unbind-key "C-j" LaTeX-mode-map)
     ;; Disable `LaTeX-insert-item' in favor of `imenu'
-    (unbind-key "C-c C-j" LaTeX-mode-map)
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+    (unbind-key "C-c C-j" LaTeX-mode-map))
 
   (when (executable-find "okular")
     (setq
@@ -2533,7 +2507,8 @@
 
 (use-package citar-embark
   :after (citar embark)
-  :config (citar-embark-mode))
+  :config (citar-embark-mode)
+  :diminish)
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
 ;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
@@ -2820,7 +2795,7 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
 
 (use-package centaur-tabs
-  :hook (elpaca-after-init . centaur-tabs-mode)
+  :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
    ("C-<tab>" . centaur-tabs-forward-tab)
@@ -2835,7 +2810,7 @@ PAD can be left (`l') or right (`r')."
   (centaur-tabs-set-bar 'under)
   :config
   (when (display-graphic-p)
-    (setopt centaur-tab-style "wave" centaur-tabs-set-icons t centaur-tabs-icon-type 'nerd-icons))
+    (setopt centaur-tabs-set-icons t centaur-tabs-icon-type 'nerd-icons))
   ;; Make the headline face match `centaur-tabs-default' face for an uniform face
   (centaur-tabs-headline-match))
 
@@ -2893,6 +2868,7 @@ PAD can be left (`l') or right (`r')."
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 (unbind-key "C-x f") ; Bound to `set-fill-column'
+(unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
 
 (bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
 
@@ -2956,24 +2932,9 @@ PAD can be left (`l') or right (`r')."
 
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-  :mode ("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
   :hook (ssh-config-mode . turn-on-font-lock))
-
-(add-to-list 'display-buffer-alist '("\\*Warnings*" (display-buffer-at-bottom) (window-height . 8)))
-(add-to-list 'display-buffer-alist '("\\*Help" (display-buffer-same-window)))
-(add-to-list 'display-buffer-alist '("*Async Shell Command*" display-buffer-no-window (nil)))
-(add-to-list
- 'display-buffer-alist
- '("\\*Compilation\\*"
-   display-buffer-in-side-window
-   (side . bottom)
-   (slot . 0)
-   (window-height . fit-window-to-buffer)
-   (preserve-size . (nil . t))
-   (no-other-window . t)
-   (no-delete-other-windows . t)))
 
 (add-hook
  'elpaca-after-init-hook
