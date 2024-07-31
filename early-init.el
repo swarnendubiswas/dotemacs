@@ -112,7 +112,7 @@
   (cond
    ((string= (system-name) "inspiron-7572")
     (progn
-      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 230)
+      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 210)
       (set-face-attribute 'mode-line nil :height 160)
       (set-face-attribute 'mode-line-inactive nil :height 160)))
 

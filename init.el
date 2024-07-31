@@ -154,6 +154,9 @@
 
 (elpaca-wait)
 
+(with-eval-after-load "bind-key"
+  (bind-key "C-c d k" #'describe-personal-keybindings))
+
 ;; Check "use-package-keywords.org" for a suggested order of `use-package' keywords.
 
 (use-package diminish
@@ -542,8 +545,7 @@
   ;; Include this directory in $PATH on remote
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-  ;; Recommended to connect with Bash
-  (setenv "SHELL" shell-file-name)
+  (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
   (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
@@ -596,6 +598,18 @@
 (use-package popwin
   :hook (elpaca-after-init . popwin-mode)
   :config (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config))
+
+(use-package avy
+  :bind
+  (("C-\\" . avy-goto-word-1)
+   ("C-'" . avy-goto-char-timer)
+   ("C-/" . avy-goto-line)
+   ("C-M-c" . avy-copy-line)
+   ("C-M-m" . avy-move-line)
+   :map isearch-mode-map
+   ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
+   ;; visible `isearch' candidates.
+   ("C-'" . avy-isearch)))
 
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
@@ -701,6 +715,33 @@
   :ensure (:host github :repo "karthink/dired-hist")
   :hook (dired-mode . dired-hist-mode)
   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+
+(use-package project
+  :bind
+  (("<f5>" . project-switch-project)
+   ("<f6>" . project-find-file)
+   :map
+   project-prefix-map
+   ("f" . project-or-external-find-file)
+   ("b" . project-switch-to-buffer)
+   ("d" . project-dired)
+   ("v" . project-vc-dir)
+   ("c" . project-compile)
+   ("k" . project-kill-buffers)
+   ("g" . project-find-regexp)
+   ("r" . project-query-replace-regexp))
+  :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
+
+;;(with-eval-after-load "project"
+;;  (debug))
+
+(use-package project-x
+  :ensure (:host github :repo "karthink/project-x")
+  :after project
+  :demand t
+  :config (project-x-mode 1))
+
+(elpaca-wait)
 
 (use-package vertico
   :ensure
@@ -814,7 +855,8 @@
 
 (use-package embark
   :bind
-  (([remap describe-bindings] . embark-bindings) ; "C-h b"
+  ( ;; "C-h b" lists all the bindings available in a buffer
+   ([remap describe-bindings] . embark-bindings)
    ("C-`" . embark-act)
    ;; ("C-`" . embark-dwim)
    :map
@@ -944,7 +986,7 @@
 ;; the entire buffer.
 (use-package jinx
   :when (symbol-value 'sb/IS-LINUX)
-  :hook (text-mode . jinx-mode)
+  :hook ((text-mode conf-mode prog-mode) . jinx-mode)
   :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
   :custom (jinx-languages "en_US")
   :diminish)
@@ -1076,29 +1118,6 @@
   :hook (prog-mode . ws-butler-mode)
   :diminish)
 
-;; Both project.el and projectile are unable to remember remote projects.
-(use-package project
-  :bind
-  (("<f5>" . project-switch-project)
-   ("<f6>" . project-find-file)
-   :map
-   project-prefix-map
-   ("f" . project-or-external-find-file)
-   ("b" . project-switch-to-buffer)
-   ("d" . project-dired)
-   ("v" . project-vc-dir)
-   ("c" . project-compile)
-   ("k" . project-kill-buffers)
-   ("g" . project-find-regexp)
-   ("r" . project-query-replace-regexp))
-  :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
-
-(use-package project-x
-  :ensure (:host github :repo "karthink/project-x")
-  :after project
-  :demand t
-  :config (project-x-mode 1))
-
 (use-package isearch
   :ensure nil
   :bind
@@ -1141,18 +1160,6 @@
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
-
-(use-package avy
-  :bind
-  (("C-\\" . avy-goto-word-1)
-   ("C-'" . avy-goto-char-timer)
-   ("C-/" . avy-goto-line)
-   ("C-M-c" . avy-copy-line)
-   ("C-M-m" . avy-move-line)
-   :map isearch-mode-map
-   ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
-   ;; visible `isearch' candidates.
-   ("C-'" . avy-isearch)))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
 ;; and replacements as you type.
@@ -1232,10 +1239,8 @@
    .
    (lambda ()
      (git-commit-save-message)
-     (git-commit-turn-on-auto-fill)
-     (git-commit-turn-on-flyspell))))
+     (git-commit-turn-on-auto-fill))))
 
-;; Use the minor mode `smerge-mode' to move between conflicts and resolve them.
 (use-package smerge-mode
   :ensure nil
   :bind
@@ -1789,7 +1794,6 @@
    ("I" . lsp-goto-implementation)
    ("t" . lsp-goto-type-definition)
    ("r" . lsp-rename)
-   ("h" . lsp-symbol-highlight)
    ("f" . lsp-format-buffer)
    ("x" . lsp-execute-code-action)
    ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
@@ -1842,7 +1846,7 @@
   (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
   ;; I am using symbol-overlay for languages that do not have a server
-  ;; (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-symbol-highlighting nil)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
@@ -1953,7 +1957,6 @@
         #s(hash-table
            size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
-;; `lsp-tex' provides minimal settings for Texlab, `lsp-latex' supports full features of Texlab.
 (use-package lsp-latex
   :hook
   (LaTeX-mode
@@ -1976,9 +1979,8 @@
   :hook ((LaTeX-mode prog-mode) . subword-mode)
   :diminish)
 
-;; Highlight symbol under point for non-LSP major modes, use LSP for others
 (use-package symbol-overlay
-  :hook ((elisp-mode lisp-data-mode conf-mode) . symbol-overlay-mode)
+  :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
@@ -2595,98 +2597,6 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
-(defcustom sb/skippable-buffers
-  '("TAGS"
-    "*Messages*"
-    "*Backtrace*"
-    "*scratch*"
-    "*company-documentation*"
-    "*Help*"
-    "*Packages*"
-    "*prettier (local)*"
-    "*emacs*"
-    "*Warnings*"
-    "*Compile-Log* *lsp-log*"
-    "*pyright*"
-    "*texlab::stderr*"
-    "*texlab*"
-    "*perl-language-server*"
-    "*perl-language-server::stderr*"
-    "*json-ls*"
-    "*json-ls::stderr*"
-    "*xmlls*"
-    "*xmlls::stderr*"
-    "*pyright::stderr*"
-    "*yamlls*"
-    "*yamlls::stderr*"
-    "*jdtls*"
-    "*jdtls::stderr*"
-    "*clangd::stderr*"
-    "*shfmt errors*")
-  "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
-  :type '(repeat string)
-  :group 'sb/emacs)
-
-(defun sb/get-buffer-major-mode (buffer-or-string)
-  "Return the major mode associated with BUFFER-OR-STRING."
-  (with-current-buffer buffer-or-string
-    major-mode))
-
-(defcustom sb/skippable-modes
-  '(dired-mode
-    fundamental-mode
-    helpful-mode
-    special-mode
-    lsp-log-io-mode
-    help-mode
-    magit-status-mode
-    magit-process-mode
-    magit-diff-mode
-    tags-table-mode
-    compilation-mode
-    flycheck-verify-mode
-    ibuffer-mode
-    bs-mode
-    ediff-meta-mode)
-  "List of major modes to skip over when calling `change-buffer'."
-  :type '(repeat string)
-  :group 'sb/emacs)
-
-(defun sb/change-buffer (change-buffer)
-  "Call CHANGE-BUFFER.
-Keep trying until current buffer is not in `sb/skippable-buffers'
-or the major mode is not in `sb/skippable-modes'."
-  (let ((initial (current-buffer)))
-    (funcall change-buffer)
-    (let ((first-change (current-buffer)))
-      (catch 'loop
-        (while (or (member (buffer-name) sb/skippable-buffers)
-                   (member (sb/get-buffer-major-mode (buffer-name)) sb/skippable-modes))
-          (funcall change-buffer)
-          (when (eq (current-buffer) first-change)
-            (switch-to-buffer initial)
-            (throw 'loop t)))))))
-
-(defun sb/next-buffer ()
-  "Variant of `next-buffer' that skips `sb/skippable-buffers'."
-  (interactive)
-  (sb/change-buffer 'next-buffer))
-
-(defun sb/previous-buffer ()
-  "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
-  (interactive)
-  (sb/change-buffer 'previous-buffer))
-
-(defun sb/get-derived-modes (mode)
-  "Return a list of the ancestor modes that MODE is derived from."
-  (interactive)
-  (let ((modes ())
-        (parent nil))
-    (while (setq parent (get mode 'derived-mode-parent))
-      (push parent modes)
-      (setq mode parent))
-    (setq modes (nreverse modes))))
-
 (progn
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
@@ -2859,11 +2769,7 @@ PAD can be left (`l') or right (`r')."
  ("C-M-b" . backward-sexp)
  ("C-M-f" . forward-sexp)
  ("C-M-k" . kill-sexp)
- ("C-M-@" . mark-sexp)
-
- ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the keybindings for the
- ;; major and the minor modes.
- ("C-c d k" . describe-personal-keybindings))
+ ("C-M-@" . mark-sexp))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
