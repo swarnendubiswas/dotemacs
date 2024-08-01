@@ -68,91 +68,54 @@
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
 
-(defvar elpaca-installer-version 0.7)
-(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-(defvar elpaca-order
-  '(elpaca
-    :repo "https://github.com/progfolio/elpaca.git"
-    :ref nil
-    :depth 1
-    :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-    :build (:not elpaca--activate-package)))
-(let* ((repo (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
-  (add-to-list
-   'load-path
-   (if (file-exists-p build)
-       build
-     repo))
-  (unless (file-exists-p repo)
-    (make-directory repo t)
-    (when (< emacs-major-version 28)
-      (require 'subr-x))
-    (condition-case-unless-debug err
-        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop
-                   (apply #'call-process
-                          `("git" nil ,buffer t "clone" ,@
-                            (when-let ((depth (plist-get order :depth)))
-                              (list (format "--depth=%d" depth) "--no-single-branch"))
-                            ,(plist-get order :repo) ,repo))))
-                 ((zerop
-                   (call-process "git" nil buffer t "checkout" (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop
-                   (call-process emacs
-                                 nil
-                                 buffer
-                                 nil
-                                 "-Q"
-                                 "-L"
-                                 "."
-                                 "--batch"
-                                 "--eval"
-                                 "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
-          (progn
-            (message "%s" (buffer-string))
-            (kill-buffer buffer))
-          (error
-           "%s"
-           (with-current-buffer buffer
-             (buffer-string))))
-      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-  (unless (require 'elpaca-autoloads nil t)
-    (require 'elpaca)
-    (elpaca-generate-autoloads "elpaca" repo)
-    (load "./elpaca-autoloads")))
-(add-hook 'after-init-hook #'elpaca-process-queues)
-(elpaca `(,@elpaca-order))
+;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub.
+(setq
+ straight-build-dir
+ (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
+ ;; Do not check packages on startup to reduce load time
+ straight-check-for-modifications '(check-on-save find-when-checking)
+ straight-use-package-by-default t
+ ;; There is no need to download the whole Git history, and a single branch often suffices.
+ straight-vc-git-default-clone-depth '(1 single-branch))
+
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el"
+                         (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent
+         'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 ;; These variables need to be set before loading `use-package'.
-(setopt use-package-enable-imenu-support t)
-
-(elpaca elpaca-use-package (elpaca-use-package-mode) (setopt elpaca-use-package-by-default t))
+(setq use-package-enable-imenu-support t)
+(straight-use-package
+ '(use-package :source
+    melpa))
 
 (cond
  ((eq sb/op-mode 'daemon)
-  (setopt
+  (setq
    use-package-always-demand t
    use-package-minimum-reported-time 0 ; Show everything
    use-package-verbose t))
  ((eq sb/op-mode 'standalone)
   (if (bound-and-true-p sb/debug-init-file)
-      (setopt
-       debug-on-error nil debug-on-event 'sigusr2
+      (setq
+       debug-on-error nil
+       debug-on-event 'sigusr2
        use-package-compute-statistics t ; Use "M-x use-package-report" to see results
        use-package-verbose t
        use-package-minimum-reported-time 0 ; Show everything
        use-package-always-demand t)
-    (setopt use-package-always-defer t use-package-expand-minimally t))))
-
-(elpaca-wait)
+    (setq
+     use-package-always-defer t
+     use-package-expand-minimally t))))
 
 (with-eval-after-load "bind-key"
   (bind-key "C-c d k" #'describe-personal-keybindings))
@@ -166,25 +129,6 @@
   :demand t
   :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-(progn
-  (unload-feature 'eldoc t) ;; Unload built-in eldoc
-  (setq custom-delayed-init-variables '())
-  (defvar global-eldoc-mode nil)
-  (elpaca
-   eldoc (require 'eldoc) (global-eldoc-mode 1)
-   (setopt eldoc-area-prefer-doc-buffer t) ; Disable popups
-   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
-   ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
-   ;; is on a variable with a multiline docstring, but then it cuts of useful information.
-   ;; (setopt eldoc-echo-area-use-multiline-p nil)
-   ;; Allow eldoc to trigger after completions
-   (with-eval-after-load "company"
-     (eldoc-add-command
-      'company-complete-selection 'company-complete-common 'company-capf 'company-abort))
-   (diminish 'eldoc-mode)))
-
-(elpaca-wait)
-
 ;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
 (defcustom sb/private-file (no-littering-expand-etc-file-name "private.el")
   "File to include private information."
@@ -194,18 +138,14 @@
 (use-package exec-path-from-shell
   :when (symbol-value 'sb/IS-LINUX)
   :init
-  (setopt
-   exec-path-from-shell-check-startup-files
-   nil
-   exec-path-from-shell-variables
-   '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY" "LSP_USE_PLISTS")
-   exec-path-from-shell-arguments
-   nil)
+  (setq
+   exec-path-from-shell-check-startup-files nil
+   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY" "LSP_USE_PLISTS")
+   exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
 (use-package emacs
-  :ensure nil
-  :hook ((elpaca-after-init . garbage-collect) (elpaca-after-init . save-place-mode))
+  :hook ((emacs-startup . garbage-collect) (emacs-startup . save-place-mode))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
@@ -294,21 +234,24 @@
     (add-to-list 'completion-ignored-extensions exts))
 
   (when sb/EMACS28+
-    (setopt
-     next-error-message-highlight t read-minibuffer-restore-windows t
+    (setq
+     next-error-message-highlight t
+     read-minibuffer-restore-windows t
      ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
-     read-extended-command-predicate #'command-completion-default-include-p use-short-answers t))
+     read-extended-command-predicate #'command-completion-default-include-p
+     use-short-answers t))
 
   (when sb/EMACS29+
-    (setopt
-     help-window-keep-selected t find-sibling-rules
+    (setq
+     help-window-keep-selected t
+     find-sibling-rules
      '(("\\([^/]+\\)\\.c\\'" "\\1.h")
        ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
        ("\\([^/]+\\)\\.h\\'" "\\1.c")
        ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
 
   (when sb/IS-WINDOWS
-    (setopt w32-get-true-file-attributes nil))
+    (setq w32-get-true-file-attributes nil))
 
   ;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
   (tooltip-mode -1)
@@ -329,10 +272,11 @@
     (when (fboundp mode)
       (funcall mode 1)))
 
-  (setopt
+  (setq
    ;; Scroll settings from Doom Emacs
    scroll-preserve-screen-position t
-   scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
+   scroll-margin
+   5 ; Add margin lines when scrolling vertically to have a sense of continuity
    scroll-conservatively 101
    ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
    auto-window-vscroll nil)
@@ -340,7 +284,8 @@
   ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
   ;; buffer-local variable's default value.
   (setq-default
-   cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+   cursor-in-non-selected-windows
+   nil ; Hide the cursor in inactive windows
    fill-column sb/fill-column
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
@@ -356,7 +301,7 @@
 
   ;; Hide "When done with a buffer, type C-x 5" message
   (when (bound-and-true-p server-client-instructions)
-    (setopt server-client-instructions nil))
+    (setq server-client-instructions nil))
 
   (when (file-exists-p custom-file)
     (load custom-file 'noerror 'nomessage))
@@ -369,8 +314,8 @@
   :diminish visual-line-mode)
 
 (use-package autorevert
-  :ensure nil
-  :hook (elpaca-after-init . global-auto-revert-mode)
+  :straight (:type built-in)
+  :hook (emacs-startup . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
@@ -379,8 +324,8 @@
   :diminish auto-revert-mode)
 
 (use-package savehist
-  :ensure nil
-  :hook (elpaca-after-init . savehist-mode)
+  :straight (:type built-in)
+  :hook (emacs-startup . savehist-mode)
   :custom
   (savehist-additional-variables
    '(savehist-minibuffer-history-variables
@@ -397,8 +342,8 @@
      regexp-search-ring)))
 
 (use-package abbrev
-  :ensure nil
-  :hook (elpaca-after-init . abbrev-mode)
+  :straight (:type built-in)
+  :hook (emacs-startup . abbrev-mode)
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
   (save-abbrevs 'silently)
@@ -406,12 +351,12 @@
 
 ;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c".
 (use-package so-long
-  :ensure nil
+  :straight (:type built-in)
   :when sb/EMACS28+
-  :hook (elpaca-after-init . global-so-long-mode))
+  :hook (emacs-startup . global-so-long-mode))
 
 (use-package imenu
-  :ensure nil
+  :straight (:type built-in)
   :after (:any makefile-mode markdown-mode org-mode yaml-mode yaml-ts-mode prog-mode)
   :custom
   (imenu-auto-rescan t)
@@ -419,8 +364,8 @@
   (imenu-use-popup-menu nil))
 
 (use-package recentf
-  :ensure nil
-  :hook (elpaca-after-init . recentf-mode)
+  :straight (:type built-in)
+  :hook (emacs-startup . recentf-mode)
   :bind ("<f9>" . recentf-open-files)
   :custom
   (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
@@ -447,14 +392,13 @@
   :config
   ;; Abbreviate the home directory to "~/" to make it easy to read the actual file name.
   (unless sb/EMACS28+
-    (setopt recentf-filename-handlers '(abbreviate-file-name)))
+    (setq recentf-filename-handlers '(abbreviate-file-name)))
 
   ;; Use the true file name and not the symlink name
   (dolist (exclude
            `(,(recentf-expand-file-name no-littering-etc-directory)
              ,(recentf-expand-file-name no-littering-var-directory)
-             ;; ,(recentf-expand-file-name (straight--emacs-dir "straight"))
-             ))
+             ,(recentf-expand-file-name (straight--emacs-dir "straight"))))
     (add-to-list 'recentf-exclude exclude))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
@@ -487,12 +431,12 @@
 ;; keybindings for moving around windows in Tmux which is okay because I do not split Emacs frames
 ;; often.
 (use-package windmove
-  :ensure nil
+  :straight (:type built-in)
   :when (display-graphic-p)
   :init (windmove-default-keybindings))
 
 (use-package doc-view
-  :ensure nil
+  :straight (:type built-in)
   :hook
   (doc-view-mode
    .
@@ -516,12 +460,12 @@
 
 ;; Highlight and allow to open http links in strings and comments in buffers.
 (use-package goto-addr
-  :ensure nil
+  :straight (:type built-in)
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
   :bind ("C-c RET" . goto-address-at-point))
 
 (use-package ediff
-  :ensure nil
+  :straight (:type built-in)
   :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
   ;; Put the control panel in the same frame as the diff windows
@@ -538,7 +482,7 @@
 ;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 (use-package tramp
-  :ensure nil
+  :straight (:type built-in)
   :bind ("C-S-q" . tramp-cleanup-all-buffers)
   :custom
   (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
@@ -550,15 +494,15 @@
   (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-  (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
+  (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
-  :ensure nil
+  :straight (:type built-in)
   :custom (whitespace-line-column sb/fill-column)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
-  :ensure nil
+  :straight (:type built-in)
   :hook (ibuffer . ibuffer-auto-mode)
   :bind (("C-x C-b" . ibuffer-jump) :map ibuffer-mode-map ("`" . ibuffer-switch-format))
   :custom
@@ -579,7 +523,7 @@
   (ibuffer
    .
    (lambda ()
-     (setopt ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
+     (setq ibuffer-filter-groups (ibuffer-project-generate-filter-groups))
      (unless (eq ibuffer-sorting-mode 'project-file-relative)
        (ibuffer-do-sort-by-project-file-relative))))
   :custom (ibuffer-project-use-cache t "Avoid calculating project root, use cache")
@@ -588,11 +532,11 @@
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
 (use-package immortal-scratch
-  :hook (elpaca-after-init . immortal-scratch-mode))
+  :hook (emacs-startup . immortal-scratch-mode))
 
 (use-package persistent-scratch
   :hook
-  (elpaca-after-init
+  (emacs-startup
    .
    (lambda ()
      (ignore-errors
@@ -600,7 +544,7 @@
   :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package popwin
-  :hook (elpaca-after-init . popwin-mode)
+  :hook (emacs-startup . popwin-mode)
   :config (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config))
 
 (use-package avy
@@ -641,7 +585,7 @@
     (interactive)
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
-  :ensure nil
+  :straight (:type built-in)
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh dired when files change
    (dired-mode . dired-hide-details-mode))
@@ -671,10 +615,10 @@
   (dired-hide-details-hide-symlink-targets nil)
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
-    (setopt dired-kill-when-opening-new-dired-buffer t)))
+    (setq dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
-  :ensure nil
+  :straight (:type built-in)
   :hook
   (dired-mode
    .
@@ -688,22 +632,21 @@
   :config
   ;; Obsolete from Emacs 28+
   (unless sb/EMACS28+
-    (setopt dired-bind-jump t))
+    (setq dired-bind-jump t))
 
-  (setopt
-   dired-omit-files
-   (concat
-    dired-omit-files
-    "\\|^\\..*$" ; Hide all dotfiles
-    "\\|^.DS_Store\\'"
-    "\\|^.project\\(?:ile\\)?\\'"
-    "\\|^.\\(svn\\|git\\)\\'"
-    "\\|^.cache\\'"
-    "\\|^.ccls-cache\\'"
-    "\\|^__pycache__\\'"
-    "\\|^eln-cache\\'"
-    "\\|\\(?:\\.js\\)?\\.meta\\'"
-    "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+  (setq dired-omit-files
+        (concat
+         dired-omit-files
+         "\\|^\\..*$" ; Hide all dotfiles
+         "\\|^.DS_Store\\'"
+         "\\|^.project\\(?:ile\\)?\\'"
+         "\\|^.\\(svn\\|git\\)\\'"
+         "\\|^.cache\\'"
+         "\\|^.ccls-cache\\'"
+         "\\|^__pycache__\\'"
+         "\\|^eln-cache\\'"
+         "\\|\\(?:\\.js\\)?\\.meta\\'"
+         "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
@@ -716,7 +659,7 @@
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
 (use-package dired-hist
-  :ensure (:host github :repo "karthink/dired-hist")
+  :straight (:host github :repo "karthink/dired-hist")
   :hook (dired-mode . dired-hist-mode)
   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
@@ -746,24 +689,19 @@
    ("r" . project-query-replace-regexp))
   :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
 
-;;(with-eval-after-load "project"
-;;  (debug))
-
 (use-package project-x
-  :ensure (:host github :repo "karthink/project-x")
+  :straight (:host github :repo "karthink/project-x")
   :after project
   :demand t
   :config (project-x-mode 1))
 
-(elpaca-wait)
-
 (use-package vertico
-  :ensure
+  :straight
   (vertico
    :files (:defaults "extensions/*")
    :includes (vertico-directory vertico-repeat vertico-quick))
   :hook
-  ((elpaca-after-init . vertico-mode)
+  ((emacs-startup . vertico-mode)
    ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
    ;; the following fixes the path so the selected path does not have prepended junk left behind.
    ;; This works with `file-name-shadow-mode' enabled. When you are in a sub-directory and use, say,
@@ -909,13 +847,13 @@
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  (setopt marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
+  (setq marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
 ;; ":after consult" prevents `consult-tramp' keybinding from being registered
 (use-package consult-tramp
-  :ensure (:host github :repo "Ladicle/consult-tramp")
+  :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-flycheck
@@ -926,7 +864,7 @@
   :bind ("C-M-y" . consult-yasnippet))
 
 (use-package ispell
-  :ensure nil
+  :straight (:type built-in)
   :bind ("M-$" . ispell-word)
   :custom
   (ispell-dictionary "en_US")
@@ -941,36 +879,26 @@
       (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-      (setopt
-       ispell-program-name
-       "hunspell"
-       ispell-local-dictionary-alist
-       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-       ispell-hunspell-dictionary-alist
-       ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist
-       `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
+      (setq
+       ispell-program-name "hunspell"
+       ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
    ((and (symbol-value 'sb/IS-LINUX) (executable-find "aspell"))
     (progn
-      (setopt
-       ispell-program-name
-       "aspell"
-       ispell-extra-args
-       '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))))
+      (setq
+       ispell-program-name "aspell"
+       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90"))))
    ((and (symbol-value 'sb/IS-WINDOWS) (executable-find "hunspell"))
     (progn
       (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-      (setopt
-       ispell-program-name
-       "hunspell"
-       ispell-local-dictionary-alist
-       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
-       ispell-hunspell-dictionary-alist
-       ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist
-       `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))))
+      (setq
+       ispell-program-name "hunspell"
+       ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))))
 
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC"))
@@ -1020,7 +948,7 @@
 (use-package hungry-delete
   :hook
   ((minibuffer-setup . (lambda () (hungry-delete-mode -1)))
-   (elpaca-after-init . global-hungry-delete-mode))
+   (emacs-startup . global-hungry-delete-mode))
   :diminish)
 
 ;; Move lines with "M-<up>" and "M-<down>"
@@ -1036,11 +964,11 @@
 
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
-  :hook (elpaca-after-init . smart-mark-mode))
+  :hook (emacs-startup . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :hook (elpaca-after-init . whole-line-or-region-global-mode)
+  :hook (emacs-startup . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
 (use-package goto-last-change
@@ -1061,12 +989,12 @@
   :bind* ("C-." . iedit-mode))
 
 (use-package hl-todo
-  :ensure (:depth nil)
-  :hook (elpaca-after-init . global-hl-todo-mode)
+  :hook (emacs-startup . global-hl-todo-mode)
   :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
-  (setopt
-   hl-todo-highlight-punctuation ":" hl-todo-keyword-faces
+  (setq
+   hl-todo-highlight-punctuation ":"
+   hl-todo-keyword-faces
    (append
     '(("LATER" . "#d0bf8f")
       ("IMP" . "#7cb8bb")
@@ -1082,7 +1010,10 @@
 ;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
 ;; `bookmark-bmenu-mode' with `R'.
 (use-package bm
-  :init (setopt bm-verbosity-level 1 bm-modeline-display-total t)
+  :init
+  (setq
+   bm-verbosity-level 1
+   bm-modeline-display-total t)
   :hook
   ((kill-emacs
     .
@@ -1094,7 +1025,7 @@
    (vc-before-checkin . bm-buffer-save)
    (after-revert . bm-buffer-restore)
    (find-file . bm-buffer-restore)
-   (elpaca-after-init . bm-repository-load))
+   (emacs-startup . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
   :custom (bm-buffer-persistence t "Save bookmarks"))
 
@@ -1115,16 +1046,16 @@
 
 ;; Temporarily highlight the region involved in certain operations like `kill-line' and `yank'.
 (use-package volatile-highlights
-  :hook (elpaca-after-init . volatile-highlights-mode)
+  :hook (emacs-startup . volatile-highlights-mode)
   :diminish volatile-highlights-mode)
 
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
-  :hook (elpaca-after-init . xclip-mode))
+  :hook (emacs-startup . xclip-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
-  :hook (elpaca-after-init . gcmh-mode)
+  :hook (emacs-startup . gcmh-mode)
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
@@ -1133,7 +1064,7 @@
   :diminish)
 
 (use-package isearch
-  :ensure nil
+  :straight (:type built-in)
   :bind
   (("C-s")
    ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
@@ -1147,10 +1078,13 @@
   :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
 
 (with-eval-after-load "grep"
-  (setopt grep-command "grep --color -irHn " grep-highlight-matches t grep-scroll-output t)
+  (setq
+   grep-command "grep --color -irHn "
+   grep-highlight-matches t
+   grep-scroll-output t)
 
   (when (executable-find "rg")
-    (setopt grep-program "rg")
+    (setq grep-program "rg")
     (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
 
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
@@ -1183,7 +1117,7 @@
   ([remap replace-regex] . vr/replace))
 
 (use-package vc-hooks
-  :ensure nil
+  :straight (:type built-in)
   :custom (vc-handled-backends '(Git))
   ;; (vc-follow-symlinks t "No need to ask")
   ;; Disable version control for remote files to improve performance
@@ -1236,7 +1170,7 @@
     (lambda ()
       (unless (display-graphic-p)
         (diff-hl-margin-local-mode 1))))
-   (dired-mode . diff-hl-dired-mode-unless-remote) (elpaca-after-init . global-diff-hl-mode))
+   (dired-mode . diff-hl-dired-mode-unless-remote) (emacs-startup . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -1256,7 +1190,7 @@
      (git-commit-turn-on-auto-fill))))
 
 (use-package smerge-mode
-  :ensure nil
+  :straight (:type built-in)
   :bind
   (:map
    smerge-mode-map
@@ -1273,27 +1207,25 @@
    ("M-g M" . smerge-popup-context-menu)))
 
 (use-package paren
-  :ensure nil
+  :straight (:type built-in)
   :custom
   (show-paren-when-point-inside-paren t)
   (show-paren-when-point-in-periphery t))
 
 (use-package elec-pair
-  :ensure nil
+  :straight (:type built-in)
   :hook
-  ((elpaca-after-init . electric-pair-mode)
-   ;; Disable pairs when entering minibuffer
+  ((emacs-startup . electric-pair-mode)
    (minibuffer-setup . (lambda () (electric-pair-local-mode -1))))
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
   :config
-  (setopt
-   electric-pair-inhibit-predicate
-   (lambda (c)
-     (if (char-equal c ?\")
-         t
-       (electric-pair-default-inhibit c))))
+  (setq electric-pair-inhibit-predicate
+        (lambda (c)
+          (if (char-equal c ?\")
+              t
+            (electric-pair-default-inhibit c))))
 
   (defvar sb/markdown-pairs '((?` . ?`))
     "Electric pairs for `markdown-mode'.")
@@ -1320,11 +1252,11 @@
   :bind ("C-h C-m" . discover-my-major))
 
 (use-package mode-minder
-  :ensure (:host github :repo "jdtsmith/mode-minder")
+  :straight (:host github :repo "jdtsmith/mode-minder")
   :commands mode-minder)
 
 (use-package flycheck
-  :hook (elpaca-after-init . global-flycheck-mode)
+  :hook (emacs-startup . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we want the
   ;; `flycheck-idle-change-delay' to be in effect while editing.
@@ -1340,7 +1272,7 @@
 
   ;; These themes have their own styles for displaying flycheck info.
   (when (eq sb/modeline-theme 'doom-modeline)
-    (setopt flycheck-mode-line nil))
+    (setq flycheck-mode-line nil))
 
   (setq-default
    flycheck-markdown-markdownlint-cli-config
@@ -1393,15 +1325,13 @@
   :diminish)
 
 (use-package indent-bars
-  :ensure (:host github :repo "jdtsmith/indent-bars")
+  :straight (:host github :repo "jdtsmith/indent-bars")
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :config
   (when (executable-find "tree-sitter")
-    (setopt
-     indent-bars-treesit-support
-     t
-     indent-bars-treesit-ignore-blank-lines-types
-     '("module")
+    (setq
+     indent-bars-treesit-support t
+     indent-bars-treesit-ignore-blank-lines-types '("module")
      indent-bars-treesit-scope
      '((python
         function_definition
@@ -1436,7 +1366,7 @@
 ;; "/u/s/l" for "/usr/share/local". While "partial-completion" matches search terms must match in
 ;; order, "orderless" can match search terms in any order.
 (use-package minibuffer
-  :ensure nil
+  :straight (:type built-in)
   :bind
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion)
@@ -1447,23 +1377,23 @@
   :config
   ;; Show docstring description for completion candidates in commands like `describe-function'.
   (when sb/EMACS28+
-    (setopt completions-detailed t))
+    (setq completions-detailed t))
 
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setopt completion-styles '(orderless substring basic)))
+    (setq completion-styles '(orderless substring basic)))
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
   ;; work. I also want substring matching for file names.
-  (setopt completion-category-overrides '((file (styles basic substring partial-completion)))))
+  (setq completion-category-overrides '((file (styles basic substring partial-completion)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
 (use-package dabbrev
-  :ensure nil
+  :straight (:type built-in)
   :bind ("C-M-;" . dabbrev-completion)
   :custom
   (dabbrev-ignored-buffer-regexps
@@ -1477,7 +1407,7 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
 (use-package hippie-exp
-  :ensure nil
+  :straight (:type built-in)
   :custom
   (hippie-expand-try-functions-list
    '(try-expand-dabbrev
@@ -1505,7 +1435,7 @@
 
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (elpaca-after-init . yas-global-mode)
+  :hook (emacs-startup . yas-global-mode)
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -1524,7 +1454,7 @@
 ;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
 ;; `complete-symbol' with regex search.
 (use-package company
-  :hook (elpaca-after-init . global-company-mode)
+  :hook (emacs-startup . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend in `company-backends'
    :map
@@ -1589,7 +1519,7 @@
   (company-reftex-labels-parse-all nil))
 
 (use-package company-anywhere
-  :ensure (:host github :repo "zk-phi/company-anywhere")
+  :straight (:host github :repo "zk-phi/company-anywhere")
   :after company
   :demand t)
 
@@ -1615,7 +1545,7 @@
   :config (require 'company-web-html))
 
 (use-package company-bibtex
-  :ensure (:host github :repo "gbgar/company-bibtex")
+  :straight (:host github :repo "gbgar/company-bibtex")
   :after (:all tex-mode company)
   :demand t)
 
@@ -1882,7 +1812,7 @@
   (lsp-auto-register-remote-clients nil)
   :config
   (when (or (display-graphic-p) (daemonp))
-    (setopt lsp-modeline-code-actions-segments '(count icon name)))
+    (setq lsp-modeline-code-actions-segments '(count icon name)))
 
   (dolist (ignore-dirs
            '("/build\\'"
@@ -1971,25 +1901,8 @@
         #s(hash-table
            size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
-(use-package lsp-latex
-  :hook
-  (LaTeX-mode
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  ;; “%f” is replaced with "The path of the current TeX file", "%p" with "The path of the current
-  ;; PDF file", "%l" with "The current line number" by texlab
-  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f")))
-
 (use-package subword
-  :ensure nil
+  :straight (:type built-in)
   :hook ((LaTeX-mode prog-mode) . subword-mode)
   :diminish)
 
@@ -2000,7 +1913,7 @@
   :diminish)
 
 (use-package compile
-  :ensure nil
+  :straight (:type built-in)
   :bind (("<f10>" . compile) ("<f11>" . recompile))
   :custom
   (compile-command (format "make -k -j%s " (num-processors)))
@@ -2015,6 +1928,21 @@
 
 ;; (use-package rainbow-delimiters
 ;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
+
+(use-package eldoc
+  :straight (:type built-in)
+  :hook (emacs-startup . global-eldoc-mode)
+  :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
+  ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
+  ;; is on a variable with a multiline docstring, but then it cuts of useful information.
+  ;; (eldoc-echo-area-use-multiline-p nil)
+  :config
+  ;; Allow eldoc to trigger after completions
+  (with-eval-after-load "company"
+    (eldoc-add-command
+     'company-complete-selection 'company-complete-common 'company-capf 'company-abort))
+  :diminish)
 
 (use-package treesit-auto
   :when (executable-find "tree-sitter")
@@ -2082,7 +2010,7 @@
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
 (use-package cc-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
   :hook
   ((c-mode c-ts-mode c++-mode c++-ts-mode)
@@ -2099,7 +2027,7 @@
   :bind (:map c-mode-base-map ("C-c C-d")))
 
 (use-package c-ts-mode
-  :ensure nil
+  :straight (:type built-in)
   :hook
   ((c-ts-mode c++-ts-mode)
    .
@@ -2123,7 +2051,7 @@
   :mode ("\\.cuh\\'" . cuda-mode))
 
 (use-package opencl-c-mode
-  :ensure (:host github :repo "salmanebah/opencl-mode")
+  :straight (:host github :repo "salmanebah/opencl-mode")
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
@@ -2137,11 +2065,11 @@
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
-     (setopt lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred))))
 
 (use-package python
-  :ensure nil
+  :straight (:type built-in)
   :mode
   (("SCon\(struct\|script\)$" . python-ts-mode)
    ("[./]flake8\\'" . conf-mode)
@@ -2176,12 +2104,12 @@
   (pyvenv-post-deactivate-hooks (list (lambda () (setq python-shell-interpreter "python3")))))
 
 (use-package cperl-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode "latexmkrc\\'"
   :config (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
-  :ensure nil
+  :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
   :hook ((sh-mode bash-ts-mode) . lsp-deferred)
   :bind (:map sh-mode-map ("C-c C-d"))
@@ -2199,7 +2127,7 @@
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
 
 (use-package lisp-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode)
   :hook
   (lisp-data-mode
@@ -2209,7 +2137,7 @@
        (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package elisp-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode ("\\.el\\'" . emacs-lisp-mode)
   :hook
   (emacs-lisp-mode
@@ -2222,7 +2150,7 @@
   :commands (ini-mode))
 
 (use-package conf-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode
   "\\.cfg\\'"
   "\\.conf\\'")
@@ -2241,14 +2169,14 @@
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
-     (setopt lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
 (use-package css-mode
-  :ensure nil
+  :straight (:type built-in)
   :hook ((css-mode css-ts-mode) . lsp-deferred)
   :custom (css-indent-offset 2))
 
@@ -2258,7 +2186,7 @@
   :config (emmet-preview-mode 1))
 
 (use-package make-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode
   (("\\Makefile\\'" . makefile-mode)
    ("\\Makefile.common\\'" . makefile-mode)
@@ -2305,7 +2233,7 @@
   :diminish)
 
 (use-package nxml-mode
-  :ensure nil
+  :straight (:type built-in)
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
   :hook
   (nxml-mode
@@ -2315,7 +2243,7 @@
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (make-local-variable 'lsp-disabled-clients)
-     (setopt lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
@@ -2335,7 +2263,7 @@
    .
    (lambda ()
      (make-local-variable 'js-indent-level)
-     (setopt js-indent-level 2)
+     (setq js-indent-level 2)
      (lsp-deferred))))
 
 (use-package org
@@ -2379,11 +2307,10 @@
   (add-to-list 'org-latex-packages-alist '("" "color"))
   (add-to-list 'org-latex-packages-alist '("" "minted"))
 
-  (setopt
-   org-latex-pdf-process
-   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setq org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
   ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance feels
   ;; better with the mode disabled.
@@ -2408,7 +2335,7 @@
    ("C-c C-," . org-insert-structure-template)))
 
 (use-package org-appear
-  :ensure (:host github :repo "awth13/org-appear")
+  :straight (:host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode)
   :custom
   (org-appear-autosubmarkers t)
@@ -2428,24 +2355,14 @@
    org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
 
 (use-package org-modern-indent
-  :ensure (:host github :repo "jdtsmith/org-modern-indent")
+  :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
 ;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
 ;; the tex package.
 (use-package tex
-  :ensure
-  (auctex
-   :repo "https://git.savannah.gnu.org/git/auctex.git"
-   :branch "main"
-   :pre-build (("make" "elpa"))
-   :build (:not elpaca--compile-info) ;; Make will take care of this step
-   :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
-   :version
-   (lambda (_)
-     (require 'tex-site)
-     AUCTeX-version))
+  :straight auctex
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
@@ -2489,7 +2406,7 @@
      TeX-view-program-selection '((output-pdf "Okular")))))
 
 (use-package bibtex
-  :ensure nil
+  :straight (:type built-in)
   :hook (bibtex-mode . lsp-deferred)
   :custom
   (bibtex-align-at-equal-sign t)
@@ -2497,7 +2414,7 @@
   (bibtex-comma-after-last-field nil))
 
 (use-package consult-reftex
-  :ensure (:host github :repo "karthink/consult-reftex")
+  :straight (:host github :repo "karthink/consult-reftex")
   :after (consult tex-mode)
   :bind (("C-c [" . consult-reftex-insert-reference) ("C-c )" . consult-reftex-goto-label)))
 
@@ -2511,7 +2428,7 @@
   (add-hook 'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
 
 (use-package math-delimiters
-  :ensure (:host github :repo "oantolin/math-delimiters")
+  :straight (:host github :repo "oantolin/math-delimiters")
   :after tex
   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
@@ -2620,7 +2537,7 @@ If region is active, apply to active region instead."
   :init (load-theme 'modus-vivendi t))
 
 (use-package nerd-icons
-  :ensure (:host github :repo "rainstormstudio/nerd-icons.el")
+  :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (display-graphic-p)
   :custom
   (nerd-icons-color-icons nil)
@@ -2689,7 +2606,7 @@ PAD can be left (`l') or right (`r')."
                         (powerline-fill nil (powerline-width rhs))
                         (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :hook (elpaca-after-init . sb/powerline-nano-theme)
+  :hook (emacs-startup . sb/powerline-nano-theme)
   :custom
   (powerline-display-hud nil "Visualization of the buffer position is not useful")
   (powerline-display-buffer-size nil)
@@ -2699,7 +2616,7 @@ PAD can be left (`l') or right (`r')."
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
-  :hook (elpaca-after-init . doom-modeline-mode)
+  :hook (emacs-startup . doom-modeline-mode)
   :custom
   (doom-modeline-height 28 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
@@ -2709,7 +2626,7 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
 
 (use-package centaur-tabs
-  :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
+  :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
    ("C-<tab>" . centaur-tabs-forward-tab)
@@ -2724,7 +2641,9 @@ PAD can be left (`l') or right (`r')."
   (centaur-tabs-set-bar 'under)
   :config
   (when (display-graphic-p)
-    (setopt centaur-tabs-set-icons t centaur-tabs-icon-type 'nerd-icons))
+    (setq
+     centaur-tabs-set-icons t
+     centaur-tabs-icon-type 'nerd-icons))
   ;; Make the headline face match `centaur-tabs-default' face for an uniform face
   (centaur-tabs-headline-match))
 
@@ -2790,14 +2709,14 @@ PAD can be left (`l') or right (`r')."
   :commands free-keys)
 
 (use-package which-key
-  :hook (elpaca-after-init . which-key-mode)
+  :hook (emacs-startup . which-key-mode)
   :diminish)
 
 (use-package kkp
-  :hook (elpaca-after-init . global-kkp-mode))
+  :hook (emacs-startup . global-kkp-mode))
 
 (use-package kdl-mode
-  :ensure (:host github :repo "bobuk/kdl-mode")
+  :straight (:host github :repo "bobuk/kdl-mode")
   :mode ("\\.kdl\\'" . kdl-mode))
 
 (use-package pdf-tools
@@ -2847,7 +2766,7 @@ PAD can be left (`l') or right (`r')."
   :hook (ssh-config-mode . turn-on-font-lock))
 
 (add-hook
- 'elpaca-after-init-hook
+ 'emacs-startup-hook
  (lambda ()
    (let ((gc-time (float-time gc-elapsed)))
      (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
