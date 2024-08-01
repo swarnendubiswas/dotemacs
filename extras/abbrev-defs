@@ -1602,6 +1602,7 @@
     ("ahve" "have" nil :count 0)
     ("arbitary" "arbitrary" nil :count 0)
     ("bandwdith" "bandwidth" nil :count 0)
+    ("betwwen" "between" nil :count 0)
     ("chaning" "changing" nil :count 0)
     ("conrol" "control" nil :count 0)
     ("currenly" "currently" nil :count 0)

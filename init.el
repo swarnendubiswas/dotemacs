@@ -21,7 +21,7 @@
   :type '(radio (const :tag "daemon" daemon) (const :tag "standalone" standalone))
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file t
+(defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -252,7 +252,6 @@
   (tags-case-fold-search nil "case-sensitive")
   (tags-revert-without-query
    t "Do not ask before rereading the \"TAGS\" files after it has changed")
-  (max-mini-window-height 0.35)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
   ;; ISSUE: There is a known bug with Emacs upstream.
@@ -282,11 +281,16 @@
              ".fdb_latexmk"
              ".fls"
              ".lof"
+             ".nav"
              ".pyc"
              ".rel"
              ".rip"
+             ".snm"
              ".synctex.gz"
-             "TAGS"))
+             ".toc"
+             ".vrb"
+             "TAGS"
+             "indent.log"))
     (add-to-list 'completion-ignored-extensions exts))
 
   (when sb/EMACS28+
@@ -715,6 +719,16 @@
   :ensure (:host github :repo "karthink/dired-hist")
   :hook (dired-mode . dired-hist-mode)
   :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+
+;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
+;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
+(use-package xref
+  :bind
+  (("M-." . xref-find-definitions)
+   ("M-?" . xref-find-references)
+   ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
+   ("M-," . xref-go-back))
+  :custom (xref-search-program 'ripgrep))
 
 (use-package project
   :bind
@@ -2511,16 +2525,6 @@
   :after (citar embark)
   :config (citar-embark-mode)
   :diminish)
-
-;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
-;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
-(use-package xref
-  :bind
-  (("M-." . xref-find-definitions)
-   ("M-?" . xref-find-references)
-   ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
-   ("M-," . xref-go-back))
-  :custom (xref-search-program 'ripgrep))
 
 (use-package citre
   :hook (prog-mode . citre-mode)

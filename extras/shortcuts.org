@@ -274,6 +274,8 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 
 ** Markdown
 
+- ~C-c C-s 2~ - Insert a level-2 atx-style heading (~markdown-insert-header-atx-2~)
+- ~C-c C-s h~ - Insert a heading with automatically chosen type and level determined by the previous heading (~markdown-insert-header-dwim~)
 - ~M-Ret~ - Insert new list item (~markdown-insert-list-item~)
 - ~C-c C-s i~ - Make region or word italic (~markdown-insert-italic~)
 - ~C-c C-s e~ - Make region or word emphasis (~markdown-insert-emphasis~)
@@ -288,6 +290,7 @@ key in the label selection buffer, the table of contents buffer, or the index bu
 - ~C-c C-c p~ - Live preview in a browser (~markdown-preview~)
 - ~C-c <~ - Outdent the region (~markdown-outdent-region~)
 - ~C-c >~ - Indent the region (~markdown-indent-region~)
+- ~C-c C-x RET~ - Toggle markup hiding (~markdown-toggle-markup-hiding~)
 
 ** Outline
 
