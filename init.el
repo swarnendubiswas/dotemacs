@@ -16,9 +16,9 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/op-mode 'standalone
+(defcustom sb/op-mode-daemon nil
   "Specify the way you expect Emacs to be used."
-  :type '(radio (const :tag "daemon" daemon) (const :tag "standalone" standalone))
+  :type 'boolean
   :group 'sb/emacs)
 
 (defcustom sb/debug-init-file nil
@@ -98,24 +98,23 @@
  '(use-package :source
     melpa))
 
-(cond
- ((eq sb/op-mode 'daemon)
-  (setq
-   use-package-always-demand t
-   use-package-minimum-reported-time 0 ; Show everything
-   use-package-verbose t))
- ((eq sb/op-mode 'standalone)
-  (if (bound-and-true-p sb/debug-init-file)
-      (setq
-       debug-on-error nil
-       debug-on-event 'sigusr2
-       use-package-compute-statistics t ; Use "M-x use-package-report" to see results
-       use-package-verbose t
-       use-package-minimum-reported-time 0 ; Show everything
-       use-package-always-demand t)
+(if (bound-and-true-p sb/op-mode-daemon)
     (setq
-     use-package-always-defer t
-     use-package-expand-minimally t))))
+     use-package-always-demand t
+     use-package-minimum-reported-time 0 ; Show everything
+     use-package-verbose t)
+  (setq
+   use-package-always-defer t
+   use-package-expand-minimally t))
+
+(if (bound-and-true-p sb/debug-init-file)
+    (setq
+     debug-on-error t
+     debug-on-event 'sigusr2
+     use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+     use-package-verbose t
+     use-package-minimum-reported-time 0 ; Show everything
+     use-package-always-demand t))
 
 (with-eval-after-load "bind-key"
   (bind-key "C-c d k" #'describe-personal-keybindings))
@@ -190,8 +189,7 @@
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (tags-add-tables nil)
   (tags-case-fold-search nil "case-sensitive")
-  (tags-revert-without-query
-   t "Do not ask before rereading the \"TAGS\" files after it has changed")
+  (tags-revert-without-query t "Do not ask before rereading \"TAGS\" file after it has changed")
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
   ;; ISSUE: There is a known bug with Emacs upstream.
@@ -272,11 +270,10 @@
     (when (fboundp mode)
       (funcall mode 1)))
 
+  ;; Scroll settings from Doom Emacs
   (setq
-   ;; Scroll settings from Doom Emacs
    scroll-preserve-screen-position t
-   scroll-margin
-   5 ; Add margin lines when scrolling vertically to have a sense of continuity
+   scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
    scroll-conservatively 101
    ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
    auto-window-vscroll nil)
@@ -284,8 +281,7 @@
   ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
   ;; buffer-local variable's default value.
   (setq-default
-   cursor-in-non-selected-windows
-   nil ; Hide the cursor in inactive windows
+   cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
    fill-column sb/fill-column
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
@@ -319,8 +315,7 @@
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
-  ;; Revert dired buffers if the contents of the directory changes
-  (global-auto-revert-non-file-buffers t)
+  (global-auto-revert-non-file-buffers t "Revert dired buffers if the directory contents changes")
   :diminish auto-revert-mode)
 
 (use-package savehist
@@ -510,14 +505,11 @@
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
   (ibuffer-formats '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
-  :config
-  (require 'ibuf-ext)
-  (add-to-list 'ibuffer-never-show-predicates "^\\*")
+  :config (require 'ibuf-ext)
+  ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
   (defalias 'list-buffers 'ibuffer))
 
-;; Provides ibuffer filtering and sorting functions to group buffers by function or regexp applied
-;; to `default-directory'. By default buffers are grouped by `project-current' or by
-;; `default-directory'.
+;; By default buffers are grouped by `project-current' or by `default-directory'.
 (use-package ibuffer-project
   :hook
   (ibuffer
@@ -562,9 +554,7 @@
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
   :custom (aw-minibuffer-flag t)
-  :config
-  (add-to-list 'aw-ignored-buffers "*toc*")
-  (ace-window-display-mode 1))
+  :config (ace-window-display-mode 1))
 
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
@@ -726,7 +716,6 @@
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
-;; Useful search and navigation commands
 (use-package consult
   :after vertico
   :commands consult-fd
@@ -810,7 +799,7 @@
   ( ;; "C-h b" lists all the bindings available in a buffer
    ([remap describe-bindings] . embark-bindings)
    ("C-`" . embark-act)
-   ;; ("C-`" . embark-dwim)
+   ("C-;" . embark-dwim)
    :map
    minibuffer-local-map
    ("C-`" . embark-act)
@@ -818,23 +807,14 @@
    ("C-c C-e" . embark-export)
    :map
    minibuffer-local-completion-map
-   ("C-`" . embark-act)
-   :map embark-file-map
-   ;; ("s" . sudo-edit)
-   ("l" . vlf))
+   ("C-`" . embark-act))
   :custom
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command)
   :config
   (with-eval-after-load "vertico"
-    (bind-keys :map vertico-map ("C-`" . embark-act) ("C-c C-e" . embark-export)))
-
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list
-   'display-buffer-alist
-   '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-     nil
-     (window-parameters (mode-line-format . none)))))
+    (bind-keys
+     :map vertico-map ("C-`" . embark-act) ("c-;" . embark-dwim) ("C-c C-e" . embark-export))))
 
 ;; Supports exporting search results to a `grep-mode' buffer, on which you can use `wgrep'.
 (use-package embark-consult
@@ -851,7 +831,6 @@
   (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
 
-;; ":after consult" prevents `consult-tramp' keybinding from being registered
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
@@ -944,14 +923,12 @@
    ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
    :map helpful-mode-map ("q" . helpful-kill-buffers)))
 
-;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
   :hook
   ((minibuffer-setup . (lambda () (hungry-delete-mode -1)))
    (emacs-startup . global-hungry-delete-mode))
   :diminish)
 
-;; Move lines with "M-<up>" and "M-<down>"
 (use-package move-text
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
@@ -984,7 +961,6 @@
    ;; These are for vertical movements.
    ("C-n" . vundo-next) ("C-p" . vundo-previous)))
 
-;; Edit multiple regions in the same way simultaneously
 (use-package iedit
   :bind* ("C-." . iedit-mode))
 
@@ -1002,7 +978,6 @@
       ("DEBUG" . "#ff8c00")
       ("TEST" . "tomato")
       ("WARNING" . "#cc0000")
-      ("BEWARE" . "#aa0000")
       ("REFACTOR" . "#cc9393"))
     hl-todo-keyword-faces)))
 
@@ -1012,8 +987,8 @@
 (use-package bm
   :init
   (setq
-   bm-verbosity-level 1
-   bm-modeline-display-total t)
+   bm-restore-repository-on-load t
+   bm-verbosity-level 0)
   :hook
   ((kill-emacs
     .
@@ -1033,10 +1008,6 @@
   :bind (("<f12>" . crux-kill-other-buffers) ("C-c d s" . crux-sudo-edit))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; (use-package rainbow-mode
-;;   :hook ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode) . rainbow-mode)
-;;   :diminish)
-
 (use-package colorful-mode
   :hook
   ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode helpful-mode)
@@ -1053,7 +1024,6 @@
   :when (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup . xclip-mode))
 
-;; Allow GC to happen after a period of idle time
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
   :diminish)
@@ -1119,15 +1089,12 @@
 (use-package vc-hooks
   :straight (:type built-in)
   :custom (vc-handled-backends '(Git))
-  ;; (vc-follow-symlinks t "No need to ask")
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
 
 (use-package transient
   :custom (transient-semantic-coloring t)
-  :config
-  ;; Allow using `q' to quit out of popups in addition to `C-g'
-  (transient-bind-q-to-quit))
+  :config (transient-bind-q-to-quit))
 
 (use-package magit
   :after transient
@@ -1136,7 +1103,6 @@
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (magit-bury-buffer-function #'magit-restore-window-configuration)
-  ;; Suppress the message "Turning on magit-auto-revert-mode" when loading Magit
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
   ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist
@@ -1402,9 +1368,8 @@
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
   :config
-  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
-  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+  (dolist (exclude '(doc-view-mode pdf-view-mode tags-table-mode))
+    (add-to-list 'dabbrev-ignored-buffer-modes exclude)))
 
 (use-package hippie-exp
   :straight (:type built-in)
@@ -1445,7 +1410,6 @@
   (unbind-key "<tab>" yas-minor-mode-map)
   :diminish yas-minor-mode)
 
-;; YASnippet no longer bundles snippets directly
 (use-package yasnippet-snippets
   :after yasnippet
   :init (yasnippet-snippets-initialize))
@@ -1518,10 +1482,10 @@
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-(use-package company-anywhere
-  :straight (:host github :repo "zk-phi/company-anywhere")
-  :after company
-  :demand t)
+;; (use-package company-anywhere
+;;   :straight (:host github :repo "zk-phi/company-anywhere")
+;;   :after company
+;;   :demand t)
 
 (use-package company-dict
   :after company
@@ -1559,23 +1523,23 @@
 ;; grouped backends order.
 ;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
-;; The keyword :with helps to make sure the results from major/minor mode agnostic backends (such as
-;; company-yasnippet, company-dabbrev-code) are returned without preventing results from
-;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
-;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
-;; :with, and only then put context agnostic backend(s).
-;; (setq company-backends '((company-capf :with company-yasnippet)))
-
-;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent backends . Only a
-;; few backends are specialized on certain major modes or certain contexts (e.g. outside of strings
-;; and comments), and pass on control to later backends when outside of that major mode or context.
-
 ;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
 ;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
 ;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
 ;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
 ;; non-nil for following backends even when their ‘candidates’ list command is empty:
 ;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
+
+;; The keyword :with helps to make sure the results from major/minor mode agnostic backends (such as
+;; company-yasnippet, company-dabbrev-code) are returned without preventing results from
+;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
+;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
+;; :with, and then put context agnostic backend(s).
+;; (setq company-backends '((company-capf :with company-yasnippet)))
+
+;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent backends . Only a
+;; few backends are specialized on certain major modes or certain contexts (e.g. outside of strings
+;; and comments), and pass on control to later backends when outside of that major mode or context.
 
 ;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
 ;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
@@ -1593,9 +1557,6 @@
      ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
      ;; ignored.
      company-ispell company-dict company-dabbrev)
-   ;; Options: `company-sort-prefer-same-case-prefix', `company-sort-by-occurrence',
-   ;; `company-sort-by-statistics', `company-sort-by-length', `company-sort-by-backend-importance',
-   ;; `delete-dups'.
    company-transformers '(delete-dups company-sort-by-statistics company-sort-prefer-same-case-prefix))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
@@ -1673,27 +1634,24 @@
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         (company-capf company-web-html) company-ispell company-dict company-dabbrev)))
+         (company-capf company-web-html) company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
       (add-hook hook (lambda () (sb/company-html-mode)))))
 
   (progn
     (defun sb/company-prog-mode ()
-      ;; Typing short prefixes help with faster completion and a more responsive UI
-      (setq-local company-minimum-prefix-length 2)
-
-      (make-local-variable 'company-backends)
-
-      (setq company-backends
-            '(company-files
-              (company-capf
-               company-c-headers
-               :with company-keywords
-               company-dabbrev-code ; Useful for variable names
-               company-yasnippet
-               :separate)
-              company-dict company-ispell company-dabbrev)))
+      (setq-local
+       company-minimum-prefix-length 2
+       company-backends
+       '(company-files
+         (company-capf
+          company-c-headers
+          :with company-keywords
+          company-dabbrev-code ; Useful for variable names
+          company-yasnippet
+          :separate)
+         company-dict company-ispell company-dabbrev)))
 
     (add-hook
      'prog-mode-hook
@@ -1705,19 +1663,16 @@
 
   (progn
     (defun sb/company-elisp-mode ()
-      ;; Typing short prefixes help with faster completion and a more responsive UI
-      (setq-local company-minimum-prefix-length 2)
-
-      (make-local-variable 'company-backends)
-
-      (setq company-backends
-            '(company-files
-              (company-capf
-               :with company-keywords
-               company-dabbrev-code ; Useful for variable names
-               company-yasnippet
-               :separate)
-              company-dict company-ispell company-dabbrev)))
+      (setq-local
+       company-minimum-prefix-length 2
+       company-backends
+       '(company-files
+         (company-capf
+          :with company-keywords
+          company-dabbrev-code ; Useful for variable names
+          company-yasnippet
+          :separate)
+         company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
@@ -1789,23 +1744,17 @@
   (lsp-xml-logs-client nil)
   (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  ;; I am using symbol-overlay for languages that do not have a server
+  ;; I use `symbol-overlay' to include languages that do not have a language server
   (lsp-enable-symbol-highlighting nil)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
   (lsp-pylsp-plugins-preload-modules ["numpy" "csv" "pandas" "statistics" "json"])
   (lsp-pylsp-plugins-pycodestyle-enabled nil)
-  (lsp-pylsp-plugins-pycodestyle-max-line-length sb/fill-column)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
-  (lsp-pylsp-plugins-pydocstyle-ignore (vconcat (list "D100" "D101" "D103" "D213")))
   (lsp-pylsp-plugins-pylint-enabled t)
   (lsp-pylsp-plugins-yapf-enabled t)
   (lsp-pylsp-plugins-flake8-enabled nil)
-  (lsp-pylsp-plugins-pylint-args
-   (vconcat
-    (list
-     "-j 2" (concat "--rcfile=" (expand-file-name ".config/pylintrc" sb/user-home-directory)))))
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
@@ -1822,9 +1771,6 @@
              "/\\.cache\\'"
              "/__pycache__\\'"))
     (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
-
-  (with-eval-after-load "lsp-lens"
-    (diminish 'lsp-lens-mode))
 
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
@@ -1860,8 +1806,7 @@
 
 (use-package consult-lsp
   :after (consult lsp)
-  :commands (consult-lsp-diagnostics consult-lsp-file-symbols)
-  :bind (:map lsp-mode-map ([remap xref-find-apropos] . consult-lsp-symbols)))
+  :bind (:map lsp-command-map ("g" . consult-lsp-symbols) ("h" . consult-lsp-file-symbols)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -1926,9 +1871,6 @@
   :after compile
   :init (fancy-compilation-mode 1))
 
-;; (use-package rainbow-delimiters
-;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
-
 (use-package eldoc
   :straight (:type built-in)
   :hook (emacs-startup . global-eldoc-mode)
@@ -1978,18 +1920,16 @@
   :config
   (global-treesit-auto-mode 1)
   (treesit-auto-add-to-auto-mode-alist 'all)
-  ;; Install grammars
   (when (unless (and (treesit-language-available-p 'bash)
                      (treesit-language-available-p 'bibtex)
                      (treesit-language-available-p 'c)
                      (treesit-language-available-p 'cpp)
                      (treesit-language-available-p 'cmake)
                      (treesit-language-available-p 'css)
-                     ;; (treesit-language-available-p 'docker)
+                     (treesit-language-available-p 'docker)
                      (treesit-language-available-p 'elisp)
                      (treesit-language-available-p 'html)
                      (treesit-language-available-p 'java)
-                     ;; (treesit-language-available-p 'js)
                      (treesit-language-available-p 'json)
                      (treesit-language-available-p 'latex)
                      (treesit-language-available-p 'make)
@@ -2051,7 +1991,6 @@
   :mode ("\\.cuh\\'" . cuda-mode))
 
 (use-package opencl-c-mode
-  :straight (:host github :repo "salmanebah/opencl-mode")
   :mode "\\.cl\\'")
 
 (use-package cmake-mode
@@ -2064,8 +2003,7 @@
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (make-local-variable 'lsp-disabled-clients)
-     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred))))
 
 (use-package python
@@ -2168,8 +2106,7 @@
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (make-local-variable 'lsp-disabled-clients)
-     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred))))
 
 (use-package yaml-imenu
@@ -2190,7 +2127,6 @@
   :mode
   (("\\Makefile\\'" . makefile-mode)
    ("\\Makefile.common\\'" . makefile-mode)
-   ;; Add "makefile.rules" to `makefile-gmake-mode' for Intel Pin
    ("makefile\\.rules\\'" . makefile-mode))
   :hook ((makefile-mode make-ts-mode) . (lambda () (setq-local indent-tabs-mode t))))
 
@@ -2242,8 +2178,7 @@
      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (make-local-variable 'lsp-disabled-clients)
-     (setq lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
      (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
@@ -2262,8 +2197,7 @@
   ((json-mode json-ts-mode jsonc-mode)
    .
    (lambda ()
-     (make-local-variable 'js-indent-level)
-     (setq js-indent-level 2)
+     (setq-local js-indent-level 2)
      (lsp-deferred))))
 
 (use-package org
@@ -2312,10 +2246,6 @@
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
-  ;; There is a lot of visible distortion with `org-indent-mode' enabled. Emacs performance feels
-  ;; better with the mode disabled.
-  (with-eval-after-load "org-indent"
-    (diminish 'org-indent-mode))
   :bind-keymap ("C-c o" . org-mode-map)
   :bind
   (:map
@@ -2335,7 +2265,6 @@
    ("C-c C-," . org-insert-structure-template)))
 
 (use-package org-appear
-  :straight (:host github :repo "awth13/org-appear")
   :hook (org-mode . org-appear-mode)
   :custom
   (org-appear-autosubmarkers t)
@@ -2368,8 +2297,6 @@
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
    ;; Revert PDF buffer after TeX compilation has finished
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-   ;; Enable rainbow mode after applying styles to the buffer
-   ;; (TeX-update-style . rainbow-delimiters-mode)
    (LaTeX-mode . TeX-source-correlate-mode) ; Jump between editor and pdf viewer
    (LaTeX-mode . lsp-deferred))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
@@ -2433,10 +2360,7 @@
   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
 (use-package citar
-  :hook (LaTeX-mode . citar-capf-setup)
-  :custom
-  (citar-bibliography
-   '((expand-file-name "prospar-workspace/references/references.bib" sb/user-home-directory))))
+  :hook (LaTeX-mode . citar-capf-setup))
 
 (use-package citar-embark
   :after (citar embark)
@@ -2500,24 +2424,6 @@
     markdown-ts-mode)
    . breadcrumb-mode))
 
-(defun sb/save-all-buffers ()
-  "Save all modified buffers without prompting."
-  (interactive)
-  (save-some-buffers t))
-
-(defun sb/comment-line (n)
-  "Comment or uncomment current line and leave point after it.
-With positive prefix, apply to N lines including current one.
-With negative prefix, apply to -N lines above.
-If region is active, apply to active region instead."
-  (interactive "p")
-  (if (use-region-p)
-      (comment-or-uncomment-region (region-beginning) (region-end))
-    (let ((range (list (line-beginning-position) (goto-char (line-end-position n)))))
-      (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
-    (forward-line 1)
-    (back-to-indentation)))
-
 (progn
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
@@ -2537,11 +2443,8 @@ If region is active, apply to active region instead."
   :init (load-theme 'modus-vivendi t))
 
 (use-package nerd-icons
-  :straight (:host github :repo "rainstormstudio/nerd-icons.el")
   :when (display-graphic-p)
-  :custom
-  (nerd-icons-color-icons nil)
-  (nerd-icons-scale-factor 0.9))
+  :custom (nerd-icons-scale-factor 0.9))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline. However, it does not
 ;; show lsp status, flycheck information, and Python virtualenv information on the modeline. The
@@ -2650,6 +2553,24 @@ PAD can be left (`l') or right (`r')."
 (use-package olivetti
   :hook ((text-mode prog-mode) . olivetti-mode)
   :diminish)
+
+(defun sb/save-all-buffers ()
+  "Save all modified buffers without prompting."
+  (interactive)
+  (save-some-buffers t))
+
+(defun sb/comment-line (n)
+  "Comment or uncomment current line and leave point after it.
+With positive prefix, apply to N lines including current one.
+With negative prefix, apply to -N lines above.
+If region is active, apply to active region instead."
+  (interactive "p")
+  (if (use-region-p)
+      (comment-or-uncomment-region (region-beginning) (region-end))
+    (let ((range (list (line-beginning-position) (goto-char (line-end-position n)))))
+      (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
+    (forward-line 1)
+    (back-to-indentation)))
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
 ;; "C-<up>". Standalone special keys (and some combinations) can be written in square brackets, e.g.
