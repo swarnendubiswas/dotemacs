@@ -160,6 +160,7 @@
   (fast-but-imprecise-scrolling t)
   (help-window-select t "Makes it easy to close the window")
   (history-delete-duplicates t)
+  (idle-update-delay 1)
   (read-process-output-max (* 5 1024 1024) "`lsp-mode' suggests increasing the value")
   (remote-file-name-inhibit-locks t)
   (ring-bell-function 'ignore "Disable beeping sound")
@@ -275,6 +276,7 @@
    scroll-preserve-screen-position t
    scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
    scroll-conservatively 101
+   bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
    ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
    auto-window-vscroll nil)
 
@@ -288,7 +290,7 @@
    ;; TAB first tries to indent the current line, and if the line was already indented,
    ;; then try to complete the thing at point.
    tab-always-indent 'complete
-   bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
+   bidi-display-reordering 'left-to-right
    bidi-paragraph-direction 'left-to-right)
 
   (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
@@ -1005,7 +1007,10 @@
   :custom (bm-buffer-persistence t "Save bookmarks"))
 
 (use-package crux
-  :bind (("<f12>" . crux-kill-other-buffers) ("C-c d s" . crux-sudo-edit))
+  :bind
+  (("<f12>" . crux-kill-other-buffers)
+   ("C-c d s" . crux-sudo-edit)
+   ("C-<f9>" . crux-recentf-find-directory))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 (use-package colorful-mode
@@ -1104,7 +1109,6 @@
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
   (magit-bury-buffer-function #'magit-restore-window-configuration)
   (magit-no-message '("Turning on magit-auto-revert-mode..."))
-  ;; https://irreal.org/blog/?p=8877
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
@@ -1482,10 +1486,10 @@
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-;; (use-package company-anywhere
-;;   :straight (:host github :repo "zk-phi/company-anywhere")
-;;   :after company
-;;   :demand t)
+(use-package company-anywhere
+  :straight (:host github :repo "zk-phi/company-anywhere")
+  :after company
+  :demand t)
 
 (use-package company-dict
   :after company

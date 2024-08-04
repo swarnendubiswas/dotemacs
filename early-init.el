@@ -66,9 +66,10 @@
 ;; is deprecated.
 (scroll-bar-mode -1)
 ;; The menu bar can be useful to identify different capabilities available and their shortcuts.
-(menu-bar-mode -1)
+(push '(menu-bar-lines . 0) default-frame-alist)
 ;; This is faster than running "(tool-bar-mode -1)"
 (push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
 
 ;; Set a hint of transparency, works with GUI frames
 (set-frame-parameter (selected-frame) 'alpha '(97 . 97))
