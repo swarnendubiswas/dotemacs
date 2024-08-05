@@ -37,11 +37,7 @@
 
 (defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
-  :type
-  '(radio
-    (const :tag "powerline" powerline)
-    (const :tag "doom-modeline" doom-modeline)
-    (const :tag "none" none))
+  :type '(radio (const :tag "doom-modeline" doom-modeline) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Large values make reading difficult when the window is split side-by-side, 100 is also a stretch
@@ -264,8 +260,8 @@
          global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
          size-indication-mode
          ;; When you call `find-file', you do not need to clear the existing file path before adding
-         ;; the new one. Just start typing the whole path and Emacs will "shadow" the current one. For
-         ;; example, you are at "~/Documents/notes/file.txt" and you want to go to
+         ;; the new one. Just start typing the whole path and Emacs will "shadow" the current one.
+         ;; For example, you are at "~/Documents/notes/file.txt" and you want to go to
          ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take you there.
          file-name-shadow-mode))
     (when (fboundp mode)
@@ -2449,77 +2445,6 @@
 (use-package nerd-icons
   :when (display-graphic-p)
   :custom (nerd-icons-scale-factor 0.9))
-
-;; Powerline theme for Nano looks great, and takes less space on the modeline. However, it does not
-;; show lsp status, flycheck information, and Python virtualenv information on the modeline. The
-;; package is not being actively maintained. Inspired by
-;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-(use-package powerline
-  :preface
-  (defun sb/powerline-raw (str &optional face pad)
-    "Render STR as mode-line data using FACE and optionally PAD import.
-PAD can be left (`l') or right (`r')."
-    (when str
-      (let* ((rendered-str (format-mode-line str))
-             (padded-str
-              (concat
-               (when (and (> (length rendered-str) 0) (eq pad 'l))
-                 "")
-               (if (listp str)
-                   rendered-str
-                 str)
-               (when (and (> (length rendered-str) 0) (eq pad 'r))
-                 ""))))
-        (if face
-            (pl/add-text-property padded-str 'face face)
-          padded-str))))
-
-  (defun sb/powerline-nano-theme ()
-    "Setup a nano-like modeline"
-    (interactive)
-    (setq-default mode-line-format
-                  '("%e" (:eval
-                     (let* ((active (powerline-selected-window-active))
-                            (face0
-                             (if active
-                                 'powerline-active0
-                               'powerline-inactive0))
-                            (lhs
-                             (list
-                              (powerline-raw
-                               (concat
-                                "GNU Emacs "
-                                (number-to-string emacs-major-version)
-                                "."
-                                (number-to-string emacs-minor-version))
-                               nil 'l)))
-                            (rhs
-                             (list
-                              (when which-function-mode
-                                (sb/powerline-raw which-func-format nil 'l))
-                              (powerline-vc nil 'l)
-                              (powerline-raw "")
-                              (powerline-raw "%4l" nil 'l)
-                              (powerline-raw ",")
-                              (powerline-raw "%3c" nil 'r)
-                              (if (buffer-modified-p)
-                                  (powerline-raw " ⠾" nil 'r)
-                                (powerline-raw "  " nil 'r))))
-                            (center (list (powerline-raw "%b" nil 'r))))
-                       (concat
-                        (powerline-render lhs)
-                        (powerline-fill-center nil (/ (powerline-width center) 2.0))
-                        (powerline-render center)
-                        (powerline-fill nil (powerline-width rhs))
-                        (powerline-render rhs)))))))
-  :when (eq sb/modeline-theme 'powerline)
-  :hook (emacs-startup . sb/powerline-nano-theme)
-  :custom
-  (powerline-display-hud nil "Visualization of the buffer position is not useful")
-  (powerline-display-buffer-size nil)
-  (powerline-display-mule-info nil "File encoding information is not useful")
-  (powerline-gui-use-vcs-glyph t)
-  (powerline-height 20))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
