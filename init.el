@@ -1,5 +1,5 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
-;;; no-byte-compile: t; fill-column: 100 -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
+;;; coding: utf-8; no-byte-compile: t; fill-column: 80 -*-
 
 ;; Swarnendu Biswas
 
@@ -40,9 +40,9 @@
   :type '(radio (const :tag "doom-modeline" doom-modeline) (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Large values make reading difficult when the window is split side-by-side, 100 is also a stretch
-;; for smaller screens.
-(defcustom sb/fill-column 100
+;; Large values make reading difficult when the window is split side-by-side,
+;; 100 is also a stretch for smaller screens.
+(defcustom sb/fill-column 80
   "Column beyond which lines should not extend."
   :type 'number
   :group 'sb/emacs)
@@ -64,19 +64,25 @@
 (defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
   "Non-nil if the OS is Windows.")
 
-;; "straight.el" makes it easy to install packages from arbitrary sources like GitHub.
+;; "straight.el" makes it easy to install packages from arbitrary sources like
+;; GitHub.
 (setq
  straight-build-dir
- (format "build/%d%s%d" emacs-major-version version-separator emacs-minor-version)
+ (format "build/%d%s%d"
+         emacs-major-version
+         version-separator
+         emacs-minor-version)
  ;; Do not check packages on startup to reduce load time
  straight-check-for-modifications '(check-on-save find-when-checking)
  straight-use-package-by-default t
- ;; There is no need to download the whole Git history, and a single branch often suffices.
+ ;; There is no need to download the whole Git history, and a single branch
+ ;; often suffices.
  straight-vc-git-default-clone-depth '(1 single-branch))
 
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el"
-                         (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
       (bootstrap-version 7))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
@@ -107,7 +113,8 @@
     (setq
      debug-on-error t
      debug-on-event 'sigusr2
-     use-package-compute-statistics t ; Use "M-x use-package-report" to see results
+     ;; Use "M-x use-package-report" to see results
+     use-package-compute-statistics t
      use-package-verbose t
      use-package-minimum-reported-time 0 ; Show everything
      use-package-always-demand t))
@@ -115,14 +122,17 @@
 (with-eval-after-load "bind-key"
   (bind-key "C-c d k" #'describe-personal-keybindings))
 
-;; Check "use-package-keywords.org" for a suggested order of `use-package' keywords.
+;; Check "use-package-keywords.org" for a suggested order of `use-package'
+;; keywords.
 
 (use-package diminish
   :demand t)
 
 (use-package no-littering
   :demand t
-  :custom (auto-save-file-name-transforms `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
+  :custom
+  (auto-save-file-name-transforms
+   `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
 ;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
 (defcustom sb/private-file (no-littering-expand-etc-file-name "private.el")
@@ -135,7 +145,15 @@
   :init
   (setq
    exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "PYTHONPATH" "LANG" "LC_CTYPE" "XAUTHORITY" "LSP_USE_PLISTS")
+   exec-path-from-shell-variables
+   '("PATH"
+     "JAVA_HOME"
+     "TERM"
+     "PYTHONPATH"
+     "LANG"
+     "LC_CTYPE"
+     "XAUTHORITY"
+     "LSP_USE_PLISTS")
    exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
@@ -145,31 +163,39 @@
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (apropos-do-all t "Make `apropos' search more extensively")
   (auto-save-no-message t "Do not print frequent autosave messages")
-  (auto-save-interval 0 "Disable autosaving based on number of characters typed")
-  (bookmark-save-flag 1 "Save bookmark after every bookmark edit and also when Emacs is killed")
-  (comment-auto-fill-only-comments t "Autofill comments in modes that define them")
+  ;; Disable autosaving based on number of characters typed
+  (auto-save-interval 0)
+  ;; Save bookmark after every bookmark edit and also when Emacs is killed
+  (bookmark-save-flag 1)
+  ;; Autofill comments in modes that define them
+  (comment-auto-fill-only-comments t)
   (create-lockfiles nil)
   (custom-safe-themes t)
-  (delete-by-moving-to-trash t "Use system trash to deal with mistakes while deleting")
-  ;; Accelerate scrolling operations by fontifying only those portions of the buffer which are
-  ;; actually going to be displayed.
+  ;; Use system trash to deal with mistakes while deleting
+  (delete-by-moving-to-trash t)
+  ;; Accelerate scrolling operations by fontifying only those portions of the
+  ;; buffer which are actually going to be displayed.
   (fast-but-imprecise-scrolling t)
   (help-window-select t "Makes it easy to close the window")
   (history-delete-duplicates t)
   (idle-update-delay 1)
-  (read-process-output-max (* 5 1024 1024) "`lsp-mode' suggests increasing the value")
+  ;; `lsp-mode' suggests increasing the value
+  (read-process-output-max (* 5 1024 1024))
   (remote-file-name-inhibit-locks t)
   (ring-bell-function 'ignore "Disable beeping sound")
-  ;; If you have something on the system clipboard, and then kill something in Emacs, then by
-  ;; default whatever you had on the system clipboard is gone and there is no way to get it back.
-  ;; Setting the following option makes it so that when you kill something in Emacs, whatever was
-  ;; previously on the system clipboard is pushed into the kill ring. This way, you can paste it
+  ;; If you have something on the system clipboard, and then kill something in
+  ;; Emacs, then by default whatever you had on the system clipboard is gone and
+  ;; there is no way to get it back. Setting the following option makes it so
+  ;; that when you kill something in Emacs, whatever was previously on the
+  ;; system clipboard is pushed into the kill ring. This way, you can paste it
   ;; with `yank-pop'.
   (save-interprogram-paste-before-kill t)
-  ;; Enable use of system clipboard across Emacs and other applications, does not work on the TUI
+  ;; Enable use of system clipboard across Emacs and other applications, does
+  ;; not work on the TUI
   (select-enable-clipboard t)
   (sentence-end-double-space nil)
-  (shift-select-mode nil "Do not use `shift-select' for marking, possibly use it for `windmove'")
+  ;; Do not use `shift-select' for marking, possibly use it for `windmove'
+  (shift-select-mode nil)
   (sort-fold-case nil "Do not ignore case when sorting")
   (standard-indent 2)
   (switch-to-buffer-preserve-window-point t)
@@ -180,13 +206,17 @@
   (warning-minimum-level :error)
   (window-combination-resize t "Resize windows proportionally")
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
-  (x-gtk-resize-child-frames 'resize-mode "Always trigger an immediate resize of the child frame")
-  (x-underline-at-descent-line t "Underline looks a bit better when drawn lower")
-  (read-buffer-completion-ignore-case t "Ignore case when reading a buffer name")
+  ;; Always trigger an immediate resize of the child frame
+  (x-gtk-resize-child-frames 'resize-mode)
+  ;; Underline looks a bit better when drawn lower
+  (x-underline-at-descent-line t)
+  ;; Ignore case when reading a buffer name
+  (read-buffer-completion-ignore-case t)
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (tags-add-tables nil)
   (tags-case-fold-search nil "case-sensitive")
-  (tags-revert-without-query t "Do not ask before rereading \"TAGS\" file after it has changed")
+  ;; Do not ask before rereading "TAGS" file after it has changed
+  (tags-revert-without-query t)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
   ;; ISSUE: There is a known bug with Emacs upstream.
@@ -196,15 +226,16 @@
   (backup-inhibited t "Disable backup for a per-file basis")
   (confirm-nonexistent-file-or-buffer t)
   (confirm-kill-emacs nil)
-  (confirm-kill-processes nil "Prevent 'Active processes exist' when you quit Emacs")
+  ;; Prevent 'Active processes exist' when you quit Emacs
+  (confirm-kill-processes nil)
   (make-backup-files nil "Stop making backup `~' files")
   (require-final-newline t "Always end a file with a newline")
-  ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents to the visiting
-  ;; file and runs all save-related hooks. We disable `auto-save-mode' and prefer
-  ;; `auto-save-visited-mode' instead.
+  ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents
+  ;; to the visiting file and runs all save-related hooks. We disable
+  ;; `auto-save-mode' and prefer `auto-save-visited-mode' instead.
   (auto-save-default nil)
-  ;; Save buffer to file after idling for some time, the default of 5s may be too frequent since
-  ;; it runs all the save-related hooks.
+  ;; Save buffer to file after idling for some time, the default of 5s may be
+  ;; too frequent since it runs all the save-related hooks.
   (auto-save-visited-interval 30)
   (revert-without-query '("\\.*") "Revert all files without asking")
   (custom-file (no-littering-expand-var-file-name "custom.el"))
@@ -232,7 +263,7 @@
     (setq
      next-error-message-highlight t
      read-minibuffer-restore-windows t
-     ;; Hide commands in "M-x" in Emacs 28 which do not work in the current mode.
+     ;; Hide commands in "M-x" which do not work in the current mode.
      read-extended-command-predicate #'command-completion-default-include-p
      use-short-answers t))
 
@@ -254,15 +285,20 @@
   ;; Enable the following modes
   (dolist
       (mode
-       '(auto-save-visited-mode ; Auto-save file-visiting buffers at idle time intervals
+       '(
+         ;; Auto-save file-visiting buffers at idle time intervals
+         auto-save-visited-mode
          column-number-mode
-         delete-selection-mode ; Typing with the mark active will overwrite the marked region
-         global-visual-line-mode ; Use soft wraps, wrap lines without the ugly continuation marks
-         size-indication-mode
-         ;; When you call `find-file', you do not need to clear the existing file path before adding
-         ;; the new one. Just start typing the whole path and Emacs will "shadow" the current one.
-         ;; For example, you are at "~/Documents/notes/file.txt" and you want to go to
-         ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take you there.
+         ;; Typing with the mark active will overwrite the marked region
+         delete-selection-mode
+         ;; Use soft wraps, wrap lines without the ugly continuation marks
+         global-visual-line-mode size-indication-mode
+         ;; When you call `find-file', you do not need to clear the existing
+         ;; file path before adding the new one. Just start typing the whole
+         ;; path and Emacs will "shadow" the current one. For example, you are
+         ;; at "~/Documents/notes/file.txt" and you want to go to
+         ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
+         ;; you there.
          file-name-shadow-mode))
     (when (fboundp mode)
       (funcall mode 1)))
@@ -270,26 +306,29 @@
   ;; Scroll settings from Doom Emacs
   (setq
    scroll-preserve-screen-position t
-   scroll-margin 5 ; Add margin lines when scrolling vertically to have a sense of continuity
+   ;; Add margin lines when scrolling vertically to have a sense of continuity
+   scroll-margin 5
    scroll-conservatively 101
    bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
-   ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines
+   ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for
+   ;; tall lines
    auto-window-vscroll nil)
 
-  ;; Changing buffer-local variables will only affect a single buffer. `setq-default' changes the
-  ;; buffer-local variable's default value.
+  ;; Changing buffer-local variables will only affect a single buffer.
+  ;; `setq-default' changes the buffer-local variable's default value.
   (setq-default
    cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
    fill-column sb/fill-column
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
-   ;; TAB first tries to indent the current line, and if the line was already indented,
-   ;; then try to complete the thing at point.
+   ;; TAB first tries to indent the current line, and if the line was already
+   ;; indented, then try to complete the thing at point.
    tab-always-indent 'complete
    bidi-display-reordering 'left-to-right
    bidi-paragraph-direction 'left-to-right)
 
-  (diminish 'auto-fill-function) ; Not a library/file, so `eval-after-load' does not work
+  ;; Not a library/file, so `eval-after-load' does not work
+  (diminish 'auto-fill-function)
 
   (advice-add 'risky-local-variable-p :override #'ignore)
 
@@ -313,7 +352,8 @@
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
-  (global-auto-revert-non-file-buffers t "Revert dired buffers if the directory contents changes")
+  ;; Revert `dired' buffers if the directory contents changes
+  (global-auto-revert-non-file-buffers t)
   :diminish auto-revert-mode)
 
 (use-package savehist
@@ -342,7 +382,8 @@
   (save-abbrevs 'silently)
   :diminish)
 
-;; This puts the buffer in read-only mode and disables font locking, revert with "C-c C-c".
+;; This puts the buffer in read-only mode and disables font locking, revert with
+;; "C-c C-c".
 (use-package so-long
   :straight (:type built-in)
   :when sb/EMACS28+
@@ -383,7 +424,8 @@
   ;; Larger values help in lookup but takes more time to check if the files exist
   (recentf-max-saved-items 250)
   :config
-  ;; Abbreviate the home directory to "~/" to make it easy to read the actual file name.
+  ;; Abbreviate the home directory to "~/" to make it easy to read the actual
+  ;; file name.
   (unless sb/EMACS28+
     (setq recentf-filename-handlers '(abbreviate-file-name)))
 
@@ -394,8 +436,8 @@
              ,(recentf-expand-file-name (straight--emacs-dir "straight"))))
     (add-to-list 'recentf-exclude exclude))
 
-  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent list periodically
-  ;; after idling for a few seconds.
+  ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent
+  ;; list periodically after idling for a few seconds.
   (run-with-idle-timer 30 t #'recentf-save-list))
 
 (progn
@@ -420,9 +462,9 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; Use "Shift + direction" arrows for moving around windows. I also use the "Shift + direction"
-;; keybindings for moving around windows in Tmux which is okay because I do not split Emacs frames
-;; often.
+;; Use "Shift + direction" arrows for moving around windows. I also use the
+;; "Shift + direction" keybindings for moving around windows in Tmux which is
+;; okay because I do not split Emacs frames often.
 (use-package windmove
   :straight (:type built-in)
   :when (display-graphic-p)
@@ -463,28 +505,32 @@
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
-  (ediff-split-window-function #'split-window-horizontally "Split diffs side by side")
-  (ediff-keep-variants nil "Prompt and kill file variants on quitting an Ediff session"))
+  ;; Split diffs side by side
+  (ediff-split-window-function #'split-window-horizontally)
+  ;; Prompt and kill file variants on quitting an Ediff session
+  (ediff-keep-variants nil))
 
-;; To edit remote files, use "/method:user@host#port:filename". The shortcut "/ssh::" will connect
-;; to default "user@host#port". To edit a local file with sudo, use "C-x C-f /sudo::/etc/hosts". To
-;; open a remote file with ssh + sudo, use "C-x C-f /ssh:host|sudo:root:/etc/passwd".
+;; To edit remote files, use "/method:user@host#port:filename".
+;; The shortcut "/ssh::" will connect to default "user@host#port".
+;; To edit a local file with sudo, use "C-x C-f /sudo::/etc/hosts".
+;; To open a remote file with ssh + sudo, use "C-x C-f /ssh:host|sudo:root:/etc/passwd".
 ;; Multihop syntax: "C-x C-f /ssh:bird@bastion|ssh:you@remotehost:/path"
 ;; Multihop with sudo: "C-x C-f /ssh:you@remotehost|sudo:remotehost:/path/to/file"
-;; Multihop with sudo with custom user: "C-x C-f
-;; /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
+;; Multihop with sudo with custom user: "C-x C-f /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 (use-package tramp
   :straight (:type built-in)
   :bind ("C-S-q" . tramp-cleanup-all-buffers)
   :custom
-  (remote-file-name-inhibit-cache nil "Remote files are not updated outside of Tramp")
+  ;; Remote files are not updated outside of Tramp
+  (remote-file-name-inhibit-cache nil)
   (tramp-verbose 1 "Only errors and warnings")
   :config
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include this directory in $PATH on remote
-  (add-to-list 'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
+  (add-to-list
+   'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
   (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
@@ -497,12 +543,18 @@
 (use-package ibuffer
   :straight (:type built-in)
   :hook (ibuffer . ibuffer-auto-mode)
-  :bind (("C-x C-b" . ibuffer-jump) :map ibuffer-mode-map ("`" . ibuffer-switch-format))
+  :bind
+  (("C-x C-b" . ibuffer-jump)
+   :map
+   ibuffer-mode-map
+   ("`" . ibuffer-switch-format))
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
-  (ibuffer-show-empty-filter-groups nil "Do not show empty groups if there are no buffers")
-  (ibuffer-formats '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
+  (ibuffer-show-empty-filter-groups
+   nil "Do not show empty groups if there are no buffers")
+  (ibuffer-formats
+   '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
   :config (require 'ibuf-ext)
   ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
   (defalias 'list-buffers 'ibuffer))
@@ -531,11 +583,16 @@
    (lambda ()
      (ignore-errors
        (persistent-scratch-setup-default))))
-  :config (advice-add 'persistent-scratch-setup-default :around #'sb/inhibit-message-call-orig-fun))
+  :config
+  (advice-add
+   'persistent-scratch-setup-default
+   :around #'sb/inhibit-message-call-orig-fun))
 
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
-  :config (push '(helpful-mode :noselect t :position bottom :height 20) popwin:special-display-config))
+  :config
+  (push '(helpful-mode :noselect t :position bottom :height 20)
+        popwin:special-display-config))
 
 (use-package avy
   :bind
@@ -545,8 +602,8 @@
    ("C-M-c" . avy-copy-line)
    ("C-M-m" . avy-move-line)
    :map isearch-mode-map
-   ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the many currently
-   ;; visible `isearch' candidates.
+   ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the
+   ;; many currently visible `isearch' candidates.
    ("C-'" . avy-isearch)))
 
 (use-package ace-window
@@ -575,7 +632,7 @@
     (dired-next-line -1))
   :straight (:type built-in)
   :hook
-  ((dired-mode . auto-revert-mode) ; Auto refresh dired when files change
+  ((dired-mode . auto-revert-mode) ; Auto refresh `dired' when files change
    (dired-mode . dired-hide-details-mode))
   :bind
   (:map
@@ -585,16 +642,21 @@
    ("M-<down>" . sb/dired-jump-to-bottom)
    ("i" . find-file))
   :custom
-  ;; When there are two dired buffer windows in the same frame, Emacs will select the other buffer
-  ;; as the target directory (e.g., for copying or renaming files).
+  ;; When there are two `dired' buffer windows in the same frame, Emacs will
+  ;; select the other buffer as the target directory (e.g., for copying or
+  ;; renaming files).
   (dired-dwim-target t)
-  (dired-auto-revert-buffer t "Revert each dired buffer automatically when you revisit it")
-  ;; "A" is to avoid listing "." and "..", "B" is to avoid listing backup entries ending with "~",
-  ;; "F" appends indicator to entries, "g" omits the owner, "h" is to print human-readable sizes,
-  ;; "N" prints entry names without quoting, "si" is to use powers of 1000 not 1024, "o" does not
-  ;; print group information, "p" is to append "/" indicator to directories, "v" uses natural sort
-  ;; of (version) numbers within text. Check "ls" for additional options.
-  (dired-listing-switches "-ABFghlNopv --group-directories-first --time-style=locale")
+  ;; Revert each dired buffer automatically when you revisit it
+  (dired-auto-revert-buffer t)
+  ;; "A" is to avoid listing "." and "..", "B" is to avoid listing backup
+  ;; entries ending with "~", "F" appends indicator to entries, "g" omits the
+  ;; owner, "h" is to print human-readable sizes, "N" prints entry names without
+  ;; quoting, "si" is to use powers of 1000 not 1024, "o" does not print group
+  ;; information, "p" is to append "/" indicator to directories, "v" uses
+  ;; natural sort of (version) numbers within text. Check "ls" for additional
+  ;; options.
+  (dired-listing-switches
+   "-ABFghlNopv --group-directories-first --time-style=locale")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
@@ -649,16 +711,19 @@
 (use-package dired-hist
   :straight (:host github :repo "karthink/dired-hist")
   :hook (dired-mode . dired-hist-mode)
-  :bind (:map dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+  :bind
+  (:map
+   dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
-;; In Emacs Lisp mode, `xref-find-definitions' will by default find only functions and variables
-;; from Lisp packages which are loaded into the current Emacs session or are auto-loaded.
+;; In Emacs Lisp mode, `xref-find-definitions' will by default find only
+;; functions and variables from Lisp packages which are loaded into the current
+;; Emacs session or are auto-loaded.
 (use-package xref
   :bind
   (("M-." . xref-find-definitions)
    ("M-?" . xref-find-references)
-   ("C-M-." . xref-find-apropos) ; Find all identifiers whose name matches pattern
-   ("M-," . xref-go-back))
+   ;; Find all identifiers whose name matches pattern
+   ("C-M-." . xref-find-apropos) ("M-," . xref-go-back))
   :custom (xref-search-program 'ripgrep))
 
 (use-package project
@@ -675,7 +740,9 @@
    ("k" . project-kill-buffers)
    ("g" . project-find-regexp)
    ("r" . project-query-replace-regexp))
-  :custom (project-switch-commands 'project-find-file "Start `project-find-file' by default"))
+  :custom
+  ;; Start `project-find-file' by default
+  (project-switch-commands 'project-find-file))
 
 (use-package project-x
   :straight (:host github :repo "karthink/project-x")
@@ -690,12 +757,14 @@
    :includes (vertico-directory vertico-repeat vertico-quick))
   :hook
   ((emacs-startup . vertico-mode)
-   ;; Tidy shadowed file names. That is, when using a command for selecting a file in the minibuffer,
-   ;; the following fixes the path so the selected path does not have prepended junk left behind.
-   ;; This works with `file-name-shadow-mode' enabled. When you are in a sub-directory and use, say,
-   ;; `find-file' to go to your home '~/' or root '/' directory, Vertico will clear the old path to
-   ;; keep only your current input.
-   (rfn-eshadow-update-overlay . vertico-directory-tidy) (minibuffer-setup . vertico-repeat-save))
+   ;; Tidy shadowed file names. That is, when using a command for selecting a
+   ;; file in the minibuffer, the following fixes the path so the selected path
+   ;; does not have prepended junk left behind. This works with
+   ;; `file-name-shadow-mode' enabled. When you are in a sub-directory and use,
+   ;; say, `find-file' to go to your home '~/' or root '/' directory, Vertico
+   ;; will clear the old path to keep only your current input.
+   (rfn-eshadow-update-overlay . vertico-directory-tidy)
+   (minibuffer-setup . vertico-repeat-save))
   :bind
   (("C-c r" . vertico-repeat-last)
    ("M-r" . vertico-repeat-select)
@@ -718,9 +787,9 @@
   :after vertico
   :commands consult-fd
   :bind
-  ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f SPC" to filter by
-   ;; files, "p SPC" to filter by projects. If you press "DEL" afterwards, the full candidate list
-   ;; will be shown again.
+  ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
+   ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
+   ;; afterwards, the full candidate list will be shown again.
    ([remap switch-to-buffer] . consult-buffer)
    ("<f3>" . consult-buffer)
    ([remap project-switch-to-buffer] . consult-project-buffer)
@@ -737,9 +806,9 @@
    ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
    ("C-c s l" . consult-locate)
-   ;; Prefix argument "C-u" allows to specify the directory. You can pass additional grep flags to
-   ;; `consult-grep' with the "--" separator. E.g.: "foo bar -- -A3" to get matches with 3 lines of
-   ;; 'after' context.
+   ;; Prefix argument "C-u" allows to specify the directory. You can pass
+   ;; additional grep flags to `consult-grep' with the "--" separator. E.g.:
+   ;; "foo bar -- -A3" to get matches with 3 lines of 'after' context.
    ([remap rgrep] . consult-grep)
    ("C-c s g" . consult-grep)
    ([remap vc-git-grep] . consult-git-grep)
@@ -759,10 +828,11 @@
   (consult-line-start-from-top t "Start search from the beginning")
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
-  (consult-preview-key nil "Disable preview by default, enable for selected commands")
+  ;; Disable preview by default, enable for selected commands
+  (consult-preview-key nil)
   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
-  ;; Having multiple other sources like recentf makes it difficult to identify and switch quickly
-  ;; between only buffers, especially while wrapping around.
+  ;; Having multiple other sources like `recentf' makes it difficult to identify
+  ;; and switch quickly between only buffers, especially while wrapping around.
   (consult-buffer-sources '(consult--source-buffer))
   (consult-narrow-key "<")
   :config
@@ -812,22 +882,32 @@
   :config
   (with-eval-after-load "vertico"
     (bind-keys
-     :map vertico-map ("C-`" . embark-act) ("c-;" . embark-dwim) ("C-c C-e" . embark-export))))
+     :map
+     vertico-map
+     ("C-`" . embark-act)
+     ("c-;" . embark-dwim)
+     ("C-c C-e" . embark-export))))
 
-;; Supports exporting search results to a `grep-mode' buffer, on which you can use `wgrep'.
+;; Supports exporting search results to a `grep-mode' buffer, on which you can
+;; use `wgrep'.
 (use-package embark-consult
   :after (embark consult)
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-;; Rich annotations in the minibuffer, e.g., documentation strings or file information.
+;; Rich annotations in the minibuffer, e.g., documentation strings or file
+;; information.
 (use-package marginalia
   :after vertico
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  (setq marginalia-annotator-registry (assq-delete-all 'file marginalia-annotator-registry))
-  (add-to-list 'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
-  (add-to-list 'marginalia-annotator-registry '(project-buffer marginalia-annotate-project-buffer)))
+  (setq marginalia-annotator-registry
+        (assq-delete-all 'file marginalia-annotator-registry))
+  (add-to-list
+   'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
+  (add-to-list
+   'marginalia-annotator-registry
+   '(project-buffer marginalia-annotate-project-buffer)))
 
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
@@ -847,8 +927,10 @@
   (ispell-dictionary "en_US")
   (ispell-local-dictionary "en_US")
   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  (ispell-alternate-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
-  (ispell-silently-savep t "Save a new word to personal dictionary without asking")
+  (ispell-alternate-dictionary
+   (expand-file-name "wordlist.5" sb/extras-directory))
+  ;; Save a new word to personal dictionary without asking
+  (ispell-silently-savep t)
   :config
   (cond
    ((and (symbol-value 'sb/IS-LINUX) (executable-find "hunspell"))
@@ -858,7 +940,15 @@
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
       (setq
        ispell-program-name "hunspell"
-       ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+       ispell-local-dictionary-alist
+       '(("en_US"
+          "[[:alpha:]]"
+          "[^[:alpha:]]"
+          "[']"
+          nil
+          ("-d" "en_US")
+          nil
+          utf-8))
        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
    ((and (symbol-value 'sb/IS-LINUX) (executable-find "aspell"))
@@ -873,25 +963,38 @@
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
       (setq
        ispell-program-name "hunspell"
-       ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))
+       ispell-local-dictionary-alist
+       '(("en_US"
+          "[[:alpha:]]"
+          "[^[:alpha:]]"
+          "[']"
+          nil
+          ("-d" "en_US")
+          nil
+          utf-8))
        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff")))))))
 
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC"))
-  (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE"))
+  (add-to-list
+   'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE"))
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
   (add-to-list 'ispell-skip-region-alist '("=" "="))
   (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
-  ;; Footnotes in org that have http links that are line breaked should not be ispelled
+  ;; Footnotes in org that have http links that are line breaked should not be
+  ;; ispelled
   (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
   (add-to-list 'ispell-skip-region-alist '("`" "`"))
   (add-to-list 'ispell-skip-region-alist '("cite:" . "[[:space:]]"))
   (add-to-list 'ispell-skip-region-alist '("label:" . "[[:space:]]"))
   (add-to-list 'ispell-skip-region-alist '("ref:" . "[[:space:]]"))
-  (add-to-list 'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
-  (add-to-list 'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
-  (add-to-list 'ispell-skip-region-alist '("\\\\begin{align}" . "\\\\end{align}"))
+  (add-to-list
+   'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
+  (add-to-list
+   'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
+  (add-to-list
+   'ispell-skip-region-alist '("\\\\begin{align}" . "\\\\end{align}"))
 
   ;; Hide the "Starting new Ispell process" message
   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
@@ -900,9 +1003,9 @@
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
-;; As of Emacs 29, `flyspell' does not provide a way to automatically check only the on-screen text.
-;; "M-$" triggers correction for the misspelled word before point, "C-u M-$" triggers correction for
-;; the entire buffer.
+;; As of Emacs 29, `flyspell' does not provide a way to automatically check only
+;; the on-screen text. "M-$" triggers correction for the misspelled word before
+;; point, "C-u M-$" triggers correction for the entire buffer.
 (use-package jinx
   :when (symbol-value 'sb/IS-LINUX)
   :hook ((text-mode conf-mode prog-mode) . jinx-mode)
@@ -913,8 +1016,9 @@
 (use-package helpful
   :bind
   (([remap describe-variable] . helpful-variable) ; "C-h v"
-   ;; The built-in `describe-function' includes both functions and macros. `helpful-function' is only
-   ;; for functions, so we use `helpful-callable' as a replacement.
+   ;; The built-in `describe-function' includes both functions and macros.
+   ;; `helpful-function' is only for functions, so we use `helpful-callable' as
+   ;; a replacement.
    ([remap describe-function] . helpful-callable) ; "C-h f"
    ([remap describe-symbol] . helpful-symbol) ; "C-h o"
    ([remap describe-key] . helpful-key) ; "C-h k"
@@ -979,9 +1083,9 @@
       ("REFACTOR" . "#cc9393"))
     hl-todo-keyword-faces)))
 
-;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark, use `bookmark-jump'
-;; ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename the bookmarked location in
-;; `bookmark-bmenu-mode' with `R'.
+;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
+;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
+;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
 (use-package bm
   :init
   (setq
@@ -1011,9 +1115,9 @@
 
 (use-package colorful-mode
   :hook
-  ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode helpful-mode)
-   .
-   colorful-mode)
+  ((LaTeX-mode
+    css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode helpful-mode)
+   . colorful-mode)
   :diminish)
 
 ;; Temporarily highlight the region involved in certain operations like `kill-line' and `yank'.
@@ -1038,9 +1142,14 @@
   :straight (:type built-in)
   :bind
   (("C-s")
-   ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
-   ("C-f" . isearch-forward-regexp) ("C-r" . isearch-backward-regexp)
-   :map isearch-mode-map ("C-s") ("C-f" . isearch-repeat-forward) ("C-c C-o" . isearch-occur))
+   ("C-M-f")
+   ("C-f" . isearch-forward-regexp)
+   ("C-r" . isearch-backward-regexp)
+   :map
+   isearch-mode-map
+   ("C-s")
+   ("C-f" . isearch-repeat-forward)
+   ("C-c C-o" . isearch-occur))
   :custom (isearch-lazy-count t "Show match count"))
 
 ;; Auto populate `isearch' with the symbol at point
@@ -1061,10 +1170,11 @@
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
-;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode' might freeze
-;; Emacs for several minutes.
+;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode'
+;; might freeze Emacs for several minutes.
 (use-package wgrep
-  ;; Allows you to edit a deadgrep buffer and apply those changes to the file buffer.
+  ;; Allows you to edit a deadgrep buffer and apply those changes to the file
+  ;; buffer.
   :hook (deadgrep-finished . wgrep-deadgrep-setup)
   :bind
   (:map
@@ -1075,13 +1185,14 @@
    ("C-x C-q" . wgrep-exit))
   :custom (wgrep-auto-save-buffer t))
 
-;; `consult-rg' provides live search, while `deadgrep' provides a resulting search buffer.
+;; `consult-rg' provides live search, while `deadgrep' provides a resulting
+;; search buffer.
 (use-package deadgrep
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
 
-;; Package `visual-regexp' provides an alternate version of `query-replace' which highlights matches
-;; and replacements as you type.
+;; Package `visual-regexp' provides an alternate version of `query-replace'
+;; which highlights matches and replacements as you type.
 (use-package visual-regexp
   :bind
   ([remap query-replace] . vr/query-replace)
@@ -1091,7 +1202,8 @@
   :straight (:type built-in)
   :custom (vc-handled-backends '(Git))
   ;; Disable version control for remote files to improve performance
-  (vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
+  (vc-ignore-dir-regexp
+   (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
 
 (use-package transient
   :custom (transient-semantic-coloring t)
@@ -1099,7 +1211,10 @@
 
 (use-package magit
   :after transient
-  :bind (("C-x g" . magit-status) ("C-c M-g" . magit-file-dispatch) ("C-x M-g" . magit-dispatch))
+  :bind
+  (("C-x g" . magit-status)
+   ("C-c M-g" . magit-file-dispatch)
+   ("C-x M-g" . magit-dispatch))
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
@@ -1108,7 +1223,8 @@
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
-  (magit-diff-refine-hunk t "Show fine differences for the current diff hunk only"))
+  (magit-diff-refine-hunk
+   t "Show fine differences for the current diff hunk only"))
 
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
@@ -1136,7 +1252,8 @@
     (lambda ()
       (unless (display-graphic-p)
         (diff-hl-margin-local-mode 1))))
-   (dired-mode . diff-hl-dired-mode-unless-remote) (emacs-startup . global-diff-hl-mode))
+   (dired-mode . diff-hl-dired-mode-unless-remote)
+   (emacs-startup . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -1198,7 +1315,8 @@
 
   (defun sb/add-markdown-pairs ()
     "Add custom pairs to `markdown-mode'."
-    (setq-local electric-pair-pairs (append electric-pair-pairs sb/markdown-pairs))
+    (setq-local electric-pair-pairs
+                (append electric-pair-pairs sb/markdown-pairs))
     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
@@ -1228,8 +1346,10 @@
   ;; `flycheck-idle-change-delay' to be in effect while editing.
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
   (flycheck-checker-error-threshold nil)
-  (flycheck-idle-buffer-switch-delay 2 "Increase the time (s) to allow for quick transitions")
-  (flycheck-idle-change-delay 2 "Increase the time (s) to allow for transient edits")
+  (flycheck-idle-buffer-switch-delay
+   2 "Increase the time (s) to allow for quick transitions")
+  (flycheck-idle-change-delay
+   2 "Increase the time (s) to allow for transient edits")
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-global-modes '(not csv-mode conf-mode))
   :config
@@ -1278,8 +1398,11 @@
                   ("HTML" tidy)
                   ("LaTeX" latexindent)
                   ("Markdown" (prettier "--print-width" "100"))
-                  ("Perl"
-                   (perltidy "--quiet" "--standard-error-output" "--perl-best-practices" "-l=100"))
+                  ("Perl" (perltidy
+                    "--quiet"
+                    "--standard-error-output"
+                    "--perl-best-practices"
+                    "-l=100"))
                   ("Python" (yapf "--style" "file") isort)
                   ("Shell" (shfmt "-i" "4" "-ci"))
                   ("XML" tidy)
@@ -1338,7 +1461,8 @@
    ("M-n" . minibuffer-next-completion)
    ("M-RET" . minibuffer-choose-completion))
   :custom
-  (read-file-name-completion-ignore-case t "Ignore case when reading a file name")
+  (read-file-name-completion-ignore-case
+   t "Ignore case when reading a file name")
   (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
   :config
   ;; Show docstring description for completion candidates in commands like `describe-function'.
@@ -1354,7 +1478,8 @@
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
   ;; work. I also want substring matching for file names.
-  (setq completion-category-overrides '((file (styles basic substring partial-completion)))))
+  (setq completion-category-overrides
+        '((file (styles basic substring partial-completion)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
 ;; presents suggestions for completion.
@@ -1445,13 +1570,19 @@
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic flex))
-  (company-ispell-dictionary (expand-file-name "wordlist.5" sb/extras-directory))
+  (company-ispell-dictionary
+   (expand-file-name "wordlist.5" sb/extras-directory))
   (company-show-quick-access t "Speed up selecting a completion")
   (company-tooltip-align-annotations t)
   (company-global-modes
-   '(not dired-mode magit-status-mode help-mode csv-mode minibuffer-inactive-mode))
+   '(not dired-mode
+         magit-status-mode
+         help-mode
+         csv-mode
+         minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
-  (company-selection-wrap-around t "Convenient to wrap around completion items at boundaries"))
+  (company-selection-wrap-around
+   t "Convenient to wrap around completion items at boundaries"))
 
 (use-package company-quickhelp
   :after company
@@ -1501,7 +1632,9 @@
 (use-package company-c-headers
   :after (company cc-mode)
   :demand t
-  :custom (company-c-headers-path-system '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
+  :custom
+  (company-c-headers-path-system
+   '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 (use-package company-web
   :after company
@@ -1557,11 +1690,14 @@
      ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
      ;; ignored.
      company-ispell company-dict company-dabbrev)
-   company-transformers '(delete-dups company-sort-by-statistics company-sort-prefer-same-case-prefix))
+   company-transformers
+   '(delete-dups company-sort-by-statistics
+                 company-sort-prefer-same-case-prefix))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
-  (push (apply-partially #'cl-remove-if (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+  (push (apply-partially #'cl-remove-if
+                         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
         company-transformers)
 
   (progn
@@ -1571,22 +1707,23 @@
       ;; `company-capf' does not pass to later backends with Texlab, so it makes it difficult to
       ;; complete non-LaTeX commands (e.g. words) which is the majority. We therefore exclude it
       ;; from `company-backends' and invoke it on demand.
-      (setq company-backends
-            '(company-files
-              company-bibtex
-              company-reftex-citations
-              company-math-symbols-latex ; Math latex tags
-              company-latex-commands
-              company-reftex-labels
-              company-auctex-environments
-              company-auctex-macros
-              company-auctex-labels
-              company-math-symbols-unicode ; Math unicode symbols and sub(super)scripts
-              company-auctex-symbols
-              company-auctex-bibs
-              company-ispell
-              company-dict
-              company-dabbrev)))
+      (setq
+       company-backends
+       '(company-files
+         company-bibtex
+         company-reftex-citations
+         company-math-symbols-latex ; Math latex tags
+         company-latex-commands
+         company-reftex-labels
+         company-auctex-environments
+         company-auctex-macros
+         company-auctex-labels
+         company-math-symbols-unicode ; Math unicode symbols and sub(super)scripts
+         company-auctex-symbols
+         company-auctex-bibs
+         company-ispell
+         company-dict
+         company-dabbrev)))
 
     (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
 
@@ -1594,7 +1731,8 @@
     (defun sb/company-org-mode ()
       (set
        (make-local-variable 'company-backends)
-       '(company-files company-org-block company-ispell company-dict company-dabbrev)))
+       '(company-files
+         company-org-block company-ispell company-dict company-dabbrev)))
 
     (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
 
@@ -1634,7 +1772,10 @@
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         (company-capf company-web-html) company-dict company-ispell company-dabbrev)))
+         (company-capf company-web-html)
+         company-dict
+         company-ispell
+         company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
       (add-hook hook (lambda () (sb/company-html-mode)))))
@@ -1721,35 +1862,46 @@
      ;; "--enable-config"
      "--pch-storage=memory" ; Increases memory usage but can improve performance
      "--pretty"))
-  (lsp-completion-provider :none "Enable integration of custom backends other than `capf'")
-  (lsp-completion-show-detail t "Disable completion metadata, e.g., java.util.ArrayList")
-  (lsp-completion-show-kind t "Show completion kind, e.g., interface/class")
-  (lsp-completion-show-label-description t "Show description of completion candidates")
+  (lsp-completion-provider
+   :none "Enable integration of custom backends other than `capf'")
+  (lsp-completion-show-detail
+   t "Show/hide completion metadata, e.g., java.util.ArrayList")
+  (lsp-completion-show-kind
+   t "Show/hide completion kind, e.g., interface/class")
+  (lsp-completion-show-label-description
+   t "Show/hide description of completion candidates")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
-  (lsp-headerline-breadcrumb-enable nil "Breadcrumb is not useful for all modes")
+  (lsp-headerline-breadcrumb-enable
+   nil "Breadcrumb is not useful for all modes")
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
   (lsp-lens-enable nil "Lenses are intrusive")
-  (lsp-modeline-diagnostics-enable nil "We have Flycheck, and the modeline gets congested")
-  (lsp-modeline-diagnostics-scope :file "Simpler to focus on the errors at hand")
+  (lsp-modeline-diagnostics-enable
+   nil "We have Flycheck, and the modeline gets congested")
+  (lsp-modeline-diagnostics-scope
+   :file "Simpler to focus on the errors at hand")
   ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
   ;; request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
-  (lsp-restart 'auto-restart "Avoid annoying questions, we expect a server restart to succeed")
+  (lsp-restart
+   'auto-restart
+   "Avoid annoying questions, we expect a server restart to succeed")
   (lsp-xml-logs-client nil)
-  (lsp-warn-no-matched-clients nil "Avoid warning messages for unsupported modes like csv-mode")
+  (lsp-warn-no-matched-clients
+   nil "Avoid warning messages for unsupported modes like csv-mode")
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
   ;; I use `symbol-overlay' to include languages that do not have a language server
   (lsp-enable-symbol-highlighting nil)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   ;; We can also set this per-project
-  (lsp-pylsp-plugins-preload-modules ["numpy" "csv" "pandas" "statistics" "json"])
+  (lsp-pylsp-plugins-preload-modules
+   ["numpy" "csv" "pandas" "statistics" "json"])
   (lsp-pylsp-plugins-pycodestyle-enabled nil)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
   (lsp-pylsp-plugins-pylint-enabled t)
@@ -1800,13 +1952,19 @@
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
         orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  (advice-add
+   'lsp-resolve-final-command
+   :around #'lsp-booster--advice-final-command)
 
   :diminish)
 
 (use-package consult-lsp
   :after (consult lsp)
-  :bind (:map lsp-command-map ("g" . consult-lsp-symbols) ("h" . consult-lsp-file-symbols)))
+  :bind
+  (:map
+   lsp-command-map
+   ("g" . consult-lsp-symbols)
+   ("h" . consult-lsp-file-symbols)))
 
 ;; Try to delete `lsp-java-workspace-dir' if the JDTLS fails
 (use-package lsp-java
@@ -1822,7 +1980,8 @@
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url
-   (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml" sb/user-home-directory)))
+   (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
+                     sb/user-home-directory)))
 
 (use-package lsp-grammarly
   :after lsp-mode
@@ -1837,14 +1996,18 @@
 (use-package lsp-ltex
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
-  (lsp-ltex-language "en" "Recommended to set a generic language to disable spell check")
+  (lsp-ltex-language
+   "en" "Recommended to set a generic language to disable spell check")
   (lsp-ltex-check-frequency "save")
-  (lsp-ltex-dictionary (expand-file-name "company-dict/text-mode" user-emacs-directory))
+  (lsp-ltex-dictionary
+   (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
   (setq lsp-ltex-disabled-rules
         #s(hash-table
-           size 30 data ("en-US" ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
+           size 30 data
+           ("en-US"
+            ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
 (use-package subword
   :straight (:type built-in)
@@ -1854,7 +2017,9 @@
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
-  :custom (symbol-overlay-idle-time 2 "Delay highlighting to allow for transient cursor placements")
+  :custom
+  (symbol-overlay-idle-time
+   2 "Delay highlighting to allow for transient cursor placements")
   :diminish)
 
 (use-package compile
@@ -1862,7 +2027,8 @@
   :bind (("<f10>" . compile) ("<f11>" . recompile))
   :custom
   (compile-command (format "make -k -j%s " (num-processors)))
-  (compilation-always-kill t "Kill a compilation process before starting a new one")
+  (compilation-always-kill
+   t "Kill a compilation process before starting a new one")
   (compilation-ask-about-save nil "Save all modified buffers without asking")
   ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first error.
   (compilation-scroll-output 'first-error))
@@ -1883,7 +2049,10 @@
   ;; Allow eldoc to trigger after completions
   (with-eval-after-load "company"
     (eldoc-add-command
-     'company-complete-selection 'company-complete-common 'company-capf 'company-abort))
+     'company-complete-selection
+     'company-complete-common
+     'company-capf
+     'company-abort))
   :diminish)
 
 (use-package treesit-auto
@@ -1892,7 +2061,8 @@
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom
   (treesit-auto-install 'prompt)
-  (treesit-font-lock-level 3 "Increased default font locking may hurt performance")
+  (treesit-font-lock-level
+   3 "Increased default font locking may hurt performance")
   (treesit-language-source-alist
    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
@@ -1939,7 +2109,9 @@
                      (treesit-language-available-p 'python)
                      (treesit-language-available-p 'toml)
                      (treesit-language-available-p 'yaml)))
-    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
+    (mapc
+     #'treesit-install-language-grammar
+     (mapcar #'car treesit-language-source-alist)))
 
   (with-eval-after-load "c++-ts-mode"
     (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -1983,8 +2155,13 @@
      (lsp-deferred)))
   :bind
   (:map
-   c-ts-mode-map ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun)
-   :map c++-ts-mode-map ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun)))
+   c-ts-mode-map
+   ("C-M-a" . treesit-beginning-of-defun)
+   ("C-M-e" . treesit-end-of-defun)
+   :map
+   c++-ts-mode-map
+   ("C-M-a" . treesit-beginning-of-defun)
+   ("C-M-e" . treesit-end-of-defun)))
 
 (use-package cuda-mode
   :mode ("\\.cu\\'" . cuda-mode)
@@ -2022,8 +2199,10 @@
    ("C-c <" . python-indent-shift-left)
    ("C-c >" . python-indent-shift-right))
   :custom
-  (python-shell-completion-native-enable nil "Disable readline based native completion")
-  (python-indent-guess-indent-offset-verbose nil "Remove guess indent python message")
+  (python-shell-completion-native-enable
+   nil "Disable readline based native completion")
+  (python-indent-guess-indent-offset-verbose
+   nil "Remove guess indent python message")
   (python-indent-guess-indent-offset nil)
   (python-indent-offset 4)
   (python-shell-exec-path "python3")
@@ -2036,10 +2215,15 @@
 (use-package pyvenv
   :hook ((python-mode python-ts-mode) . pyvenv-mode)
   :custom
-  (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name (" [venv:" pyvenv-virtual-env-name "] ")))
+  (pyvenv-mode-line-indicator
+   '(pyvenv-virtual-env-name (" [venv:" pyvenv-virtual-env-name "] ")))
   (pyvenv-post-activate-hooks
-   (list (lambda () (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python")))))
-  (pyvenv-post-deactivate-hooks (list (lambda () (setq python-shell-interpreter "python3")))))
+   (list
+    (lambda ()
+      (setq python-shell-interpreter
+            (concat pyvenv-virtual-env "bin/python")))))
+  (pyvenv-post-deactivate-hooks
+   (list (lambda () (setq python-shell-interpreter "python3")))))
 
 (use-package cperl-mode
   :straight (:type built-in)
@@ -2059,7 +2243,9 @@
 (use-package fish-mode
   :mode "\\.fish\\'"
   :interpreter "fish"
-  :hook (fish-mode . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
+  :hook
+  (fish-mode
+   . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
@@ -2148,8 +2334,16 @@
 
 ;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  :mode (("\\.md\\'" . markdown-mode) ("\\.markdown\\'" . markdown-mode) ("README\\.md\\'" . gfm-mode))
-  :bind (:map markdown-mode-map ("C-c C-d") ("C-c C-j") ("C-c C-c l" . markdown-live-preview-mode))
+  :mode
+  (("\\.md\\'" . markdown-mode)
+   ("\\.markdown\\'" . markdown-mode)
+   ("README\\.md\\'" . gfm-mode))
+  :bind
+  (:map
+   markdown-mode-map
+   ("C-c C-d")
+   ("C-c C-j")
+   ("C-c C-c l" . markdown-live-preview-mode))
   :custom
   (markdown-command
    "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
@@ -2241,10 +2435,11 @@
   (add-to-list 'org-latex-packages-alist '("" "color"))
   (add-to-list 'org-latex-packages-alist '("" "minted"))
 
-  (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setq
+   org-latex-pdf-process
+   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
   :bind-keymap ("C-c o" . org-mode-map)
   :bind
@@ -2287,9 +2482,9 @@
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
-;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which automatically replace the
-;; vanilla ones. Auctex provides `LaTeX-mode', which is an alias to `latex-mode'. Auctex overrides
-;; the tex package.
+;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
+;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
+;; is an alias to `latex-mode'. Auctex overrides the tex package.
 (use-package tex
   :straight auctex
   :hook
@@ -2301,18 +2496,22 @@
    (LaTeX-mode . lsp-deferred))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
-  (TeX-auto-save t "Enable parse on save, stores parsed information in an `auto' directory")
+  (TeX-auto-save
+   t "Enable parse on save, stores parsed information in an `auto' directory")
   (TeX-auto-untabify t "Remove all tabs before saving")
   (TeX-clean-confirm nil)
   ;; Automatically insert braces after typing ^ and _ in math mode
   (TeX-electric-sub-and-superscript t)
-  (TeX-electric-math t "Inserting $ completes the math mode and positions the cursor")
+  (TeX-electric-math
+   t "Inserting $ completes the math mode and positions the cursor")
   (TeX-parse-self t "Parse documents")
   (TeX-save-query nil "Save buffers automatically when compiling")
   (LaTeX-item-indent 0 "Indent lists by two spaces")
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-  (tex-fontify-script nil "Avoid raising of superscripts and lowering of subscripts")
-  ;; Avoid superscripts and subscripts from being displayed in a different font size
+  (tex-fontify-script
+   nil "Avoid raising of superscripts and lowering of subscripts")
+  ;; Avoid superscripts and subscripts from being displayed in a different font
+  ;; size
   (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
@@ -2329,7 +2528,8 @@
 
   (when (executable-find "okular")
     (setq
-     TeX-view-program-list '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+     TeX-view-program-list
+     '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
      TeX-view-program-selection '((output-pdf "Okular")))))
 
 (use-package bibtex
@@ -2343,16 +2543,21 @@
 (use-package consult-reftex
   :straight (:host github :repo "karthink/consult-reftex")
   :after (consult tex-mode)
-  :bind (("C-c [" . consult-reftex-insert-reference) ("C-c )" . consult-reftex-goto-label)))
+  :bind
+  (("C-c [" . consult-reftex-insert-reference)
+   ("C-c )" . consult-reftex-goto-label)))
 
 (use-package auctex-latexmk
   :after tex-mode
   :when (executable-find "latexmk")
   :demand t
-  :custom (auctex-latexmk-inherit-TeX-PDF-mode t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  :custom
+  ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
+  (auctex-latexmk-inherit-TeX-PDF-mode t)
   :config
   (auctex-latexmk-setup)
-  (add-hook 'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
+  (add-hook
+   'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
@@ -2394,7 +2599,8 @@
 ;; add dirs/files to scan here, one line per dir/file
 ")
   :config
-  ;; Try LSP first, and then use Citre if the enabled xref backends cannot find a definition
+  ;; Try LSP first, and then use Citre if the enabled xref backends cannot find
+  ;; a definition
   (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
     (let ((fetcher (apply -fn -args))
           (citre-fetcher
@@ -2454,8 +2660,8 @@
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-minor-modes t)
   (doom-modeline-checker-simple-format nil)
-  (doom-modeline-buffer-file-name-style 'file-name "Reduce space on the modeline")
-  (doom-modeline-unicode-fallback t "Use Unicode instead of ASCII when not using icons"))
+  (doom-modeline-buffer-file-name-style 'file-name)
+  (doom-modeline-unicode-fallback t))
 
 (use-package centaur-tabs
   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -2476,7 +2682,7 @@
     (setq
      centaur-tabs-set-icons t
      centaur-tabs-icon-type 'nerd-icons))
-  ;; Make the headline face match `centaur-tabs-default' face for an uniform face
+  ;; Make the headline face match `centaur-tabs-default' face
   (centaur-tabs-headline-match))
 
 (use-package olivetti
@@ -2496,14 +2702,16 @@ If region is active, apply to active region instead."
   (interactive "p")
   (if (use-region-p)
       (comment-or-uncomment-region (region-beginning) (region-end))
-    (let ((range (list (line-beginning-position) (goto-char (line-end-position n)))))
+    (let ((range
+           (list (line-beginning-position) (goto-char (line-end-position n)))))
       (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
     (forward-line 1)
     (back-to-indentation)))
 
-;; Inside strings, special keys like tab or F1-Fn have to be written inside angle brackets, e.g.
-;; "C-<up>". Standalone special keys (and some combinations) can be written in square brackets, e.g.
-;; [tab] instead of "<tab>".
+;; Inside strings, special keys like tab or F1-Fn have to be written inside
+;; angle brackets, e.g. "C-<up>". Standalone special keys (and some
+;; combinations) can be written in square brackets, e.g. [tab] instead of
+;; "<tab>".
 
 (bind-keys
  ("RET" . newline-and-indent)
@@ -2522,8 +2730,9 @@ If region is active, apply to active region instead."
  ("C-x x g" . revert-buffer-quick)
  ("C-x x r" . rename-file)
 
- ;; In a line with comments, "C-u M-;" removes the comments altogether. That means deleting the
- ;; comment, NOT UNCOMMENTING but removing all commented text and the comment marker itself.
+ ;; In a line with comments, "C-u M-;" removes the comments altogether. That
+ ;; means deleting the comment, NOT UNCOMMENTING but removing all commented text
+ ;; and the comment marker itself.
  ("C-c n" . comment-region)
  ("C-c m" . uncomment-region)
  ("C-c ;" . sb/comment-line)
@@ -2553,7 +2762,9 @@ If region is active, apply to active region instead."
 
 (use-package default-text-scale
   :when (display-graphic-p)
-  :bind (("C-M-+" . default-text-scale-increase) ("C-M--" . default-text-scale-decrease)))
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
 
 (use-package free-keys
   :commands free-keys)
