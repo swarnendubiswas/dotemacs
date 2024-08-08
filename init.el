@@ -1223,8 +1223,8 @@
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
-  (magit-diff-refine-hunk
-   t "Show fine differences for the current diff hunk only"))
+  ;; Show fine differences for the current diff hunk only
+  (magit-diff-refine-hunk t))
 
 (use-package difftastic
   :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
@@ -1342,14 +1342,14 @@
 (use-package flycheck
   :hook (emacs-startup . global-flycheck-mode)
   :custom
-  ;; Remove newline checks, since they would trigger an immediate check when we want the
-  ;; `flycheck-idle-change-delay' to be in effect while editing.
+  ;; Remove newline checks, since they would trigger an immediate check when we
+  ;; want the `flycheck-idle-change-delay' to be in effect while editing.
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
   (flycheck-checker-error-threshold nil)
-  (flycheck-idle-buffer-switch-delay
-   2 "Increase the time (s) to allow for quick transitions")
-  (flycheck-idle-change-delay
-   2 "Increase the time (s) to allow for transient edits")
+  ;; Increase the time (s) to allow for quick transitions
+  (flycheck-idle-buffer-switch-delay 2)
+  ;; Increase the time (s) to allow for transient edits
+  (flycheck-idle-change-delay 2)
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-global-modes '(not csv-mode conf-mode))
   :config
@@ -1449,11 +1449,12 @@
 (use-package consult-todo
   :commands consult-todo)
 
-;; "basic" matches only the prefix, "substring" matches the whole string. "initials" matches
-;; acronyms and initialisms, e.g., can complete "M-x lch" to "list-command-history".
-;; "partial-completion" style allows to use wildcards for file completion and partial paths, e.g.,
-;; "/u/s/l" for "/usr/share/local". While "partial-completion" matches search terms must match in
-;; order, "orderless" can match search terms in any order.
+;; "basic" matches only the prefix, "substring" matches the whole string.
+;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
+;; "list-command-history". "partial-completion" style allows to use wildcards
+;; for file completion and partial paths, e.g., "/u/s/l" for "/usr/share/local".
+;; While "partial-completion" matches search terms must match in order,
+;; "orderless" can match search terms in any order.
 (use-package minibuffer
   :straight (:type built-in)
   :bind
@@ -1476,13 +1477,13 @@
     ;; substring is needed to complete common prefix, orderless does not
     (setq completion-styles '(orderless substring basic)))
 
-  ;; The "basic" completion style needs to be tried first for TRAMP hostname completion to
-  ;; work. I also want substring matching for file names.
+  ;; The "basic" completion style needs to be tried first for TRAMP hostname
+  ;; completion to work. I also want substring matching for file names.
   (setq completion-category-overrides
         '((file (styles basic substring partial-completion)))))
 
-;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the current buffer and
-;; presents suggestions for completion.
+;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the
+;; current buffer and presents suggestions for completion.
 (use-package dabbrev
   :straight (:type built-in)
   :bind ("C-M-;" . dabbrev-completion)
@@ -1539,9 +1540,10 @@
   :after yasnippet
   :init (yasnippet-snippets-initialize))
 
-;; Use "M-x company-diag" or the modeline status (without diminish) to see the backend used for the
-;; last completion. Try "M-x company-complete-common" when there are no completions. Use "C-M-i" for
-;; `complete-symbol' with regex search.
+;; Use "M-x company-diag" or the modeline status (without diminish) to see the
+;; backend used for the last completion. Try "M-x company-complete-common" when
+;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
+;; search.
 (use-package company
   :hook (emacs-startup . global-company-mode)
   :bind
@@ -1581,8 +1583,8 @@
          csv-mode
          minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
-  (company-selection-wrap-around
-   t "Convenient to wrap around completion items at boundaries"))
+  ;; Convenient to wrap around completion items at boundaries
+  (company-selection-wrap-around t))
 
 (use-package company-quickhelp
   :after company
@@ -1652,47 +1654,52 @@
 ;; Merge completions of all the backends:
 ;; (setq company-backends '((company-xxx company-yyy company-zzz)))
 
-;; Merge completions of all the backends but keep the candidates organized in accordance with the
-;; grouped backends order.
+;; Merge completions of all the backends but keep the candidates organized in
+;; accordance with the grouped backends order.
 ;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
-;; A few backends are applicable to all modes: `company-yasnippet', `company-ispell',
-;; `company-dabbrev-code', and `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev'
-;; returns a non-nil prefix in almost any context (major mode, inside strings or comments). That is
-;; why it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command always returns
-;; non-nil for following backends even when their ‘candidates’ list command is empty:
-;; `company-abbrev', `company-dabbrev', `company-dabbrev-code'.
+;; A few backends are applicable to all modes: `company-yasnippet',
+;; `company-ispell', `company-dabbrev-code', and `company-dabbrev'.
+;; `company-yasnippet' is blocking. `company-dabbrev' returns a non-nil prefix
+;; in almost any context (major mode, inside strings or comments). That is why
+;; it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command
+;; always returns non-nil for following backends even when their ‘candidates’
+;; list command is empty: `company-abbrev', `company-dabbrev',
+;; `company-dabbrev-code'.
 
-;; The keyword :with helps to make sure the results from major/minor mode agnostic backends (such as
-;; company-yasnippet, company-dabbrev-code) are returned without preventing results from
-;; context-aware backends (such as company-capf or company-clang). For this feature to work, put
-;; backends dependent on a mode at the beginning of the grouped backends list, then put a keyword
-;; :with, and then put context agnostic backend(s).
+;; The keyword :with helps to make sure the results from major/minor mode
+;; agnostic backends (such as company-yasnippet, company-dabbrev-code) are
+;; returned without preventing results from context-aware backends (such as
+;; company-capf or company-clang). For this feature to work, put backends
+;; dependent on a mode at the beginning of the grouped backends list, then put a
+;; keyword :with, and then put context agnostic backend(s).
 ;; (setq company-backends '((company-capf :with company-yasnippet)))
 
-;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent backends . Only a
-;; few backends are specialized on certain major modes or certain contexts (e.g. outside of strings
-;; and comments), and pass on control to later backends when outside of that major mode or context.
+;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
+;; backends . Only a few backends are specialized on certain major modes or
+;; certain contexts (e.g. outside of strings and comments), and pass on control
+;; to later backends when outside of that major mode or context.
 
-;; Company does not support grouping of entirely arbitrary backends, they need to be compatible in
-;; what `prefix' returns. If the group contains keyword `:with', the backends listed after this
-;; keyword are ignored for the purpose of the `prefix' command. If the group contains keyword
-;; `:separate', the candidates that come from different backends are sorted separately in the
-;; combined list. That is, with `:separate', the multi-backend-adapter will stop sorting and keep
-;; the order of completions just like the backends returned them.
+;; Company does not support grouping of entirely arbitrary backends, they need
+;; to be compatible in what `prefix' returns. If the group contains keyword
+;; `:with', the backends listed after this keyword are ignored for the purpose
+;; of the `prefix' command. If the group contains keyword `:separate', the
+;; candidates that come from different backends are sorted separately in the
+;; combined list. That is, with `:separate', the multi-backend-adapter will stop
+;; sorting and keep the order of completions just like the backends returned
+;; them.
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
-  (setq
-   company-backends
-   '(company-files
-     (company-capf :with company-dabbrev-code company-yasnippet)
-     ;; If we have `company-dabbrev' first, then other matches from `company-ispell' will be
-     ;; ignored.
-     company-ispell company-dict company-dabbrev)
-   company-transformers
-   '(delete-dups company-sort-by-statistics
-                 company-sort-prefer-same-case-prefix))
+  (setq company-backends
+        '(company-files
+          (company-capf :with company-dabbrev-code company-yasnippet)
+          ;; If we have `company-dabbrev' first, then other matches from
+          ;; `company-ispell' will be ignored.
+          company-ispell company-dict company-dabbrev)
+        company-transformers
+        '(delete-dups company-sort-by-statistics
+                      company-sort-prefer-same-case-prefix))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -1704,9 +1711,10 @@
     (defun sb/company-latex-mode ()
       (make-local-variable 'company-backends)
 
-      ;; `company-capf' does not pass to later backends with Texlab, so it makes it difficult to
-      ;; complete non-LaTeX commands (e.g. words) which is the majority. We therefore exclude it
-      ;; from `company-backends' and invoke it on demand.
+      ;; `company-capf' does not pass to later backends with Texlab, so it makes
+      ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
+      ;; majority. We therefore exclude it from `company-backends' and invoke it
+      ;; on demand.
       (setq
        company-backends
        '(company-files
@@ -1842,10 +1850,11 @@
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
   :custom
-  ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the directory where
-  ;; "compile_commands.json" reside. If path is invalid, clangd will look in the current directory
-  ;; and parent paths of each source file. We can also use the environment variable CLANGD_FLAGS as
-  ;; "export CLANGD_FLAGS="--header-insertion=never"".
+  ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the
+  ;; directory where "compile_commands.json" reside. If path is invalid, clangd
+  ;; will look in the current directory and parent paths of each source file. We
+  ;; can also use the environment variable CLANGD_FLAGS as "export
+  ;; CLANGD_FLAGS="--header-insertion=never"".
   (lsp-clients-clangd-args
    '("-j=4"
      "--all-scopes-completion"
@@ -1862,20 +1871,20 @@
      ;; "--enable-config"
      "--pch-storage=memory" ; Increases memory usage but can improve performance
      "--pretty"))
-  (lsp-completion-provider
-   :none "Enable integration of custom backends other than `capf'")
-  (lsp-completion-show-detail
-   t "Show/hide completion metadata, e.g., java.util.ArrayList")
-  (lsp-completion-show-kind
-   t "Show/hide completion kind, e.g., interface/class")
-  (lsp-completion-show-label-description
-   t "Show/hide description of completion candidates")
+  ;; Enable integration of custom backends other than `capf'
+  (lsp-completion-provider :none)
+  ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
+  (lsp-completion-show-detail t)
+  ;; Show/hide completion kind, e.g., interface/class
+  (lsp-completion-show-kind t)
+  ;; Show/hide description of completion candidates
+  (lsp-completion-show-label-description t)
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
-  (lsp-headerline-breadcrumb-enable
-   nil "Breadcrumb is not useful for all modes")
+  ;; Breadcrumb is not useful for all modes
+  (lsp-headerline-breadcrumb-enable nil)
   (lsp-html-format-wrap-line-length sb/fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
@@ -1885,15 +1894,14 @@
    nil "We have Flycheck, and the modeline gets congested")
   (lsp-modeline-diagnostics-scope
    :file "Simpler to focus on the errors at hand")
-  ;; Sudden changes in the height of the echo area causes the cursor to lose position, manually
-  ;; request via `lsp-signature-activate'.
+  ;; Sudden changes in the height of the echo area causes the cursor to lose
+  ;; position, manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
-  (lsp-restart
-   'auto-restart
-   "Avoid annoying questions, we expect a server restart to succeed")
+  ;; Avoid annoying questions, we expect a server restart to succeed
+  (lsp-restart 'auto-restart)
   (lsp-xml-logs-client nil)
-  (lsp-warn-no-matched-clients
-   nil "Avoid warning messages for unsupported modes like csv-mode")
+  ;; Avoid warning messages for unsupported modes like `csv-mode'
+  (lsp-warn-no-matched-clients nil)
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
   ;; I use `symbol-overlay' to include languages that do not have a language server
   (lsp-enable-symbol-highlighting nil)
@@ -1944,8 +1952,8 @@
     (let ((orig-result (funcall old-fn cmd test?)))
       (if (and
            (not test?) ;; for check lsp-server-present?
-           (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-           lsp-use-plists
+           ;; see lsp-resolve-final-command, it would add extra shell wrapper
+           (not (file-remote-p default-directory)) lsp-use-plists
            (not (functionp 'json-rpc-connection)) ;; native json-rpc
            (executable-find "emacs-lsp-booster"))
           (progn
@@ -1996,13 +2004,14 @@
 (use-package lsp-ltex
   :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
   :custom
-  (lsp-ltex-language
-   "en" "Recommended to set a generic language to disable spell check")
+  ;; Recommended to set a generic language to disable spell check
+  (lsp-ltex-language "en")
   (lsp-ltex-check-frequency "save")
   (lsp-ltex-dictionary
    (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
-  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom dict words.
+  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
+  ;; dict words.
   (setq lsp-ltex-disabled-rules
         #s(hash-table
            size 30 data
@@ -2018,19 +2027,19 @@
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
   :custom
-  (symbol-overlay-idle-time
-   2 "Delay highlighting to allow for transient cursor placements")
+  ;; Delay highlighting to allow for transient cursor placements
+  (symbol-overlay-idle-time 2)
   :diminish)
 
 (use-package compile
   :straight (:type built-in)
   :bind (("<f10>" . compile) ("<f11>" . recompile))
-  :custom
-  (compile-command (format "make -k -j%s " (num-processors)))
-  (compilation-always-kill
-   t "Kill a compilation process before starting a new one")
+  :custom (compile-command (format "make -k -j%s " (num-processors)))
+  ;; Kill a compilation process before starting a new one
+  (compilation-always-kill t)
   (compilation-ask-about-save nil "Save all modified buffers without asking")
-  ;; Automatically scroll the *Compilation* buffer as output appears, but stop at the first error.
+  ;; Automatically scroll the *Compilation* buffer as output appears, but stop
+  ;; at the first error.
   (compilation-scroll-output 'first-error))
 
 (use-package fancy-compilation
@@ -2041,9 +2050,10 @@
   :straight (:type built-in)
   :hook (emacs-startup . global-eldoc-mode)
   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
-  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We can limit ElDoc
-  ;; messages to one line which prevents the echo area from resizing itself unexpectedly when point
-  ;; is on a variable with a multiline docstring, but then it cuts of useful information.
+  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We
+  ;; can limit ElDoc messages to one line which prevents the echo area from
+  ;; resizing itself unexpectedly when point is on a variable with a multiline
+  ;; docstring, but then it cuts of useful information.
   ;; (eldoc-echo-area-use-multiline-p nil)
   :config
   ;; Allow eldoc to trigger after completions
@@ -2059,10 +2069,9 @@
   :when (executable-find "tree-sitter")
   :demand t
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-  :custom
-  (treesit-auto-install 'prompt)
-  (treesit-font-lock-level
-   3 "Increased default font locking may hurt performance")
+  :custom (treesit-auto-install 'prompt)
+  ;; Increased default font locking may hurt performance
+  (treesit-font-lock-level 3)
   (treesit-language-source-alist
    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
@@ -2118,7 +2127,8 @@
     (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map)))
 
 ;; (with-eval-after-load "treesit"
-;;   ;; Improves performance with large files without significantly diminishing highlight quality
+;;   ;; Improves performance with large files without significantly diminishing
+;;   ;; highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
 (use-package cc-mode
@@ -2177,7 +2187,8 @@
   ((cmake-mode cmake-ts-mode)
    .
    (lambda ()
-     ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell checking.
+     ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
+     ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
@@ -2199,10 +2210,10 @@
    ("C-c <" . python-indent-shift-left)
    ("C-c >" . python-indent-shift-right))
   :custom
-  (python-shell-completion-native-enable
-   nil "Disable readline based native completion")
-  (python-indent-guess-indent-offset-verbose
-   nil "Remove guess indent python message")
+  ;; Disable readline based native completion
+  (python-shell-completion-native-enable nil)
+  ;; Remove guess indent python message
+  (python-indent-guess-indent-offset-verbose nil)
   (python-indent-guess-indent-offset nil)
   (python-indent-offset 4)
   (python-shell-exec-path "python3")
@@ -2289,7 +2300,8 @@
   ((yaml-mode yaml-ts-mode)
    .
    (lambda ()
-     ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell checking.
+     ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
+     ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
@@ -2332,7 +2344,7 @@
       c-enable-auto-newline nil
       c-syntactic-indentation nil))))
 
-;; The following page lists more shortcuts: https://jblevins.org/projects/markdown-mode/
+;; More shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
   :mode
   (("\\.md\\'" . markdown-mode)
@@ -2355,8 +2367,9 @@
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
 
-;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert `markdown' to `org': "pandoc
-;; -f markdown -t org -o output-file.org input-file.md"
+;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
+;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
+;; input-file.md"
 (use-package pandoc-mode
   :hook (markdown-mode . pandoc-mode)
   :config (pandoc-load-default-settings)
@@ -2369,7 +2382,8 @@
   (nxml-mode
    .
    (lambda ()
-     ;; `xml-mode' is derived from `text-mode', so disable grammar and spell checking.
+     ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
+     ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
      (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
@@ -2406,9 +2420,9 @@
   (org-startup-truncated nil)
   (org-startup-folded 'showeverything)
   (org-startup-with-inline-images t)
-  ;; See `org-speed-commands-default' for a list of the keys and commands enabled at the
-  ;; beginning of headlines. `org-babel-describe-bindings' will display a list of the code
-  ;; blocks commands and their related keys.
+  ;; See `org-speed-commands-default' for a list of the keys and commands
+  ;; enabled at the beginning of headlines. `org-babel-describe-bindings' will
+  ;; display a list of the code blocks commands and their related keys.
   (org-use-speed-commands t)
   (org-src-strip-leading-and-trailing-blank-lines t)
   ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
@@ -2423,9 +2437,10 @@
   ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a headline
   (org-export-with-toc nil)
   (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
-  ;; This exports broken links as [BROKEN LINK %s], so we can actually find them. The default value
-  ;; nil just aborts the export process with an error message "Unable to resolve link: nil". This
-  ;; doesn't give any hint on which line the broken link actually is.
+  ;; This exports broken links as [BROKEN LINK %s], so we can actually find
+  ;; them. The default value nil just aborts the export process with an error
+  ;; message "Unable to resolve link: nil". This doesn't give any hint on which
+  ;; line the broken link actually is.
   (org-export-with-broken-links 'mark)
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   (org-imenu-depth 4)
@@ -2450,9 +2465,9 @@
    ("M-<up>")
    ("M-<down>")
    ("C-'")
-   ("C-c C-d") ; Was bound to `org-deadline', I prefer to use it for `duplicate-thing'
-   ("C-c C-j") ; Was bound to `org-goto', I prefer to use it for `imenu' and its variants
-   ("M-e") ; Was bound to `org-forward-paragraph', I prefer to use it for `forward-sentence'
+   ("C-c C-d")
+   ("C-c C-j")
+   ("M-e")
    ("<tab>" . org-indent-item)
    ("<backtab>" . org-outdent-item)
    ("M-{" . org-backward-element)
@@ -2496,20 +2511,20 @@
    (LaTeX-mode . lsp-deferred))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
-  (TeX-auto-save
-   t "Enable parse on save, stores parsed information in an `auto' directory")
+  ;; Enable parse on save, stores parsed information in an `auto' directory
+  (TeX-auto-save t)
   (TeX-auto-untabify t "Remove all tabs before saving")
   (TeX-clean-confirm nil)
   ;; Automatically insert braces after typing ^ and _ in math mode
   (TeX-electric-sub-and-superscript t)
-  (TeX-electric-math
-   t "Inserting $ completes the math mode and positions the cursor")
+  ;; Inserting $ completes the math mode and positions the cursor
+  (TeX-electric-math t)
   (TeX-parse-self t "Parse documents")
   (TeX-save-query nil "Save buffers automatically when compiling")
   (LaTeX-item-indent 0 "Indent lists by two spaces")
   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-  (tex-fontify-script
-   nil "Avoid raising of superscripts and lowering of subscripts")
+  ;; Avoid raising of superscripts and lowering of subscripts
+  (tex-fontify-script nil)
   ;; Avoid superscripts and subscripts from being displayed in a different font
   ;; size
   (font-latex-fontify-script nil)

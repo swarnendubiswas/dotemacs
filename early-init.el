@@ -1,11 +1,12 @@
-;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8;
-;;; no-byte-compile: t; fill-column: 100 -*-
+;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode:
+;;; emacs-lisp; coding: utf-8; no-byte-compile: t; fill-column: 80 -*-
 
 ;; Swarnendu Biswas
 
 ;;; Commentary:
 
-;; This file is supported from Emacs 27+, and is run before package and UI initialization.
+;; This file is supported from Emacs 27+, and is run before package and UI
+;; initialization.
 
 ;;; Code:
 
@@ -17,14 +18,16 @@
  gc-cons-percentage 0.8 ; Portion of heap used for allocation
  gc-cons-threshold sb/emacs-1GB)
 
-;; GC may happen after this many bytes are allocated since last GC. If you experience freezing,
-;; decrease this. If you experience stuttering, increase this.
+;; GC may happen after this many bytes are allocated since last GC. If you
+;; experience freezing, decrease this. If you experience stuttering, increase
+;; this.
 (defun sb/defer-gc ()
   "Defer garbage collection during execution."
   (setq gc-cons-threshold sb/emacs-1GB))
 
-;; There will be large pause times with large `gc-cons-threshold' values whenever GC eventually
-;; happens. `lsp-mode' suggests increasing the limit permanently to a reasonable value.
+;; There will be large pause times with large `gc-cons-threshold' values
+;; whenever GC eventually happens. `lsp-mode' suggests increasing the limit
+;; permanently to a reasonable value.
 (defun sb/restore-gc ()
   "Restore garbage collection threshold during execution."
   (setq
@@ -41,31 +44,33 @@
 ;; (require 'loadhist)
 ;; (file-dependents (feature-file 'cl))
 
-;; The run-time load order is: (1) file described by `site-run-file' if non-nil, (2)
-;; `user-init-file', and (3) `default.el'.
+;; The run-time load order is: (1) file described by `site-run-file' if non-nil,
+;; (2) `user-init-file', and (3) `default.el'.
 (setq
  site-run-file nil ; Disable site-wide run-time initialization
  ;; Disable loading of `default.el' at startup
  inhibit-default-init t)
 
-;; Do not resize the frame to preserve the number of columns or lines being displayed when setting
-;; font, menu bar, tool bar, tab bar, internal borders, fringes, or scroll bars.
+;; Do not resize the frame to preserve the number of columns or lines being
+;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
+;; fringes, or scroll bars.
 (setq
  frame-inhibit-implied-resize t
  frame-resize-pixelwise t
  window-resize-pixelwise t
  inhibit-startup-echo-area-message t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
- ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for composing emails, but
- ;; `text-mode' is more expensive to start. Furthermore, lsp support is not enabled for the
- ;; *scratch* buffer.
+ ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for
+ ;; composing emails, but `text-mode' is more expensive to start. Furthermore,
+ ;; lsp support is not enabled for the *scratch* buffer.
  initial-major-mode 'fundamental-mode
  initial-scratch-message nil)
 
-;; Disable UI elements early before being initialized. Use `display-graphic-p' since `window-system'
-;; is deprecated.
+;; Disable UI elements early before being initialized. Use `display-graphic-p'
+;; since `window-system' is deprecated.
 (scroll-bar-mode -1)
-;; The menu bar can be useful to identify different capabilities available and their shortcuts.
+;; The menu bar can be useful to identify different capabilities available and
+;; their shortcuts.
 (push '(menu-bar-lines . 0) default-frame-alist)
 ;; This is faster than running "(tool-bar-mode -1)"
 (push '(tool-bar-lines . 0) default-frame-alist)
@@ -90,8 +95,8 @@
               (garbage-collect))
             t))
 
-;; Avoid loading packages twice, this is set during `(package-initialize)'. This is also useful if
-;; we prefer "straight.el" over "package.el".
+;; Avoid loading packages twice, this is set during `(package-initialize)'. This
+;; is also useful if we prefer "straight.el" over "package.el".
 ;; (setq package-enable-at-startup nil)
 
 (when (featurep 'native-compile)
@@ -104,8 +109,9 @@
 
 (setenv "LSP_USE_PLISTS" "true")
 
-;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences will be ignored when
-;; we use TUI Emacs. Then, the terminal font setting will be used.
+;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences
+;; will be ignored when we use TUI Emacs. Then, the terminal font setting will
+;; be used.
 
 ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
 
@@ -152,7 +158,9 @@
 
    ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
     (progn
-      (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 180)))))
+      (set-face-attribute 'default nil
+                          :font "JetBrainsMono Nerd Font"
+                          :height 180)))))
 
 (provide 'early-init)
 
