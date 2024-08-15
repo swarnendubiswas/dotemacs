@@ -1409,8 +1409,6 @@
                   ("YAML" prettier "--print-width" "100")))
   (with-eval-after-load "markdown-mode"
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
-  (with-eval-after-load "latex"
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
   :diminish)
 
 (use-package indent-bars
@@ -2538,8 +2536,10 @@
 
   (with-eval-after-load "latex"
     (unbind-key "C-j" LaTeX-mode-map)
+    (unbind-key "C-c C-d" LaTeX-mode-map)
     ;; Disable `LaTeX-insert-item' in favor of `imenu'
-    (unbind-key "C-c C-j" LaTeX-mode-map))
+    (unbind-key "C-c C-j" LaTeX-mode-map)
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 
   (when (executable-find "okular")
     (setq
