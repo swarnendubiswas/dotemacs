@@ -35,6 +35,8 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~M-d~ - Kill the next word (~kill-word~)
 - ~M-- M-d~ - Kill the previous word (~negative-argument kill-word~)
 - ~C-x i~ - Insert file contents (~insert-file~)
+- ~C-x r s r~ - Copy region into register ~r~ (~copy-to-register~)
+- ~C-x r i r~ - Insert text from register ~r~ (~insert-register~)  
 
 ** Marking
 
@@ -51,6 +53,9 @@ Use ~M-x describe-personal-keybindings (C-c d k)~ to see personal keybindings de
 - ~C-x C-@~ - Jump to the buffer and position of the latest entry in the global mark ring (~pop-global-mark~)
 - ~C-x r SPC~ - Store a position in a register (~point-to-register~)
 - ~C-x r j~ - Jump to a position stored in a register (~jump-to-register~)
+- ~C-x r m~ - Set the bookmark for the visited file at point (~bookmark-set~)
+- ~C-x r b~  - Jump to the bookmark named bookmark (~bookmark-jump~)
+- ~C-x r l~ - List all bookmarks (~list-bookmarks~)
   
 ** Key motion
 

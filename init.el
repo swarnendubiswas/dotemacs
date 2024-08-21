@@ -1034,7 +1034,6 @@
 (use-package move-text
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
-;; Expand region by semantic units
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
@@ -1170,26 +1169,29 @@
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
+;; `consult-rg' provides live search, while `deadgrep' provides a resulting
+;; search buffer.
+(use-package deadgrep
+  :bind ("C-c s d" . deadgrep)
+  :custom (deadgrep-max-buffers 1))
+
 ;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode'
 ;; might freeze Emacs for several minutes.
 (use-package wgrep
-  ;; Allows you to edit a deadgrep buffer and apply those changes to the file
-  ;; buffer.
-  :hook (deadgrep-finished . wgrep-deadgrep-setup)
   :bind
   (:map
    grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
    ("C-x C-p" . wgrep-change-to-wgrep-mode)
    ("C-x C-s" . wgrep-finish-edit)
    ("C-x C-k" . wgrep-abort-changes)
-   ("C-x C-q" . wgrep-exit))
+   ("C-x C-q" . wgrep-exit)
+   :map
+   deadgrep-mode-map
+   ("e" . wgrep-change-to-wgrep-mode))
   :custom (wgrep-auto-save-buffer t))
 
-;; `consult-rg' provides live search, while `deadgrep' provides a resulting
-;; search buffer.
-(use-package deadgrep
-  :bind ("C-c s d" . deadgrep)
-  :custom (deadgrep-max-buffers 1))
+(use-package wgrep-deadgrep
+  :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace'
 ;; which highlights matches and replacements as you type.
@@ -1208,6 +1210,8 @@
 (use-package transient
   :custom (transient-semantic-coloring t)
   :config (transient-bind-q-to-quit))
+
+(use-package with-editor :diminish)
 
 (use-package magit
   :after transient
@@ -1289,12 +1293,6 @@
    ("M-g m" . smerge-context-menu)
    ("M-g M" . smerge-popup-context-menu)))
 
-(use-package paren
-  :straight (:type built-in)
-  :custom
-  (show-paren-when-point-inside-paren t)
-  (show-paren-when-point-in-periphery t))
-
 (use-package elec-pair
   :straight (:type built-in)
   :hook
@@ -1310,22 +1308,18 @@
               t
             (electric-pair-default-inhibit c))))
 
-  (defvar sb/markdown-pairs '((?` . ?`))
-    "Electric pairs for `markdown-mode'.")
+  (defvar sb/markdown-pairs '((?` . ?`)))
 
   (defun sb/add-markdown-pairs ()
-    "Add custom pairs to `markdown-mode'."
     (setq-local electric-pair-pairs
                 (append electric-pair-pairs sb/markdown-pairs))
     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-  (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\)))
-    "Electric pairs for `LaTeX-mode'.")
+  (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
 
   (defun sb/add-latex-pairs ()
-    "Add custom pairs to `LaTeX-mode'."
     (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
@@ -1370,8 +1364,8 @@
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Chain flycheck checkers with lsp, using per-project directory local variables.
-  ;; https://github.com/flycheck/flycheck/issues/1762
+  ;; Chain flycheck checkers with lsp, using per-project directory local
+  ;; variables. https://github.com/flycheck/flycheck/issues/1762
   (defvar-local sb/flycheck-local-checkers nil)
   (defun sb/flycheck-checker-get (fn checker property)
     (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
