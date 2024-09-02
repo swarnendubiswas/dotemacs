@@ -1593,20 +1593,20 @@
   :after company
   :init (company-statistics-mode 1))
 
-(use-package company-auctex
-  :after (:all tex-mode company)
-  :demand t)
+;; (use-package company-auctex
+;;   :after (:all tex-mode company)
+;;   :demand t)
 
 (use-package company-math
   :after (:all tex-mode company)
   :demand t)
 
-(use-package company-reftex
-  :after (:all tex-mode company)
-  :demand t
-  :custom
-  ;; https://github.com/TheBB/company-reftex/pull/13
-  (company-reftex-labels-parse-all nil))
+;; (use-package company-reftex
+;;   :after (:all tex-mode company)
+;;   :demand t
+;;   :custom
+;;   ;; https://github.com/TheBB/company-reftex/pull/13
+;;   (company-reftex-labels-parse-all nil))
 
 (use-package company-anywhere
   :straight (:host github :repo "zk-phi/company-anywhere")
@@ -1636,10 +1636,10 @@
   :demand t
   :config (require 'company-web-html))
 
-(use-package company-bibtex
-  :straight (:host github :repo "gbgar/company-bibtex")
-  :after (:all tex-mode company)
-  :demand t)
+;; (use-package company-bibtex
+;;   :straight (:host github :repo "gbgar/company-bibtex")
+;;   :after (:all tex-mode company)
+;;   :demand t)
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -1711,22 +1711,12 @@
       (setq
        company-backends
        '(company-files
-         company-bibtex
-         company-reftex-citations
          company-math-symbols-latex ; Math latex tags
          company-latex-commands
-         company-reftex-labels
-         company-auctex-environments
-         company-auctex-macros
-         company-auctex-labels
          company-math-symbols-unicode ; Math unicode symbols and sub(super)scripts
-         company-auctex-symbols
-         company-auctex-bibs
-         company-ispell
-         company-dict
-         company-dabbrev)))
+         company-ispell company-dict company-dabbrev company-capf)))
 
-    (add-hook 'LaTeX-mode-hook (lambda () (sb/company-latex-mode))))
+    (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
 
   (progn
     (defun sb/company-org-mode ()
@@ -2010,6 +2000,24 @@
            size 30 data
            ("en-US"
             ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
+
+(use-package lsp-latex
+  :hook
+  ((latex-mode bibtex-mode)
+   .
+   (lambda ()
+     (require 'lsp-latex)
+     (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
+  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+  (lsp-latex-diagnostics-delay 2000)
+
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click
+  ;; in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f")))
 
 (use-package subword
   :straight (:type built-in)
@@ -2490,61 +2498,60 @@
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
-;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
-;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
-;; is an alias to `latex-mode'. Auctex overrides the tex package.
-(use-package tex
-  :straight auctex
-  :hook
-  ((LaTeX-mode . LaTeX-math-mode)
-   (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-   ;; Revert PDF buffer after TeX compilation has finished
-   (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-   (LaTeX-mode . TeX-source-correlate-mode) ; Jump between editor and pdf viewer
-   (LaTeX-mode . lsp-deferred))
-  :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
-  :custom
-  ;; Enable parse on save, stores parsed information in an `auto' directory
-  (TeX-auto-save t)
-  (TeX-auto-untabify t "Remove all tabs before saving")
-  (TeX-clean-confirm nil)
-  ;; Automatically insert braces after typing ^ and _ in math mode
-  (TeX-electric-sub-and-superscript t)
-  ;; Inserting $ completes the math mode and positions the cursor
-  (TeX-electric-math t)
-  (TeX-parse-self t "Parse documents")
-  (TeX-save-query nil "Save buffers automatically when compiling")
-  (LaTeX-item-indent 0 "Indent lists by two spaces")
-  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-  ;; Avoid raising of superscripts and lowering of subscripts
-  (tex-fontify-script nil)
-  ;; Avoid superscripts and subscripts from being displayed in a different font
-  ;; size
-  (font-latex-fontify-script nil)
-  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
-  :config
-  (setq-default TeX-master nil) ; Always query for the master file
-  (with-eval-after-load "auctex"
-    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
-    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
+;; ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
+;; ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
+;; ;; is an alias to `latex-mode'. Auctex overrides the tex package.
+;; (use-package tex
+;;   :straight auctex
+;;   :hook
+;;   ((LaTeX-mode . LaTeX-math-mode)
+;;    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
+;;    ;; Revert PDF buffer after TeX compilation has finished
+;;    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+;;    (LaTeX-mode . TeX-source-correlate-mode) ; Jump between editor and pdf viewer
+;;    (LaTeX-mode . lsp-deferred))
+;;   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
+;;   :custom
+;;   ;; Enable parse on save, stores parsed information in an `auto' directory
+;;   (TeX-auto-save t)
+;;   (TeX-auto-untabify t "Remove all tabs before saving")
+;;   (TeX-clean-confirm nil)
+;;   ;; Automatically insert braces after typing ^ and _ in math mode
+;;   (TeX-electric-sub-and-superscript t)
+;;   ;; Inserting $ completes the math mode and positions the cursor
+;;   (TeX-electric-math t)
+;;   (TeX-parse-self t "Parse documents")
+;;   (TeX-save-query nil "Save buffers automatically when compiling")
+;;   (LaTeX-item-indent 0 "Indent lists by two spaces")
+;;   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
+;;   ;; Avoid raising of superscripts and lowering of subscripts
+;;   (tex-fontify-script nil)
+;;   ;; Avoid superscripts and subscripts from being displayed in a different font
+;;   ;; size
+;;   (font-latex-fontify-script nil)
+;;   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
+;;   :config
+;;   (setq-default TeX-master nil) ; Always query for the master file
+;;   (with-eval-after-load "auctex"
+;;     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
+;;     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
+;;     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
 
-  (with-eval-after-load "latex"
-    (unbind-key "C-j" LaTeX-mode-map)
-    (unbind-key "C-c C-d" LaTeX-mode-map)
-    ;; Disable `LaTeX-insert-item' in favor of `imenu'
-    (unbind-key "C-c C-j" LaTeX-mode-map)
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+;;   (with-eval-after-load "latex"
+;;     (unbind-key "C-j" LaTeX-mode-map)
+;;     (unbind-key "C-c C-d" LaTeX-mode-map)
+;;     ;; Disable `LaTeX-insert-item' in favor of `imenu'
+;;     (unbind-key "C-c C-j" LaTeX-mode-map)
+;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 
-  (when (executable-find "okular")
-    (setq
-     TeX-view-program-list
-     '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-     TeX-view-program-selection '((output-pdf "Okular")))))
+;;   (when (executable-find "okular")
+;;     (setq
+;;      TeX-view-program-list
+;;      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+;;      TeX-view-program-selection '((output-pdf "Okular")))))
 
 (use-package bibtex
   :straight (:type built-in)
-  :hook (bibtex-mode . lsp-deferred)
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
@@ -2557,17 +2564,17 @@
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
 
-(use-package auctex-latexmk
-  :after tex-mode
-  :when (executable-find "latexmk")
-  :demand t
-  :custom
-  ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
-  (auctex-latexmk-inherit-TeX-PDF-mode t)
-  :config
-  (auctex-latexmk-setup)
-  (add-hook
-   'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
+;; (use-package auctex-latexmk
+;;   :after tex-mode
+;;   :when (executable-find "latexmk")
+;;   :demand t
+;;   :custom
+;;   ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
+;;   (auctex-latexmk-inherit-TeX-PDF-mode t)
+;;   :config
+;;   (auctex-latexmk-setup)
+;;   (add-hook
+;;    'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
