@@ -518,6 +518,7 @@
 ;; Multihop with sudo: "C-x C-f /ssh:you@remotehost|sudo:remotehost:/path/to/file"
 ;; Multihop with sudo with custom user: "C-x C-f /ssh:you@remotehost|sudo:them@remotehost:/path/to/file"
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
+;; Connect as non-root user and then use sudo: "C-x C-f /ssh:192.168.249.10|su::/some/file"
 (use-package tramp
   :straight (:type built-in)
   :bind ("C-S-q" . tramp-cleanup-all-buffers)
@@ -2695,7 +2696,7 @@
   (centaur-tabs-headline-match))
 
 (use-package olivetti
-  :hook ((text-mode prog-mode) . olivetti-mode)
+  :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
   :diminish)
 
 (defun sb/save-all-buffers ()
@@ -2834,14 +2835,5 @@ If region is active, apply to active region instead."
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
   :hook (ssh-config-mode . turn-on-font-lock))
-
-(add-hook
- 'emacs-startup-hook
- (lambda ()
-   (let ((gc-time (float-time gc-elapsed)))
-     (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."
-              (emacs-init-time)
-              gc-time
-              gcs-done))))
 
 ;;; init.el ends here
