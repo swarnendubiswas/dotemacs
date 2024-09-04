@@ -26,12 +26,13 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'doom-nord
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "doom-nord" doom-nord)
     (const :tag "modus-vivendi" modus-vivendi)
+    (const :tag "catppuccin" catppuccin)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -1886,7 +1887,8 @@
   ;; Avoid warning messages for unsupported modes like `csv-mode'
   (lsp-warn-no-matched-clients nil)
   (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  ;; I use `symbol-overlay' to include languages that do not have a language server
+  ;; I use `symbol-overlay' to include languages that do not have a language
+  ;; server
   (lsp-enable-symbol-highlighting nil)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
@@ -1902,6 +1904,7 @@
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
   (lsp-auto-register-remote-clients nil)
+  (lsp-enable-snippet nil)
   :config
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -2550,6 +2553,10 @@
 ;;      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
 ;;      TeX-view-program-selection '((output-pdf "Okular")))))
 
+
+(with-eval-after-load "tex-mode"
+  (bind-key "C-x f" #'format-all-buffer tex-mode-map))
+
 (use-package bibtex
   :straight (:type built-in)
   :custom
@@ -2664,6 +2671,11 @@
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t))
+
+(use-package catppuccin-theme
+  :when (eq sb/theme 'catppuccin)
+  :init (load-theme 'catppuccin t)
+  :custom (catppuccin-flavor 'mocha))
 
 (use-package nerd-icons
   :when (display-graphic-p)
