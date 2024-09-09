@@ -658,7 +658,7 @@
   ;; natural sort of (version) numbers within text. Check "ls" for additional
   ;; options.
   (dired-listing-switches
-   "-ABFghlNopv --group-directories-first --time-style=locale")
+   "-ABFghlNopva --group-directories-first --time-style=locale")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
@@ -2020,7 +2020,10 @@
   ;; Support forward search with Okular. Perform inverse search with Shift+Click
   ;; in the PDF.
   (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f")))
+  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
+  :config
+  (with-eval-after-load "tex-mode"
+    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 (use-package subword
   :straight (:type built-in)
@@ -2553,8 +2556,9 @@
 ;;      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
 ;;      TeX-view-program-selection '((output-pdf "Okular")))))
 
-
 (with-eval-after-load "tex-mode"
+  (setq tex-command "pdflatex")
+  (bind-key "C-c C-j" #'consult-outline tex-mode-map)
   (bind-key "C-x f" #'format-all-buffer tex-mode-map))
 
 (use-package bibtex
@@ -2715,7 +2719,8 @@
   (centaur-tabs-headline-match))
 
 (use-package olivetti
-  :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
+  :hook ((fundamental-mode text-mode prog-mode conf-mode) . olivetti-mode)
+  :bind (:map olivetti-mode-map ("C-c {") ("C-c }"))
   :diminish)
 
 (defun sb/save-all-buffers ()
@@ -2808,46 +2813,6 @@ If region is active, apply to active region instead."
 (use-package kdl-mode
   :straight (:host github :repo "bobuk/kdl-mode")
   :mode ("\\.kdl\\'" . kdl-mode))
-
-(use-package pdf-tools
-  :when (display-graphic-p)
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  :magic ("%PDF" . pdf-view-mode)
-  :bind
-  (:map
-   pdf-view-mode-map
-   ("j" . pdf-view-next-line-or-next-page)
-   ("k" . pdf-view-previous-line-or-previous-page)
-   ("n" . pdf-view-next-page-command)
-   ("p" . pdf-view-previous-page-command)
-   ("a" . pdf-view-first-page)
-   ("e" . pdf-view-last-page)
-   ("l" . pdf-view-goto-page)
-   ("P" . pdf-view-fit-page-to-window)
-   ("W" . pdf-view-fit-width-to-window)
-   ("H" . pdf-view-fit-height-to-window)
-   ("+" . pdf-view-enlarge)
-   ("-" . pdf-view-shrink)
-   ("r" . pdf-view-revert-buffer)
-   ("d" . pdf-annot-delete)
-   ("h" . pdf-annot-add-highlight-markup-annotation)
-   ("t" . pdf-annot-add-text-annotation)
-   ("M" . pdf-view-midnight-minor-mode))
-  :custom
-  (pdf-annot-activate-created-annotations t "Automatically annotate highlights")
-  (pdf-view-resize-factor 1.1 "Fine-grained zoom factor of 10%")
-  :config
-  (pdf-loader-install) ; Expected to be faster than `(pdf-tools-install :no-query)'
-
-  (setq-default pdf-view-display-size 'fit-width) ; Buffer-local variable
-
-  ;; We do not enable `pdf-view-themed-minor-mode' since it can change plot colors
-  (add-hook 'pdf-view-mode-hook #'pdf-tools-enable-minor-modes))
-
-;; Support `pdf-view-mode' and `doc-view-mode' buffers in `save-place-mode'.
-(use-package saveplace-pdf-view
-  :after (pdf-tools saveplace)
-  :demand t)
 
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: knpblock
+# key: knp
+# --
+\begin{knpblock}{$0}
+\end{knpblock}
