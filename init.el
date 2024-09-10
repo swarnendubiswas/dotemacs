@@ -2032,7 +2032,13 @@
 
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
-  :bind (("M-p" . symbol-overlay-jump-prev) ("M-n" . symbol-overlay-jump-next))
+  :bind
+  (("M-p" . symbol-overlay-jump-prev)
+   ("M-n" . symbol-overlay-jump-next)
+   ("<" . symbol-overlay-jump-first)
+   (">" . symbol-overlay-jump-last)
+   ("d" . symbol-overlay-jump-to-definition)
+   ("r" . symbol-overlay-rename))
   :custom
   ;; Delay highlighting to allow for transient cursor placements
   (symbol-overlay-idle-time 2)
