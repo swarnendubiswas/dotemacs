@@ -240,6 +240,7 @@
   (auto-save-visited-interval 30)
   (revert-without-query '("\\.*") "Revert all files without asking")
   (custom-file (no-littering-expand-var-file-name "custom.el"))
+  (max-mini-window-height 0.4)
   :config
   (dolist (exts
            '(".directory"
@@ -1594,20 +1595,9 @@
   :after company
   :init (company-statistics-mode 1))
 
-;; (use-package company-auctex
-;;   :after (:all tex-mode company)
-;;   :demand t)
-
 (use-package company-math
   :after (:all tex-mode company)
   :demand t)
-
-;; (use-package company-reftex
-;;   :after (:all tex-mode company)
-;;   :demand t
-;;   :custom
-;;   ;; https://github.com/TheBB/company-reftex/pull/13
-;;   (company-reftex-labels-parse-all nil))
 
 (use-package company-anywhere
   :straight (:host github :repo "zk-phi/company-anywhere")
@@ -1636,11 +1626,6 @@
   :after company
   :demand t
   :config (require 'company-web-html))
-
-;; (use-package company-bibtex
-;;   :straight (:host github :repo "gbgar/company-bibtex")
-;;   :after (:all tex-mode company)
-;;   :demand t)
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -1968,8 +1953,7 @@
    (lambda ()
      (setq-local
       c-basic-offset 4
-      c-set-style "java")
-     (lsp-deferred)))
+      c-set-style "java")))
   :custom
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
@@ -2005,12 +1989,7 @@
             ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
 (use-package lsp-latex
-  :hook
-  ((latex-mode bibtex-mode)
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
+  :hook ((latex-mode bibtex-mode) . (lambda () (require 'lsp-latex)))
   :custom
   (lsp-latex-bibtex-formatter "latexindent")
   (lsp-latex-latex-formatter "latexindent")
@@ -2033,7 +2012,9 @@
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind
-  (("M-p" . symbol-overlay-jump-prev)
+  (:map
+   symbol-overlay-map
+   ("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next)
    ("<" . symbol-overlay-jump-first)
    (">" . symbol-overlay-jump-last)
@@ -2144,25 +2125,25 @@
 ;;   ;; highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
-(use-package cc-mode
-  :straight (:type built-in)
-  :mode (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
-  :hook
-  ((c-mode c-ts-mode c++-mode c++-ts-mode)
-   .
-   (lambda ()
-     (setq-local
-      c-set-style "cc-mode"
-      c-basic-offset 2
-      c-auto-newline nil ; Disable electric indentation and on-type formatting
-      c-electric-flag nil
-      c-enable-auto-newline nil
-      c-syntactic-indentation nil)
-     (lsp-deferred)))
-  :bind (:map c-mode-base-map ("C-c C-d")))
+;; (use-package cc-mode
+;;   :straight (:type built-in)
+;;   :mode (("\\.h\\'" . c++-mode) ("\\.c\\'" . c++-mode))
+;;   :hook
+;;   ((c-mode c++-mode)
+;;    .
+;;    (lambda ()
+;;      (setq-local
+;;       c-set-style "cc-mode"
+;;       c-basic-offset 2
+;;       c-auto-newline nil ; Disable electric indentation and on-type formatting
+;;       c-electric-flag nil
+;;       c-enable-auto-newline nil
+;;       c-syntactic-indentation nil)))
+;;   :bind (:map c-mode-base-map ("C-c C-d")))
 
 (use-package c-ts-mode
   :straight (:type built-in)
+  :mode (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
   :hook
   ((c-ts-mode c++-ts-mode)
    .
@@ -2174,8 +2155,7 @@
       c-auto-newline nil ; Disable electric indentation and on-type formatting
       c-electric-flag nil
       c-enable-auto-newline nil
-      c-syntactic-indentation nil)
-     (lsp-deferred)))
+      c-syntactic-indentation nil)))
   :bind
   (:map
    c-ts-mode-map
@@ -2204,8 +2184,7 @@
      ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
-     (lsp-deferred))))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls)))))
 
 (use-package python
   :straight (:type built-in)
@@ -2213,7 +2192,6 @@
   (("SCon\(struct\|script\)$" . python-ts-mode)
    ("[./]flake8\\'" . conf-mode)
    ("/Pipfile\\'" . conf-mode))
-  :hook ((python-mode python-ts-mode) . lsp-deferred)
   :bind
   (:map
    python-mode-map
@@ -2257,7 +2235,6 @@
 (use-package sh-script
   :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
-  :hook ((sh-mode bash-ts-mode) . lsp-deferred)
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
@@ -2317,15 +2294,13 @@
      ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
-     (lsp-deferred))))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls)))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
 (use-package css-mode
   :straight (:type built-in)
-  :hook ((css-mode css-ts-mode) . lsp-deferred)
   :custom (css-indent-offset 2))
 
 (use-package emmet-mode
@@ -2399,8 +2374,7 @@
      ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
-     (lsp-deferred)))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -2417,9 +2391,7 @@
   :hook
   ((json-mode json-ts-mode jsonc-mode)
    .
-   (lambda ()
-     (setq-local js-indent-level 2)
-     (lsp-deferred))))
+   (lambda () (setq-local js-indent-level 2))))
 
 (use-package org
   :defer 2
@@ -2510,58 +2482,6 @@
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
-;; ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
-;; ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
-;; ;; is an alias to `latex-mode'. Auctex overrides the tex package.
-;; (use-package tex
-;;   :straight auctex
-;;   :hook
-;;   ((LaTeX-mode . LaTeX-math-mode)
-;;    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-;;    ;; Revert PDF buffer after TeX compilation has finished
-;;    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-;;    (LaTeX-mode . TeX-source-correlate-mode) ; Jump between editor and pdf viewer
-;;    (LaTeX-mode . lsp-deferred))
-;;   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
-;;   :custom
-;;   ;; Enable parse on save, stores parsed information in an `auto' directory
-;;   (TeX-auto-save t)
-;;   (TeX-auto-untabify t "Remove all tabs before saving")
-;;   (TeX-clean-confirm nil)
-;;   ;; Automatically insert braces after typing ^ and _ in math mode
-;;   (TeX-electric-sub-and-superscript t)
-;;   ;; Inserting $ completes the math mode and positions the cursor
-;;   (TeX-electric-math t)
-;;   (TeX-parse-self t "Parse documents")
-;;   (TeX-save-query nil "Save buffers automatically when compiling")
-;;   (LaTeX-item-indent 0 "Indent lists by two spaces")
-;;   (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
-;;   ;; Avoid raising of superscripts and lowering of subscripts
-;;   (tex-fontify-script nil)
-;;   ;; Avoid superscripts and subscripts from being displayed in a different font
-;;   ;; size
-;;   (font-latex-fontify-script nil)
-;;   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
-;;   :config
-;;   (setq-default TeX-master nil) ; Always query for the master file
-;;   (with-eval-after-load "auctex"
-;;     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
-;;     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-;;     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
-
-;;   (with-eval-after-load "latex"
-;;     (unbind-key "C-j" LaTeX-mode-map)
-;;     (unbind-key "C-c C-d" LaTeX-mode-map)
-;;     ;; Disable `LaTeX-insert-item' in favor of `imenu'
-;;     (unbind-key "C-c C-j" LaTeX-mode-map)
-;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
-
-;;   (when (executable-find "okular")
-;;     (setq
-;;      TeX-view-program-list
-;;      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-;;      TeX-view-program-selection '((output-pdf "Okular")))))
-
 (with-eval-after-load "tex-mode"
   (setq tex-command "pdflatex")
   (bind-key "C-c C-j" #'consult-outline tex-mode-map)
@@ -2581,25 +2501,13 @@
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
 
-;; (use-package auctex-latexmk
-;;   :after tex-mode
-;;   :when (executable-find "latexmk")
-;;   :demand t
-;;   :custom
-;;   ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
-;;   (auctex-latexmk-inherit-TeX-PDF-mode t)
-;;   :config
-;;   (auctex-latexmk-setup)
-;;   (add-hook
-;;    'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
-
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
-  :after tex
-  :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
+  :after tex-mode
+  :bind (:map tex-mode-map ("$" . math-delimiters-insert)))
 
 (use-package citar
-  :hook (LaTeX-mode . citar-capf-setup))
+  :hook (latex-mode . citar-capf-setup))
 
 (use-package citar-embark
   :after (citar embark)
