@@ -135,12 +135,6 @@
   (auto-save-file-name-transforms
    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-;; NOTE: Make a symlink to "private.el" in "$HOME/.emacs.d/etc".
-(defcustom sb/private-file (no-littering-expand-etc-file-name "private.el")
-  "File to include private information."
-  :type 'string
-  :group 'sb/emacs)
-
 (use-package exec-path-from-shell
   :when (symbol-value 'sb/IS-LINUX)
   :init
@@ -181,7 +175,7 @@
   (history-delete-duplicates t)
   (idle-update-delay 1)
   ;; `lsp-mode' suggests increasing the value
-  (read-process-output-max (* 5 1024 1024))
+  (read-process-output-max (* 4 1024 1024))
   (remote-file-name-inhibit-locks t)
   (ring-bell-function 'ignore "Disable beeping sound")
   ;; If you have something on the system clipboard, and then kill something in
@@ -195,7 +189,8 @@
   ;; not work on the TUI
   (select-enable-clipboard t)
   (sentence-end-double-space nil)
-  ;; Do not use `shift-select' for marking, possibly use it for `windmove'
+  ;; I do not use `shift-select' for marking, use it for `windmove' or terminal
+  ;; bindings
   (shift-select-mode nil)
   (sort-fold-case nil "Do not ignore case when sorting")
   (standard-indent 2)
@@ -340,8 +335,6 @@
 
   (when (file-exists-p custom-file)
     (load custom-file 'noerror 'nomessage))
-  (when (file-exists-p sb/private-file)
-    (load sb/private-file 'noerror 'nomessage))
 
   ;; Mark safe variables
   (put 'compilation-read-command 'safe-local-variable #'stringp)
@@ -495,6 +488,16 @@
   (doc-view-continuous t)
   (doc-view-resolution 120))
 
+;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
+;; `find-file' unless a prefix argument is given. Then it will find file at
+;; point.
+(use-package ffap
+  :straight (:type built-in)
+  :bind ("<f2>" . ffap)
+  :custom
+  ;; Do not ping things that look like domain names
+  (ffap-machine-p-known 'reject))
+
 ;; Highlight and allow to open http links in strings and comments in buffers.
 (use-package goto-addr
   :straight (:type built-in)
@@ -510,7 +513,8 @@
   ;; Split diffs side by side
   (ediff-split-window-function #'split-window-horizontally)
   ;; Prompt and kill file variants on quitting an Ediff session
-  (ediff-keep-variants nil))
+  (ediff-keep-variants nil)
+  :config (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 ;; To edit remote files, use "/method:user@host#port:filename".
 ;; The shortcut "/ssh::" will connect to default "user@host#port".
@@ -659,7 +663,7 @@
   ;; natural sort of (version) numbers within text. Check "ls" for additional
   ;; options.
   (dired-listing-switches
-   "-ABFghlNopva --group-directories-first --time-style=locale")
+   "-aBFghlNopv --group-directories-first --time-style=locale")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
@@ -769,7 +773,7 @@
    (rfn-eshadow-update-overlay . vertico-directory-tidy)
    (minibuffer-setup . vertico-repeat-save))
   :bind
-  (("C-c r" . vertico-repeat-last)
+  (("C-c r" . vertico-repeat)
    ("M-r" . vertico-repeat-select)
    :map
    vertico-map
@@ -1232,17 +1236,6 @@
   (magit-save-repository-buffers 'dontask)
   ;; Show fine differences for the current diff hunk only
   (magit-diff-refine-hunk t))
-
-(use-package difftastic
-  :commands (difftastic-files difftastic-dired-diff difftastic-magit-diff)
-  :bind
-  (:map
-   difftastic-mode-map
-   ("e" . difftastic-leave)
-   ("g" . difftastic-rerun)
-   ("p" . difftastic-previous-chunk)
-   ("n" . difftastic-next-chunk)
-   ("q" . difftastic-quit)))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -1953,7 +1946,8 @@
    (lambda ()
      (setq-local
       c-basic-offset 4
-      c-set-style "java")))
+      c-set-style "java")
+     (lsp-deferred)))
   :custom
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-profile "Swarnendu")
@@ -1989,7 +1983,12 @@
             ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
 
 (use-package lsp-latex
-  :hook ((latex-mode bibtex-mode) . (lambda () (require 'lsp-latex)))
+  :hook
+  ((latex-mode bibtex-mode)
+   .
+   (lambda ()
+     (require 'lsp-latex)
+     (lsp-deferred)))
   :custom
   (lsp-latex-bibtex-formatter "latexindent")
   (lsp-latex-latex-formatter "latexindent")
@@ -1999,7 +1998,7 @@
   ;; Support forward search with Okular. Perform inverse search with Shift+Click
   ;; in the PDF.
   (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--unique" "file:%p#src:%l%f"))
+  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
   :config
   (with-eval-after-load "tex-mode"
     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
@@ -2155,7 +2154,8 @@
       c-auto-newline nil ; Disable electric indentation and on-type formatting
       c-electric-flag nil
       c-enable-auto-newline nil
-      c-syntactic-indentation nil)))
+      c-syntactic-indentation nil)
+     (lsp-deferred)))
   :bind
   (:map
    c-ts-mode-map
@@ -2184,7 +2184,8 @@
      ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls)))))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (lsp-deferred))))
 
 (use-package python
   :straight (:type built-in)
@@ -2192,6 +2193,7 @@
   (("SCon\(struct\|script\)$" . python-ts-mode)
    ("[./]flake8\\'" . conf-mode)
    ("/Pipfile\\'" . conf-mode))
+  :hook ((python-mode python-ts-mode) . lsp-deferred)
   :bind
   (:map
    python-mode-map
@@ -2235,6 +2237,7 @@
 (use-package sh-script
   :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
+  :hook ((sh-mode bash-ts-mode) . lsp-deferred)
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
@@ -2294,13 +2297,15 @@
      ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls)))))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (lsp-deferred))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
 (use-package css-mode
   :straight (:type built-in)
+  :hook ((css-mode css-ts-mode) . lsp-deferred)
   :custom (css-indent-offset 2))
 
 (use-package emmet-mode
@@ -2374,7 +2379,8 @@
      ;; checking.
      (when (fboundp 'jinx-mode)
        (jinx-mode -1))
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))))
+     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -2391,7 +2397,9 @@
   :hook
   ((json-mode json-ts-mode jsonc-mode)
    .
-   (lambda () (setq-local js-indent-level 2))))
+   (lambda ()
+     (setq-local js-indent-level 2)
+     (lsp-deferred))))
 
 (use-package org
   :defer 2
@@ -2669,7 +2677,6 @@ If region is active, apply to active region instead."
  ("C-z" . undo)
 
  ("<f1>" . execute-extended-command)
- ("<f2>" . find-file)
 
  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
  ("<f8>" . next-error) ; "M-g n" is the default keybinding

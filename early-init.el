@@ -103,9 +103,10 @@
   (setq
    ;; Silence compiler warnings as they can be pretty disruptive
    native-comp-async-report-warnings-errors nil
-   package-native-compile t ; Enable ahead-of-time compilation when installing a package
+   ;; Enable ahead-of-time compilation when installing a package
+   package-native-compile t
    ;; Compile loaded packages asynchronously
-   native-comp-deferred-compilation t))
+   native-comp-jit-compilation t))
 
 (setenv "LSP_USE_PLISTS" "true")
 
