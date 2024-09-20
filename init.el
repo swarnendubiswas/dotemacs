@@ -1402,7 +1402,6 @@
   :diminish)
 
 (use-package indent-bars
-  :straight (:host github :repo "jdtsmith/indent-bars")
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :config
   (when (executable-find "tree-sitter")
@@ -1435,6 +1434,7 @@
   :init (flycheck-hl-todo-setup))
 
 (use-package consult-todo
+  :after (consult hl-todo)
   :commands consult-todo)
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
@@ -2695,7 +2695,7 @@ If region is active, apply to active region instead."
 
  ("C-s" . save-buffer)
  ("C-S-s" . sb/save-all-buffers)
- ("C-x k" . kill-this-buffer)
+ ("C-x k" . kill-current-buffer)
 
  ("C-<left>" . backward-word)
  ("C-<right>" . forward-word)
