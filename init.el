@@ -1683,17 +1683,17 @@
     (defun sb/company-latex-mode ()
       (make-local-variable 'company-backends)
 
-      ;; `company-capf' does not pass to later backends with Texlab, so it makes
+      ;; `company-capf' with Texlab does not pass to later backends, so it makes
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority. We therefore exclude it from `company-backends' and invoke it
       ;; on demand.
       (setq
        company-backends
-       '(company-files
-         company-math-symbols-latex ; Math latex tags
-         company-latex-commands
-         company-math-symbols-unicode ; Math unicode symbols and sub(super)scripts
-         company-ispell company-dict company-dabbrev company-capf)))
+       '((company-files
+          company-math-symbols-latex ; Math latex tags
+          company-latex-commands
+          company-math-symbols-unicode ; Math unicode symbols and sub(super)scripts
+          company-ispell company-dict company-dabbrev company-capf))))
 
     (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
 
@@ -2642,7 +2642,7 @@
 
 (use-package olivetti
   :hook ((fundamental-mode text-mode prog-mode conf-mode) . olivetti-mode)
-  :bind (:map olivetti-mode-map ("C-c {") ("C-c }"))
+  :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
   :diminish)
 
 (defun sb/save-all-buffers ()
@@ -2740,5 +2740,8 @@ If region is active, apply to active region instead."
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
   :hook (ssh-config-mode . turn-on-font-lock))
+
+(use-package asm-mode
+  :hook (asm-mode . lsp-deferred))
 
 ;;; init.el ends here
