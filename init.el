@@ -2307,11 +2307,6 @@
   :hook ((css-mode css-ts-mode) . lsp-deferred)
   :custom (css-indent-offset 2))
 
-(use-package emmet-mode
-  :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-  :custom (emmet-move-cursor-between-quote t)
-  :config (emmet-preview-mode 1))
-
 (use-package make-mode
   :straight (:type built-in)
   :mode
