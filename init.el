@@ -215,9 +215,6 @@
   (tags-revert-without-query t)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
-  ;; ISSUE: There is a known bug with Emacs upstream.
-  ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=52292
-  (find-file-visit-truename nil "Show true name, useful in case of symlinks")
   (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
   (backup-inhibited t "Disable backup for a per-file basis")
   (confirm-nonexistent-file-or-buffer t)
@@ -278,6 +275,7 @@
 
   ;; Disable unhelpful modes, ignore disabling for modes I am not bothered with
   (tooltip-mode -1)
+  (auto-encryption-mode -1)
 
   ;; Enable the following modes
   (dolist
@@ -1572,7 +1570,8 @@
          minibuffer-inactive-mode))
   (company-format-margin-function nil "Disable icons")
   ;; Convenient to wrap around completion items at boundaries
-  (company-selection-wrap-around t))
+  (company-selection-wrap-around t)
+  :diminish)
 
 (use-package company-quickhelp
   :after company
@@ -2677,7 +2676,6 @@ If region is active, apply to active region instead."
  ("C-z" . undo)
 
  ("<f1>" . execute-extended-command)
-
  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
  ("<f8>" . next-error) ; "M-g n" is the default keybinding
 
