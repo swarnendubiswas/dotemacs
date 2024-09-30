@@ -1385,16 +1385,16 @@
                   ("Fish" fish-indent)
                   ("HTML" tidy)
                   ("LaTeX" latexindent)
-                  ("Markdown" (prettier "--print-width" "100"))
+                  ("Markdown" (prettier "--print-width" "80"))
                   ("Perl" (perltidy
                     "--quiet"
                     "--standard-error-output"
                     "--perl-best-practices"
-                    "-l=100"))
+                    "-l=80"))
                   ("Python" (yapf "--style" "file") isort)
                   ("Shell" (shfmt "-i" "4" "-ci"))
                   ("XML" tidy)
-                  ("YAML" prettier "--print-width" "100")))
+                  ("YAML" prettier "--print-width" "80")))
   (with-eval-after-load "markdown-mode"
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   :diminish)
