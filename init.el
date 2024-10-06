@@ -593,10 +593,13 @@
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
 
+;; Allow *Help* buffers to use the full frame
+(add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
+
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
   :config
-  (push '(helpful-mode :noselect t :position bottom :height 20)
+  (push '(helpful-mode :noselect t :position bottom :height 0.5)
         popwin:special-display-config))
 
 (use-package avy
@@ -1512,7 +1515,7 @@
 
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook (emacs-startup . yas-global-mode)
+  :hook ((prog-mode latex-mode) . yas-global-mode)
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -1851,10 +1854,10 @@
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
   (lsp-lens-enable nil "Lenses are intrusive")
-  (lsp-modeline-diagnostics-enable
-   nil "We have Flycheck, and the modeline gets congested")
-  (lsp-modeline-diagnostics-scope
-   :file "Simpler to focus on the errors at hand")
+  ;; We have Flycheck, and the modeline gets congested
+  (lsp-modeline-diagnostics-enable nil)
+  ;; Simpler to focus on the errors at hand
+  (lsp-modeline-diagnostics-scope :file)
   ;; Sudden changes in the height of the echo area causes the cursor to lose
   ;; position, manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
@@ -2251,7 +2254,7 @@
    . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
 
 (use-package highlight-doxygen
-  :hook ((c-mode c-ts-mode c++-mode c++-ts-mode) . highlight-doxygen-mode))
+  :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
 
 (use-package lisp-mode
   :straight (:type built-in)
@@ -2421,7 +2424,8 @@
   (org-return-follows-link t)
   (org-export-with-smart-quotes t "#+OPTIONS ':t")
   (org-export-with-section-numbers nil "#+OPTIONS num:nil")
-  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a headline
+  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a
+  ;; #headline
   (org-export-with-toc nil)
   (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
   ;; This exports broken links as [BROKEN LINK %s], so we can actually find
@@ -2557,23 +2561,6 @@
 
   :diminish)
 
-(use-package breadcrumb
-  :hook
-  ((c-mode
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    python-mode
-    python-ts-mode
-    sh-mode
-    bash-ts-mode
-    java-mode
-    java-ts-mode
-    org-mode
-    markdown-mode
-    markdown-ts-mode)
-   . breadcrumb-mode))
-
 (progn
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
@@ -2666,7 +2653,6 @@ If region is active, apply to active region instead."
 (bind-keys
  ("RET" . newline-and-indent)
  ("C-l" . goto-line)
-
  ("C-c z" . repeat)
  ("C-z" . undo)
 
@@ -2731,8 +2717,7 @@ If region is active, apply to active region instead."
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
-  :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode)
-  :hook (ssh-config-mode . turn-on-font-lock))
+  :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
 
 (use-package asm-mode
   :hook (asm-mode . lsp-deferred))
