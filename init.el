@@ -233,6 +233,15 @@
   (revert-without-query '("\\.*") "Revert all files without asking")
   (custom-file (no-littering-expand-var-file-name "custom.el"))
   (max-mini-window-height 0.4)
+  (pixel-scroll-precision-use-momentum nil)
+  (scroll-preserve-screen-position t)
+  ;; Add margin lines when scrolling vertically to have a sense of continuity
+  (scroll-margin 5)
+  (scroll-conservatively 101)
+  (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
+  ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for
+  ;; tall lines
+  (auto-window-vscroll nil)
   :config
   (dolist (exts
            '(".directory"
@@ -294,20 +303,9 @@
          ;; at "~/Documents/notes/file.txt" and you want to go to
          ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
          ;; you there.
-         file-name-shadow-mode))
+         file-name-shadow-mode pixel-scroll-precision-mode))
     (when (fboundp mode)
       (funcall mode 1)))
-
-  ;; Scroll settings from Doom Emacs
-  (setq
-   scroll-preserve-screen-position t
-   ;; Add margin lines when scrolling vertically to have a sense of continuity
-   scroll-margin 5
-   scroll-conservatively 101
-   bidi-inhibit-bpa nil ; Disabling BPA makes redisplay faster
-   ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for
-   ;; tall lines
-   auto-window-vscroll nil)
 
   ;; Changing buffer-local variables will only affect a single buffer.
   ;; `setq-default' changes the buffer-local variable's default value.
@@ -593,8 +591,13 @@
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
 
-;; Allow *Help* buffers to use the full frame
-(add-to-list 'display-buffer-alist '("*Help*" display-buffer-same-window))
+(use-package window
+  :straight (:type built-in)
+  :custom
+  (display-buffer-alist
+   '(
+     ;; Allow *Help* buffers to use the full frame
+     ("*Help*" (display-buffer-same-window)))))
 
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
@@ -1254,7 +1257,7 @@
       (unless (display-graphic-p)
         (diff-hl-margin-local-mode 1))))
    (dired-mode . diff-hl-dired-mode-unless-remote)
-   (emacs-startup . global-diff-hl-mode))
+   (find-file . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -1285,10 +1288,7 @@
    ("M-g l" . smerge-keep-lower)
    ("M-g b" . smerge-keep-base)
    ("M-g a" . smerge-keep-all)
-   ("M-g e" . smerge-ediff)
-   ("M-g K" . smerge-kill-current)
-   ("M-g m" . smerge-context-menu)
-   ("M-g M" . smerge-popup-context-menu)))
+   ("M-g e" . smerge-ediff)))
 
 (use-package elec-pair
   :straight (:type built-in)
@@ -1791,7 +1791,6 @@
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
 
 (use-package lsp-mode
-  :init (setq lsp-keymap-prefix "C-c l")
   :bind
   (:map
    lsp-command-map
@@ -1813,7 +1812,7 @@
    ("a" . lsp-workspace-folders-add)
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
-  :custom
+  :custom (lsp-keymap-prefix "C-c l")
   ;; We can add "--compile-commands-dir=<build-dir>" option to indicate the
   ;; directory where "compile_commands.json" reside. If path is invalid, clangd
   ;; will look in the current directory and parent paths of each source file. We
@@ -1885,6 +1884,7 @@
   (lsp-use-plists t)
   (lsp-auto-register-remote-clients nil)
   (lsp-enable-snippet nil)
+  (lsp-keep-workspace-alive nil)
   :config
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -2066,7 +2066,7 @@
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom (treesit-auto-install 'prompt)
   ;; Increased default font locking may hurt performance
-  (treesit-font-lock-level 3)
+  (treesit-font-lock-level 4)
   (treesit-language-source-alist
    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
@@ -2582,7 +2582,18 @@
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
   :init (load-theme 'catppuccin t)
-  :custom (catppuccin-flavor 'mocha))
+  :custom (catppuccin-flavor 'mocha)
+  :config
+  (custom-set-faces
+   `(diff-hl-change
+     ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
+  (custom-set-faces
+   `(diff-hl-delete
+     ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
+  (custom-set-faces
+   `(diff-hl-insert
+     ((t
+       (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
 (use-package nerd-icons
   :when (display-graphic-p)
