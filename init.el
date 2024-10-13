@@ -651,7 +651,8 @@
    ("M-<home>" . sb/dired-go-home)
    ("M-<up>" . sb/dired-jump-to-top)
    ("M-<down>" . sb/dired-jump-to-bottom)
-   ("i" . find-file))
+   ("i" . find-file)
+   ("_" . dired-create-empty-file))
   :custom
   ;; When there are two `dired' buffer windows in the same frame, Emacs will
   ;; select the other buffer as the target directory (e.g., for copying or
@@ -1283,10 +1284,8 @@
    smerge-mode-map
    ("M-g n" . smerge-next)
    ("M-g p" . smerge-prev)
-   ("M-g c" . smerge-keep-current)
    ("M-g u" . smerge-keep-upper)
    ("M-g l" . smerge-keep-lower)
-   ("M-g b" . smerge-keep-base)
    ("M-g a" . smerge-keep-all)
    ("M-g e" . smerge-ediff)))
 
@@ -1451,11 +1450,12 @@
    ("M-n" . minibuffer-next-completion)
    ("M-RET" . minibuffer-choose-completion))
   :custom
-  (read-file-name-completion-ignore-case
-   t "Ignore case when reading a file name")
+  ;; Ignore case when reading a file name
+  (read-file-name-completion-ignore-case t)
   (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
   :config
-  ;; Show docstring description for completion candidates in commands like `describe-function'.
+  ;; Show docstring description for completion candidates in commands like
+  ;; `describe-function'.
   (when sb/EMACS28+
     (setq completions-detailed t))
 
@@ -2043,7 +2043,7 @@
 
 (use-package eldoc
   :straight (:type built-in)
-  :hook (emacs-startup . global-eldoc-mode)
+  :hook (find-file . global-eldoc-mode)
   :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
   ;; The variable-height minibuffer and extra eldoc buffers are distracting. We
   ;; can limit ElDoc messages to one line which prevents the echo area from
@@ -2336,10 +2336,7 @@
 
 ;; More shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
-  :mode
-  (("\\.md\\'" . markdown-mode)
-   ("\\.markdown\\'" . markdown-mode)
-   ("README\\.md\\'" . gfm-mode))
+  :mode ("README\\.md\\'" . gfm-mode)
   :bind
   (:map
    markdown-mode-map
