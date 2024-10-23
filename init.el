@@ -1983,15 +1983,16 @@
 
 (use-package compile
   :straight (:type built-in)
-  :bind
-  (:map
-   prog-mode-map ("<f10>" . compile) ("<f11>" . recompile)
-   :map tex-mode-map ("<f10>" . compile) ("<f11>" . recompile))
+  :bind (:map prog-mode-map ("<f10>" . compile) ("<f11>" . recompile))
   :custom
   (compile-command (format "make -k -j%s " (num-processors)))
   (compilation-always-kill t)
   (compilation-ask-about-save nil "Save all modified buffers without asking")
-  (compilation-scroll-output 'first-error))
+  (compilation-scroll-output 'first-error)
+  :config
+  (with-eval-after-load "tex-mode"
+    (bind-key "<f10>" #'compile tex-mode-map)
+    (bind-key "<f11>" #'recompile tex-mode-map)))
 
 (use-package fancy-compilation
   :after compile
@@ -2629,8 +2630,7 @@ If region is active, apply to active region instead."
 
  ("C-M-b" . backward-sexp)
  ("C-M-f" . forward-sexp)
- ("C-M-k" . kill-sexp)
- ("C-M-@" . mark-sexp))
+ ("C-M-k" . kill-sexp))
 
 (unbind-key "C-]") ; Bound to `abort-recursive-edit'
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
