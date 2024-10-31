@@ -1168,8 +1168,8 @@
 ;; which highlights matches and replacements as you type.
 (use-package visual-regexp
   :bind
-  ([remap query-replace] . vr/query-replace)
-  ([remap replace-regex] . vr/replace))
+  (([remap query-replace] . vr/query-replace)
+   ([remap replace-regex] . vr/replace)))
 
 (use-package vc-hooks
   :straight (:type built-in)
@@ -2216,6 +2216,10 @@
      (when buffer-file-name
        (add-hook 'after-save-hook #'check-parens nil t)))))
 
+(use-package paren-face
+  :straight (:host github :repo "tarsius/paren-face")
+  :hook (emacs-startup . global-paren-face-mode))
+
 (use-package ini-mode
   :commands (ini-mode))
 
@@ -2255,7 +2259,12 @@
   (("\\Makefile\\'" . makefile-mode)
    ("\\Makefile.common\\'" . makefile-mode)
    ("makefile\\.rules\\'" . makefile-mode))
-  :hook (makefile-mode . (lambda () (setq-local indent-tabs-mode t))))
+  :hook
+  (makefile-mode
+   .
+   (lambda ()
+     (setq-local indent-tabs-mode t)
+     (lsp-deferred))))
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -2666,5 +2675,10 @@ If region is active, apply to active region instead."
 
 (use-package asm-mode
   :hook (asm-mode . lsp-deferred))
+
+(use-package dtrt-indent
+  :straight (:host github :repo "jscheid/dtrt-indent")
+  :hook (find-file . dtrt-indent-mode)
+  :diminish)
 
 ;;; init.el ends here

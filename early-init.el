@@ -63,7 +63,7 @@
  ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for
  ;; composing emails, but `text-mode' is more expensive to start. Furthermore,
  ;; lsp support is not enabled for the *scratch* buffer.
- initial-major-mode 'fundamental-mode
+ initial-major-mode 'text-mode
  initial-scratch-message nil)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
