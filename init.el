@@ -218,7 +218,9 @@
   (pixel-scroll-precision-use-momentum nil)
   (scroll-preserve-screen-position t)
   (scroll-margin 3)
-  (scroll-conservatively 101)
+  ;; Scroll the window by 1 line whenever the cursor moves off the visible screen
+  (scroll-step 1)
+  (scroll-conservatively 10000)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
   (auto-window-vscroll nil)
   :config
@@ -1841,6 +1843,7 @@
   (lsp-auto-register-remote-clients nil)
   (lsp-enable-snippet nil)
   (lsp-keep-workspace-alive nil)
+  (lsp-modeline-workspace-status-enable nil)
   :config
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -1890,6 +1893,7 @@
 
 (use-package consult-lsp
   :after (consult lsp)
+  :demand t
   :bind
   (:map
    lsp-command-map
@@ -2007,6 +2011,7 @@
   ;; resizing itself unexpectedly when point is on a variable with a multiline
   ;; docstring, but then it cuts of useful information.
   ;; (eldoc-echo-area-use-multiline-p nil)
+  (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   :config
   ;; Allow eldoc to trigger after completions
   (with-eval-after-load "company"
