@@ -529,6 +529,20 @@
   (ibuffer-show-empty-filter-groups nil)
   (ibuffer-formats
    '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
+  (ibuffer-never-show-predicates
+   '("*Messages\\*"
+     "*Help\\*"
+     "*Quick Help\\*"
+     "*Warnings\\*"
+     "*Calc Trail\\*"
+     "*Compile-Log\\*"
+     "*Async-native-compile-log\\*"
+     "*Native-compile-log\\*"
+     "*Calculator\\*"
+     "*Calendar\\*"
+     "*Warning\\*"
+     "magit:.*"
+     "*Org Help\\*"))
   :config (require 'ibuf-ext)
   ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
   (defalias 'list-buffers 'ibuffer))
@@ -2269,7 +2283,8 @@
    .
    (lambda ()
      (setq-local indent-tabs-mode t)
-     (lsp-deferred))))
+     ;; (lsp-deferred)
+     )))
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
