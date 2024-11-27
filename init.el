@@ -1182,10 +1182,18 @@
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace'
 ;; which highlights matches and replacements as you type.
-(use-package visual-regexp
+
+;; (use-package visual-regexp
+;;   :bind
+;;   (([remap query-replace] . vr/query-replace)
+;;    ([remap replace-regex] . vr/replace)))
+
+(use-package visual-replace
   :bind
-  (([remap query-replace] . vr/query-replace)
-   ([remap replace-regex] . vr/replace)))
+  (([remap query-replace] . visual-replace)
+   ([remap replace-string] . visual-replace)
+   ([remap isearch-query-replace] . visual-replace-from-isearch)
+   ([remap isearch-query-replace-regexp] . visual-replace-from-isearch)))
 
 (use-package vc-hooks
   :straight (:type built-in)
@@ -2700,5 +2708,9 @@ If region is active, apply to active region instead."
   :straight (:host github :repo "jscheid/dtrt-indent")
   :hook (find-file . dtrt-indent-mode)
   :diminish)
+
+(use-package consult-xref-stack
+  :straight (:host github :repo "brett-lempereur/consult-xref-stack")
+  :bind ("C-," . consult-xref-stack-backward))
 
 ;;; init.el ends here
