@@ -542,7 +542,10 @@
      "*Calendar\\*"
      "*Warning\\*"
      "magit:.*"
-     "*Org Help\\*"))
+     "*Org Help\\*"
+     "*ltex-ls.*"
+     "*grammarly-ls.*"
+     "*bash-ls.*"))
   :config (require 'ibuf-ext)
   ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
   (defalias 'list-buffers 'ibuffer))
@@ -582,7 +585,10 @@
   (display-buffer-alist
    '(
      ;; Allow *Help* buffers to use the full frame
-     ("*Help*" (display-buffer-same-window)))))
+     ("*Help*" (display-buffer-same-window))
+     ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
+      (display-buffer-no-window)
+      (allow-no-window . t)))))
 
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
@@ -627,9 +633,10 @@
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
   :straight (:type built-in)
+  :commands dired
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh `dired' when files change
-   (dired-mode . dired-hide-details-mode))
+   (dired-mode . dired-hide-details-mode) (dired-mode . hl-line-mode))
   :bind
   (:map
    dired-mode-map
@@ -1866,6 +1873,7 @@
   (lsp-enable-snippet nil)
   (lsp-keep-workspace-alive nil)
   (lsp-modeline-workspace-status-enable nil)
+  (lsp-enable-suggest-server-download nil)
   :config
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
