@@ -97,9 +97,7 @@
 
 ;; These variables need to be set before loading `use-package'.
 (setq use-package-enable-imenu-support t)
-(straight-use-package
- '(use-package :source
-    melpa))
+(straight-use-package '(use-package))
 
 (if (bound-and-true-p sb/op-mode-daemon)
     (setq
@@ -545,7 +543,8 @@
      "*Org Help\\*"
      "*ltex-ls.*"
      "*grammarly-ls.*"
-     "*bash-ls.*"))
+     "*bash-ls.*"
+     "*marksman.*"))
   :config (require 'ibuf-ext)
   ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
   (defalias 'list-buffers 'ibuffer))
@@ -2022,7 +2021,9 @@
   (compile-command (format "make -k -j%s " (num-processors)))
   (compilation-always-kill t)
   (compilation-ask-about-save nil "Save all modified buffers without asking")
-  (compilation-scroll-output 'first-error)
+  (compilation-scroll-output t)
+  (compilation-auto-jump-to-first-error t)
+  (compilation-max-output-line-length nil)
   :config
   (with-eval-after-load "tex-mode"
     (bind-key "<f10>" #'compile tex-mode-map)
@@ -2073,6 +2074,7 @@
      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
      (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
      (json "https://github.com/tree-sitter/tree-sitter-json")
+     (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
      (latex "https://github.com/latex-lsp/tree-sitter-latex")
      (make "https://github.com/alemuller/tree-sitter-make")
      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
@@ -2097,6 +2099,7 @@
                      (treesit-language-available-p 'html)
                      (treesit-language-available-p 'java)
                      (treesit-language-available-p 'json)
+                     (treesit-language-available-p 'kdl)
                      (treesit-language-available-p 'latex)
                      (treesit-language-available-p 'make)
                      (treesit-language-available-p 'markdown)
@@ -2700,9 +2703,25 @@ If region is active, apply to active region instead."
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode))
 
-(use-package kdl-mode
-  :straight (:host github :repo "bobuk/kdl-mode")
-  :mode ("\\.kdl\\'" . kdl-mode))
+(use-package reformatter
+  :after kdl-ts-mode
+  :demand t
+  :config
+  (reformatter-define
+   kdl-format
+   :program kdlfmt
+   :args '("format")
+   :lighter " KDLFMT"
+   :group 'reformatter))
+
+;; (use-package kdl-mode
+;;   :straight (:host github :repo "bobuk/kdl-mode")
+;;   :mode ("\\.kdl\\'" . kdl-mode))
+
+(use-package kdl-ts-mode
+  :straight (:host github :repo "dataphract/kdl-ts-mode")
+  :mode ("\\.kdl\\'" . kdl-ts-mode)
+  :hook (kdl-ts-mode . kdl-format-on-save-mode))
 
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
@@ -2722,3 +2741,7 @@ If region is active, apply to active region instead."
   :bind ("C-," . consult-xref-stack-backward))
 
 ;;; init.el ends here
+
+;; Local variables:
+;; elisp-autofmt-load-packages-local: ("use-package")
+;; end:
