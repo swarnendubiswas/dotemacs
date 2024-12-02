@@ -528,8 +528,7 @@
   (ibuffer-formats
    '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
   (ibuffer-never-show-predicates
-   '("*Messages\\*"
-     "*Help\\*"
+   '("*Help\\*"
      "*Quick Help\\*"
      "*Warnings\\*"
      "*Calc Trail\\*"
@@ -541,10 +540,13 @@
      "*Warning\\*"
      "magit:.*"
      "*Org Help\\*"
+     "*lsp-log*"
      "*ltex-ls.*"
      "*grammarly-ls.*"
      "*bash-ls.*"
-     "*marksman.*"))
+     "*marksman.*"
+     "*yaml-ls.*"
+     "*clangd.*"))
   :config (require 'ibuf-ext)
   ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
   (defalias 'list-buffers 'ibuffer))
@@ -866,6 +868,7 @@
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end)))))
 
+;; TODO: Is this causing the issue with minibuffer map?
 (use-package embark
   :bind
   ( ;; "C-h b" lists all the bindings available in a buffer
@@ -2031,7 +2034,8 @@
 
 (use-package fancy-compilation
   :after compile
-  :init (fancy-compilation-mode 1))
+  :init (fancy-compilation-mode 1)
+  :custom (fancy-compilation-scroll-output 'first-error))
 
 (use-package eldoc
   :straight (:type built-in)
@@ -2703,25 +2707,21 @@ If region is active, apply to active region instead."
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode))
 
-(use-package reformatter
-  :after kdl-ts-mode
-  :demand t
-  :config
-  (reformatter-define
-   kdl-format
-   :program kdlfmt
-   :args '("format")
-   :lighter " KDLFMT"
-   :group 'reformatter))
-
-;; (use-package kdl-mode
-;;   :straight (:host github :repo "bobuk/kdl-mode")
-;;   :mode ("\\.kdl\\'" . kdl-mode))
-
 (use-package kdl-ts-mode
   :straight (:host github :repo "dataphract/kdl-ts-mode")
   :mode ("\\.kdl\\'" . kdl-ts-mode)
-  :hook (kdl-ts-mode . kdl-format-on-save-mode))
+  :hook (kdl-ts-mode . kdl-format-on-save-mode)
+  :config
+  (use-package reformatter
+    :after kdl-ts-mode
+    :demand t
+    :config
+    (reformatter-define
+     kdl-format
+     :program kdlfmt
+     :args '("format")
+     :lighter " KDLFMT"
+     :group 'reformatter)))
 
 (use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
