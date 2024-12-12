@@ -214,6 +214,7 @@
   (revert-without-query '("\\.*") "Revert all files without asking")
   (max-mini-window-height 0.4)
   (pixel-scroll-precision-use-momentum nil)
+  (pixel-scroll-precision-interpolate-page t)
   (scroll-preserve-screen-position t)
   (scroll-margin 3)
   ;; Scroll the window by 1 line whenever the cursor moves off the visible screen
@@ -264,6 +265,11 @@
   (tooltip-mode -1)
   (auto-encryption-mode -1)
 
+  (when (fboundp 'pixel-scroll-mode)
+    (pixel-scroll-mode 1))
+  (when (fboundp 'pixel-scroll-precision-mode)
+    (pixel-scroll-precision-mode 1))
+
   (dolist
       (mode
        '(
@@ -280,7 +286,7 @@
          ;; at "~/Documents/notes/file.txt" and you want to go to
          ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
          ;; you there.
-         file-name-shadow-mode pixel-scroll-precision-mode))
+         file-name-shadow-mode))
     (when (fboundp mode)
       (funcall mode 1)))
 
@@ -546,9 +552,10 @@
      "*bash-ls.*"
      "*marksman.*"
      "*yaml-ls.*"
-     "*clangd.*"))
-  :config (require 'ibuf-ext)
-  ;; (add-to-list 'ibuffer-never-show-predicates "^\\*")
+     "*clangd.*"
+     "*texlab2.*"))
+  :config
+  (require 'ibuf-ext)
   (defalias 'list-buffers 'ibuffer))
 
 ;; By default buffers are grouped by `project-current' or by `default-directory'.
@@ -616,7 +623,9 @@
 
 (use-package ace-jump-buffer
   :bind ("C-b" . ace-jump-buffer)
-  :custom (ajb-bs-configuration "files-and-scratch"))
+  :custom
+  (ajb-bs-configuration "files-and-scratch")
+  (ajb-sort-function 'bs--sort-by-filename))
 
 (use-package dired
   :preface
@@ -1028,6 +1037,10 @@
 (use-package change-inner
   :commands (change-inner change-outer))
 
+(use-package expand-line
+  :bind ("M-i" . turn-on-expand-line-mode)
+  :diminish)
+
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
@@ -1099,6 +1112,13 @@
    ("C-c d s" . crux-sudo-edit)
    ("C-<f9>" . crux-recentf-find-directory))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
+
+(use-package rainbow-mode
+  :hook
+  ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode)
+   .
+   rainbow-mode)
+  :diminish)
 
 (use-package colorful-mode
   :hook
@@ -1188,6 +1208,10 @@
 
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
+
+(use-package re-builder
+  :commands re-builder
+  :custom (reb-re-syntax 'string))
 
 ;; Package `visual-regexp' provides an alternate version of `query-replace'
 ;; which highlights matches and replacements as you type.
@@ -1923,9 +1947,28 @@
 
   :diminish)
 
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-imenu-auto-refresh 'after-save)
+  ;; Enables understanding when to invoke code actions
+  (lsp-ui-sideline-show-code-actions t)
+  ;; Noisy to show symbol information in the sideline
+  (lsp-ui-sideline-enable t)
+  ;; Hide diagnostics when typing because they can be intrusive,
+  ;; Flycheck/flymake already highlights errors
+  (lsp-ui-sideline-show-diagnostics nil)
+  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
+  (lsp-ui-peek-enable nil))
+
 (use-package consult-lsp
   :after (consult lsp)
   :demand t
+  :commands consult-lsp-diagnostics
   :bind
   (:map
    lsp-command-map
@@ -2700,6 +2743,9 @@ If region is active, apply to active region instead."
 (use-package free-keys
   :commands free-keys)
 
+(use-package key-quiz
+  :commands key-quiz)
+
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
   :diminish)
@@ -2739,6 +2785,18 @@ If region is active, apply to active region instead."
 (use-package consult-xref-stack
   :straight (:host github :repo "brett-lempereur/consult-xref-stack")
   :bind ("C-," . consult-xref-stack-backward))
+
+(use-package buffer-terminator
+  :straight (:host github :repo "jamescherti/buffer-terminator.el")
+  :hook (emacs-startup . buffer-terminator-mode)
+  :custom
+  (buffer-terminator-verbose nil)
+  (buffer-terminator-inactivity-timeout (* 60 60) "60 minutes")
+  :diminish)
+
+;; The color sometimes makes it difficult to distinguish text on terminals.
+(use-package hl-line
+  :hook (emacs-startup . global-hl-line-mode))
 
 ;;; init.el ends here
 
