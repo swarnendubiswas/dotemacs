@@ -2009,6 +2009,8 @@
   (lsp-ltex-check-frequency "save")
   (lsp-ltex-dictionary
    (expand-file-name "company-dict/text-mode" user-emacs-directory))
+  (lsp-ltex-repo-path "ltex-plus/ltex-ls-plus")
+  (lsp-ltex-version "18.3.0")
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
   ;; dict words.
@@ -2041,7 +2043,7 @@
 
 (use-package subword
   :straight (:type built-in)
-  :hook ((LaTeX-mode prog-mode) . subword-mode)
+  :hook ((LaTeX-mode latex-mode prog-mode) . subword-mode)
   :diminish)
 
 (use-package symbol-overlay
@@ -2637,7 +2639,6 @@
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-minor-modes t)
   (doom-modeline-checker-simple-format nil)
-  (doom-modeline-buffer-file-name-style 'file-name)
   (doom-modeline-unicode-fallback t))
 
 (use-package centaur-tabs
@@ -2751,7 +2752,8 @@ If region is active, apply to active region instead."
   :diminish)
 
 (use-package kkp
-  :hook (emacs-startup . global-kkp-mode))
+  :hook (emacs-startup . global-kkp-mode)
+  :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
 
 (use-package kdl-ts-mode
   :straight (:host github :repo "dataphract/kdl-ts-mode")
@@ -2797,6 +2799,10 @@ If region is active, apply to active region instead."
 ;; The color sometimes makes it difficult to distinguish text on terminals.
 (use-package hl-line
   :hook (emacs-startup . global-hl-line-mode))
+
+(use-package clipetty
+  :hook (emacs-startup . global-clipetty-mode)
+  :diminish)
 
 ;;; init.el ends here
 
