@@ -895,14 +895,15 @@
   :custom
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command)
-  :config
-  (with-eval-after-load "vertico"
-    (bind-keys
-     :map
-     vertico-map
-     ("C-`" . embark-act)
-     ("c-;" . embark-dwim)
-     ("C-c C-e" . embark-export))))
+  ;; :config
+  ;; (with-eval-after-load "vertico"
+  ;;   (bind-keys
+  ;;    :map
+  ;;    vertico-map
+  ;;    ("C-`" . embark-act)
+  ;;    ("c-;" . embark-dwim)
+  ;;    ("C-c C-e" . embark-export)))
+  )
 
 ;; Supports exporting search results to a `grep-mode' buffer, on which you can
 ;; use `wgrep'.
