@@ -1561,6 +1561,8 @@
    ("C-M-/" . company-other-backend)
    ("C-s" . company-search-candidates)
    ("C-M-s" . company-filter-candidates)
+   ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
+   ;; "TAB").
    ("<tab>" . company-complete-common-or-cycle)
    ("TAB" . company-complete-common-or-cycle)
    ("<backtab>" .
@@ -2151,6 +2153,7 @@
                      (treesit-language-available-p 'json)
                      (treesit-language-available-p 'kdl)
                      (treesit-language-available-p 'latex)
+                     (treesit-language-available-p 'kdl)
                      (treesit-language-available-p 'make)
                      (treesit-language-available-p 'markdown)
                      (treesit-language-available-p 'org)
