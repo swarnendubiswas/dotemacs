@@ -36,9 +36,31 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
-  :type '(radio (const :tag "doom-modeline" doom-modeline) (const :tag "none" none))
+  :type
+  '(radio
+    (const :tag "powerline" powerline)
+    (const :tag "doom-modeline" doom-modeline)
+    (const :tag "none" none))
+  :group 'sb/emacs)
+
+;; Corfu integrates nicely with `orderless' and provides better completion for
+;; elisp symbols with `cape-symbol'. But `corfu-terminal-mode' has a potential
+;; rendering problem for completion popups appearing near the right edges with
+;; TUI Emacs. The completion entries wrap around, and sometimes messes up the
+;; completion. Company works better with both Windows and TUI Emacs, and has
+;; more extensive LaTeX support than Corfu. We can set up separate completion
+;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
+;; completion from inside a word/symbol. However, `company-ispell' does not keep
+;; prefix case when used as a grouped backend.
+(defcustom sb/in-buffer-completion 'corfu
+  "Choose the framework to use for completion at point."
+  :type
+  '(radio
+    (const :tag "corfu" corfu)
+    (const :tag "company" company)
+    (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Large values make reading difficult when the window is split side-by-side,
@@ -1551,6 +1573,7 @@
 ;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
 ;; search.
 (use-package company
+  :when (eq sb/in-buffer-completion 'company)
   :hook (emacs-startup . global-company-mode)
   :bind
   (
@@ -1621,7 +1644,7 @@
   :demand t)
 
 (use-package company-dict
-  :after company
+  :after (:any company corfu)
   :demand t
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
@@ -1639,7 +1662,7 @@
    '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
 (use-package company-web
-  :after company
+  :after (:any company corfu)
   :demand t
   :config (require 'company-web-html))
 
@@ -1710,16 +1733,30 @@
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority. We therefore exclude it from `company-backends' and invoke it
       ;; on demand.
+
+      ;; (setq company-backends
+      ;;       '((company-files
+      ;;          company-math-symbols-latex ; Math latex tags
+      ;;          company-latex-commands
+      ;;          ;; Math Unicode symbols and sub(super)scripts
+      ;;          company-math-symbols-unicode
+      ;;          company-ispell
+      ;;          company-dict
+      ;;          company-dabbrev
+      ;;          company-capf)))
+
       (setq company-backends
-            '((company-files
-               company-math-symbols-latex ; Math latex tags
-               company-latex-commands
-               ;; Math Unicode symbols and sub(super)scripts
+            '((:separate
+               company-reftex-labels
+               company-reftex-citations
+               company-math-symbols-latex
                company-math-symbols-unicode
-               company-ispell
-               company-dict
+               company-capf
+               company-latex-commands
                company-dabbrev
-               company-capf))))
+               company-abbrev
+               company-yasnippet
+               company-ispell))))
 
     (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
 
@@ -1814,6 +1851,177 @@
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
 
+;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
+(use-package corfu
+  :straight
+  (corfu
+   :files (:defaults "extensions/*")
+   :includes (corfu-info corfu-history corfu-echo corfu-popupinfo corfu-indexed))
+  :when (eq sb/in-buffer-completion 'corfu)
+  :hook
+  ((emacs-startup . global-corfu-mode)
+   (corfu-mode
+    .
+    (lambda ()
+      (setq-local completion-styles '(basic))
+      (corfu-history-mode)
+      (corfu-echo-mode)
+      (corfu-popupinfo-mode)
+      (corfu-indexed-mode))))
+  :bind
+  (:map
+   corfu-map
+   ("ESCAPE" . corfu-quit)
+   ([escape] . corfu-quit)
+   ("TAB" . corfu-next)
+   ([tab] . corfu-next)
+   ("S-TAB" . corfu-previous)
+   ([backtab] . corfu-previous)
+   ("M-d" . corfu-info-documentation)
+   ("M-l" . corfu-info-location)
+   ("M-n" . corfu-popupinfo-scroll-up)
+   ("M-p" . corfu-popupinfo-scroll-down)
+   ([remap corfu-show-documentation] . corfu-popupinfo-toggle))
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-exclude-modes
+   '(dired-mode
+     inferior-python-mode
+     magit-status-mode
+     help-mode
+     csv-mode
+     minibuffer-inactive-mode))
+  :config
+  ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
+  ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
+  ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
+  ;; entries.
+  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2)))
+
+  (with-eval-after-load "savehist"
+    (add-to-list 'savehist-additional-variables 'corfu-history)))
+
+(use-package corfu-terminal
+  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
+  :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
+  :hook (corfu-mode . corfu-terminal-mode)
+  :custom
+  (corfu-terminal-position-right-margin
+   5 "Prevent wraparound at the right edge"))
+
+(use-package yasnippet-capf
+  :straight (:host github :repo "elken/yasnippet-capf")
+  :after (yasnippet corfu)
+  :demand t)
+
+(use-package cape
+  :after corfu
+  :demand t
+  :init
+  ;; Initialize for all generic languages that are not specifically handled
+  (add-hook 'completion-at-point-functions #'cape-keyword)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook
+   'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev))
+  :custom
+  (cape-dabbrev-min-length 3)
+  (cape-dict-file
+   `(,(expand-file-name "wordlist.5" sb/extras-directory)
+     ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  :config
+  ;; Make these capfs composable
+  (with-eval-after-load "lsp-mode"
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
+
+  ;; Override CAPFS for specific major modes
+  (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local completion-at-point-functions
+                   (list
+                    #'cape-file #'yasnippet-capf
+                    (cape-capf-super
+                     #'elisp-completion-at-point
+                     #'citre-completion-at-point
+                     #'cape-elisp-symbol
+                     (cape-company-to-capf #'company-yasnippet))
+                    #'cape-dict #'cape-dabbrev)))))
+
+  (dolist (mode '(flex-mode-hook bison-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local completion-at-point-functions
+                   (list
+                    #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
+
+  (add-hook
+   'text-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  #'cape-file
+                  (cape-capf-properties
+                   (cape-capf-super #'cape-dict #'cape-dabbrev)
+                   :sort t)))))
+
+  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+  (add-hook
+   'LaTeX-mode-hook
+   (lambda ()
+     (setq-local
+      completion-at-point-functions
+      (list
+       #'cape-file
+       (cape-capf-super
+        (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
+        (cape-company-to-capf #'company-latex-commands)
+        (cape-company-to-capf #'company-reftex-labels)
+        (cape-company-to-capf #'company-reftex-citations)
+        (cape-company-to-capf #'company-auctex-environments)
+        (cape-company-to-capf #'company-auctex-macros)
+        (cape-company-to-capf #'company-auctex-labels)
+        ;; Math unicode symbols and sub(super)scripts
+        (cape-company-to-capf #'company-math-symbols-unicode)
+        (cape-company-to-capf #'company-auctex-symbols)
+        #'cape-dabbrev)
+       #'cape-dict #'yasnippet-capf))))
+
+  (with-eval-after-load "lsp-mode"
+    (dolist (mode
+             '(c-mode-hook
+               c-ts-mode-hook
+               c++-mode-hook
+               c++-ts-mode-hook
+               java-mode-hook
+               java-ts-mode-hook
+               python-mode-hook
+               python-ts-mode-hook
+               sh-mode-hook
+               bash-ts-mode-hook
+               cmake-mode-hook
+               cmake-ts-mode-hook
+               json-mode-hook
+               json-ts-mode-hook
+               jsonc-mode-hook
+               yaml-mode-hook
+               yaml-ts-mode-hook))
+      (add-hook
+       mode
+       (lambda ()
+         (setq-local completion-at-point-functions
+                     (list
+                      #'cape-file #'yasnippet-capf
+                      (cape-capf-super
+                       #'lsp-completion-at-point
+                       #'citre-completion-at-point
+                       #'cape-keyword
+                       (cape-company-to-capf #'company-yasnippet))
+                      #'cape-dabbrev #'cape-dict)))))))
+
 (use-package lsp-mode
   :bind
   (:map
@@ -1904,6 +2112,13 @@
   (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-suggest-server-download nil)
   :config
+  (when (eq sb/in-buffer-completion 'corfu)
+    (defun sb/lsp-mode-setup-completion ()
+      (setf (alist-get
+             'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(flex)))
+    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
+
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
@@ -2012,8 +2227,6 @@
   (lsp-ltex-check-frequency "save")
   (lsp-ltex-dictionary
    (expand-file-name "company-dict/text-mode" user-emacs-directory))
-  (lsp-ltex-repo-path "ltex-plus/ltex-ls-plus")
-  (lsp-ltex-version "18.3.0")
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
   ;; dict words.
@@ -2524,6 +2737,13 @@
   :straight (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
+;; Use "<" to trigger org block completion at point.
+(use-package org-block-capf
+  :straight (:host github :repo "xenodium/org-block-capf")
+  :after corfu
+  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+  :custom (org-block-capf-edit-style 'inline))
+
 (with-eval-after-load "tex-mode"
   (setq tex-command "pdflatex")
   (bind-key "C-c C-j" #'consult-outline tex-mode-map)
@@ -2542,6 +2762,12 @@
   :bind
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
+
+;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
+(use-package bibtex-capf
+  :straight (:host github :repo "mclear-tools/bibtex-capf")
+  :when (eq sb/in-buffer-completion 'corfu)
+  :hook (LaTeX-mode . bibtex-capf-mode))
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
@@ -2634,6 +2860,80 @@
 (use-package nerd-icons
   :when (display-graphic-p)
   :custom (nerd-icons-scale-factor 0.9))
+
+;; Powerline theme for Nano looks great, and takes less space on the modeline.
+;; It does not show lsp status, flycheck information, and Python virtualenv
+;; information on the modeline. The package is not being actively maintained.
+;; Inspired by
+;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+(use-package powerline
+  :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let* ((rendered-str (format-mode-line str))
+             (padded-str
+              (concat
+               (when (and (> (length rendered-str) 0) (eq pad 'l))
+                 "")
+               (if (listp str)
+                   rendered-str
+                 str)
+               (when (and (> (length rendered-str) 0) (eq pad 'r))
+                 ""))))
+        (if face
+            (pl/add-text-property padded-str 'face face)
+          padded-str))))
+
+  (defun sb/powerline-nano-theme ()
+    "Setup a nano-like modeline"
+    (interactive)
+    (setq-default mode-line-format
+                  '("%e" (:eval
+                     (let* ((active (powerline-selected-window-active))
+                            (face0
+                             (if active
+                                 'powerline-active0
+                               'powerline-inactive0))
+                            (lhs
+                             (list
+                              (powerline-raw
+                               (concat
+                                "GNU Emacs "
+                                (number-to-string emacs-major-version)
+                                "."
+                                (number-to-string emacs-minor-version))
+                               nil 'l)))
+                            (rhs
+                             (list
+                              (when which-function-mode
+                                (sb/powerline-raw which-func-format nil 'l))
+                              (powerline-vc nil 'l)
+                              (powerline-raw "")
+                              (powerline-raw "%4l" nil 'l)
+                              (powerline-raw ",")
+                              (powerline-raw "%3c" nil 'r)
+                              (if (buffer-modified-p)
+                                  (powerline-raw " ⠾" nil 'r)
+                                (powerline-raw "  " nil 'r))))
+                            (center (list (powerline-raw "%b" nil 'r))))
+                       (concat
+                        (powerline-render lhs)
+                        (powerline-fill-center
+                         nil (/ (powerline-width center) 2.0))
+                        (powerline-render center)
+                        (powerline-fill nil (powerline-width rhs))
+                        (powerline-render rhs)))))))
+  :when (eq sb/modeline-theme 'powerline)
+  :hook (emacs-startup . sb/powerline-nano-theme)
+  :custom
+  (powerline-display-hud
+   nil "Visualization of the buffer position is not useful")
+  (powerline-display-buffer-size nil)
+  (powerline-display-mule-info nil "File encoding information is not useful")
+  (powerline-gui-use-vcs-glyph t)
+  (powerline-height 20))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
