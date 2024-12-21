@@ -1747,15 +1747,13 @@
 
       (setq company-backends
             '((:separate
-               company-reftex-labels
-               company-reftex-citations
                company-math-symbols-latex
                company-math-symbols-unicode
                company-capf
                company-latex-commands
                company-dabbrev
-               company-abbrev
                company-yasnippet
+               company-dict
                company-ispell))))
 
     (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
@@ -1851,7 +1849,8 @@
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
 
-;; Corfu is not a completion framework, it is a front-end for `completion-at-point'.
+;; Corfu is not a completion framework, it is a front-end for
+;; `completion-at-point'.
 (use-package corfu
   :straight
   (corfu
@@ -1863,7 +1862,6 @@
    (corfu-mode
     .
     (lambda ()
-      (setq-local completion-styles '(basic))
       (corfu-history-mode)
       (corfu-echo-mode)
       (corfu-popupinfo-mode)
@@ -1958,6 +1956,10 @@
                    (list
                     #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
 
+  ;; https://github.com/minad/cape/discussions/130
+  ;; There is no mechanism to force deduplication if candidates from cape-dict
+  ;; and cape-dabbrev are not exactly equal (equal string and equal text
+  ;; properties).
   (add-hook
    'text-mode-hook
    (lambda ()
@@ -1968,7 +1970,8 @@
                    (cape-capf-super #'cape-dict #'cape-dabbrev)
                    :sort t)))))
 
-  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX
+  ;; names.
   (add-hook
    'LaTeX-mode-hook
    (lambda ()
@@ -1978,15 +1981,9 @@
        #'cape-file
        (cape-capf-super
         (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
-        (cape-company-to-capf #'company-latex-commands)
-        (cape-company-to-capf #'company-reftex-labels)
-        (cape-company-to-capf #'company-reftex-citations)
-        (cape-company-to-capf #'company-auctex-environments)
-        (cape-company-to-capf #'company-auctex-macros)
-        (cape-company-to-capf #'company-auctex-labels)
         ;; Math unicode symbols and sub(super)scripts
         (cape-company-to-capf #'company-math-symbols-unicode)
-        (cape-company-to-capf #'company-auctex-symbols)
+        (cape-company-to-capf #'company-latex-commands)
         #'cape-dabbrev)
        #'cape-dict #'yasnippet-capf))))
 
@@ -2887,7 +2884,7 @@ PAD can be left (`l') or right (`r')."
           padded-str))))
 
   (defun sb/powerline-nano-theme ()
-    "Setup a nano-like modeline"
+    "Setup a Nano-like modeline"
     (interactive)
     (setq-default mode-line-format
                   '("%e" (:eval
@@ -2928,8 +2925,8 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/modeline-theme 'powerline)
   :hook (emacs-startup . sb/powerline-nano-theme)
   :custom
-  (powerline-display-hud
-   nil "Visualization of the buffer position is not useful")
+  ;; Visualization of the buffer position is not useful
+  (powerline-display-hud nil)
   (powerline-display-buffer-size nil)
   (powerline-display-mule-info nil "File encoding information is not useful")
   (powerline-gui-use-vcs-glyph t)
