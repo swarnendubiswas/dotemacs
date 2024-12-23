@@ -54,7 +54,7 @@
 ;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
 ;; completion from inside a word/symbol. However, `company-ispell' does not keep
 ;; prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -1309,6 +1309,7 @@
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package git-commit
+  :after magit
   :hook
   (git-commit-setup
    .
@@ -1747,13 +1748,14 @@
 
       (setq company-backends
             '((:separate
+               company-files
                company-math-symbols-latex
                company-math-symbols-unicode
-               company-capf
                company-latex-commands
-               company-dabbrev
+               company-capf
                company-yasnippet
                company-dict
+               company-dabbrev
                company-ispell))))
 
     (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
