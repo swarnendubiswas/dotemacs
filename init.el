@@ -26,7 +26,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -46,15 +46,15 @@
   :group 'sb/emacs)
 
 ;; Corfu integrates nicely with `orderless' and provides better completion for
-;; elisp symbols with `cape-symbol'. But `corfu-terminal-mode' has a potential
-;; rendering problem for completion popups appearing near the right edges with
-;; TUI Emacs. The completion entries wrap around, and sometimes messes up the
+;; Elisp symbols with `cape-symbol'. But `corfu-terminal-mode' has a rendering
+;; problem for completion popups appearing near the right edges with terminal
+;; Emacs. The completion entries wrap around sometimes, and messes up the
 ;; completion. Company works better with both Windows and TUI Emacs, and has
 ;; more extensive LaTeX support than Corfu. We can set up separate completion
 ;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
 ;; completion from inside a word/symbol. However, `company-ispell' does not keep
 ;; prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -140,8 +140,8 @@
    use-package-minimum-reported-time 0 ; Show everything
    use-package-always-demand t))
 
-(with-eval-after-load "bind-key"
-  (bind-key "C-c d k" #'describe-personal-keybindings))
+(use-package bind-key
+  :bind ("C-c d k" . describe-personal-keybindings))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
@@ -163,11 +163,15 @@
    exec-path-from-shell-check-startup-files nil
    exec-path-from-shell-variables
    '("PATH"
+     "COLORTERM"
+     "VISUAL"
+     "EDITOR"
+     "ALTERNATE_EDITOR"
      "JAVA_HOME"
      "TERM"
      "PYTHONPATH"
      "LANG"
-     "LC_CTYPE"
+     "LC_ALL"
      "XAUTHORITY"
      "LSP_USE_PLISTS")
    exec-path-from-shell-arguments nil)
@@ -239,7 +243,8 @@
   (pixel-scroll-precision-interpolate-page t)
   (scroll-preserve-screen-position t)
   (scroll-margin 3)
-  ;; Scroll the window by 1 line whenever the cursor moves off the visible screen
+  ;; Scroll the window by 1 line whenever the cursor moves off the visible
+  ;; screen
   (scroll-step 1)
   (scroll-conservatively 10000)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
@@ -387,7 +392,16 @@
 
 (use-package imenu
   :straight (:type built-in)
-  :after (:any makefile-mode markdown-mode org-mode yaml-mode yaml-ts-mode prog-mode)
+  :after
+  (:any
+   makefile-mode
+   markdown-mode
+   org-mode
+   yaml-mode
+   yaml-ts-mode
+   prog-mode
+   latex-mode
+   LaTeX-mode)
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 1000)
@@ -417,7 +431,8 @@
      "*[/\\]straight/repos/"))
   ;; Keep remote file without testing if they still exist
   (recentf-keep '(file-remote-p file-readable-p))
-  ;; Larger values help in lookup but takes more time to check if the files exist
+  ;; Larger values help in lookup but takes more time to check if the files
+  ;; exist
   (recentf-max-saved-items 250)
   :config
   ;; Abbreviate the home directory to make it easy to read the actual file name.
@@ -580,7 +595,8 @@
   (require 'ibuf-ext)
   (defalias 'list-buffers 'ibuffer))
 
-;; By default buffers are grouped by `project-current' or by `default-directory'.
+;; By default buffers are grouped by `project-current' or by
+;; `default-directory'.
 (use-package ibuffer-project
   :hook
   (ibuffer
@@ -668,7 +684,7 @@
   :commands dired
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh `dired' when files change
-   (dired-mode . dired-hide-details-mode) (dired-mode . hl-line-mode))
+   (dired-mode . dired-hide-details-mode))
   :bind
   (:map
    dired-mode-map
@@ -815,6 +831,11 @@
    ("C-'" . vertico-quick-jump))
   :custom (vertico-cycle t)
   :config
+  (when (eq sb/theme 'catppuccin)
+    (with-eval-after-load 'vertico
+      (set-face-attribute 'vertico-current nil
+                          :background "#676767"
+                          :foreground "#FFFFFF")))
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
@@ -899,7 +920,6 @@
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end)))))
 
-;; TODO: Is this causing the issue with minibuffer map?
 (use-package embark
   :bind
   ( ;; "C-h b" lists all the bindings available in a buffer
@@ -916,16 +936,7 @@
    ("C-`" . embark-act))
   :custom
   ;; Replace the key help with a completing-read interface
-  (prefix-help-command #'embark-prefix-help-command)
-  ;; :config
-  ;; (with-eval-after-load "vertico"
-  ;;   (bind-keys
-  ;;    :map
-  ;;    vertico-map
-  ;;    ("C-`" . embark-act)
-  ;;    ("c-;" . embark-dwim)
-  ;;    ("C-c C-e" . embark-export)))
-  )
+  (prefix-help-command #'embark-prefix-help-command))
 
 ;; Supports exporting search results to a `grep-mode' buffer, on which you can
 ;; use `wgrep'.
@@ -955,9 +966,6 @@
 (use-package consult-flycheck
   :after (consult flycheck)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
-
-(use-package consult-yasnippet
-  :bind ("C-M-y" . consult-yasnippet))
 
 (use-package ispell
   :straight (:type built-in)
@@ -1138,13 +1146,6 @@
 
 (use-package rainbow-mode
   :hook
-  ((LaTeX-mode css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode)
-   .
-   rainbow-mode)
-  :diminish)
-
-(use-package colorful-mode
-  :hook
   ((LaTeX-mode
     latex-mode
     css-mode
@@ -1154,8 +1155,22 @@
     web-mode
     help-mode
     helpful-mode)
-   . colorful-mode)
+   . rainbow-mode)
   :diminish)
+
+;; (use-package colorful-mode
+;;   :hook
+;;   ((LaTeX-mode
+;;     latex-mode
+;;     css-mode
+;;     css-ts-mode
+;;     html-mode
+;;     html-ts-mode
+;;     web-mode
+;;     help-mode
+;;     helpful-mode)
+;;    . colorful-mode)
+;;   :diminish)
 
 ;; Temporarily highlight the region involved in certain operations like
 ;; `kill-line' and `yank'.
@@ -1266,6 +1281,13 @@
 
 (use-package magit
   :after transient
+  :hook
+  ;; Use "M-p/n" to cycle between older commit messages.
+  (git-commit-setup
+   .
+   (lambda ()
+     (git-commit-save-message)
+     (git-commit-turn-on-auto-fill)))
   :bind
   (("C-x g" . magit-status)
    ("C-c M-g" . magit-file-dispatch)
@@ -1306,16 +1328,6 @@
   (with-eval-after-load "magit"
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
-
-;; Use "M-p/n" to cycle between older commit messages.
-(use-package git-commit
-  :after magit
-  :hook
-  (git-commit-setup
-   .
-   (lambda ()
-     (git-commit-save-message)
-     (git-commit-turn-on-auto-fill))))
 
 (use-package smerge-mode
   :straight (:type built-in)
@@ -1359,7 +1371,8 @@
     (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  (add-hook 'LaTeX-mode-hook #'sb/add-latex-pairs))
+  (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook mode #'sb/add-latex-pairs)))
 
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
@@ -1569,6 +1582,9 @@
   :after yasnippet
   :init (yasnippet-snippets-initialize))
 
+(use-package consult-yasnippet
+  :bind ("C-M-y" . consult-yasnippet))
+
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the
 ;; backend used for the last completion. Try "M-x company-complete-common" when
 ;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
@@ -1619,6 +1635,7 @@
   (company-format-margin-function nil "Disable icons")
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
+  (company-minimum-prefix-length 4)
   :diminish)
 
 (use-package company-quickhelp
@@ -1780,7 +1797,7 @@
     (add-hook
      'text-mode-hook
      (lambda ()
-       (unless (derived-mode-p 'LaTeX-mode)
+       (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'latex-mode))
          (sb/company-text-mode)))))
 
   (progn
@@ -1892,12 +1909,13 @@
      help-mode
      csv-mode
      minibuffer-inactive-mode))
-  :config
-  ;; The goal is to use a smaller prefix for programming languages to get faster auto-completion,
-  ;; but the popup wraps around with `corfu-terminal-mode' on TUI Emacs. This mostly happens with
-  ;; longish completion entries. Hence, a larger prefix can limit to more precise and smaller
-  ;; entries.
-  (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2)))
+  ;; :config
+  ;; ;; The goal is to use a smaller prefix for programming languages to get
+  ;; ;; faster auto-completion, but the popup wraps around with
+  ;; ;; `corfu-terminal-mode' on TUI Emacs. This mostly happens with longish
+  ;; ;; completion entries. Hence, a larger prefix can limit to more precise and
+  ;; ;; smaller entries.
+  ;; (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))
 
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'corfu-history)))
@@ -1907,8 +1925,8 @@
   :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
   :hook (corfu-mode . corfu-terminal-mode)
   :custom
-  (corfu-terminal-position-right-margin
-   5 "Prevent wraparound at the right edge"))
+  ;; Prevent wraparound at the right edge
+  (corfu-terminal-position-right-margin 2))
 
 (use-package yasnippet-capf
   :straight (:host github :repo "elken/yasnippet-capf")
@@ -1925,7 +1943,7 @@
   (add-hook
    'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev))
   :custom
-  (cape-dabbrev-min-length 3)
+  (cape-dabbrev-min-length 4)
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
@@ -1946,9 +1964,8 @@
                     (cape-capf-super
                      #'elisp-completion-at-point
                      #'citre-completion-at-point
-                     #'cape-elisp-symbol
-                     (cape-company-to-capf #'company-yasnippet))
-                    #'cape-dict #'cape-dabbrev)))))
+                     #'cape-elisp-symbol)
+                    (cape-capf-super #'cape-dict #'cape-dabbrev))))))
 
   (dolist (mode '(flex-mode-hook bison-mode-hook))
     (add-hook
@@ -1974,20 +1991,24 @@
 
   ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX
   ;; names.
-  (add-hook
-   'LaTeX-mode-hook
-   (lambda ()
-     (setq-local
-      completion-at-point-functions
-      (list
-       #'cape-file
-       (cape-capf-super
-        (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
-        ;; Math unicode symbols and sub(super)scripts
-        (cape-company-to-capf #'company-math-symbols-unicode)
-        (cape-company-to-capf #'company-latex-commands)
-        #'cape-dabbrev)
-       #'cape-dict #'yasnippet-capf))))
+  (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local
+        completion-at-point-functions
+        (list
+         #'cape-file
+         (cape-capf-super
+          #'lsp-completion-at-point
+          (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
+          ;; Math Unicode symbols and sub(super)scripts
+          (cape-company-to-capf #'company-math-symbols-unicode)
+          (cape-company-to-capf #'company-latex-commands)
+          #'yasnippet-capf)
+         (cape-capf-properties
+          (cape-capf-super #'cape-dabbrev #'cape-dict)
+          :strip t))))))
 
   (with-eval-after-load "lsp-mode"
     (dolist (mode
@@ -2017,9 +2038,8 @@
                       (cape-capf-super
                        #'lsp-completion-at-point
                        #'citre-completion-at-point
-                       #'cape-keyword
-                       (cape-company-to-capf #'company-yasnippet))
-                      #'cape-dabbrev #'cape-dict)))))))
+                       #'cape-keyword)
+                      (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
 
 (use-package lsp-mode
   :bind
@@ -2210,7 +2230,7 @@
 
 (use-package lsp-grammarly
   :after lsp-mode
-  :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
+  :hook ((text-mode markdown-mode org-mode LaTeX-mode latex-mode) . lsp-deferred)
   :custom
   (lsp-grammarly-suggestions-oxford-comma t)
   (lsp-grammarly-suggestions-passive-voice t)
@@ -2219,7 +2239,7 @@
   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t))
 
 (use-package lsp-ltex
-  :hook ((text-mode markdown-mode org-mode LaTeX-mode) . lsp-deferred)
+  :hook ((text-mode markdown-mode org-mode LaTeX-mode latex-mode) . lsp-deferred)
   :custom
   ;; Recommended to set a generic language to disable spell check
   (lsp-ltex-language "en")
@@ -2567,8 +2587,7 @@
    .
    (lambda ()
      (setq-local indent-tabs-mode t)
-     ;; (lsp-deferred)
-     )))
+     (lsp-deferred))))
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -2766,7 +2785,7 @@
 (use-package bibtex-capf
   :straight (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :hook (LaTeX-mode . bibtex-capf-mode))
+  :hook ((LaTeX-mode latex-mode) . bibtex-capf-mode))
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
@@ -2774,7 +2793,7 @@
   :bind (:map tex-mode-map ("$" . math-delimiters-insert)))
 
 (use-package citar
-  :hook (latex-mode . citar-capf-setup))
+  :hook ((latex-mode LaTeX-mode) . citar-capf-setup))
 
 (use-package citar-embark
   :after (citar embark)
@@ -2825,7 +2844,7 @@
 (progn
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
-    (set (make-local-variable 'face-remapping-alist) '((default :height 0.90))))
+    (set (make-local-variable 'face-remapping-alist) '((default :height 0.95))))
 
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
@@ -2967,7 +2986,7 @@ PAD can be left (`l') or right (`r')."
   (centaur-tabs-headline-match))
 
 (use-package olivetti
-  :hook ((fundamental-mode text-mode prog-mode conf-mode) . olivetti-mode)
+  :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
   :diminish)
 
@@ -2991,7 +3010,7 @@ If region is active, apply to active region instead."
     (back-to-indentation)))
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
-;; angle brackets, e.g. "C-<up>". Standalone special keys (and some
+;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
 ;; "<tab>".
 
@@ -3093,15 +3112,13 @@ If region is active, apply to active region instead."
 
 (use-package buffer-terminator
   :straight (:host github :repo "jamescherti/buffer-terminator.el")
-  :hook (emacs-startup . buffer-terminator-mode)
-  :custom
-  (buffer-terminator-verbose nil)
-  (buffer-terminator-inactivity-timeout (* 60 60) "60 minutes")
+  :hook (fild-file . buffer-terminator-mode)
+  :custom (buffer-terminator-verbose nil)
   :diminish)
 
 ;; The color sometimes makes it difficult to distinguish text on terminals.
 (use-package hl-line
-  :hook (emacs-startup . global-hl-line-mode))
+  :hook ((emacs-startup . global-hl-line-mode) (dired-mode . hl-line-mode)))
 
 (use-package clipetty
   :hook (emacs-startup . global-clipetty-mode)

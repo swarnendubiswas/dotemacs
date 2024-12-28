@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: onlyenv
+# key: onl    
+# --
+\begin{only}<1-$0>
+\end{onlyenv}
+\begin{only}<2>
+\end{onlyenv}
