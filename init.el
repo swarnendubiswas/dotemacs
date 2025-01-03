@@ -36,7 +36,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -1874,7 +1874,9 @@
   :straight
   (corfu
    :files (:defaults "extensions/*")
-   :includes (corfu-info corfu-history corfu-echo corfu-popupinfo corfu-indexed))
+   :includes
+   (corfu-info
+    corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
   :when (eq sb/in-buffer-completion 'corfu)
   :hook
   ((emacs-startup . global-corfu-mode)
@@ -1894,6 +1896,8 @@
    ([tab] . corfu-next)
    ("S-TAB" . corfu-previous)
    ([backtab] . corfu-previous)
+   ("M-c" . corfu-quick-insert)
+   ("M-q" . corfu-quick-complete)
    ("M-d" . corfu-info-documentation)
    ("M-l" . corfu-info-location)
    ("M-n" . corfu-popupinfo-scroll-up)
@@ -1902,21 +1906,17 @@
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-exclude-modes
-   '(dired-mode
-     inferior-python-mode
-     magit-status-mode
-     help-mode
-     csv-mode
-     minibuffer-inactive-mode))
-  ;; :config
-  ;; ;; The goal is to use a smaller prefix for programming languages to get
-  ;; ;; faster auto-completion, but the popup wraps around with
-  ;; ;; `corfu-terminal-mode' on TUI Emacs. This mostly happens with longish
-  ;; ;; completion entries. Hence, a larger prefix can limit to more precise and
-  ;; ;; smaller entries.
-  ;; (add-hook 'prog-mode-hook (lambda () (setq-local corfu-auto-prefix 2))
-
+  (corfu-auto-prefix 4)
+  (global-corfu-modes
+   '((not dired-mode
+          inferior-python-mode
+          magit-status-mode
+          help-mode
+          csv-mode
+          minibuffer-inactive-mode)
+     t))
+  (corfu-on-exact-match nil) ; Do not auto expand snippets
+  :config
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'corfu-history)))
 
@@ -1937,11 +1937,13 @@
   :after corfu
   :demand t
   :init
-  ;; Initialize for all generic languages that are not specifically handled
-  (add-hook 'completion-at-point-functions #'cape-keyword)
-  (add-hook 'completion-at-point-functions #'cape-file)
+  ;; Initialize for all generic languages that are not specifically handled. The
+  ;; order of the functions matters, unless they are merged, the first function
+  ;; returning a result wins. Note that the list of buffer-local completion
+  ;; functions takes precedence over the global list.
   (add-hook
-   'completion-at-point-functions (cape-capf-super #'cape-dict #'cape-dabbrev))
+   'completion-at-point-functions
+   (cape-capf-super #'cape-keyword #'cape-dict #'cape-dabbrev #'cape-file))
   :custom
   (cape-dabbrev-min-length 4)
   (cape-dict-file
@@ -1954,76 +1956,118 @@
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
 
   ;; Override CAPFS for specific major modes
+
+  (defun elisp-capf ()
+    (cape-wrap-super
+     #'elisp-completion-at-point
+     #'citre-completion-at-point
+     #'cape-elisp-symbol
+     #'yasnippet-capf
+     #'cape-dict
+     #'cape-dabbrev
+     #'cape-file))
+
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
      mode
      (lambda ()
        (setq-local completion-at-point-functions
-                   (list
-                    #'cape-file #'yasnippet-capf
-                    (cape-capf-super
-                     #'elisp-completion-at-point
-                     #'citre-completion-at-point
-                     #'cape-elisp-symbol)
-                    (cape-capf-super #'cape-dict #'cape-dabbrev))))))
+                   (list (cape-capf-buster #'elisp-capf))))))
+
+  (defun generic-prog-no-tags-capf ()
+    (cape-wrap-super
+     #'cape-keyword
+     #'cape-symbol
+     #'yasnippet-capf
+     #'cape-dict
+     #'cape-dabbrev
+     #'cape-file))
 
   (dolist (mode '(flex-mode-hook bison-mode-hook))
     (add-hook
      mode
      (lambda ()
        (setq-local completion-at-point-functions
-                   (list
-                    #'cape-file #'cape-keyword #'cape-dabbrev #'cape-dict)))))
+                   (list (cape-capf-buster #'generic-prog-no-tags-capf))))))
 
   ;; https://github.com/minad/cape/discussions/130
   ;; There is no mechanism to force deduplication if candidates from cape-dict
   ;; and cape-dabbrev are not exactly equal (equal string and equal text
   ;; properties).
+  (defun text-capf ()
+    (cape-wrap-super #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))
+
   (add-hook
    'text-mode-hook
    (lambda ()
      (setq-local completion-at-point-functions
-                 (list
-                  #'cape-file
-                  (cape-capf-properties
-                   (cape-capf-super #'cape-dict #'cape-dabbrev)
-                   :sort t)))))
+                 (list (cape-capf-buster #'text-capf)))))
 
-  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX
-  ;; names.
-  (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local
-        completion-at-point-functions
-        (list
-         #'cape-file
-         (cape-capf-super
-          #'lsp-completion-at-point
-          (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
-          ;; Math Unicode symbols and sub(super)scripts
-          (cape-company-to-capf #'company-math-symbols-unicode)
-          (cape-company-to-capf #'company-latex-commands)
-          #'yasnippet-capf)
-         (cape-capf-properties
-          (cape-capf-super #'cape-dabbrev #'cape-dict)
-          :strip t))))))
+  (defun org-capf ()
+    (cape-wrap-super
+     #'cape-elisp-block
+     #'cape-dict
+     #'cape-dabbrev
+     #'cape-file
+     #'yasnippet-capf))
+
+  (add-hook
+   'org-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list (cape-capf-buster #'org-capf)))))
 
   (with-eval-after-load "lsp-mode"
+    (defun latex-capf ()
+      (cape-wrap-super
+       ;; #'lsp-completion-at-point
+       (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
+       ;; Math Unicode symbols and sub(super)scripts
+       (cape-company-to-capf #'company-math-symbols-unicode)
+       (cape-company-to-capf #'company-latex-commands)
+       ;; Used for Unicode symbols and not for the corresponding LaTeX names.
+       #'cape-tex
+       #'citar-capf
+       #'bibtex-capf
+       #'cape-dabbrev
+       #'cape-dict
+       #'cape-file
+       #'yasnippet-capf))
+
+    (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+      (add-hook
+       mode
+       (lambda ()
+         (setq-local completion-at-point-functions
+                     (list (cape-capf-buster #'latex-capf))))))
+
+    (defun mode-with-lsp-capf ()
+      (cape-wrap-super
+       #'lsp-completion-at-point
+       #'citre-completion-at-point
+       #'cape-keyword
+       #'cape-dict
+       #'cape-dabbrev
+       #'yasnippet-capf
+       #'cape-file))
+
     (dolist (mode
              '(c-mode-hook
                c-ts-mode-hook
                c++-mode-hook
                c++-ts-mode-hook
+               cmake-mode-hook
+               cmake-ts-mode-hook
+               css-mode-hook
+               css-ts-mode-hook
+               fish-mode-hook
                java-mode-hook
                java-ts-mode-hook
+               makefile-mode
                python-mode-hook
                python-ts-mode-hook
                sh-mode-hook
                bash-ts-mode-hook
-               cmake-mode-hook
-               cmake-ts-mode-hook
                json-mode-hook
                json-ts-mode-hook
                jsonc-mode-hook
@@ -2033,13 +2077,7 @@
        mode
        (lambda ()
          (setq-local completion-at-point-functions
-                     (list
-                      #'cape-file #'yasnippet-capf
-                      (cape-capf-super
-                       #'lsp-completion-at-point
-                       #'citre-completion-at-point
-                       #'cape-keyword)
-                      (cape-capf-super #'cape-dabbrev #'cape-dict))))))))
+                     (list (cape-capf-buster #'mode-with-lsp-capf))))))))
 
 (use-package lsp-mode
   :bind
@@ -2257,7 +2295,7 @@
 
 (use-package lsp-latex
   :hook
-  ((latex-mode bibtex-mode)
+  ((latex-mode LaTeX-mode bibtex-mode)
    .
    (lambda ()
      (require 'lsp-latex)
@@ -2320,12 +2358,8 @@
 (use-package eldoc
   :straight (:type built-in)
   :hook (find-file . global-eldoc-mode)
-  :custom (eldoc-area-prefer-doc-buffer t "Disable popups")
-  ;; The variable-height minibuffer and extra eldoc buffers are distracting. We
-  ;; can limit ElDoc messages to one line which prevents the echo area from
-  ;; resizing itself unexpectedly when point is on a variable with a multiline
-  ;; docstring, but then it cuts of useful information.
-  ;; (eldoc-echo-area-use-multiline-p nil)
+  :custom
+  (eldoc-area-prefer-doc-buffer t "Disable popups")
   (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   :config
   ;; Allow eldoc to trigger after completions
@@ -2785,7 +2819,8 @@
 (use-package bibtex-capf
   :straight (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :hook ((LaTeX-mode latex-mode) . bibtex-capf-mode))
+  :after (:any LaTeX-mode latex-mode)
+  :demand t)
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
@@ -2793,7 +2828,8 @@
   :bind (:map tex-mode-map ("$" . math-delimiters-insert)))
 
 (use-package citar
-  :hook ((latex-mode LaTeX-mode) . citar-capf-setup))
+  :after (:any latex-mode LaTeX-mode)
+  :demand t)
 
 (use-package citar-embark
   :after (citar embark)
@@ -2958,10 +2994,13 @@ PAD can be left (`l') or right (`r')."
   :hook (emacs-startup . doom-modeline-mode)
   :custom
   (doom-modeline-height 28 "Respected only in GUI")
+  (doom-modeline-bar-width 5 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-minor-modes t)
   (doom-modeline-checker-simple-format nil)
-  (doom-modeline-unicode-fallback t))
+  (doom-modeline-unicode-fallback t)
+  (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
+  (doom-modeline-enable-word-count t))
 
 (use-package centaur-tabs
   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -2985,10 +3024,10 @@ PAD can be left (`l') or right (`r')."
   ;; Make the headline face match `centaur-tabs-default' face
   (centaur-tabs-headline-match))
 
-(use-package olivetti
-  :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
-  :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
-  :diminish)
+;; (use-package olivetti
+;;   :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
+;;   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
+;;   :diminish)
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -3015,7 +3054,6 @@ If region is active, apply to active region instead."
 ;; "<tab>".
 
 (bind-keys
- ("RET" . newline-and-indent)
  ("C-l" . goto-line)
  ("C-c z" . repeat)
  ("C-z" . undo)
@@ -3050,7 +3088,8 @@ If region is active, apply to active region instead."
  ("C-M-f" . forward-sexp)
  ("C-M-k" . kill-sexp))
 
-(unbind-key "C-]") ; Bound to `abort-recursive-edit'
+;; Bound to `abort-recursive-edit', I use it as the prefix key for Zellij
+(unbind-key "C-]")
 (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 (unbind-key "C-x f") ; Bound to `set-fill-column'
 (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
@@ -3117,8 +3156,8 @@ If region is active, apply to active region instead."
   :diminish)
 
 ;; The color sometimes makes it difficult to distinguish text on terminals.
-(use-package hl-line
-  :hook ((emacs-startup . global-hl-line-mode) (dired-mode . hl-line-mode)))
+;; (use-package hl-line
+;;   :hook ((emacs-startup . global-hl-line-mode) (dired-mode . hl-line-mode)))
 
 (use-package clipetty
   :hook (emacs-startup . global-clipetty-mode)
