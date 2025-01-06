@@ -54,7 +54,7 @@
 ;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
 ;; completion from inside a word/symbol. However, `company-ispell' does not keep
 ;; prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -1517,7 +1517,7 @@
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setq completion-styles '(orderless substring basic)))
+    (setq completion-styles '(orderless substring partial-completion basic)))
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
@@ -1564,7 +1564,14 @@
     (defun sb/just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
-    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
+    (advice-add 'company-capf--candidates :around #'sb/just-one-face))
+
+  (with-eval-after-load "lsp-mode"
+    (defun sb/lsp-mode-setup-orderless ()
+      (setf (alist-get
+             'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(orderless)))
+    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-orderless)))
 
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
@@ -1635,8 +1642,7 @@
   (company-format-margin-function nil "Disable icons")
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
-  (company-minimum-prefix-length 4)
-  :diminish)
+  (company-minimum-prefix-length 4))
 
 (use-package company-quickhelp
   :after company
@@ -1766,10 +1772,10 @@
       (setq company-backends
             '((:separate
                company-files
+               company-capf
                company-math-symbols-latex
                company-math-symbols-unicode
                company-latex-commands
-               company-capf
                company-yasnippet
                company-dict
                company-dabbrev
@@ -1918,7 +1924,14 @@
   (corfu-on-exact-match nil) ; Do not auto expand snippets
   :config
   (with-eval-after-load "savehist"
-    (add-to-list 'savehist-additional-variables 'corfu-history)))
+    (add-to-list 'savehist-additional-variables 'corfu-history))
+
+  (with-eval-after-load "lsp-mode"
+    (defun sb/lsp-mode-setup-corfu ()
+      (setf (alist-get
+             'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(substring)))
+    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-corfu)))
 
 (use-package corfu-terminal
   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
@@ -1936,16 +1949,9 @@
 (use-package cape
   :after corfu
   :demand t
-  :init
-  ;; Initialize for all generic languages that are not specifically handled. The
-  ;; order of the functions matters, unless they are merged, the first function
-  ;; returning a result wins. Note that the list of buffer-local completion
-  ;; functions takes precedence over the global list.
-  (add-hook
-   'completion-at-point-functions
-   (cape-capf-super #'cape-keyword #'cape-dict #'cape-dabbrev #'cape-file))
   :custom
   (cape-dabbrev-min-length 4)
+  (cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
@@ -1955,6 +1961,14 @@
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
 
+  ;; Initialize for all generic languages that are not specifically handled. The
+  ;; order of the functions matters, unless they are merged, the first function
+  ;; returning a result wins. Note that the list of buffer-local completion
+  ;; functions takes precedence over the global list.
+  (add-hook
+   'completion-at-point-functions
+   (cape-capf-super #'cape-keyword #'cape-file #'cape-dict #'cape-dabbrev))
+
   ;; Override CAPFS for specific major modes
 
   (defun elisp-capf ()
@@ -1962,10 +1976,10 @@
      #'elisp-completion-at-point
      #'citre-completion-at-point
      #'cape-elisp-symbol
-     #'yasnippet-capf
+     #'cape-file
      #'cape-dict
      #'cape-dabbrev
-     #'cape-file))
+     #'yasnippet-capf))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -1978,10 +1992,10 @@
     (cape-wrap-super
      #'cape-keyword
      #'cape-symbol
-     #'yasnippet-capf
+     #'cape-file
      #'cape-dict
      #'cape-dabbrev
-     #'cape-file))
+     #'yasnippet-capf))
 
   (dolist (mode '(flex-mode-hook bison-mode-hook))
     (add-hook
@@ -1995,7 +2009,7 @@
   ;; and cape-dabbrev are not exactly equal (equal string and equal text
   ;; properties).
   (defun text-capf ()
-    (cape-wrap-super #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))
+    (cape-wrap-super #'cape-file #'cape-dict #'cape-dabbrev #'yasnippet-capf))
 
   (add-hook
    'text-mode-hook
@@ -2007,8 +2021,8 @@
     (cape-wrap-super
      #'cape-elisp-block
      #'cape-dict
-     #'cape-dabbrev
      #'cape-file
+     #'cape-dabbrev
      #'yasnippet-capf))
 
   (add-hook
@@ -2021,17 +2035,17 @@
     (defun latex-capf ()
       (cape-wrap-super
        ;; #'lsp-completion-at-point
-       (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
+       ;; (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
        ;; Math Unicode symbols and sub(super)scripts
-       (cape-company-to-capf #'company-math-symbols-unicode)
-       (cape-company-to-capf #'company-latex-commands)
+       ;; (cape-company-to-capf #'company-math-symbols-unicode)
+       ;; (cape-company-to-capf #'company-latex-commands)
        ;; Used for Unicode symbols and not for the corresponding LaTeX names.
        #'cape-tex
        #'citar-capf
        #'bibtex-capf
+       #'cape-file
        #'cape-dabbrev
        #'cape-dict
-       #'cape-file
        #'yasnippet-capf))
 
     (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
@@ -2043,7 +2057,6 @@
 
     (defun mode-with-lsp-capf ()
       (cape-wrap-super
-       #'lsp-completion-at-point
        #'citre-completion-at-point
        #'cape-keyword
        #'cape-dict
@@ -2169,13 +2182,6 @@
   (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-suggest-server-download nil)
   :config
-  (when (eq sb/in-buffer-completion 'corfu)
-    (defun sb/lsp-mode-setup-completion ()
-      (setf (alist-get
-             'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(flex)))
-    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-completion))
-
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
