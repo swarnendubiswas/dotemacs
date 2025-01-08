@@ -3030,10 +3030,10 @@ PAD can be left (`l') or right (`r')."
   ;; Make the headline face match `centaur-tabs-default' face
   (centaur-tabs-headline-match))
 
-;; (use-package olivetti
-;;   :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
-;;   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
-;;   :diminish)
+(use-package olivetti
+  :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
+  :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
+  :diminish)
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -3162,8 +3162,8 @@ If region is active, apply to active region instead."
   :diminish)
 
 ;; The color sometimes makes it difficult to distinguish text on terminals.
-;; (use-package hl-line
-;;   :hook ((emacs-startup . global-hl-line-mode) (dired-mode . hl-line-mode)))
+(use-package hl-line
+  :hook ((emacs-startup . global-hl-line-mode) (dired-mode . hl-line-mode)))
 
 (use-package clipetty
   :hook (emacs-startup . global-clipetty-mode)

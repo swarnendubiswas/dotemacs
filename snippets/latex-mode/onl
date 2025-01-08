@@ -2,7 +2,7 @@
 # name: onlyenv
 # key: onl    
 # --
-\begin{only}<1-$0>
+\begin{onlyenv}<1-$0>
 \end{onlyenv}
-\begin{only}<2>
+\begin{onlyenv}<2>
 \end{onlyenv}
