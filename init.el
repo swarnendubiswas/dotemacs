@@ -54,7 +54,10 @@
 ;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
 ;; completion from inside a word/symbol. However, `company-ispell' does not keep
 ;; prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion
+  (if (display-graphic-p)
+      'corfu
+    'company)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -1172,12 +1175,6 @@
 ;;    . colorful-mode)
 ;;   :diminish)
 
-;; Temporarily highlight the region involved in certain operations like
-;; `kill-line' and `yank'.
-(use-package volatile-highlights
-  :hook (emacs-startup . volatile-highlights-mode)
-  :diminish volatile-highlights-mode)
-
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup . xclip-mode))
@@ -1229,8 +1226,6 @@
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
 
-;; Writable grep. When the "*grep*" buffer is huge, `wgrep-change-to-wgrep-mode'
-;; might freeze Emacs for several minutes.
 (use-package wgrep
   :bind
   (:map
@@ -1238,11 +1233,11 @@
    ("C-x C-p" . wgrep-change-to-wgrep-mode)
    ("C-x C-s" . wgrep-finish-edit)
    ("C-x C-k" . wgrep-abort-changes)
-   ("C-x C-q" . wgrep-exit)
-   :map
-   deadgrep-mode-map
-   ("e" . wgrep-change-to-wgrep-mode))
-  :custom (wgrep-auto-save-buffer t))
+   ("C-x C-q" . wgrep-exit))
+  :custom (wgrep-auto-save-buffer t)
+  :config
+  (with-eval-after-load "deadgrep"
+    (bind-key "e" #'wgrep-change-to-wgrep-mode deadgrep-mode-map)))
 
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
@@ -1338,14 +1333,11 @@
    ("M-g p" . smerge-prev)
    ("M-g u" . smerge-keep-upper)
    ("M-g l" . smerge-keep-lower)
-   ("M-g a" . smerge-keep-all)
-   ("M-g e" . smerge-ediff)))
+   ("M-g a" . smerge-keep-all)))
 
 (use-package elec-pair
   :straight (:type built-in)
-  :hook
-  ((emacs-startup . electric-pair-mode)
-   (minibuffer-setup . (lambda () (electric-pair-local-mode -1))))
+  :hook (emacs-startup . electric-pair-mode)
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
@@ -1365,14 +1357,15 @@
 
   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-  (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
+  ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
 
-  (defun sb/add-latex-pairs ()
-    (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
-    (setq-local electric-pair-text-pairs electric-pair-pairs))
+  ;; (defun sb/add-latex-pairs ()
+  ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
+  ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-    (add-hook mode #'sb/add-latex-pairs)))
+  ;; (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+  ;;   (add-hook mode #'sb/add-latex-pairs))
+  )
 
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
@@ -1674,6 +1667,7 @@
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-yasnippet nil))
 
+;; Use "<" to trigger company completion of org blocks.
 (use-package company-org-block
   :after (company org)
   :demand t)
@@ -1689,6 +1683,13 @@
   :after (:any company corfu)
   :demand t
   :config (require 'company-web-html))
+
+(use-package company-ctags
+  :after (company prog-mode)
+  :demand t
+  :custom
+  (company-ctags-support-etags t)
+  (company-ctags-fuzzy-match-p t))
 
 ;; Try completion backends in order untill there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -1733,15 +1734,16 @@
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
-  (setq company-backends
-        '(company-files
-          (company-capf :with company-dabbrev-code company-yasnippet)
-          ;; If we have `company-dabbrev' first, then other matches from
-          ;; `company-ispell' will be ignored.
-          company-ispell company-dict company-dabbrev)
-        company-transformers
-        '(delete-dups company-sort-by-statistics
-                      company-sort-prefer-same-case-prefix))
+  (setq
+   company-backends
+   '(company-files
+     (company-capf :with company-dabbrev-code company-ctags company-yasnippet)
+     ;; If we have `company-dabbrev' first, then other matches from
+     ;; `company-ispell' will be ignored.
+     company-ispell company-dict company-dabbrev)
+   company-transformers
+   '(delete-dups company-sort-by-statistics
+                 company-sort-prefer-same-case-prefix))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -1775,7 +1777,6 @@
                company-capf
                company-math-symbols-latex
                company-math-symbols-unicode
-               company-latex-commands
                company-yasnippet
                company-dict
                company-dabbrev
@@ -1846,7 +1847,7 @@
           company-c-headers
           :with company-keywords
           company-dabbrev-code ; Useful for variable names
-          company-yasnippet
+          company-ctags company-yasnippet
           :separate)
          company-dict company-ispell company-dabbrev)))
 

@@ -1,9 +1,9 @@
 #+TITLE: Emacs Notes
 #+AUTHOR: Swarnendu Biswas
 #+EMAIL: swarnendu@cse.iitk.ac.in
-#+STARTUP: showeverything indent nonum align showstars nohideblocks entitiespretty
+#+STARTUP: showeverything noindent nonum align inlineimages showstars odd nohideblocks entitiespretty
 
-* Notes
+* Emacs Notes
 
 ** GNU Emacs
 
