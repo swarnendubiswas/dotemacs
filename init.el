@@ -26,7 +26,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'catppuccin
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -516,8 +516,11 @@
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
   :bind ("C-c RET" . goto-address-at-point))
 
+;; Use `ediff-regions-wordwise' for small regions and `ediff-regions-linewise'
+;; for larger regions.
 (use-package ediff
   :straight (:type built-in)
+  :commands (ediff-regions-linewise ediff-regions-wordwise)
   :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
   ;; Put the control panel in the same frame as the diff windows
@@ -1303,16 +1306,10 @@
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
+;; Fringe is unavailable in TTY
 (use-package diff-hl
-  :when (boundp 'vc-handled-backends)
   :hook
-  (
-   ;; Display in the margin since the fringe is unavailable in TTY
-   (diff-hl-mode-on
-    .
-    (lambda ()
-      (unless (display-graphic-p)
-        (diff-hl-margin-local-mode 1))))
+  ((diff-hl-mode-on . diff-hl-margin-local-mode)
    (dired-mode . diff-hl-dired-mode-unless-remote)
    (find-file . global-diff-hl-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
@@ -1632,7 +1629,7 @@
          help-mode
          csv-mode
          minibuffer-inactive-mode))
-  (company-format-margin-function nil "Disable icons")
+  ;; (company-format-margin-function nil "Disable icons")
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
   (company-minimum-prefix-length 4))
@@ -2378,6 +2375,13 @@
      'company-abort))
   :diminish)
 
+(use-package eldoc-box
+  :when (display-graphic-p)
+  :commands eldoc-box-help-at-point
+  :hook (prog-mode . eldoc-box-hover-mode)
+  :custom (eldoc-box-clear-with-C-g t)
+  :diminish)
+
 (use-package treesit-auto
   :when (executable-find "tree-sitter")
   :demand t
@@ -2649,6 +2653,12 @@
 ;; More shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
   :mode ("README\\.md\\'" . gfm-mode)
+  :hook
+  (markdown-mode
+   .
+   (lambda ()
+     (require 'lsp-marksman)
+     (lsp-deferred)))
   :bind
   (:map
    markdown-mode-map
@@ -2849,6 +2859,7 @@
   (("C-x c j" . citre-jump)
    ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
+   ("C-x c a" . citre-ace-peek)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-tags-file)
    ("C-x c e" . citre-edit-tags-file-recipe))
@@ -2882,6 +2893,59 @@
               (funcall fetcher))
             (funcall citre-fetcher)))))
 
+  ;; This is a completion-at-point-function that tries lsp first, and if no
+  ;; completions are given, try Citre.
+  (defun lsp-citre-capf-function ()
+    "A capf backend that tries lsp first, then Citre."
+    (let ((lsp-result (lsp-completion-at-point)))
+      (if (and lsp-result
+               (try-completion
+                (buffer-substring
+                 (nth 0 lsp-result) (nth 1 lsp-result))
+                (nth 2 lsp-result)))
+          lsp-result
+        (citre-completion-at-point))))
+
+  (defun enable-lsp-citre-capf-backend ()
+    "Enable the lsp + Citre capf backend in current buffer."
+    (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
+
+  ;; (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
+
+  (defmacro citre-backend-to-company-backend (backend)
+    "Create a company backend from Citre completion backend BACKEND.
+The result is a company backend called
+`company-citre-<backend>' (like `company-citre-tags') and can be
+used in `company-backends'."
+    (let ((backend-name
+           (intern (concat "company-citre-" (symbol-name backend))))
+          (docstring
+           (concat
+            "`company-mode' backend from the `"
+            (symbol-name backend)
+            "' Citre backend.\n"
+            "`citre-mode' needs to be enabled to use this.")))
+      `(defun ,backend-name (command &optional arg &rest ignored)
+         ,docstring
+         (pcase command
+           ('interactive (company-begin-backend ',backend-name))
+           ('prefix
+            (and (bound-and-true-p citre-mode)
+                 (citre-backend-usable-p ',backend)
+                 ;; We shouldn't use this as it's defined for getting
+                 ;; definitions/references.  But the Citre completion
+                 ;; backend design is not fully compliant with company's
+                 ;; design so there's no simple "right" solution, and this
+                 ;; works for tags/global backends.
+                 (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
+           ('meta (citre-get-property 'signature arg))
+           ('annotation (citre-get-property 'annotation arg))
+           ('candidates
+            (let ((citre-completion-backends '(,backend)))
+              (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+
+  (citre-backend-to-company-backend tags)
+  (citre-backend-to-company-backend global)
   :diminish)
 
 (progn
@@ -2921,6 +2985,27 @@
 (use-package nerd-icons
   :when (display-graphic-p)
   :custom (nerd-icons-scale-factor 0.9))
+
+(use-package nerd-icons-corfu
+  :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+  :when (eq sb/in-buffer-completion 'corfu)
+  :after corfu
+  :demand t
+  :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package nerd-icons-completion
+  :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
+  :init (nerd-icons-completion-mode 1)
+  :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
+
+(use-package nerd-icons-dired
+  :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
+  :hook (dired-mode . nerd-icons-dired-mode)
+  :diminish)
+
+(use-package nerd-icons-ibuffer
+  :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
+  :custom (nerd-icons-ibuffer-icon-size 1.0))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline.
 ;; It does not show lsp status, flycheck information, and Python virtualenv
@@ -3000,11 +3085,9 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (emacs-startup . doom-modeline-mode)
   :custom
-  (doom-modeline-height 28 "Respected only in GUI")
-  (doom-modeline-bar-width 5 "Respected only in GUI")
+  (doom-modeline-height 30 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-minor-modes t)
-  (doom-modeline-checker-simple-format nil)
   (doom-modeline-unicode-fallback t)
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
   (doom-modeline-enable-word-count t))
@@ -3034,6 +3117,52 @@ PAD can be left (`l') or right (`r')."
 (use-package olivetti
   :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
+  :diminish)
+
+(use-package kdl-ts-mode
+  :straight (:host github :repo "dataphract/kdl-ts-mode")
+  :mode ("\\.kdl\\'" . kdl-ts-mode)
+  :hook (kdl-ts-mode . kdl-format-on-save-mode)
+  :config
+  (use-package reformatter
+    :after kdl-ts-mode
+    :demand t
+    :config
+    (reformatter-define
+     kdl-format
+     :program kdlfmt
+     :args '("format")
+     :lighter " KDLFMT"
+     :group 'reformatter)))
+
+(use-package ssh-config-mode
+  :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
+  :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
+  :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
+
+(use-package asm-mode
+  :hook (asm-mode . lsp-deferred))
+
+(use-package dtrt-indent
+  :straight (:host github :repo "jscheid/dtrt-indent")
+  :hook (find-file . dtrt-indent-mode)
+  :diminish)
+
+(use-package consult-xref-stack
+  :straight (:host github :repo "brett-lempereur/consult-xref-stack")
+  :bind ("C-," . consult-xref-stack-backward))
+
+(use-package buffer-terminator
+  :straight (:host github :repo "jamescherti/buffer-terminator.el")
+  :hook (find-file . buffer-terminator-mode)
+  :custom (buffer-terminator-verbose nil)
+  :diminish)
+
+(use-package hl-line
+  :hook (dired-mode . hl-line-mode))
+
+(use-package clipetty
+  :hook (emacs-startup . global-clipetty-mode)
   :diminish)
 
 (defun sb/save-all-buffers ()
@@ -3122,53 +3251,6 @@ If region is active, apply to active region instead."
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode)
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
-
-(use-package kdl-ts-mode
-  :straight (:host github :repo "dataphract/kdl-ts-mode")
-  :mode ("\\.kdl\\'" . kdl-ts-mode)
-  :hook (kdl-ts-mode . kdl-format-on-save-mode)
-  :config
-  (use-package reformatter
-    :after kdl-ts-mode
-    :demand t
-    :config
-    (reformatter-define
-     kdl-format
-     :program kdlfmt
-     :args '("format")
-     :lighter " KDLFMT"
-     :group 'reformatter)))
-
-(use-package ssh-config-mode
-  :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-  :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
-  :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
-
-(use-package asm-mode
-  :hook (asm-mode . lsp-deferred))
-
-(use-package dtrt-indent
-  :straight (:host github :repo "jscheid/dtrt-indent")
-  :hook (find-file . dtrt-indent-mode)
-  :diminish)
-
-(use-package consult-xref-stack
-  :straight (:host github :repo "brett-lempereur/consult-xref-stack")
-  :bind ("C-," . consult-xref-stack-backward))
-
-(use-package buffer-terminator
-  :straight (:host github :repo "jamescherti/buffer-terminator.el")
-  :hook (fild-file . buffer-terminator-mode)
-  :custom (buffer-terminator-verbose nil)
-  :diminish)
-
-;; The color sometimes makes it difficult to distinguish text on terminals.
-(use-package hl-line
-  :hook ((emacs-startup . global-hl-line-mode) (dired-mode . hl-line-mode)))
-
-(use-package clipetty
-  :hook (emacs-startup . global-clipetty-mode)
-  :diminish)
 
 ;;; init.el ends here
 
