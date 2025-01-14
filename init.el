@@ -194,7 +194,7 @@
   (create-lockfiles nil)
   (custom-safe-themes t)
   (delete-by-moving-to-trash t)
-  (fast-but-imprecise-scrolling t)
+  ;; (fast-but-imprecise-scrolling t)
   (help-window-select t "Makes it easy to close the window")
   (history-delete-duplicates t)
   (read-process-output-max (* 4 1024 1024))
@@ -242,16 +242,13 @@
   (auto-save-visited-interval 30)
   (revert-without-query '("\\.*") "Revert all files without asking")
   (max-mini-window-height 0.4)
-  (pixel-scroll-precision-use-momentum nil)
-  (pixel-scroll-precision-interpolate-page t)
-  (scroll-preserve-screen-position t)
-  (scroll-margin 3)
-  ;; Scroll the window by 1 line whenever the cursor moves off the visible
-  ;; screen
-  (scroll-step 1)
-  (scroll-conservatively 10000)
+  ;; (pixel-scroll-precision-use-momentum nil)
+  ;; (pixel-scroll-precision-interpolate-page t)
+  ;; (scroll-preserve-screen-position t)
+  ;; (scroll-margin 3)
+  ;; (scroll-step 1)
+  ;; (scroll-conservatively 10000)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
-  (auto-window-vscroll nil)
   :config
   (dolist (exts
            '(".directory"
@@ -295,10 +292,11 @@
   (tooltip-mode -1)
   (auto-encryption-mode -1)
 
-  (when (fboundp 'pixel-scroll-mode)
-    (pixel-scroll-mode 1))
-  (when (fboundp 'pixel-scroll-precision-mode)
-    (pixel-scroll-precision-mode 1))
+  ;; `pixel-scroll-mode' uses line-by-line scrolling.
+  ;; (when (fboundp 'pixel-scroll-mode)
+  ;;   (pixel-scroll-mode 1))
+  ;; (when (fboundp 'pixel-scroll-precision-mode)
+  ;;   (pixel-scroll-precision-mode 1))
 
   (dolist
       (mode
@@ -1841,7 +1839,7 @@
        company-backends
        '(company-files
          (company-capf
-          company-c-headers
+          company-citre-tags company-c-headers
           :with company-keywords
           company-dabbrev-code ; Useful for variable names
           company-ctags company-yasnippet
@@ -3164,6 +3162,36 @@ PAD can be left (`l') or right (`r')."
 (use-package clipetty
   :hook (emacs-startup . global-clipetty-mode)
   :diminish)
+
+(use-package ultra-scroll
+  :straight (:host github :repo "jdtsmith/ultra-scroll")
+  :custom
+  (scroll-conservatively 101)
+  (scroll-margin 0)
+  :hook (find-file . ultra-scroll-mode))
+
+;; (use-package tabnine
+;;   :commands (tabnine-start-process)
+;;   :hook (prog-mode . tabnine-mode)
+;;   :straight t
+;;   :diminish "⌬"
+;;   :custom
+;;   (tabnine-wait 1)
+;;   (tabnine-minimum-prefix-length 0)
+;;   :hook (kill-emacs . tabnine-kill-process)
+;;   :config
+;;   (add-to-list 'completion-at-point-functions #'tabnine-completion-at-point)
+;;   (tabnine-start-process)
+;;   :bind
+;;   (:map
+;;    tabnine-completion-map
+;;    ("<tab>" . tabnine-accept-completion)
+;;    ("TAB" . tabnine-accept-completion)
+;;    ("M-f" . tabnine-accept-completion-by-word)
+;;    ("M-<return>" . tabnine-accept-completion-by-line)
+;;    ("C-g" . tabnine-clear-overlay)
+;;    ("M-[" . tabnine-previous-completion)
+;;    ("M-]" . tabnine-next-completion)))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
