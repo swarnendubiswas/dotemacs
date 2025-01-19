@@ -968,7 +968,6 @@
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-flycheck
-  :after (consult flycheck)
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 (use-package ispell
@@ -1162,20 +1161,6 @@
    . rainbow-mode)
   :diminish)
 
-;; (use-package colorful-mode
-;;   :hook
-;;   ((LaTeX-mode
-;;     latex-mode
-;;     css-mode
-;;     css-ts-mode
-;;     html-mode
-;;     html-ts-mode
-;;     web-mode
-;;     help-mode
-;;     helpful-mode)
-;;    . colorful-mode)
-;;   :diminish)
-
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
   :hook (emacs-startup . xclip-mode))
@@ -1336,6 +1321,7 @@
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
+  (electric-pair-skip-self nil)
   :config
   (setq electric-pair-inhibit-predicate
         (lambda (c)
@@ -2052,13 +2038,11 @@
                      (list (cape-capf-buster #'latex-capf))))))
 
     (defun mode-with-lsp-capf ()
-      (cape-wrap-super
-       #'citre-completion-at-point
-       #'cape-keyword
-       #'cape-dict
-       #'cape-dabbrev
-       #'yasnippet-capf
-       #'cape-file))
+      #'citre-completion-at-point
+      #'cape-keyword
+      ;; #'yasnippet-capf
+      #'cape-file
+      (cape-wrap-super #'cape-dict #'cape-dabbrev))
 
     (dolist (mode
              '(c-mode-hook
@@ -2181,14 +2165,14 @@
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
-  (dolist (ignore-dirs
-           '("/build\\'"
-             "/\\.metadata\\'"
-             "/\\.recommenders\\'"
-             "/\\.clangd\\'"
-             "/\\.cache\\'"
-             "/__pycache__\\'"))
-    (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
+  ;; (dolist (ignore-dirs
+  ;;          '("/build\\'"
+  ;;            "/\\.metadata\\'"
+  ;;            "/\\.recommenders\\'"
+  ;;            "/\\.clangd\\'"
+  ;;            "/\\.cache\\'"
+  ;;            "/__pycache__\\'"))
+  ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."

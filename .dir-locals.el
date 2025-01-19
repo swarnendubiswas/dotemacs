@@ -25,7 +25,7 @@
     (add-hook
      'lsp-managed-mode-hook
      (lambda ()
-       (add-to-list lsp-file-watch-ignored-directories "/build")
+       ;; (add-to-list lsp-file-watch-ignored-directories "/build")
 
        (when (derived-mode-p 'markdown-mode)
          (setq sb/flycheck-local-checkers
