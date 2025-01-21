@@ -1590,7 +1590,19 @@
     (lambda ()
       (interactive)
       (company-complete-common-or-cycle -1)))
-   ;; ([escape] . company-abort)
+   ("S-TAB" .
+    (lambda ()
+      (interactive)
+      (company-complete-common-or-cycle -1)))
+   ;; ([escape]
+   ;;  .
+   ;;  (lambda ()
+   ;;    (interactive)
+   ;;    (company-abort)))
+   ;; ("ESCAPE" .
+   ;;  (lambda ()
+   ;;    (interactive)
+   ;;    (company-abort)))
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
    :map
@@ -1598,7 +1610,17 @@
    ("C-s" . company-search-repeat-forward)
    ("C-r" . company-search-repeat-backward)
    ("C-g" . company-search-abort)
-   ("DEL" . company-search-delete-char))
+   ("DEL" . company-search-delete-char)
+   ;; ([escape]
+   ;;  .
+   ;;  (lambda ()
+   ;;    (interactive)
+   ;;    (company-search-abort)))
+   ;; ("ESCAPE" .
+   ;;  (lambda ()
+   ;;    (interactive)
+   ;;    (company-search-abort)))
+   )
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-code-ignore-case t)
@@ -1616,7 +1638,13 @@
   ;; (company-format-margin-function nil "Disable icons")
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
-  (company-minimum-prefix-length 4))
+  (company-minimum-prefix-length 4)
+  (company-frontends
+   '(
+     ;; always show candidates in overlay tooltip
+     company-pseudo-tooltip-frontend
+     ;; show selected candidate docs in echo area
+     company-echo-metadata-frontend)))
 
 (use-package company-quickhelp
   :after company
@@ -1723,8 +1751,10 @@
      ;; `company-ispell' will be ignored.
      company-ispell company-dict company-dabbrev)
    company-transformers
-   '(delete-dups company-sort-by-statistics
-                 company-sort-prefer-same-case-prefix))
+   '(company-sort-by-occurrence
+     delete-dups
+     company-sort-by-statistics
+     company-sort-prefer-same-case-prefix))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -1825,10 +1855,15 @@
        company-backends
        '(company-files
          (company-capf
-          company-citre-tags company-c-headers
-          :with company-keywords
+          company-citre-tags
+          company-citre-global
+          company-gtags
+          company-c-headers
+          :with
+          company-keywords
           company-dabbrev-code ; Useful for variable names
-          company-ctags company-yasnippet
+          company-ctags
+          company-yasnippet
           :separate)
          company-dict company-ispell company-dabbrev)))
 

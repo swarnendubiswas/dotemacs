@@ -72,29 +72,6 @@ The following are examples of a few customization options defined in [[./modules
 - =sb/python-langserver= - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
 - =sb/delete-trailing-whitespace-p= - Control whether trailing whitespace should be deleted
   
-** LSP
-
-We enable LSP support for the more popular languages supported with either =lsp-mode= or =eglot=. You may need to install the necessary language servers separately to complement the packages. Use =M-x lsp-install-server= or check =setup-emacs.sh=.
-
-*** Installing servers for Eglot
-
-#+begin_src shell
-npm install -save-dev @emacs-grammarly/grammarly-languageserver
-
-LTEX_VER="16.0.0"
-sudo apt-get install -y libslf4j-java liblog4j1.2-java
-wget https://github.com/valentjn/ltex-ls/releases/download/${LTEX_VER}/ltex-ls-${LTEX_VER}-linux-x64.tar.gz
-tar xf ltex-ls-${LTEX_VER}-linux-x64.tar.gz
-
-JDT_VER="1.27.1"
-wget https://github.com/eclipse/eclipse.jdt.ls/archive/refs/tags/v${JDT_VER}.tar.gz
-tar xf v${JDT_VER}.tar.gz
-cd eclipse.jdt.ls-${JDT_VER}
-./mvnw clean verify -DskipTests=true
-# Add "eclipse.jdt.ls-${JDT_VER}/org.eclipse.jdt.ls.product/target/repository/bin" to $PATH
-# rm -rf eclipse.jdt.ls-${JDT_VER} 
-#+end_src
-
 ** Support for Tags
 
 Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by =lsp-mode= and to understand complicated project structures that a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
