@@ -87,6 +87,8 @@
    ;; directory, not in any subdirectories.
    (subdirs . nil)))
 
+ (c-mode . ((mode . c++)))
+
  (c++-mode
   .
   ((clang-format-style . "file")
@@ -110,6 +112,7 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
+            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (let ((compdir (file-name-directory buffer-file-name)))
               (add-to-list
@@ -139,6 +142,7 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
+            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (let ((compdir (file-name-directory buffer-file-name)))
               (add-to-list
@@ -156,8 +160,8 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (progn
-              (add-hook 'before-save-hook #'lsp-format-buffer nil t)))))))
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (sh-mode . ((subdirs . nil)))
 
@@ -168,77 +172,99 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (yaml-ts-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (toml-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (toml-ts-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (json-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (json-ts-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (jsonc-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (html-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (html-ts-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (cmake-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (cmake-ts-mode
   .
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (latex-mode . ((lsp-latex-build-on-save . nil)))
 
