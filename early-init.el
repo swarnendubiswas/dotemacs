@@ -106,7 +106,9 @@
    ;; Enable ahead-of-time compilation when installing a package
    package-native-compile t
    ;; Compile loaded packages asynchronously
-   native-comp-jit-compilation t))
+   native-comp-jit-compilation t
+   native-comp-async-query-on-exit t
+   native-comp-warning-on-missing-source nil))
 
 (setenv "LSP_USE_PLISTS" "true")
 

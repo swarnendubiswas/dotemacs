@@ -132,6 +132,8 @@ find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h
 find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
 
 find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
+
+find . -type d \( -path ./etc -o -path ./var -o -path ./eln-cache -o -path ./.cache \) -prune | gtags -cv --gtagslabel=new-ctags -f -
 #+end_src
 
 ** Configuring Emacs Daemon

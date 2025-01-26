@@ -16,11 +16,6 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/op-mode-daemon nil
-  "Specify the way you expect Emacs to be used."
-  :type 'boolean
-  :group 'sb/emacs)
-
 (defcustom sb/debug-init-file nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
@@ -124,30 +119,34 @@
 (setq use-package-enable-imenu-support t)
 (straight-use-package '(use-package))
 
-(if (bound-and-true-p sb/op-mode-daemon)
+(if (bound-and-true-p sb/debug-init-file)
     (setq
-     use-package-always-demand t
+     debug-on-error t
+     debug-on-event 'sigusr2
+     ;; Use "M-x use-package-report" to see results
+     use-package-compute-statistics t
+     use-package-verbose t
      use-package-minimum-reported-time 0 ; Show everything
-     use-package-verbose t)
+     use-package-always-demand t)
   (setq
    use-package-always-defer t
    use-package-expand-minimally t))
 
-(when (bound-and-true-p sb/debug-init-file)
-  (setq
-   debug-on-error t
-   debug-on-event 'sigusr2
-   ;; Use "M-x use-package-report" to see results
-   use-package-compute-statistics t
-   use-package-verbose t
-   use-package-minimum-reported-time 0 ; Show everything
-   use-package-always-demand t))
+;; Check "use-package-keywords.org" for a suggested order of `use-package'
+;; keywords.
+
+;; (use-package compile-angel
+;;   :demand t
+;;   :custom (compile-angel-verbose nil)
+;;   :config
+;;   (compile-angel-on-load-mode)
+;;   (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-mode)
+;;   (with-eval-after-load "diminish"
+;;     (diminish 'compile-angel-on-load-mode "")
+;;     (diminish 'compile-angel-on-save-mode "")))
 
 (use-package bind-key
   :bind ("C-c d k" . describe-personal-keybindings))
-
-;; Check "use-package-keywords.org" for a suggested order of `use-package'
-;; keywords.
 
 (use-package diminish
   :demand t)
@@ -348,13 +347,30 @@
   (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
   :diminish visual-line-mode)
 
+;; (use-package pixel-scroll
+;;   :ensure nil
+;;   :when (fboundp 'pixel-scroll-precision-mode)
+;;   :custom (pixel-scroll-precision-mode)
+;;   :config
+;;   (setq
+;;    auto-window-vscroll nil
+;;    scroll-margin 0
+;;    scroll-conservatively 10
+;;    scroll-error-top-bottom t
+;;    fast-but-imprecise-scrolling t
+;;    scroll-preserve-screen-position t
+;;    hscroll-margin 2
+;;    hscroll-step 1
+;;    mouse-wheel-scroll-amount '(1 ((shift) . hscroll))
+;;    mouse-wheel-scroll-amount-horizontal 1))
+
 (use-package autorevert
   :straight (:type built-in)
   :hook (emacs-startup . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files t)
-  ;; Revert `dired' buffers if the directory contents changes
+  ;; Revert `dired' buffers if the directory contents change
   (global-auto-revert-non-file-buffers t)
   :diminish auto-revert-mode)
 
@@ -923,6 +939,15 @@
    :initial
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end)))))
+
+(use-package consult-dir
+  :bind
+  (("C-x C-d" . consult-dir)
+   :map
+   vertico-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file))
+  :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
 (use-package embark
   :bind
@@ -1751,16 +1776,18 @@
      ;; `company-ispell' will be ignored.
      company-ispell company-dict company-dabbrev)
    company-transformers
-   '(company-sort-by-occurrence
+   '( ;company-sort-by-occurrence
      delete-dups
      company-sort-by-statistics
-     company-sort-prefer-same-case-prefix))
+     ;company-sort-prefer-same-case-prefix
+     ))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
-  (push (apply-partially #'cl-remove-if
-                         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
-        company-transformers)
+
+  ;; (push (apply-partially #'cl-remove-if
+  ;;                        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
+  ;;       company-transformers)
 
   (progn
     (defun sb/company-latex-mode ()
@@ -1789,6 +1816,7 @@
                company-math-symbols-latex
                company-math-symbols-unicode
                company-yasnippet
+               company-ctags
                company-dict
                company-dabbrev
                company-ispell))))
@@ -1855,15 +1883,10 @@
        company-backends
        '(company-files
          (company-capf
-          company-citre-tags
-          company-citre-global
-          company-gtags
-          company-c-headers
-          :with
-          company-keywords
+          company-citre-tags company-c-headers
+          :with company-keywords
           company-dabbrev-code ; Useful for variable names
-          company-ctags
-          company-yasnippet
+          company-ctags company-yasnippet
           :separate)
          company-dict company-ispell company-dabbrev)))
 
@@ -2297,13 +2320,20 @@
   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t))
 
-(use-package lsp-ltex
-  :hook ((text-mode markdown-mode org-mode LaTeX-mode latex-mode) . lsp-deferred)
+(use-package lsp-ltex-plus
+  :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
+  :init (setq lsp-ltex-plus-version "18.4.0")
+  :hook
+  ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
+   .
+   (lambda ()
+     (require 'lsp-ltex-plus)
+     (lsp-deferred)))
   :custom
   ;; Recommended to set a generic language to disable spell check
   (lsp-ltex-language "en")
   (lsp-ltex-check-frequency "save")
-  (lsp-ltex-dictionary
+  (lsp-ltex-plus-dictionary
    (expand-file-name "company-dict/text-mode" user-emacs-directory))
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
@@ -3110,6 +3140,7 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-enable-word-count t))
 
 (use-package centaur-tabs
+  :disabled
   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
   :bind*
   (("M-<right>" . centaur-tabs-forward-tab)
@@ -3189,29 +3220,6 @@ PAD can be left (`l') or right (`r')."
   (scroll-margin 0)
   :hook (find-file . ultra-scroll-mode))
 
-;; (use-package tabnine
-;;   :commands (tabnine-start-process)
-;;   :hook (prog-mode . tabnine-mode)
-;;   :straight t
-;;   :diminish "⌬"
-;;   :custom
-;;   (tabnine-wait 1)
-;;   (tabnine-minimum-prefix-length 0)
-;;   :hook (kill-emacs . tabnine-kill-process)
-;;   :config
-;;   (add-to-list 'completion-at-point-functions #'tabnine-completion-at-point)
-;;   (tabnine-start-process)
-;;   :bind
-;;   (:map
-;;    tabnine-completion-map
-;;    ("<tab>" . tabnine-accept-completion)
-;;    ("TAB" . tabnine-accept-completion)
-;;    ("M-f" . tabnine-accept-completion-by-word)
-;;    ("M-<return>" . tabnine-accept-completion-by-line)
-;;    ("C-g" . tabnine-clear-overlay)
-;;    ("M-[" . tabnine-previous-completion)
-;;    ("M-]" . tabnine-next-completion)))
-
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
   (interactive)
@@ -3287,9 +3295,6 @@ If region is active, apply to active region instead."
 
 (use-package free-keys
   :commands free-keys)
-
-(use-package key-quiz
-  :commands key-quiz)
 
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
