@@ -2310,15 +2310,15 @@
    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
                      sb/user-home-directory)))
 
-(use-package lsp-grammarly
-  :after lsp-mode
-  :hook ((text-mode markdown-mode org-mode LaTeX-mode latex-mode) . lsp-deferred)
-  :custom
-  (lsp-grammarly-suggestions-oxford-comma t)
-  (lsp-grammarly-suggestions-passive-voice t)
-  (lsp-grammarly-suggestions-informal-pronouns-academic t)
-  (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
-  (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t))
+;; (use-package lsp-grammarly
+;;   :after lsp-mode
+;;   :hook ((text-mode markdown-mode org-mode LaTeX-mode latex-mode) . lsp-deferred)
+;;   :custom
+;;   (lsp-grammarly-suggestions-oxford-comma t)
+;;   (lsp-grammarly-suggestions-passive-voice t)
+;;   (lsp-grammarly-suggestions-informal-pronouns-academic t)
+;;   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
+;;   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t))
 
 (use-package lsp-ltex-plus
   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
@@ -2331,10 +2331,11 @@
      (lsp-deferred)))
   :custom
   ;; Recommended to set a generic language to disable spell check
-  (lsp-ltex-language "en")
-  (lsp-ltex-check-frequency "save")
-  (lsp-ltex-plus-dictionary
-   (expand-file-name "company-dict/text-mode" user-emacs-directory))
+  (lsp-ltex-plus-plus-language "en")
+  (lsp-ltex-plus-check-frequency "save")
+  ;; (lsp-ltex-plus-dictionary
+  ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  (lsp-ltex-plus-log-level "warning")
   :config
   ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
   ;; dict words.
