@@ -3184,23 +3184,28 @@ PAD can be left (`l') or right (`r')."
      :lighter " KDLFMT"
      :group 'reformatter)))
 
-(use-package ssh-config-mode
+(use-package ssh-config-mode ; Fontify ssh files
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
 
 (use-package asm-mode
+  :straight (:type built-in)
   :hook (asm-mode . lsp-deferred))
 
+;; Guess the indentation offset originally used in foreign source code files and
+;; transparently adjust the corresponding settings in Emacs making it more
+;; convenient to edit the foreign files.
 (use-package dtrt-indent
   :straight (:host github :repo "jscheid/dtrt-indent")
   :hook (find-file . dtrt-indent-mode)
   :diminish)
 
-(use-package consult-xref-stack
+(use-package consult-xref-stack ; Navigate the xref stack with consult
   :straight (:host github :repo "brett-lempereur/consult-xref-stack")
   :bind ("C-," . consult-xref-stack-backward))
 
+;; Kill Emacs buffers automatically after a timeout
 (use-package buffer-terminator
   :straight (:host github :repo "jamescherti/buffer-terminator.el")
   :hook (find-file . buffer-terminator-mode)
@@ -3210,16 +3215,28 @@ PAD can be left (`l') or right (`r')."
 (use-package hl-line
   :hook (dired-mode . hl-line-mode))
 
-(use-package clipetty
+(use-package clipetty ; Send every kill from a TTY frame to the system clipboard
   :hook (emacs-startup . global-clipetty-mode)
   :diminish)
 
+;; Provides pixel-precise smooth scrolling which can keep up with the very high
+;; event rates of modern trackpads and high-precision wheel mice.
 (use-package ultra-scroll
   :straight (:host github :repo "jdtsmith/ultra-scroll")
+  :disabled
   :custom
   (scroll-conservatively 101)
   (scroll-margin 0)
   :hook (find-file . ultra-scroll-mode))
+
+(use-package outline-indent
+  :hook
+  ((python-mode python-ts-mode yaml-mode yaml-ts-mode)
+   .
+   outline-indent-minor-mode)
+  :custom
+  (outline-indent-ellipsis " ▼ ")
+  (outline-blank-line t))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -3294,15 +3311,18 @@ If region is active, apply to active region instead."
   (("C-M-+" . default-text-scale-increase)
    ("C-M--" . default-text-scale-decrease)))
 
-(use-package free-keys
+(use-package free-keys ; Show free bindings in current buffer
   :commands free-keys)
 
+;; Displays available keybindings following the currently entered incomplete
+;; command/prefix in a popup
 (use-package which-key
   :hook (emacs-startup . which-key-mode)
   :diminish)
 
-(use-package kkp
+(use-package kkp ; Support the Kitty Keyboard protocol in Emacs
   :hook (emacs-startup . global-kkp-mode)
+  :bind ("M-<backspace>" . backward-kill-word) ; should be remapped to "M-DEL"
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
 
 ;;; init.el ends here
