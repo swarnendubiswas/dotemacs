@@ -25,9 +25,9 @@
   "Defer garbage collection during execution."
   (setq gc-cons-threshold sb/emacs-1GB))
 
+;; `lsp-mode' suggests increasing the limit permanently to a reasonable value.
 ;; There will be large pause times with large `gc-cons-threshold' values
-;; whenever GC eventually happens. `lsp-mode' suggests increasing the limit
-;; permanently to a reasonable value.
+;; whenever GC eventually happens.
 (defun sb/restore-gc ()
   "Restore garbage collection threshold during execution."
   (setq
@@ -38,12 +38,6 @@
 (add-hook 'minibuffer-setup-hook #'sb/defer-gc)
 (add-hook 'minibuffer-exit-hook #'sb/restore-gc)
 
-;; https://github.com/hlissner/doom-emacs/issues/3372#issuecomment-643567913
-;; Get a list of loaded packages that depend on `cl' by calling the following.
-
-;; (require 'loadhist)
-;; (file-dependents (feature-file 'cl))
-
 ;; The run-time load order is: (1) file described by `site-run-file' if non-nil,
 ;; (2) `user-init-file', and (3) `default.el'.
 (setq
@@ -51,24 +45,23 @@
  ;; Disable loading of `default.el' at startup
  inhibit-default-init t)
 
-;; Do not resize the frame to preserve the number of columns or lines being
-;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
-;; fringes, or scroll bars.
 (setq
+ ;; Do not resize the frame to preserve the number of columns or lines being
+ ;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
+ ;; fringes, or scroll bars.
  frame-inhibit-implied-resize t
  frame-resize-pixelwise t
  window-resize-pixelwise t
- inhibit-startup-echo-area-message t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
- ;; *scratch* is in `lisp-interaction-mode' by default. I use *scratch* for
- ;; composing emails, but `text-mode' is more expensive to start. Furthermore,
- ;; lsp support is not enabled for the *scratch* buffer.
+ inhibit-startup-echo-area-message t
+ ;; *scratch* is in `lisp-interaction-mode' by default.
  initial-major-mode 'text-mode
  initial-scratch-message nil)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
-(scroll-bar-mode -1)
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 ;; The menu bar can be useful to identify different capabilities available and
 ;; their shortcuts.
 (push '(menu-bar-lines . 0) default-frame-alist)
@@ -97,7 +90,7 @@
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
 ;; is also useful if we prefer "straight.el" over "package.el".
-;; (setq package-enable-at-startup nil)
+(setq package-enable-at-startup nil)
 
 (when (featurep 'native-compile)
   (setq
@@ -113,11 +106,12 @@
 (setenv "LSP_USE_PLISTS" "true")
 
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences
-;; will be ignored when we use TUI Emacs. Then, the terminal font setting will
-;; be used.
+;; will be ignored when we use TUI Emacs, and the terminal font setting will be
+;; used.
 
 ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
 
+;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
 (defun sb/init-fonts-graphic ()
   (cond
    ((string= (system-name) "inspiron-7572")
@@ -134,36 +128,11 @@
 
    ((string= (system-name) "cseiitk")
     (progn
-      ;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
-      ;;   (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 210)
       (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 210)
       (set-face-attribute 'mode-line nil :height 140)
       (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
-
-;; (defun sb/init-fonts-daemon (frame)
-;;   (message "getting called")
-;;   (cond
-;;     ((string= (system-name) "inspiron-7572")
-;;       (progn
-;;         ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
-;;         (add-to-list 'default-frame-alist '(font . "MesloLGSNF-20"))))))
-;; FIXME: The hook is not working.
-;; (add-hook 'server-after-make-frame-functions #'sb/init-fonts-daemon 'append)
-
-(when (daemonp)
-  (cond
-   ((string= (system-name) "inspiron-7572")
-    (progn
-      ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-18"))
-      (add-to-list 'default-frame-alist '(font . "MesloLGSNF-18"))))
-
-   ((string= (system-name) "cse-BM1AF-BP1AF-BM6AF")
-    (progn
-      (set-face-attribute 'default nil
-                          :font "JetBrainsMono Nerd Font"
-                          :height 180)))))
 
 (provide 'early-init)
 

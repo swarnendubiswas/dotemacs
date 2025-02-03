@@ -21,7 +21,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -524,17 +524,21 @@
   ;; Do not ping things that look like domain names
   (ffap-machine-p-known 'reject))
 
-;; Highlight and allow to open http links in strings and comments in buffers.
+;; Highlight and open http links in strings and comments in buffers.
 (use-package goto-addr
   :straight (:type built-in)
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
   :bind ("C-c RET" . goto-address-at-point))
 
+(use-package winner
+  :hook (emacs-startup . winner-mode)
+  :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
+
 ;; Use `ediff-regions-wordwise' for small regions and `ediff-regions-linewise'
 ;; for larger regions.
 (use-package ediff
   :straight (:type built-in)
-  :commands (ediff-regions-linewise ediff-regions-wordwise)
+  :commands (ediff-buffers ediff-regions-linewise ediff-regions-wordwise)
   :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
   :custom
   ;; Put the control panel in the same frame as the diff windows
@@ -543,7 +547,9 @@
   (ediff-split-window-function #'split-window-horizontally)
   ;; Prompt and kill file variants on quitting an Ediff session
   (ediff-keep-variants nil)
-  :config (ediff-set-diff-options 'ediff-diff-options "-w"))
+  :config
+  (ediff-set-diff-options 'ediff-diff-options "-w")
+  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
 
 ;; To edit remote files, use "/method:user@host#port:filename".
 ;; The shortcut "/ssh::" will connect to default "user@host#port".
@@ -1973,13 +1979,13 @@
             '(substring)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-corfu)))
 
-(use-package corfu-terminal
-  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
-  :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
-  :hook (corfu-mode . corfu-terminal-mode)
-  :custom
-  ;; Prevent wraparound at the right edge
-  (corfu-terminal-position-right-margin 2))
+;; (use-package corfu-terminal
+;;   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
+;;   :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
+;;   :hook (corfu-mode . corfu-terminal-mode)
+;;   :custom
+;;   ;; Prevent wraparound at the right edge
+;;   (corfu-terminal-position-right-margin 2))
 
 (use-package yasnippet-capf
   :straight (:host github :repo "elken/yasnippet-capf")
@@ -1996,7 +2002,7 @@
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   :config
-  ;; Make these capfs composable
+  ;; Make the capf composable
   (with-eval-after-load "lsp-mode"
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
@@ -3184,7 +3190,8 @@ PAD can be left (`l') or right (`r')."
      :lighter " KDLFMT"
      :group 'reformatter)))
 
-(use-package ssh-config-mode ; Fontify ssh files
+;; Fontify ssh files
+(use-package ssh-config-mode
   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
@@ -3201,7 +3208,8 @@ PAD can be left (`l') or right (`r')."
   :hook (find-file . dtrt-indent-mode)
   :diminish)
 
-(use-package consult-xref-stack ; Navigate the xref stack with consult
+;; Navigate the xref stack with consult
+(use-package consult-xref-stack
   :straight (:host github :repo "brett-lempereur/consult-xref-stack")
   :bind ("C-," . consult-xref-stack-backward))
 
@@ -3215,7 +3223,8 @@ PAD can be left (`l') or right (`r')."
 (use-package hl-line
   :hook (dired-mode . hl-line-mode))
 
-(use-package clipetty ; Send every kill from a TTY frame to the system clipboard
+;; Send every kill from a TTY frame to the system clipboard
+(use-package clipetty
   :hook (emacs-startup . global-clipetty-mode)
   :diminish)
 

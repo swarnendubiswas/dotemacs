@@ -3,7 +3,6 @@
   ((fill-column . 80)
 
    (make-local-variable 'completion-ignored-extensions)
-   (eval . (add-to-list 'completion-ignored-extensions "elisp-autofmt-cache/"))
    (eval . (add-to-list 'completion-ignored-extensions "eln-cache/"))
    (eval . (add-to-list 'completion-ignored-extensions "tree-sitter/"))
    (eval .
