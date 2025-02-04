@@ -1426,6 +1426,20 @@
         (funcall fn checker property)))
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get))
 
+(use-package sideline
+  :init (setq sideline-backends-left nil)
+  :hook ((flycheck-mode lsp-mode) . sideline-mode))
+
+(use-package sideline-flycheck
+  :after sideline
+  :hook (flycheck-mode . sideline-flycheck-setup))
+
+(use-package sideline-lsp
+  :after sideline
+  :config
+  (setq sideline-backends-right
+        '((sideline-lsp . up) (sideline-flycheck . down))))
+
 (use-package format-all
   :hook
   ((format-all-mode . format-all-ensure-formatter)
@@ -2279,10 +2293,9 @@
   (lsp-ui-doc-enable nil)
   (lsp-ui-doc-include-signature t)
   (lsp-ui-imenu-auto-refresh 'after-save)
+  (lsp-ui-sideline-enable nil)
   ;; Enables understanding when to invoke code actions
   (lsp-ui-sideline-show-code-actions t)
-  ;; Noisy to show symbol information in the sideline
-  (lsp-ui-sideline-enable t)
   ;; Hide diagnostics when typing because they can be intrusive,
   ;; Flycheck/flymake already highlights errors
   (lsp-ui-sideline-show-diagnostics nil)
@@ -2342,14 +2355,22 @@
   ;; (lsp-ltex-plus-dictionary
   ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
   (lsp-ltex-plus-log-level "warning")
-  :config
-  ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
-  ;; dict words.
-  (setq lsp-ltex-disabled-rules
-        #s(hash-table
-           size 30 data
-           ("en-US"
-            ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"]))))
+  (lsp-ltex-disabled-rules
+   '(:en
+     ["EN_QUOTES"
+      "OXFORD_SPELLING_Z_NOT_S"
+      "MORFOLOGIK_RULE_EN_US"
+      "WANT"
+      "EN_DIACRITICS_REPLACE"]))
+  ;; :config
+  ;; ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
+  ;; ;; dict words.
+  ;; (setq lsp-ltex-plus-disabled-rules
+  ;;       #s(hash-table
+  ;;          size 30 data
+  ;;          ("en-US"
+  ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
+  )
 
 (use-package lsp-latex
   :hook
