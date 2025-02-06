@@ -1428,7 +1428,8 @@
 
 (use-package sideline
   :init (setq sideline-backends-left nil)
-  :hook ((flycheck-mode lsp-mode) . sideline-mode))
+  :hook ((flycheck-mode lsp-mode) . sideline-mode)
+  :diminish)
 
 (use-package sideline-flycheck
   :after sideline
@@ -1473,6 +1474,7 @@
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   :diminish)
 
+;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :config
@@ -1815,25 +1817,14 @@
 
       ;; `company-capf' with Texlab does not pass to later backends, so it makes
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
-      ;; majority. We therefore exclude it from `company-backends' and invoke it
-      ;; on demand.
-
-      ;; (setq company-backends
-      ;;       '((company-files
-      ;;          company-math-symbols-latex ; Math latex tags
-      ;;          company-latex-commands
-      ;;          ;; Math Unicode symbols and sub(super)scripts
-      ;;          company-math-symbols-unicode
-      ;;          company-ispell
-      ;;          company-dict
-      ;;          company-dabbrev
-      ;;          company-capf)))
-
+      ;; majority.
       (setq company-backends
             '((:separate
                company-files
                company-capf
+               ;; Math latex tags
                company-math-symbols-latex
+               ;; Math Unicode symbols and sub(super)scripts
                company-math-symbols-unicode
                company-yasnippet
                company-ctags
@@ -1883,8 +1874,6 @@
 
   (progn
     (defun sb/company-html-mode ()
-      (setq-local company-minimum-prefix-length 2)
-
       (set
        (make-local-variable 'company-backends)
        '(company-files
@@ -1898,17 +1887,16 @@
 
   (progn
     (defun sb/company-prog-mode ()
-      (setq-local
-       company-minimum-prefix-length 2
-       company-backends
-       '(company-files
-         (company-capf
-          company-citre-tags company-c-headers
-          :with company-keywords
-          company-dabbrev-code ; Useful for variable names
-          company-ctags company-yasnippet
-          :separate)
-         company-dict company-ispell company-dabbrev)))
+      (setq-local company-backends
+                  '(company-files
+                    (company-capf
+                     ;; company-citre-tags
+                     company-c-headers
+                     :with company-keywords
+                     company-dabbrev-code ; Useful for variable names
+                     company-ctags company-yasnippet
+                     :separate)
+                    company-dict company-ispell company-dabbrev)))
 
     (add-hook
      'prog-mode-hook
@@ -1920,16 +1908,14 @@
 
   (progn
     (defun sb/company-elisp-mode ()
-      (setq-local
-       company-minimum-prefix-length 2
-       company-backends
-       '(company-files
-         (company-capf
-          :with company-keywords
-          company-dabbrev-code ; Useful for variable names
-          company-yasnippet
-          :separate)
-         company-dict company-ispell company-dabbrev)))
+      (setq-local company-backends
+                  '(company-files
+                    (company-capf
+                     :with company-keywords
+                     company-dabbrev-code ; Useful for variable names
+                     company-yasnippet
+                     :separate)
+                    company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
@@ -2116,9 +2102,9 @@
                      (list (cape-capf-buster #'latex-capf))))))
 
     (defun mode-with-lsp-capf ()
-      #'citre-completion-at-point
+      ;; #'citre-completion-at-point
       #'cape-keyword
-      ;; #'yasnippet-capf
+      #'yasnippet-capf
       #'cape-file
       (cape-wrap-super #'cape-dict #'cape-dabbrev))
 
@@ -2942,6 +2928,7 @@
   (citre-default-create-tags-file-location 'in-dir)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-imenu-integration nil)
+  (citre-enable-capf-integration t)
   (citre-ctags-default-options
    "-o
 %TAGSFILE%
@@ -3190,6 +3177,7 @@ PAD can be left (`l') or right (`r')."
   ;; Make the headline face match `centaur-tabs-default' face
   (centaur-tabs-headline-match))
 
+;; Center the text environment
 (use-package olivetti
   :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
@@ -3259,6 +3247,7 @@ PAD can be left (`l') or right (`r')."
   (scroll-margin 0)
   :hook (find-file . ultra-scroll-mode))
 
+;; Fold text using indentation levels
 (use-package outline-indent
   :hook
   ((python-mode python-ts-mode yaml-mode yaml-ts-mode)
@@ -3350,7 +3339,8 @@ If region is active, apply to active region instead."
   :hook (emacs-startup . which-key-mode)
   :diminish)
 
-(use-package kkp ; Support the Kitty Keyboard protocol in Emacs
+;; Support the Kitty Keyboard protocol in Emacs
+(use-package kkp
   :hook (emacs-startup . global-kkp-mode)
   :bind ("M-<backspace>" . backward-kill-word) ; should be remapped to "M-DEL"
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
