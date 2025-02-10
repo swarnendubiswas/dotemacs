@@ -999,6 +999,8 @@
   :bind ("C-c d t" . consult-tramp))
 
 (use-package consult-flycheck
+  :after flycheck
+  :demand t
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 (use-package ispell
@@ -1676,21 +1678,21 @@
    (expand-file-name "wordlist.5" sb/extras-directory))
   (company-show-quick-access t "Speed up selecting a completion")
   (company-tooltip-align-annotations t)
+  ;; (company-format-margin-function nil "Disable icons")
   (company-global-modes
    '(not dired-mode
          magit-status-mode
          help-mode
          csv-mode
          minibuffer-inactive-mode))
-  ;; (company-format-margin-function nil "Disable icons")
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
-  (company-minimum-prefix-length 4)
+  (company-minimum-prefix-length 3)
   (company-frontends
    '(
-     ;; always show candidates in overlay tooltip
+     ;; Always show candidates in overlay tooltip
      company-pseudo-tooltip-frontend
-     ;; show selected candidate docs in echo area
+     ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend)))
 
 (use-package company-quickhelp
@@ -3330,7 +3332,8 @@ If region is active, apply to active region instead."
   (("C-M-+" . default-text-scale-increase)
    ("C-M--" . default-text-scale-decrease)))
 
-(use-package free-keys ; Show free bindings in current buffer
+;; Show free bindings in current buffer
+(use-package free-keys
   :commands free-keys)
 
 ;; Displays available keybindings following the currently entered incomplete
