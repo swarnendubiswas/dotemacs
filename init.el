@@ -611,7 +611,6 @@
      "*Org Help\\*"
      "*lsp-log*"
      "*ltex-ls.*"
-     "*grammarly-ls.*"
      "*bash-ls.*"
      "*marksman.*"
      "*yaml-ls.*"
@@ -1315,7 +1314,8 @@
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
   ;; Show fine differences for the current diff hunk only
-  (magit-diff-refine-hunk t))
+  (magit-diff-refine-hunk t)
+  (magit-format-file-function #'magit-format-file-nerd-icons))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -2317,16 +2317,6 @@
    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
                      sb/user-home-directory)))
 
-;; (use-package lsp-grammarly
-;;   :after lsp-mode
-;;   :hook ((text-mode markdown-mode org-mode LaTeX-mode latex-mode) . lsp-deferred)
-;;   :custom
-;;   (lsp-grammarly-suggestions-oxford-comma t)
-;;   (lsp-grammarly-suggestions-passive-voice t)
-;;   (lsp-grammarly-suggestions-informal-pronouns-academic t)
-;;   (lsp-grammarly-suggestions-preposition-at-the-end-of-sentence t)
-;;   (lsp-grammarly-suggestions-conjunction-at-start-of-sentence t))
-
 (use-package lsp-ltex-plus
   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
   :init (setq lsp-ltex-plus-version "18.4.0")
@@ -2557,7 +2547,7 @@
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls))
      (lsp-deferred))))
 
 (use-package python
@@ -2673,7 +2663,7 @@
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls))
      (lsp-deferred))))
 
 (use-package yaml-imenu
@@ -2757,7 +2747,7 @@
      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls grammarly-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls))
      (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
