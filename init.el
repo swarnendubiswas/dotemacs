@@ -1348,38 +1348,40 @@
    ("M-g l" . smerge-keep-lower)
    ("M-g a" . smerge-keep-all)))
 
-(use-package elec-pair
-  :straight (:type built-in)
-  :hook (emacs-startup . electric-pair-mode)
-  :custom
-  ;; Avoid balancing parentheses since they can be both irritating and slow
-  (electric-pair-preserve-balance nil)
-  (electric-pair-skip-self nil)
-  :config
-  (setq electric-pair-inhibit-predicate
-        (lambda (c)
-          (if (char-equal c ?\")
-              t
-            (electric-pair-default-inhibit c))))
+;; I find automated pairing of parentheses obstructing.
 
-  (defvar sb/markdown-pairs '((?` . ?`)))
+;; (use-package elec-pair
+;;   :straight (:type built-in)
+;;   :hook (emacs-startup . electric-pair-mode)
+;;   :custom
+;;   ;; Avoid balancing parentheses since they can be both irritating and slow
+;;   (electric-pair-preserve-balance nil)
+;;   (electric-pair-skip-self nil)
+;;   :config
+;;   (setq electric-pair-inhibit-predicate
+;;         (lambda (c)
+;;           (if (char-equal c ?\")
+;;               t
+;;             (electric-pair-default-inhibit c))))
 
-  (defun sb/add-markdown-pairs ()
-    (setq-local electric-pair-pairs
-                (append electric-pair-pairs sb/markdown-pairs))
-    (setq-local electric-pair-text-pairs electric-pair-pairs))
+;;   (defvar sb/markdown-pairs '((?` . ?`)))
 
-  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+;;   (defun sb/add-markdown-pairs ()
+;;     (setq-local electric-pair-pairs
+;;                 (append electric-pair-pairs sb/markdown-pairs))
+;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
+;;   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-  ;; (defun sb/add-latex-pairs ()
-  ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
-  ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
+;;   ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
 
-  ;; (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-  ;;   (add-hook mode #'sb/add-latex-pairs))
-  )
+;;   ;; (defun sb/add-latex-pairs ()
+;;   ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
+;;   ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
+
+;;   ;; (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+;;   ;;   (add-hook mode #'sb/add-latex-pairs))
+;;   )
 
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
@@ -1744,12 +1746,9 @@
 
 (use-package company-ctags
   :after (company prog-mode)
-  :demand t
-  :custom
-  (company-ctags-support-etags t)
-  (company-ctags-fuzzy-match-p t))
+  :demand t)
 
-;; Try completion backends in order untill there is a non-empty completion list:
+;; Try completion backends in order until there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
 
 ;; Merge completions of all the backends:
@@ -1821,18 +1820,18 @@
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
       (setq company-backends
-            '((:separate
-               company-files
+            '((company-files
                company-capf
                ;; Math latex tags
                company-math-symbols-latex
                ;; Math Unicode symbols and sub(super)scripts
-               company-math-symbols-unicode
+               ;; company-math-symbols-unicode
                company-yasnippet
                company-ctags
                company-dict
                company-dabbrev
-               company-ispell))))
+               company-ispell
+               :separate))))
 
     (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
 
@@ -2920,7 +2919,6 @@
   (citre-default-create-tags-file-location 'in-dir)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
   (citre-enable-imenu-integration nil)
-  (citre-enable-capf-integration t)
   (citre-ctags-default-options
    "-o
 %TAGSFILE%
@@ -2947,22 +2945,33 @@
               (funcall fetcher))
             (funcall citre-fetcher)))))
 
-  ;; This is a completion-at-point-function that tries lsp first, and if no
-  ;; completions are given, try Citre.
-  (defun lsp-citre-capf-function ()
-    "A capf backend that tries lsp first, then Citre."
-    (let ((lsp-result (lsp-completion-at-point)))
-      (if (and lsp-result
-               (try-completion
-                (buffer-substring
-                 (nth 0 lsp-result) (nth 1 lsp-result))
-                (nth 2 lsp-result)))
-          lsp-result
-        (citre-completion-at-point))))
+  ;; Use `citre' with Emacs Lisp
+  ;; https://github.com/universal-ctags/citre/blob/master/docs/user-manual/adapt-an-existing-xref-backend.md
+  (citre-register-backend
+   'elisp
+   (citre-xref-backend-to-citre-backend
+    'elisp (lambda () (derived-mode-p 'emacs-lisp-mode))))
 
-  (defun enable-lsp-citre-capf-backend ()
-    "Enable the lsp + Citre capf backend in current buffer."
-    (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
+  ;; Add Elisp to the backend lists.
+  (add-to-list 'citre-find-definition-backends 'elisp)
+  (add-to-list 'citre-find-reference-backends 'elisp)
+
+  ;; ;; This is a completion-at-point-function that tries lsp first, and if no
+  ;; ;; completions are given, try Citre.
+  ;; (defun lsp-citre-capf-function ()
+  ;;   "A capf backend that tries lsp first, then Citre."
+  ;;   (let ((lsp-result (lsp-completion-at-point)))
+  ;;     (if (and lsp-result
+  ;;              (try-completion
+  ;;               (buffer-substring
+  ;;                (nth 0 lsp-result) (nth 1 lsp-result))
+  ;;               (nth 2 lsp-result)))
+  ;;         lsp-result
+  ;;       (citre-completion-at-point))))
+
+  ;; (defun enable-lsp-citre-capf-backend ()
+  ;;   "Enable the lsp + Citre capf backend in current buffer."
+  ;;   (add-hook 'completion-at-point-functions #'lsp-citre-capf-function nil t))
 
   ;; (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
 
@@ -2999,7 +3008,6 @@ used in `company-backends'."
               (all-completions arg (nth 2 (citre-completion-at-point)))))))))
 
   (citre-backend-to-company-backend tags)
-  (citre-backend-to-company-backend global)
   :diminish)
 
 (progn
@@ -3249,6 +3257,40 @@ PAD can be left (`l') or right (`r')."
   (outline-indent-ellipsis " ▼ ")
   (outline-blank-line t))
 
+;; Allows to easily identify the file path in a project
+(use-package project-headerline
+  :straight (:host github :repo "gavv/project-headerline")
+  :hook (emacs-startup . global-project-headerline-mode))
+
+;; Show all folds with "C-c @ C-a", hide all folds with "C-c @ C-t", toggle
+;; hiding with "C-c @ C-c", hide a block with "C-c @ C-d",
+(use-package hideshow-mode
+  :hook
+  ((c-mode-common
+    c-ts-mode
+    c++-mode
+    c++-ts-mode
+    cmake-mode
+    cmake-ts-mode
+    css-mode
+    css-ts-mode
+    fish-mode
+    emacs-lisp-mode
+    java-mode
+    java-ts-mode
+    makefile-mode
+    perl-mode
+    python-mode
+    python-ts-mode
+    sh-mode
+    bash-ts-mode
+    json-mode
+    json-ts-mode
+    jsonc-mode
+    yaml-mode
+    yaml-ts-mode)
+   . (lambda () (hs-minor-mode 1))))
+
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
   (interactive)
@@ -3335,8 +3377,9 @@ If region is active, apply to active region instead."
 ;; Support the Kitty Keyboard protocol in Emacs
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode)
-  :bind ("M-<backspace>" . backward-kill-word) ; should be remapped to "M-DEL"
-  :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
+  ;; :bind ("M-<backspace>" . backward-kill-word) ; should be remapped to "M-DEL"
+  ;; :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
+  )
 
 ;;; init.el ends here
 
