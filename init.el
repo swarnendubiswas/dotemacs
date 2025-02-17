@@ -3262,11 +3262,13 @@ PAD can be left (`l') or right (`r')."
   :straight (:host github :repo "gavv/project-headerline")
   :hook (emacs-startup . global-project-headerline-mode))
 
-;; Show all folds with "C-c @ C-a", hide all folds with "C-c @ C-t", toggle
-;; hiding with "C-c @ C-c", hide a block with "C-c @ C-d",
-(use-package hideshow-mode
+;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", show a block
+;; with "C-c @ C-s", show all folds with "C-c @ C-a", and toggle hiding of a
+;; block with "C-c @ C-c".
+(use-package hideshow
   :hook
-  ((c-mode-common
+  ((prog-mode
+    c-mode-common
     c-ts-mode
     c++-mode
     c++-ts-mode
@@ -3274,8 +3276,9 @@ PAD can be left (`l') or right (`r')."
     cmake-ts-mode
     css-mode
     css-ts-mode
-    fish-mode
     emacs-lisp-mode
+    fish-mode
+    html-mode
     java-mode
     java-ts-mode
     makefile-mode
@@ -3289,7 +3292,10 @@ PAD can be left (`l') or right (`r')."
     jsonc-mode
     yaml-mode
     yaml-ts-mode)
-   . (lambda () (hs-minor-mode 1))))
+   .
+   (lambda ()
+     (hs-minor-mode 1)
+     (hs-hide-all))))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
