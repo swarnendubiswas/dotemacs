@@ -1959,7 +1959,7 @@
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-prefix 4)
+  (corfu-auto-prefix 3)
   (global-corfu-modes
    '((not dired-mode
           inferior-python-mode
@@ -3292,10 +3292,8 @@ PAD can be left (`l') or right (`r')."
     jsonc-mode
     yaml-mode
     yaml-ts-mode)
-   .
-   (lambda ()
-     (hs-minor-mode 1)
-     (hs-hide-all))))
+   . hs-minor-mode)
+  :diminish hs-minor-mode)
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."

@@ -1,12 +1,17 @@
-#+OPTIONS: ':t ^:{}
+#+TITLE: My GNU Emacs Configuration
+#+AUTHOR: Swarnendu Biswas
+#+EMAIL: swarnendu_cse@yahoo
+#+DATE: 21 Feb 2025
+#+STARTUP: showeverything nofold noindent nonum align inlineimages showstars oddeven nohideblocks latexpreview entitiesplain
+#+OPTIONS: author:t date:t ^:{} ':t
 
-* GNU Emacs
+* My GNU Emacs Configuration
 
-This repository lists my configuration for GNU Emacs, my primary editor. The install instructions and customizations should work on a GNU/Linux platform and are not extensively tested on Windows. Suggestions and pull requests are welcome.
+This repository lists my configuration for GNU Emacs, my primary editor. The installation instructions and customizations should work on a GNU/Linux platform and are not extensively tested on Windows. Suggestions and pull requests are welcome.
 
 ** Install GNU Emacs
 
-The Emacs version on Ubuntu is outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but they do not include build flags that I need. So, I prefer to build from source [[[*Build GNU Emacs]]].
+The Emacs version on Ubuntu is mostly outdated. There are a couple of PPAs [[[https://launchpad.net/~kelleyk/+archive/ubuntu/emacs][Emacs stable releases]], [[https://launchpad.net/~ubuntu-elisp/+archive/ubuntu/ppa][Ubuntu Emacs Lisp]]] that we can use, but they may not include build flags I prefer. So, I suggest building Emacs from source [[[*Build GNU Emacs]]].
 
 ** Build GNU Emacs
 
@@ -18,28 +23,26 @@ sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 sudo apt install -y gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 libjansson-dev
 #+end_src
 
-Use the following instructions to configure and build GNU Emacs from the source (Ubuntu 20.04 or 22.04).
+Use the following instructions to configure and build GNU Emacs from source. 
 
 #+begin_src shell
-wget https://ftp.gnu.org/gnu/emacs/emacs-29.1.tar.xz
-tar -xf emacs-29.1.tar.xz
+wget https://ftp.gnu.org/gnu/emacs/emacs-29.4.tar.xz
+tar -xf emacs-29.4.tar.xz
 
-# Use GCC 10 if you are on Ubuntu 20.04
-export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
+# Use GCC 10 or newer if you are on Ubuntu 20.04
+# export CC=/usr/bin/gcc-11 CXX=/usr/bin/g++-11
+
 make distclean
 ./autogen.sh
-./configure --with-cairo --with-modules --without-compress-install --with-x-toolkit=no --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --with-mailutils --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff --with-wide-int --with-xft --with-xml2 --with-xpm --with-gif --with-threads --with-included-regex --with-zlib --without-sound --with-dbus --without-pop --with-dbus --with-tree-sitter=ifavailable CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer -funroll-loops -floop-parallelize-all" prefix=/usr/local
+./configure --with-cairo --with-modules --without-compress-install --without-x-toolkit --with-gnutls=ifavailable --without-gconf --without-xwidgets --without-toolkit-scroll-bars --without-xaw3d --without-gsettings --without-mailutils --without-pop --without-kerberos --with-native-compilation=aot --with-json=ifavailable --with-harfbuzz --with-imagemagick --with-jpeg --with-png --with-rsvg --with-tiff=ifavailable --with-wide-int --with-xft --with-xml2 --with-xpm=ifavailable --with-gif=ifavailable --with-threads --with-included-regex --with-zlib --without-sound --with-dbus --with-tree-sitter=ifavailable CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer -funroll-loops -floop-parallelize-all" prefix=$HOME/.local
 
-# Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files included in the Emacs
-# distribution instead of after startup
+# Use NATIVE_FULL_AOT=1 to native compile ahead-of-time all the elisp files
+# included in the Emacs distribution instead of after startup
 make -j"$(nproc)" NATIVE_FULL_AOT=1
-sudo make install
+make install
 #+end_src
 
 Try the [[https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg01404.html][following]] if the build fails: ~make bootstrap~ or ~rm lisp/loaddefs.el; make;~.
-
-You can check whether "NATIVE__COMP" is part of the ~system-configuration-features~ variable. Run the following to native compile all Elisp files under a directory (e.g., =~/.emacs.d=):
-~(native-compile-async "//home/swarnendu//.emacs.d/elpa" 'recursively)~
 
 ** Setup Emacs 
 
@@ -51,37 +54,24 @@ git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 
 ** Directory structure
 
-- =modules= - Emacs modules divided across features
 - =extras= - third-party packages (may not be available from the package archives)
 - =snippets= - custom snippets
 - =references= - documentation and help files
 - =dir-locals-examples= - examples to show how to use directory-local variables
 - =projectile-examples= - projectile configuration files
 
-The following are examples of a few customization options defined in [[./modules/init-config.el][init-config.el]]. Please check the file for more customization options.
+The following are examples of a few customization options defined in [[./init.el][init.el]]. Please check the file for more customization options.
 
 - =sb/theme= -- Set the desired theme from a bunch of themes (default is =modus-vivendi=)
 - =sb/modeline-theme= -- Set the desired modeline theme (default is =powerline-nano=)
-- =sb/fill-column= -- Column beyond which lines should not extend (default is 100)
-- =sb/minibuffer-completion= - Choose either =ivy= or =vertico= for narrowing and selection (default is =vertico=)
-- =sb/capf= - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
-- =sb/tab-bar-handler= - Choose either =awesome-tab= or =centaur-tabs= for tabbed display (default is =centaur-tabs=)
-- =sb/project-handler= - Choose either =project.el= or =projectile= for handling projects (default is =projectile=)
-- =sb/lsp-provider= - Choose between =lsp-mode= and =eglot= (default is =lsp-mode=) 
-- =sb/disable-package.el= - Disable =package.el= and prefer the =straight.el= package manager.
-- =sb/python-langserver= - Choose between =pylsp= and =pyright= as the Python language server (default is =pylsp=).
-- =sb/delete-trailing-whitespace-p= - Control whether trailing whitespace should be deleted
+- =sb/in-buffer-completion= - Choose either =company= or =corfu= for in-buffer completion at point (default is =company=)
+- =sb/fill-column= -- Column beyond which lines should not extend (default is 80)
   
 ** Support for Tags
 
 Support for LSP in GNU Emacs means you will usually not need to create tags separately. However, tags are still useful for languages that are not yet supported by =lsp-mode= and to understand complicated project structures that a language server may not understand. I prefer [[https://github.com/universal-ctags/ctags][Universal Ctags]] over [[https://www.gnu.org/software/global/][GNU Global]].
 
 GNU Global has better database search support while Universal Ctags supports more languages. GNU Global can be built with support for Universal Ctags.
-
-- [[https://github.com/rdbeni0/emacs.d/tree/main/ggtags]]
-- [[https://stackoverflow.com/questions/55073452/compiling-gnu-global-with-universal-ctags-support][Compiling GNU Global with universal-ctags support]]
-- [[https://stackoverflow.com/questions/12922526/tags-for-emacs-relationship-between-etags-ebrowse-cscope-gnu-global-and-exub][Tags for Emacs: Relationship between etags, ebrowse, cscope, GNU Global and exuberant ctags]]
-- [[https://blade6570.github.io/soumyatripathy/blog_gnuglobal/gnu_global.html][GTags for Python in Emacs]]
 
 *** Universal Ctags
 
@@ -242,12 +232,8 @@ There are a few choices to evaluate the performance of the configuration.
 - Use the package =benchmark-init=
 - Use the script =profile-dotemacs.el= as follows: ~emacs -Q -l $HOME/.emacs.d/extras/profile-dotemacs.el -f profile-dotemacs~
 
-- [[https://blog.d46.us/advanced-emacs-startup][Advanced Techniques for Reducing Emacs Startup Time]]
-
 ** Known Bugs
 
 - Flickering with =corfu-terminal-mode=
-- Disable pairing = before at the beginning of a word in =smartparens=
 - Enable =flycheck-mode= for Elisp configuration files
-- Load custom snippets with ~yasnippet~
 - Disable prettifying of symbols on auto-completion in ~LaTeX-mode~
