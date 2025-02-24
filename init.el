@@ -68,22 +68,8 @@
   :type 'number
   :group 'sb/emacs)
 
-;; Helper const variables
-
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
-
-(defconst sb/EMACS28+ (> emacs-major-version 27)
-  "Non-nil if Emacs version is 28 and above.")
-
-(defconst sb/EMACS29+ (> emacs-major-version 28)
-  "Non-nil if Emacs version is 29 and above.")
-
-(defconst sb/IS-LINUX (eq system-type 'gnu/linux)
-  "Non-nil if the OS is GNU/Linux.")
-
-(defconst sb/IS-WINDOWS (eq system-type 'windows-nt)
-  "Non-nil if the OS is Windows.")
 
 ;; "straight.el" makes it easy to install packages from arbitrary sources like
 ;; GitHub.
@@ -159,7 +145,7 @@
   (custom-file (no-littering-expand-var-file-name "custom.el")))
 
 (use-package exec-path-from-shell
-  :when (symbol-value 'sb/IS-LINUX)
+  :when (eq system-type 'gnu/linux)
   :init
   (setq
    exec-path-from-shell-check-startup-files nil
@@ -268,7 +254,7 @@
              "indent.log"))
     (add-to-list 'completion-ignored-extensions exts))
 
-  (when sb/EMACS28+
+  (when (> emacs-major-version 27)
     (setq
      next-error-message-highlight t
      read-minibuffer-restore-windows t
@@ -276,7 +262,7 @@
      read-extended-command-predicate #'command-completion-default-include-p
      use-short-answers t))
 
-  (when sb/EMACS29+
+  (when (> emacs-major-version 28)
     (setq
      help-window-keep-selected t
      find-sibling-rules
@@ -285,7 +271,7 @@
        ("\\([^/]+\\)\\.h\\'" "\\1.c")
        ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
 
-  (when sb/IS-WINDOWS
+  (when (eq system-type 'windows-nt)
     (setq w32-get-true-file-attributes nil))
 
   (tooltip-mode -1)
@@ -404,7 +390,7 @@
 ;; "C-c C-c".
 (use-package so-long
   :straight (:type built-in)
-  :when sb/EMACS28+
+  :when (> emacs-major-version 27)
   :hook (emacs-startup . global-so-long-mode))
 
 (use-package imenu
@@ -453,7 +439,7 @@
   (recentf-max-saved-items 250)
   :config
   ;; Abbreviate the home directory to make it easy to read the actual file name.
-  (unless sb/EMACS28+
+  (unless (> emacs-major-version 27)
     (setq recentf-filename-handlers '(abbreviate-file-name)))
 
   (dolist (exclude
@@ -528,7 +514,11 @@
 (use-package goto-addr
   :straight (:type built-in)
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
-  :bind ("C-c RET" . goto-address-at-point))
+  :bind
+  (("C-c C-o" . goto-address-at-point)
+   :map
+   goto-address-highlight-keymap
+   ("M-RET" . goto-address-at-point)))
 
 (use-package winner
   :hook (emacs-startup . winner-mode)
@@ -757,7 +747,7 @@
   (dired-clean-confirm-killing-deleted-buffers nil)
   :config
   ;; Obsolete from Emacs 28+
-  (unless sb/EMACS28+
+  (unless (> emacs-major-version 27)
     (setq dired-bind-jump t))
 
   (setq dired-omit-files
@@ -916,8 +906,36 @@
   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
   ;; Having multiple other sources like `recentf' makes it difficult to identify
   ;; and switch quickly between only buffers, especially while wrapping around.
-  (consult-buffer-sources '(consult--source-buffer))
+  ;; (consult-buffer-sources '(consult--source-buffer))
   (consult-narrow-key "<")
+  (consult-widen-key ">")
+  (consult-buffer-filter
+   '("^ "
+     "\\` "
+     "\\*Echo Area"
+     "\\*Minibuf"
+     "\\*Backtrace"
+     "Flymake log"
+     "Shell command output"
+     "direnv"
+     "\\*Messages"
+     "\\*Warning"
+     "*magit-"
+     "magit-process"
+     "^:"
+     ".+-shell*"
+     "*straight-"
+     "\\*Compile-Log"
+     "*format-all-error"
+     "*Async-"
+     "COMMIT_EDITMSG"
+     "TAGS"
+     "*lsp-"
+     "*EGLOT"
+     "*pylsp"
+     "*vc"
+     "*citre-ctags*"
+     "*ltex-ls"))
   :config
   (consult-customize
    consult-line
@@ -943,8 +961,12 @@
    ;; Initialize search string with the highlighted region
    :initial
    (when (use-region-p)
-     (buffer-substring-no-properties (region-beginning) (region-end)))))
+     (buffer-substring-no-properties (region-beginning) (region-end))))
 
+  (with-eval-after-load "tex-mode"
+    (bind-key "C-c C-j" #'consult-outline tex-mode-map)))
+
+;; Easily add file and directory paths into the minibuffer.
 (use-package consult-dir
   :bind
   (("C-x C-d" . consult-dir)
@@ -1068,9 +1090,10 @@
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
-;; triggers correction for the entire buffer.
+;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
+;; the word at point, even if it is not misspelled.
 (use-package jinx
-  :when (symbol-value 'sb/IS-LINUX)
+  :when (and (eq system-type 'gnu/linux) (executable-find "enchant-2"))
   :hook ((text-mode conf-mode prog-mode) . jinx-mode)
   :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
   :custom (jinx-languages "en_US")
@@ -1127,7 +1150,10 @@
    ;; These are for horizontal movements.
    ("C-f" . vundo-forward) ("C-b" . vundo-backward)
    ;; These are for vertical movements.
-   ("C-n" . vundo-next) ("C-p" . vundo-previous)))
+   ("C-n" . vundo-next) ("C-p" . vundo-previous))
+  ::custom
+  ;; Use pretty Unicode glyphs to draw the tree
+  (vundo-glyph-alist vundo-unicode-symbols))
 
 (use-package iedit
   :bind* ("C-." . iedit-mode))
@@ -1173,10 +1199,8 @@
   :custom (bm-buffer-persistence t "Save bookmarks"))
 
 (use-package crux
-  :bind
-  (("<f12>" . crux-kill-other-buffers)
-   ("C-c d s" . crux-sudo-edit)
-   ("C-<f9>" . crux-recentf-find-directory))
+  :commands crux-kill-other-buffers
+  :bind (("C-c d s" . crux-sudo-edit) ("C-<f9>" . crux-recentf-find-directory))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 (use-package rainbow-mode
@@ -1192,10 +1216,6 @@
     helpful-mode)
    . rainbow-mode)
   :diminish)
-
-(use-package xclip
-  :when (or (executable-find "xclip") (executable-find "xsel"))
-  :hook (emacs-startup . xclip-mode))
 
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
@@ -1293,7 +1313,6 @@
 (use-package with-editor :diminish)
 
 (use-package magit
-  :after transient
   :hook
   ;; Use "M-p/n" to cycle between older commit messages.
   (git-commit-setup
@@ -1348,40 +1367,38 @@
    ("M-g l" . smerge-keep-lower)
    ("M-g a" . smerge-keep-all)))
 
-;; I find automated pairing of parentheses obstructing.
+(use-package elec-pair
+  :straight (:type built-in)
+  :hook (emacs-startup . electric-pair-mode)
+  :custom
+  ;; Avoid balancing parentheses since they can be both irritating and slow
+  (electric-pair-preserve-balance nil)
+  (electric-pair-skip-self nil)
+  :config
+  (setq electric-pair-inhibit-predicate
+        (lambda (c)
+          (if (char-equal c ?\")
+              t
+            (electric-pair-default-inhibit c))))
 
-;; (use-package elec-pair
-;;   :straight (:type built-in)
-;;   :hook (emacs-startup . electric-pair-mode)
-;;   :custom
-;;   ;; Avoid balancing parentheses since they can be both irritating and slow
-;;   (electric-pair-preserve-balance nil)
-;;   (electric-pair-skip-self nil)
-;;   :config
-;;   (setq electric-pair-inhibit-predicate
-;;         (lambda (c)
-;;           (if (char-equal c ?\")
-;;               t
-;;             (electric-pair-default-inhibit c))))
+  (defvar sb/markdown-pairs '((?` . ?`)))
 
-;;   (defvar sb/markdown-pairs '((?` . ?`)))
+  (defun sb/add-markdown-pairs ()
+    (setq-local electric-pair-pairs
+                (append electric-pair-pairs sb/markdown-pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-;;   (defun sb/add-markdown-pairs ()
-;;     (setq-local electric-pair-pairs
-;;                 (append electric-pair-pairs sb/markdown-pairs))
-;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
+  (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
 
-;;   (add-hook 'markdown-mode-hook #'sb/add-markdown-pairs)
+  ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
 
-;;   ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
+  ;; (defun sb/add-latex-pairs ()
+  ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
+  ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-;;   ;; (defun sb/add-latex-pairs ()
-;;   ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
-;;   ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
-
-;;   ;; (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-;;   ;;   (add-hook mode #'sb/add-latex-pairs))
-;;   )
+  ;; (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+  ;;   (add-hook mode #'sb/add-latex-pairs))
+  )
 
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
@@ -1476,13 +1493,20 @@
                   ("YAML" prettier "--print-width" "80")))
   (with-eval-after-load "markdown-mode"
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
+  (with-eval-after-load "tex-mode"
+    (bind-key "C-x f" #'format-all-buffer tex-mode-map))
   :diminish)
 
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
-  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :hook
+  ((python-mode python-ts-mode yaml-mode yaml-ts-mode tex-mode LaTeX-mode)
+   .
+   indent-bars-mode)
   :config
-  (when (executable-find "tree-sitter")
+  (when (and (executable-find "tree-sitter")
+             (fboundp 'treesit-available-p)
+             (treesit-available-p))
     (setq
      indent-bars-treesit-support t
      indent-bars-treesit-ignore-blank-lines-types '("module")
@@ -1534,7 +1558,7 @@
   :config
   ;; Show docstring description for completion candidates in commands like
   ;; `describe-function'.
-  (when sb/EMACS28+
+  (when (> emacs-major-version 27)
     (setq completions-detailed t))
 
   (when (fboundp 'dabbrev-capf)
@@ -1557,7 +1581,7 @@
   :custom
   (dabbrev-ignored-buffer-regexps
    '("^ "
-     "\\.\\(?:jpe?g\\|png\\)\\'"
+     "\\.\\(?:jpe?g\\|png\\|pdf\\)\\'"
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
   :config
@@ -1980,13 +2004,17 @@
             '(substring)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-corfu)))
 
-;; (use-package corfu-terminal
-;;   :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
-;;   :when (and (eq sb/in-buffer-completion 'corfu) (not (display-graphic-p)))
-;;   :hook (corfu-mode . corfu-terminal-mode)
-;;   :custom
-;;   ;; Prevent wraparound at the right edge
-;;   (corfu-terminal-position-right-margin 2))
+;; Emacs 31+ has in-built support for child frames in the terminal
+(use-package corfu-terminal
+  :straight (:host codeberg :repo "akib/emacs-corfu-terminal")
+  :when
+  (and (eq sb/in-buffer-completion 'corfu)
+       (not (display-graphic-p))
+       (< emacs-major-version 31))
+  :hook (corfu-mode . corfu-terminal-mode)
+  :custom
+  ;; Prevent wraparound at the right edge
+  (corfu-terminal-position-right-margin 2))
 
 (use-package yasnippet-capf
   :straight (:host github :repo "elken/yasnippet-capf")
@@ -1997,7 +2025,7 @@
   :after corfu
   :demand t
   :custom
-  (cape-dabbrev-min-length 4)
+  (cape-dabbrev-min-length 3)
   (cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
@@ -2332,7 +2360,7 @@
   ;; (lsp-ltex-plus-dictionary
   ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
   (lsp-ltex-plus-log-level "warning")
-  (lsp-ltex-disabled-rules
+  (lsp-ltex-plus-disabled-rules
    '(:en
      ["EN_QUOTES"
       "OXFORD_SPELLING_Z_NOT_S"
@@ -2435,7 +2463,10 @@
   :diminish)
 
 (use-package treesit-auto
-  :when (executable-find "tree-sitter")
+  :when
+  (and (executable-find "tree-sitter")
+       (fboundp 'treesit-available-p)
+       (treesit-available-p))
   :demand t
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom (treesit-auto-install 'prompt)
@@ -2505,6 +2536,10 @@
 
 (use-package c-ts-mode
   :straight (:type built-in)
+  :when
+  (and (executable-find "treesitter")
+       (fboundp 'treesit-available-p)
+       (treesit-available-p))
   :mode (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
   :hook
   ((c-ts-mode c++-ts-mode)
@@ -2804,6 +2839,7 @@
   ;; line the broken link actually is.
   (org-export-with-broken-links 'mark)
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
+  (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
   :config
   (require 'ox-latex)
@@ -2813,9 +2849,7 @@
 
   (setq
    org-latex-pdf-process
-   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+   '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
 
   :bind-keymap ("C-c o" . org-mode-map)
   :bind
@@ -2833,7 +2867,8 @@
    ("<backtab>" . org-outdent-item)
    ("M-{" . org-backward-element)
    ("M-}" . org-forward-element)
-   ("C-c C-," . org-insert-structure-template)))
+   ("C-c C-," . org-insert-structure-template)
+   ("C-c C-j" . consult-outline)))
 
 (use-package org-appear
   :hook (org-mode . org-appear-mode)
@@ -2866,9 +2901,7 @@
   :custom (org-block-capf-edit-style 'inline))
 
 (with-eval-after-load "tex-mode"
-  (setq tex-command "pdflatex")
-  (bind-key "C-c C-j" #'consult-outline tex-mode-map)
-  (bind-key "C-x f" #'format-all-buffer tex-mode-map))
+  (setq tex-command "pdflatex"))
 
 (use-package bibtex
   :straight (:type built-in)
@@ -3154,28 +3187,28 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
   (doom-modeline-enable-word-count t))
 
-(use-package centaur-tabs
-  :disabled
-  :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
-  :bind*
-  (("M-<right>" . centaur-tabs-forward-tab)
-   ("C-<tab>" . centaur-tabs-forward-tab)
-   ("M-<left>" . centaur-tabs-backward-tab)
-   ("C-S-<iso-lefttab>" . centaur-tabs-backward-tab)
-   ("M-'" . centaur-tabs-ace-jump))
-  :custom
-  (centaur-tabs-set-modified-marker t)
-  (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-  (centaur-tabs-set-close-button nil "I do not use the mouse")
-  (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
-  (centaur-tabs-set-bar 'under)
-  :config
-  (when (display-graphic-p)
-    (setq
-     centaur-tabs-set-icons t
-     centaur-tabs-icon-type 'nerd-icons))
-  ;; Make the headline face match `centaur-tabs-default' face
-  (centaur-tabs-headline-match))
+;; (use-package centaur-tabs
+;;   :disabled
+;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
+;;   :bind*
+;;   (("M-<right>" . centaur-tabs-forward-tab)
+;;    ("C-<tab>" . centaur-tabs-forward-tab)
+;;    ("M-<left>" . centaur-tabs-backward-tab)
+;;    ("C-S-<iso-lefttab>" . centaur-tabs-backward-tab)
+;;    ("M-'" . centaur-tabs-ace-jump))
+;;   :custom
+;;   (centaur-tabs-set-modified-marker t)
+;;   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
+;;   (centaur-tabs-set-close-button nil "I do not use the mouse")
+;;   (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
+;;   (centaur-tabs-set-bar 'under)
+;;   :config
+;;   (when (display-graphic-p)
+;;     (setq
+;;      centaur-tabs-set-icons t
+;;      centaur-tabs-icon-type 'nerd-icons))
+;;   ;; Make the headline face match `centaur-tabs-default' face
+;;   (centaur-tabs-headline-match))
 
 ;; Center the text environment
 (use-package olivetti
@@ -3232,6 +3265,10 @@ PAD can be left (`l') or right (`r')."
 (use-package hl-line
   :hook (dired-mode . hl-line-mode))
 
+(use-package xclip
+  :when (or (executable-find "xclip") (executable-find "xsel"))
+  :hook (emacs-startup . xclip-mode))
+
 ;; Send every kill from a TTY frame to the system clipboard
 (use-package clipetty
   :hook (emacs-startup . global-clipetty-mode)
@@ -3239,13 +3276,13 @@ PAD can be left (`l') or right (`r')."
 
 ;; Provides pixel-precise smooth scrolling which can keep up with the very high
 ;; event rates of modern trackpads and high-precision wheel mice.
-(use-package ultra-scroll
-  :straight (:host github :repo "jdtsmith/ultra-scroll")
-  :disabled
-  :custom
-  (scroll-conservatively 101)
-  (scroll-margin 0)
-  :hook (find-file . ultra-scroll-mode))
+;; (use-package ultra-scroll
+;;   :straight (:host github :repo "jdtsmith/ultra-scroll")
+;;   :disabled
+;;   :custom
+;;   (scroll-conservatively 101)
+;;   (scroll-margin 0)
+;;   :hook (find-file . ultra-scroll-mode))
 
 ;; Fold text using indentation levels
 (use-package outline-indent
@@ -3314,6 +3351,92 @@ If region is active, apply to active region instead."
     (forward-line 1)
     (back-to-indentation)))
 
+(defcustom sb/skippable-buffers
+  '("TAGS"
+    "*Messages*"
+    "*Backtrace*"
+    "*scratch*"
+    "*company-documentation*"
+    "*Help*"
+    "*Packages*"
+    "*prettier (local)*"
+    "*emacs*"
+    "*Warnings*"
+    "*Compile-Log* *lsp-log*"
+    "*pyright*"
+    "*texlab::stderr*"
+    "*texlab*"
+    "*Paradox Report*"
+    "*perl-language-server*"
+    "*perl-language-server::stderr*"
+    "*json-ls*"
+    "*json-ls::stderr*"
+    "*xmlls*"
+    "*xmlls::stderr*"
+    "*pyright::stderr*"
+    "*yamlls*"
+    "*yamlls::stderr*"
+    "*jdtls*"
+    "*jdtls::stderr*"
+    "*clangd::stderr*"
+    "*shfmt errors*")
+  "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
+  :type '(repeat string)
+  :group 'sb/emacs)
+
+(defun sb/get-buffer-major-mode (buffer-or-string)
+  "Return the major mode associated with BUFFER-OR-STRING."
+  (with-current-buffer buffer-or-string
+    major-mode))
+
+(defcustom sb/skippable-modes
+  '(dired-mode
+    fundamental-mode
+    helpful-mode
+    special-mode
+    paradox-menu-mode
+    lsp-log-io-mode
+    help-mode
+    magit-status-mode
+    magit-process-mode
+    magit-diff-mode
+    tags-table-mode
+    compilation-mode
+    flycheck-verify-mode
+    ibuffer-mode
+    bs-mode
+    ediff-meta-mode)
+  "List of major modes to skip over when calling `change-buffer'."
+  :type '(repeat string)
+  :group 'sb/emacs)
+
+(defun sb/change-buffer (change-buffer)
+  "Call CHANGE-BUFFER.
+Keep trying until current buffer is not in `sb/skippable-buffers'
+or the major mode is not in `sb/skippable-modes'."
+  (let ((initial (current-buffer)))
+    (funcall change-buffer)
+    (let ((first-change (current-buffer)))
+      (catch 'loop
+        (while (or (member (buffer-name) sb/skippable-buffers)
+                   (member
+                    (sb/get-buffer-major-mode (buffer-name))
+                    sb/skippable-modes))
+          (funcall change-buffer)
+          (when (eq (current-buffer) first-change)
+            (switch-to-buffer initial)
+            (throw 'loop t)))))))
+
+(defun sb/next-buffer ()
+  "Variant of `next-buffer' that skips `sb/skippable-buffers'."
+  (interactive)
+  (sb/change-buffer 'next-buffer))
+
+(defun sb/previous-buffer ()
+  "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
+  (interactive)
+  (sb/change-buffer 'previous-buffer))
+
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
@@ -3361,6 +3484,15 @@ If region is active, apply to active region instead."
 (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
 
 (bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
+
+(global-set-key [remap next-buffer] #'sb/next-buffer)
+(global-set-key [remap previous-buffer] #'sb/previous-buffer)
+
+(bind-keys
+ ("M-<left>" . sb/previous-buffer)
+ ("C-S-<iso-lefttab>" . sb/previous-buffer)
+ ("M-<right>" . sb/next-buffer)
+ ("C-<tab>" . sb/next-buffer))
 
 (use-package default-text-scale
   :when (display-graphic-p)

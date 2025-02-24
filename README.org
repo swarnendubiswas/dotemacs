@@ -52,6 +52,20 @@ Back up the contents of your =.emacs.d= directory if it is not empty, and then c
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 #+end_src
 
+We use [[https://github.com/radian-software/straight.el][straight.el]] as the package manager, and the setup should work on most Linux systems. Try the following resolution in case there is an error trying to connect to "raw.githubusercontent.com:443".
+
+#+begin_src shell
+git clone -b develop https://github.com/raxod502/straight.el ~/.emacs.d/straight/repos/straight.el
+#+end_src
+
+Comment the bootstrap code in ~init.el~ and add the following snippet.
+#+begin_src elisp
+(load "~/.emacs.d/straight/repos/straight.el/bootstrap.el" 'nomessage)
+(load "~/.emacs.d/straight/repos/straight.el/straight.el" 'nomessage)
+#+end_src
+
+Comment the recipe for =nongnu-elpa= in ~bootstrap.el~ if there is an error while cloning.
+
 ** Directory structure
 
 - =extras= - third-party packages (may not be available from the package archives)
