@@ -21,7 +21,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'catppuccin
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -31,7 +31,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -59,13 +59,6 @@
     (const :tag "corfu" corfu)
     (const :tag "company" company)
     (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; Large values make reading difficult when the window is split side-by-side,
-;; 100 is also a stretch for smaller screens.
-(defcustom sb/fill-column 80
-  "Column beyond which lines should not extend."
-  :type 'number
   :group 'sb/emacs)
 
 (defconst sb/user-home-directory (getenv "HOME")
@@ -116,7 +109,9 @@
      use-package-always-demand t)
   (setq
    use-package-always-defer t
-   use-package-expand-minimally t))
+   use-package-expand-minimally t
+   use-package-minimum-reported-time 0 ; Show everything
+   use-package-compute-statistics t))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
@@ -307,7 +302,6 @@
   ;; `setq-default' changes the buffer-local variable's default value.
   (setq-default
    cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
-   fill-column sb/fill-column
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
    ;; TAB first tries to indent the current line, and if the line was already
@@ -569,7 +563,7 @@
 
 (use-package whitespace
   :straight (:type built-in)
-  :custom (whitespace-line-column sb/fill-column)
+  :custom (whitespace-line-column fill-column)
   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
@@ -600,7 +594,6 @@
      "magit:.*"
      "*Org Help\\*"
      "*lsp-log*"
-     "*ltex-ls.*"
      "*bash-ls.*"
      "*marksman.*"
      "*yaml-ls.*"
@@ -1151,7 +1144,7 @@
    ("C-f" . vundo-forward) ("C-b" . vundo-backward)
    ;; These are for vertical movements.
    ("C-n" . vundo-next) ("C-p" . vundo-previous))
-  ::custom
+  :custom
   ;; Use pretty Unicode glyphs to draw the tree
   (vundo-glyph-alist vundo-unicode-symbols))
 
@@ -2040,21 +2033,18 @@
   ;; order of the functions matters, unless they are merged, the first function
   ;; returning a result wins. Note that the list of buffer-local completion
   ;; functions takes precedence over the global list.
-  (add-hook
-   'completion-at-point-functions
-   (cape-capf-super #'cape-keyword #'cape-file #'cape-dict #'cape-dabbrev))
+  (add-hook 'completion-at-point-functions #'cape-dict)
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
 
   ;; Override CAPFS for specific major modes
 
   (defun elisp-capf ()
-    (cape-wrap-super
-     #'elisp-completion-at-point
-     #'citre-completion-at-point
-     #'cape-elisp-symbol
-     #'cape-file
-     #'cape-dict
-     #'cape-dabbrev
-     #'yasnippet-capf))
+    ((cape-wrap-super
+      #'elisp-completion-at-point
+      #'citre-completion-at-point
+      #'cape-elisp-symbol)
+     #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2064,12 +2054,10 @@
                    (list (cape-capf-buster #'elisp-capf))))))
 
   (defun generic-prog-no-tags-capf ()
-    (cape-wrap-super
-     #'cape-keyword
-     #'cape-symbol
+    ((cape-wrap-super #'cape-keyword #'cape-symbol)
      #'cape-file
-     #'cape-dict
      #'cape-dabbrev
+     #'cape-dict
      #'yasnippet-capf))
 
   (dolist (mode '(flex-mode-hook bison-mode-hook))
@@ -2084,7 +2072,7 @@
   ;; and cape-dabbrev are not exactly equal (equal string and equal text
   ;; properties).
   (defun text-capf ()
-    (cape-wrap-super #'cape-file #'cape-dict #'cape-dabbrev #'yasnippet-capf))
+    (#'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))
 
   (add-hook
    'text-mode-hook
@@ -2093,12 +2081,8 @@
                  (list (cape-capf-buster #'text-capf)))))
 
   (defun org-capf ()
-    (cape-wrap-super
-     #'cape-elisp-block
-     #'cape-dict
-     #'cape-file
-     #'cape-dabbrev
-     #'yasnippet-capf))
+    (#'cape-elisp-block
+     #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))
 
   (add-hook
    'org-mode-hook
@@ -2108,7 +2092,7 @@
 
   (with-eval-after-load "lsp-mode"
     (defun latex-capf ()
-      (cape-wrap-super
+      (
        ;; #'lsp-completion-at-point
        ;; (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
        ;; Math Unicode symbols and sub(super)scripts
@@ -2133,9 +2117,10 @@
     (defun mode-with-lsp-capf ()
       ;; #'citre-completion-at-point
       #'cape-keyword
-      #'yasnippet-capf
       #'cape-file
-      (cape-wrap-super #'cape-dict #'cape-dabbrev))
+      #'cape-dabbrev
+      #'cape-dict
+      #'yasnippet-capf)
 
     (dolist (mode
              '(c-mode-hook
@@ -2189,6 +2174,7 @@
    ("b" . lsp-workspace-blacklist-remove))
   :custom
   (lsp-keymap-prefix "C-c l")
+  (lsp-clangd-version "19.1.2")
   (lsp-clients-clangd-args
    '("-j=4"
      "--all-scopes-completion"
@@ -2218,7 +2204,7 @@
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
-  (lsp-html-format-wrap-line-length sb/fill-column)
+  (lsp-html-format-wrap-line-length fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
@@ -2387,7 +2373,7 @@
   :custom
   (lsp-latex-bibtex-formatter "latexindent")
   (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length sb/fill-column)
+  (lsp-latex-bibtex-formatter-line-length fill-column)
   (lsp-latex-diagnostics-delay 2000)
 
   ;; Support forward search with Okular. Perform inverse search with Shift+Click
@@ -2581,7 +2567,7 @@
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls-plus))
      (lsp-deferred))))
 
 (use-package python
@@ -2697,7 +2683,7 @@
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls-plus))
      (lsp-deferred))))
 
 (use-package yaml-imenu
@@ -2781,7 +2767,7 @@
      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls))
+     (setq-local lsp-disabled-clients '(ltex-ls-plus))
      (lsp-deferred)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
@@ -3276,13 +3262,12 @@ PAD can be left (`l') or right (`r')."
 
 ;; Provides pixel-precise smooth scrolling which can keep up with the very high
 ;; event rates of modern trackpads and high-precision wheel mice.
-;; (use-package ultra-scroll
-;;   :straight (:host github :repo "jdtsmith/ultra-scroll")
-;;   :disabled
-;;   :custom
-;;   (scroll-conservatively 101)
-;;   (scroll-margin 0)
-;;   :hook (find-file . ultra-scroll-mode))
+(use-package ultra-scroll
+  :straight (:host github :repo "jdtsmith/ultra-scroll")
+  :custom
+  (scroll-conservatively 101)
+  (scroll-margin 0)
+  :hook (find-file . ultra-scroll-mode))
 
 ;; Fold text using indentation levels
 (use-package outline-indent

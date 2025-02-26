@@ -56,17 +56,19 @@
  inhibit-startup-echo-area-message t
  ;; *scratch* is in `lisp-interaction-mode' by default.
  initial-major-mode 'text-mode
- initial-scratch-message nil)
+ initial-scratch-message nil
+ inhibit-x-resources t)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode -1))
+
+;; This is faster than running "(tool-bar-mode -1)"
+(push '(tool-bar-lines . 0) default-frame-alist)
 ;; The menu bar can be useful to identify different capabilities available and
 ;; their shortcuts.
 (push '(menu-bar-lines . 0) default-frame-alist)
-;; This is faster than running "(tool-bar-mode -1)"
-(push '(tool-bar-lines . 0) default-frame-alist)
+;; (when (fboundp 'scroll-bar-mode)
+;;   (scroll-bar-mode -1))
 (push '(vertical-scroll-bars) default-frame-alist)
 
 ;; Set a hint of transparency, works with GUI frames
@@ -94,6 +96,7 @@
 
 (when (featurep 'native-compile)
   (setq
+   native-comp-always-compile t
    ;; Silence compiler warnings as they can be pretty disruptive
    native-comp-async-report-warnings-errors nil
    ;; Enable ahead-of-time compilation when installing a package
