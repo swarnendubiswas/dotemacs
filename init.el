@@ -61,6 +61,12 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
+(defcustom sb/enable-icons nil
+  "Should icons be enabled?
+The provider is nerd-icons."
+  :type 'boolean
+  :group 'sb/emacs)
+
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -116,16 +122,6 @@
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
 
-;; (use-package compile-angel
-;;   :demand t
-;;   :custom (compile-angel-verbose nil)
-;;   :config
-;;   (compile-angel-on-load-mode)
-;;   (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-mode)
-;;   (with-eval-after-load "diminish"
-;;     (diminish 'compile-angel-on-load-mode "")
-;;     (diminish 'compile-angel-on-save-mode "")))
-
 (use-package bind-key
   :bind ("C-c d k" . describe-personal-keybindings))
 
@@ -155,7 +151,6 @@
      "PYTHONPATH"
      "LANG"
      "LC_ALL"
-     "XAUTHORITY"
      "LSP_USE_PLISTS")
    exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
@@ -301,6 +296,7 @@
   ;; Changing buffer-local variables will only affect a single buffer.
   ;; `setq-default' changes the buffer-local variable's default value.
   (setq-default
+   fill-column 80
    cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
@@ -545,8 +541,13 @@
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 ;; Connect as non-root user and then use sudo: "C-x C-f /ssh:192.168.249.10|su::/some/file"
 (use-package tramp
+  :preface
+  (defun sb/cleanup-tramp (interactive)
+    (progn
+      (tramp-cleanup-all-buffers)
+      (tramp-cleanup-all-connections)))
   :straight (:type built-in)
-  :bind ("C-S-q" . tramp-cleanup-all-buffers)
+  :bind ("C-M-g" . sb/cleanup-tramp)
   :custom
   ;; Remote files are not updated outside of Tramp
   (remote-file-name-inhibit-cache nil)
@@ -644,12 +645,14 @@
       (display-buffer-no-window)
       (allow-no-window . t)))))
 
+;; Show temporary buffers as a popup window, and close them with "C-g"
 (use-package popwin
   :hook (emacs-startup . popwin-mode)
   :config
   (push '(helpful-mode :noselect t :position bottom :height 0.5)
         popwin:special-display-config))
 
+;; Jump to visible text using a char-based decision tree
 (use-package avy
   :bind
   (("C-\\" . avy-goto-word-1)
@@ -662,16 +665,29 @@
    ;; many currently visible `isearch' candidates.
    ("C-'" . avy-isearch)))
 
+;; Quickly select a window to jump to
 (use-package ace-window
   :bind (([remap other-window] . ace-window) ("M-o" . ace-window))
   :custom (aw-minibuffer-flag t)
   :config (ace-window-display-mode 1))
 
-(use-package ace-jump-buffer
-  :bind ("C-b" . ace-jump-buffer)
-  :custom
-  (ajb-bs-configuration "files-and-scratch")
-  (ajb-sort-function 'bs--sort-by-filename))
+;; Jump around buffers in few keystrokes
+(use-package frog-jump-buffer
+  :bind ("C-b" . frog-jump-buffer)
+  :config
+  (dolist (regexp
+           '("TAGS"
+             "^\\*Compile-log"
+             "^\\:"
+             "errors\\*$"
+             "^\\*Backtrace"
+             "-ls\\*$"
+             "stderr\\*$"
+             "^\\*Flymake"
+             "^\\*vc"
+             "^\\*Warnings"
+             "^\\*eldoc"))
+    (push regexp frog-jump-buffer-ignore-buffers)))
 
 (use-package dired
   :preface
@@ -1564,7 +1580,7 @@
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
   (setq completion-category-overrides
-        '((file (styles basic substring partial-completion)))))
+        '((file (styles basic partial-completion)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the
 ;; current buffer and presents suggestions for completion.
@@ -2023,7 +2039,8 @@
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-  :config
+  :config (add-to-list 'completion-category-overrides '((cape-dict (styles (basic)))))
+
   ;; Make the capf composable
   (with-eval-after-load "lsp-mode"
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
@@ -2033,122 +2050,104 @@
   ;; order of the functions matters, unless they are merged, the first function
   ;; returning a result wins. Note that the list of buffer-local completion
   ;; functions takes precedence over the global list.
-  (add-hook 'completion-at-point-functions #'cape-dict)
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file)
+
+  (setq-local completion-at-point-functions
+              (list
+               #'cape-keyword
+               #'cape-file
+               #'cape-dict
+               #'cape-dabbrev
+               #'yasnippet-capf))
 
   ;; Override CAPFS for specific major modes
-
-  (defun elisp-capf ()
-    ((cape-wrap-super
-      #'elisp-completion-at-point
-      #'citre-completion-at-point
-      #'cape-elisp-symbol)
-     #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))
-
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
      mode
      (lambda ()
        (setq-local completion-at-point-functions
-                   (list (cape-capf-buster #'elisp-capf))))))
-
-  (defun generic-prog-no-tags-capf ()
-    ((cape-wrap-super #'cape-keyword #'cape-symbol)
-     #'cape-file
-     #'cape-dabbrev
-     #'cape-dict
-     #'yasnippet-capf))
-
-  (dolist (mode '(flex-mode-hook bison-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local completion-at-point-functions
-                   (list (cape-capf-buster #'generic-prog-no-tags-capf))))))
+                   (list
+                    (cape-capf-super
+                     #'elisp-completion-at-point #'cape-elisp-symbol)
+                    #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf)))))
 
   ;; https://github.com/minad/cape/discussions/130
   ;; There is no mechanism to force deduplication if candidates from cape-dict
   ;; and cape-dabbrev are not exactly equal (equal string and equal text
   ;; properties).
-  (defun text-capf ()
-    (#'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))
 
   (add-hook
    'text-mode-hook
    (lambda ()
      (setq-local completion-at-point-functions
-                 (list (cape-capf-buster #'text-capf)))))
-
-  (defun org-capf ()
-    (#'cape-elisp-block
-     #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))
+                 (list
+                  #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
    (lambda ()
      (setq-local completion-at-point-functions
-                 (list (cape-capf-buster #'org-capf)))))
+                 (list
+                  #'cape-elisp-block
+                  #'cape-file
+                  #'cape-dabbrev
+                  #'cape-dict
+                  #'yasnippet-capf))))
 
-  (with-eval-after-load "lsp-mode"
-    (defun latex-capf ()
-      (
-       ;; #'lsp-completion-at-point
-       ;; (cape-company-to-capf #'company-math-symbols-latex) ; Math latex tags
-       ;; Math Unicode symbols and sub(super)scripts
-       ;; (cape-company-to-capf #'company-math-symbols-unicode)
-       ;; (cape-company-to-capf #'company-latex-commands)
-       ;; Used for Unicode symbols and not for the corresponding LaTeX names.
-       #'cape-tex
-       #'citar-capf
-       #'bibtex-capf
-       #'cape-file
-       #'cape-dabbrev
-       #'cape-dict
-       #'yasnippet-capf))
+  (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local
+        completion-at-point-functions
+        (list
+         #'lsp-completion-at-point
+         ;; Math latex tags
+         ;; (cape-company-to-capf #'company-math-symbols-latex)
+         ;; Math Unicode symbols and sub(super)scripts
+         ;; (cape-company-to-capf #'company-math-symbols-unicode)
+         ;; (cape-company-to-capf #'company-latex-commands)
+         ;; Used for Unicode symbols and not for the corresponding LaTeX names.
+         #'cape-tex
+         #'citar-capf
+         #'bibtex-capf
+         #'cape-file
+         #'cape-dabbrev
+         #'cape-dict
+         #'yasnippet-capf)))))
 
-    (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
-      (add-hook
-       mode
-       (lambda ()
-         (setq-local completion-at-point-functions
-                     (list (cape-capf-buster #'latex-capf))))))
-
-    (defun mode-with-lsp-capf ()
-      ;; #'citre-completion-at-point
-      #'cape-keyword
-      #'cape-file
-      #'cape-dabbrev
-      #'cape-dict
-      #'yasnippet-capf)
-
-    (dolist (mode
-             '(c-mode-hook
-               c-ts-mode-hook
-               c++-mode-hook
-               c++-ts-mode-hook
-               cmake-mode-hook
-               cmake-ts-mode-hook
-               css-mode-hook
-               css-ts-mode-hook
-               fish-mode-hook
-               java-mode-hook
-               java-ts-mode-hook
-               makefile-mode
-               python-mode-hook
-               python-ts-mode-hook
-               sh-mode-hook
-               bash-ts-mode-hook
-               json-mode-hook
-               json-ts-mode-hook
-               jsonc-mode-hook
-               yaml-mode-hook
-               yaml-ts-mode-hook))
-      (add-hook
-       mode
-       (lambda ()
-         (setq-local completion-at-point-functions
-                     (list (cape-capf-buster #'mode-with-lsp-capf))))))))
+  (dolist (mode
+           '(c-mode-hook
+             c-ts-mode-hook
+             c++-mode-hook
+             c++-ts-mode-hook
+             cmake-mode-hook
+             cmake-ts-mode-hook
+             css-mode-hook
+             css-ts-mode-hook
+             fish-mode-hook
+             java-mode-hook
+             java-ts-mode-hook
+             makefile-mode
+             python-mode-hook
+             python-ts-mode-hook
+             sh-mode-hook
+             bash-ts-mode-hook
+             json-mode-hook
+             json-ts-mode-hook
+             jsonc-mode-hook
+             yaml-mode-hook
+             yaml-ts-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local completion-at-point-functions
+                   (list
+                    #'lsp-completion-at-point
+                    #'cape-keyword
+                    #'cape-file
+                    #'cape-dabbrev
+                    #'cape-dict
+                    #'yasnippet-capf))))))
 
 (use-package lsp-mode
   :bind
@@ -3064,27 +3063,30 @@ used in `company-backends'."
        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
 (use-package nerd-icons
-  :when (display-graphic-p)
+  :when (and (bound-and-true-p sb/enable-icons) (display-graphic-p))
   :custom (nerd-icons-scale-factor 0.9))
 
 (use-package nerd-icons-corfu
   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
-  :when (eq sb/in-buffer-completion 'corfu)
+  :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'corfu))
   :after corfu
   :demand t
   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
+  :when (bound-and-true-p sb/enable-icons)
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
 (use-package nerd-icons-dired
   :straight (:host github :repo "rainstormstudio/nerd-icons-dired")
+  :when (bound-and-true-p sb/enable-icons)
   :hook (dired-mode . nerd-icons-dired-mode)
   :diminish)
 
 (use-package nerd-icons-ibuffer
+  :when (bound-and-true-p sb/enable-icons)
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
   :custom (nerd-icons-ibuffer-icon-size 1.0))
 
@@ -3387,6 +3389,7 @@ If region is active, apply to active region instead."
     magit-diff-mode
     tags-table-mode
     compilation-mode
+    emacs-lisp-compilation-mode
     flycheck-verify-mode
     ibuffer-mode
     bs-mode
