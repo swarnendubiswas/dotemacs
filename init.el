@@ -61,7 +61,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/enable-icons nil
+(defcustom sb/enable-icons t
   "Should icons be enabled?
 The provider is nerd-icons."
   :type 'boolean
@@ -542,7 +542,8 @@ The provider is nerd-icons."
 ;; Connect as non-root user and then use sudo: "C-x C-f /ssh:192.168.249.10|su::/some/file"
 (use-package tramp
   :preface
-  (defun sb/cleanup-tramp (interactive)
+  (defun sb/cleanup-tramp ()
+    (interactive)
     (progn
       (tramp-cleanup-all-buffers)
       (tramp-cleanup-all-connections)))
@@ -819,11 +820,12 @@ The provider is nerd-icons."
   ;; Start `project-find-file' by default
   (project-switch-commands 'project-find-file))
 
+;; Allows identifying custom projects with a ".project" file
 (use-package project-x
   :straight (:host github :repo "karthink/project-x")
   :after project
   :demand t
-  :config (project-x-mode 1))
+  :config (add-hook 'project-find-functions 'project-x-try-local 90))
 
 (use-package vertico
   :straight
@@ -927,24 +929,27 @@ The provider is nerd-icons."
      "Flymake log"
      "Shell command output"
      "direnv"
-     "\\*Messages"
      "\\*Warning"
-     "*magit-"
+     "\\*magit-"
      "magit-process"
      "^:"
      ".+-shell*"
-     "*straight-"
+     "\\*straight-"
      "\\*Compile-Log"
-     "*format-all-error"
-     "*Async-"
+     "\\*format-all-error"
+     "\\*Async-"
      "COMMIT_EDITMSG"
      "TAGS"
-     "*lsp-"
-     "*EGLOT"
-     "*pylsp"
-     "*vc"
-     "*citre-ctags*"
-     "*ltex-ls"))
+     "\\*lsp-*"
+     "\\*EGLOT"
+     "\\*pylsp"
+     "\\*vc"
+     "\\*citre-ctags*"
+     "\\*ltex-ls"
+     "\\*texlab"
+     "\\*tramp"
+     "\\*Flycheck"
+     "\\*bash-ls*"))
   :config
   (consult-customize
    consult-line
@@ -1024,6 +1029,8 @@ The provider is nerd-icons."
    'marginalia-annotator-registry
    '(project-buffer marginalia-annotate-project-buffer)))
 
+;; Use `consult' to select Tramp targets. Supported completion sources are ssh
+;; config, known hosts, and docker containers.
 (use-package consult-tramp
   :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
@@ -1667,7 +1674,10 @@ The provider is nerd-icons."
    ("C-s" . company-search-candidates)
    ("C-M-s" . company-filter-candidates)
    ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
-   ;; "TAB").
+   ;; "TAB"). First TAB keypress will complete the common part of all
+   ;; completions, and the next will switch to the next completion in a cyclic
+   ;; fashion, meaning that if you reach the end you continue from the top.
+   ;; S-TAB will go in reverse direction.
    ("<tab>" . company-complete-common-or-cycle)
    ("TAB" . company-complete-common-or-cycle)
    ("<backtab>" .
@@ -1694,17 +1704,7 @@ The provider is nerd-icons."
    ("C-s" . company-search-repeat-forward)
    ("C-r" . company-search-repeat-backward)
    ("C-g" . company-search-abort)
-   ("DEL" . company-search-delete-char)
-   ;; ([escape]
-   ;;  .
-   ;;  (lambda ()
-   ;;    (interactive)
-   ;;    (company-search-abort)))
-   ;; ("ESCAPE" .
-   ;;  (lambda ()
-   ;;    (interactive)
-   ;;    (company-search-abort)))
-   )
+   ("DEL" . company-search-delete-char))
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-code-ignore-case t)
@@ -1713,7 +1713,6 @@ The provider is nerd-icons."
    (expand-file-name "wordlist.5" sb/extras-directory))
   (company-show-quick-access t "Speed up selecting a completion")
   (company-tooltip-align-annotations t)
-  ;; (company-format-margin-function nil "Disable icons")
   (company-global-modes
    '(not dired-mode
          magit-status-mode
@@ -1728,8 +1727,205 @@ The provider is nerd-icons."
      ;; Always show candidates in overlay tooltip
      company-pseudo-tooltip-frontend
      ;; Show selected candidate docs in echo area
-     company-echo-metadata-frontend)))
+     company-echo-metadata-frontend))
+  (company-format-margin-function (bound-and-true-p sb/enable-icons)))
 
+(use-package kind-icon
+  :when (bound-and-true-p sb/enable-icons)
+  :after company
+  :demand t
+  :config
+  (require 'svg-lib)
+  (add-to-list
+   'svg-lib-icon-collections
+   '("nerd-fonts-codicons"
+     .
+     "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
+
+  (setq kind-icon-mapping
+        '((array
+           "a"
+           :icon "symbol-array"
+           :face font-lock-type-face
+           :collection "nerd-fonts-codicons")
+          (boolean
+           "b"
+           :icon "symbol-boolean"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (color
+           "#"
+           :icon "symbol-color"
+           :face success
+           :collection "nerd-fonts-codicons")
+          (command
+           "cm"
+           :icon "chevron-right"
+           :face default
+           :collection "nerd-fonts-codicons")
+          (constant
+           "co"
+           :icon "symbol-constant"
+           :face font-lock-constant-face
+           :collection "nerd-fonts-codicons")
+          (class
+           "c"
+           :icon "symbol-class"
+           :face font-lock-type-face
+           :collection "nerd-fonts-codicons")
+          (constructor
+           "cn"
+           :icon "symbol-method"
+           :face font-lock-function-name-face
+           :collection "nerd-fonts-codicons")
+          (enum
+           "e"
+           :icon "symbol-enum"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (enummember
+           "em"
+           :icon "symbol-enum-member"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (enum-member
+           "em"
+           :icon "symbol-enum-member"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (event
+           "ev"
+           :icon "symbol-event"
+           :face font-lock-warning-face
+           :collection "nerd-fonts-codicons")
+          (field
+           "fd"
+           :icon "symbol-field"
+           :face font-lock-variable-name-face
+           :collection "nerd-fonts-codicons")
+          (file
+           "f"
+           :icon "symbol-file"
+           :face font-lock-string-face
+           :collection "nerd-fonts-codicons")
+          (folder
+           "d"
+           :icon "folder"
+           :face font-lock-doc-face
+           :collection "nerd-fonts-codicons")
+          (function "f"
+                    :icon "symbol-method"
+                    :face font-lock-function-name-face
+                    :collection "nerd-fonts-codicons")
+          (interface
+           "if"
+           :icon "symbol-interface"
+           :face font-lock-type-face
+           :collection "nerd-fonts-codicons")
+          (keyword
+           "kw"
+           :icon "symbol-keyword"
+           :face font-lock-keyword-face
+           :collection "nerd-fonts-codicons")
+          (macro "mc" :icon "lambda" :face font-lock-keyword-face)
+          (magic
+           "ma"
+           :icon "lightbulb-autofix"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (method
+           "m"
+           :icon "symbol-method"
+           :face font-lock-function-name-face
+           :collection "nerd-fonts-codicons")
+          (module
+           "{"
+           :icon "file-code-outline"
+           :face font-lock-preprocessor-face)
+          (numeric
+           "nu"
+           :icon "symbol-numeric"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (operator
+           "op"
+           :icon "symbol-operator"
+           :face font-lock-comment-delimiter-face
+           :collection "nerd-fonts-codicons")
+          (param
+           "pa"
+           :icon "gear"
+           :face default
+           :collection "nerd-fonts-codicons")
+          (property
+           "pr"
+           :icon "symbol-property"
+           :face font-lock-variable-name-face
+           :collection "nerd-fonts-codicons")
+          (reference
+           "rf"
+           :icon "library"
+           :face font-lock-variable-name-face
+           :collection "nerd-fonts-codicons")
+          (snippet
+           "S"
+           :icon "symbol-snippet"
+           :face font-lock-string-face
+           :collection "nerd-fonts-codicons")
+          (string
+           "s"
+           :icon "symbol-string"
+           :face font-lock-string-face
+           :collection "nerd-fonts-codicons")
+          (struct
+           "%"
+           :icon "symbol-structure"
+           :face font-lock-variable-name-face
+           :collection "nerd-fonts-codicons")
+          (text
+           "tx"
+           :icon "symbol-key"
+           :face font-lock-doc-face
+           :collection "nerd-fonts-codicons")
+          (typeparameter
+           "tp"
+           :icon "symbol-parameter"
+           :face font-lock-type-face
+           :collection "nerd-fonts-codicons")
+          (type-parameter
+           "tp"
+           :icon "symbol-parameter"
+           :face font-lock-type-face
+           :collection "nerd-fonts-codicons")
+          (unit
+           "u"
+           :icon "symbol-ruler"
+           :face font-lock-constant-face
+           :collection "nerd-fonts-codicons")
+          (value
+           "v"
+           :icon "symbol-enum"
+           :face font-lock-builtin-face
+           :collection "nerd-fonts-codicons")
+          (variable
+           "va"
+           :icon "symbol-variable"
+           :face font-lock-variable-name-face
+           :collection "nerd-fonts-codicons")
+          (t
+           "."
+           :icon "question"
+           :face font-lock-warning-face
+           :collection "nerd-fonts-codicons")))
+
+  (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
+         (formatter
+          (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
+    (defun my-company-kind-icon-margin (cand _selected)
+      (funcall formatter cand))
+    (setq company-format-margin-function #'my-company-kind-icon-margin)))
+
+;; Show documentation popups
 (use-package company-quickhelp
   :after company
   :when (display-graphic-p)
@@ -1744,6 +1940,10 @@ The provider is nerd-icons."
   :after company
   :init (company-statistics-mode 1))
 
+;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
+;; active in latex math environments and latex math symbols
+;; (`company-math-symbols-latex') is not available outside of math latex
+;; environments
 (use-package company-math
   :after (:all tex-mode company)
   :demand t)
@@ -1754,7 +1954,7 @@ The provider is nerd-icons."
   :demand t)
 
 (use-package company-dict
-  :after (:any company corfu)
+  :after company
   :demand t
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
@@ -1765,17 +1965,13 @@ The provider is nerd-icons."
   :after (company org)
   :demand t)
 
+;; Enables completion of C/C++ header file names
 (use-package company-c-headers
   :after (company cc-mode)
   :demand t
   :custom
   (company-c-headers-path-system
    '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
-
-(use-package company-web
-  :after (:any company corfu)
-  :demand t
-  :config (require 'company-web-html))
 
 (use-package company-ctags
   :after (company prog-mode)
@@ -1911,10 +2107,7 @@ The provider is nerd-icons."
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         (company-capf company-web-html)
-         company-dict
-         company-ispell
-         company-dabbrev)))
+         company-capf company-dict company-ispell company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
       (add-hook hook (lambda () (sb/company-html-mode)))))
@@ -2080,7 +2273,7 @@ The provider is nerd-icons."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf))))
+                  #'cape-file #'cape-dict #'cape-dabbrev #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2089,8 +2282,8 @@ The provider is nerd-icons."
                  (list
                   #'cape-elisp-block
                   #'cape-file
-                  #'cape-dabbrev
                   #'cape-dict
+                  #'cape-dabbrev
                   #'yasnippet-capf))))
 
   (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
@@ -2111,8 +2304,8 @@ The provider is nerd-icons."
          #'citar-capf
          #'bibtex-capf
          #'cape-file
-         #'cape-dabbrev
          #'cape-dict
+         #'cape-dabbrev
          #'yasnippet-capf)))))
 
   (dolist (mode
@@ -3073,6 +3266,7 @@ used in `company-backends'."
   :demand t
   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
+;; Icons in the minibuffer
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
   :when (bound-and-true-p sb/enable-icons)
@@ -3318,6 +3512,16 @@ PAD can be left (`l') or right (`r')."
     yaml-ts-mode)
    . hs-minor-mode)
   :diminish hs-minor-mode)
+
+(use-package dogears
+  :straight (:host github :repo "alphapapa/dogears.el")
+  :hook (find-file . dogears-mode)
+  :bind
+  (("M-g d" . dogears-go)
+   ("M-g M-b" . dogears-back)
+   ("M-g M-f" . dogears-forward)
+   ("M-g M-d" . dogears-list)
+   ("M-g M-D" . dogears-sidebar)))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
