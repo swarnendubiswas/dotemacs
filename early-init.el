@@ -54,8 +54,6 @@
  window-resize-pixelwise t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message t
- ;; *scratch* is in `lisp-interaction-mode' by default.
- initial-major-mode 'text-mode
  initial-scratch-message nil
  inhibit-x-resources t)
 

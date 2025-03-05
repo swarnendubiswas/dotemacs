@@ -16,7 +16,7 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-file nil
+(defcustom sb/debug-init-perf t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -104,10 +104,8 @@ The provider is nerd-icons."
 (setq use-package-enable-imenu-support t)
 (straight-use-package '(use-package))
 
-(if (bound-and-true-p sb/debug-init-file)
+(if (bound-and-true-p sb/debug-init-perf)
     (setq
-     debug-on-error t
-     debug-on-event 'sigusr2
      ;; Use "M-x use-package-report" to see results
      use-package-compute-statistics t
      use-package-verbose t
@@ -117,7 +115,7 @@ The provider is nerd-icons."
    use-package-always-defer t
    use-package-expand-minimally t
    use-package-minimum-reported-time 0 ; Show everything
-   use-package-compute-statistics t))
+   use-package-compute-statistics nil))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
@@ -169,7 +167,6 @@ The provider is nerd-icons."
   (create-lockfiles nil)
   (custom-safe-themes t)
   (delete-by-moving-to-trash t)
-  ;; (fast-but-imprecise-scrolling t)
   (help-window-select t "Makes it easy to close the window")
   (history-delete-duplicates t)
   (read-process-output-max (* 4 1024 1024))
@@ -217,13 +214,9 @@ The provider is nerd-icons."
   (auto-save-visited-interval 30)
   (revert-without-query '("\\.*") "Revert all files without asking")
   (max-mini-window-height 0.4)
-  ;; (pixel-scroll-precision-use-momentum nil)
-  ;; (pixel-scroll-precision-interpolate-page t)
-  ;; (scroll-preserve-screen-position t)
-  ;; (scroll-margin 3)
-  ;; (scroll-step 1)
-  ;; (scroll-conservatively 10000)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
+  ;; *scratch* is in `lisp-interaction-mode' by default.
+  (initial-major-mode 'text-mode)
   :config
   (dolist (exts
            '(".directory"
@@ -244,34 +237,29 @@ The provider is nerd-icons."
              "indent.log"))
     (add-to-list 'completion-ignored-extensions exts))
 
-  (when (> emacs-major-version 27)
-    (setq
-     next-error-message-highlight t
-     read-minibuffer-restore-windows t
-     ;; Hide commands in "M-x" which do not work in the current mode.
-     read-extended-command-predicate #'command-completion-default-include-p
-     use-short-answers t))
-
-  (when (> emacs-major-version 28)
-    (setq
-     help-window-keep-selected t
-     find-sibling-rules
-     '(("\\([^/]+\\)\\.c\\'" "\\1.h")
-       ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
-       ("\\([^/]+\\)\\.h\\'" "\\1.c")
-       ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
-
+  (when (boundp next-error-message-highlight)
+    (setq next-error-message-highlight t))
+  (when (boundp read-minibuffer-restore-windows)
+    (setq read-minibuffer-restore-windows t))
+  (when (boundp use-short-answers)
+    (setq use-short-answers t))
+  ;; Hide commands in "M-x" which do not work in the current mode.
+  (when (boundp read-extended-command-predicate)
+    (setq read-extended-command-predicate
+          #'command-completion-default-include-p))
+  (when (boundp help-window-keep-selected)
+    (setq help-window-keep-selected t))
+  (when (boundp find-sibling-rules)
+    (setq find-sibling-rules
+          '(("\\([^/]+\\)\\.c\\'" "\\1.h")
+            ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
+            ("\\([^/]+\\)\\.h\\'" "\\1.c")
+            ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
   (when (eq system-type 'windows-nt)
     (setq w32-get-true-file-attributes nil))
 
   (tooltip-mode -1)
   (auto-encryption-mode -1)
-
-  ;; `pixel-scroll-mode' uses line-by-line scrolling.
-  ;; (when (fboundp 'pixel-scroll-mode)
-  ;;   (pixel-scroll-mode 1))
-  ;; (when (fboundp 'pixel-scroll-precision-mode)
-  ;;   (pixel-scroll-precision-mode 1))
 
   (dolist
       (mode
@@ -323,22 +311,27 @@ The provider is nerd-icons."
   (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
   :diminish visual-line-mode)
 
+;; `pixel-scroll-mode' uses line-by-line scrolling.
 ;; (use-package pixel-scroll
-;;   :ensure nil
-;;   :when (fboundp 'pixel-scroll-precision-mode)
-;;   :custom (pixel-scroll-precision-mode)
+;;   :custom
+;;   (pixel-scroll-precision-use-momentum nil)
+;;   (pixel-scroll-precision-interpolate-page t)
+;;   (scroll-preserve-screen-position t)
+;;   (scroll-margin 3)
+;;   (scroll-step 1)
+;;   (scroll-conservatively 10000)
+;;   (scroll-error-top-bottom t)
+;;   (auto-window-vscroll nil)
+;;   (fast-but-imprecise-scrolling t)
+;;   (hscroll-margin 2)
+;;   (hscroll-step 1)
+;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+;;   (mouse-wheel-scroll-amount-horizontal 1)
 ;;   :config
-;;   (setq
-;;    auto-window-vscroll nil
-;;    scroll-margin 0
-;;    scroll-conservatively 10
-;;    scroll-error-top-bottom t
-;;    fast-but-imprecise-scrolling t
-;;    scroll-preserve-screen-position t
-;;    hscroll-margin 2
-;;    hscroll-step 1
-;;    mouse-wheel-scroll-amount '(1 ((shift) . hscroll))
-;;    mouse-wheel-scroll-amount-horizontal 1))
+;;   (when (fboundp 'pixel-scroll-mode)
+;;     (pixel-scroll-mode 1))
+;;   (when (fboundp 'pixel-scroll-precision-mode)
+;;     (pixel-scroll-precision-mode 1)))
 
 (use-package autorevert
   :straight (:type built-in)
@@ -380,7 +373,7 @@ The provider is nerd-icons."
 ;; "C-c C-c".
 (use-package so-long
   :straight (:type built-in)
-  :when (> emacs-major-version 27)
+  :when (featurep 'so-long)
   :hook (emacs-startup . global-so-long-mode))
 
 (use-package imenu
@@ -923,21 +916,23 @@ The provider is nerd-icons."
   (consult-buffer-filter
    '("^ "
      "\\` "
+     "^:"
      "\\*Echo Area"
      "\\*Minibuf"
      "\\*Backtrace"
+     "\\*Warning"
      "Flymake log"
+     "\\*Flycheck"
      "Shell command output"
      "direnv"
-     "\\*Warning"
      "\\*magit-"
      "magit-process"
-     "^:"
      ".+-shell*"
      "\\*straight-"
      "\\*Compile-Log"
-     "\\*format-all-error"
+     "\\*Native-*"
      "\\*Async-"
+     "\\*format-all-error"
      "COMMIT_EDITMSG"
      "TAGS"
      "\\*lsp-*"
@@ -948,8 +943,8 @@ The provider is nerd-icons."
      "\\*ltex-ls"
      "\\*texlab"
      "\\*tramp"
-     "\\*Flycheck"
-     "\\*bash-ls*"))
+     "\\*bash-ls*"
+     "\\*json-ls*"))
   :config
   (consult-customize
    consult-line
@@ -1574,7 +1569,7 @@ The provider is nerd-icons."
   :config
   ;; Show docstring description for completion candidates in commands like
   ;; `describe-function'.
-  (when (> emacs-major-version 27)
+  (when (boundp completions-detailed)
     (setq completions-detailed t))
 
   (when (fboundp 'dabbrev-capf)
@@ -1717,6 +1712,7 @@ The provider is nerd-icons."
    '(not dired-mode
          magit-status-mode
          help-mode
+         helpful-mode
          csv-mode
          minibuffer-inactive-mode))
   ;; Convenient to wrap around completion items at boundaries
@@ -3521,7 +3517,8 @@ PAD can be left (`l') or right (`r')."
    ("M-g M-b" . dogears-back)
    ("M-g M-f" . dogears-forward)
    ("M-g M-d" . dogears-list)
-   ("M-g M-D" . dogears-sidebar)))
+   ("M-g M-D" . dogears-sidebar))
+  :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -3633,6 +3630,10 @@ or the major mode is not in `sb/skippable-modes'."
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
 ;; "<tab>".
+
+;; ESC serves as a substitute for META, but there is no need to hold down ESC -
+;; instead "M-something" keybindings can be triggered by pressing ESC and the
+;; other key sequentially.
 
 (bind-keys
  ("C-l" . goto-line)
