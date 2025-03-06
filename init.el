@@ -1490,7 +1490,7 @@ The provider is nerd-icons."
                   ("Dockerfile" dockfmt)
                   ("Emacs Lisp" emacs-lisp)
                   ("Fish" fish-indent)
-                  ("HTML" tidy)
+                  ("HTML" (prettier "--print-width" "80"))
                   ("LaTeX" latexindent)
                   ("Markdown" (prettier "--print-width" "80"))
                   ("Perl" (perltidy
@@ -2636,14 +2636,15 @@ The provider is nerd-icons."
   :custom (eldoc-box-clear-with-C-g t)
   :diminish)
 
-(use-package treesit-auto
+(use-package treesit
+  :straight (:type built-in)
   :when
   (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
        (treesit-available-p))
   :demand t
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
-  :custom (treesit-auto-install 'prompt)
+  :custom
   ;; Increased default font locking may hurt performance
   (treesit-font-lock-level 4)
   (treesit-language-source-alist
@@ -2653,8 +2654,10 @@ The provider is nerd-icons."
      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
      (cmake "https://github.com/uyha/tree-sitter-cmake")
      (css "https://github.com/tree-sitter/tree-sitter-css")
+     (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
      (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
      (html "https://github.com/tree-sitter/tree-sitter-html")
      (java "https://github.com/tree-sitter/tree-sitter-java")
      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
@@ -2664,22 +2667,25 @@ The provider is nerd-icons."
      (latex "https://github.com/latex-lsp/tree-sitter-latex")
      (make "https://github.com/alemuller/tree-sitter-make")
      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (markdown-inline
+      "https://github.com/tree-sitter-grammars/tree-sitter-markdown")
      (org "https://github.com/milisims/tree-sitter-org")
      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+     (php "https://github.com/tree-sitter/tree-sitter-php")
      (python "https://github.com/tree-sitter/tree-sitter-python")
      (toml "https://github.com/tree-sitter/tree-sitter-toml")
      (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+     (rust "https://github.com/tree-sitter/tree-sitter-rust")
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all)
+
   (when (unless (and (treesit-language-available-p 'bash)
                      (treesit-language-available-p 'bibtex)
                      (treesit-language-available-p 'c)
                      (treesit-language-available-p 'cpp)
                      (treesit-language-available-p 'cmake)
                      (treesit-language-available-p 'css)
+                     (treesit-language-available-p 'cuda)
                      (treesit-language-available-p 'docker)
                      (treesit-language-available-p 'elisp)
                      (treesit-language-available-p 'html)
@@ -2687,7 +2693,6 @@ The provider is nerd-icons."
                      (treesit-language-available-p 'json)
                      (treesit-language-available-p 'kdl)
                      (treesit-language-available-p 'latex)
-                     (treesit-language-available-p 'kdl)
                      (treesit-language-available-p 'make)
                      (treesit-language-available-p 'markdown)
                      (treesit-language-available-p 'org)
@@ -2697,11 +2702,17 @@ The provider is nerd-icons."
                      (treesit-language-available-p 'yaml)))
     (mapc
      #'treesit-install-language-grammar
-     (mapcar #'car treesit-language-source-alist)))
+     (mapcar #'car treesit-language-source-alist))))
 
-  (with-eval-after-load "c++-ts-mode"
-    (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
-    (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map)))
+(use-package treesit-auto
+  :after treesit
+  :config
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all))
+
+(with-eval-after-load "c++-ts-mode"
+  (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
+  (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map))
 
 ;; (with-eval-after-load "treesit"
 ;;   ;; Improves performance with large files without significantly diminishing
@@ -3252,8 +3263,8 @@ used in `company-backends'."
        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
 (use-package nerd-icons
-  :when (and (bound-and-true-p sb/enable-icons) (display-graphic-p))
-  :custom (nerd-icons-scale-factor 0.9))
+  :when (bound-and-true-p sb/enable-icons)
+  :custom (nerd-icons-scale-factor 0.8))
 
 (use-package nerd-icons-corfu
   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
@@ -3481,8 +3492,7 @@ PAD can be left (`l') or right (`r')."
 ;; block with "C-c @ C-c".
 (use-package hideshow
   :hook
-  ((prog-mode
-    c-mode-common
+  ((c-mode-common
     c-ts-mode
     c++-mode
     c++-ts-mode
@@ -3707,8 +3717,7 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode)
   ;; :bind ("M-<backspace>" . backward-kill-word) ; should be remapped to "M-DEL"
-  ;; :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
-  )
+  :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
 
 ;;; init.el ends here
 

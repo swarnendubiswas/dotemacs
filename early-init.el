@@ -54,8 +54,7 @@
  window-resize-pixelwise t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message t
- initial-scratch-message nil
- inhibit-x-resources t)
+ initial-scratch-message nil)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
