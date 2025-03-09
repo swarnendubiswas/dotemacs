@@ -49,10 +49,7 @@
 ;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
 ;; completion from inside a word/symbol. However, `company-ispell' does not keep
 ;; prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion
-  (if (display-graphic-p)
-      'corfu
-    'company)
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -101,7 +98,10 @@ The provider is nerd-icons."
   (load bootstrap-file nil 'nomessage))
 
 ;; These variables need to be set before loading `use-package'.
-(setq use-package-enable-imenu-support t)
+(setq
+ use-package-enable-imenu-support t
+ ;; Show everything
+ use-package-minimum-reported-time 0)
 (straight-use-package '(use-package))
 
 (if (bound-and-true-p sb/debug-init-perf)
@@ -109,12 +109,10 @@ The provider is nerd-icons."
      ;; Use "M-x use-package-report" to see results
      use-package-compute-statistics t
      use-package-verbose t
-     use-package-minimum-reported-time 0 ; Show everything
      use-package-always-demand t)
   (setq
    use-package-always-defer t
    use-package-expand-minimally t
-   use-package-minimum-reported-time 0 ; Show everything
    use-package-compute-statistics nil))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
@@ -160,6 +158,7 @@ The provider is nerd-icons."
   (auto-save-no-message t "Do not print frequent autosave messages")
   ;; Disable autosaving based on number of characters typed
   (auto-save-interval 0)
+  (apropos-do-all t)
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
   ;; Autofill comments in modes that define them
@@ -168,6 +167,8 @@ The provider is nerd-icons."
   (custom-safe-themes t)
   (delete-by-moving-to-trash t)
   (help-window-select t "Makes it easy to close the window")
+  (help-enable-autoload nil)
+  (help-enable-completion-autoload nil)
   (history-delete-duplicates t)
   (read-process-output-max (* 4 1024 1024))
   (remote-file-name-inhibit-locks t)
@@ -179,8 +180,6 @@ The provider is nerd-icons."
   (sort-fold-case nil "Do not ignore case when sorting")
   (standard-indent 2)
   (switch-to-buffer-preserve-window-point t)
-  (use-dialog-box nil "Do not use dialog boxes with mouse commands")
-  (use-file-dialog nil)
   (view-read-only t "View mode for read-only buffers")
   (visible-bell nil)
   (warning-minimum-level :error)
@@ -215,8 +214,6 @@ The provider is nerd-icons."
   (revert-without-query '("\\.*") "Revert all files without asking")
   (max-mini-window-height 0.4)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
-  ;; *scratch* is in `lisp-interaction-mode' by default.
-  (initial-major-mode 'text-mode)
   :config
   (dolist (exts
            '(".directory"
@@ -258,7 +255,6 @@ The provider is nerd-icons."
   (when (eq system-type 'windows-nt)
     (setq w32-get-true-file-attributes nil))
 
-  (tooltip-mode -1)
   (auto-encryption-mode -1)
 
   (dolist
@@ -395,7 +391,12 @@ The provider is nerd-icons."
 
 (use-package recentf
   :straight (:type built-in)
-  :hook (emacs-startup . recentf-mode)
+  :hook
+  (emacs-startup
+   .
+   (lambda ()
+     (let ((inhibit-message t))
+       (recentf-mode 1))))
   :bind ("<f9>" . recentf-open-files)
   :custom
   (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
@@ -574,7 +575,8 @@ The provider is nerd-icons."
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil)
   (ibuffer-formats
-   '((mark modified read-only " " (name 24 24 :left :elide) " " filename)))
+   '((mark
+      modified read-only locked " " (name 24 24 :left :elide) " " filename)))
   (ibuffer-never-show-predicates
    '("*Help\\*"
      "*Quick Help\\*"
@@ -732,6 +734,7 @@ The provider is nerd-icons."
   ;; Do not ask whether to kill buffers visiting deleted files
   (dired-clean-confirm-killing-deleted-buffers nil)
   (dired-hide-details-hide-symlink-targets nil)
+  (dired-free-space nil)
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setq dired-kill-when-opening-new-dired-buffer t)))
@@ -944,7 +947,8 @@ The provider is nerd-icons."
      "\\*texlab"
      "\\*tramp"
      "\\*bash-ls*"
-     "\\*json-ls*"))
+     "\\*json-ls*"
+     "\\*yaml-ls*"))
   :config
   (consult-customize
    consult-line
@@ -1249,7 +1253,9 @@ The provider is nerd-icons."
    ("C-s")
    ("C-f" . isearch-repeat-forward)
    ("C-c C-o" . isearch-occur))
-  :custom (isearch-lazy-count t "Show match count"))
+  :custom
+  (isearch-lazy-count t "Show match count")
+  (lazy-highlight-initial-delay 0))
 
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
@@ -1596,7 +1602,9 @@ The provider is nerd-icons."
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
   :config
-  (dolist (exclude '(doc-view-mode pdf-view-mode tags-table-mode))
+  (dolist (exclude
+           '(doc-view-mode
+             pdf-view-mode tags-table-mode image-mode archive-mode))
     (add-to-list 'dabbrev-ignored-buffer-modes exclude)))
 
 (use-package hippie-exp
@@ -2990,6 +2998,7 @@ The provider is nerd-icons."
 
 (use-package org
   :defer 2
+  :mode ("\\.org\\'" . org-mode)
   :custom
   (org-fontify-quote-and-verse-blocks t)
   (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")

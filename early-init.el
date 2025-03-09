@@ -54,7 +54,15 @@
  window-resize-pixelwise t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message t
- initial-scratch-message nil)
+ initial-scratch-message nil
+ ;; *scratch* is in `lisp-interaction-mode' by default.
+ initial-major-mode 'fundamental-mode
+ use-file-dialog nil
+ use-dialog-box nil)
+
+;; Suppress the vanilla startup screen completely. We've disabled it with
+;; `inhibit-startup-screen', but it would still initialize anyway.
+(advice-add #'display-startup-screen :override #'ignore)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
@@ -67,6 +75,9 @@
 ;; (when (fboundp 'scroll-bar-mode)
 ;;   (scroll-bar-mode -1))
 (push '(vertical-scroll-bars) default-frame-alist)
+(push '(horizontal-scroll-bars) default-frame-alist)
+(when (fbound 'tooltip-mode)
+  (tooltip-mode -1))
 
 ;; Set a hint of transparency, works with GUI frames
 (set-frame-parameter (selected-frame) 'alpha '(97 . 97))
