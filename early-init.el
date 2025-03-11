@@ -76,7 +76,7 @@
 ;;   (scroll-bar-mode -1))
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
-(when (fbound 'tooltip-mode)
+(when (fboundp 'tooltip-mode)
   (tooltip-mode -1))
 
 ;; Set a hint of transparency, works with GUI frames

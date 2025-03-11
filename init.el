@@ -16,7 +16,7 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-perf t
+(defcustom sb/debug-init-perf nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -31,7 +31,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -305,6 +305,8 @@ The provider is nerd-icons."
   ;; Mark safe variables
   (put 'compilation-read-command 'safe-local-variable #'stringp)
   (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
+
+  (put 'overwrite-mode 'disabled t)
   :diminish visual-line-mode)
 
 ;; `pixel-scroll-mode' uses line-by-line scrolling.
@@ -948,7 +950,9 @@ The provider is nerd-icons."
      "\\*tramp"
      "\\*bash-ls*"
      "\\*json-ls*"
-     "\\*yaml-ls*"))
+     "\\*yaml-ls*"
+     "\\*Ediff Registry\\*"
+     "\\*shfmt*"))
   :config
   (consult-customize
    consult-line
@@ -1536,6 +1540,7 @@ The provider is nerd-icons."
         with_statement
         while_statement)))))
 
+;; Auto-format elisp code
 (use-package elisp-autofmt
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
   :custom
@@ -1548,13 +1553,15 @@ The provider is nerd-icons."
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
 
+;; Include `hl-todo' keywords in flycheck messages.
 (use-package flycheck-hl-todo
   :after flycheck
   :init (flycheck-hl-todo-setup))
 
+;; Jump to `hl-todo' keywords in current buffer.
 (use-package consult-todo
   :after (consult hl-todo)
-  :commands consult-todo)
+  :commands (consult-todo consult-todo-all))
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -1948,38 +1955,38 @@ The provider is nerd-icons."
 ;; active in latex math environments and latex math symbols
 ;; (`company-math-symbols-latex') is not available outside of math latex
 ;; environments
-(use-package company-math
-  :after (:all tex-mode company)
-  :demand t)
+;; (use-package company-math
+;;   :after (:all tex-mode company)
+;;   :demand t)
 
-(use-package company-anywhere
-  :straight (:host github :repo "zk-phi/company-anywhere")
-  :after company
-  :demand t)
+;; (use-package company-anywhere
+;;   :straight (:host github :repo "zk-phi/company-anywhere")
+;;   :after company
+;;   :demand t)
 
-(use-package company-dict
-  :after company
-  :demand t
-  :custom
-  (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
-  (company-dict-enable-yasnippet nil))
+;; (use-package company-dict
+;;   :after company
+;;   :demand t
+;;   :custom
+;;   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
+;;   (company-dict-enable-yasnippet nil))
 
 ;; Use "<" to trigger company completion of org blocks.
-(use-package company-org-block
-  :after (company org)
-  :demand t)
+;; (use-package company-org-block
+;;   :after (company org)
+;;   :demand t)
 
 ;; Enables completion of C/C++ header file names
-(use-package company-c-headers
-  :after (company cc-mode)
-  :demand t
-  :custom
-  (company-c-headers-path-system
-   '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
+;; (use-package company-c-headers
+;;   :after (company cc-mode)
+;;   :demand t
+;;   :custom
+;;   (company-c-headers-path-system
+;;    '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
 
-(use-package company-ctags
-  :after (company prog-mode)
-  :demand t)
+;; (use-package company-ctags
+;;   :after (company prog-mode)
+;;   :demand t)
 
 ;; Try completion backends in order until there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -2024,19 +2031,22 @@ The provider is nerd-icons."
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
-  (setq
-   company-backends
-   '(company-files
-     (company-capf :with company-dabbrev-code company-ctags company-yasnippet)
-     ;; If we have `company-dabbrev' first, then other matches from
-     ;; `company-ispell' will be ignored.
-     company-ispell company-dict company-dabbrev)
-   company-transformers
-   '( ;company-sort-by-occurrence
-     delete-dups
-     company-sort-by-statistics
-     ;company-sort-prefer-same-case-prefix
-     ))
+  (setq company-backends
+        '(company-files
+          (company-capf
+           :with company-dabbrev-code ;;company-ctags
+           company-yasnippet)
+          ;; If we have `company-dabbrev' first, then other matches from
+          ;; `company-ispell' will be ignored.
+          company-ispell
+          ;;company-dict
+          company-dabbrev)
+        company-transformers
+        '( ;company-sort-by-occurrence
+          delete-dups
+          company-sort-by-statistics
+          ;company-sort-prefer-same-case-prefix
+          ))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -2054,26 +2064,29 @@ The provider is nerd-icons."
       ;; majority.
       (setq company-backends
             '((company-files
-               company-capf
+               ;; company-capf
                ;; Math latex tags
-               company-math-symbols-latex
+               ;; company-math-symbols-latex
                ;; Math Unicode symbols and sub(super)scripts
                ;; company-math-symbols-unicode
                company-yasnippet
-               company-ctags
-               company-dict
-               company-dabbrev
-               company-ispell
+               ;; company-ctags
+               ;; company-dict
+               company-dabbrev company-ispell
                :separate))))
 
-    (add-hook 'latex-mode-hook (lambda () (sb/company-latex-mode))))
+    (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
+      (add-hook mode (lambda () (sb/company-latex-mode)))))
 
   (progn
     (defun sb/company-org-mode ()
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         company-org-block company-ispell company-dict company-dabbrev)))
+         ;; company-org-block
+         company-ispell
+         ;; company-dict
+         company-dabbrev)))
 
     (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
 
@@ -2082,7 +2095,10 @@ The provider is nerd-icons."
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-files (company-ispell company-dict company-dabbrev))))
+       '(company-files
+         (company-ispell
+          ;; company-dict
+          company-dabbrev))))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -2101,7 +2117,8 @@ The provider is nerd-icons."
                company-dabbrev-code ; Useful for variable names
                company-yasnippet
                :separate)
-              company-dict company-ispell company-dabbrev)))
+              ;; company-dict
+              company-ispell company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode (lambda () (sb/company-yaml-mode)))))
@@ -2111,7 +2128,9 @@ The provider is nerd-icons."
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         company-capf company-dict company-ispell company-dabbrev)))
+         company-capf
+         ;; company-dict
+         company-ispell company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
       (add-hook hook (lambda () (sb/company-html-mode)))))
@@ -2122,12 +2141,14 @@ The provider is nerd-icons."
                   '(company-files
                     (company-capf
                      ;; company-citre-tags
-                     company-c-headers
-                     :with company-keywords
+                     ;; company-c-headers
                      company-dabbrev-code ; Useful for variable names
-                     company-ctags company-yasnippet
+                     :with company-keywords
+                     ;; company-ctags
+                     company-yasnippet
                      :separate)
-                    company-dict company-ispell company-dabbrev)))
+                    ;; company-dict
+                    company-ispell company-dabbrev)))
 
     (add-hook
      'prog-mode-hook
@@ -2146,7 +2167,8 @@ The provider is nerd-icons."
                      company-dabbrev-code ; Useful for variable names
                      company-yasnippet
                      :separate)
-                    company-dict company-ispell company-dabbrev)))
+                    ;; company-dict
+                    company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook (lambda () (sb/company-elisp-mode))))))
@@ -2346,6 +2368,9 @@ The provider is nerd-icons."
                     #'cape-dict
                     #'yasnippet-capf))))))
 
+;; It is tempting to use `eglot' because it is built in to Emacs. However,
+;; `lsp-mode' offers several advantages. It allows connecting to multiple
+;; servers simultaneously and provides helpers to install and uninstall servers.
 (use-package lsp-mode
   :bind
   (:map
@@ -2395,6 +2420,7 @@ The provider is nerd-icons."
   (lsp-completion-show-kind t)
   ;; Show/hide description of completion candidates
   (lsp-completion-show-label-description t)
+  (lsp-completion-default-behaviour :insert)
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
@@ -2431,11 +2457,16 @@ The provider is nerd-icons."
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-use-plists t)
+  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
+  ;; Tramp which is slower
   (lsp-auto-register-remote-clients nil)
-  (lsp-enable-snippet nil)
+  (lsp-enable-snippet t)
   (lsp-keep-workspace-alive nil)
+  ;; The workspace status icon on the terminal interface is misleading across
+  ;; projects
   (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-suggest-server-download nil)
+  (lsp-inlay-hint-enable t)
   :config
   (when (or (display-graphic-p) (daemonp))
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -2644,6 +2675,11 @@ The provider is nerd-icons."
   :custom (eldoc-box-clear-with-C-g t)
   :diminish)
 
+;; Many treesitter modes are now derived from their based modes. For example,
+;; `(derived-mode-p 'c-mode)' will return t in `c-ts-mode'. That means
+;; `.dir-locals.el' settings and yasnippets for `c-mode' will work for
+;; `c-ts-mode' too. However, `c-ts-mode' still does not run c-mode's major mode
+;; hooks. Also, there's still no major mode fallback.
 (use-package treesit
   :straight (:type built-in)
   :when
@@ -2712,11 +2748,11 @@ The provider is nerd-icons."
      #'treesit-install-language-grammar
      (mapcar #'car treesit-language-source-alist))))
 
-(use-package treesit-auto
-  :after treesit
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all))
+;; (use-package treesit-auto
+;;   :after treesit
+;;   :config
+;;   (global-treesit-auto-mode 1)
+;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
 (with-eval-after-load "c++-ts-mode"
   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -2955,6 +2991,22 @@ The provider is nerd-icons."
   (markdown-list-indent-width 2)
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
+
+(use-package markdown-ts-mode
+  :mode ("\\.md\\'" . markdown-ts-mode)
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(markdown
+     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+     "split_parser"
+     "tree-sitter-markdown/src"))
+  (add-to-list
+   'treesit-language-source-alist
+   '(markdown-inline
+     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+     "split_parser"
+     "tree-sitter-markdown-inline/src")))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
@@ -3691,7 +3743,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; Bound to `abort-recursive-edit', I use it as the prefix key for Zellij
 (unbind-key "C-]")
-(unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
+;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 (unbind-key "C-x f") ; Bound to `set-fill-column'
 (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
 
@@ -3731,5 +3783,5 @@ or the major mode is not in `sb/skippable-modes'."
 ;;; init.el ends here
 
 ;; Local variables:
-;; elisp-autofmt-load-packages-local: ("use-package")
+;; elisp-autofmt-load-packages-local: ("use-package-core")
 ;; end:
