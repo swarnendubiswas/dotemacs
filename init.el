@@ -46,9 +46,8 @@
 ;; Emacs. The completion entries wrap around sometimes, and messes up the
 ;; completion. Company works better with both Windows and TUI Emacs, and has
 ;; more extensive LaTeX support than Corfu. We can set up separate completion
-;; files with `company-ispell' and `company-dict'. `company-anywhere' allows
-;; completion from inside a word/symbol. However, `company-ispell' does not keep
-;; prefix case when used as a grouped backend.
+;; files with `company-ispell' and `company-dict'. However, `company-ispell'
+;; does not keep prefix case when used as a grouped backend.
 (defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
@@ -101,19 +100,16 @@ The provider is nerd-icons."
 (setq
  use-package-enable-imenu-support t
  ;; Show everything
- use-package-minimum-reported-time 0)
+ use-package-minimum-reported-time 0
+ use-package-expand-minimally t
+ use-package-always-defer t)
 (straight-use-package '(use-package))
 
-(if (bound-and-true-p sb/debug-init-perf)
-    (setq
-     ;; Use "M-x use-package-report" to see results
-     use-package-compute-statistics t
-     use-package-verbose t
-     use-package-always-demand t)
+(when (bound-and-true-p sb/debug-init-perf)
+  ;; Use "M-x use-package-report" to see results
   (setq
-   use-package-always-defer t
-   use-package-expand-minimally t
-   use-package-compute-statistics nil))
+   use-package-compute-statistics t
+   use-package-verbose t))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
@@ -152,18 +148,35 @@ The provider is nerd-icons."
   (exec-path-from-shell-initialize))
 
 (use-package emacs
-  :hook ((emacs-startup . garbage-collect) (emacs-startup . save-place-mode))
+  :hook
+  (emacs-startup
+   .
+   (lambda ()
+     (save-place-mode 1)
+     (column-number-mode 1)
+     (size-indication-mode 1)))
+
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
+  (warning-minimum-level :error)
   (auto-save-no-message t "Do not print frequent autosave messages")
   ;; Disable autosaving based on number of characters typed
   (auto-save-interval 0)
+  ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents
+  ;; to the visiting file and runs all save-related hooks. We disable
+  ;; `auto-save-mode' and prefer `auto-save-visited-mode' instead.
+  (auto-save-default nil)
+  ;; Save buffer to file after idling for some time, the default of 5s may be
+  ;; too frequent since it runs all the save-related hooks.
+  (auto-save-visited-interval 30)
   (apropos-do-all t)
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
   ;; Autofill comments in modes that define them
   (comment-auto-fill-only-comments t)
   (create-lockfiles nil)
+  (backup-inhibited t "Disable backup for a per-file basis")
+  (make-backup-files nil "Stop making backup `~' files")
   (custom-safe-themes t)
   (delete-by-moving-to-trash t)
   (help-window-select t "Makes it easy to close the window")
@@ -173,57 +186,48 @@ The provider is nerd-icons."
   (read-process-output-max (* 4 1024 1024))
   (remote-file-name-inhibit-locks t)
   (ring-bell-function 'ignore "Disable beeping sound")
+  (visible-bell nil)
   (save-interprogram-paste-before-kill t)
   (select-enable-clipboard t)
+  (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (sentence-end-double-space nil)
   (shift-select-mode nil)
   (sort-fold-case nil "Do not ignore case when sorting")
+  ;; Ignore case when reading a buffer name
+  (read-buffer-completion-ignore-case t)
   (standard-indent 2)
   (switch-to-buffer-preserve-window-point t)
   (view-read-only t "View mode for read-only buffers")
-  (visible-bell nil)
-  (warning-minimum-level :error)
   (window-combination-resize t "Resize windows proportionally")
+  (max-mini-window-height 0.4)
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
   ;; Always trigger an immediate resize of the child frame
   (x-gtk-resize-child-frames 'resize-mode)
   (x-underline-at-descent-line t)
-  ;; Ignore case when reading a buffer name
-  (read-buffer-completion-ignore-case t)
-  (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (tags-add-tables nil)
   (tags-case-fold-search nil "case-sensitive")
   (tags-revert-without-query t)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
   (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
-  (backup-inhibited t "Disable backup for a per-file basis")
   (confirm-nonexistent-file-or-buffer t)
   (confirm-kill-emacs nil)
   ;; Prevent 'Active processes exist' when you quit Emacs
   (confirm-kill-processes nil)
-  (make-backup-files nil "Stop making backup `~' files")
   (require-final-newline t "Always end a file with a newline")
-  ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents
-  ;; to the visiting file and runs all save-related hooks. We disable
-  ;; `auto-save-mode' and prefer `auto-save-visited-mode' instead.
-  (auto-save-default nil)
-  ;; Save buffer to file after idling for some time, the default of 5s may be
-  ;; too frequent since it runs all the save-related hooks.
-  (auto-save-visited-interval 30)
   (revert-without-query '("\\.*") "Revert all files without asking")
-  (max-mini-window-height 0.4)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
   :config
   (dolist (exts
-           '(".directory"
+           '(".aux"
+             ".blg"
+             ".directory"
              ".dll"
              ".exe"
              ".fdb_latexmk"
              ".fls"
              ".lof"
              ".nav"
-             ".pyc"
              ".rel"
              ".rip"
              ".snm"
@@ -262,7 +266,6 @@ The provider is nerd-icons."
        '(
          ;; Auto-save file-visiting buffers at idle time intervals
          auto-save-visited-mode
-         column-number-mode size-indication-mode
          ;; Typing with the mark active will overwrite the marked region
          delete-selection-mode
          ;; Use soft wraps, wrap lines without the ugly continuation marks
@@ -2590,26 +2593,26 @@ The provider is nerd-icons."
   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
   )
 
-(use-package lsp-latex
-  :hook
-  ((latex-mode LaTeX-mode bibtex-mode)
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length fill-column)
-  (lsp-latex-diagnostics-delay 2000)
+;; (use-package lsp-latex
+;;   :hook
+;;   ((latex-mode LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter "latexindent")
+;;   (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
 
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click
-  ;; in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-  :config
-  (with-eval-after-load "tex-mode"
-    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load "tex-mode"
+;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 (use-package subword
   :straight (:type built-in)
@@ -2659,7 +2662,7 @@ The provider is nerd-icons."
   (eldoc-area-prefer-doc-buffer t "Disable popups")
   (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   :config
-  ;; Allow eldoc to trigger after completions
+  ;; Allow Eldoc to trigger after completions
   (with-eval-after-load "company"
     (eldoc-add-command
      'company-complete-selection
@@ -2668,12 +2671,12 @@ The provider is nerd-icons."
      'company-abort))
   :diminish)
 
-(use-package eldoc-box
-  :when (display-graphic-p)
-  :commands eldoc-box-help-at-point
-  :hook (prog-mode . eldoc-box-hover-mode)
-  :custom (eldoc-box-clear-with-C-g t)
-  :diminish)
+;; (use-package eldoc-box
+;;   :when (display-graphic-p)
+;;   :commands eldoc-box-help-at-point
+;;   :hook (prog-mode . eldoc-box-hover-mode)
+;;   :custom (eldoc-box-clear-with-C-g t)
+;;   :diminish)
 
 ;; Many treesitter modes are now derived from their based modes. For example,
 ;; `(derived-mode-p 'c-mode)' will return t in `c-ts-mode'. That means
@@ -2754,9 +2757,9 @@ The provider is nerd-icons."
 ;;   (global-treesit-auto-mode 1)
 ;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
-(with-eval-after-load "c++-ts-mode"
-  (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
-  (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map))
+;; (with-eval-after-load "c++-ts-mode"
+;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
+;;   (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map))
 
 ;; (with-eval-after-load "treesit"
 ;;   ;; Improves performance with large files without significantly diminishing
@@ -3145,6 +3148,50 @@ The provider is nerd-icons."
   :after corfu
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
   :custom (org-block-capf-edit-style 'inline))
+
+(use-package tex
+  :straight auctex
+  :hook
+  ((LaTeX-mode . LaTeX-math-mode)
+   (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
+   ;; Revert PDF buffer after TeX compilation has finished
+   (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+   ;; Enable rainbow mode after applying styles to the buffer
+   ;; (TeX-update-style . rainbow-delimiters-mode)
+   (LaTeX-mode . lsp-deferred))
+  :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
+  :custom
+  ;; Enable parse on save, stores parsed information in an `auto' directory
+  (TeX-auto-save t)
+  (TeX-auto-untabify t "Remove all tabs before saving")
+  (TeX-clean-confirm nil)
+  ;; Automatically insert braces after typing ^ and _ in math mode
+  (TeX-electric-sub-and-superscript t)
+  ;; Inserting $ completes the math mode and positions the cursor
+  (TeX-electric-math t)
+  (TeX-parse-self t "Parse documents")
+  (TeX-save-query nil "Save buffers automatically when compiling")
+  (LaTeX-item-indent 0 "Indent lists by two spaces")
+  (LaTeX-fill-break-at-separators nil "Do not insert line-break at inline math")
+  ;; Avoid raising of superscripts and lowering of subscripts
+  (tex-fontify-script nil)
+  ;; Avoid superscripts and subscripts from being displayed in a different font
+  ;; size
+  (font-latex-fontify-script nil)
+  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
+  :config
+  (setq-default TeX-master nil) ; Always query for the master file
+  (with-eval-after-load "auctex"
+    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
+    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
+    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
+
+  (with-eval-after-load "latex"
+    ;; (unbind-key "C-j" LaTeX-mode-map)
+    ;; Disable `LaTeX-insert-item' in favor of `imenu'
+    (unbind-key "C-c C-j" LaTeX-mode-map)
+
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map)))
 
 (with-eval-after-load "tex-mode"
   (setq tex-command "pdflatex"))
@@ -3758,11 +3805,11 @@ or the major mode is not in `sb/skippable-modes'."
  ("M-<right>" . sb/next-buffer)
  ("C-<tab>" . sb/next-buffer))
 
-(use-package default-text-scale
-  :when (display-graphic-p)
-  :bind
-  (("C-M-+" . default-text-scale-increase)
-   ("C-M--" . default-text-scale-decrease)))
+;; (use-package default-text-scale
+;;   :when (display-graphic-p)
+;;   :bind
+;;   (("C-M-+" . default-text-scale-increase)
+;;    ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
 (use-package free-keys
