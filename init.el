@@ -850,6 +850,10 @@ The provider is nerd-icons."
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
 
 (use-package consult
+  :preface
+  (defun sb/consult-line-symbol-at-point ()
+    (interactive)
+    (consult-line (thing-at-point 'symbol)))
   :after vertico
   :commands consult-fd
   :bind
@@ -885,6 +889,7 @@ The provider is nerd-icons."
    ("C-c s r" . consult-ripgrep)
    ("C-c s h" . consult-isearch-history)
    ("<f4>" . consult-line)
+   ("M-g l" . sb/consult-line-symbol-at-point)
    ([remap multi-occur] . consult-multi-occur)
    ("M-s m" . consult-multi-occur)
    ([remap recentf-open-files] . consult-recent-file)
@@ -3245,9 +3250,18 @@ The provider is nerd-icons."
   (auctex-latexmk-setup))
 
 (use-package citre
+  :preface
+  (defun sb/citre-jump+ ()
+    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
+    (interactive)
+    (condition-case _
+        (citre-jump)
+      (error
+       (let* ((xref-prompt-for-identifier nil))
+         (call-interactively #'xref-find-definitions)))))
   :hook (prog-mode . citre-mode)
   :bind
-  (("C-x c j" . citre-jump)
+  (("C-x c j" . sb/citre-jump+)
    ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c a" . citre-ace-peek)
@@ -3314,39 +3328,52 @@ The provider is nerd-icons."
 
   ;; (add-hook 'citre-mode-hook #'enable-lsp-citre-capf-backend)
 
-  (defmacro citre-backend-to-company-backend (backend)
-    "Create a company backend from Citre completion backend BACKEND.
+  (when (eq sb/in-buffer-completion 'company)
+    (defmacro citre-backend-to-company-backend (backend)
+      "Create a company backend from Citre completion backend BACKEND.
 The result is a company backend called
 `company-citre-<backend>' (like `company-citre-tags') and can be
 used in `company-backends'."
-    (let ((backend-name
-           (intern (concat "company-citre-" (symbol-name backend))))
-          (docstring
-           (concat
-            "`company-mode' backend from the `"
-            (symbol-name backend)
-            "' Citre backend.\n"
-            "`citre-mode' needs to be enabled to use this.")))
-      `(defun ,backend-name (command &optional arg &rest ignored)
-         ,docstring
-         (pcase command
-           ('interactive (company-begin-backend ',backend-name))
-           ('prefix
-            (and (bound-and-true-p citre-mode)
-                 (citre-backend-usable-p ',backend)
-                 ;; We shouldn't use this as it's defined for getting
-                 ;; definitions/references.  But the Citre completion
-                 ;; backend design is not fully compliant with company's
-                 ;; design so there's no simple "right" solution, and this
-                 ;; works for tags/global backends.
-                 (or (citre-get-symbol-at-point-for-backend ',backend) 'stop)))
-           ('meta (citre-get-property 'signature arg))
-           ('annotation (citre-get-property 'annotation arg))
-           ('candidates
-            (let ((citre-completion-backends '(,backend)))
-              (all-completions arg (nth 2 (citre-completion-at-point)))))))))
+      (let ((backend-name
+             (intern (concat "company-citre-" (symbol-name backend))))
+            (docstring
+             (concat
+              "`company-mode' backend from the `"
+              (symbol-name backend)
+              "' Citre backend.\n"
+              "`citre-mode' needs to be enabled to use this.")))
+        `(defun ,backend-name (command &optional arg &rest ignored)
+           ,docstring
+           (pcase command
+             ('interactive (company-begin-backend ',backend-name))
+             ('prefix
+              (and (bound-and-true-p citre-mode)
+                   (citre-backend-usable-p ',backend)
+                   ;; We shouldn't use this as it's defined for getting
+                   ;; definitions/references.  But the Citre completion
+                   ;; backend design is not fully compliant with company's
+                   ;; design so there's no simple "right" solution, and this
+                   ;; works for tags/global backends.
+                   (or (citre-get-symbol-at-point-for-backend ',backend)
+                       'stop)))
+             ('meta (citre-get-property 'signature arg))
+             ('annotation (citre-get-property 'annotation arg))
+             ('candidates
+              (let ((citre-completion-backends '(,backend)))
+                (all-completions arg (nth 2 (citre-completion-at-point)))))))))
 
-  (citre-backend-to-company-backend tags)
+    (citre-backend-to-company-backend tags))
+
+  (defun sb/push-point-to-xref-marker-stack (&rest r)
+    (xref-push-marker-stack (point-marker)))
+  (dolist (func
+           '(find-function consult-imenu
+                           project-grep
+                           deadgrep
+                           counsel-rg
+                           consult-lsp-file-symbols
+                           citre-jump))
+    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
   :diminish)
 
 (progn
@@ -3724,7 +3751,8 @@ If region is active, apply to active region instead."
     flycheck-verify-mode
     ibuffer-mode
     bs-mode
-    ediff-meta-mode)
+    ediff-meta-mode
+    native-comp-limple-mode)
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat string)
   :group 'sb/emacs)
