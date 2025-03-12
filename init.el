@@ -48,7 +48,7 @@
 ;; more extensive LaTeX support than Corfu. We can set up separate completion
 ;; files with `company-ispell' and `company-dict'. However, `company-ispell'
 ;; does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -154,8 +154,21 @@ The provider is nerd-icons."
    (lambda ()
      (save-place-mode 1)
      (column-number-mode 1)
-     (size-indication-mode 1)))
-
+     (size-indication-mode 1)
+     ;; Auto-save file-visiting buffers at idle time intervals
+     (auto-save-visited-mode 1)
+     ;; Typing with the mark active will overwrite the marked region
+     (delete-selection-mode 1)
+     ;; Use soft wraps, wrap lines without the ugly continuation marks
+     (global-visual-line-mode 1)
+     ;; When you call `find-file', you do not need to clear the existing
+     ;; file path before adding the new one. Just start typing the whole
+     ;; path and Emacs will "shadow" the current one. For example, you are
+     ;; at "~/Documents/notes/file.txt" and you want to go to
+     ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
+     ;; you there.
+     (file-name-shadow-mode 1)
+     (auto-encryption-mode -1)))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (warning-minimum-level :error)
@@ -259,27 +272,6 @@ The provider is nerd-icons."
   (when (eq system-type 'windows-nt)
     (setq w32-get-true-file-attributes nil))
 
-  (auto-encryption-mode -1)
-
-  (dolist
-      (mode
-       '(
-         ;; Auto-save file-visiting buffers at idle time intervals
-         auto-save-visited-mode
-         ;; Typing with the mark active will overwrite the marked region
-         delete-selection-mode
-         ;; Use soft wraps, wrap lines without the ugly continuation marks
-         global-visual-line-mode
-         ;; When you call `find-file', you do not need to clear the existing
-         ;; file path before adding the new one. Just start typing the whole
-         ;; path and Emacs will "shadow" the current one. For example, you are
-         ;; at "~/Documents/notes/file.txt" and you want to go to
-         ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
-         ;; you there.
-         file-name-shadow-mode))
-    (when (fboundp mode)
-      (funcall mode 1)))
-
   ;; Changing buffer-local variables will only affect a single buffer.
   ;; `setq-default' changes the buffer-local variable's default value.
   (setq-default
@@ -311,28 +303,6 @@ The provider is nerd-icons."
 
   (put 'overwrite-mode 'disabled t)
   :diminish visual-line-mode)
-
-;; `pixel-scroll-mode' uses line-by-line scrolling.
-;; (use-package pixel-scroll
-;;   :custom
-;;   (pixel-scroll-precision-use-momentum nil)
-;;   (pixel-scroll-precision-interpolate-page t)
-;;   (scroll-preserve-screen-position t)
-;;   (scroll-margin 3)
-;;   (scroll-step 1)
-;;   (scroll-conservatively 10000)
-;;   (scroll-error-top-bottom t)
-;;   (auto-window-vscroll nil)
-;;   (fast-but-imprecise-scrolling t)
-;;   (hscroll-margin 2)
-;;   (hscroll-step 1)
-;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
-;;   (mouse-wheel-scroll-amount-horizontal 1)
-;;   :config
-;;   (when (fboundp 'pixel-scroll-mode)
-;;     (pixel-scroll-mode 1))
-;;   (when (fboundp 'pixel-scroll-precision-mode)
-;;     (pixel-scroll-precision-mode 1)))
 
 (use-package autorevert
   :straight (:type built-in)
@@ -374,7 +344,7 @@ The provider is nerd-icons."
 ;; "C-c C-c".
 (use-package so-long
   :straight (:type built-in)
-  :when (featurep 'so-long)
+  :unless (version<= emacs-version "27")
   :hook (emacs-startup . global-so-long-mode))
 
 (use-package imenu
@@ -464,10 +434,10 @@ The provider is nerd-icons."
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
 ;; Use "Shift + direction" arrows for moving around windows.
-(use-package windmove
-  :straight (:type built-in)
-  :when (display-graphic-p)
-  :init (windmove-default-keybindings))
+;; (use-package windmove
+;;   :straight (:type built-in)
+;;   :when (display-graphic-p)
+;;   :init (windmove-default-keybindings))
 
 (use-package doc-view
   :straight (:type built-in)
@@ -503,11 +473,7 @@ The provider is nerd-icons."
 (use-package goto-addr
   :straight (:type built-in)
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
-  :bind
-  (("C-c C-o" . goto-address-at-point)
-   :map
-   goto-address-highlight-keymap
-   ("M-RET" . goto-address-at-point)))
+  :bind ("C-c C-o" . goto-address-at-point))
 
 (use-package winner
   :hook (emacs-startup . winner-mode)
@@ -518,7 +484,7 @@ The provider is nerd-icons."
 (use-package ediff
   :straight (:type built-in)
   :commands (ediff-buffers ediff-regions-linewise ediff-regions-wordwise)
-  :hook (ediff-cleanup . (lambda () (ediff-janitor nil nil)))
+  :hook (ediff-cleanup . winner-undo)
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -526,9 +492,7 @@ The provider is nerd-icons."
   (ediff-split-window-function #'split-window-horizontally)
   ;; Prompt and kill file variants on quitting an Ediff session
   (ediff-keep-variants nil)
-  :config
-  (ediff-set-diff-options 'ediff-diff-options "-w")
-  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
+  :config (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 ;; To edit remote files, use "/method:user@host#port:filename".
 ;; The shortcut "/ssh::" will connect to default "user@host#port".
@@ -556,10 +520,10 @@ The provider is nerd-icons."
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include this directory in $PATH on remote
-  (add-to-list
-   'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
+  ;; (add-to-list
+  ;;  'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-  (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
+  ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
   (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
@@ -645,6 +609,28 @@ The provider is nerd-icons."
      ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
       (display-buffer-no-window)
       (allow-no-window . t)))))
+
+;; `pixel-scroll-mode' uses line-by-line scrolling.
+;; (use-package pixel-scroll
+;;   :custom
+;;   (pixel-scroll-precision-use-momentum nil)
+;;   (pixel-scroll-precision-interpolate-page t)
+;;   (scroll-preserve-screen-position t)
+;;   (scroll-margin 3)
+;;   (scroll-step 1)
+;;   (scroll-conservatively 10000)
+;;   (scroll-error-top-bottom t)
+;;   (auto-window-vscroll nil)
+;;   (fast-but-imprecise-scrolling t)
+;;   (hscroll-margin 2)
+;;   (hscroll-step 1)
+;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+;;   (mouse-wheel-scroll-amount-horizontal 1)
+;;   :config
+;;   (when (fboundp 'pixel-scroll-mode)
+;;     (pixel-scroll-mode 1))
+;;   (when (fboundp 'pixel-scroll-precision-mode)
+;;     (pixel-scroll-precision-mode 1)))
 
 ;; Show temporary buffers as a popup window, and close them with "C-g"
 (use-package popwin
@@ -811,11 +797,8 @@ The provider is nerd-icons."
    project-prefix-map
    ("f" . project-or-external-find-file)
    ("b" . project-switch-to-buffer)
-   ("d" . project-dired)
-   ("v" . project-vc-dir)
    ("c" . project-compile)
    ("k" . project-kill-buffers)
-   ("g" . project-find-regexp)
    ("r" . project-query-replace-regexp))
   :custom
   ;; Start `project-find-file' by default
@@ -983,6 +966,8 @@ The provider is nerd-icons."
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end))))
 
+  (with-eval-after-load "LaTeX-mode"
+    (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map))
   (with-eval-after-load "tex-mode"
     (bind-key "C-c C-j" #'consult-outline tex-mode-map)))
 
@@ -1041,11 +1026,6 @@ The provider is nerd-icons."
   :straight (:host github :repo "Ladicle/consult-tramp")
   :bind ("C-c d t" . consult-tramp))
 
-(use-package consult-flycheck
-  :after flycheck
-  :demand t
-  :bind (:map flycheck-command-map ("!" . consult-flycheck)))
-
 (use-package ispell
   :straight (:type built-in)
   :bind ("M-$" . ispell-word)
@@ -1058,6 +1038,7 @@ The provider is nerd-icons."
   ;; Save a new word to personal dictionary without asking
   (ispell-silently-savep t)
   :config
+  ;; Prefer hunspell over aspell on Linux platforms
   (cond
    ((executable-find "hunspell")
     (progn
@@ -1135,16 +1116,19 @@ The provider is nerd-icons."
 
 (use-package hungry-delete
   :hook
-  ((minibuffer-setup . (lambda () (hungry-delete-mode -1)))
-   (emacs-startup . global-hungry-delete-mode))
+  ((emacs-startup . global-hungry-delete-mode)
+   (minibuffer-setup . (lambda () (hungry-delete-mode -1))))
   :diminish)
 
 (use-package move-text
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
+;; Expand region increases the selected region by semantic units
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
+;; `change-inner "' allows to kill the string contents, `change-outer "' will
+;; kill the entire string.
 (use-package change-inner
   :commands (change-inner change-outer))
 
@@ -1221,8 +1205,10 @@ The provider is nerd-icons."
   :custom (bm-buffer-persistence t "Save bookmarks"))
 
 (use-package crux
-  :commands crux-kill-other-buffers
-  :bind (("C-c d s" . crux-sudo-edit) ("C-<f9>" . crux-recentf-find-directory))
+  :bind
+  (("C-c d s" . crux-sudo-edit)
+   ("C-<f9>" . crux-recentf-find-directory)
+   ("C-<f11>" . crux-kill-other-buffers))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 (use-package rainbow-mode
@@ -1238,6 +1224,9 @@ The provider is nerd-icons."
     helpful-mode)
    . rainbow-mode)
   :diminish)
+
+(use-package rainbow-delimiters
+  :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
@@ -1347,7 +1336,8 @@ The provider is nerd-icons."
   :bind
   (("C-x g" . magit-status)
    ("C-c M-g" . magit-file-dispatch)
-   ("C-x M-g" . magit-dispatch))
+   ;; ("C-x M-g" . magit-dispatch)
+   )
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
@@ -1356,9 +1346,10 @@ The provider is nerd-icons."
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
-  ;; Show fine differences for the current diff hunk only
-  (magit-diff-refine-hunk t)
-  (magit-format-file-function #'magit-format-file-nerd-icons))
+  (with-eval-after-load "magit-diff"
+    ;; Show fine differences for the current diff hunk only
+    (magit-diff-refine-hunk t)
+    (magit-format-file-function #'magit-format-file-nerd-icons)))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -1368,9 +1359,9 @@ The provider is nerd-icons."
 ;; Fringe is unavailable in TTY
 (use-package diff-hl
   :hook
-  ((diff-hl-mode-on . diff-hl-margin-local-mode)
+  ((find-file . global-diff-hl-mode)
    (dired-mode . diff-hl-dired-mode-unless-remote)
-   (find-file . global-diff-hl-mode))
+   (diff-hl-mode-on . diff-hl-margin-local-mode))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
   :config
@@ -1471,6 +1462,21 @@ The provider is nerd-icons."
         (funcall fn checker property)))
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get))
 
+(use-package consult-flycheck
+  :after flycheck
+  :demand t
+  :bind (:map flycheck-command-map ("!" . consult-flycheck)))
+
+;; Include `hl-todo' keywords in flycheck messages.
+(use-package flycheck-hl-todo
+  :after flycheck
+  :init (flycheck-hl-todo-setup))
+
+;; Jump to `hl-todo' keywords in current buffer.
+(use-package consult-todo
+  :after (consult hl-todo)
+  :commands (consult-todo consult-todo-all))
+
 (use-package sideline
   :init (setq sideline-backends-left nil)
   :hook ((flycheck-mode lsp-mode) . sideline-mode)
@@ -1519,14 +1525,13 @@ The provider is nerd-icons."
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   (with-eval-after-load "tex-mode"
     (bind-key "C-x f" #'format-all-buffer tex-mode-map))
+  (with-eval-after-load "LaTeX-mode"
+    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
   :diminish)
 
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
-  :hook
-  ((python-mode python-ts-mode yaml-mode yaml-ts-mode tex-mode LaTeX-mode)
-   .
-   indent-bars-mode)
+  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :config
   (when (and (executable-find "tree-sitter")
              (fboundp 'treesit-available-p)
@@ -1555,50 +1560,6 @@ The provider is nerd-icons."
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
-
-;; Include `hl-todo' keywords in flycheck messages.
-(use-package flycheck-hl-todo
-  :after flycheck
-  :init (flycheck-hl-todo-setup))
-
-;; Jump to `hl-todo' keywords in current buffer.
-(use-package consult-todo
-  :after (consult hl-todo)
-  :commands (consult-todo consult-todo-all))
-
-;; "basic" matches only the prefix, "substring" matches the whole string.
-;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
-;; "list-command-history". "partial-completion" style allows to use wildcards
-;; for file completion and partial paths, e.g., "/u/s/l" for "/usr/share/local".
-;; While "partial-completion" matches search terms must match in order,
-;; "orderless" can match search terms in any order.
-(use-package minibuffer
-  :straight (:type built-in)
-  :bind
-  (("M-p" . minibuffer-previous-completion)
-   ("M-n" . minibuffer-next-completion)
-   ("M-RET" . minibuffer-choose-completion))
-  :custom
-  ;; Ignore case when reading a file name
-  (read-file-name-completion-ignore-case t)
-  (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
-  :config
-  ;; Show docstring description for completion candidates in commands like
-  ;; `describe-function'.
-  (when (boundp completions-detailed)
-    (setq completions-detailed t))
-
-  (when (fboundp 'dabbrev-capf)
-    (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
-
-  (with-eval-after-load "orderless"
-    ;; substring is needed to complete common prefix, orderless does not
-    (setq completion-styles '(orderless substring partial-completion basic)))
-
-  ;; The "basic" completion style needs to be tried first for TRAMP hostname
-  ;; completion to work. I also want substring matching for file names.
-  (setq completion-category-overrides
-        '((file (styles basic partial-completion)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the
 ;; current buffer and presents suggestions for completion.
@@ -1651,6 +1612,38 @@ The provider is nerd-icons."
             '(orderless)))
     (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-orderless)))
 
+;; "basic" matches only the prefix, "substring" matches the whole string.
+;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
+;; "list-command-history". "partial-completion" style allows to use wildcards
+;; for file completion and partial paths, e.g., "/u/s/l" for "/usr/share/local".
+;; While "partial-completion" matches search terms must match in order,
+;; "orderless" can match search terms in any order.
+(use-package minibuffer
+  :straight (:type built-in)
+  :bind
+  (("M-p" . minibuffer-previous-completion)
+   ("M-n" . minibuffer-next-completion))
+  :custom
+  ;; Ignore case when reading a file name
+  (read-file-name-completion-ignore-case t)
+  (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
+  :config
+  ;; Show docstring description for completion candidates in commands like
+  ;; `describe-function'.
+  (when (boundp completions-detailed)
+    (setq completions-detailed t))
+  (when (fboundp 'dabbrev-capf)
+    (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
+
+  (with-eval-after-load "orderless"
+    ;; substring is needed to complete common prefix, orderless does not
+    (setq completion-styles '(orderless substring partial-completion basic)))
+
+  ;; The "basic" completion style needs to be tried first for TRAMP hostname
+  ;; completion to work. I also want substring matching for file names.
+  (setq completion-category-overrides
+        '((file (styles basic partial-completion)))))
+
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((prog-mode LaTeX-mode latex-mode) . yas-global-mode)
@@ -1678,9 +1671,7 @@ The provider is nerd-icons."
   :when (eq sb/in-buffer-completion 'company)
   :hook (emacs-startup . global-company-mode)
   :bind
-  (
-   ;; Invoke the next backend in `company-backends'
-   ("C-M-/" . company-other-backend)
+  (("C-M-/" . company-other-backend) ; Invoke the next backend
    :map
    company-active-map
    ("C-M-/" . company-other-backend)
@@ -2215,14 +2206,6 @@ The provider is nerd-icons."
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-prefix 3)
-  (global-corfu-modes
-   '((not dired-mode
-          inferior-python-mode
-          magit-status-mode
-          help-mode
-          csv-mode
-          minibuffer-inactive-mode)
-     t))
   (corfu-on-exact-match nil) ; Do not auto expand snippets
   :config
   (with-eval-after-load "savehist"
@@ -2471,7 +2454,7 @@ The provider is nerd-icons."
   (lsp-enable-suggest-server-download nil)
   (lsp-inlay-hint-enable t)
   :config
-  (when (or (display-graphic-p) (daemonp))
+  (when (display-graphic-p)
     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
   ;; (dolist (ignore-dirs
@@ -2593,26 +2576,6 @@ The provider is nerd-icons."
   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
   )
 
-;; (use-package lsp-latex
-;;   :hook
-;;   ((latex-mode LaTeX-mode bibtex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'lsp-latex)
-;;      (lsp-deferred)))
-;;   :custom
-;;   (lsp-latex-bibtex-formatter "latexindent")
-;;   (lsp-latex-latex-formatter "latexindent")
-;;   (lsp-latex-bibtex-formatter-line-length fill-column)
-;;   (lsp-latex-diagnostics-delay 2000)
-
-;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
-;;   ;; in the PDF.
-;;   (lsp-latex-forward-search-executable "okular")
-;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-;;   :config
-;;   (with-eval-after-load "tex-mode"
-;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 (use-package subword
   :straight (:type built-in)
@@ -2648,7 +2611,10 @@ The provider is nerd-icons."
   :config
   (with-eval-after-load "tex-mode"
     (bind-key "<f10>" #'compile tex-mode-map)
-    (bind-key "<f11>" #'recompile tex-mode-map)))
+    (bind-key "<f11>" #'recompile tex-mode-map))
+  (with-eval-after-load "LaTeX-mode"
+    (bind-key "<f10>" #'compile LaTeX-mode-map)
+    (bind-key "<f11>" #'recompile LaTeX-mode-map)))
 
 (use-package fancy-compilation
   :after compile
@@ -2678,11 +2644,13 @@ The provider is nerd-icons."
 ;;   :custom (eldoc-box-clear-with-C-g t)
 ;;   :diminish)
 
-;; Many treesitter modes are now derived from their based modes. For example,
-;; `(derived-mode-p 'c-mode)' will return t in `c-ts-mode'. That means
-;; `.dir-locals.el' settings and yasnippets for `c-mode' will work for
-;; `c-ts-mode' too. However, `c-ts-mode' still does not run c-mode's major mode
-;; hooks. Also, there's still no major mode fallback.
+;; Tree-sitter provides advanced syntax highlighting features. Run
+;; `tree-sitter-langs-install-grammar' to install the grammar files for
+;; languages for tree-sitter. Many treesitter modes are derived from their based
+;; modes since Emacs 30. For example, `(derived-mode-p 'c-mode)' will return t
+;; in `c-ts-mode'. That means `.dir-locals.el' settings and yasnippets for
+;; `c-mode' will work for `c-ts-mode' too. However, `c-ts-mode' still does not
+;; run c-mode's major mode hooks. Also, there's still no major mode fallback.
 (use-package treesit
   :straight (:type built-in)
   :when
@@ -2690,6 +2658,7 @@ The provider is nerd-icons."
        (fboundp 'treesit-available-p)
        (treesit-available-p))
   :demand t
+  :commands treesit-install-language-grammar
   :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
   :custom
   ;; Increased default font locking may hurt performance
@@ -2702,13 +2671,12 @@ The provider is nerd-icons."
      (cmake "https://github.com/uyha/tree-sitter-cmake")
      (css "https://github.com/tree-sitter/tree-sitter-css")
      (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
-     (docker "https://github.com/camdencheek/tree-sitter-dockerfile")
+     (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
      (go "https://github.com/tree-sitter/tree-sitter-go")
      (html "https://github.com/tree-sitter/tree-sitter-html")
      (java "https://github.com/tree-sitter/tree-sitter-java")
      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-     (js "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
      (json "https://github.com/tree-sitter/tree-sitter-json")
      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
      (latex "https://github.com/latex-lsp/tree-sitter-latex")
@@ -2735,8 +2703,10 @@ The provider is nerd-icons."
                      (treesit-language-available-p 'cuda)
                      (treesit-language-available-p 'docker)
                      (treesit-language-available-p 'elisp)
+                     (treesit-language-available-p 'go)
                      (treesit-language-available-p 'html)
                      (treesit-language-available-p 'java)
+                     (treesit-language-available-p 'javascript)
                      (treesit-language-available-p 'json)
                      (treesit-language-available-p 'kdl)
                      (treesit-language-available-p 'latex)
@@ -2744,12 +2714,31 @@ The provider is nerd-icons."
                      (treesit-language-available-p 'markdown)
                      (treesit-language-available-p 'org)
                      (treesit-language-available-p 'perl)
+                     (treesit-language-available-p 'php)
                      (treesit-language-available-p 'python)
                      (treesit-language-available-p 'toml)
+                     (treesit-language-available-p 'tsx)
+                     (treesit-language-available-p 'typescript)
+                     (treesit-language-available-p 'rust)
                      (treesit-language-available-p 'yaml)))
     (mapc
      #'treesit-install-language-grammar
-     (mapcar #'car treesit-language-source-alist))))
+     (mapcar #'car treesit-language-source-alist)))
+
+  (when (treesit-available-p)
+    (setq major-mode-remap-alist
+          '((sh-mode . bash-ts-mode)
+            (c-mode . c++-ts-mode)
+            (c++-mode . c++-ts-mode)
+            (cmake-mode . cmake-ts-mode)
+            (css-mode . css-ts-mode)
+            (dockerfile-mode . dockerfile-ts-mode)
+            (html-mode . html-ts-mode)
+            (java-mode . java-ts-mode)
+            (json-mode . json-ts-mode)
+            (python-mode . python-ts-mode)
+            (toml-mode . toml-ts-mode)
+            (yaml-mode . yaml-ts-mode)))))
 
 ;; (use-package treesit-auto
 ;;   :after treesit
@@ -2769,7 +2758,7 @@ The provider is nerd-icons."
 (use-package c-ts-mode
   :straight (:type built-in)
   :when
-  (and (executable-find "treesitter")
+  (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
        (treesit-available-p))
   :mode (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
@@ -2788,10 +2777,6 @@ The provider is nerd-icons."
      (lsp-deferred)))
   :bind
   (:map
-   c-ts-mode-map
-   ("C-M-a" . treesit-beginning-of-defun)
-   ("C-M-e" . treesit-end-of-defun)
-   :map
    c++-ts-mode-map
    ("C-M-a" . treesit-beginning-of-defun)
    ("C-M-e" . treesit-end-of-defun)))
@@ -2995,21 +2980,21 @@ The provider is nerd-icons."
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
 
-(use-package markdown-ts-mode
-  :mode ("\\.md\\'" . markdown-ts-mode)
-  :config
-  (add-to-list
-   'treesit-language-source-alist
-   '(markdown
-     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-     "split_parser"
-     "tree-sitter-markdown/src"))
-  (add-to-list
-   'treesit-language-source-alist
-   '(markdown-inline
-     "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-     "split_parser"
-     "tree-sitter-markdown-inline/src")))
+;; (use-package markdown-ts-mode
+;;   :mode ("\\.md\\'" . markdown-ts-mode)
+;;   :config
+;;   (add-to-list
+;;    'treesit-language-source-alist
+;;    '(markdown
+;;      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+;;      "split_parser"
+;;      "tree-sitter-markdown/src"))
+;;   (add-to-list
+;;    'treesit-language-source-alist
+;;    '(markdown-inline
+;;      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+;;      "split_parser"
+;;      "tree-sitter-markdown-inline/src")))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
@@ -3149,6 +3134,30 @@ The provider is nerd-icons."
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
   :custom (org-block-capf-edit-style 'inline))
 
+;; Without auctex
+;; (with-eval-after-load "tex-mode"
+;;   (setq tex-command "pdflatex"))
+
+;; (use-package lsp-latex
+;;   :hook
+;;   ((latex-mode LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter "latexindent")
+;;   (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load "tex-mode"
+;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+
 (use-package tex
   :straight auctex
   :hook
@@ -3157,8 +3166,7 @@ The provider is nerd-icons."
    ;; Revert PDF buffer after TeX compilation has finished
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
-   ;; (TeX-update-style . rainbow-delimiters-mode)
-   (LaTeX-mode . lsp-deferred))
+   (TeX-update-style . rainbow-delimiters-mode))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
@@ -3185,16 +3193,10 @@ The provider is nerd-icons."
     (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
     (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
     (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
-
   (with-eval-after-load "latex"
     ;; (unbind-key "C-j" LaTeX-mode-map)
     ;; Disable `LaTeX-insert-item' in favor of `imenu'
-    (unbind-key "C-c C-j" LaTeX-mode-map)
-
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map)))
-
-(with-eval-after-load "tex-mode"
-  (setq tex-command "pdflatex"))
+    (unbind-key "C-c C-j" LaTeX-mode-map)))
 
 (use-package bibtex
   :straight (:type built-in)
@@ -3205,7 +3207,7 @@ The provider is nerd-icons."
 
 (use-package consult-reftex
   :straight (:host github :repo "karthink/consult-reftex")
-  :after (consult tex-mode)
+  :after (:any consult tex-mode LaTeX-mode)
   :bind
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
@@ -3219,7 +3221,7 @@ The provider is nerd-icons."
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
-  :after tex-mode
+  :after (:any tex-mode LaTeX-mode)
   :bind (:map tex-mode-map ("$" . math-delimiters-insert)))
 
 (use-package citar
@@ -3230,6 +3232,17 @@ The provider is nerd-icons."
   :after (citar embark)
   :config (citar-embark-mode)
   :diminish)
+
+(use-package auctex-latexmk
+  :after LaTeX-mode
+  :when (executable-find "latexmk")
+  :demand t
+  :custom
+  (auctex-latexmk-inherit-TeX-PDF-mode
+   t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  :config
+  (setq-default TeX-command-default "LatexMk")
+  (auctex-latexmk-setup))
 
 (use-package citre
   :hook (prog-mode . citre-mode)
@@ -3485,7 +3498,6 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-enable-word-count t))
 
 ;; (use-package centaur-tabs
-;;   :disabled
 ;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
 ;;   :bind*
 ;;   (("M-<right>" . centaur-tabs-forward-tab)
