@@ -162,6 +162,20 @@
             (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
+ (python-ts-mode
+  .
+  ((python-shell-exec-path . "/usr/bin/python3")
+   (python-shell-interpreter . "/usr/bin/python3")
+   (flycheck-pylintrc . "setup.cfg")
+   (py-isort-options . '("--settings-path=setup.cfg"))
+
+   (eval .
+         (add-hook
+          'lsp-managed-mode-hook
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
+
  (sh-mode . ((subdirs . nil)))
 
  (bash-ts-mode . ((subdirs . nil)))
@@ -266,6 +280,8 @@
             (add-hook 'before-save-hook #'lsp-format-buffer nil t))))))
 
  (latex-mode . ((lsp-latex-build-on-save . nil)))
+
+ (LaTeX-mode . ())
 
  (kdl-ts-mode . (mode . kdl-format-on-save)))
 
