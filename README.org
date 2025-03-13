@@ -226,6 +226,7 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 
 ** Debugging Emacs
 
+- Delete all ~.elc~ files: ~find $HOME/.emacs.d -name "*.elc" -delete~
 - ~kill -s USR2 [pid]~
 - ~killall -s USR2 emacs~
 - ~pkill -USR2 emacs~

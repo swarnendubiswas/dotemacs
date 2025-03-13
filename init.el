@@ -63,6 +63,16 @@ The provider is nerd-icons."
   :type 'boolean
   :group 'sb/emacs)
 
+;; Eglot does not allow multiple servers to connect to a major mode. For
+;; example, I can use `texlab' and `lsp-ltex-plus' together with LaTeX files.
+;; Eglot also does not support semantic tokens. However, configuring Eglot is
+;; simpler and I expect it to receive significant improvements now that it is in
+;; the Emacs core.
+(defcustom sb/lsp-provider 'eglot
+  "Choose between Lsp-mode and Eglot."
+  :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
+  :group 'sb/emacs)
+
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -114,6 +124,10 @@ The provider is nerd-icons."
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
 
+;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
+;; which provides a much prettier API for manipulating keymaps than `define-key'
+;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
+;; "C-h m" shows the keybindings for the major and the minor modes.
 (use-package bind-key
   :bind ("C-c d k" . describe-personal-keybindings))
 
@@ -182,7 +196,7 @@ The provider is nerd-icons."
   ;; Save buffer to file after idling for some time, the default of 5s may be
   ;; too frequent since it runs all the save-related hooks.
   (auto-save-visited-interval 30)
-  (apropos-do-all t)
+  (apropos-do-all t "Make `apropos' search more extensively")
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
   ;; Autofill comments in modes that define them
@@ -462,9 +476,12 @@ The provider is nerd-icons."
   (doc-view-continuous t)
   (doc-view-resolution 120))
 
+;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
+;; `find-file' unless a prefix argument is given. Then it will find file at
+;; point.
 (use-package ffap
   :straight (:type built-in)
-  :bind ("<f2>" . ffap)
+  :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
   :custom
   ;; Do not ping things that look like domain names
   (ffap-machine-p-known 'reject))
@@ -621,6 +638,8 @@ The provider is nerd-icons."
 ;;   (scroll-conservatively 10000)
 ;;   (scroll-error-top-bottom t)
 ;;   (auto-window-vscroll nil)
+;; ;; Accelerate scrolling operations when non-nil. Only those portions of the
+;; ;; buffer which are actually going to be displayed get fontified.
 ;;   (fast-but-imprecise-scrolling t)
 ;;   (hscroll-margin 2)
 ;;   (hscroll-step 1)
@@ -917,6 +936,7 @@ The provider is nerd-icons."
      "\\*Minibuf"
      "\\*Backtrace"
      "\\*Warning"
+     "\\*Help*"
      "Flymake log"
      "\\*Flycheck"
      "Shell command output"
@@ -929,20 +949,20 @@ The provider is nerd-icons."
      "\\*Native-*"
      "\\*Async-"
      "\\*format-all-error"
+     "\\*Ediff Registry\\*"
      "COMMIT_EDITMSG"
      "TAGS"
      "\\*lsp-*"
      "\\*EGLOT"
      "\\*pylsp"
      "\\*vc"
-     "\\*citre-ctags*"
+     "\\*citre*"
      "\\*ltex-ls"
      "\\*texlab"
      "\\*tramp"
      "\\*bash-ls*"
      "\\*json-ls*"
      "\\*yaml-ls*"
-     "\\*Ediff Registry\\*"
      "\\*shfmt*"))
   :config
   (consult-customize
@@ -986,6 +1006,7 @@ The provider is nerd-icons."
    ("C-x C-j" . consult-dir-jump-file))
   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
+;; Provide context-dependent actions similar to a content menu.
 (use-package embark
   :bind
   ( ;; "C-h b" lists all the bindings available in a buffer
@@ -1166,6 +1187,7 @@ The provider is nerd-icons."
   ;; Use pretty Unicode glyphs to draw the tree
   (vundo-glyph-alist vundo-unicode-symbols))
 
+;; Edit multiple regions in the same way simultaneously
 (use-package iedit
   :bind* ("C-." . iedit-mode))
 
@@ -1230,8 +1252,9 @@ The provider is nerd-icons."
    . rainbow-mode)
   :diminish)
 
-(use-package rainbow-delimiters
-  :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
+;; LATER: The parenthesis faces are wrongly highlighted
+;; (use-package rainbow-delimiters
+;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
@@ -1276,6 +1299,9 @@ The provider is nerd-icons."
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
+(when (executable-find "fd")
+  (setq find-program "fd"))
+
 ;; `consult-rg' provides live search, while `deadgrep' provides a resulting
 ;; search buffer.
 (use-package deadgrep
@@ -1295,6 +1321,8 @@ The provider is nerd-icons."
   (with-eval-after-load "deadgrep"
     (bind-key "e" #'wgrep-change-to-wgrep-mode deadgrep-mode-map)))
 
+;; Allows you to edit a deadgrep buffer and apply those changes to the file
+;; buffer.
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
@@ -1361,7 +1389,8 @@ The provider is nerd-icons."
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-;; Fringe is unavailable in TTY
+;; Diff-hl looks nicer than git-gutter, and is based on `vc'.
+;; Fringe is unavailable in TTY.
 (use-package diff-hl
   :hook
   ((find-file . global-diff-hl-mode)
@@ -1649,6 +1678,7 @@ The provider is nerd-icons."
   (setq completion-category-overrides
         '((file (styles basic partial-completion)))))
 
+;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
   :hook ((prog-mode LaTeX-mode latex-mode) . yas-global-mode)
@@ -1732,6 +1762,13 @@ The provider is nerd-icons."
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
   (company-minimum-prefix-length 3)
+  ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup
+  ;; unless there is only one candidate, `company-preview-frontend' shows the
+  ;; preview in-place which is too intrusive,
+  ;; `company-preview-if-just-one-frontend' shows in-place preview if there is
+  ;; only choice, `company-echo-metadata-frontend' shows selected candidate docs
+  ;; in echo area, and `company-pseudo-tooltip-frontend' which always shows the
+  ;; candidates in an overlay.
   (company-frontends
    '(
      ;; Always show candidates in overlay tooltip
@@ -1985,6 +2022,10 @@ The provider is nerd-icons."
 
 ;; (use-package company-ctags
 ;;   :after (company prog-mode)
+;;   :demand t)
+
+;; (use-package company-auctex
+;;   :after (company LaTeX-mode)
 ;;   :demand t)
 
 ;; Try completion backends in order until there is a non-empty completion list:
@@ -2533,6 +2574,7 @@ The provider is nerd-icons."
    ("h" . consult-lsp-file-symbols)))
 
 (use-package lsp-java
+  :when (eq sb/lsp-provider 'lsp-mode)
   :hook
   ((java-mode java-ts-mode)
    .
@@ -2550,6 +2592,7 @@ The provider is nerd-icons."
 
 (use-package lsp-ltex-plus
   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
+  :when (eq sb/lsp-provider 'lsp-mode)
   :init (setq lsp-ltex-plus-version "18.4.0")
   :hook
   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
@@ -2779,7 +2822,11 @@ The provider is nerd-icons."
       c-electric-flag nil
       c-enable-auto-newline nil
       c-syntactic-indentation nil)
-     (lsp-deferred)))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
   :bind
   (:map
    c++-ts-mode-map
@@ -2803,8 +2850,13 @@ The provider is nerd-icons."
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls-plus))
-     (lsp-deferred))))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (progn
+         (setq-local lsp-disabled-clients '(ltex-ls-plus))
+         (lsp-deferred)))))))
 
 (use-package python
   :straight (:type built-in)
@@ -2812,7 +2864,15 @@ The provider is nerd-icons."
   (("SCon\(struct\|script\)$" . python-ts-mode)
    ("[./]flake8\\'" . conf-mode)
    ("/Pipfile\\'" . conf-mode))
-  :hook ((python-mode python-ts-mode) . lsp-deferred)
+  :hook
+  ((python-mode python-ts-mode)
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
   :bind
   (:map
    python-mode-map
@@ -2856,7 +2916,15 @@ The provider is nerd-icons."
 (use-package sh-script
   :straight (:type built-in)
   :mode ("\\bashrc\\'" . bash-ts-mode)
-  :hook ((sh-mode bash-ts-mode) . lsp-deferred)
+  :hook
+  ((sh-mode bash-ts-mode)
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
@@ -2919,15 +2987,28 @@ The provider is nerd-icons."
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls-plus))
-     (lsp-deferred))))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (progn
+         (setq-local lsp-disabled-clients '(ltex-ls-plus))
+         (lsp-deferred)))))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
 (use-package css-mode
   :straight (:type built-in)
-  :hook ((css-mode css-ts-mode) . lsp-deferred)
+  :hook
+  ((css-mode css-ts-mode)
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
   :custom (css-indent-offset 2))
 
 (use-package make-mode
@@ -2941,7 +3022,11 @@ The provider is nerd-icons."
    .
    (lambda ()
      (setq-local indent-tabs-mode t)
-     (lsp-deferred))))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -2966,8 +3051,13 @@ The provider is nerd-icons."
   (markdown-mode
    .
    (lambda ()
-     (require 'lsp-marksman)
-     (lsp-deferred)))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (progn
+         (require 'lsp-marksman)
+         (lsp-deferred))))))
   :bind
   (:map
    markdown-mode-map
@@ -3019,8 +3109,13 @@ The provider is nerd-icons."
      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (setq-local lsp-disabled-clients '(ltex-ls-plus))
-     (lsp-deferred)))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (progn
+         (setq-local lsp-disabled-clients '(ltex-ls-plus))
+         (lsp-deferred))))))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -3039,7 +3134,24 @@ The provider is nerd-icons."
    .
    (lambda ()
      (setq-local js-indent-level 2)
-     (lsp-deferred))))
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
+
+;; Links in org-mode by default are displayed as "descriptive" links, meaning
+;; they hide their target URLs. While this looks great, it makes it a bit tricky
+;; to figure out how you can edit their URL. There are two easy options: (i)
+;; press "C-c C-l" (`org-insert-link') while your point is within a link and you
+;; will be prompted to edit its URL in the minibuffer. You can use the same
+;; command to create new links (when your point is not on an existing link).
+;; (ii) You can convert the "descriptive" links to "literal" links by invoking
+;; the command "M-x org-toggle-link-display". You can also toggle between the
+;; two display modes for links. Use zero-width space "C-x 8 zero width space" to
+;; treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 
 (use-package org
   :defer 2
@@ -3163,6 +3275,9 @@ The provider is nerd-icons."
 ;;   (with-eval-after-load "tex-mode"
 ;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
+;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
+;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
+;; is an alias to `latex-mode'. Auctex overrides the tex package.
 (use-package tex
   :straight auctex
   :hook
@@ -3576,7 +3691,15 @@ PAD can be left (`l') or right (`r')."
 
 (use-package asm-mode
   :straight (:type built-in)
-  :hook (asm-mode . lsp-deferred))
+  :hook
+  (asm-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
 
 ;; Guess the indentation offset originally used in foreign source code files and
 ;; transparently adjust the corresponding settings in Emacs making it more
@@ -3627,7 +3750,8 @@ PAD can be left (`l') or right (`r')."
    outline-indent-minor-mode)
   :custom
   (outline-indent-ellipsis " ▼ ")
-  (outline-blank-line t))
+  (outline-blank-line t)
+  :diminish (outline-minor-mode outline-indent-minor-mode))
 
 ;; Allows to easily identify the file path in a project
 (use-package project-headerline
@@ -3664,6 +3788,7 @@ PAD can be left (`l') or right (`r')."
     yaml-mode
     yaml-ts-mode)
    . hs-minor-mode)
+  :custom (hs-isearch-open t "Open all folds while searching")
   :diminish hs-minor-mode)
 
 (use-package dogears
@@ -3676,6 +3801,181 @@ PAD can be left (`l') or right (`r')."
    ("M-g M-d" . dogears-list)
    ("M-g M-D" . dogears-sidebar))
   :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
+
+(use-package kill-file-path
+  :straight (:host github :repo "chyla/kill-file-path")
+  :commands
+  (kill-file-path-basename
+   kill-file-path-basename-without-extension
+   kill-file-path-dirname
+   kill-file-path))
+
+(use-package eglot
+  :straight (:source (gnu-elpa-mirror))
+  :when (eq sb/lsp-provider 'eglot)
+  :bind
+  (("C-c l l" . eglot)
+   ("C-c l q" . eglot-shutdown)
+   ("C-c l Q" . eglot-shutdown-all)
+   ("C-c l d" . eglot-find-declaration)
+   ("C-c l i" . eglot-find-implementation)
+   ("C-c l t" . eglot-find-typeDefinition)
+   ("C-c l r" . eglot-rename)
+   ("C-c l f" . eglot-format)
+   ("C-c l F" . eglot-format-buffer)
+   ("C-c l x" . eglot-code-actions))
+  :hook
+  ( ;; (eglot-managed-mode . eglot-inlay-hints-mode) ; Inlay hints are distracting
+   ((c-mode
+     c-ts-mode
+     c++-mode
+     c++-ts-mode
+     python-mode
+     python-ts-mode
+     css-mode
+     css-ts-mode
+     markdown-mode
+     sh-mode
+     bash-ts-mode
+     LaTeX-mode
+     bibtex-mode
+     html-mode
+     html-ts-mode
+     json-mode
+     json-ts-mode
+     dockerfile-ts-mode
+     perl-mode)
+    . eglot-ensure))
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-sync-connect nil)
+  (eglot-connect-timeout nil)
+  (eglot-send-changes-idle-time 3)
+  (eglot-extend-to-xref t)
+  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
+  ;; Eglot overwrites `company-backends' to only include `company-capf'
+  (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
+  (fset #'jsonrpc--log-event #'ignore)
+  (eglot-ignored-server-capabilities
+   '(:codeLensProvider
+     :executeCommandProvider
+     :hoverProvider ; Automatic documentation popups can be distracting
+     :foldingRangeProvider
+     :documentOnTypeFormattingProvider
+     :documentLinkProvider
+     :documentHighlightProvider
+     ;; Inlay hints are distracting
+     :inlayHintProvider))
+  :config
+  ;; Show all of the available eldoc information when we want it. This way Flymake errors
+  ;; don't just get clobbered by docstrings.
+  (add-hook
+   'eglot-managed-mode-hook
+   (lambda ()
+     "Make sure Eldoc will show us all of the feedback at point."
+     (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
+
+  ;; (let ((disabled-modes '(emacs-lisp-mode dockerfile-ts-mode)))
+  ;;   (unless (apply 'derived-mode-p disabled-modes)
+  ;;     (eglot-ensure)))
+
+  ;; (setq-default eglot-workspace-configuration
+  ;;   '
+  ;;   (
+  ;;     (:pylsp
+  ;;       .
+  ;;       (:configurationSources
+  ;;         ["setup.cfg"]
+  ;;         :plugins
+  ;;         (:jedi_completion
+  ;;           (:include_params t :fuzzy t)
+  ;;           :pycodestyle (:enabled :json-false)
+  ;;           :mccabe (:enabled :json-false)
+  ;;           :pyflakes (:enabled :json-false)
+  ;;           :flake8 (:enabled :json-false :maxLineLength 100)
+  ;;           :black (:enabled :json-false :line_length 100 :cache_config t)
+  ;;           :yapf (:enabled t)
+  ;;           :pydocstyle (:enabled t :convention "numpy")
+  ;;           :autopep8 (:enabled :json-false)
+  ;;           :pylint (:enabled t)
+  ;;           :ruff (:enabled :json-false :lineLength 100)
+  ;;           :pylsp_isort (:enabled t)
+  ;;           :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false))))
+  ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
+
+  (add-to-list
+   'eglot-server-programs
+   '((c++-mode c++-ts-mode c-mode c-ts-mode)
+     .
+     ("clangd"
+      "-j=4"
+      "--all-scopes-completion"
+      "--background-index"
+      "--clang-tidy"
+      "--completion-style=detailed"
+      "--fallback-style=LLVM"
+      "--header-insertion=never"
+      "--header-insertion-decorators=0"
+      "--log=error"
+      ;; Unsupported option with Clangd 10: malloc-trim and enable-config
+      "--malloc-trim" ; Release memory periodically
+      "--enable-config"
+      "--pch-storage=memory" ; Increases memory usage but can improve performance
+      "--pretty")))
+
+  (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
+
+(use-package eglot-booster
+  :straight (:type git :host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :demand t
+  :config (eglot-booster-mode))
+
+(use-package eglot-java
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  (java-mode
+   .
+   (lambda ()
+     (eglot-ensure)
+     (eglot-java-mode))))
+
+(use-package eglot-hierarchy
+  :straight (:host github :repo "dolmens/eglot-hierarchy"))
+
+(use-package consult-eglot
+  :when (eq sb/lsp-provider 'eglot)
+  :after (consult eglot)
+  :commands consult-eglot-symbols)
+
+(use-package flycheck-eglot
+  :straight (:host github :repo "intramurz/flycheck-eglot")
+  :when (eq sb/lsp-provider 'eglot)
+  :after (flycheck eglot)
+  :init (global-flycheck-eglot-mode 1))
+
+(use-package eglot-ltex-plus
+  :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
+   .
+   (lambda ()
+     (require 'eglot-ltex-plus)
+     (eglot-ensure)))
+  :init
+  (setq
+   eglot-ltex-plus-server-path "path/to/ltex-ls-XX.X.X/"
+   eglot-ltex-plus-communication-channel 'stdio)
+
+  ;; Configure the LSP as follows using `.dir-locals.el'.
+
+  ;; ((nil .
+  ;;       ((eglot-workspace-configuration
+  ;;         . (:ltex-ls-plus  (:language  "en-US"
+  ;;                                       :additionalRules (:motherTongue "de-DE")))))))
+  )
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
