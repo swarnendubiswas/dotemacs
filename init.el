@@ -3825,32 +3825,30 @@ PAD can be left (`l') or right (`r')."
    ("C-c l F" . eglot-format-buffer)
    ("C-c l x" . eglot-code-actions))
   :hook
-  ( ;; (eglot-managed-mode . eglot-inlay-hints-mode) ; Inlay hints are distracting
-   ((c-mode
-     c-ts-mode
-     c++-mode
-     c++-ts-mode
-     python-mode
-     python-ts-mode
-     css-mode
-     css-ts-mode
-     markdown-mode
-     sh-mode
-     bash-ts-mode
-     LaTeX-mode
-     bibtex-mode
-     html-mode
-     html-ts-mode
-     json-mode
-     json-ts-mode
-     dockerfile-ts-mode
-     perl-mode)
-    . eglot-ensure))
+  ((c-mode
+    c-ts-mode
+    c++-mode
+    c++-ts-mode
+    python-mode
+    python-ts-mode
+    css-mode
+    css-ts-mode
+    markdown-mode
+    sh-mode
+    bash-ts-mode
+    LaTeX-mode
+    bibtex-mode
+    html-mode
+    html-ts-mode
+    json-mode
+    json-ts-mode
+    dockerfile-ts-mode
+    perl-mode)
+   . eglot-ensure)
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil)
   (eglot-connect-timeout nil)
-  (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   (fset #'jsonrpc--log-event #'ignore)
@@ -3883,6 +3881,10 @@ PAD can be left (`l') or right (`r')."
   ;;   (setq eglot-server-programs (assq-delete-all mode eglot-server-programs)))
 
   (setq eglot-server-programs nil)
+  (add-to-list
+   'eglot-server-programs
+   '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
+     . ("ltex-ls-plus")))
   (add-to-list
    'eglot-server-programs
    '((c++-mode c++-ts-mode c-mode c-ts-mode)
@@ -3941,54 +3943,54 @@ PAD can be left (`l') or right (`r')."
    '((perl-mode cperl-mode) "perl" "-MPerl::LanguageServer" "-e"))
   (add-to-list 'eglot-server-programs '(markdown-mode "marksman" "server"))
 
-  (setq-default eglot-workspace-configuration
-                '(:pylsp
-                  (:configurationSources
-                   ["setup.cfg"]
-                   :plugins
-                   (:autopep8
-                    (:enabled :json-false)
-                    :flake8
-                    (:enabled :json-false :config t :maxLineLength 80)
-                    :jedi (:extra_paths [])
-                    :jedi_completion
-                    (:include_params
-                     t
-                     :include_class_objects t
-                     :fuzzy t
-                     :cache_for
-                     ["pandas" "numpy" "matplotlib"])
-                    :jedi_definition
-                    (:enabled t :follow_imports t :follow_builtin_imports t)
-                    :jedi_references (:enabled t)
-                    :jedi_signature_help (:enabled t)
-                    :jedi_symbols
-                    (:enabled t :all_scopes t :include_import_symbols t)
-                    :mccabe
-                    (:enabled :json-false)
-                    :preload
-                    (:enabled t :modules ["pandas" "numpy" "matplotlib"])
-                    :pycodestyle
-                    (:enabled :json-false)
-                    :pydocstyle
-                    (:enabled t :convention "numpy")
-                    :pyflakes
-                    (:enabled :json-false)
-                    :pylint (:enabled t)
-                    :pylsp_isort (:enabled t)
-                    :pylsp_mypy
-                    (:enabled t :report_progress t :live_mode :json-false)
-                    :rope_completion
-                    (:enabled t :eager :json-false)
-                    :ruff
-                    (:enabled :json-false :lineLength 80)
-                    :yapf (:enabled t)))
-                  :basedpyright (:typeCheckingMode "recommended")
-                  :basedpyright.analysis
-                  (:diagnosticSeverityOverrides
-                   (:reportUnusedCallResult "none")
-                   :inlayHints (:callArgumentNames :json-false))
-                  :pyright (:useLibraryCodeForTypes t))))
+  (setq-default
+   eglot-workspace-configuration
+   '(:pylsp
+     (:configurationSources
+      ["setup.cfg"]
+      :plugins
+      (:autopep8
+       (:enabled :json-false)
+       :flake8 (:enabled :json-false :config t :maxLineLength 80)
+       :jedi (:extra_paths [])
+       :jedi_completion
+       (:include_params
+        t
+        :include_class_objects t
+        :fuzzy t
+        :cache_for
+        ["pandas" "numpy" "matplotlib"])
+       :jedi_definition (:enabled t :follow_imports t :follow_builtin_imports t)
+       :jedi_references (:enabled t)
+       :jedi_signature_help (:enabled t)
+       :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
+       :mccabe (:enabled :json-false)
+       :preload (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+       :pycodestyle (:enabled :json-false)
+       :pydocstyle (:enabled t :convention "numpy")
+       :pyflakes (:enabled :json-false)
+       :pylint (:enabled t)
+       :pylsp_isort (:enabled t)
+       :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false)
+       :rope_completion (:enabled t :eager :json-false)
+       :ruff (:enabled :json-false :lineLength 80)
+       :yapf (:enabled t)))
+     :basedpyright (:checkOnlyOpenFiles t :typeCheckingMode "recommended")
+     :basedpyright.analysis
+     (:diagnosticSeverityOverrides
+      (:reportUnusedCallResult "none")
+      :inlayHints (:callArgumentNames :json-false))
+     :pyright
+     (:checkOnlyOpenFiles
+      t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t)
+     :ltex-ls-plus
+     '(:language
+       "en-US"
+       :disabledRules
+       (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
+       :additionalRules (:enablePickyRules t)))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
@@ -4018,28 +4020,6 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/lsp-provider 'eglot)
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
-
-;; (use-package eglot-ltex-plus
-;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'eglot-ltex-plus)
-;;      (eglot-ensure)))
-;;   :init
-;;   (setq
-;;    eglot-ltex-plus-server-path "path/to/ltex-ls-XX.X.X/"
-;;    eglot-ltex-plus-communication-channel 'stdio)
-
-;;   ;; Configure the LSP as follows using `.dir-locals.el'.
-
-;;   ;; ((nil .
-;;   ;;       ((eglot-workspace-configuration
-;;   ;;         . (:ltex-ls-plus  (:language  "en-US"
-;;   ;;                                       :additionalRules (:motherTongue "de-DE")))))))
-;;   )
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
