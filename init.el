@@ -265,19 +265,19 @@ The provider is nerd-icons."
              "indent.log"))
     (add-to-list 'completion-ignored-extensions exts))
 
-  (when (boundp next-error-message-highlight)
+  (when (boundp 'next-error-message-highlight)
     (setq next-error-message-highlight t))
-  (when (boundp read-minibuffer-restore-windows)
+  (when (boundp 'read-minibuffer-restore-windows)
     (setq read-minibuffer-restore-windows t))
-  (when (boundp use-short-answers)
+  (when (boundp 'use-short-answers)
     (setq use-short-answers t))
   ;; Hide commands in "M-x" which do not work in the current mode.
-  (when (boundp read-extended-command-predicate)
+  (when (boundp 'read-extended-command-predicate)
     (setq read-extended-command-predicate
           #'command-completion-default-include-p))
-  (when (boundp help-window-keep-selected)
+  (when (boundp 'help-window-keep-selected)
     (setq help-window-keep-selected t))
-  (when (boundp find-sibling-rules)
+  (when (boundp 'find-sibling-rules)
     (setq find-sibling-rules
           '(("\\([^/]+\\)\\.c\\'" "\\1.h")
             ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
@@ -533,12 +533,13 @@ The provider is nerd-icons."
   ;; Remote files are not updated outside of Tramp
   (remote-file-name-inhibit-cache nil)
   (tramp-verbose 1 "Only errors and warnings")
+  (tramp-default-method "ssh")
   :config
+  (when (boundp 'tramp-use-connection-share)
+    (setq tramp-use-connection-share nil))
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
-  ;; Include this directory in $PATH on remote
-  ;; (add-to-list
-  ;;  'tramp-remote-path (expand-file-name ".local/bin" (getenv "HOME")))
+  ;; Include "$HOME/.local/bin" directory in $PATH on remote
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
   (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
@@ -736,8 +737,9 @@ The provider is nerd-icons."
   ;; information, "p" is to append "/" indicator to directories, "v" uses
   ;; natural sort of (version) numbers within text. Check "ls" for additional
   ;; options.
-  (dired-listing-switches
-   "-aBFghlNopv --group-directories-first --time-style=locale")
+
+  ;; (dired-listing-switches
+  ;;  "-aBFghlNopv --group-directories-first --time-style=locale")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
@@ -828,7 +830,7 @@ The provider is nerd-icons."
   :straight (:host github :repo "karthink/project-x")
   :after project
   :demand t
-  :config (add-hook 'project-find-functions 'project-x-try-local 90))
+  :config (add-hook 'project-find-functions #'project-x-try-local 90))
 
 (use-package vertico
   :straight
@@ -1513,7 +1515,7 @@ The provider is nerd-icons."
 
 (use-package sideline
   :init (setq sideline-backends-left nil)
-  :hook ((flycheck-mode lsp-mode) . sideline-mode)
+  :hook ((flycheck-mode lsp-mode eglot-managed-mode) . sideline-mode)
   :diminish)
 
 (use-package sideline-flycheck
@@ -1521,6 +1523,7 @@ The provider is nerd-icons."
   :hook (flycheck-mode . sideline-flycheck-setup))
 
 (use-package sideline-lsp
+  :when (eq sb/lsp-provider 'lsp-mode)
   :after sideline
   :config
   (setq sideline-backends-right
@@ -1664,7 +1667,7 @@ The provider is nerd-icons."
   :config
   ;; Show docstring description for completion candidates in commands like
   ;; `describe-function'.
-  (when (boundp completions-detailed)
+  (when (boundp 'completions-detailed)
     (setq completions-detailed t))
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
@@ -1775,7 +1778,8 @@ The provider is nerd-icons."
      company-pseudo-tooltip-frontend
      ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend))
-  (company-format-margin-function (bound-and-true-p sb/enable-icons)))
+  (company-format-margin-function (bound-and-true-p sb/enable-icons))
+  :diminish)
 
 (use-package kind-icon
   :when (bound-and-true-p sb/enable-icons)
@@ -3286,7 +3290,8 @@ The provider is nerd-icons."
    ;; Revert PDF buffer after TeX compilation has finished
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
-   (TeX-update-style . rainbow-delimiters-mode))
+   ;; (TeX-update-style . rainbow-delimiters-mode)
+   )
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
@@ -3632,12 +3637,12 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (emacs-startup . doom-modeline-mode)
   :custom
-  (doom-modeline-height 30 "Respected only in GUI")
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-minor-modes t)
   (doom-modeline-unicode-fallback t)
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
-  (doom-modeline-enable-word-count t))
+  (doom-modeline-enable-word-count t)
+  (doom-modeline-lsp nil))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -3854,16 +3859,16 @@ PAD can be left (`l') or right (`r')."
   (fset #'jsonrpc--log-event #'ignore)
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
-  (eglot-ignored-server-capabilities
-   '(:codeLensProvider
-     :executeCommandProvider
-     :hoverProvider ; Automatic documentation popups can be distracting
-     :foldingRangeProvider
-     :documentOnTypeFormattingProvider
-     :documentLinkProvider
-     ;; :inlayHintProvider ; Inlay hints are distracting
-     ;; :documentHighlightProvider
-     ))
+  ;; (eglot-ignored-server-capabilities
+  ;;  '(:codeLensProvider
+  ;;    :executeCommandProvider
+  ;;    :hoverProvider ; Automatic documentation popups can be distracting
+  ;;    :foldingRangeProvider
+  ;;    :documentOnTypeFormattingProvider
+  ;;    :documentLinkProvider
+  ;;    :inlayHintProvider ; Inlay hints are distracting
+  ;;    :documentHighlightProvider
+  ;;    ))
   :config
   ;; Show all of the available eldoc information when we want it. This way
   ;; Flymake errors don't just get clobbered by docstrings.
@@ -3873,14 +3878,23 @@ PAD can be left (`l') or right (`r')."
      "Make sure Eldoc will show us all of the feedback at point."
      (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
 
-  ;; (let ((disabled-modes '(emacs-lisp-mode dockerfile-ts-mode)))
-  ;;   (unless (apply 'derived-mode-p disabled-modes)
-  ;;     (eglot-ensure)))
-
   ;; (dolist (mode '(yaml-mode yaml-ts-mode))
   ;;   (setq eglot-server-programs (assq-delete-all mode eglot-server-programs)))
 
   (setq eglot-server-programs nil)
+  (add-to-list
+   'eglot-server-programs
+   '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
+     . ("autotools-language-server")))
+  (add-to-list 'eglot-server-programs '(fish-mode . ("fish-lsp" "start")))
+  (add-to-list
+   'eglot-server-programs '((awk-mode awk-ts-mode) . ("awk-language-server")))
+  (add-to-list
+   'eglot-server-programs
+   '(web-mode . ("vscode-html-language-server" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp")))
   (add-to-list
    'eglot-server-programs
    '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
@@ -3905,7 +3919,6 @@ PAD can be left (`l') or right (`r')."
       "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty")))
   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
-  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
   (add-to-list
    'eglot-server-programs
    '((css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio")))
@@ -3927,21 +3940,25 @@ PAD can be left (`l') or right (`r')."
    '((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")))
   (add-to-list 'eglot-server-programs '(php-mode . ("intelephense" "--stdio")))
   (add-to-list
-   'eglot-server-programs '((rust-ts-mode rust-mode) "rust-analyzer"))
-  (add-to-list
-   'eglot-server-programs '((cmake-mode cmake-ts-mode) "cmake-language-server"))
-  (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) "pylsp"))
+   'eglot-server-programs '((rust-ts-mode rust-mode) . ("rust-analyzer")))
   (add-to-list
    'eglot-server-programs
-   '((bash-ts-mode sh-mode) "bash-language-server" "start"))
-  (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) "jdtls"))
+   '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
+  (add-to-list
+   'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
   (add-to-list
    'eglot-server-programs
-   '((dockerfile-mode dockerfile-ts-mode) "docker-langserver" "--stdio"))
+   '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
+  (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) . ("jdtls")))
   (add-to-list
    'eglot-server-programs
-   '((perl-mode cperl-mode) "perl" "-MPerl::LanguageServer" "-e"))
-  (add-to-list 'eglot-server-programs '(markdown-mode "marksman" "server"))
+   '((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((perl-mode cperl-mode) . ("perl" "-MPerl::LanguageServer" "-e")))
+  ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
+  (add-to-list
+   'eglot-server-programs `((toml-mode toml-ts-mode) . ("taplo" "lsp" "stdio")))
 
   (setq-default
    eglot-workspace-configuration
@@ -3986,11 +4003,25 @@ PAD can be left (`l') or right (`r')."
       :typeCheckingMode "recommended"
       :useLibraryCodeForTypes t)
      :ltex-ls-plus
-     '(:language
-       "en-US"
-       :disabledRules
-       (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
-       :additionalRules (:enablePickyRules t)))))
+     (:language
+      "en-US"
+      :disabledRules
+      (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
+      :additionalRules (:enablePickyRules t))
+     :jdtls
+     (:initializationOptions
+      (:settings
+       (:java
+        (:completion
+         (:guessMethodArguments t)
+         (:format
+          (:enabled
+           t
+           :settings
+           (:url
+            "file:///data/cay/bin/cay-eclipse.formatter.xml"
+            :profile "cay")))))
+       :extendedClientCapabilities (:classFileContentsSupport t))))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
@@ -4020,6 +4051,28 @@ PAD can be left (`l') or right (`r')."
   :when (eq sb/lsp-provider 'eglot)
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
+
+(use-package eglot-semantic-tokens
+  :straight (:host github :repo "eownerdead/eglot-semantic-tokens")
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
+  :custom (eglot-enable-semantic-tokens t))
+
+(use-package eglot-inactive-regions
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
+  :demand t
+  :custom
+  (eglot-inactive-regions-style 'darken-foreground)
+  (eglot-inactive-regions-opacity 0.4)
+  :config (eglot-inactive-regions-mode 1))
+
+(use-package sideline-eglot
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
+  :config
+  (setq sideline-backends-right
+        '((sideline-eglot . up) (sideline-flycheck . down))))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
