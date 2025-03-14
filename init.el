@@ -48,7 +48,7 @@
 ;; more extensive LaTeX support than Corfu. We can set up separate completion
 ;; files with `company-ispell' and `company-dict'. However, `company-ispell'
 ;; does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -3853,9 +3853,9 @@ PAD can be left (`l') or right (`r')."
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
+  (fset #'jsonrpc--log-event #'ignore)
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
-  (fset #'jsonrpc--log-event #'ignore)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
      :executeCommandProvider
@@ -3863,12 +3863,12 @@ PAD can be left (`l') or right (`r')."
      :foldingRangeProvider
      :documentOnTypeFormattingProvider
      :documentLinkProvider
-     :documentHighlightProvider
-     ;; Inlay hints are distracting
-     :inlayHintProvider))
+     ;; :inlayHintProvider ; Inlay hints are distracting
+     ;; :documentHighlightProvider
+     ))
   :config
-  ;; Show all of the available eldoc information when we want it. This way Flymake errors
-  ;; don't just get clobbered by docstrings.
+  ;; Show all of the available eldoc information when we want it. This way
+  ;; Flymake errors don't just get clobbered by docstrings.
   (add-hook
    'eglot-managed-mode-hook
    (lambda ()
@@ -3879,30 +3879,10 @@ PAD can be left (`l') or right (`r')."
   ;;   (unless (apply 'derived-mode-p disabled-modes)
   ;;     (eglot-ensure)))
 
-  ;; (setq-default eglot-workspace-configuration
-  ;;   '
-  ;;   (
-  ;;     (:pylsp
-  ;;       .
-  ;;       (:configurationSources
-  ;;         ["setup.cfg"]
-  ;;         :plugins
-  ;;         (:jedi_completion
-  ;;           (:include_params t :fuzzy t)
-  ;;           :pycodestyle (:enabled :json-false)
-  ;;           :mccabe (:enabled :json-false)
-  ;;           :pyflakes (:enabled :json-false)
-  ;;           :flake8 (:enabled :json-false :maxLineLength 100)
-  ;;           :black (:enabled :json-false :line_length 100 :cache_config t)
-  ;;           :yapf (:enabled t)
-  ;;           :pydocstyle (:enabled t :convention "numpy")
-  ;;           :autopep8 (:enabled :json-false)
-  ;;           :pylint (:enabled t)
-  ;;           :ruff (:enabled :json-false :lineLength 100)
-  ;;           :pylsp_isort (:enabled t)
-  ;;           :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false))))
-  ;;     (:pyright . ((:useLibraryCodeForTypes t)))))
+  ;; (dolist (mode '(yaml-mode yaml-ts-mode))
+  ;;   (setq eglot-server-programs (assq-delete-all mode eglot-server-programs)))
 
+  (setq eglot-server-programs nil)
   (add-to-list
    'eglot-server-programs
    '((c++-mode c++-ts-mode c-mode c-ts-mode)
@@ -3922,9 +3902,93 @@ PAD can be left (`l') or right (`r')."
       "--enable-config"
       "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty")))
-
   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
-  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman"))))
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman")))
+  (add-to-list
+   'eglot-server-programs
+   '((css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((html-mode html-ts-mode) . ("vscode-html-language-server" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((js-ts-mode tsx-ts-mode typescript-ts-mode)
+     .
+     ("typescript-language-server" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((js-json-mode json-mode json-ts-mode jsonc-mode)
+     .
+     ("vscode-json-language-server" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs '(php-mode . ("intelephense" "--stdio")))
+  (add-to-list
+   'eglot-server-programs '((rust-ts-mode rust-mode) "rust-analyzer"))
+  (add-to-list
+   'eglot-server-programs '((cmake-mode cmake-ts-mode) "cmake-language-server"))
+  (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) "pylsp"))
+  (add-to-list
+   'eglot-server-programs
+   '((bash-ts-mode sh-mode) "bash-language-server" "start"))
+  (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) "jdtls"))
+  (add-to-list
+   'eglot-server-programs
+   '((dockerfile-mode dockerfile-ts-mode) "docker-langserver" "--stdio"))
+  (add-to-list
+   'eglot-server-programs
+   '((perl-mode cperl-mode) "perl" "-MPerl::LanguageServer" "-e"))
+  (add-to-list 'eglot-server-programs '(markdown-mode "marksman" "server"))
+
+  (setq-default eglot-workspace-configuration
+                '(:pylsp
+                  (:configurationSources
+                   ["setup.cfg"]
+                   :plugins
+                   (:autopep8
+                    (:enabled :json-false)
+                    :flake8
+                    (:enabled :json-false :config t :maxLineLength 80)
+                    :jedi (:extra_paths [])
+                    :jedi_completion
+                    (:include_params
+                     t
+                     :include_class_objects t
+                     :fuzzy t
+                     :cache_for
+                     ["pandas" "numpy" "matplotlib"])
+                    :jedi_definition
+                    (:enabled t :follow_imports t :follow_builtin_imports t)
+                    :jedi_references (:enabled t)
+                    :jedi_signature_help (:enabled t)
+                    :jedi_symbols
+                    (:enabled t :all_scopes t :include_import_symbols t)
+                    :mccabe
+                    (:enabled :json-false)
+                    :preload
+                    (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+                    :pycodestyle
+                    (:enabled :json-false)
+                    :pydocstyle
+                    (:enabled t :convention "numpy")
+                    :pyflakes
+                    (:enabled :json-false)
+                    :pylint (:enabled t)
+                    :pylsp_isort (:enabled t)
+                    :pylsp_mypy
+                    (:enabled t :report_progress t :live_mode :json-false)
+                    :rope_completion
+                    (:enabled t :eager :json-false)
+                    :ruff
+                    (:enabled :json-false :lineLength 80)
+                    :yapf (:enabled t)))
+                  :basedpyright (:typeCheckingMode "recommended")
+                  :basedpyright.analysis
+                  (:diagnosticSeverityOverrides
+                   (:reportUnusedCallResult "none")
+                   :inlayHints (:callArgumentNames :json-false))
+                  :pyright (:useLibraryCodeForTypes t))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
@@ -3955,27 +4019,27 @@ PAD can be left (`l') or right (`r')."
   :after (flycheck eglot)
   :init (global-flycheck-eglot-mode 1))
 
-(use-package eglot-ltex-plus
-  :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
-  :when (eq sb/lsp-provider 'eglot)
-  :hook
-  ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
-   .
-   (lambda ()
-     (require 'eglot-ltex-plus)
-     (eglot-ensure)))
-  :init
-  (setq
-   eglot-ltex-plus-server-path "path/to/ltex-ls-XX.X.X/"
-   eglot-ltex-plus-communication-channel 'stdio)
+;; (use-package eglot-ltex-plus
+;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :hook
+;;   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'eglot-ltex-plus)
+;;      (eglot-ensure)))
+;;   :init
+;;   (setq
+;;    eglot-ltex-plus-server-path "path/to/ltex-ls-XX.X.X/"
+;;    eglot-ltex-plus-communication-channel 'stdio)
 
-  ;; Configure the LSP as follows using `.dir-locals.el'.
+;;   ;; Configure the LSP as follows using `.dir-locals.el'.
 
-  ;; ((nil .
-  ;;       ((eglot-workspace-configuration
-  ;;         . (:ltex-ls-plus  (:language  "en-US"
-  ;;                                       :additionalRules (:motherTongue "de-DE")))))))
-  )
+;;   ;; ((nil .
+;;   ;;       ((eglot-workspace-configuration
+;;   ;;         . (:ltex-ls-plus  (:language  "en-US"
+;;   ;;                                       :additionalRules (:motherTongue "de-DE")))))))
+;;   )
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
