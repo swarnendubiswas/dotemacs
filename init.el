@@ -1995,9 +1995,9 @@ The provider is nerd-icons."
 ;; active in latex math environments and latex math symbols
 ;; (`company-math-symbols-latex') is not available outside of math latex
 ;; environments
-;; (use-package company-math
-;;   :after (:all tex-mode company)
-;;   :demand t)
+(use-package company-math
+  :after (:all tex-mode company)
+  :demand t)
 
 ;; (use-package company-anywhere
 ;;   :straight (:host github :repo "zk-phi/company-anywhere")
@@ -3694,6 +3694,7 @@ PAD can be left (`l') or right (`r')."
   :hook (emacs-startup . doom-modeline-mode)
   :custom
   (doom-modeline-buffer-encoding nil)
+  (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-minor-modes t)
   (doom-modeline-unicode-fallback t)
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
@@ -3938,10 +3939,10 @@ PAD can be left (`l') or right (`r')."
   ;;   (setq eglot-server-programs (assq-delete-all mode eglot-server-programs)))
 
   (setq eglot-server-programs nil)
-  (add-to-list
-   'eglot-server-programs
-   '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
-     . ("ltex-ls-plus")))
+  ;; (add-to-list
+  ;;  'eglot-server-programs
+  ;;  '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
+  ;;    . ("ltex-ls-plus")))
   (add-to-list
    'eglot-server-programs
    '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -4131,6 +4132,52 @@ PAD can be left (`l') or right (`r')."
   :config
   (setq sideline-backends-right
         '((sideline-eglot . up) (sideline-flycheck . down))))
+
+(use-package eglot-ltex
+  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+  :when (eq sb/lsp-provider 'eglot)
+  :init
+  (setq eglot-ltex-server-path
+        (expand-file-name "ltex-ls-16.0.0" user-emacs-directory))
+  :hook
+  ((text-mode LaTeX-mode org-mode markdown-mode)
+   .
+   (lambda ()
+     (require 'eglot-ltex)
+     (eglot-ensure)))
+  :custom (eglot-ltex-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+  ;; :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+  ;;   'append)
+  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+  )
+
+(use-package eglot-ltex-plus
+  :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
+  :when (eq sb/lsp-provider 'eglot)
+  :init
+  (setq eglot-ltex-plus-server-path
+        (expand-file-name "ltex-ls-plus-18.4.0" user-emacs-directory))
+  :hook
+  ((text-mode LaTeX-mode org-mode markdown-mode)
+   .
+   (lambda ()
+     (require 'eglot-ltex-plus)
+     (eglot-ensure)))
+  :custom (eglot-ltex-plus-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+  ;; :config
+  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+  ;; (add-to-list
+  ;;   'eglot-server-programs
+  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+  ;;   'append)
+  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+  )
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
