@@ -2028,9 +2028,19 @@ The provider is nerd-icons."
 ;;   :after (company prog-mode)
 ;;   :demand t)
 
-;; (use-package company-auctex
-;;   :after (company LaTeX-mode)
-;;   :demand t)
+(use-package company-auctex
+  :after (company LaTeX-mode)
+  :demand t)
+
+;; Uses RefTeX to complete label references and citations. When working with
+;; multi-file documents, ensure that the variable `TeX-master' is appropriately
+;; set in all files, so that RefTeX can find citations across documents.
+(use-package company-reftex
+  :after (company LaTeX-mode)
+  :demand t
+  :custom
+  ;; https://github.com/TheBB/company-reftex/pull/13
+  (company-reftex-labels-parse-all nil))
 
 ;; Try completion backends in order until there is a non-empty completion list:
 ;; (setq company-backends '(company-xxx company-yyy company-zzz))
@@ -2108,15 +2118,24 @@ The provider is nerd-icons."
       ;; majority.
       (setq company-backends
             '((company-files
+               company-reftex-citations
+               company-auctex-bibs
+               company-reftex-labels
+               company-auctex-labels
+               company-auctex-symbols
+               company-auctex-environments
+               company-auctex-macros
                ;; company-capf
+               company-latex-commands
                ;; Math latex tags
-               ;; company-math-symbols-latex
+               company-math-symbols-latex
                ;; Math Unicode symbols and sub(super)scripts
-               ;; company-math-symbols-unicode
+               company-math-symbols-unicode
                company-yasnippet
                ;; company-ctags
                ;; company-dict
-               company-dabbrev company-ispell
+               company-dabbrev
+               company-ispell
                :separate))))
 
     (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
@@ -2788,8 +2807,10 @@ The provider is nerd-icons."
             (html-mode . html-ts-mode)
             (java-mode . java-ts-mode)
             (json-mode . json-ts-mode)
+            (kdl-mode . kdl-ts-mode)
             (python-mode . python-ts-mode)
             (toml-mode . toml-ts-mode)
+            (conf-toml-mode . toml-ts-mode)
             (yaml-mode . yaml-ts-mode)))))
 
 ;; (use-package treesit-auto
@@ -2806,6 +2827,19 @@ The provider is nerd-icons."
 ;;   ;; Improves performance with large files without significantly diminishing
 ;;   ;; highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
+
+(use-package cc-mode
+  :straight (:type built-in)
+  :hook
+  (awk-mode
+   .
+   (lambda ()
+     (setq-local c-basic-offset 4)
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
 
 (use-package c-ts-mode
   :straight (:type built-in)
@@ -2915,6 +2949,15 @@ The provider is nerd-icons."
 (use-package cperl-mode
   :straight (:type built-in)
   :mode "latexmkrc\\'"
+  :hook
+  (cperl-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
   :config (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
@@ -2977,6 +3020,19 @@ The provider is nerd-icons."
   :mode
   "\\.cfg\\'"
   "\\.conf\\'")
+
+(use-package toml-ts-mode
+  :straight (:type built-in)
+  :mode ("\\.toml\\'" "Cargo\\.lock\\'")
+  :hook
+  (toml-ts-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
 
 (use-package yaml-mode
   :mode
@@ -3884,21 +3940,16 @@ PAD can be left (`l') or right (`r')."
   (setq eglot-server-programs nil)
   (add-to-list
    'eglot-server-programs
+   '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
+     . ("ltex-ls-plus")))
+  (add-to-list
+   'eglot-server-programs
    '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
      . ("autotools-language-server")))
   (add-to-list 'eglot-server-programs '(fish-mode . ("fish-lsp" "start")))
   (add-to-list
-   'eglot-server-programs '((awk-mode awk-ts-mode) . ("awk-language-server")))
-  (add-to-list
-   'eglot-server-programs
-   '(web-mode . ("vscode-html-language-server" "--stdio")))
-  (add-to-list
    'eglot-server-programs
    '((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp")))
-  (add-to-list
-   'eglot-server-programs
-   '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
-     . ("ltex-ls-plus")))
   (add-to-list
    'eglot-server-programs
    '((c++-mode c++-ts-mode c-mode c-ts-mode)
@@ -3924,12 +3975,13 @@ PAD can be left (`l') or right (`r')."
    '((css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
-   '((html-mode html-ts-mode) . ("vscode-html-language-server" "--stdio")))
+   '((html-mode html-ts-mode web-mode)
+     .
+     ("vscode-html-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
-   '((js-ts-mode tsx-ts-mode typescript-ts-mode)
-     .
-     ("typescript-language-server" "--stdio")))
+   '((js-mode js-ts-mode tsx-ts-mode typescript-mode typescript-ts-mode)
+     . ("typescript-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
    '((js-json-mode json-mode json-ts-mode jsonc-mode)
@@ -3938,7 +3990,9 @@ PAD can be left (`l') or right (`r')."
   (add-to-list
    'eglot-server-programs
    '((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")))
-  (add-to-list 'eglot-server-programs '(php-mode . ("intelephense" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '((php-mode php-ts-mode) . ("intelephense" "--stdio")))
   (add-to-list
    'eglot-server-programs '((rust-ts-mode rust-mode) . ("rust-analyzer")))
   (add-to-list
@@ -3955,73 +4009,77 @@ PAD can be left (`l') or right (`r')."
    '((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio")))
   (add-to-list
    'eglot-server-programs
-   '((perl-mode cperl-mode) . ("perl" "-MPerl::LanguageServer" "-e")))
+   '((perl-mode cperl-mode)
+     .
+     ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run")))
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
   (add-to-list
-   'eglot-server-programs `((toml-mode toml-ts-mode) . ("taplo" "lsp" "stdio")))
+   'eglot-server-programs
+   `((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
 
-  (setq-default
-   eglot-workspace-configuration
-   '(:pylsp
-     (:configurationSources
-      ["setup.cfg"]
-      :plugins
-      (:autopep8
-       (:enabled :json-false)
-       :flake8 (:enabled :json-false :config t :maxLineLength 80)
-       :jedi (:extra_paths [])
-       :jedi_completion
-       (:include_params
-        t
-        :include_class_objects t
-        :fuzzy t
-        :cache_for
-        ["pandas" "numpy" "matplotlib"])
-       :jedi_definition (:enabled t :follow_imports t :follow_builtin_imports t)
-       :jedi_references (:enabled t)
-       :jedi_signature_help (:enabled t)
-       :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
-       :mccabe (:enabled :json-false)
-       :preload (:enabled t :modules ["pandas" "numpy" "matplotlib"])
-       :pycodestyle (:enabled :json-false)
-       :pydocstyle (:enabled t :convention "numpy")
-       :pyflakes (:enabled :json-false)
-       :pylint (:enabled t)
-       :pylsp_isort (:enabled t)
-       :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false)
-       :rope_completion (:enabled t :eager :json-false)
-       :ruff (:enabled :json-false :lineLength 80)
-       :yapf (:enabled t)))
-     :basedpyright (:checkOnlyOpenFiles t :typeCheckingMode "recommended")
-     :basedpyright.analysis
-     (:diagnosticSeverityOverrides
-      (:reportUnusedCallResult "none")
-      :inlayHints (:callArgumentNames :json-false))
-     :pyright
-     (:checkOnlyOpenFiles
-      t
-      :typeCheckingMode "recommended"
-      :useLibraryCodeForTypes t)
-     :ltex-ls-plus
-     (:language
-      "en-US"
-      :disabledRules
-      (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
-      :additionalRules (:enablePickyRules t))
-     :jdtls
-     (:initializationOptions
-      (:settings
-       (:java
-        (:completion
-         (:guessMethodArguments t)
-         (:format
-          (:enabled
-           t
-           :settings
-           (:url
-            "file:///data/cay/bin/cay-eclipse.formatter.xml"
-            :profile "cay")))))
-       :extendedClientCapabilities (:classFileContentsSupport t))))))
+  ;; (setq-default
+  ;;  eglot-workspace-configuration
+  ;;  '(:pylsp
+  ;;    (:configurationSources
+  ;;     ["setup.cfg"]
+  ;;     :plugins
+  ;;     (:autopep8
+  ;;      (:enabled :json-false)
+  ;;      :flake8 (:enabled :json-false :config t :maxLineLength 80)
+  ;;      :jedi (:extra_paths [])
+  ;;      :jedi_completion
+  ;;      (:include_params
+  ;;       t
+  ;;       :include_class_objects t
+  ;;       :fuzzy t
+  ;;       :cache_for
+  ;;       ["pandas" "numpy" "matplotlib"])
+  ;;      :jedi_definition (:enabled t :follow_imports t :follow_builtin_imports t)
+  ;;      :jedi_references (:enabled t)
+  ;;      :jedi_signature_help (:enabled t)
+  ;;      :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
+  ;;      :mccabe (:enabled :json-false)
+  ;;      :preload (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+  ;;      :pycodestyle (:enabled :json-false)
+  ;;      :pydocstyle (:enabled t :convention "numpy")
+  ;;      :pyflakes (:enabled :json-false)
+  ;;      :pylint (:enabled t)
+  ;;      :pylsp_isort (:enabled t)
+  ;;      :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false)
+  ;;      :rope_completion (:enabled t :eager :json-false)
+  ;;      :ruff (:enabled :json-false :lineLength 80)
+  ;;      :yapf (:enabled t)))
+  ;;    :basedpyright (:checkOnlyOpenFiles t :typeCheckingMode "recommended")
+  ;;    :basedpyright.analysis
+  ;;    (:diagnosticSeverityOverrides
+  ;;     (:reportUnusedCallResult "none")
+  ;;     :inlayHints (:callArgumentNames :json-false))
+  ;;    :pyright
+  ;;    (:checkOnlyOpenFiles
+  ;;     t
+  ;;     :typeCheckingMode "recommended"
+  ;;     :useLibraryCodeForTypes t)
+  ;;    :ltex-ls-plus
+  ;;    (:language
+  ;;     "en-US"
+  ;;     :disabledRules
+  ;;     (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
+  ;;     :additionalRules (:enablePickyRules t))
+  ;;    :jdtls
+  ;;    (:initializationOptions
+  ;;     (:settings
+  ;;      (:java
+  ;;       (:completion
+  ;;        (:guessMethodArguments t)
+  ;;        (:format
+  ;;         (:enabled
+  ;;          t
+  ;;          :settings
+  ;;          (:url
+  ;;           "file:///data/cay/bin/cay-eclipse.formatter.xml"
+  ;;           :profile "cay")))))
+  ;;      :extendedClientCapabilities (:classFileContentsSupport t)))))
+  )
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
