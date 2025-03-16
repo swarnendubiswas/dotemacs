@@ -993,7 +993,7 @@ The provider is nerd-icons."
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end))))
 
-  (with-eval-after-load "LaTeX-mode"
+  (with-eval-after-load "latex"
     (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map))
   (with-eval-after-load "tex-mode"
     (bind-key "C-c C-j" #'consult-outline tex-mode-map)))
@@ -1562,7 +1562,7 @@ The provider is nerd-icons."
     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
   (with-eval-after-load "tex-mode"
     (bind-key "C-x f" #'format-all-buffer tex-mode-map))
-  (with-eval-after-load "LaTeX-mode"
+  (with-eval-after-load "latex"
     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
   :diminish)
 
@@ -2029,14 +2029,14 @@ The provider is nerd-icons."
 ;;   :demand t)
 
 (use-package company-auctex
-  :after (company LaTeX-mode)
+  :after (company latex)
   :demand t)
 
 ;; Uses RefTeX to complete label references and citations. When working with
 ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
 ;; set in all files, so that RefTeX can find citations across documents.
 (use-package company-reftex
-  :after (company LaTeX-mode)
+  :after (company latex)
   :demand t
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
@@ -3347,7 +3347,9 @@ The provider is nerd-icons."
    (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
    ;; (TeX-update-style . rainbow-delimiters-mode)
-   )
+   (LaTeX-mode . TeX-source-correlate-mode)
+   (LaTeX-mode . hs-minor-mode)
+   (LaTeX-mode . (lambda () (turn-on-reftex))))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
@@ -3369,18 +3371,43 @@ The provider is nerd-icons."
   (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
-  (setq-default TeX-master nil) ; Always query for the master file
-  (with-eval-after-load "auctex"
-    (bind-key "C-c C-e" LaTeX-environment LaTeX-mode-map)
-    (bind-key "C-c C-s" LaTeX-section LaTeX-mode-map)
-    (bind-key "C-c C-m" TeX-insert-macro LaTeX-mode-map))
-  (with-eval-after-load "latex"
-    ;; (unbind-key "C-j" LaTeX-mode-map)
-    ;; Disable `LaTeX-insert-item' in favor of `imenu'
-    (unbind-key "C-c C-j" LaTeX-mode-map)))
+  ;; Always query for the master file
+  (setq-default TeX-master nil))
+
+(use-package reftex
+  :straight (:type built-in)
+  :hook (LaTeX-mode . turn-on-reftex)
+  :bind
+  (("C-c [" . reftex-citation)
+   ("C-c )" . reftex-reference)
+   ("C-c (" . reftex-label)
+   ("C-c &" . reftex-view-crossref))
+  :custom
+  (reftex-plug-into-AUCTeX t)
+  (reftex-enable-partial-scans t)
+  (reftex-highlight-selection 'both)
+  ;; Save parse info to avoid reparsing every time a file is visited
+  (reftex-save-parse-info t)
+  ;; Revisit files if necessary when browsing toc
+  (reftex-revisit-to-follow t)
+  (reftex-ref-macro-prompt nil) ; No unnecessary prompts
+  (reftex-guess-label-type t "Try to guess the label type before prompting")
+  (reftex-use-fonts t "Use nice fonts for TOC")
+  ;; Cache selection buffers for faster access
+  (reftex-use-multiple-selection-buffers t)
+  :diminish)
 
 (use-package bibtex
   :straight (:type built-in)
+  :hook
+  (bibtex-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
@@ -3388,7 +3415,7 @@ The provider is nerd-icons."
 
 (use-package consult-reftex
   :straight (:host github :repo "karthink/consult-reftex")
-  :after (:any consult tex-mode LaTeX-mode)
+  :after (consult LaTeX-mode)
   :bind
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
@@ -3415,7 +3442,7 @@ The provider is nerd-icons."
   :diminish)
 
 (use-package auctex-latexmk
-  :after LaTeX-mode
+  :after latex
   :when (executable-find "latexmk")
   :demand t
   :custom
@@ -3914,8 +3941,6 @@ PAD can be left (`l') or right (`r')."
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   (fset #'jsonrpc--log-event #'ignore)
-  ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (eglot-stay-out-of '(flymake company eldoc eldoc-documentation-strategy))
   ;; (eglot-ignored-server-capabilities
   ;;  '(:codeLensProvider
   ;;    :executeCommandProvider
@@ -3939,10 +3964,11 @@ PAD can be left (`l') or right (`r')."
   ;;   (setq eglot-server-programs (assq-delete-all mode eglot-server-programs)))
 
   (setq eglot-server-programs nil)
-  ;; (add-to-list
-  ;;  'eglot-server-programs
-  ;;  '((org-mode markdown-mode text-mode rst-mode git-commit-major-mode)
-  ;;    . ("ltex-ls-plus")))
+  (add-to-list
+   'eglot-server-programs
+   '((org-mode markdown-mode text-mode git-commit-major-mode)
+     .
+     ("ltex-ls-plus")))
   (add-to-list
    'eglot-server-programs
    '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -4016,7 +4042,12 @@ PAD can be left (`l') or right (`r')."
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
   (add-to-list
    'eglot-server-programs
-   `((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
+   '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
+  ;; (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
+
+  ;; Eglot overwrites `company-backends' to only include `company-capf'
+  (setq eglot-stay-out-of
+        '(flymake yasnippet company eldoc eldoc-documentation-strategy))
 
   ;; (setq-default
   ;;  eglot-workspace-configuration
@@ -4133,51 +4164,51 @@ PAD can be left (`l') or right (`r')."
   (setq sideline-backends-right
         '((sideline-eglot . up) (sideline-flycheck . down))))
 
-(use-package eglot-ltex
-  :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-  :when (eq sb/lsp-provider 'eglot)
-  :init
-  (setq eglot-ltex-server-path
-        (expand-file-name "ltex-ls-16.0.0" user-emacs-directory))
-  :hook
-  ((text-mode LaTeX-mode org-mode markdown-mode)
-   .
-   (lambda ()
-     (require 'eglot-ltex)
-     (eglot-ensure)))
-  :custom (eglot-ltex-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-  ;; :config
-  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-  ;; (add-to-list
-  ;;   'eglot-server-programs
-  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-  ;;   'append)
-  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-  )
+;; (use-package eglot-ltex
+;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :init
+;;   (setq eglot-ltex-server-path
+;;         (expand-file-name "ltex-ls-16.0.0" user-emacs-directory))
+;;   :hook
+;;   ((text-mode LaTeX-mode org-mode markdown-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'eglot-ltex)
+;;      (eglot-ensure)))
+;;   :custom (eglot-ltex-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+;;   ;; :config
+;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+;;   ;; (add-to-list
+;;   ;;   'eglot-server-programs
+;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+;;   ;;   'append)
+;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+;;   )
 
-(use-package eglot-ltex-plus
-  :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
-  :when (eq sb/lsp-provider 'eglot)
-  :init
-  (setq eglot-ltex-plus-server-path
-        (expand-file-name "ltex-ls-plus-18.4.0" user-emacs-directory))
-  :hook
-  ((text-mode LaTeX-mode org-mode markdown-mode)
-   .
-   (lambda ()
-     (require 'eglot-ltex-plus)
-     (eglot-ensure)))
-  :custom (eglot-ltex-plus-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-  ;; :config
-  ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-  ;; (add-to-list
-  ;;   'eglot-server-programs
-  ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-  ;;   'append)
-  ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-  ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-  )
+;; (use-package eglot-ltex-plus
+;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :init
+;;   (setq eglot-ltex-plus-server-path
+;;         (expand-file-name "ltex-ls-plus-18.4.0" user-emacs-directory))
+;;   :hook
+;;   ((text-mode LaTeX-mode org-mode markdown-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'eglot-ltex-plus)
+;;      (eglot-ensure)))
+;;   :custom (eglot-ltex-plus-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
+;;   ;; :config
+;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
+;;   ;; (add-to-list
+;;   ;;   'eglot-server-programs
+;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
+;;   ;;   'append)
+;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
+;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
+;;   )
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
