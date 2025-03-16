@@ -2799,18 +2799,22 @@ The provider is nerd-icons."
   (when (treesit-available-p)
     (setq major-mode-remap-alist
           '((sh-mode . bash-ts-mode)
-            (c-mode . c++-ts-mode)
+            (c-mode . c-ts-mode)
             (c++-mode . c++-ts-mode)
+            (c-or-c++-mode . c-or-c++-ts-mode)
             (cmake-mode . cmake-ts-mode)
             (css-mode . css-ts-mode)
             (dockerfile-mode . dockerfile-ts-mode)
             (html-mode . html-ts-mode)
             (java-mode . java-ts-mode)
             (json-mode . json-ts-mode)
+            (js2-mode . js-ts-mode)
             (kdl-mode . kdl-ts-mode)
             (python-mode . python-ts-mode)
             (toml-mode . toml-ts-mode)
             (conf-toml-mode . toml-ts-mode)
+            (tsx-mode . tsx-ts-mode)
+            (typescript-mode . typescript-ts-mode)
             (yaml-mode . yaml-ts-mode)))))
 
 ;; (use-package treesit-auto
@@ -3312,8 +3316,8 @@ The provider is nerd-icons."
   :custom (org-block-capf-edit-style 'inline))
 
 ;; Without auctex
-;; (with-eval-after-load "tex-mode"
-;;   (setq tex-command "pdflatex"))
+(with-eval-after-load "tex-mode"
+  (setq tex-command "pdflatex"))
 
 ;; (use-package lsp-latex
 ;;   :hook
@@ -3429,8 +3433,10 @@ The provider is nerd-icons."
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
-  :after (:any tex-mode LaTeX-mode)
-  :bind (:map tex-mode-map ("$" . math-delimiters-insert)))
+  :after (:any tex-mode latex-mode)
+  :config
+  (with-eval-after-load "latex"
+    (bind-key "$" #'math-delimiters-insert LaTeX-mode-map)))
 
 (use-package citar
   :after (:any latex-mode LaTeX-mode)
@@ -3938,6 +3944,7 @@ PAD can be left (`l') or right (`r')."
   (eglot-autoshutdown t)
   (eglot-sync-connect nil)
   (eglot-connect-timeout nil)
+  (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   (fset #'jsonrpc--log-event #'ignore)
@@ -4049,69 +4056,75 @@ PAD can be left (`l') or right (`r')."
   (setq eglot-stay-out-of
         '(flymake yasnippet company eldoc eldoc-documentation-strategy))
 
-  ;; (setq-default
-  ;;  eglot-workspace-configuration
-  ;;  '(:pylsp
-  ;;    (:configurationSources
-  ;;     ["setup.cfg"]
-  ;;     :plugins
-  ;;     (:autopep8
-  ;;      (:enabled :json-false)
-  ;;      :flake8 (:enabled :json-false :config t :maxLineLength 80)
-  ;;      :jedi (:extra_paths [])
-  ;;      :jedi_completion
-  ;;      (:include_params
-  ;;       t
-  ;;       :include_class_objects t
-  ;;       :fuzzy t
-  ;;       :cache_for
-  ;;       ["pandas" "numpy" "matplotlib"])
-  ;;      :jedi_definition (:enabled t :follow_imports t :follow_builtin_imports t)
-  ;;      :jedi_references (:enabled t)
-  ;;      :jedi_signature_help (:enabled t)
-  ;;      :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
-  ;;      :mccabe (:enabled :json-false)
-  ;;      :preload (:enabled t :modules ["pandas" "numpy" "matplotlib"])
-  ;;      :pycodestyle (:enabled :json-false)
-  ;;      :pydocstyle (:enabled t :convention "numpy")
-  ;;      :pyflakes (:enabled :json-false)
-  ;;      :pylint (:enabled t)
-  ;;      :pylsp_isort (:enabled t)
-  ;;      :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false)
-  ;;      :rope_completion (:enabled t :eager :json-false)
-  ;;      :ruff (:enabled :json-false :lineLength 80)
-  ;;      :yapf (:enabled t)))
-  ;;    :basedpyright (:checkOnlyOpenFiles t :typeCheckingMode "recommended")
-  ;;    :basedpyright.analysis
-  ;;    (:diagnosticSeverityOverrides
-  ;;     (:reportUnusedCallResult "none")
-  ;;     :inlayHints (:callArgumentNames :json-false))
-  ;;    :pyright
-  ;;    (:checkOnlyOpenFiles
-  ;;     t
-  ;;     :typeCheckingMode "recommended"
-  ;;     :useLibraryCodeForTypes t)
-  ;;    :ltex-ls-plus
-  ;;    (:language
-  ;;     "en-US"
-  ;;     :disabledRules
-  ;;     (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
-  ;;     :additionalRules (:enablePickyRules t))
-  ;;    :jdtls
-  ;;    (:initializationOptions
-  ;;     (:settings
-  ;;      (:java
-  ;;       (:completion
-  ;;        (:guessMethodArguments t)
-  ;;        (:format
-  ;;         (:enabled
-  ;;          t
-  ;;          :settings
-  ;;          (:url
-  ;;           "file:///data/cay/bin/cay-eclipse.formatter.xml"
-  ;;           :profile "cay")))))
-  ;;      :extendedClientCapabilities (:classFileContentsSupport t)))))
-  )
+  (setq-default
+   eglot-workspace-configuration
+   '(:pylsp
+     (:configurationSources
+      ["setup.cfg"]
+      :plugins
+      (:autopep8
+       (:enabled :json-false)
+       :flake8 (:enabled :json-false :config t :maxLineLength 80)
+       :jedi (:extra_paths [])
+       :jedi_completion
+       (:include_params
+        t
+        :include_class_objects t
+        :fuzzy t
+        :cache_for
+        ["pandas" "numpy" "matplotlib"])
+       :jedi_definition (:enabled t :follow_imports t :follow_builtin_imports t)
+       :jedi_references (:enabled t)
+       :jedi_signature_help (:enabled t)
+       :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
+       :mccabe (:enabled :json-false)
+       :preload (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+       :pycodestyle (:enabled :json-false)
+       :pydocstyle (:enabled t :convention "numpy")
+       :pyflakes (:enabled :json-false)
+       :pylint (:enabled t)
+       :pylsp_isort (:enabled t)
+       :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false)
+       :rope_completion (:enabled t :eager :json-false)
+       :ruff (:enabled :json-false :lineLength 80)
+       :yapf (:enabled t)))
+     :basedpyright
+     (:checkOnlyOpenFiles
+      t
+      :reportDuplicateImport t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t)
+     :basedpyright.analysis
+     (:diagnosticSeverityOverrides
+      (:reportUnusedCallResult "none")
+      :inlayHints (:callArgumentNames :json-false))
+     :pyright
+     (:checkOnlyOpenFiles
+      t
+      :reportDuplicateImport t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t)
+     :ltex-ls-plus
+     (:language
+      "en-US"
+      :disabledRules
+      (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
+      :additionalRules (:enablePickyRules t))
+     :jdtls
+     (:initializationOptions
+      (:settings
+       (:java
+        (:completion
+         (:guessMethodArguments t)
+         (:format
+          (:enabled
+           t
+           :settings
+           (:url
+            "file:///data/cay/bin/cay-eclipse.formatter.xml"
+            :profile "cay")))))
+       :extendedClientCapabilities (:classFileContentsSupport t)))
+     :yaml (:format (:enable t) :validate t :hover t :completion t))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
