@@ -1500,7 +1500,6 @@ The provider is nerd-icons."
 
 (use-package consult-flycheck
   :after flycheck
-  :demand t
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 ;; Include `hl-todo' keywords in flycheck messages.
@@ -2030,7 +2029,12 @@ The provider is nerd-icons."
 
 (use-package company-auctex
   :after (company latex)
-  :demand t)
+  :commands
+  (company-auctex-bibs
+   company-auctex-environments
+   company-auctex-labels
+   company-auctex-macros
+   company-auctex-symbols))
 
 ;; Uses RefTeX to complete label references and citations. When working with
 ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
@@ -2052,7 +2056,7 @@ The provider is nerd-icons."
 ;; accordance with the grouped backends order.
 ;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
-;; A few backends are applicable to all modes: `company-yasnippet',
+;; A few mode-agnostic backends are applicable to all modes: `company-yasnippet',
 ;; `company-ispell', `company-dabbrev-code', and `company-dabbrev'.
 ;; `company-yasnippet' is blocking. `company-dabbrev' returns a non-nil prefix
 ;; in almost any context (major mode, inside strings or comments). That is why
@@ -2070,7 +2074,7 @@ The provider is nerd-icons."
 ;; (setq company-backends '((company-capf :with company-yasnippet)))
 
 ;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
-;; backends . Only a few backends are specialized on certain major modes or
+;; backends. Only a few backends are specialized on certain major modes or
 ;; certain contexts (e.g. outside of strings and comments), and pass on control
 ;; to later backends when outside of that major mode or context.
 
@@ -2134,9 +2138,8 @@ The provider is nerd-icons."
                company-yasnippet
                ;; company-ctags
                ;; company-dict
-               company-dabbrev
                company-ispell
-               :separate))))
+               company-dabbrev))))
 
     (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
       (add-hook mode (lambda () (sb/company-latex-mode)))))
@@ -2178,8 +2181,7 @@ The provider is nerd-icons."
               (company-capf
                :with
                company-dabbrev-code ; Useful for variable names
-               company-yasnippet
-               :separate)
+               company-yasnippet)
               ;; company-dict
               company-ispell company-dabbrev)))
 
@@ -2205,11 +2207,10 @@ The provider is nerd-icons."
                     (company-capf
                      ;; company-citre-tags
                      ;; company-c-headers
-                     company-dabbrev-code ; Useful for variable names
-                     :with company-keywords
                      ;; company-ctags
-                     company-yasnippet
-                     :separate)
+                     :with company-keywords
+                     company-dabbrev-code ; Useful for variable names
+                     company-yasnippet)
                     ;; company-dict
                     company-ispell company-dabbrev)))
 
@@ -2228,8 +2229,7 @@ The provider is nerd-icons."
                     (company-capf
                      :with company-keywords
                      company-dabbrev-code ; Useful for variable names
-                     company-yasnippet
-                     :separate)
+                     company-yasnippet)
                     ;; company-dict
                     company-ispell company-dabbrev)))
 
@@ -3420,9 +3420,7 @@ The provider is nerd-icons."
 (use-package consult-reftex
   :straight (:host github :repo "karthink/consult-reftex")
   :after (consult LaTeX-mode)
-  :bind
-  (("C-c [" . consult-reftex-insert-reference)
-   ("C-c )" . consult-reftex-goto-label)))
+  :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
@@ -3732,7 +3730,8 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-unicode-fallback t)
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
   (doom-modeline-enable-word-count t)
-  (doom-modeline-lsp nil))
+  (doom-modeline-lsp nil)
+  (doom-modeline-workspace-name nil))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -3958,6 +3957,7 @@ PAD can be left (`l') or right (`r')."
   ;;    :inlayHintProvider ; Inlay hints are distracting
   ;;    :documentHighlightProvider
   ;;    ))
+  (eglot-report-progress nil)
   :config
   ;; Show all of the available eldoc information when we want it. This way
   ;; Flymake errors don't just get clobbered by docstrings.
@@ -4037,7 +4037,11 @@ PAD can be left (`l') or right (`r')."
   (add-to-list
    'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
-  (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) . ("jdtls")))
+  (add-to-list
+   'eglot-server-programs
+   '((java-mode java-ts-mode)
+     .
+     ("jdtls" "-noverify" "--illegal-access=warn" "-Xms2G" "-Xmx8G")))
   (add-to-list
    'eglot-server-programs
    '((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio")))
@@ -4051,6 +4055,7 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
   ;; (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
+  ;; (add-to-list 'eglot-server-programs '(nxml-mode . ("xmlls")))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of
@@ -4110,21 +4115,21 @@ PAD can be left (`l') or right (`r')."
       :disabledRules
       (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
       :additionalRules (:enablePickyRules t))
-     :jdtls
-     (:initializationOptions
-      (:settings
-       (:java
-        (:completion
-         (:guessMethodArguments t)
-         (:format
-          (:enabled
-           t
-           :settings
-           (:url
-            "file:///data/cay/bin/cay-eclipse.formatter.xml"
-            :profile "cay")))))
-       :extendedClientCapabilities (:classFileContentsSupport t)))
-     :yaml (:format (:enable t) :validate t :hover t :completion t))))
+     ;; :jdtls
+     ;; (:settings
+     ;;  (:java
+     ;;   (:completion
+     ;;    (:guessMethodArguments t)
+     ;;    (:format
+     ;;     (:enabled
+     ;;      t
+     ;;      :settings
+     ;;      (:url
+     ;;       "file:///data/cay/bin/cay-eclipse.formatter.xml"
+     ;;       :profile "cay")))))
+     ;; :extendedClientCapabilities (:classFileContentsSupport t))
+     :yaml (:format (:enable t) :validate t :hover t :completion t)
+     :vscode-json-language-server (:provideFormatter t))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")

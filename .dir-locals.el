@@ -373,7 +373,19 @@
 
  (LaTeX-mode . ())
 
- (kdl-ts-mode . (mode . kdl-format-on-save)))
+ (kdl-ts-mode . (mode . kdl-format-on-save))
+
+ (java-mode
+  .
+  ((eglot-workspace-configuration
+    .
+    (:java
+     (:project
+      (:sourcePaths ["src"])
+      :dependencies
+      ["libs/**/*.jar" "libs/*.jar"]
+      :output-dir "build")))
+   (jdtls (:workspaceFolder "~/java/")))))
 
 
 ;; Local Variables:
