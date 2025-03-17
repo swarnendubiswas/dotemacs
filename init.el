@@ -1515,6 +1515,9 @@ The provider is nerd-icons."
 (use-package sideline
   :init (setq sideline-backends-left nil)
   :hook ((flycheck-mode lsp-mode eglot-managed-mode) . sideline-mode)
+  :custom
+  (sideline-display-backend-name t)
+  (sideline-display-backend-type 'inner)
   :diminish)
 
 (use-package sideline-flycheck
@@ -3847,10 +3850,28 @@ PAD can be left (`l') or right (`r')."
   (outline-blank-line t)
   :diminish (outline-minor-mode outline-indent-minor-mode))
 
+;; (use-package all-the-icons
+;;   :commands all-the-icons-install-fonts
+;;   :custom
+;;   ;; Small icons look nicer
+;;   (all-the-icons-scale-factor 0.9)
+;;   (all-the-icons-faicon-scale-factor 0.9)
+;;   (all-the-icons-wicon-scale-factor 0.9)
+;;   (all-the-icons-octicon-scale-factor 0.9)
+;;   (all-the-icons-fileicon-scale-factor 0.9)
+;;   (all-the-icons-material-scale-factor 0.9)
+;;   (all-the-icons-alltheicon-scale-factor 0.9)
+;;   (all-the-icons-color-icons t))
+
 ;; Allows to easily identify the file path in a project
-(use-package project-headerline
-  :straight (:host github :repo "gavv/project-headerline")
-  :hook (emacs-startup . global-project-headerline-mode))
+;; (use-package project-headerline
+;;   :straight (:host github :repo "gavv/project-headerline")
+;;   :hook (emacs-startup . global-project-headerline-mode))
+
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb")
+  :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
+  :config (breadcrumb-imenu-crumbs))
 
 ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", show a block
 ;; with "C-c @ C-s", show all folds with "C-c @ C-a", and toggle hiding of a
@@ -4041,7 +4062,7 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    '((java-mode java-ts-mode)
      .
-     ("jdtls" "-noverify" "--illegal-access=warn" "-Xms2G" "-Xmx8G")))
+     ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G")))
   (add-to-list
    'eglot-server-programs
    '((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio")))
@@ -4055,7 +4076,13 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
   ;; (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
-  ;; (add-to-list 'eglot-server-programs '(nxml-mode . ("xmlls")))
+  (add-to-list
+   'eglot-server-programs
+   `((nxml-mode xml-mode)
+     .
+     ("java" "-jar"
+      ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
+                         user-emacs-directory))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of

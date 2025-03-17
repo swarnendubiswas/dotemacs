@@ -9,18 +9,21 @@
 
 Emacs searches for the initiation files in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init][following order]]: ~~/.emacs.el > ~/.emacs > ~/.emacs.d/init.el~.
 
-To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current top-level s-expression. Use
-~M-:~ to evaluate an Emacs Lisp expression and print the result. Only interactive functions can be invoked with ~M-x~ or a key binding.
+To evaluate an s-expression, use ~C-x C-e~. Use ~C-M-x~ to evaluate the current
+top-level s-expression. Use ~M-:~ to evaluate an Emacs Lisp expression and print
+the result. Only interactive functions can be invoked with ~M-x~ or a key binding.
 
-The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~ since they cause eager loading and
-are expensive. A cheaper alternative is to use ~autoload~.
+The ~user-init-file~ should not ideally contain calls to ~load~ or ~require~ since
+they cause eager loading and are expensive. A cheaper alternative is to use
+~autoload~.
 
 ** Elisp
 
 *** Lambda functions
 
-Quoting a lambda form means the anonymous function is not byte-compiled. The following forms are
-all equivalent.
+Quoting a lambda form means the anonymous function is not byte-compiled. The
+following forms are all equivalent.
+
 - ~(lambda (x) (* x x))~
 - ~(function (lambda (x) (* x x)))~
 - ~#'(lambda (x) (* x x))~
@@ -102,7 +105,6 @@ https://with-emacs.com/posts/tutorials/almost-all-you-need-to-know-about-variabl
 ** Using Hooks
 
 ~emacs-startup-hook~ runs later than the ~after-init-hook~, it is the last recommended hook to load customizations. ~window-setup-hook~ runs after loading init files and handling the command line similar to ~emacs-startup-hook~. The only difference is that ~window-setup-hook~ hook runs after frame parameters have been set up in response to any settings from the init file.
-
 
 ** Useful Information
 
