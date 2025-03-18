@@ -1240,18 +1240,25 @@ The provider is nerd-icons."
    ("C-<f11>" . crux-kill-other-buffers))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-(use-package rainbow-mode
+;; (use-package rainbow-mode
+;;   :hook
+;;   ((LaTeX-mode
+;;     latex-mode
+;;     css-mode
+;;     css-ts-mode
+;;     html-mode
+;;     html-ts-mode
+;;     web-mode
+;;     help-mode
+;;     helpful-mode)
+;;    . rainbow-mode)
+;;   :diminish)
+
+(use-package colorful-mode
   :hook
   ((LaTeX-mode
-    latex-mode
-    css-mode
-    css-ts-mode
-    html-mode
-    html-ts-mode
-    web-mode
-    help-mode
-    helpful-mode)
-   . rainbow-mode)
+    css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode helpful-mode)
+   . colorful-mode)
   :diminish)
 
 ;; LATER: The parenthesis faces are wrongly highlighted
@@ -2990,7 +2997,14 @@ The provider is nerd-icons."
   :interpreter "fish"
   :hook
   (fish-mode
-   . (lambda () (add-hook 'before-save-hook #'fish_indent-before-save))))
+   .
+   (lambda ()
+     (add-hook 'before-save-hook #'fish_indent-before-save)
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
 
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
@@ -3288,6 +3302,7 @@ The provider is nerd-icons."
    ("C-c C-," . org-insert-structure-template)
    ("C-c C-j" . consult-outline)))
 
+;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
 (use-package org-appear
   :hook (org-mode . org-appear-mode)
   :custom
@@ -3940,30 +3955,12 @@ PAD can be left (`l') or right (`r')."
    ("C-c l F" . eglot-format-buffer)
    ("C-c l x" . eglot-code-actions))
   :hook
-  ((c-mode
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    python-mode
-    python-ts-mode
-    css-mode
-    css-ts-mode
-    markdown-mode
-    sh-mode
-    bash-ts-mode
-    LaTeX-mode
-    bibtex-mode
-    html-mode
-    html-ts-mode
-    json-mode
-    json-ts-mode
-    dockerfile-ts-mode
-    perl-mode)
+  ((dockerfile-ts-mode
+    html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
    . eglot-ensure)
   :custom
   (eglot-autoshutdown t)
-  (eglot-sync-connect nil)
-  (eglot-connect-timeout nil)
+  (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
@@ -3979,6 +3976,9 @@ PAD can be left (`l') or right (`r')."
   ;;    :documentHighlightProvider
   ;;    ))
   (eglot-report-progress nil)
+  (eglot-mode-line-format
+   '(eglot-mode-line-error eglot-mode-line-action-suggestion))
+
   :config
   ;; Show all of the available eldoc information when we want it. This way
   ;; Flymake errors don't just get clobbered by docstrings.
@@ -4011,6 +4011,7 @@ PAD can be left (`l') or right (`r')."
      .
      ("clangd"
       "-j=4"
+      "--compile-commands-dir=./build"
       "--all-scopes-completion"
       "--background-index"
       "--clang-tidy"
@@ -4142,19 +4143,6 @@ PAD can be left (`l') or right (`r')."
       :disabledRules
       (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
       :additionalRules (:enablePickyRules t))
-     ;; :jdtls
-     ;; (:settings
-     ;;  (:java
-     ;;   (:completion
-     ;;    (:guessMethodArguments t)
-     ;;    (:format
-     ;;     (:enabled
-     ;;      t
-     ;;      :settings
-     ;;      (:url
-     ;;       "file:///data/cay/bin/cay-eclipse.formatter.xml"
-     ;;       :profile "cay")))))
-     ;; :extendedClientCapabilities (:classFileContentsSupport t))
      :yaml (:format (:enable t) :validate t :hover t :completion t)
      :vscode-json-language-server (:provideFormatter t))))
 
@@ -4165,13 +4153,38 @@ PAD can be left (`l') or right (`r')."
   :config (eglot-booster-mode))
 
 (use-package eglot-java
+  :preface
+  (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
+    "Custom options that will be merged with any default settings."
+    '( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
+      :settings
+      (:java
+       (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
+       :configuration
+       (:runtimes
+        [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
+         (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
+       (:completion
+        (:guessMethodArguments t)
+        :format
+        (:enabled
+         t
+         :comments (:enabled t)
+         :onType (:enabled :json-false)
+         :tabSize 4
+         :insertSpaces t
+         :settings
+         (:url
+          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")))
+       :extendedClientCapabilities (:classFileContentsSupport t))))
   :when (eq sb/lsp-provider 'eglot)
   :hook
   (java-mode
    .
    (lambda ()
      (eglot-ensure)
-     (eglot-java-mode))))
+     (eglot-java-mode)))
+  :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy"))
