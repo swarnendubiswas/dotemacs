@@ -1278,6 +1278,10 @@ The provider is nerd-icons."
   :hook (prog-mode . ws-butler-mode)
   :diminish)
 
+;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
+;; saves mark where the search started, so you can jump back to that point later
+;; with "C-u C-SPC". Use "M-s M-<" to go to the first match and "M-s M->" to go
+;; to the last match.
 (use-package isearch
   :straight (:type built-in)
   :bind
@@ -1292,12 +1296,21 @@ The provider is nerd-icons."
    ("C-c C-o" . isearch-occur))
   :custom
   (isearch-lazy-count t "Show match count")
+  (isearch-allow-scroll t "Scrolling should not cancel search")
+  ;; Enable "M-<", "M->", "C-v" and "M-v" to jump among matches
+  (isearch-allow-motion t)
+  (isearch-motion-changes-direction t)
   (lazy-highlight-initial-delay 0))
 
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
-  :commands (isearch-forward-symbol-at-point isearch-backward-symbol-at-point)
-  :bind (("M-s ." . isearch-symbol-at-point) ("M-s _" . isearch-forward-symbol)))
+  :commands isearch-backward-symbol-at-point
+  :bind
+  (("M-s ." . isearch-symbol-at-point)
+   ("M-s _" . isearch-forward-symbol)
+   :map
+   isearch-mode-map
+   ("C-d" . isearch-forward-symbol-at-point)))
 
 (with-eval-after-load "grep"
   (setq
@@ -1316,8 +1329,11 @@ The provider is nerd-icons."
   (setq find-program "fd"))
 
 ;; `consult-rg' provides live search, while `deadgrep' provides a resulting
-;; search buffer.
+;; search buffer. Visit the result in another buffer with "o", move between
+;; search hits with "n" and "p", and move between files with "M-n" and "M-p".
+;; Change the search term with "S" and enable incremental search with "I".
 (use-package deadgrep
+  :commands deadgrep-edit-mode
   :bind ("C-c s d" . deadgrep)
   :custom (deadgrep-max-buffers 1))
 
@@ -2399,26 +2415,54 @@ The provider is nerd-icons."
                   #'cape-dabbrev
                   #'yasnippet-capf))))
 
-  (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local
-        completion-at-point-functions
-        (list
-         ;; Math latex tags
-         ;; (cape-company-to-capf #'company-math-symbols-latex)
-         ;; Math Unicode symbols and sub(super)scripts
-         ;; (cape-company-to-capf #'company-math-symbols-unicode)
-         ;; (cape-company-to-capf #'company-latex-commands)
-         ;; Used for Unicode symbols and not for the corresponding LaTeX names.
-         #'cape-tex
-         #'citar-capf
-         #'bibtex-capf
-         #'cape-file
-         #'cape-dict
-         #'cape-dabbrev
-         #'yasnippet-capf)))))
+  (when (eq sb/lsp-provider 'eglot)
+    (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+      (add-hook
+       mode
+       (lambda ()
+         (add-hook
+          'eglot-managed-mode-hook
+          (lambda ()
+            (setq-local
+             completion-at-point-functions
+             (list
+              ;; Math latex tags
+              ;; (cape-company-to-capf #'company-math-symbols-latex)
+              ;; Math Unicode symbols and sub(super)scripts
+              ;; (cape-company-to-capf #'company-math-symbols-unicode)
+              ;; (cape-company-to-capf #'company-latex-commands)
+              ;; Used for Unicode symbols and not for the corresponding LaTeX
+              ;; names.
+              #'cape-tex
+              #'citar-capf
+              #'bibtex-capf
+              #'cape-file
+              #'cape-dict
+              #'cape-dabbrev
+              #'yasnippet-capf))))))))
+
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+      (add-hook
+       mode
+       (lambda ()
+         (setq-local
+          completion-at-point-functions
+          (list
+           ;; Math latex tags
+           ;; (cape-company-to-capf #'company-math-symbols-latex)
+           ;; Math Unicode symbols and sub(super)scripts
+           ;; (cape-company-to-capf #'company-math-symbols-unicode)
+           ;; (cape-company-to-capf #'company-latex-commands)
+           ;; Used for Unicode symbols and not for the corresponding LaTeX
+           ;; names.
+           #'cape-tex
+           #'citar-capf
+           #'bibtex-capf
+           #'cape-file
+           #'cape-dict
+           #'cape-dabbrev
+           #'yasnippet-capf))))))
 
   (with-eval-after-load "lsp-mode"
     (dolist (mode
@@ -2947,8 +2991,8 @@ The provider is nerd-icons."
   :mode ("\\.cu\\'" . c++-ts-mode)
   :mode ("\\.cuh\\'" . c++-ts-mode))
 
-(use-package opencl-c-mode
-  :mode "\\.cl\\'")
+;; (use-package opencl-c-mode
+;;   :mode "\\.cl\\'")
 
 (use-package cmake-mode
   :when (executable-find "cmake")
