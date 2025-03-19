@@ -1517,19 +1517,19 @@ The provider is nerd-icons."
   :after (consult hl-todo)
   :commands (consult-todo consult-todo-all))
 
-(use-package sideline
-  :init (setq sideline-backends-left nil)
-  :hook ((flycheck-mode lsp-mode eglot-managed-mode) . sideline-mode)
-  :custom
-  (sideline-display-backend-name t)
-  (sideline-display-backend-type 'inner)
-  :diminish)
+;; (use-package sideline
+;;   :init (setq sideline-backends-left nil)
+;;   :hook ((flycheck-mode lsp-mode eglot-managed-mode) . sideline-mode)
+;;   :custom
+;;   (sideline-display-backend-name t)
+;;   (sideline-display-backend-type 'inner)
+;;   :diminish)
 
-(use-package sideline-flycheck
-  :after sideline
-  :demand t
-  :init (setq sideline-flycheck-display-mode 'line)
-  :hook (flycheck-mode . sideline-flycheck-setup))
+;; (use-package sideline-flycheck
+;;   :after sideline
+;;   :demand t
+;;   :init (setq sideline-flycheck-display-mode 'line)
+;;   :hook (flycheck-mode . sideline-flycheck-setup))
 
 ;; (use-package sideline-lsp
 ;;   :when (eq sb/lsp-provider 'lsp-mode)
@@ -1539,18 +1539,18 @@ The provider is nerd-icons."
 ;;   (setq sideline-backends-right
 ;;         '((sideline-lsp . up) (sideline-flycheck . down))))
 
-(use-package sideline-eglot
-  :when (eq sb/lsp-provider 'eglot)
-  :after sideline
-  :demand t
-  :config
-  (setq sideline-backends-right
-        `(((when (featurep 'eglot)
-             'sideline-eglot)
-           . up)
-          ((when (featurep 'flycheck)
-             'sideline-flycheck)
-           . down))))
+;; (use-package sideline-eglot
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :after sideline
+;;   :demand t
+;;   :config
+;;   (setq sideline-backends-right
+;;         `(((when (featurep 'eglot)
+;;              'sideline-eglot)
+;;            . up)
+;;           ((when (featurep 'flycheck)
+;;              'sideline-flycheck)
+;;            . down))))
 
 (use-package format-all
   :hook
@@ -2342,7 +2342,15 @@ The provider is nerd-icons."
   ;; Make the capf composable
   (with-eval-after-load "lsp-mode"
     (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
-    (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive))
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-buster))
+
+  (with-eval-after-load "eglot"
+    (advice-add
+     #'eglot-completion-at-point
+     :around #'cape-wrap-noninterruptible)
+    (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
+    (advice-add #'eglot-completion-at-point :around #'cape-wrap-buster))
 
   ;; Initialize for all generic languages that are not specifically handled. The
   ;; order of the functions matters, unless they are merged, the first function
@@ -2398,7 +2406,6 @@ The provider is nerd-icons."
        (setq-local
         completion-at-point-functions
         (list
-         #'lsp-completion-at-point
          ;; Math latex tags
          ;; (cape-company-to-capf #'company-math-symbols-latex)
          ;; Math Unicode symbols and sub(super)scripts
@@ -2413,39 +2420,76 @@ The provider is nerd-icons."
          #'cape-dabbrev
          #'yasnippet-capf)))))
 
-  (dolist (mode
-           '(c-mode-hook
-             c-ts-mode-hook
-             c++-mode-hook
-             c++-ts-mode-hook
-             cmake-mode-hook
-             cmake-ts-mode-hook
-             css-mode-hook
-             css-ts-mode-hook
-             fish-mode-hook
-             java-mode-hook
-             java-ts-mode-hook
-             makefile-mode
-             python-mode-hook
-             python-ts-mode-hook
-             sh-mode-hook
-             bash-ts-mode-hook
-             json-mode-hook
-             json-ts-mode-hook
-             jsonc-mode-hook
-             yaml-mode-hook
-             yaml-ts-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local completion-at-point-functions
-                   (list
-                    #'lsp-completion-at-point
-                    #'cape-keyword
-                    #'cape-file
-                    #'cape-dabbrev
-                    #'cape-dict
-                    #'yasnippet-capf))))))
+  (with-eval-after-load "lsp-mode"
+    (dolist (mode
+             '(bash-ts-mode-hook
+               c-mode-hook
+               c-ts-mode-hook
+               c++-mode-hook
+               c++-ts-mode-hook
+               cmake-mode-hook
+               cmake-ts-mode-hook
+               css-mode-hook
+               css-ts-mode-hook
+               fish-mode-hook
+               java-mode-hook
+               java-ts-mode-hook
+               json-mode-hook
+               json-ts-mode-hook
+               jsonc-mode-hook
+               makefile-mode
+               python-mode-hook
+               python-ts-mode-hook
+               sh-mode-hook
+               yaml-mode-hook
+               yaml-ts-mode-hook))
+      (add-hook
+       mode
+       (lambda ()
+         (setq-local completion-at-point-functions
+                     (list
+                      #'lsp-completion-at-point
+                      #'cape-keyword
+                      #'cape-file
+                      #'cape-dabbrev
+                      #'cape-dict
+                      #'yasnippet-capf))))))
+
+  (with-eval-after-load "eglot"
+    (dolist (mode
+             '(bash-ts-mode-hook
+               c-mode-hook
+               c-ts-mode-hook
+               c++-mode-hook
+               c++-ts-mode-hook
+               cmake-mode-hook
+               cmake-ts-mode-hook
+               css-mode-hook
+               css-ts-mode-hook
+               fish-mode-hook
+               java-mode-hook
+               java-ts-mode-hook
+               json-mode-hook
+               json-ts-mode-hook
+               jsonc-mode-hook
+               makefile-mode-hook
+               python-mode-hook
+               python-ts-mode-hook
+               sh-mode-hook
+               yaml-mode-hook
+               yaml-ts-mode-hook))
+      (add-hook
+       mode
+       (lambda ()
+         (setq-local completion-at-point-functions
+                     (list
+                      #'eglot-completion-at-point
+                      #'citre-completion-at-point
+                      #'cape-keyword
+                      #'cape-file
+                      #'cape-dabbrev
+                      #'cape-dict
+                      #'yasnippet-capf)))))))
 
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
@@ -3981,7 +4025,6 @@ used in `company-backends'."
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
-  (eglot-events-buffer-size 0 "Drop jsonrpc log to improve performance")
   (fset #'jsonrpc--log-event #'ignore)
   ;; (eglot-ignored-server-capabilities
   ;;  '(:codeLensProvider
