@@ -244,6 +244,10 @@ The provider is nerd-icons."
   (require-final-newline t "Always end a file with a newline")
   (revert-without-query '("\\.*") "Revert all files without asking")
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
+  (vc-handled-backends '(Git))
+  ;; Disable version control for remote files to improve performance
+  (vc-ignore-dir-regexp
+   (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
   :config
   (dolist (exts
            '(".aux"
@@ -453,28 +457,28 @@ The provider is nerd-icons."
 ;;   :when (display-graphic-p)
 ;;   :init (windmove-default-keybindings))
 
-(use-package doc-view
-  :straight (:type built-in)
-  :hook
-  (doc-view-mode
-   .
-   (lambda ()
-     (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
-       (auto-revert-mode 1))))
-  :bind
-  (:map
-   doc-view-mode-map
-   ("=" . doc-view-enlarge)
-   ("-" . doc-view-shrink)
-   ("n" . doc-view-next-page)
-   ("p" . doc-view-previous-page)
-   ("0" . doc-view-scale-reset)
-   ("M-<" . doc-view-first-page)
-   ("M->" . doc-view-last-page)
-   ("C-l" . doc-view-goto-page))
-  :custom
-  (doc-view-continuous t)
-  (doc-view-resolution 120))
+;; (use-package doc-view
+;;   :straight (:type built-in)
+;;   :hook
+;;   (doc-view-mode
+;;    .
+;;    (lambda ()
+;;      (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
+;;        (auto-revert-mode 1))))
+;;   :bind
+;;   (:map
+;;    doc-view-mode-map
+;;    ("=" . doc-view-enlarge)
+;;    ("-" . doc-view-shrink)
+;;    ("n" . doc-view-next-page)
+;;    ("p" . doc-view-previous-page)
+;;    ("0" . doc-view-scale-reset)
+;;    ("M-<" . doc-view-first-page)
+;;    ("M->" . doc-view-last-page)
+;;    ("C-l" . doc-view-goto-page))
+;;   :custom
+;;   (doc-view-continuous t)
+;;   (doc-view-resolution 120))
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
 ;; `find-file' unless a prefix argument is given. Then it will find file at
@@ -792,12 +796,12 @@ The provider is nerd-icons."
   :after dired
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
-(use-package dired-hist
-  :straight (:host github :repo "karthink/dired-hist")
-  :hook (dired-mode . dired-hist-mode)
-  :bind
-  (:map
-   dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
+;; (use-package dired-hist
+;;   :straight (:host github :repo "karthink/dired-hist")
+;;   :hook (dired-mode . dired-hist-mode)
+;;   :bind
+;;   (:map
+;;    dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only
 ;; functions and variables from Lisp packages which are loaded into the current
@@ -999,39 +1003,39 @@ The provider is nerd-icons."
     (bind-key "C-c C-j" #'consult-outline tex-mode-map)))
 
 ;; Easily add file and directory paths into the minibuffer.
-(use-package consult-dir
-  :bind
-  (("C-x C-d" . consult-dir)
-   :map
-   vertico-map
-   ("C-x C-d" . consult-dir)
-   ("C-x C-j" . consult-dir-jump-file))
-  :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
+;; (use-package consult-dir
+;;   :bind
+;;   (("C-x C-d" . consult-dir)
+;;    :map
+;;    vertico-map
+;;    ("C-x C-d" . consult-dir)
+;;    ("C-x C-j" . consult-dir-jump-file))
+;;   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
 ;; Provide context-dependent actions similar to a content menu.
-(use-package embark
-  :bind
-  ( ;; "C-h b" lists all the bindings available in a buffer
-   ([remap describe-bindings] . embark-bindings)
-   ("C-`" . embark-act)
-   ("C-;" . embark-dwim)
-   :map
-   minibuffer-local-map
-   ("C-`" . embark-act)
-   ("C-c C-c" . embark-collect)
-   ("C-c C-e" . embark-export)
-   :map
-   minibuffer-local-completion-map
-   ("C-`" . embark-act))
-  :custom
-  ;; Replace the key help with a completing-read interface
-  (prefix-help-command #'embark-prefix-help-command))
+;; (use-package embark
+;;   :bind
+;;   ( ;; "C-h b" lists all the bindings available in a buffer
+;;    ([remap describe-bindings] . embark-bindings)
+;;    ("C-`" . embark-act)
+;;    ("C-;" . embark-dwim)
+;;    :map
+;;    minibuffer-local-map
+;;    ("C-`" . embark-act)
+;;    ("C-c C-c" . embark-collect)
+;;    ("C-c C-e" . embark-export)
+;;    :map
+;;    minibuffer-local-completion-map
+;;    ("C-`" . embark-act))
+;;   :custom
+;;   ;; Replace the key help with a completing-read interface
+;;   (prefix-help-command #'embark-prefix-help-command))
 
 ;; Supports exporting search results to a `grep-mode' buffer, on which you can
 ;; use `wgrep'.
-(use-package embark-consult
-  :after (embark consult)
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
+;; (use-package embark-consult
+;;   :after (embark consult)
+;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
@@ -1352,14 +1356,8 @@ The provider is nerd-icons."
   (([remap query-replace] . visual-replace)
    ([remap replace-string] . visual-replace)
    ([remap isearch-query-replace] . visual-replace-from-isearch)
-   ([remap isearch-query-replace-regexp] . visual-replace-from-isearch)))
-
-(use-package vc-hooks
-  :straight (:type built-in)
-  :custom (vc-handled-backends '(Git))
-  ;; Disable version control for remote files to improve performance
-  (vc-ignore-dir-regexp
-   (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp)))
+   ([remap isearch-query-replace-regexp] . visual-replace-from-isearch))
+  :custom (visual-replace-display-total t))
 
 (use-package transient
   :custom (transient-semantic-coloring t)
@@ -1529,14 +1527,30 @@ The provider is nerd-icons."
 
 (use-package sideline-flycheck
   :after sideline
+  :demand t
+  :init (setq sideline-flycheck-display-mode 'line)
   :hook (flycheck-mode . sideline-flycheck-setup))
 
-(use-package sideline-lsp
-  :when (eq sb/lsp-provider 'lsp-mode)
+;; (use-package sideline-lsp
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+;;   :after sideline
+;;   :demand t
+;;   :config
+;;   (setq sideline-backends-right
+;;         '((sideline-lsp . up) (sideline-flycheck . down))))
+
+(use-package sideline-eglot
+  :when (eq sb/lsp-provider 'eglot)
   :after sideline
+  :demand t
   :config
   (setq sideline-backends-right
-        '((sideline-lsp . up) (sideline-flycheck . down))))
+        `(((when (featurep 'eglot)
+             'sideline-eglot)
+           . up)
+          ((when (featurep 'flycheck)
+             'sideline-flycheck)
+           . down))))
 
 (use-package format-all
   :hook
@@ -2436,226 +2450,226 @@ The provider is nerd-icons."
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
 ;; servers simultaneously and provides helpers to install and uninstall servers.
-(use-package lsp-mode
-  :bind
-  (:map
-   lsp-command-map
-   ("l" . lsp)
-   ("q" . lsp-disconnect)
-   ("Q" . lsp-workspace-shutdown)
-   ("R" . lsp-workspace-restart)
-   ("d" . lsp-find-declaration)
-   ("e" . lsp-find-definition)
-   ("r" . lsp-find-references)
-   ("i" . lsp-find-implementation)
-   ("I" . lsp-goto-implementation)
-   ("t" . lsp-goto-type-definition)
-   ("r" . lsp-rename)
-   ("f" . lsp-format-buffer)
-   ("x" . lsp-execute-code-action)
-   ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
-   ("u" . lsp-imenu-create-uncategorised-index) ; sorts the items by position
-   ("a" . lsp-workspace-folders-add)
-   ("v" . lsp-workspace-folders-remove)
-   ("b" . lsp-workspace-blacklist-remove))
-  :custom
-  (lsp-keymap-prefix "C-c l")
-  (lsp-clangd-version "19.1.2")
-  (lsp-clients-clangd-args
-   '("-j=4"
-     "--all-scopes-completion"
-     "--background-index"
-     "--clang-tidy"
-     "--completion-style=detailed"
-     "--fallback-style=LLVM"
-     ;; Do not automatically insert #include statements when editing code
-     "--header-insertion=never"
-     "--header-insertion-decorators=0"
-     "--log=error"
-     ;; Unsupported options with Clangd 10: malloc-trim and enable-config
-     "--malloc-trim" ; Release memory periodically
-     "--enable-config"
-     "--pch-storage=memory" ; Increases memory usage but can improve performance
-     "--pretty"))
-  ;; Enable integration of custom backends other than `capf'
-  (lsp-completion-provider :none)
-  ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
-  (lsp-completion-show-detail t)
-  ;; Show/hide completion kind, e.g., interface/class
-  (lsp-completion-show-kind t)
-  ;; Show/hide description of completion candidates
-  (lsp-completion-show-label-description t)
-  (lsp-completion-default-behaviour :insert)
-  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
-  (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
-  (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
-  (lsp-enable-folding nil "I do not find the feature useful")
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-html-format-wrap-line-length fill-column)
-  (lsp-html-format-end-with-newline t)
-  (lsp-html-format-indent-inner-html t)
-  (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
-  (lsp-lens-enable nil "Lenses are intrusive")
-  (lsp-modeline-diagnostics-enable nil)
-  ;; Simpler to focus on the errors at hand
-  (lsp-modeline-diagnostics-scope :file)
-  ;; Sudden changes in the height of the echo area causes the cursor to lose
-  ;; position, manually request via `lsp-signature-activate'.
-  (lsp-signature-auto-activate nil)
-  ;; Avoid annoying questions, we expect a server restart to succeed
-  (lsp-restart 'auto-restart)
-  (lsp-xml-logs-client nil)
-  ;; Avoid warning messages for unsupported modes like `csv-mode'
-  (lsp-warn-no-matched-clients nil)
-  (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  ;; Use `symbol-overlay' to include languages that do not have a language
-  ;; server
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-pylsp-configuration-sources ["setup.cfg"])
-  (lsp-pylsp-plugins-mccabe-enabled nil)
-  (lsp-pylsp-plugins-preload-modules
-   ["numpy" "csv" "pandas" "statistics" "json"])
-  (lsp-pylsp-plugins-pydocstyle-convention "pep257")
-  (lsp-pylsp-plugins-pylint-enabled t)
-  (lsp-pylsp-plugins-yapf-enabled t)
-  (lsp-pylsp-plugins-flake8-enabled nil)
-  (lsp-pylsp-plugins-isort-enabled t)
-  (lsp-pylsp-plugins-mypy-enabled t)
-  (lsp-use-plists t)
-  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
-  ;; Tramp which is slower
-  (lsp-auto-register-remote-clients nil)
-  (lsp-enable-snippet t)
-  (lsp-keep-workspace-alive nil)
-  ;; The workspace status icon on the terminal interface is misleading across
-  ;; projects
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-enable-suggest-server-download nil)
-  (lsp-inlay-hint-enable t)
-  :config
-  (when (display-graphic-p)
-    (setq lsp-modeline-code-actions-segments '(count icon name)))
+;; (use-package lsp-mode
+;;   :bind
+;;   (:map
+;;    lsp-command-map
+;;    ("l" . lsp)
+;;    ("q" . lsp-disconnect)
+;;    ("Q" . lsp-workspace-shutdown)
+;;    ("R" . lsp-workspace-restart)
+;;    ("d" . lsp-find-declaration)
+;;    ("e" . lsp-find-definition)
+;;    ("r" . lsp-find-references)
+;;    ("i" . lsp-find-implementation)
+;;    ("I" . lsp-goto-implementation)
+;;    ("t" . lsp-goto-type-definition)
+;;    ("r" . lsp-rename)
+;;    ("f" . lsp-format-buffer)
+;;    ("x" . lsp-execute-code-action)
+;;    ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
+;;    ("u" . lsp-imenu-create-uncategorised-index) ; sorts the items by position
+;;    ("a" . lsp-workspace-folders-add)
+;;    ("v" . lsp-workspace-folders-remove)
+;;    ("b" . lsp-workspace-blacklist-remove))
+;;   :custom
+;;   (lsp-keymap-prefix "C-c l")
+;;   (lsp-clangd-version "19.1.2")
+;;   (lsp-clients-clangd-args
+;;    '("-j=4"
+;;      "--all-scopes-completion"
+;;      "--background-index"
+;;      "--clang-tidy"
+;;      "--completion-style=detailed"
+;;      "--fallback-style=LLVM"
+;;      ;; Do not automatically insert #include statements when editing code
+;;      "--header-insertion=never"
+;;      "--header-insertion-decorators=0"
+;;      "--log=error"
+;;      ;; Unsupported options with Clangd 10: malloc-trim and enable-config
+;;      "--malloc-trim" ; Release memory periodically
+;;      "--enable-config"
+;;      "--pch-storage=memory" ; Increases memory usage but can improve performance
+;;      "--pretty"))
+;;   ;; Enable integration of custom backends other than `capf'
+;;   (lsp-completion-provider :none)
+;;   ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
+;;   (lsp-completion-show-detail t)
+;;   ;; Show/hide completion kind, e.g., interface/class
+;;   (lsp-completion-show-kind t)
+;;   ;; Show/hide description of completion candidates
+;;   (lsp-completion-show-label-description t)
+;;   (lsp-completion-default-behaviour :insert)
+;;   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
+;;   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
+;;   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
+;;   (lsp-enable-folding nil "I do not find the feature useful")
+;;   (lsp-headerline-breadcrumb-enable nil)
+;;   (lsp-html-format-wrap-line-length fill-column)
+;;   (lsp-html-format-end-with-newline t)
+;;   (lsp-html-format-indent-inner-html t)
+;;   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
+;;   (lsp-lens-enable nil "Lenses are intrusive")
+;;   (lsp-modeline-diagnostics-enable nil)
+;;   ;; Simpler to focus on the errors at hand
+;;   (lsp-modeline-diagnostics-scope :file)
+;;   ;; Sudden changes in the height of the echo area causes the cursor to lose
+;;   ;; position, manually request via `lsp-signature-activate'.
+;;   (lsp-signature-auto-activate nil)
+;;   ;; Avoid annoying questions, we expect a server restart to succeed
+;;   (lsp-restart 'auto-restart)
+;;   (lsp-xml-logs-client nil)
+;;   ;; Avoid warning messages for unsupported modes like `csv-mode'
+;;   (lsp-warn-no-matched-clients nil)
+;;   (lsp-enable-file-watchers nil "Avoid watcher warnings")
+;;   ;; Use `symbol-overlay' to include languages that do not have a language
+;;   ;; server
+;;   (lsp-enable-symbol-highlighting nil)
+;;   (lsp-pylsp-configuration-sources ["setup.cfg"])
+;;   (lsp-pylsp-plugins-mccabe-enabled nil)
+;;   (lsp-pylsp-plugins-preload-modules
+;;    ["numpy" "csv" "pandas" "statistics" "json"])
+;;   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
+;;   (lsp-pylsp-plugins-pylint-enabled t)
+;;   (lsp-pylsp-plugins-yapf-enabled t)
+;;   (lsp-pylsp-plugins-flake8-enabled nil)
+;;   (lsp-pylsp-plugins-isort-enabled t)
+;;   (lsp-pylsp-plugins-mypy-enabled t)
+;;   (lsp-use-plists t)
+;;   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
+;;   ;; Tramp which is slower
+;;   (lsp-auto-register-remote-clients nil)
+;;   (lsp-enable-snippet t)
+;;   (lsp-keep-workspace-alive nil)
+;;   ;; The workspace status icon on the terminal interface is misleading across
+;;   ;; projects
+;;   (lsp-modeline-workspace-status-enable nil)
+;;   (lsp-enable-suggest-server-download nil)
+;;   (lsp-inlay-hint-enable t)
+;;   :config
+;;   (when (display-graphic-p)
+;;     (setq lsp-modeline-code-actions-segments '(count icon name)))
 
-  ;; (dolist (ignore-dirs
-  ;;          '("/build\\'"
-  ;;            "/\\.metadata\\'"
-  ;;            "/\\.recommenders\\'"
-  ;;            "/\\.clangd\\'"
-  ;;            "/\\.cache\\'"
-  ;;            "/__pycache__\\'"))
-  ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
+;;   ;; (dolist (ignore-dirs
+;;   ;;          '("/build\\'"
+;;   ;;            "/\\.metadata\\'"
+;;   ;;            "/\\.recommenders\\'"
+;;   ;;            "/\\.clangd\\'"
+;;   ;;            "/\\.cache\\'"
+;;   ;;            "/__pycache__\\'"))
+;;   ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
-  (defun lsp-booster--advice-json-parse (old-fn &rest args)
-    "Try to parse bytecode instead of json."
-    (or (when (equal (following-char) ?#)
-          (let ((bytecode (read (current-buffer))))
-            (when (byte-code-function-p bytecode)
-              (funcall bytecode))))
-        (apply old-fn args)))
-  (advice-add
-   (if (progn
-         (require 'json)
-         (fboundp 'json-parse-buffer))
-       'json-parse-buffer
-     'json-read)
-   :around #'lsp-booster--advice-json-parse)
+;;   (defun lsp-booster--advice-json-parse (old-fn &rest args)
+;;     "Try to parse bytecode instead of json."
+;;     (or (when (equal (following-char) ?#)
+;;           (let ((bytecode (read (current-buffer))))
+;;             (when (byte-code-function-p bytecode)
+;;               (funcall bytecode))))
+;;         (apply old-fn args)))
+;;   (advice-add
+;;    (if (progn
+;;          (require 'json)
+;;          (fboundp 'json-parse-buffer))
+;;        'json-parse-buffer
+;;      'json-read)
+;;    :around #'lsp-booster--advice-json-parse)
 
-  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-    "Prepend emacs-lsp-booster command to lsp CMD."
-    (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and
-           (not test?) ;; for check lsp-server-present?
-           ;; see lsp-resolve-final-command, it would add extra shell wrapper
-           (not (file-remote-p default-directory)) lsp-use-plists
-           (not (functionp 'json-rpc-connection)) ;; native json-rpc
-           (executable-find "emacs-lsp-booster"))
-          (progn
-            (message "Using emacs-lsp-booster for %s!" orig-result)
-            (cons "emacs-lsp-booster" orig-result))
-        orig-result)))
-  (advice-add
-   'lsp-resolve-final-command
-   :around #'lsp-booster--advice-final-command)
+;;   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+;;     "Prepend emacs-lsp-booster command to lsp CMD."
+;;     (let ((orig-result (funcall old-fn cmd test?)))
+;;       (if (and
+;;            (not test?) ;; for check lsp-server-present?
+;;            ;; see lsp-resolve-final-command, it would add extra shell wrapper
+;;            (not (file-remote-p default-directory)) lsp-use-plists
+;;            (not (functionp 'json-rpc-connection)) ;; native json-rpc
+;;            (executable-find "emacs-lsp-booster"))
+;;           (progn
+;;             (message "Using emacs-lsp-booster for %s!" orig-result)
+;;             (cons "emacs-lsp-booster" orig-result))
+;;         orig-result)))
+;;   (advice-add
+;;    'lsp-resolve-final-command
+;;    :around #'lsp-booster--advice-final-command)
 
-  :diminish)
+;;   :diminish)
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-imenu-auto-refresh 'after-save)
-  (lsp-ui-sideline-enable nil)
-  ;; Enables understanding when to invoke code actions
-  (lsp-ui-sideline-show-code-actions t)
-  ;; Hide diagnostics when typing because they can be intrusive,
-  ;; Flycheck/flymake already highlights errors
-  (lsp-ui-sideline-show-diagnostics nil)
-  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-  (lsp-ui-peek-enable nil))
+;; (use-package lsp-ui
+;;   :hook (lsp-mode . lsp-ui-mode)
+;;   :custom
+;;   ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
+;;   (lsp-ui-doc-enable nil)
+;;   (lsp-ui-doc-include-signature t)
+;;   (lsp-ui-imenu-auto-refresh 'after-save)
+;;   (lsp-ui-sideline-enable nil)
+;;   ;; Enables understanding when to invoke code actions
+;;   (lsp-ui-sideline-show-code-actions t)
+;;   ;; Hide diagnostics when typing because they can be intrusive,
+;;   ;; Flycheck/flymake already highlights errors
+;;   (lsp-ui-sideline-show-diagnostics nil)
+;;   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+;;   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
+;;   (lsp-ui-peek-enable nil))
 
-(use-package consult-lsp
-  :after (consult lsp)
-  :demand t
-  :commands consult-lsp-diagnostics
-  :bind
-  (:map
-   lsp-command-map
-   ("g" . consult-lsp-symbols)
-   ("h" . consult-lsp-file-symbols)))
+;; (use-package consult-lsp
+;;   :after (consult lsp)
+;;   :demand t
+;;   :commands consult-lsp-diagnostics
+;;   :bind
+;;   (:map
+;;    lsp-command-map
+;;    ("g" . consult-lsp-symbols)
+;;    ("h" . consult-lsp-file-symbols)))
 
-(use-package lsp-java
-  :when (eq sb/lsp-provider 'lsp-mode)
-  :hook
-  ((java-mode java-ts-mode)
-   .
-   (lambda ()
-     (setq-local
-      c-basic-offset 4
-      c-set-style "java")
-     (lsp-deferred)))
-  :custom
-  (lsp-java-save-actions-organize-imports t)
-  (lsp-java-format-settings-profile "Swarnendu")
-  (lsp-java-format-settings-url
-   (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
-                     sb/user-home-directory)))
+;; (use-package lsp-java
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+;;   :hook
+;;   ((java-mode java-ts-mode)
+;;    .
+;;    (lambda ()
+;;      (setq-local
+;;       c-basic-offset 4
+;;       c-set-style "java")
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-java-save-actions-organize-imports t)
+;;   (lsp-java-format-settings-profile "Swarnendu")
+;;   (lsp-java-format-settings-url
+;;    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
+;;                      sb/user-home-directory)))
 
-(use-package lsp-ltex-plus
-  :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
-  :when (eq sb/lsp-provider 'lsp-mode)
-  :init (setq lsp-ltex-plus-version "18.4.0")
-  :hook
-  ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
-   .
-   (lambda ()
-     (require 'lsp-ltex-plus)
-     (lsp-deferred)))
-  :custom
-  ;; Recommended to set a generic language to disable spell check
-  (lsp-ltex-plus-plus-language "en")
-  (lsp-ltex-plus-check-frequency "save")
-  ;; (lsp-ltex-plus-dictionary
-  ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
-  (lsp-ltex-plus-log-level "warning")
-  (lsp-ltex-plus-disabled-rules
-   '(:en
-     ["EN_QUOTES"
-      "OXFORD_SPELLING_Z_NOT_S"
-      "MORFOLOGIK_RULE_EN_US"
-      "WANT"
-      "EN_DIACRITICS_REPLACE"]))
-  ;; :config
-  ;; ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
-  ;; ;; dict words.
-  ;; (setq lsp-ltex-plus-disabled-rules
-  ;;       #s(hash-table
-  ;;          size 30 data
-  ;;          ("en-US"
-  ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
-  )
+;; (use-package lsp-ltex-plus
+;;   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+;;   :init (setq lsp-ltex-plus-version "18.4.0")
+;;   :hook
+;;   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-ltex-plus)
+;;      (lsp-deferred)))
+;;   :custom
+;;   ;; Recommended to set a generic language to disable spell check
+;;   (lsp-ltex-plus-plus-language "en")
+;;   (lsp-ltex-plus-check-frequency "save")
+;;   ;; (lsp-ltex-plus-dictionary
+;;   ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
+;;   (lsp-ltex-plus-log-level "warning")
+;;   (lsp-ltex-plus-disabled-rules
+;;    '(:en
+;;      ["EN_QUOTES"
+;;       "OXFORD_SPELLING_Z_NOT_S"
+;;       "MORFOLOGIK_RULE_EN_US"
+;;       "WANT"
+;;       "EN_DIACRITICS_REPLACE"]))
+;;   ;; :config
+;;   ;; ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
+;;   ;; ;; dict words.
+;;   ;; (setq lsp-ltex-plus-disabled-rules
+;;   ;;       #s(hash-table
+;;   ;;          size 30 data
+;;   ;;          ("en-US"
+;;   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
+;;   )
 
 
 (use-package subword
@@ -2960,19 +2974,19 @@ The provider is nerd-icons."
   (pyvenv-post-deactivate-hooks
    (list (lambda () (setq python-shell-interpreter "python3")))))
 
-(use-package cperl-mode
-  :straight (:type built-in)
-  :mode "latexmkrc\\'"
-  :hook
-  (cperl-mode
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred)))))
-  :config (fset 'perl-mode 'cperl-mode))
+;; (use-package cperl-mode
+;;   :straight (:type built-in)
+;;   :mode "latexmkrc\\'"
+;;   :hook
+;;   (cperl-mode
+;;    .
+;;    (lambda ()
+;;      (cond
+;;       ((eq sb/lsp-provider 'eglot)
+;;        (eglot-ensure))
+;;       ((eq sb/lsp-provider 'lsp-mode)
+;;        (lsp-deferred)))))
+;;   :config (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
   :straight (:type built-in)
@@ -3079,18 +3093,18 @@ The provider is nerd-icons."
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
-(use-package css-mode
-  :straight (:type built-in)
-  :hook
-  ((css-mode css-ts-mode)
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred)))))
-  :custom (css-indent-offset 2))
+;; (use-package css-mode
+;;   :straight (:type built-in)
+;;   :hook
+;;   ((css-mode css-ts-mode)
+;;    .
+;;    (lambda ()
+;;      (cond
+;;       ((eq sb/lsp-provider 'eglot)
+;;        (eglot-ensure))
+;;       ((eq sb/lsp-provider 'lsp-mode)
+;;        (lsp-deferred)))))
+;;   :custom (css-indent-offset 2))
 
 (use-package make-mode
   :straight (:type built-in)
@@ -3175,10 +3189,10 @@ The provider is nerd-icons."
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
 ;; input-file.md"
-(use-package pandoc-mode
-  :hook (markdown-mode . pandoc-mode)
-  :config (pandoc-load-default-settings)
-  :diminish)
+;; (use-package pandoc-mode
+;;   :hook (markdown-mode . pandoc-mode)
+;;   :config (pandoc-load-default-settings)
+;;   :diminish)
 
 (use-package nxml-mode
   :straight (:type built-in)
@@ -3669,74 +3683,74 @@ used in `company-backends'."
 ;; information on the modeline. The package is not being actively maintained.
 ;; Inspired by
 ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-(use-package powerline
-  :preface
-  (defun sb/powerline-raw (str &optional face pad)
-    "Render STR as mode-line data using FACE and optionally PAD import.
-PAD can be left (`l') or right (`r')."
-    (when str
-      (let* ((rendered-str (format-mode-line str))
-             (padded-str
-              (concat
-               (when (and (> (length rendered-str) 0) (eq pad 'l))
-                 "")
-               (if (listp str)
-                   rendered-str
-                 str)
-               (when (and (> (length rendered-str) 0) (eq pad 'r))
-                 ""))))
-        (if face
-            (pl/add-text-property padded-str 'face face)
-          padded-str))))
+;; (use-package powerline
+;;   :preface
+;;   (defun sb/powerline-raw (str &optional face pad)
+;;     "Render STR as mode-line data using FACE and optionally PAD import.
+;; PAD can be left (`l') or right (`r')."
+;;     (when str
+;;       (let* ((rendered-str (format-mode-line str))
+;;              (padded-str
+;;               (concat
+;;                (when (and (> (length rendered-str) 0) (eq pad 'l))
+;;                  "")
+;;                (if (listp str)
+;;                    rendered-str
+;;                  str)
+;;                (when (and (> (length rendered-str) 0) (eq pad 'r))
+;;                  ""))))
+;;         (if face
+;;             (pl/add-text-property padded-str 'face face)
+;;           padded-str))))
 
-  (defun sb/powerline-nano-theme ()
-    "Setup a Nano-like modeline"
-    (interactive)
-    (setq-default mode-line-format
-                  '("%e" (:eval
-                     (let* ((active (powerline-selected-window-active))
-                            (face0
-                             (if active
-                                 'powerline-active0
-                               'powerline-inactive0))
-                            (lhs
-                             (list
-                              (powerline-raw
-                               (concat
-                                "GNU Emacs "
-                                (number-to-string emacs-major-version)
-                                "."
-                                (number-to-string emacs-minor-version))
-                               nil 'l)))
-                            (rhs
-                             (list
-                              (when which-function-mode
-                                (sb/powerline-raw which-func-format nil 'l))
-                              (powerline-vc nil 'l)
-                              (powerline-raw "")
-                              (powerline-raw "%4l" nil 'l)
-                              (powerline-raw ",")
-                              (powerline-raw "%3c" nil 'r)
-                              (if (buffer-modified-p)
-                                  (powerline-raw " ⠾" nil 'r)
-                                (powerline-raw "  " nil 'r))))
-                            (center (list (powerline-raw "%b" nil 'r))))
-                       (concat
-                        (powerline-render lhs)
-                        (powerline-fill-center
-                         nil (/ (powerline-width center) 2.0))
-                        (powerline-render center)
-                        (powerline-fill nil (powerline-width rhs))
-                        (powerline-render rhs)))))))
-  :when (eq sb/modeline-theme 'powerline)
-  :hook (emacs-startup . sb/powerline-nano-theme)
-  :custom
-  ;; Visualization of the buffer position is not useful
-  (powerline-display-hud nil)
-  (powerline-display-buffer-size nil)
-  (powerline-display-mule-info nil "File encoding information is not useful")
-  (powerline-gui-use-vcs-glyph t)
-  (powerline-height 20))
+;;   (defun sb/powerline-nano-theme ()
+;;     "Setup a Nano-like modeline"
+;;     (interactive)
+;;     (setq-default mode-line-format
+;;                   '("%e" (:eval
+;;                      (let* ((active (powerline-selected-window-active))
+;;                             (face0
+;;                              (if active
+;;                                  'powerline-active0
+;;                                'powerline-inactive0))
+;;                             (lhs
+;;                              (list
+;;                               (powerline-raw
+;;                                (concat
+;;                                 "GNU Emacs "
+;;                                 (number-to-string emacs-major-version)
+;;                                 "."
+;;                                 (number-to-string emacs-minor-version))
+;;                                nil 'l)))
+;;                             (rhs
+;;                              (list
+;;                               (when which-function-mode
+;;                                 (sb/powerline-raw which-func-format nil 'l))
+;;                               (powerline-vc nil 'l)
+;;                               (powerline-raw "")
+;;                               (powerline-raw "%4l" nil 'l)
+;;                               (powerline-raw ",")
+;;                               (powerline-raw "%3c" nil 'r)
+;;                               (if (buffer-modified-p)
+;;                                   (powerline-raw " ⠾" nil 'r)
+;;                                 (powerline-raw "  " nil 'r))))
+;;                             (center (list (powerline-raw "%b" nil 'r))))
+;;                        (concat
+;;                         (powerline-render lhs)
+;;                         (powerline-fill-center
+;;                          nil (/ (powerline-width center) 2.0))
+;;                         (powerline-render center)
+;;                         (powerline-fill nil (powerline-width rhs))
+;;                         (powerline-render rhs)))))))
+;;   :when (eq sb/modeline-theme 'powerline)
+;;   :hook (emacs-startup . sb/powerline-nano-theme)
+;;   :custom
+;;   ;; Visualization of the buffer position is not useful
+;;   (powerline-display-hud nil)
+;;   (powerline-display-buffer-size nil)
+;;   (powerline-display-mule-info nil "File encoding information is not useful")
+;;   (powerline-gui-use-vcs-glyph t)
+;;   (powerline-height 20))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
@@ -3744,12 +3758,9 @@ PAD can be left (`l') or right (`r')."
   :custom
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-buffer-file-name-style 'buffer-name)
-  (doom-modeline-minor-modes t)
   (doom-modeline-unicode-fallback t)
-  (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
-  (doom-modeline-enable-word-count t)
-  (doom-modeline-lsp nil)
-  (doom-modeline-workspace-name nil))
+  ;; LSP state is wrong for non-LSP-managed files
+  (doom-modeline-lsp nil))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -3847,23 +3858,23 @@ PAD can be left (`l') or right (`r')."
 
 ;; Provides pixel-precise smooth scrolling which can keep up with the very high
 ;; event rates of modern trackpads and high-precision wheel mice.
-(use-package ultra-scroll
-  :straight (:host github :repo "jdtsmith/ultra-scroll")
-  :custom
-  (scroll-conservatively 101)
-  (scroll-margin 0)
-  :hook (find-file . ultra-scroll-mode))
+;; (use-package ultra-scroll
+;;   :straight (:host github :repo "jdtsmith/ultra-scroll")
+;;   :custom
+;;   (scroll-conservatively 101)
+;;   (scroll-margin 0)
+;;   :hook (find-file . ultra-scroll-mode))
 
 ;; Fold text using indentation levels
-(use-package outline-indent
-  :hook
-  ((python-mode python-ts-mode yaml-mode yaml-ts-mode)
-   .
-   outline-indent-minor-mode)
-  :custom
-  (outline-indent-ellipsis " ▼ ")
-  (outline-blank-line t)
-  :diminish (outline-minor-mode outline-indent-minor-mode))
+;; (use-package outline-indent
+;;   :hook
+;;   ((python-mode python-ts-mode yaml-mode yaml-ts-mode)
+;;    .
+;;    outline-indent-minor-mode)
+;;   :custom
+;;   (outline-indent-ellipsis " ▼ ")
+;;   (outline-blank-line t)
+;;   :diminish (outline-minor-mode outline-indent-minor-mode))
 
 ;; (use-package all-the-icons
 ;;   :commands all-the-icons-install-fonts
@@ -3888,38 +3899,45 @@ PAD can be left (`l') or right (`r')."
   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
   :config (breadcrumb-imenu-crumbs))
 
-;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", show a block
-;; with "C-c @ C-s", show all folds with "C-c @ C-a", and toggle hiding of a
-;; block with "C-c @ C-c".
-(use-package hideshow
-  :hook
-  ((c-mode-common
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    cmake-mode
-    cmake-ts-mode
-    css-mode
-    css-ts-mode
-    emacs-lisp-mode
-    fish-mode
-    html-mode
-    java-mode
-    java-ts-mode
-    makefile-mode
-    perl-mode
-    python-mode
-    python-ts-mode
-    sh-mode
-    bash-ts-mode
-    json-mode
-    json-ts-mode
-    jsonc-mode
-    yaml-mode
-    yaml-ts-mode)
-   . hs-minor-mode)
-  :custom (hs-isearch-open t "Open all folds while searching")
-  :diminish hs-minor-mode)
+;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
+;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
+;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
+;; @ C-c".
+;; (use-package hideshow
+;;   :preface
+;;   (defun sb/toggle-fold ()
+;;     (interactive)
+;;     (save-excursion
+;;       (end-of-line)
+;;       (hs-toggle-hiding)))
+;;   :hook
+;;   ((c-mode-common
+;;     c-ts-mode
+;;     c++-mode
+;;     c++-ts-mode
+;;     cmake-mode
+;;     cmake-ts-mode
+;;     css-mode
+;;     css-ts-mode
+;;     emacs-lisp-mode
+;;     fish-mode
+;;     html-mode
+;;     java-mode
+;;     java-ts-mode
+;;     makefile-mode
+;;     perl-mode
+;;     python-mode
+;;     python-ts-mode
+;;     sh-mode
+;;     bash-ts-mode
+;;     json-mode
+;;     json-ts-mode
+;;     jsonc-mode
+;;     yaml-mode
+;;     yaml-ts-mode)
+;;    . hs-minor-mode)
+;;   :custom (hs-isearch-open t "Open all folds while searching")
+;;   :diminish hs-minor-mode)
 
 (use-package dogears
   :straight (:host github :repo "alphapapa/dogears.el")
@@ -4076,7 +4094,7 @@ PAD can be left (`l') or right (`r')."
   (add-to-list
    'eglot-server-programs
    '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
-  ;; (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
+  (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
   (add-to-list
    'eglot-server-programs
    `((nxml-mode xml-mode)
@@ -4152,39 +4170,39 @@ PAD can be left (`l') or right (`r')."
   :demand t
   :config (eglot-booster-mode))
 
-(use-package eglot-java
-  :preface
-  (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
-    "Custom options that will be merged with any default settings."
-    '( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
-      :settings
-      (:java
-       (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
-       :configuration
-       (:runtimes
-        [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
-         (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
-       (:completion
-        (:guessMethodArguments t)
-        :format
-        (:enabled
-         t
-         :comments (:enabled t)
-         :onType (:enabled :json-false)
-         :tabSize 4
-         :insertSpaces t
-         :settings
-         (:url
-          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")))
-       :extendedClientCapabilities (:classFileContentsSupport t))))
-  :when (eq sb/lsp-provider 'eglot)
-  :hook
-  (java-mode
-   .
-   (lambda ()
-     (eglot-ensure)
-     (eglot-java-mode)))
-  :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
+;; (use-package eglot-java
+;;   :preface
+;;   (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
+;;     "Custom options that will be merged with any default settings."
+;;     '( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
+;;       :settings
+;;       (:java
+;;        (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
+;;        :configuration
+;;        (:runtimes
+;;         [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
+;;          (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
+;;        (:completion
+;;         (:guessMethodArguments t)
+;;         :format
+;;         (:enabled
+;;          t
+;;          :comments (:enabled t)
+;;          :onType (:enabled :json-false)
+;;          :tabSize 4
+;;          :insertSpaces t
+;;          :settings
+;;          (:url
+;;           "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")))
+;;        :extendedClientCapabilities (:classFileContentsSupport t))))
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :hook
+;;   (java-mode
+;;    .
+;;    (lambda ()
+;;      (eglot-ensure)
+;;      (eglot-java-mode)))
+;;   :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy"))
@@ -4214,13 +4232,6 @@ PAD can be left (`l') or right (`r')."
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4)
   :config (eglot-inactive-regions-mode 1))
-
-(use-package sideline-eglot
-  :when (eq sb/lsp-provider 'eglot)
-  :after eglot
-  :config
-  (setq sideline-backends-right
-        '((sideline-eglot . up) (sideline-flycheck . down))))
 
 ;; (use-package eglot-ltex
 ;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
@@ -4443,8 +4454,8 @@ or the major mode is not in `sb/skippable-modes'."
 ;;    ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
-(use-package free-keys
-  :commands free-keys)
+;; (use-package free-keys
+;;   :commands free-keys)
 
 ;; Displays available keybindings following the currently entered incomplete
 ;; command/prefix in a popup
