@@ -1568,42 +1568,50 @@ The provider is nerd-icons."
 ;;              'sideline-flycheck)
 ;;            . down))))
 
-(use-package format-all
-  :hook
-  ((format-all-mode . format-all-ensure-formatter)
-   ((markdown-mode markdown-ts-mode) . format-all-mode))
+;; (use-package format-all
+;;   :hook
+;;   ((format-all-mode . format-all-ensure-formatter)
+;;    ((markdown-mode markdown-ts-mode) . format-all-mode))
+;;   :config
+;;   (setq-default format-all-formatters
+;;                 '(("Assembly" asmfmt)
+;;                   ("Awk" gawk)
+;;                   ("BibTeX" latexindent)
+;;                   ("C" clang-format)
+;;                   ("C++" clang-format)
+;;                   ("CMake" cmake-format)
+;;                   ("CSS" prettier)
+;;                   ("Cuda" clang-format)
+;;                   ("Dockerfile" dockfmt)
+;;                   ("Emacs Lisp" emacs-lisp)
+;;                   ("Fish" fish-indent)
+;;                   ("HTML" (prettier "--print-width" "80"))
+;;                   ("LaTeX" latexindent)
+;;                   ("Markdown" (prettier "--print-width" "80"))
+;;                   ("Perl" (perltidy
+;;                     "--quiet"
+;;                     "--standard-error-output"
+;;                     "--perl-best-practices"
+;;                     "-l=80"))
+;;                   ("Python" (yapf "--style" "file") isort)
+;;                   ("Shell" (shfmt "-i" "4" "-ci"))
+;;                   ("XML" tidy)
+;;                   ("YAML" prettier "--print-width" "80")))
+;;   (with-eval-after-load "markdown-mode"
+;;     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
+;;   (with-eval-after-load "tex-mode"
+;;     (bind-key "C-x f" #'format-all-buffer tex-mode-map))
+;;   (with-eval-after-load "latex"
+;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+;;   :diminish)
+
+(use-package apheleia
+  :hook ((markdown-mode markdown-ts-mode) . apheleia-mode)
+  :custom (apheleia-formatters-respect-fill-column t)
   :config
-  (setq-default format-all-formatters
-                '(("Assembly" asmfmt)
-                  ("Awk" gawk)
-                  ("BibTeX" latexindent)
-                  ("C" clang-format)
-                  ("C++" clang-format)
-                  ("CMake" cmake-format)
-                  ("CSS" prettier)
-                  ("Cuda" clang-format)
-                  ("Dockerfile" dockfmt)
-                  ("Emacs Lisp" emacs-lisp)
-                  ("Fish" fish-indent)
-                  ("HTML" (prettier "--print-width" "80"))
-                  ("LaTeX" latexindent)
-                  ("Markdown" (prettier "--print-width" "80"))
-                  ("Perl" (perltidy
-                    "--quiet"
-                    "--standard-error-output"
-                    "--perl-best-practices"
-                    "-l=80"))
-                  ("Python" (yapf "--style" "file") isort)
-                  ("Shell" (shfmt "-i" "4" "-ci"))
-                  ("XML" tidy)
-                  ("YAML" prettier "--print-width" "80")))
-  (with-eval-after-load "markdown-mode"
-    (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
-  (with-eval-after-load "tex-mode"
-    (bind-key "C-x f" #'format-all-buffer tex-mode-map))
-  (with-eval-after-load "latex"
-    (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
-  :diminish)
+  (setf (alist-get 'prettier apheleia-formatters)
+        '("prettier" "--print-width" "80"))
+  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" 4 "-ci")))
 
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
@@ -2427,10 +2435,10 @@ The provider is nerd-icons."
              completion-at-point-functions
              (list
               ;; Math latex tags
-              ;; (cape-company-to-capf #'company-math-symbols-latex)
+              (cape-company-to-capf #'company-math-symbols-latex)
               ;; Math Unicode symbols and sub(super)scripts
-              ;; (cape-company-to-capf #'company-math-symbols-unicode)
-              ;; (cape-company-to-capf #'company-latex-commands)
+              (cape-company-to-capf #'company-math-symbols-unicode)
+              (cape-company-to-capf #'company-latex-commands)
               ;; Used for Unicode symbols and not for the corresponding LaTeX
               ;; names.
               #'cape-tex
@@ -2450,10 +2458,10 @@ The provider is nerd-icons."
           completion-at-point-functions
           (list
            ;; Math latex tags
-           ;; (cape-company-to-capf #'company-math-symbols-latex)
+           (cape-company-to-capf #'company-math-symbols-latex)
            ;; Math Unicode symbols and sub(super)scripts
-           ;; (cape-company-to-capf #'company-math-symbols-unicode)
-           ;; (cape-company-to-capf #'company-latex-commands)
+           (cape-company-to-capf #'company-math-symbols-unicode)
+           (cape-company-to-capf #'company-latex-commands)
            ;; Used for Unicode symbols and not for the corresponding LaTeX
            ;; names.
            #'cape-tex
@@ -2572,7 +2580,7 @@ The provider is nerd-icons."
 ;;      "--fallback-style=LLVM"
 ;;      ;; Do not automatically insert #include statements when editing code
 ;;      "--header-insertion=never"
-;;      "--header-insertion-decorators=0"
+;;      "--header-insertion-decorators"
 ;;      "--log=error"
 ;;      ;; Unsupported options with Clangd 10: malloc-trim and enable-config
 ;;      "--malloc-trim" ; Release memory periodically
@@ -2637,7 +2645,6 @@ The provider is nerd-icons."
 ;;   :config
 ;;   (when (display-graphic-p)
 ;;     (setq lsp-modeline-code-actions-segments '(count icon name)))
-
 ;;   ;; (dolist (ignore-dirs
 ;;   ;;          '("/build\\'"
 ;;   ;;            "/\\.metadata\\'"
@@ -2646,7 +2653,6 @@ The provider is nerd-icons."
 ;;   ;;            "/\\.cache\\'"
 ;;   ;;            "/__pycache__\\'"))
 ;;   ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
-
 ;;   (defun lsp-booster--advice-json-parse (old-fn &rest args)
 ;;     "Try to parse bytecode instead of json."
 ;;     (or (when (equal (following-char) ?#)
@@ -2661,7 +2667,6 @@ The provider is nerd-icons."
 ;;        'json-parse-buffer
 ;;      'json-read)
 ;;    :around #'lsp-booster--advice-json-parse)
-
 ;;   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
 ;;     "Prepend emacs-lsp-booster command to lsp CMD."
 ;;     (let ((orig-result (funcall old-fn cmd test?)))
@@ -2678,7 +2683,6 @@ The provider is nerd-icons."
 ;;   (advice-add
 ;;    'lsp-resolve-final-command
 ;;    :around #'lsp-booster--advice-final-command)
-
 ;;   :diminish)
 
 ;; (use-package lsp-ui
@@ -2758,7 +2762,6 @@ The provider is nerd-icons."
 ;;   ;;          ("en-US"
 ;;   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
 ;;   )
-
 
 (use-package subword
   :straight (:type built-in)
@@ -3710,32 +3713,32 @@ used in `company-backends'."
 
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
-(use-package doom-themes
-  :when (eq sb/theme 'doom-nord)
-  :init (load-theme 'doom-nord t)
-  :config
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+;; (use-package doom-themes
+;;   :when (eq sb/theme 'doom-nord)
+;;   :init (load-theme 'doom-nord t)
+;;   :config
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t))
 
-(use-package catppuccin-theme
-  :when (eq sb/theme 'catppuccin)
-  :init (load-theme 'catppuccin t)
-  :custom (catppuccin-flavor 'mocha)
-  :config
-  (custom-set-faces
-   `(diff-hl-change
-     ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
-  (custom-set-faces
-   `(diff-hl-delete
-     ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
-  (custom-set-faces
-   `(diff-hl-insert
-     ((t
-       (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
+;; (use-package catppuccin-theme
+;;   :when (eq sb/theme 'catppuccin)
+;;   :init (load-theme 'catppuccin t)
+;;   :custom (catppuccin-flavor 'mocha)
+;;   :config
+;;   (custom-set-faces
+;;    `(diff-hl-change
+;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
+;;   (custom-set-faces
+;;    `(diff-hl-delete
+;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
+;;   (custom-set-faces
+;;    `(diff-hl-insert
+;;      ((t
+;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
 (use-package nerd-icons
   :when (bound-and-true-p sb/enable-icons)
@@ -4123,7 +4126,7 @@ used in `company-backends'."
       "--completion-style=detailed"
       "--fallback-style=LLVM"
       "--header-insertion=never"
-      "--header-insertion-decorators=0"
+      "--header-insertion-decorators"
       "--log=error"
       ;; Unsupported option with Clangd 10: malloc-trim and enable-config
       "--malloc-trim" ; Release memory periodically
@@ -4249,7 +4252,12 @@ used in `company-backends'."
       (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
       :additionalRules (:enablePickyRules t))
      :yaml (:format (:enable t) :validate t :hover t :completion t)
-     :vscode-json-language-server (:provideFormatter t))))
+     :vscode-json-language-server (:provideFormatter t)))
+
+  (with-eval-after-load "eglot"
+    (setq
+     completion-category-defaults nil
+     completion-category-overrides '((eglot (styles orderless)) (eglot-capf (styles orderless))))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
