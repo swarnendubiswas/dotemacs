@@ -248,6 +248,13 @@ The provider is nerd-icons."
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp
    (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
+  (display-buffer-alist
+   '(
+     ;; Allow *Help* buffers to use the full frame
+     ("*Help*" (display-buffer-same-window))
+     ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
+      (display-buffer-no-window)
+      (allow-no-window . t))))
   :config
   (dolist (exts
            '(".aux"
@@ -496,16 +503,15 @@ The provider is nerd-icons."
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
   :bind ("C-c C-o" . goto-address-at-point))
 
-(use-package winner
-  :hook (emacs-startup . winner-mode)
-  :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
+;; (use-package winner
+;;   :hook (emacs-startup . winner-mode)
+;;   :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
 
 ;; Use `ediff-regions-wordwise' for small regions and `ediff-regions-linewise'
 ;; for larger regions.
 (use-package ediff
   :straight (:type built-in)
   :commands (ediff-buffers ediff-regions-linewise ediff-regions-wordwise)
-  :hook (ediff-cleanup . winner-undo)
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -513,7 +519,10 @@ The provider is nerd-icons."
   (ediff-split-window-function #'split-window-horizontally)
   ;; Prompt and kill file variants on quitting an Ediff session
   (ediff-keep-variants nil)
-  :config (ediff-set-diff-options 'ediff-diff-options "-w"))
+  :config
+  (ediff-set-diff-options 'ediff-diff-options "-w")
+  (with-eval-after-load "winner"
+    (add-hook 'ediff-cleanup-hook #'winner-undo)))
 
 ;; To edit remote files, use "/method:user@host#port:filename".
 ;; The shortcut "/ssh::" will connect to default "user@host#port".
@@ -620,17 +629,6 @@ The provider is nerd-icons."
   (advice-add
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
-
-(use-package window
-  :straight (:type built-in)
-  :custom
-  (display-buffer-alist
-   '(
-     ;; Allow *Help* buffers to use the full frame
-     ("*Help*" (display-buffer-same-window))
-     ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
-      (display-buffer-no-window)
-      (allow-no-window . t)))))
 
 ;; `pixel-scroll-mode' uses line-by-line scrolling.
 ;; (use-package pixel-scroll
@@ -1039,18 +1037,18 @@ The provider is nerd-icons."
 
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
-(use-package marginalia
-  :after vertico
-  :init (marginalia-mode 1)
-  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
-  :config
-  (setq marginalia-annotator-registry
-        (assq-delete-all 'file marginalia-annotator-registry))
-  (add-to-list
-   'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
-  (add-to-list
-   'marginalia-annotator-registry
-   '(project-buffer marginalia-annotate-project-buffer)))
+;; (use-package marginalia
+;;   :after vertico
+;;   :init (marginalia-mode 1)
+;;   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+;;   :config
+;;   (setq marginalia-annotator-registry
+;;         (assq-delete-all 'file marginalia-annotator-registry))
+;;   (add-to-list
+;;    'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
+;;   (add-to-list
+;;    'marginalia-annotator-registry
+;;    '(project-buffer marginalia-annotate-project-buffer)))
 
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
@@ -1324,9 +1322,6 @@ The provider is nerd-icons."
 
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
-
-(when (executable-find "fd")
-  (setq find-program "fd"))
 
 ;; `consult-rg' provides live search, while `deadgrep' provides a resulting
 ;; search buffer. Visit the result in another buffer with "o", move between
@@ -1687,14 +1682,7 @@ The provider is nerd-icons."
     (defun sb/just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
-    (advice-add 'company-capf--candidates :around #'sb/just-one-face))
-
-  (with-eval-after-load "lsp-mode"
-    (defun sb/lsp-mode-setup-orderless ()
-      (setf (alist-get
-             'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(orderless)))
-    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-orderless)))
+    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -2306,8 +2294,6 @@ The provider is nerd-icons."
   :bind
   (:map
    corfu-map
-   ("ESCAPE" . corfu-quit)
-   ([escape] . corfu-quit)
    ("TAB" . corfu-next)
    ([tab] . corfu-next)
    ("S-TAB" . corfu-previous)
@@ -2328,12 +2314,14 @@ The provider is nerd-icons."
   (with-eval-after-load "savehist"
     (add-to-list 'savehist-additional-variables 'corfu-history))
 
-  (with-eval-after-load "lsp-mode"
-    (defun sb/lsp-mode-setup-corfu ()
-      (setf (alist-get
-             'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(substring)))
-    (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-setup-corfu)))
+  ;; Disable `orderless' completion for Corfu
+  (add-hook
+   'corfu-mode-hook
+   (lambda ()
+     (setq-local
+      completion-styles '(basic)
+      completion-category-defaults nil
+      completion-category-overrides '((consult-location (styles . (orderless))))))))
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
@@ -2683,6 +2671,11 @@ The provider is nerd-icons."
 ;;   (advice-add
 ;;    'lsp-resolve-final-command
 ;;    :around #'lsp-booster--advice-final-command)
+;; (defun sb/lsp-mode-disable-orderless ()
+;;   (setf (alist-get
+;;          'styles (alist-get 'lsp-capf completion-category-defaults))
+;;         '(substring)))
+;; (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-disable-orderless))
 ;;   :diminish)
 
 ;; (use-package lsp-ui
@@ -4130,6 +4123,7 @@ used in `company-backends'."
       "--log=error"
       ;; Unsupported option with Clangd 10: malloc-trim and enable-config
       "--malloc-trim" ; Release memory periodically
+      ;; Project config is from a .clangd file in the project directory
       "--enable-config"
       "--pch-storage=memory" ; Increases memory usage but can improve performance
       "--pretty")))
@@ -4308,15 +4302,16 @@ used in `company-backends'."
   :commands consult-eglot-symbols)
 
 (use-package flycheck-eglot
-  :straight (:host github :repo "intramurz/flycheck-eglot")
   :when (eq sb/lsp-provider 'eglot)
   :after (flycheck eglot)
-  :init (global-flycheck-eglot-mode 1))
+  :init (global-flycheck-eglot-mode 1)
+  :custom (flycheck-eglot-exclusive nil))
 
 (use-package eglot-semantic-tokens
   :straight (:host github :repo "eownerdead/eglot-semantic-tokens")
   :when (eq sb/lsp-provider 'eglot)
   :after eglot
+  :demand t
   :custom (eglot-enable-semantic-tokens t))
 
 (use-package eglot-inactive-regions
@@ -4327,29 +4322,6 @@ used in `company-backends'."
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4)
   :config (eglot-inactive-regions-mode 1))
-
-;; (use-package eglot-ltex
-;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :init
-;;   (setq eglot-ltex-server-path
-;;         (expand-file-name "ltex-ls-16.0.0" user-emacs-directory))
-;;   :hook
-;;   ((text-mode LaTeX-mode org-mode markdown-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'eglot-ltex)
-;;      (eglot-ensure)))
-;;   :custom (eglot-ltex-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-;;   ;; :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-;;   ;;   'append)
-;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-;;   )
 
 ;; (use-package eglot-ltex-plus
 ;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
@@ -4533,13 +4505,10 @@ or the major mode is not in `sb/skippable-modes'."
 
 (bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
 
-(global-set-key [remap next-buffer] #'sb/next-buffer)
-(global-set-key [remap previous-buffer] #'sb/previous-buffer)
-
 (bind-keys
  ("M-<left>" . sb/previous-buffer)
- ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("M-<right>" . sb/next-buffer)
+ ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("C-<tab>" . sb/next-buffer))
 
 ;; (use-package default-text-scale
@@ -4555,13 +4524,14 @@ or the major mode is not in `sb/skippable-modes'."
 ;; Displays available keybindings following the currently entered incomplete
 ;; command/prefix in a popup
 (use-package which-key
+  :straight (:type built-in)
   :hook (emacs-startup . which-key-mode)
   :diminish)
 
 ;; Support the Kitty Keyboard protocol in Emacs
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode)
-  ;; :bind ("M-<backspace>" . backward-kill-word) ; should be remapped to "M-DEL"
+  ;; :bind ("M-<backspace>" . backward-kill-word) ; Should be remapped to "M-DEL"
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
 
 ;;; init.el ends here
