@@ -1813,8 +1813,7 @@ The provider is nerd-icons."
      company-pseudo-tooltip-frontend
      ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend))
-  (company-format-margin-function (bound-and-true-p sb/enable-icons))
-  :diminish)
+  (company-format-margin-function (bound-and-true-p sb/enable-icons)))
 
 (use-package kind-icon
   :when (bound-and-true-p sb/enable-icons)
@@ -2165,7 +2164,6 @@ The provider is nerd-icons."
                company-auctex-symbols
                company-auctex-environments
                company-auctex-macros
-               ;; company-capf
                company-latex-commands
                ;; Math latex tags
                company-math-symbols-latex
@@ -2294,10 +2292,6 @@ The provider is nerd-icons."
   :bind
   (:map
    corfu-map
-   ("TAB" . corfu-next)
-   ([tab] . corfu-next)
-   ("S-TAB" . corfu-previous)
-   ([backtab] . corfu-previous)
    ("M-c" . corfu-quick-insert)
    ("M-q" . corfu-quick-complete)
    ("M-d" . corfu-info-documentation)
@@ -2371,10 +2365,9 @@ The provider is nerd-icons."
 
   (setq-local completion-at-point-functions
               (list
-               #'cape-keyword
+               (cape-capf-inside-code #'cape-keyword #'cape-dabbrev)
+               (cape-capf-inside-comment #'cape-dict #'cape-dabbrev)
                #'cape-file
-               #'cape-dict
-               #'cape-dabbrev
                #'yasnippet-capf))
 
   ;; Override CAPFS for specific major modes
@@ -2384,9 +2377,14 @@ The provider is nerd-icons."
      (lambda ()
        (setq-local completion-at-point-functions
                    (list
-                    (cape-capf-super
-                     #'elisp-completion-at-point #'cape-elisp-symbol)
-                    #'cape-file #'cape-dabbrev #'cape-dict #'yasnippet-capf)))))
+                    (cape-capf-inside-code
+                     (cape-capf-super
+                      #'elisp-completion-at-point
+                      #'cape-elisp-symbol
+                      #'cape-dabbrev))
+                    (cape-capf-inside-comment
+                     #'cape-dabbrev #'cape-dict)
+                    #'cape-file #'yasnippet-capf)))))
 
   ;; https://github.com/minad/cape/discussions/130
   ;; There is no mechanism to force deduplication if candidates from cape-dict
@@ -2398,7 +2396,7 @@ The provider is nerd-icons."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'cape-file #'cape-dict #'cape-dabbrev #'yasnippet-capf))))
+                  #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2406,9 +2404,9 @@ The provider is nerd-icons."
      (setq-local completion-at-point-functions
                  (list
                   #'cape-elisp-block
-                  #'cape-file
                   #'cape-dict
                   #'cape-dabbrev
+                  #'cape-file
                   #'yasnippet-capf))))
 
   (when (eq sb/lsp-provider 'eglot)
@@ -2432,9 +2430,9 @@ The provider is nerd-icons."
               #'cape-tex
               #'citar-capf
               #'bibtex-capf
-              #'cape-file
               #'cape-dict
               #'cape-dabbrev
+              #'cape-file
               #'yasnippet-capf))))))))
 
   (when (eq sb/lsp-provider 'lsp-mode)
@@ -2455,9 +2453,9 @@ The provider is nerd-icons."
            #'cape-tex
            #'citar-capf
            #'bibtex-capf
-           #'cape-file
            #'cape-dict
            #'cape-dabbrev
+           #'cape-file
            #'yasnippet-capf))))))
 
   (with-eval-after-load "lsp-mode"
@@ -2488,12 +2486,14 @@ The provider is nerd-icons."
        (lambda ()
          (setq-local completion-at-point-functions
                      (list
-                      #'lsp-completion-at-point
-                      #'cape-keyword
-                      #'cape-file
-                      #'cape-dabbrev
-                      #'cape-dict
-                      #'yasnippet-capf))))))
+                      (cape-capf-inside-code
+                       #'lsp-completion-at-point
+                       #'citre-completion-at-point
+                       #'cape-keyword
+                       #'cape-dabbrev)
+                      (cape-capf-inside-comment
+                       #'cape-dict #'cape-dabbrev)
+                      #'cape-file #'yasnippet-capf))))))
 
   (with-eval-after-load "eglot"
     (dolist (mode
@@ -2523,13 +2523,14 @@ The provider is nerd-icons."
        (lambda ()
          (setq-local completion-at-point-functions
                      (list
-                      #'eglot-completion-at-point
-                      #'citre-completion-at-point
-                      #'cape-keyword
-                      #'cape-file
-                      #'cape-dabbrev
-                      #'cape-dict
-                      #'yasnippet-capf)))))))
+                      (cape-capf-inside-code
+                       #'eglot-completion-at-point
+                       #'citre-completion-at-point
+                       #'cape-keyword
+                       #'cape-dabbrev)
+                      (cape-capf-inside-comment
+                       #'cape-dict #'cape-dabbrev)
+                      #'cape-file #'yasnippet-capf)))))))
 
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
@@ -3468,7 +3469,6 @@ The provider is nerd-icons."
    ;; Enable rainbow mode after applying styles to the buffer
    ;; (TeX-update-style . rainbow-delimiters-mode)
    (LaTeX-mode . TeX-source-correlate-mode)
-   (LaTeX-mode . hs-minor-mode)
    (LaTeX-mode . (lambda () (turn-on-reftex))))
   :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
@@ -3547,9 +3547,10 @@ The provider is nerd-icons."
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
-  :after (:any tex-mode latex-mode)
+  :after (:any LaTeX-mode latex-mode)
+  :demand t
   :config
-  (with-eval-after-load "latex"
+  (with-eval-after-load "LaTeX-mode"
     (bind-key "$" #'math-delimiters-insert LaTeX-mode-map)))
 
 (use-package citar
@@ -3566,8 +3567,8 @@ The provider is nerd-icons."
   :when (executable-find "latexmk")
   :demand t
   :custom
-  (auctex-latexmk-inherit-TeX-PDF-mode
-   t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
+  ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
+  (auctex-latexmk-inherit-TeX-PDF-mode t)
   :config
   (setq-default TeX-command-default "LatexMk")
   (auctex-latexmk-setup))
@@ -3844,7 +3845,8 @@ used in `company-backends'."
   (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-unicode-fallback t)
   ;; LSP state is wrong for non-LSP-managed files
-  (doom-modeline-lsp nil))
+  (doom-modeline-lsp nil)
+  (doom-modeline-minor-modes t))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
