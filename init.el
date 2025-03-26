@@ -146,18 +146,6 @@ The provider is nerd-icons."
   :init
   (setq
    exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables
-   '("PATH"
-     "COLORTERM"
-     "VISUAL"
-     "EDITOR"
-     "ALTERNATE_EDITOR"
-     "JAVA_HOME"
-     "TERM"
-     "PYTHONPATH"
-     "LANG"
-     "LC_ALL"
-     "LSP_USE_PLISTS")
    exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
@@ -382,7 +370,6 @@ The provider is nerd-icons."
    yaml-mode
    yaml-ts-mode
    prog-mode
-   latex-mode
    LaTeX-mode)
   :custom
   (imenu-auto-rescan t)
@@ -996,9 +983,7 @@ The provider is nerd-icons."
      (buffer-substring-no-properties (region-beginning) (region-end))))
 
   (with-eval-after-load "latex"
-    (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map))
-  (with-eval-after-load "tex-mode"
-    (bind-key "C-c C-j" #'consult-outline tex-mode-map)))
+    (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map)))
 
 ;; Easily add file and directory paths into the minibuffer.
 ;; (use-package consult-dir
@@ -1245,7 +1230,6 @@ The provider is nerd-icons."
 ;; (use-package rainbow-mode
 ;;   :hook
 ;;   ((LaTeX-mode
-;;     latex-mode
 ;;     css-mode
 ;;     css-ts-mode
 ;;     html-mode
@@ -1463,8 +1447,7 @@ The provider is nerd-icons."
   ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
   ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-  ;; (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-  ;;   (add-hook mode #'sb/add-latex-pairs))
+  ;;   (add-hook 'LaTeX-mode-hook #'sb/add-latex-pairs)
   )
 
 ;; Discover key bindings for the current Emacs major mode
@@ -1594,9 +1577,7 @@ The provider is nerd-icons."
 ;;                   ("YAML" prettier "--print-width" "80")))
 ;;   (with-eval-after-load "markdown-mode"
 ;;     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
-;;   (with-eval-after-load "tex-mode"
-;;     (bind-key "C-x f" #'format-all-buffer tex-mode-map))
-;;   (with-eval-after-load "latex"
+;;   (with-eval-after-load "tex"
 ;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 ;;   :diminish)
 
@@ -1719,7 +1700,7 @@ The provider is nerd-icons."
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((prog-mode LaTeX-mode latex-mode) . yas-global-mode)
+  :hook ((prog-mode LaTeX-mode) . yas-global-mode)
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -2033,11 +2014,6 @@ The provider is nerd-icons."
   :after (:all tex-mode company)
   :demand t)
 
-;; (use-package company-anywhere
-;;   :straight (:host github :repo "zk-phi/company-anywhere")
-;;   :after company
-;;   :demand t)
-
 ;; (use-package company-dict
 ;;   :after company
 ;;   :demand t
@@ -2063,7 +2039,7 @@ The provider is nerd-icons."
 ;;   :demand t)
 
 (use-package company-auctex
-  :after (company latex)
+  :after (company tex)
   :commands
   (company-auctex-bibs
    company-auctex-environments
@@ -2075,7 +2051,7 @@ The provider is nerd-icons."
 ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
 ;; set in all files, so that RefTeX can find citations across documents.
 (use-package company-reftex
-  :after (company latex)
+  :after (company tex)
   :demand t
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
@@ -2789,9 +2765,6 @@ The provider is nerd-icons."
   (compilation-auto-jump-to-first-error t)
   (compilation-max-output-line-length nil)
   :config
-  (with-eval-after-load "tex-mode"
-    (bind-key "<f10>" #'compile tex-mode-map)
-    (bind-key "<f11>" #'recompile tex-mode-map))
   (with-eval-after-load "LaTeX-mode"
     (bind-key "<f10>" #'compile LaTeX-mode-map)
     (bind-key "<f11>" #'recompile LaTeX-mode-map)))
@@ -3458,9 +3431,9 @@ The provider is nerd-icons."
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
-;; is an alias to `latex-mode'. Auctex overrides the tex package.
-(use-package tex
-  :straight auctex
+;; is an alias to `latex-mode'. Auctex overrides the tex package. "P" in the
+;; modeline highlighter "LaTeX/MPS" is due to `TeX-PDF-mode'.
+(use-package auctex
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
@@ -3470,7 +3443,7 @@ The provider is nerd-icons."
    ;; (TeX-update-style . rainbow-delimiters-mode)
    (LaTeX-mode . TeX-source-correlate-mode)
    (LaTeX-mode . (lambda () (turn-on-reftex))))
-  :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
+  ;; :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
   (TeX-auto-save t)
@@ -3479,7 +3452,7 @@ The provider is nerd-icons."
   ;; Automatically insert braces after typing ^ and _ in math mode
   (TeX-electric-sub-and-superscript t)
   ;; Inserting $ completes the math mode and positions the cursor
-  (TeX-electric-math t)
+  ;; (TeX-electric-math t)
   (TeX-parse-self t "Parse documents")
   (TeX-save-query nil "Save buffers automatically when compiling")
   (LaTeX-item-indent 0 "Indent lists by two spaces")
@@ -3491,7 +3464,8 @@ The provider is nerd-icons."
   (font-latex-fontify-script nil)
   (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   :config
-  ;; Always query for the master file
+  ;; Make AUCTeX aware of the multifile document structure, always query for the
+  ;; master file
   (setq-default TeX-master nil))
 
 (use-package reftex
@@ -3547,14 +3521,16 @@ The provider is nerd-icons."
 
 (use-package math-delimiters
   :straight (:host github :repo "oantolin/math-delimiters")
-  :after (:any LaTeX-mode latex-mode)
+  :after tex
   :demand t
+  :commands (math-delimiters-no-dollars math-delimiters-toggle)
   :config
   (with-eval-after-load "LaTeX-mode"
     (bind-key "$" #'math-delimiters-insert LaTeX-mode-map)))
 
 (use-package citar
-  :after (:any latex-mode LaTeX-mode)
+  :when (eq sb/in-buffer-completion 'corfu)
+  :after tex
   :demand t)
 
 (use-package citar-embark
@@ -3563,7 +3539,7 @@ The provider is nerd-icons."
   :diminish)
 
 (use-package auctex-latexmk
-  :after latex
+  :after tex
   :when (executable-find "latexmk")
   :demand t
   :custom
@@ -4025,16 +4001,16 @@ used in `company-backends'."
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
 
-(use-package dogears
-  :straight (:host github :repo "alphapapa/dogears.el")
-  :hook (find-file . dogears-mode)
-  :bind
-  (("M-g d" . dogears-go)
-   ("M-g M-b" . dogears-back)
-   ("M-g M-f" . dogears-forward)
-   ("M-g M-d" . dogears-list)
-   ("M-g M-D" . dogears-sidebar))
-  :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
+;; (use-package dogears
+;;   :straight (:host github :repo "alphapapa/dogears.el")
+;;   :hook (find-file . dogears-mode)
+;;   :bind
+;;   (("M-g d" . dogears-go)
+;;    ("M-g M-b" . dogears-back)
+;;    ("M-g M-f" . dogears-forward)
+;;    ("M-g M-d" . dogears-list)
+;;    ("M-g M-D" . dogears-sidebar))
+;;   :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
 
 (use-package kill-file-path
   :straight (:host github :repo "chyla/kill-file-path")
@@ -4243,7 +4219,7 @@ used in `company-backends'."
       :useLibraryCodeForTypes t)
      :ltex-ls-plus
      (:language
-      "en-US"
+      "en"
       :disabledRules
       (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
       :additionalRules (:enablePickyRules t))
