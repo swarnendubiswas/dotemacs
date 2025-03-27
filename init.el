@@ -68,7 +68,7 @@ The provider is nerd-icons."
 ;; Eglot also does not support semantic tokens. However, configuring Eglot is
 ;; simpler and I expect it to receive significant improvements now that it is in
 ;; the Emacs core.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -243,6 +243,14 @@ The provider is nerd-icons."
      ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
       (display-buffer-no-window)
       (allow-no-window . t))))
+  (scroll-preserve-screen-position t)
+  (scroll-margin 3)
+  (scroll-step 1)
+  (scroll-conservatively 10)
+  (scroll-error-top-bottom t)
+  ;; Accelerate scrolling operations when non-nil. Only those portions of the
+  ;; buffer which are actually going to be displayed get fontified.
+  (fast-but-imprecise-scrolling t)
   :config
   (dolist (exts
            '(".aux"
@@ -620,26 +628,19 @@ The provider is nerd-icons."
 ;; `pixel-scroll-mode' uses line-by-line scrolling.
 ;; (use-package pixel-scroll
 ;;   :custom
-;;   (pixel-scroll-precision-use-momentum nil)
-;;   (pixel-scroll-precision-interpolate-page t)
-;;   (scroll-preserve-screen-position t)
-;;   (scroll-margin 3)
-;;   (scroll-step 1)
-;;   (scroll-conservatively 10000)
-;;   (scroll-error-top-bottom t)
-;;   (auto-window-vscroll nil)
-;; ;; Accelerate scrolling operations when non-nil. Only those portions of the
-;; ;; buffer which are actually going to be displayed get fontified.
-;;   (fast-but-imprecise-scrolling t)
-;;   (hscroll-margin 2)
-;;   (hscroll-step 1)
-;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
-;;   (mouse-wheel-scroll-amount-horizontal 1)
-;;   :config
-;;   (when (fboundp 'pixel-scroll-mode)
-;;     (pixel-scroll-mode 1))
-;;   (when (fboundp 'pixel-scroll-precision-mode)
-;;     (pixel-scroll-precision-mode 1)))
+;;   ;;   (pixel-scroll-precision-use-momentum nil)
+;;   ;;   (pixel-scroll-precision-interpolate-page t)
+;;   ;;   (auto-window-vscroll nil)
+;;   ;;   (hscroll-margin 2)
+;;   ;;   (hscroll-step 1)
+;;   ;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+;;   ;;   (mouse-wheel-scroll-amount-horizontal 1)
+;;   ;;   :config
+;;   ;;   (when (fboundp 'pixel-scroll-mode)
+;;   ;;     (pixel-scroll-mode 1))
+;;   ;;   (when (fboundp 'pixel-scroll-precision-mode)
+;;   ;;     (pixel-scroll-precision-mode 1))
+;;   )
 
 ;; Show temporary buffers as a popup window, and close them with "C-g"
 (use-package popwin
@@ -825,7 +826,7 @@ The provider is nerd-icons."
   :straight
   (vertico
    :files (:defaults "extensions/*")
-   :includes (vertico-directory vertico-repeat vertico-quick))
+   :includes (vertico-directory vertico-repeat vertico-quick vertico-indexed))
   :hook
   ((emacs-startup . vertico-mode)
    ;; Tidy shadowed file names. That is, when using a command for selecting a
@@ -851,6 +852,7 @@ The provider is nerd-icons."
    ("C-'" . vertico-quick-jump))
   :custom (vertico-cycle t)
   :config
+  (vertico-indexed-mode 1)
   (when (eq sb/theme 'catppuccin)
     (with-eval-after-load 'vertico
       (set-face-attribute 'vertico-current nil
@@ -1700,7 +1702,7 @@ The provider is nerd-icons."
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((prog-mode LaTeX-mode) . yas-global-mode)
+  :hook ((prog-mode LaTeX-mode) . yas-minor-mode)
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -2511,227 +2513,226 @@ The provider is nerd-icons."
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
 ;; servers simultaneously and provides helpers to install and uninstall servers.
-;; (use-package lsp-mode
-;;   :bind
-;;   (:map
-;;    lsp-command-map
-;;    ("l" . lsp)
-;;    ("q" . lsp-disconnect)
-;;    ("Q" . lsp-workspace-shutdown)
-;;    ("R" . lsp-workspace-restart)
-;;    ("d" . lsp-find-declaration)
-;;    ("e" . lsp-find-definition)
-;;    ("r" . lsp-find-references)
-;;    ("i" . lsp-find-implementation)
-;;    ("I" . lsp-goto-implementation)
-;;    ("t" . lsp-goto-type-definition)
-;;    ("r" . lsp-rename)
-;;    ("f" . lsp-format-buffer)
-;;    ("x" . lsp-execute-code-action)
-;;    ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
-;;    ("u" . lsp-imenu-create-uncategorised-index) ; sorts the items by position
-;;    ("a" . lsp-workspace-folders-add)
-;;    ("v" . lsp-workspace-folders-remove)
-;;    ("b" . lsp-workspace-blacklist-remove))
-;;   :custom
-;;   (lsp-keymap-prefix "C-c l")
-;;   (lsp-clangd-version "19.1.2")
-;;   (lsp-clients-clangd-args
-;;    '("-j=4"
-;;      "--all-scopes-completion"
-;;      "--background-index"
-;;      "--clang-tidy"
-;;      "--completion-style=detailed"
-;;      "--fallback-style=LLVM"
-;;      ;; Do not automatically insert #include statements when editing code
-;;      "--header-insertion=never"
-;;      "--header-insertion-decorators"
-;;      "--log=error"
-;;      ;; Unsupported options with Clangd 10: malloc-trim and enable-config
-;;      "--malloc-trim" ; Release memory periodically
-;;      "--enable-config"
-;;      "--pch-storage=memory" ; Increases memory usage but can improve performance
-;;      "--pretty"))
-;;   ;; Enable integration of custom backends other than `capf'
-;;   (lsp-completion-provider :none)
-;;   ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
-;;   (lsp-completion-show-detail t)
-;;   ;; Show/hide completion kind, e.g., interface/class
-;;   (lsp-completion-show-kind t)
-;;   ;; Show/hide description of completion candidates
-;;   (lsp-completion-show-label-description t)
-;;   (lsp-completion-default-behaviour :insert)
-;;   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
-;;   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
-;;   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
-;;   (lsp-enable-folding nil "I do not find the feature useful")
-;;   (lsp-headerline-breadcrumb-enable nil)
-;;   (lsp-html-format-wrap-line-length fill-column)
-;;   (lsp-html-format-end-with-newline t)
-;;   (lsp-html-format-indent-inner-html t)
-;;   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
-;;   (lsp-lens-enable nil "Lenses are intrusive")
-;;   (lsp-modeline-diagnostics-enable nil)
-;;   ;; Simpler to focus on the errors at hand
-;;   (lsp-modeline-diagnostics-scope :file)
-;;   ;; Sudden changes in the height of the echo area causes the cursor to lose
-;;   ;; position, manually request via `lsp-signature-activate'.
-;;   (lsp-signature-auto-activate nil)
-;;   ;; Avoid annoying questions, we expect a server restart to succeed
-;;   (lsp-restart 'auto-restart)
-;;   (lsp-xml-logs-client nil)
-;;   ;; Avoid warning messages for unsupported modes like `csv-mode'
-;;   (lsp-warn-no-matched-clients nil)
-;;   (lsp-enable-file-watchers nil "Avoid watcher warnings")
-;;   ;; Use `symbol-overlay' to include languages that do not have a language
-;;   ;; server
-;;   (lsp-enable-symbol-highlighting nil)
-;;   (lsp-pylsp-configuration-sources ["setup.cfg"])
-;;   (lsp-pylsp-plugins-mccabe-enabled nil)
-;;   (lsp-pylsp-plugins-preload-modules
-;;    ["numpy" "csv" "pandas" "statistics" "json"])
-;;   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
-;;   (lsp-pylsp-plugins-pylint-enabled t)
-;;   (lsp-pylsp-plugins-yapf-enabled t)
-;;   (lsp-pylsp-plugins-flake8-enabled nil)
-;;   (lsp-pylsp-plugins-isort-enabled t)
-;;   (lsp-pylsp-plugins-mypy-enabled t)
-;;   (lsp-use-plists t)
-;;   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
-;;   ;; Tramp which is slower
-;;   (lsp-auto-register-remote-clients nil)
-;;   (lsp-enable-snippet t)
-;;   (lsp-keep-workspace-alive nil)
-;;   ;; The workspace status icon on the terminal interface is misleading across
-;;   ;; projects
-;;   (lsp-modeline-workspace-status-enable nil)
-;;   (lsp-enable-suggest-server-download nil)
-;;   (lsp-inlay-hint-enable t)
-;;   :config
-;;   (when (display-graphic-p)
-;;     (setq lsp-modeline-code-actions-segments '(count icon name)))
-;;   ;; (dolist (ignore-dirs
-;;   ;;          '("/build\\'"
-;;   ;;            "/\\.metadata\\'"
-;;   ;;            "/\\.recommenders\\'"
-;;   ;;            "/\\.clangd\\'"
-;;   ;;            "/\\.cache\\'"
-;;   ;;            "/__pycache__\\'"))
-;;   ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
-;;   (defun lsp-booster--advice-json-parse (old-fn &rest args)
-;;     "Try to parse bytecode instead of json."
-;;     (or (when (equal (following-char) ?#)
-;;           (let ((bytecode (read (current-buffer))))
-;;             (when (byte-code-function-p bytecode)
-;;               (funcall bytecode))))
-;;         (apply old-fn args)))
-;;   (advice-add
-;;    (if (progn
-;;          (require 'json)
-;;          (fboundp 'json-parse-buffer))
-;;        'json-parse-buffer
-;;      'json-read)
-;;    :around #'lsp-booster--advice-json-parse)
-;;   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-;;     "Prepend emacs-lsp-booster command to lsp CMD."
-;;     (let ((orig-result (funcall old-fn cmd test?)))
-;;       (if (and
-;;            (not test?) ;; for check lsp-server-present?
-;;            ;; see lsp-resolve-final-command, it would add extra shell wrapper
-;;            (not (file-remote-p default-directory)) lsp-use-plists
-;;            (not (functionp 'json-rpc-connection)) ;; native json-rpc
-;;            (executable-find "emacs-lsp-booster"))
-;;           (progn
-;;             (message "Using emacs-lsp-booster for %s!" orig-result)
-;;             (cons "emacs-lsp-booster" orig-result))
-;;         orig-result)))
-;;   (advice-add
-;;    'lsp-resolve-final-command
-;;    :around #'lsp-booster--advice-final-command)
-;; (defun sb/lsp-mode-disable-orderless ()
-;;   (setf (alist-get
-;;          'styles (alist-get 'lsp-capf completion-category-defaults))
-;;         '(substring)))
-;; (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-disable-orderless))
-;;   :diminish)
+(use-package lsp-mode
+  :bind
+  (:map
+   lsp-command-map
+   ("l" . lsp)
+   ("q" . lsp-disconnect)
+   ("Q" . lsp-workspace-shutdown)
+   ("R" . lsp-workspace-restart)
+   ("d" . lsp-find-declaration)
+   ("e" . lsp-find-definition)
+   ("r" . lsp-find-references)
+   ("i" . lsp-find-implementation)
+   ("I" . lsp-goto-implementation)
+   ("t" . lsp-goto-type-definition)
+   ("r" . lsp-rename)
+   ("f" . lsp-format-buffer)
+   ("x" . lsp-execute-code-action)
+   ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
+   ("u" . lsp-imenu-create-uncategorised-index) ; sorts the items by position
+   ("a" . lsp-workspace-folders-add)
+   ("v" . lsp-workspace-folders-remove)
+   ("b" . lsp-workspace-blacklist-remove))
+  :custom
+  (lsp-keymap-prefix "C-c l")
+  (lsp-clangd-version "19.1.2")
+  (lsp-clients-clangd-args
+   '("-j=4"
+     "--all-scopes-completion"
+     "--background-index"
+     "--clang-tidy"
+     "--completion-style=detailed"
+     "--fallback-style=LLVM"
+     ;; Do not automatically insert #include statements when editing code
+     "--header-insertion=never"
+     "--header-insertion-decorators"
+     "--log=error"
+     ;; Unsupported options with Clangd 10: malloc-trim and enable-config
+     "--malloc-trim" ; Release memory periodically
+     "--enable-config"
+     "--pch-storage=memory" ; Increases memory usage but can improve performance
+     "--pretty"))
+  ;; Enable integration of custom backends other than `capf'
+  (lsp-completion-provider :none)
+  ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
+  (lsp-completion-show-detail t)
+  ;; Show/hide completion kind, e.g., interface/class
+  (lsp-completion-show-kind t)
+  ;; Show/hide description of completion candidates
+  (lsp-completion-show-label-description t)
+  (lsp-completion-default-behaviour :insert)
+  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
+  (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
+  (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
+  (lsp-enable-folding nil "I do not find the feature useful")
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-html-format-wrap-line-length fill-column)
+  (lsp-html-format-end-with-newline t)
+  (lsp-html-format-indent-inner-html t)
+  (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
+  (lsp-lens-enable nil "Lenses are intrusive")
+  (lsp-modeline-diagnostics-enable nil)
+  ;; Simpler to focus on the errors at hand
+  (lsp-modeline-diagnostics-scope :file)
+  ;; Sudden changes in the height of the echo area causes the cursor to lose
+  ;; position, manually request via `lsp-signature-activate'.
+  (lsp-signature-auto-activate nil)
+  ;; Avoid annoying questions, we expect a server restart to succeed
+  (lsp-restart 'auto-restart)
+  (lsp-xml-logs-client nil)
+  ;; Avoid warning messages for unsupported modes like `csv-mode'
+  (lsp-warn-no-matched-clients nil)
+  (lsp-enable-file-watchers nil "Avoid watcher warnings")
+  ;; Use `symbol-overlay' to include languages that do not have a language
+  ;; server
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-pylsp-configuration-sources ["setup.cfg"])
+  (lsp-pylsp-plugins-mccabe-enabled nil)
+  (lsp-pylsp-plugins-preload-modules
+   ["numpy" "csv" "pandas" "statistics" "json"])
+  (lsp-pylsp-plugins-pydocstyle-convention "pep257")
+  (lsp-pylsp-plugins-pylint-enabled t)
+  (lsp-pylsp-plugins-yapf-enabled t)
+  (lsp-pylsp-plugins-flake8-enabled nil)
+  (lsp-pylsp-plugins-isort-enabled t)
+  (lsp-pylsp-plugins-mypy-enabled t)
+  (lsp-use-plists t)
+  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
+  ;; Tramp which is slower
+  (lsp-auto-register-remote-clients nil)
+  (lsp-enable-snippet t)
+  (lsp-keep-workspace-alive nil)
+  ;; The workspace status icon on the terminal interface is misleading across
+  ;; projects
+  (lsp-modeline-workspace-status-enable nil)
+  (lsp-enable-suggest-server-download nil)
+  (lsp-inlay-hint-enable t)
+  :config
+  (when (display-graphic-p)
+    (setq lsp-modeline-code-actions-segments '(count icon name)))
+  ;; (dolist (ignore-dirs
+  ;;          '("/build\\'"
+  ;;            "/\\.metadata\\'"
+  ;;            "/\\.recommenders\\'"
+  ;;            "/\\.clangd\\'"
+  ;;            "/\\.cache\\'"
+  ;;            "/__pycache__\\'"))
+  ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or (when (equal (following-char) ?#)
+          (let ((bytecode (read (current-buffer))))
+            (when (byte-code-function-p bytecode)
+              (funcall bytecode))))
+        (apply old-fn args)))
+  (advice-add
+   (if (progn
+         (require 'json)
+         (fboundp 'json-parse-buffer))
+       'json-parse-buffer
+     'json-read)
+   :around #'lsp-booster--advice-json-parse)
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and
+           (not test?) ;; for check lsp-server-present?
+           ;; see lsp-resolve-final-command, it would add extra shell wrapper
+           (not (file-remote-p default-directory)) lsp-use-plists
+           (not (functionp 'json-rpc-connection)) ;; native json-rpc
+           (executable-find "emacs-lsp-booster"))
+          (progn
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  (advice-add
+   'lsp-resolve-final-command
+   :around #'lsp-booster--advice-final-command)
+  (defun sb/lsp-mode-disable-orderless ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(substring)))
+  (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-disable-orderless)
+  :diminish)
 
-;; (use-package lsp-ui
-;;   :hook (lsp-mode . lsp-ui-mode)
-;;   :custom
-;;   ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
-;;   (lsp-ui-doc-enable nil)
-;;   (lsp-ui-doc-include-signature t)
-;;   (lsp-ui-imenu-auto-refresh 'after-save)
-;;   (lsp-ui-sideline-enable nil)
-;;   ;; Enables understanding when to invoke code actions
-;;   (lsp-ui-sideline-show-code-actions t)
-;;   ;; Hide diagnostics when typing because they can be intrusive,
-;;   ;; Flycheck/flymake already highlights errors
-;;   (lsp-ui-sideline-show-diagnostics nil)
-;;   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-;;   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-;;   (lsp-ui-peek-enable nil))
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-imenu-auto-refresh 'after-save)
+  (lsp-ui-sideline-enable nil)
+  ;; Enables understanding when to invoke code actions
+  (lsp-ui-sideline-show-code-actions t)
+  ;; Hide diagnostics when typing because they can be intrusive,
+  ;; Flycheck/flymake already highlights errors
+  (lsp-ui-sideline-show-diagnostics nil)
+  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
+  (lsp-ui-peek-enable nil))
 
-;; (use-package consult-lsp
-;;   :after (consult lsp)
-;;   :demand t
-;;   :commands consult-lsp-diagnostics
-;;   :bind
-;;   (:map
-;;    lsp-command-map
-;;    ("g" . consult-lsp-symbols)
-;;    ("h" . consult-lsp-file-symbols)))
+(use-package consult-lsp
+  :after (consult lsp)
+  :demand t
+  :commands consult-lsp-diagnostics
+  :bind
+  (:map
+   lsp-command-map
+   ("g" . consult-lsp-symbols)
+   ("h" . consult-lsp-file-symbols)))
 
-;; (use-package lsp-java
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-;;   :hook
-;;   ((java-mode java-ts-mode)
-;;    .
-;;    (lambda ()
-;;      (setq-local
-;;       c-basic-offset 4
-;;       c-set-style "java")
-;;      (lsp-deferred)))
-;;   :custom
-;;   (lsp-java-save-actions-organize-imports t)
-;;   (lsp-java-format-settings-profile "Swarnendu")
-;;   (lsp-java-format-settings-url
-;;    (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
-;;                      sb/user-home-directory)))
+(use-package lsp-java
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :hook
+  ((java-mode java-ts-mode)
+   .
+   (lambda ()
+     (setq-local
+      c-basic-offset 4
+      c-set-style "java")
+     (lsp-deferred)))
+  :custom
+  (lsp-java-save-actions-organize-imports t)
+  (lsp-java-format-settings-profile "Swarnendu")
+  (lsp-java-format-settings-url
+   (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
+                     sb/user-home-directory)))
 
-;; (use-package lsp-ltex-plus
-;;   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-;;   :init (setq lsp-ltex-plus-version "18.4.0")
-;;   :hook
-;;   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'lsp-ltex-plus)
-;;      (lsp-deferred)))
-;;   :custom
-;;   ;; Recommended to set a generic language to disable spell check
-;;   (lsp-ltex-plus-plus-language "en")
-;;   (lsp-ltex-plus-check-frequency "save")
-;;   ;; (lsp-ltex-plus-dictionary
-;;   ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
-;;   (lsp-ltex-plus-log-level "warning")
-;;   (lsp-ltex-plus-disabled-rules
-;;    '(:en
-;;      ["EN_QUOTES"
-;;       "OXFORD_SPELLING_Z_NOT_S"
-;;       "MORFOLOGIK_RULE_EN_US"
-;;       "WANT"
-;;       "EN_DIACRITICS_REPLACE"]))
-;;   ;; :config
-;;   ;; ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
-;;   ;; ;; dict words.
-;;   ;; (setq lsp-ltex-plus-disabled-rules
-;;   ;;       #s(hash-table
-;;   ;;          size 30 data
-;;   ;;          ("en-US"
-;;   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
-;;   )
+(use-package lsp-ltex-plus
+  :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :init (setq lsp-ltex-plus-version "18.4.0")
+  :hook
+  ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
+   .
+   (lambda ()
+     (require 'lsp-ltex-plus)
+     (lsp-deferred)))
+  :custom
+  ;; Recommended to set a generic language to disable spell check
+  (lsp-ltex-plus-plus-language "en")
+  (lsp-ltex-plus-check-frequency "save")
+  ;; (lsp-ltex-plus-dictionary
+  ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  (lsp-ltex-plus-log-level "warning")
+  (lsp-ltex-plus-disabled-rules
+   '(:en
+     ["EN_QUOTES"
+      "OXFORD_SPELLING_Z_NOT_S"
+      "MORFOLOGIK_RULE_EN_US"
+      "WANT"
+      "EN_DIACRITICS_REPLACE"]))
+  ;; :config
+  ;; ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
+  ;; ;; dict words.
+  ;; (setq lsp-ltex-plus-disabled-rules
+  ;;       #s(hash-table
+  ;;          size 30 data
+  ;;          ("en-US"
+  ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
+  )
 
 (use-package subword
   :straight (:type built-in)
@@ -3101,9 +3102,9 @@ The provider is nerd-icons."
      (when buffer-file-name
        (add-hook 'after-save-hook #'check-parens nil t)))))
 
-(use-package paren-face
-  :straight (:host github :repo "tarsius/paren-face")
-  :hook (emacs-startup . global-paren-face-mode))
+;; (use-package paren-face
+;;   :straight (:host github :repo "tarsius/paren-face")
+;;   :hook (emacs-startup . global-paren-face-mode))
 
 (use-package ini-mode
   :commands (ini-mode))
@@ -4169,62 +4170,72 @@ used in `company-backends'."
   (setq eglot-stay-out-of
         '(flymake yasnippet company eldoc eldoc-documentation-strategy))
 
-  (setq-default
-   eglot-workspace-configuration
-   '(:pylsp
-     (:configurationSources
-      ["setup.cfg"]
-      :plugins
-      (:autopep8
-       (:enabled :json-false)
-       :flake8 (:enabled :json-false :config t :maxLineLength 80)
-       :jedi (:extra_paths [])
-       :jedi_completion
-       (:include_params
-        t
-        :include_class_objects t
-        :fuzzy t
-        :cache_for
-        ["pandas" "numpy" "matplotlib"])
-       :jedi_definition (:enabled t :follow_imports t :follow_builtin_imports t)
-       :jedi_references (:enabled t)
-       :jedi_signature_help (:enabled t)
-       :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
-       :mccabe (:enabled :json-false)
-       :preload (:enabled t :modules ["pandas" "numpy" "matplotlib"])
-       :pycodestyle (:enabled :json-false)
-       :pydocstyle (:enabled t :convention "numpy")
-       :pyflakes (:enabled :json-false)
-       :pylint (:enabled t)
-       :pylsp_isort (:enabled t)
-       :pylsp_mypy (:enabled t :report_progress t :live_mode :json-false)
-       :rope_completion (:enabled t :eager :json-false)
-       :ruff (:enabled :json-false :lineLength 80)
-       :yapf (:enabled t)))
-     :basedpyright
-     (:checkOnlyOpenFiles
-      t
-      :reportDuplicateImport t
-      :typeCheckingMode "recommended"
-      :useLibraryCodeForTypes t)
-     :basedpyright.analysis
-     (:diagnosticSeverityOverrides
-      (:reportUnusedCallResult "none")
-      :inlayHints (:callArgumentNames :json-false))
-     :pyright
-     (:checkOnlyOpenFiles
-      t
-      :reportDuplicateImport t
-      :typeCheckingMode "recommended"
-      :useLibraryCodeForTypes t)
-     :ltex-ls-plus
-     (:language
-      "en"
-      :disabledRules
-      (:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
-      :additionalRules (:enablePickyRules t))
-     :yaml (:format (:enable t) :validate t :hover t :completion t)
-     :vscode-json-language-server (:provideFormatter t)))
+  (setq-default eglot-workspace-configuration
+                '(:pylsp
+                  (:configurationSources
+                   ["setup.cfg"]
+                   :plugins
+                   (:autopep8
+                    (:enabled :json-false)
+                    :flake8
+                    (:enabled :json-false :config t :maxLineLength 80)
+                    :jedi (:extra_paths [])
+                    :jedi_completion
+                    (:include_params
+                     t
+                     :include_class_objects t
+                     :fuzzy t
+                     :cache_for
+                     ["pandas" "numpy" "matplotlib"])
+                    :jedi_definition
+                    (:enabled t :follow_imports t :follow_builtin_imports t)
+                    :jedi_references (:enabled t)
+                    :jedi_signature_help (:enabled t)
+                    :jedi_symbols
+                    (:enabled t :all_scopes t :include_import_symbols t)
+                    :mccabe
+                    (:enabled :json-false)
+                    :preload
+                    (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+                    :pycodestyle
+                    (:enabled :json-false)
+                    :pydocstyle
+                    (:enabled t :convention "numpy")
+                    :pyflakes
+                    (:enabled :json-false)
+                    :pylint (:enabled t)
+                    :pylsp_isort (:enabled t)
+                    :pylsp_mypy
+                    (:enabled t :report_progress t :live_mode :json-false)
+                    :rope_completion
+                    (:enabled t :eager :json-false)
+                    :ruff
+                    (:enabled :json-false :lineLength 80)
+                    :yapf (:enabled t)))
+                  :basedpyright
+                  (:checkOnlyOpenFiles
+                   t
+                   :reportDuplicateImport t
+                   :typeCheckingMode "recommended"
+                   :useLibraryCodeForTypes t)
+                  :basedpyright.analysis
+                  (:diagnosticSeverityOverrides
+                   (:reportUnusedCallResult "none")
+                   :inlayHints (:callArgumentNames :json-false))
+                  :pyright
+                  (:checkOnlyOpenFiles
+                   t
+                   :reportDuplicateImport t
+                   :typeCheckingMode "recommended"
+                   :useLibraryCodeForTypes t)
+                  :ltex-ls-plus
+                  (:language
+                   "en"
+                   :disabledRules
+                   (:en ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
+                   :additionalRules (:enablePickyRules t))
+                  :yaml (:format (:enable t) :validate t :hover t :completion t)
+                  :vscode-json-language-server (:provideFormatter t)))
 
   (with-eval-after-load "eglot"
     (setq
@@ -4502,7 +4513,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; Displays available keybindings following the currently entered incomplete
 ;; command/prefix in a popup
 (use-package which-key
-  :straight (:type built-in)
+  ;; :straight (:type built-in)
   :hook (emacs-startup . which-key-mode)
   :diminish)
 
