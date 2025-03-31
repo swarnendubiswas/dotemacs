@@ -11,19 +11,21 @@
 ;;; Code:
 
 (defconst sb/emacs-4MB (* 4 1024 1024))
+(defconst sb/emacs-64MB (* 64 1024 1024))
 (defconst sb/emacs-1GB (* 1 1024 1024 1024))
 
 ;; Defer GC during startup
 (setq
- gc-cons-percentage 0.8 ; Portion of heap used for allocation
- gc-cons-threshold sb/emacs-1GB)
+ gc-cons-percentage 0.6 ; Portion of heap used for allocation
+ ;; Temporarily increase GC threshold during startup
+ gc-cons-threshold most-positive-fixnum)
 
 ;; GC may happen after this many bytes are allocated since last GC. If you
 ;; experience freezing, decrease this. If you experience stuttering, increase
 ;; this.
 (defun sb/defer-gc ()
   "Defer garbage collection during execution."
-  (setq gc-cons-threshold sb/emacs-1GB))
+  (setq gc-cons-threshold sb/emacs-64MB))
 
 ;; `lsp-mode' suggests increasing the limit permanently to a reasonable value.
 ;; There will be large pause times with large `gc-cons-threshold' values
@@ -144,6 +146,9 @@
       (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
+
+;; Load themes early to avoid flickering during startup
+(load-theme 'modus-vivendi t)
 
 (provide 'early-init)
 

@@ -628,19 +628,18 @@ The provider is nerd-icons."
 ;; `pixel-scroll-mode' uses line-by-line scrolling.
 ;; (use-package pixel-scroll
 ;;   :custom
-;;   ;;   (pixel-scroll-precision-use-momentum nil)
-;;   ;;   (pixel-scroll-precision-interpolate-page t)
-;;   ;;   (auto-window-vscroll nil)
-;;   ;;   (hscroll-margin 2)
-;;   ;;   (hscroll-step 1)
-;;   ;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
-;;   ;;   (mouse-wheel-scroll-amount-horizontal 1)
-;;   ;;   :config
-;;   ;;   (when (fboundp 'pixel-scroll-mode)
-;;   ;;     (pixel-scroll-mode 1))
-;;   ;;   (when (fboundp 'pixel-scroll-precision-mode)
-;;   ;;     (pixel-scroll-precision-mode 1))
-;;   )
+;;   (pixel-scroll-precision-use-momentum nil)
+;;   (pixel-scroll-precision-interpolate-page t)
+;;   (auto-window-vscroll nil)
+;;   (hscroll-margin 2)
+;;   (hscroll-step 1)
+;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+;;   (mouse-wheel-scroll-amount-horizontal 1)
+;;   :config
+;;   (when (fboundp 'pixel-scroll-mode)
+;;     (pixel-scroll-mode 1))
+;;   (when (fboundp 'pixel-scroll-precision-mode)
+;;     (pixel-scroll-precision-mode 1)))
 
 ;; Show temporary buffers as a popup window, and close them with "C-g"
 (use-package popwin
@@ -1452,6 +1451,9 @@ The provider is nerd-icons."
   ;;   (add-hook 'LaTeX-mode-hook #'sb/add-latex-pairs)
   )
 
+;; "C-h m" or `describe-mode' shows all the active minor modes (and major mode)
+;; and a brief description of each.
+
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
   :bind ("C-h C-m" . discover-my-major))
@@ -1562,7 +1564,6 @@ The provider is nerd-icons."
 ;;                   ("CMake" cmake-format)
 ;;                   ("CSS" prettier)
 ;;                   ("Cuda" clang-format)
-;;                   ("Dockerfile" dockfmt)
 ;;                   ("Emacs Lisp" emacs-lisp)
 ;;                   ("Fish" fish-indent)
 ;;                   ("HTML" (prettier "--print-width" "80"))
@@ -2263,10 +2264,10 @@ The provider is nerd-icons."
    (corfu-mode
     .
     (lambda ()
-      (corfu-history-mode)
-      (corfu-echo-mode)
-      (corfu-popupinfo-mode)
-      (corfu-indexed-mode))))
+      (corfu-history-mode 1)
+      (corfu-echo-mode 1)
+      (corfu-popupinfo-mode 1)
+      (corfu-indexed-mode 1))))
   :bind
   (:map
    corfu-map
@@ -2343,10 +2344,11 @@ The provider is nerd-icons."
 
   (setq-local completion-at-point-functions
               (list
-               (cape-capf-inside-code #'cape-keyword #'cape-dabbrev)
-               (cape-capf-inside-comment #'cape-dict #'cape-dabbrev)
-               #'cape-file
-               #'yasnippet-capf))
+               (cape-capf-inside-code
+                (cape-capf-super #'cape-keyword #'cape-dabbrev))
+               (cape-capf-inside-comment
+                (cape-capf-super #'cape-dict #'cape-dabbrev))
+               #'cape-file #'yasnippet-capf))
 
   ;; Override CAPFS for specific major modes
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
@@ -2361,7 +2363,7 @@ The provider is nerd-icons."
                       #'cape-elisp-symbol
                       #'cape-dabbrev))
                     (cape-capf-inside-comment
-                     #'cape-dabbrev #'cape-dict)
+                     (cape-capf-super #'cape-dabbrev #'cape-dict))
                     #'cape-file #'yasnippet-capf)))))
 
   ;; https://github.com/minad/cape/discussions/130
@@ -2414,7 +2416,7 @@ The provider is nerd-icons."
               #'yasnippet-capf))))))))
 
   (when (eq sb/lsp-provider 'lsp-mode)
-    (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+    (dolist (mode '(LaTeX-mode-hook bibtex-mode-hook))
       (add-hook
        mode
        (lambda ()
@@ -2465,12 +2467,13 @@ The provider is nerd-icons."
          (setq-local completion-at-point-functions
                      (list
                       (cape-capf-inside-code
-                       #'lsp-completion-at-point
-                       #'citre-completion-at-point
-                       #'cape-keyword
-                       #'cape-dabbrev)
+                       (cape-capf-super
+                        #'lsp-completion-at-point
+                        #'citre-completion-at-point
+                        #'cape-keyword
+                        #'cape-dabbrev))
                       (cape-capf-inside-comment
-                       #'cape-dict #'cape-dabbrev)
+                       (cape-capf-super #'cape-dict #'cape-dabbrev))
                       #'cape-file #'yasnippet-capf))))))
 
   (with-eval-after-load "eglot"
@@ -2502,12 +2505,13 @@ The provider is nerd-icons."
          (setq-local completion-at-point-functions
                      (list
                       (cape-capf-inside-code
-                       #'eglot-completion-at-point
-                       #'citre-completion-at-point
-                       #'cape-keyword
-                       #'cape-dabbrev)
+                       (cape-capf-super
+                        #'eglot-completion-at-point
+                        #'citre-completion-at-point
+                        #'cape-keyword
+                        #'cape-dabbrev))
                       (cape-capf-inside-comment
-                       #'cape-dict #'cape-dabbrev)
+                       (cape-capf-super #'cape-dict #'cape-dabbrev))
                       #'cape-file #'yasnippet-capf)))))))
 
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
@@ -2535,8 +2539,52 @@ The provider is nerd-icons."
    ("a" . lsp-workspace-folders-add)
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
-  :custom
-  (lsp-keymap-prefix "C-c l")
+  :custom (lsp-keymap-prefix "C-c l")
+  ;; Enable/disable features
+  (lsp-auto-configure nil)
+  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
+  (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
+  (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
+  (lsp-enable-folding nil "I do not find the feature useful")
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-modeline-diagnostics-enable nil)
+  (lsp-lens-enable nil "Lenses are intrusive")
+  (lsp-enable-file-watchers nil "Avoid watcher warnings")
+  ;; I use `symbol-overlay' to include languages that do not have a language
+  ;; server
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-snippet t)
+  ;; The workspace status icon on the terminal interface is misleading across
+  ;; projects
+  (lsp-modeline-workspace-status-enable nil)
+  (lsp-enable-suggest-server-download nil)
+  (lsp-inlay-hint-enable nil)
+  ;; Enable integration of custom backends other than `capf'
+  (lsp-completion-provider :none)
+  ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
+  (lsp-completion-show-detail t)
+  ;; Show/hide completion kind, e.g., interface/class
+  (lsp-completion-show-kind t)
+  ;; Show/hide description of completion candidates
+  (lsp-completion-show-label-description t)
+  (lsp-completion-default-behaviour :insert)
+  (lsp-use-plists t)
+  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
+  ;; Tramp which is slower
+  (lsp-auto-register-remote-clients nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-progess-via-spinner nil)
+  (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
+  ;; Simpler to focus on the errors at hand
+  (lsp-modeline-diagnostics-scope :file)
+  ;; Sudden changes in the height of the echo area causes the cursor to lose
+  ;; position, manually request via `lsp-signature-activate'.
+  (lsp-signature-auto-activate nil)
+  ;; Avoid annoying questions, we expect a server restart to succeed
+  (lsp-restart 'auto-restart)
+  ;; Avoid warning messages for unsupported modes like `csv-mode'
+  (lsp-warn-no-matched-clients nil)
+  ;; Client-specific configuration
   (lsp-clangd-version "19.1.2")
   (lsp-clients-clangd-args
    '("-j=4"
@@ -2554,61 +2602,19 @@ The provider is nerd-icons."
      "--enable-config"
      "--pch-storage=memory" ; Increases memory usage but can improve performance
      "--pretty"))
-  ;; Enable integration of custom backends other than `capf'
-  (lsp-completion-provider :none)
-  ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
-  (lsp-completion-show-detail t)
-  ;; Show/hide completion kind, e.g., interface/class
-  (lsp-completion-show-kind t)
-  ;; Show/hide description of completion candidates
-  (lsp-completion-show-label-description t)
-  (lsp-completion-default-behaviour :insert)
-  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
-  (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
-  (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
-  (lsp-enable-folding nil "I do not find the feature useful")
-  (lsp-headerline-breadcrumb-enable nil)
   (lsp-html-format-wrap-line-length fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
-  (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
-  (lsp-lens-enable nil "Lenses are intrusive")
-  (lsp-modeline-diagnostics-enable nil)
-  ;; Simpler to focus on the errors at hand
-  (lsp-modeline-diagnostics-scope :file)
-  ;; Sudden changes in the height of the echo area causes the cursor to lose
-  ;; position, manually request via `lsp-signature-activate'.
-  (lsp-signature-auto-activate nil)
-  ;; Avoid annoying questions, we expect a server restart to succeed
-  (lsp-restart 'auto-restart)
   (lsp-xml-logs-client nil)
-  ;; Avoid warning messages for unsupported modes like `csv-mode'
-  (lsp-warn-no-matched-clients nil)
-  (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  ;; Use `symbol-overlay' to include languages that do not have a language
-  ;; server
-  (lsp-enable-symbol-highlighting nil)
   (lsp-pylsp-configuration-sources ["setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
-  (lsp-pylsp-plugins-preload-modules
-   ["numpy" "csv" "pandas" "statistics" "json"])
+  (lsp-pylsp-plugins-preload-modules ["numpy" "csv" "pandas" "statistics"])
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
   (lsp-pylsp-plugins-pylint-enabled t)
   (lsp-pylsp-plugins-yapf-enabled t)
   (lsp-pylsp-plugins-flake8-enabled nil)
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
-  (lsp-use-plists t)
-  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
-  ;; Tramp which is slower
-  (lsp-auto-register-remote-clients nil)
-  (lsp-enable-snippet t)
-  (lsp-keep-workspace-alive nil)
-  ;; The workspace status icon on the terminal interface is misleading across
-  ;; projects
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-enable-suggest-server-download nil)
-  (lsp-inlay-hint-enable t)
   :config
   (when (display-graphic-p)
     (setq lsp-modeline-code-actions-segments '(count icon name)))
@@ -4442,6 +4448,33 @@ or the major mode is not in `sb/skippable-modes'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
 
+(defun sb/toggle-window-split ()
+  "Switch between vertical and horizontal splits."
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd
+              (not
+               (and (<= (car this-win-edges) (car next-win-edges))
+                    (<= (cadr this-win-edges) (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges) (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd
+              (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd
+              (other-window 1))))))
+
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
@@ -4453,7 +4486,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 (bind-keys
  ("C-l" . goto-line)
- ("C-c z" . repeat)
+ ("C-c z" . repeat) ; Repeat the last command
  ("C-z" . undo)
 
  ("<f1>" . execute-extended-command)
@@ -4475,6 +4508,8 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-s" . save-buffer)
  ("C-S-s" . sb/save-all-buffers)
  ("C-x k" . kill-current-buffer)
+
+ ("C-x |" . sb/toggle-window-split)
 
  ("C-<left>" . backward-word)
  ("C-<right>" . forward-word)
@@ -4511,16 +4546,21 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   :commands free-keys)
 
 ;; Displays available keybindings following the currently entered incomplete
-;; command/prefix in a popup
-(use-package which-key
-  ;; :straight (:type built-in)
-  :hook (emacs-startup . which-key-mode)
-  :diminish)
+;; command/prefix in a popup.
+(if (> emacs-major-version 29)
+    (use-package which-key
+      :straight (:type built-in))
+  (use-package whick-key))
+(add-hook 'emacs-startup-hook #'which-key-mode)
+(with-eval-after-load "which-key-mode"
+  (diminish 'which-key-mode))
 
 ;; Support the Kitty Keyboard protocol in Emacs
 (use-package kkp
   :hook (emacs-startup . global-kkp-mode)
-  ;; :bind ("M-<backspace>" . backward-kill-word) ; Should be remapped to "M-DEL"
+  ;; :bind
+  ;; ;; Should be remapped to "M-DEL"
+  ;; ("M-<backspace>" . backward-kill-word)
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
 
 ;;; init.el ends here

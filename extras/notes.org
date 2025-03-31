@@ -77,6 +77,12 @@ The equivalent version with ~with-eval-after-load~ would be:
 
 - [[https://alhassy.github.io/ElispCheatSheet/CheatSheet.pdf][Elisp Reference Sheet]]
 
+*** ~eval-after-load~ versus mode hook
+
+Code wrapped in eval-after-load will be executed only once, so it is typically used to perform one-time setup such as setting default global values and behaviour. An example might be setting up a default keymap for a particular mode. In eval-after-load code, there's no notion of the "current buffer".
+
+Mode hooks execute once for every buffer in which the mode is enabled, so they're used for per-buffer configuration. Mode hooks are therefore run later than eval-after-load code; this lets them take actions based upon such information as whether other modes are enabled in the current buffer.
+
 *** Difference between ~fboundp~ and ~functionp~
 
 ~functionp~ tells you if its argument is a function value; ~fboundp~ tells you if a symbol has a function value bound to it.

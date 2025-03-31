@@ -166,6 +166,8 @@
    (python-shell-interpreter . "/usr/bin/python3")
    (flycheck-pylintrc . "setup.cfg")
    (py-isort-options . '("--settings-path=setup.cfg"))
+   ;; (pyvenv-workon . "./")
+   ;; (pyvenv-activate . "./venv/")
 
    (eval .
          (add-hook
@@ -186,6 +188,8 @@
    (python-shell-interpreter . "/usr/bin/python3")
    (flycheck-pylintrc . "setup.cfg")
    (py-isort-options . '("--settings-path=setup.cfg"))
+   ;; (pyvenv-workon . "./")
+   ;; (pyvenv-activate . "./venv/")
 
    (eval .
          (add-hook
