@@ -48,7 +48,7 @@
 ;; more extensive LaTeX support than Corfu. We can set up separate completion
 ;; files with `company-ispell' and `company-dict'. However, `company-ispell'
 ;; does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -68,7 +68,7 @@ The provider is nerd-icons."
 ;; Eglot also does not support semantic tokens. However, configuring Eglot is
 ;; simpler and I expect it to receive significant improvements now that it is in
 ;; the Emacs core.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -2322,7 +2322,9 @@ The provider is nerd-icons."
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-  :config (add-to-list 'completion-category-overrides '((cape-dict (styles (basic)))))
+  :config
+  ;; TODO: Is this working correctly?
+  (add-to-list 'completion-category-overrides '((cape-dict (styles (basic)))))
 
   ;; Make the capf composable
   (with-eval-after-load "lsp-mode"
@@ -2376,7 +2378,9 @@ The provider is nerd-icons."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
+                  (cape-capf-super #'cape-dict #'cape-dabbrev)
+                  #'cape-file
+                  #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2384,13 +2388,12 @@ The provider is nerd-icons."
      (setq-local completion-at-point-functions
                  (list
                   #'cape-elisp-block
-                  #'cape-dict
-                  #'cape-dabbrev
+                  (cape-capf-super #'cape-dict #'cape-dabbrev)
                   #'cape-file
                   #'yasnippet-capf))))
 
   (when (eq sb/lsp-provider 'eglot)
-    (dolist (mode '(latex-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+    (dolist (mode '(LaTeX-mode-hook bibtex-mode-hook))
       (add-hook
        mode
        (lambda ()
@@ -3039,19 +3042,19 @@ The provider is nerd-icons."
   (pyvenv-post-deactivate-hooks
    (list (lambda () (setq python-shell-interpreter "python3")))))
 
-;; (use-package cperl-mode
-;;   :straight (:type built-in)
-;;   :mode "latexmkrc\\'"
-;;   :hook
-;;   (cperl-mode
-;;    .
-;;    (lambda ()
-;;      (cond
-;;       ((eq sb/lsp-provider 'eglot)
-;;        (eglot-ensure))
-;;       ((eq sb/lsp-provider 'lsp-mode)
-;;        (lsp-deferred)))))
-;;   :config (fset 'perl-mode 'cperl-mode))
+(use-package cperl-mode
+  :straight (:type built-in)
+  :mode "latexmkrc\\'"
+  :hook
+  (cperl-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred)))))
+  :config (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
   :straight (:type built-in)
@@ -3079,11 +3082,9 @@ The provider is nerd-icons."
    .
    (lambda ()
      (add-hook 'before-save-hook #'fish_indent-before-save)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+     ;; `lsp-mode' does not support fish yet
+     (when (eq sb/lsp-provider 'eglot)
+       (eglot-ensure)))))
 
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
@@ -3212,8 +3213,9 @@ The provider is nerd-icons."
    .
    (lambda ()
      (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
+      ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
+      ;; ((eq sb/lsp-provider 'eglot)
+      ;;  (eglot-ensure))
       ((eq sb/lsp-provider 'lsp-mode)
        (progn
          (require 'lsp-marksman)
@@ -4535,6 +4537,22 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("C-<tab>" . sb/next-buffer))
 
+;; Clear any previous ESC settings
+(global-unset-key (kbd "<escape>"))
+(define-key key-translation-map [escape] nil)
+(define-key input-decode-map [escape] nil)
+
+;; Direct keyboard event interception
+(defun sb/keyboard-quit-immediately ()
+  "Quit immediately when ESC is pressed, regardless of context."
+  (interactive)
+  (keyboard-quit))
+
+;; Make ESC quit everything
+(define-key special-event-map [escape] 'sb/keyboard-quit-immediately)
+(define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
+(global-set-key [escape] 'sb/keyboard-quit-immediately)
+
 ;; (use-package default-text-scale
 ;;   :when (display-graphic-p)
 ;;   :bind
@@ -4547,12 +4565,10 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; Displays available keybindings following the currently entered incomplete
 ;; command/prefix in a popup.
-(if (> emacs-major-version 29)
-    (use-package which-key
-      :straight (:type built-in))
+(when (< emacs-major-version 30)
   (use-package whick-key))
 (add-hook 'emacs-startup-hook #'which-key-mode)
-(with-eval-after-load "which-key-mode"
+(with-eval-after-load "which-key"
   (diminish 'which-key-mode))
 
 ;; Support the Kitty Keyboard protocol in Emacs
