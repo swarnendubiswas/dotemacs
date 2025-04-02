@@ -2403,18 +2403,17 @@ The provider is nerd-icons."
             (setq-local
              completion-at-point-functions
              (list
-              ;; Math latex tags
-              (cape-company-to-capf #'company-math-symbols-latex)
-              ;; Math Unicode symbols and sub(super)scripts
-              (cape-company-to-capf #'company-math-symbols-unicode)
-              (cape-company-to-capf #'company-latex-commands)
-              ;; Used for Unicode symbols and not for the corresponding LaTeX
-              ;; names.
-              #'cape-tex
-              #'citar-capf
-              #'bibtex-capf
-              #'cape-dict
-              #'cape-dabbrev
+              (cape-capf-super
+               ;; Math latex tags
+               (cape-company-to-capf #'company-math-symbols-latex)
+               ;; Math Unicode symbols and sub(super)scripts
+               (cape-company-to-capf #'company-math-symbols-unicode)
+               (cape-company-to-capf #'company-latex-commands)
+               ;; Used for Unicode symbols and not for the corresponding LaTeX
+               ;; names.
+               #'cape-tex)
+              (cape-capf-super #'citar-capf #'bibtex-capf)
+              (cape-capf-super #'cape-dict #'cape-dabbrev)
               #'cape-file
               #'yasnippet-capf))))))))
 
@@ -2426,18 +2425,17 @@ The provider is nerd-icons."
          (setq-local
           completion-at-point-functions
           (list
-           ;; Math latex tags
-           (cape-company-to-capf #'company-math-symbols-latex)
-           ;; Math Unicode symbols and sub(super)scripts
-           (cape-company-to-capf #'company-math-symbols-unicode)
-           (cape-company-to-capf #'company-latex-commands)
-           ;; Used for Unicode symbols and not for the corresponding LaTeX
-           ;; names.
-           #'cape-tex
-           #'citar-capf
-           #'bibtex-capf
-           #'cape-dict
-           #'cape-dabbrev
+           (cape-capf-super
+            ;; Math latex tags
+            (cape-company-to-capf #'company-math-symbols-latex)
+            ;; Math Unicode symbols and sub(super)scripts
+            (cape-company-to-capf #'company-math-symbols-unicode)
+            (cape-company-to-capf #'company-latex-commands)
+            ;; Used for Unicode symbols and not for the corresponding LaTeX
+            ;; names.
+            #'cape-tex)
+           (cape-capf-super #'citar-capf #'bibtex-capf)
+           (cape-capf-super #'cape-dict #'cape-dabbrev)
            #'cape-file
            #'yasnippet-capf))))))
 
@@ -2593,6 +2591,7 @@ The provider is nerd-icons."
    '("-j=4"
      "--all-scopes-completion"
      "--background-index"
+     "--background-index-priority=low"
      "--clang-tidy"
      "--completion-style=detailed"
      "--fallback-style=LLVM"
@@ -2727,7 +2726,7 @@ The provider is nerd-icons."
   ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
   (lsp-ltex-plus-log-level "warning")
   (lsp-ltex-plus-disabled-rules
-   '(:en
+   '(:en-US
      ["EN_QUOTES"
       "OXFORD_SPELLING_Z_NOT_S"
       "MORFOLOGIK_RULE_EN_US"
@@ -4010,16 +4009,16 @@ used in `company-backends'."
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
 
-;; (use-package dogears
-;;   :straight (:host github :repo "alphapapa/dogears.el")
-;;   :hook (find-file . dogears-mode)
-;;   :bind
-;;   (("M-g d" . dogears-go)
-;;    ("M-g M-b" . dogears-back)
-;;    ("M-g M-f" . dogears-forward)
-;;    ("M-g M-d" . dogears-list)
-;;    ("M-g M-D" . dogears-sidebar))
-;;   :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
+(use-package dogears
+  :straight (:host github :repo "alphapapa/dogears.el")
+  :hook (find-file . dogears-mode)
+  :bind
+  (("M-g d" . dogears-go)
+   ("M-g M-b" . dogears-back)
+   ("M-g M-f" . dogears-forward)
+   ("M-g M-d" . dogears-list)
+   ("M-g M-D" . dogears-sidebar))
+  :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
 
 (use-package kill-file-path
   :straight (:host github :repo "chyla/kill-file-path")
@@ -4082,9 +4081,7 @@ used in `company-backends'."
   (setq eglot-server-programs nil)
   (add-to-list
    'eglot-server-programs
-   '((org-mode markdown-mode text-mode git-commit-major-mode)
-     .
-     ("ltex-ls-plus")))
+   '((org-mode markdown-mode text-mode) . ("ltex-ls-plus")))
   (add-to-list
    'eglot-server-programs
    '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -4102,6 +4099,7 @@ used in `company-backends'."
       "--compile-commands-dir=./build"
       "--all-scopes-completion"
       "--background-index"
+      "--background-index-priority=low"
       "--clang-tidy"
       "--completion-style=detailed"
       "--fallback-style=LLVM"
@@ -4178,6 +4176,11 @@ used in `company-backends'."
   (setq eglot-stay-out-of
         '(flymake yasnippet company eldoc eldoc-documentation-strategy))
 
+  ;; Translation between JSON and Eglot:
+  ;; | true  | t           |
+  ;; | false | :json-false |
+  ;; | null  | nil         |
+  ;; | {}    | eglot-{}    |
   (setq-default eglot-workspace-configuration
                 '(:pylsp
                   (:configurationSources
@@ -4238,9 +4241,9 @@ used in `company-backends'."
                    :useLibraryCodeForTypes t)
                   :ltex-ls-plus
                   (:language
-                   "en"
+                   "en-US"
                    :disabledRules
-                   (:en ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])
+                   ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
                    :additionalRules (:enablePickyRules t))
                   :yaml (:format (:enable t) :validate t :hover t :completion t)
                   :vscode-json-language-server (:provideFormatter t)))
@@ -4342,6 +4345,11 @@ used in `company-backends'."
 ;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
 ;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
 ;;   )
+
+;; Highlight the cursor position after the window scrolls
+(use-package beacon
+  :hook (emacs-startup . beacon-mode)
+  :diminish)
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
