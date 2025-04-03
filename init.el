@@ -4575,7 +4575,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; Displays available keybindings following the currently entered incomplete
 ;; command/prefix in a popup.
 (when (< emacs-major-version 30)
-  (use-package whick-key))
+  (use-package which-key))
 (add-hook 'emacs-startup-hook #'which-key-mode)
 (with-eval-after-load "which-key"
   (diminish 'which-key-mode))

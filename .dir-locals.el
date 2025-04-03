@@ -1,3 +1,5 @@
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html
+
 ((nil
   .
   ((fill-column . 80)
@@ -57,7 +59,15 @@
 
        (when (derived-mode-p 'xml-mode)
          (setq sb/flycheck-local-checkers
-               '((lsp . ((next-checkers . (xml-xmllint))))))))))))
+               '((lsp . ((next-checkers . (xml-xmllint))))))))))
+
+   ;; Associate a mode with a file
+   (eval .
+         (when (and
+                (buffer-file-name) ; Ensure the buffer is visiting a file
+                (string=
+                 (file-name-nondirectory (buffer-name)) "setup_environment"))
+           (sh-mode)))))
 
  (dired-mode
   .
@@ -81,9 +91,9 @@
   .
   ((elisp-autofmt-on-save-p . always)
    (elisp-autofmt-load-packages-local . ("use-package-core"))
-   ;; The special `subdirs' element is not a variable, but a special keyword which
-   ;; indicates that the mode settings are only to be applied in the current
-   ;; directory, not in any subdirectories.
+   ;; The special `subdirs' element is not a variable, but a special keyword
+   ;; which indicates that the mode settings are only to be applied in the
+   ;; current directory, not in any subdirectories.
    (subdirs . nil)))
 
  (c-mode . ((mode . c++)))
@@ -96,6 +106,16 @@
    (flycheck-clang-tidy-build-path . ".")
    (flycheck-gcc-openmp . t)
 
+   ;; (load-file "./util/emacs/m5-c-style.el")
+   ;; (eval ignore-errors (require 'm5-c-style))
+   ;; (c-default-style . "m5")
+   ;; (c-set-style . "m5")
+
+   ;; Not needed we are already setting it from `init.el'
+
+   ;; (eval add-hook 'hack-local-variables-hook (lambda () (when (string=
+   ;; major-mode 'c++-mode) (lsp))))
+
    (eval .
          (let ((clang-args (list "-std=c++17" "-I./src"))
                (include-path (list "./src")))
@@ -107,6 +127,7 @@
             flycheck-gcc-include-path include-path
             flycheck-cppcheck-include-path include-path)))
 
+   ;; Define clangd-args and set lsp-clients-clangd-args
    (eval .
          (add-hook
           'lsp-managed-mode-hook
@@ -131,6 +152,12 @@
    (flycheck-clang-language-standard . "c++17")
    (flycheck-clang-tidy-build-path . ".")
    (flycheck-gcc-openmp . t)
+
+
+   ;; (load-file "./util/emacs/m5-c-style.el")
+   ;; (eval ignore-errors (require 'm5-c-style))
+   ;; (c-default-style . "m5")
+   ;; (c-set-style . "m5")
 
    (eval .
          (let ((clang-args (list "-std=c++17" "-I./src"))
@@ -169,18 +196,57 @@
    ;; (pyvenv-workon . "./")
    ;; (pyvenv-activate . "./venv/")
 
+   ;; (eval .
+   ;;       (setenv "PYTHONPATH"
+   ;;               (concat "src/python:ext/ply:src/sim:" (getenv "PYTHONPATH"))))
+
+   ;; We can define lsp-pyright-extra-paths and lsp-pyright-venv-path
+   ;; (eval .
+   ;;       (let ((paths (vconcat (list "./src/python" "ext/ply" "src/sim"))))
+   ;;         (setq lsp-pyright-extra-paths paths)))
+
    (eval .
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+            (add-hook 'before-save-hook #'lsp-organize-imports nil t))))
+
+   ;; (eglot-workspace-configuration
+   ;;  .
+   ;;  ((:python
+   ;;    . (:pythonPath ".venv/bin/python")
+   ;;    (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+   ;;    (:analysis
+   ;;     (:diagnosticMode
+   ;;      "openFilesOnly"
+   ;;      :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
+   ;;   (:pylsp
+   ;;    .
+   ;;    (:plugins
+   ;;     (:jedi_completion
+   ;;      (:fuzzy t :include_params t)
+   ;;      :pylsp_isort (:enabled t)
+   ;;      :pylsp_mypy (:enabled t)
+   ;;      :pydocstyle (:enabled :json-false)
+   ;;      :pycodestyle (:enabled :json-false)
+   ;;      :mccabe (:enabled :json-false)
+   ;;      :pyflakes (:enabled :json-false)
+   ;;      :flake8 (:enabled :json-false)
+   ;;      :black (:enabled :json-false)
+   ;;      :pylint (:enabled t)
+   ;;      :mypy (:enabled :json-false))
+   ;;     :configurationSources ["setup.cfg"]))))
+
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t)
+            (add-hook
+             'before-save-hook #'eglot-code-action-organize-imports))))))
 
  (python-ts-mode
   .
@@ -191,18 +257,57 @@
    ;; (pyvenv-workon . "./")
    ;; (pyvenv-activate . "./venv/")
 
+   ;; (eval .
+   ;;       (setenv "PYTHONPATH"
+   ;;               (concat "src/python:ext/ply:src/sim:" (getenv "PYTHONPATH"))))
+
+   ;; We can define lsp-pyright-extra-paths and lsp-pyright-venv-path
+   ;; (eval .
+   ;;       (let ((paths (vconcat (list "./src/python" "ext/ply" "src/sim"))))
+   ;;         (setq lsp-pyright-extra-paths paths)))
+
    (eval .
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t)
+            (add-hook 'before-save-hook #'lsp-organize-imports nil t))))
+
+   ;; (eglot-workspace-configuration
+   ;;  .
+   ;;  ((:python
+   ;;    . (:pythonPath ".venv/bin/python")
+   ;;    (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+   ;;    (:analysis
+   ;;     (:diagnosticMode
+   ;;      "openFilesOnly"
+   ;;      :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
+   ;;   (:pylsp
+   ;;    .
+   ;;    (:plugins
+   ;;     (:jedi_completion
+   ;;      (:fuzzy t :include_params t)
+   ;;      :pylsp_isort (:enabled t)
+   ;;      :pylsp_mypy (:enabled t)
+   ;;      :pydocstyle (:enabled :json-false)
+   ;;      :pycodestyle (:enabled :json-false)
+   ;;      :mccabe (:enabled :json-false)
+   ;;      :pyflakes (:enabled :json-false)
+   ;;      :flake8 (:enabled :json-false)
+   ;;      :black (:enabled :json-false)
+   ;;      :pylint (:enabled t)
+   ;;      :mypy (:enabled :json-false))
+   ;;     :configurationSources ["setup.cfg"]))))
+
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t)
+            (add-hook
+             'before-save-hook #'eglot-code-action-organize-imports))))))
 
  (sh-mode . ((subdirs . nil)))
 
@@ -389,7 +494,19 @@
       :dependencies
       ["libs/**/*.jar" "libs/*.jar"]
       :output-dir "build")))
-   (jdtls (:workspaceFolder "~/java/")))))
+   (jdtls (:workspaceFolder "~/java/"))
+   (eval .
+         (add-hook
+          'lsp-managed-mode-hook
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
+          (lambda ()
+            (make-local-variable 'before-save-hook)
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t)))))))
 
 
 ;; Local Variables:
