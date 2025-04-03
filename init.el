@@ -3451,7 +3451,6 @@ The provider is nerd-icons."
    ;; (TeX-update-style . rainbow-delimiters-mode)
    (LaTeX-mode . TeX-source-correlate-mode)
    (LaTeX-mode . (lambda () (turn-on-reftex))))
-  ;; :bind (:map TeX-mode-map ("C-c ;") ("C-c C-d") ("C-c C-c" . TeX-command-master))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
   (TeX-auto-save t)
@@ -3474,7 +3473,9 @@ The provider is nerd-icons."
   :config
   ;; Make AUCTeX aware of the multifile document structure, always query for the
   ;; master file
-  (setq-default TeX-master nil))
+  (setq-default TeX-master nil)
+  (with-eval-after-load "tex-mode"
+    (unbind-key "C-c ;" TeX-mode-map)))
 
 (use-package reftex
   :straight (:type built-in)
@@ -4545,21 +4546,21 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("C-<tab>" . sb/next-buffer))
 
-;; Clear any previous ESC settings
-(global-unset-key (kbd "<escape>"))
-(define-key key-translation-map [escape] nil)
-(define-key input-decode-map [escape] nil)
+;; ;; Clear any previous ESC settings
+;; (global-unset-key (kbd "<escape>"))
+;; (define-key key-translation-map [escape] nil)
+;; (define-key input-decode-map [escape] nil)
 
-;; Direct keyboard event interception
-(defun sb/keyboard-quit-immediately ()
-  "Quit immediately when ESC is pressed, regardless of context."
-  (interactive)
-  (keyboard-quit))
+;; ;; Direct keyboard event interception
+;; (defun sb/keyboard-quit-immediately ()
+;;   "Quit immediately when ESC is pressed, regardless of context."
+;;   (interactive)
+;;   (keyboard-quit))
 
-;; Make ESC quit everything
-(define-key special-event-map [escape] 'sb/keyboard-quit-immediately)
-(define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
-(global-set-key [escape] 'sb/keyboard-quit-immediately)
+;; ;; Make ESC quit everything
+;; (define-key special-event-map [escape] 'sb/keyboard-quit-immediately)
+;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
+;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
 ;; (use-package default-text-scale
 ;;   :when (display-graphic-p)
