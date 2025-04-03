@@ -82,9 +82,9 @@
   ((no-byte-compile . t)
    (elisp-autofmt-on-save-p . always)
    (elisp-autofmt-load-packages-local . ("use-package-core"))
-   ;; The special `subdirs' element is not a variable, but a special keyword which
-   ;; indicates that the mode settings are only to be applied in the current
-   ;; directory, not in any subdirectories.
+   ;; The special `subdirs' element is not a variable, but a special keyword
+   ;; which indicates that the mode settings are only to be applied in the
+   ;; current directory, not in any subdirectories.
    (subdirs . nil)))
 
  (lisp-data-mode
@@ -111,8 +111,6 @@
    ;; (c-default-style . "m5")
    ;; (c-set-style . "m5")
 
-   ;; Not needed we are already setting it from `init.el'
-
    ;; (eval add-hook 'hack-local-variables-hook (lambda () (when (string=
    ;; major-mode 'c++-mode) (lsp))))
 
@@ -127,7 +125,7 @@
             flycheck-gcc-include-path include-path
             flycheck-cppcheck-include-path include-path)))
 
-   ;; Define clangd-args and set lsp-clients-clangd-args
+   ;; Alternatively, define clangd-args and set lsp-clients-clangd-args.
    (eval .
          (add-hook
           'lsp-managed-mode-hook
@@ -152,7 +150,6 @@
    (flycheck-clang-language-standard . "c++17")
    (flycheck-clang-tidy-build-path . ".")
    (flycheck-gcc-openmp . t)
-
 
    ;; (load-file "./util/emacs/m5-c-style.el")
    ;; (eval ignore-errors (require 'm5-c-style))
@@ -213,31 +210,73 @@
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (add-hook 'before-save-hook #'lsp-organize-imports nil t))))
 
-   ;; (eglot-workspace-configuration
-   ;;  .
-   ;;  ((:python
-   ;;    . (:pythonPath ".venv/bin/python")
-   ;;    (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
-   ;;    (:analysis
-   ;;     (:diagnosticMode
-   ;;      "openFilesOnly"
-   ;;      :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
-   ;;   (:pylsp
-   ;;    .
-   ;;    (:plugins
-   ;;     (:jedi_completion
-   ;;      (:fuzzy t :include_params t)
-   ;;      :pylsp_isort (:enabled t)
-   ;;      :pylsp_mypy (:enabled t)
-   ;;      :pydocstyle (:enabled :json-false)
-   ;;      :pycodestyle (:enabled :json-false)
-   ;;      :mccabe (:enabled :json-false)
-   ;;      :pyflakes (:enabled :json-false)
-   ;;      :flake8 (:enabled :json-false)
-   ;;      :black (:enabled :json-false)
-   ;;      :pylint (:enabled t)
-   ;;      :mypy (:enabled :json-false))
-   ;;     :configurationSources ["setup.cfg"]))))
+   ;;  https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
+   (eglot-workspace-configuration
+    .
+    ((:python
+      (:pythonPath "./.venv/bin/python")
+      (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+      (:analysis
+       (:diagnosticMode
+        "openFilesOnly"
+        :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
+     (:pylsp
+      (:configurationSources
+       ["setup.cfg"]
+       :plugins
+       (:autopep8
+        (:enabled :json-false)
+        :black
+        (:enabled :json-false)
+        :flake8
+        (:enabled :json-false :config t :maxLineLength 80)
+        :jedi
+        (:environment "./.venv/" :extra_paths [])
+        :jedi_completion
+        (:fuzzy
+         t
+         :include_params t
+         :include_class_objects t
+         :cache_for
+         ["pandas" "numpy" "matplotlib"])
+        :jedi_definition
+        (:enabled t :follow_imports t :follow_builtin_imports t)
+        :jedi_hover
+        (:enabled t)
+        :jedi_references
+        (:enabled t)
+        :jedi_signature_help
+        (:enabled t)
+        :jedi_symbols
+        (:enabled t :all_scopes t :include_import_symbols t)
+        :mccabe
+        (:enabled :json-false :threshold 15)
+        :mypy
+        (:enabled :json-false)
+        :preload
+        (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+        :pycodestyle
+        (:enabled :json-false :maxLineLength 80)
+        :pydocstyle
+        (:enabled t :convention "numpy")
+        :pyflakes
+        (:enabled :json-false)
+        :pylint
+        (:enabled t)
+        :pylsp_black
+        (:enabled :json-false)
+        :pylsp_isort
+        (:enabled t)
+        :pylsp_mypy
+        (:enabled t :report_progress t :live_mode :json-false)
+        :rope_autoimport
+        (:code_actions (:enabled t) :completions (:enabled t) :enabled t)
+        :rope_completion
+        (:enabled t :eager :json-false)
+        :ruff
+        (:enabled :json-false :formatEnabled t :lineLength 80)
+        :yapf
+        (:enabled t))))))
 
    (eval .
          (add-hook
@@ -274,31 +313,72 @@
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (add-hook 'before-save-hook #'lsp-organize-imports nil t))))
 
-   ;; (eglot-workspace-configuration
-   ;;  .
-   ;;  ((:python
-   ;;    . (:pythonPath ".venv/bin/python")
-   ;;    (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
-   ;;    (:analysis
-   ;;     (:diagnosticMode
-   ;;      "openFilesOnly"
-   ;;      :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
-   ;;   (:pylsp
-   ;;    .
-   ;;    (:plugins
-   ;;     (:jedi_completion
-   ;;      (:fuzzy t :include_params t)
-   ;;      :pylsp_isort (:enabled t)
-   ;;      :pylsp_mypy (:enabled t)
-   ;;      :pydocstyle (:enabled :json-false)
-   ;;      :pycodestyle (:enabled :json-false)
-   ;;      :mccabe (:enabled :json-false)
-   ;;      :pyflakes (:enabled :json-false)
-   ;;      :flake8 (:enabled :json-false)
-   ;;      :black (:enabled :json-false)
-   ;;      :pylint (:enabled t)
-   ;;      :mypy (:enabled :json-false))
-   ;;     :configurationSources ["setup.cfg"]))))
+   (eglot-workspace-configuration
+    .
+    ((:python
+      (:pythonPath "./.venv/bin/python")
+      (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+      (:analysis
+       (:diagnosticMode
+        "openFilesOnly"
+        :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
+     (:pylsp
+      (:configurationSources
+       ["setup.cfg"]
+       :plugins
+       (:autopep8
+        (:enabled :json-false)
+        :black
+        (:enabled :json-false)
+        :flake8
+        (:enabled :json-false :config t :maxLineLength 80)
+        :jedi
+        (:environment "./.venv/" :extra_paths [])
+        :jedi_completion
+        (:fuzzy
+         t
+         :include_params t
+         :include_class_objects t
+         :cache_for
+         ["pandas" "numpy" "matplotlib"])
+        :jedi_definition
+        (:enabled t :follow_imports t :follow_builtin_imports t)
+        :jedi_hover
+        (:enabled t)
+        :jedi_references
+        (:enabled t)
+        :jedi_signature_help
+        (:enabled t)
+        :jedi_symbols
+        (:enabled t :all_scopes t :include_import_symbols t)
+        :mccabe
+        (:enabled :json-false :threshold 15)
+        :mypy
+        (:enabled :json-false)
+        :preload
+        (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+        :pycodestyle
+        (:enabled :json-false :maxLineLength 80)
+        :pydocstyle
+        (:enabled t :convention "numpy")
+        :pyflakes
+        (:enabled :json-false)
+        :pylint
+        (:enabled t)
+        :pylsp_black
+        (:enabled :json-false)
+        :pylsp_isort
+        (:enabled t)
+        :pylsp_mypy
+        (:enabled t :report_progress t :live_mode :json-false)
+        :rope_autoimport
+        (:code_actions (:enabled t) :completions (:enabled t) :enabled t)
+        :rope_completion
+        (:enabled t :eager :json-false)
+        :ruff
+        (:enabled :json-false :formatEnabled t :lineLength 80)
+        :yapf
+        (:enabled t))))))
 
    (eval .
          (add-hook
@@ -490,7 +570,7 @@
     .
     (:java
      (:project
-      (:sourcePaths ["src"])
+      (:sourcePaths ["src"] :referencedLibraries ["lib/*.jar"])
       :dependencies
       ["libs/**/*.jar" "libs/*.jar"]
       :output-dir "build")))

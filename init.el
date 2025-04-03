@@ -4189,40 +4189,53 @@ used in `company-backends'."
                    :plugins
                    (:autopep8
                     (:enabled :json-false)
+                    :black
+                    (:enabled :json-false)
                     :flake8
                     (:enabled :json-false :config t :maxLineLength 80)
                     :jedi (:extra_paths [])
                     :jedi_completion
-                    (:include_params
+                    (:fuzzy
                      t
+                     :include_params t
                      :include_class_objects t
-                     :fuzzy t
                      :cache_for
                      ["pandas" "numpy" "matplotlib"])
                     :jedi_definition
                     (:enabled t :follow_imports t :follow_builtin_imports t)
+                    :jedi_hover (:enabled t)
                     :jedi_references (:enabled t)
                     :jedi_signature_help (:enabled t)
                     :jedi_symbols
                     (:enabled t :all_scopes t :include_import_symbols t)
                     :mccabe
+                    (:enabled :json-false :threshold 15)
+                    :mypy
                     (:enabled :json-false)
                     :preload
                     (:enabled t :modules ["pandas" "numpy" "matplotlib"])
                     :pycodestyle
-                    (:enabled :json-false)
+                    (:enabled :json-false :maxLineLength 8)
                     :pydocstyle
                     (:enabled t :convention "numpy")
                     :pyflakes
                     (:enabled :json-false)
                     :pylint (:enabled t)
+                    :pylsp_black
+                    (:enabled :json-false)
                     :pylsp_isort (:enabled t)
                     :pylsp_mypy
                     (:enabled t :report_progress t :live_mode :json-false)
+                    :rope_autoimport
+                    (:code_actions
+                     (:enabled t)
+                     :completions
+                     (:enabled t)
+                     :enabled t)
                     :rope_completion
                     (:enabled t :eager :json-false)
                     :ruff
-                    (:enabled :json-false :lineLength 80)
+                    (:enabled :json-false :formatEnabled t :lineLength 80)
                     :yapf (:enabled t)))
                   :basedpyright
                   (:checkOnlyOpenFiles
@@ -4246,7 +4259,12 @@ used in `company-backends'."
                    :disabledRules
                    ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
                    :additionalRules (:enablePickyRules t))
-                  :yaml (:format (:enable t) :validate t :hover t :completion t)
+                  :yaml
+                  (:format
+                   (:enable t :singleQuote nil :bracketSpacing t)
+                   :validate t
+                   :hover t
+                   :completion t)
                   :vscode-json-language-server (:provideFormatter t)))
 
   (with-eval-after-load "eglot"
