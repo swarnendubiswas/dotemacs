@@ -68,7 +68,7 @@ The provider is nerd-icons."
 ;; Eglot also does not support semantic tokens. However, configuring Eglot is
 ;; simpler and I expect it to receive significant improvements now that it is in
 ;; the Emacs core.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -78,18 +78,21 @@ The provider is nerd-icons."
 
 ;; "straight.el" makes it easy to install packages from arbitrary sources like
 ;; GitHub.
-(setq
+(setopt
  straight-build-dir
  (format "build/%d%s%d"
          emacs-major-version
          version-separator
          emacs-minor-version)
  ;; Do not check packages on startup to reduce load time
- straight-check-for-modifications '(check-on-save find-when-checking)
- straight-use-package-by-default t
+ straight-check-for-modifications
+ '(check-on-save find-when-checking)
+ straight-use-package-by-default
+ t
  ;; There is no need to download the whole Git history, and a single branch
  ;; often suffices.
- straight-vc-git-default-clone-depth '(1 single-branch))
+ straight-vc-git-default-clone-depth
+ '(1 single-branch))
 
 (let ((bootstrap-file
        (expand-file-name
@@ -107,19 +110,21 @@ The provider is nerd-icons."
   (load bootstrap-file nil 'nomessage))
 
 ;; These variables need to be set before loading `use-package'.
-(setq
- use-package-enable-imenu-support t
+(setopt
+ use-package-enable-imenu-support
+ t
  ;; Show everything
- use-package-minimum-reported-time 0
- use-package-expand-minimally t
- use-package-always-defer t)
+ use-package-minimum-reported-time
+ 0
+ use-package-expand-minimally
+ t
+ use-package-always-defer
+ t)
 (straight-use-package '(use-package))
 
 (when (bound-and-true-p sb/debug-init-perf)
   ;; Use "M-x use-package-report" to see results
-  (setq
-   use-package-compute-statistics t
-   use-package-verbose t))
+  (setopt use-package-compute-statistics t use-package-verbose t))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
@@ -144,9 +149,7 @@ The provider is nerd-icons."
 (use-package exec-path-from-shell
   :when (eq system-type 'gnu/linux)
   :init
-  (setq
-   exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-arguments nil)
+  (setopt exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
 (use-package emacs
@@ -208,8 +211,6 @@ The provider is nerd-icons."
   (sentence-end-double-space nil)
   (shift-select-mode nil)
   (sort-fold-case nil "Do not ignore case when sorting")
-  ;; Ignore case when reading a buffer name
-  (read-buffer-completion-ignore-case t)
   (standard-indent 2)
   (switch-to-buffer-preserve-window-point t)
   (view-read-only t "View mode for read-only buffers")
@@ -251,6 +252,7 @@ The provider is nerd-icons."
   ;; Accelerate scrolling operations when non-nil. Only those portions of the
   ;; buffer which are actually going to be displayed get fontified.
   (fast-but-imprecise-scrolling t)
+  (fringes-outside-margins t)
   :config
   (dolist (exts
            '(".aux"
@@ -273,25 +275,26 @@ The provider is nerd-icons."
     (add-to-list 'completion-ignored-extensions exts))
 
   (when (boundp 'next-error-message-highlight)
-    (setq next-error-message-highlight t))
+    (setopt next-error-message-highlight t))
   (when (boundp 'read-minibuffer-restore-windows)
-    (setq read-minibuffer-restore-windows t))
+    (setopt read-minibuffer-restore-windows t))
   (when (boundp 'use-short-answers)
-    (setq use-short-answers t))
+    (setopt use-short-answers t))
   ;; Hide commands in "M-x" which do not work in the current mode.
   (when (boundp 'read-extended-command-predicate)
-    (setq read-extended-command-predicate
-          #'command-completion-default-include-p))
+    (setopt
+     read-extended-command-predicate #'command-completion-default-include-p))
   (when (boundp 'help-window-keep-selected)
-    (setq help-window-keep-selected t))
+    (setopt help-window-keep-selected t))
   (when (boundp 'find-sibling-rules)
-    (setq find-sibling-rules
-          '(("\\([^/]+\\)\\.c\\'" "\\1.h")
-            ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
-            ("\\([^/]+\\)\\.h\\'" "\\1.c")
-            ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
+    (setopt
+     find-sibling-rules
+     '(("\\([^/]+\\)\\.c\\'" "\\1.h")
+       ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
+       ("\\([^/]+\\)\\.h\\'" "\\1.c")
+       ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
   (when (eq system-type 'windows-nt)
-    (setq w32-get-true-file-attributes nil))
+    (setopt w32-get-true-file-attributes nil))
 
   ;; Changing buffer-local variables will only affect a single buffer.
   ;; `setq-default' changes the buffer-local variable's default value.
@@ -313,7 +316,7 @@ The provider is nerd-icons."
 
   ;; Hide "When done with a buffer, type C-x 5" message
   (when (bound-and-true-p server-client-instructions)
-    (setq server-client-instructions nil))
+    (setopt server-client-instructions nil))
 
   (when (file-exists-p custom-file)
     (load custom-file 'noerror 'nomessage))
@@ -419,7 +422,7 @@ The provider is nerd-icons."
   :config
   ;; Abbreviate the home directory to make it easy to read the actual file name.
   (unless (> emacs-major-version 27)
-    (setq recentf-filename-handlers '(abbreviate-file-name)))
+    (setopt recentf-filename-handlers '(abbreviate-file-name)))
 
   (dolist (exclude
            `(,(recentf-expand-file-name no-littering-etc-directory)
@@ -544,13 +547,13 @@ The provider is nerd-icons."
   (tramp-default-method "ssh")
   :config
   (when (boundp 'tramp-use-connection-share)
-    (setq tramp-use-connection-share nil))
+    (setopt tramp-use-connection-share nil))
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-  (setq debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
+  (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
 
 (use-package whitespace
   :straight (:type built-in)
@@ -726,9 +729,9 @@ The provider is nerd-icons."
   ;; information, "p" is to append "/" indicator to directories, "v" uses
   ;; natural sort of (version) numbers within text. Check "ls" for additional
   ;; options.
-
   ;; (dired-listing-switches
   ;;  "-aBFghlNopv --group-directories-first --time-style=locale")
+  (dired-listing-switches "--group-directories-first")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
@@ -738,7 +741,7 @@ The provider is nerd-icons."
   (dired-free-space nil)
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
-    (setq dired-kill-when-opening-new-dired-buffer t)))
+    (setopt dired-kill-when-opening-new-dired-buffer t)))
 
 (use-package dired-x
   :straight (:type built-in)
@@ -757,19 +760,22 @@ The provider is nerd-icons."
   (unless (> emacs-major-version 27)
     (setq dired-bind-jump t))
 
-  (setq dired-omit-files
-        (concat
-         dired-omit-files
-         "\\|^\\..*$" ; Hide all dotfiles
-         "\\|^.DS_Store\\'"
-         "\\|^.project\\(?:ile\\)?\\'"
-         "\\|^.\\(svn\\|git\\)\\'"
-         "\\|^.cache\\'"
-         "\\|^.ccls-cache\\'"
-         "\\|^__pycache__\\'"
-         "\\|^eln-cache\\'"
-         "\\|\\(?:\\.js\\)?\\.meta\\'"
-         "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+  (setopt
+   dired-omit-files
+   (concat
+    dired-omit-files
+    "\\|^\\..*$" ; Hide all dotfiles
+    "\\|^.DS_Store\\'"
+    "\\|^.project\\(?:ile\\)?\\'"
+    "\\|^.\\(svn\\|git\\)\\'"
+    "\\|^.cache\\'"
+    "\\|^.ccls-cache\\'"
+    "\\|^__pycache__\\'"
+    "\\|^eln-cache\\'"
+    "\\|^.ctags.d\\'"
+    "\\|^.git\\'"
+    "\\|\\(?:\\.js\\)?\\.meta\\'"
+    "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
   (defadvice dired-omit-startup (after diminish-dired-omit activate)
@@ -839,8 +845,9 @@ The provider is nerd-icons."
   :bind
   (("C-c r" . vertico-repeat)
    ("M-r" . vertico-repeat-select)
-   :map
-   vertico-map
+   :map vertico-map
+   ;; `vertico-exit' (RET) exits with the currently selected candidate, while
+   ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
    ("M-<" . vertico-first)
    ("M->" . vertico-last)
    ("C-M-j" . vertico-exit-input)
@@ -1679,9 +1686,11 @@ The provider is nerd-icons."
   :bind
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
-  :custom
+  :custom (completion-ignore-case t)
   ;; Ignore case when reading a file name
   (read-file-name-completion-ignore-case t)
+  ;; Ignore case when reading a buffer name
+  (read-buffer-completion-ignore-case t)
   (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
   :config
   ;; Show docstring description for completion candidates in commands like
@@ -2344,13 +2353,17 @@ The provider is nerd-icons."
   ;; returning a result wins. Note that the list of buffer-local completion
   ;; functions takes precedence over the global list.
 
-  (setq-local completion-at-point-functions
-              (list
-               (cape-capf-inside-code
-                (cape-capf-super #'cape-keyword #'cape-dabbrev))
-               (cape-capf-inside-comment
-                (cape-capf-super #'cape-dict #'cape-dabbrev))
-               #'cape-file #'yasnippet-capf))
+  (add-hook
+   'prog-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  (cape-capf-inside-code
+                   (cape-capf-super #'cape-keyword #'cape-dabbrev))
+                  (cape-capf-inside-comment #'cape-dict)
+                  #'cape-dabbrev
+                  (cape-capf-inside-string #'cape-file)
+                  #'yasnippet-capf))))
 
   ;; Override CAPFS for specific major modes
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
@@ -2364,13 +2377,14 @@ The provider is nerd-icons."
                       #'elisp-completion-at-point
                       #'cape-elisp-symbol
                       #'cape-dabbrev))
-                    (cape-capf-inside-comment
-                     (cape-capf-super #'cape-dabbrev #'cape-dict))
-                    #'cape-file #'yasnippet-capf)))))
+                    (cape-capf-inside-comment #'cape-dict)
+                    #'cape-dabbrev
+                    (cape-capf-inside-string #'cape-file)
+                    #'yasnippet-capf)))))
 
   ;; https://github.com/minad/cape/discussions/130
-  ;; There is no mechanism to force deduplication if candidates from cape-dict
-  ;; and cape-dabbrev are not exactly equal (equal string and equal text
+  ;; There is no mechanism to force deduplication if candidates from `cape-dict'
+  ;; and `cape-dabbrev' are not exactly equal (equal string and equal text
   ;; properties).
 
   (add-hook
@@ -2378,9 +2392,7 @@ The provider is nerd-icons."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  (cape-capf-super #'cape-dict #'cape-dabbrev)
-                  #'cape-file
-                  #'yasnippet-capf))))
+                  #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2388,7 +2400,8 @@ The provider is nerd-icons."
      (setq-local completion-at-point-functions
                  (list
                   #'cape-elisp-block
-                  (cape-capf-super #'cape-dict #'cape-dabbrev)
+                  #'cape-dict
+                  #'cape-dabbrev
                   #'cape-file
                   #'yasnippet-capf))))
 
@@ -2413,8 +2426,9 @@ The provider is nerd-icons."
                ;; names.
                #'cape-tex)
               (cape-capf-super #'citar-capf #'bibtex-capf)
-              (cape-capf-super #'cape-dict #'cape-dabbrev)
-              #'cape-file
+              #'cape-dict
+              #'cape-dabbrev
+              (cape-capf-inside-string #'cape-file)
               #'yasnippet-capf))))))))
 
   (when (eq sb/lsp-provider 'lsp-mode)
@@ -2435,8 +2449,9 @@ The provider is nerd-icons."
             ;; names.
             #'cape-tex)
            (cape-capf-super #'citar-capf #'bibtex-capf)
-           (cape-capf-super #'cape-dict #'cape-dabbrev)
-           #'cape-file
+           #'cape-dict
+           #'cape-dabbrev
+           (cape-capf-inside-string #'cape-file)
            #'yasnippet-capf))))))
 
   (with-eval-after-load "lsp-mode"
@@ -2473,9 +2488,10 @@ The provider is nerd-icons."
                         #'citre-completion-at-point
                         #'cape-keyword
                         #'cape-dabbrev))
-                      (cape-capf-inside-comment
-                       (cape-capf-super #'cape-dict #'cape-dabbrev))
-                      #'cape-file #'yasnippet-capf))))))
+                      (cape-capf-inside-comment #'cape-dict)
+                      #'cape-dabbrev
+                      (cape-capf-inside-string #'cape-file)
+                      #'yasnippet-capf))))))
 
   (with-eval-after-load "eglot"
     (dolist (mode
@@ -2511,9 +2527,10 @@ The provider is nerd-icons."
                         #'citre-completion-at-point
                         #'cape-keyword
                         #'cape-dabbrev))
-                      (cape-capf-inside-comment
-                       (cape-capf-super #'cape-dict #'cape-dabbrev))
-                      #'cape-file #'yasnippet-capf)))))))
+                      (cape-capf-inside-comment #'cape-dict)
+                      #'cape-dabbrev
+                      (cape-capf-inside-string #'cape-file)
+                      #'yasnippet-capf)))))))
 
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
@@ -2550,16 +2567,16 @@ The provider is nerd-icons."
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-modeline-diagnostics-enable nil)
   (lsp-lens-enable nil "Lenses are intrusive")
-  (lsp-enable-file-watchers nil "Avoid watcher warnings")
+  ;; (lsp-enable-file-watchers nil "Avoid watcher warnings")
   ;; I use `symbol-overlay' to include languages that do not have a language
   ;; server
   (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-snippet t)
+  ;; (lsp-enable-snippet t)
   ;; The workspace status icon on the terminal interface is misleading across
   ;; projects
   (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-suggest-server-download nil)
-  (lsp-inlay-hint-enable nil)
+  ;; (lsp-inlay-hint-enable nil)
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
   ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
@@ -3701,7 +3718,7 @@ used in `company-backends'."
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
-  :init (load-theme 'modus-vivendi t))
+  :init (load-theme 'modus-vivendi-tinted t))
 
 ;; (use-package catppuccin-theme
 ;;   :when (eq sb/theme 'catppuccin)
@@ -3723,12 +3740,25 @@ used in `company-backends'."
   :when (bound-and-true-p sb/enable-icons)
   :custom (nerd-icons-scale-factor 0.8))
 
-(use-package nerd-icons-corfu
-  :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+(use-package kind-icon
   :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'corfu))
   :after corfu
   :demand t
-  :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+  :custom
+  ;; Compute blended backgrounds correctly
+  (kind-icon-default-face 'corfu-default)
+  ;; Prefer smaller icons and a more compact popup
+  (kind-icon-default-style
+   '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+  (kind-icon-blend-background nil)
+  :config (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;; (use-package nerd-icons-corfu
+;;   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+;;   :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'corfu))
+;;   :after corfu
+;;   :demand t
+;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 ;; Icons in the minibuffer
 (use-package nerd-icons-completion
@@ -4268,7 +4298,7 @@ used in `company-backends'."
                   :vscode-json-language-server (:provideFormatter t)))
 
   (with-eval-after-load "eglot"
-    (setq
+    (setq-default
      completion-category-defaults nil
      completion-category-overrides '((eglot (styles orderless)) (eglot-capf (styles orderless))))))
 
@@ -4278,39 +4308,39 @@ used in `company-backends'."
   :demand t
   :config (eglot-booster-mode))
 
-;; (use-package eglot-java
-;;   :preface
-;;   (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
-;;     "Custom options that will be merged with any default settings."
-;;     '( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
-;;       :settings
-;;       (:java
-;;        (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
-;;        :configuration
-;;        (:runtimes
-;;         [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
-;;          (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
-;;        (:completion
-;;         (:guessMethodArguments t)
-;;         :format
-;;         (:enabled
-;;          t
-;;          :comments (:enabled t)
-;;          :onType (:enabled :json-false)
-;;          :tabSize 4
-;;          :insertSpaces t
-;;          :settings
-;;          (:url
-;;           "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")))
-;;        :extendedClientCapabilities (:classFileContentsSupport t))))
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   (java-mode
-;;    .
-;;    (lambda ()
-;;      (eglot-ensure)
-;;      (eglot-java-mode)))
-;;   :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
+(use-package eglot-java
+  :preface
+  (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
+    "Custom options that will be merged with any default settings."
+    '( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
+      :settings
+      (:java
+       (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
+       :configuration
+       (:runtimes
+        [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
+         (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
+       (:completion
+        (:guessMethodArguments t)
+        :format
+        (:enabled
+         t
+         :comments (:enabled t)
+         :onType (:enabled :json-false)
+         :tabSize 4
+         :insertSpaces t
+         :settings
+         (:url
+          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")))
+       :extendedClientCapabilities (:classFileContentsSupport t))))
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  (java-mode
+   .
+   (lambda ()
+     (eglot-ensure)
+     (eglot-java-mode)))
+  :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy"))
@@ -4586,7 +4616,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   (("C-M-+" . default-text-scale-increase)
 ;;    ("C-M--" . default-text-scale-decrease)))
 
-;; Show free bindings in current buffer
+;; ;; Show free bindings in current buffer
 ;; (use-package free-keys
 ;;   :commands free-keys)
 

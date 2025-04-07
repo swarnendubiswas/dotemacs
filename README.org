@@ -15,7 +15,7 @@ The Emacs version on Ubuntu is mostly outdated. There are a couple of PPAs [[[ht
 
 ** Build GNU Emacs
 
-Add the following repository only if you are using Ubuntu 20.04.
+Add the following repository to install GCC v10 only if you are using Ubuntu 20.04. We do not need the following step if a more recent version version of GCC is already installed.
 
 #+begin_src shell
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -242,6 +242,4 @@ There are a few choices to evaluate the performance of the configuration.
 
 ** Known Bugs
 
-- Flickering with =corfu-terminal-mode=
-- Enable =flycheck-mode= for Elisp configuration files
 - Disable prettifying symbols on auto-completion in ~LaTeX-mode~
