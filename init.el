@@ -834,12 +834,9 @@ The provider is nerd-icons."
    :includes (vertico-directory vertico-repeat vertico-quick vertico-indexed))
   :hook
   ((emacs-startup . vertico-mode)
-   ;; Tidy shadowed file names. That is, when using a command for selecting a
-   ;; file in the minibuffer, the following fixes the path so the selected path
-   ;; does not have prepended junk left behind. This works with
-   ;; `file-name-shadow-mode' enabled. When you are in a sub-directory and use,
-   ;; say, `find-file' to go to your home '~/' or root '/' directory, Vertico
-   ;; will clear the old path to keep only your current input.
+   ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
+   ;; use, say, `find-file' to go to your home '~/' or root '/' directory,
+   ;; Vertico will clear the old path to keep only your current input.
    (rfn-eshadow-update-overlay . vertico-directory-tidy)
    (minibuffer-setup . vertico-repeat-save))
   :bind
@@ -2353,16 +2350,24 @@ The provider is nerd-icons."
   ;; returning a result wins. Note that the list of buffer-local completion
   ;; functions takes precedence over the global list.
 
+  ;; File completion with `cape-file' is available in comments and string
+  ;; literals, but not in normal code.
+
+  ;; `cape-capf-super' works for static completion functions like
+  ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
+  ;; completions like `cape-file'.
+
   (add-hook
    'prog-mode-hook
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
                   (cape-capf-inside-code
-                   (cape-capf-super #'cape-keyword #'cape-dabbrev))
+                   (cape-capf-super
+                    #'cape-keyword (cape-capf-prefix-length #'cape-dabbrev 4)))
                   (cape-capf-inside-comment #'cape-dict)
                   #'cape-dabbrev
-                  (cape-capf-inside-string #'cape-file)
+                  #'cape-file
                   #'yasnippet-capf))))
 
   ;; Override CAPFS for specific major modes
@@ -2376,10 +2381,10 @@ The provider is nerd-icons."
                      (cape-capf-super
                       #'elisp-completion-at-point
                       #'cape-elisp-symbol
-                      #'cape-dabbrev))
+                      (cape-capf-prefix-length #'cape-dabbrev 4)))
                     (cape-capf-inside-comment #'cape-dict)
                     #'cape-dabbrev
-                    (cape-capf-inside-string #'cape-file)
+                    #'cape-file
                     #'yasnippet-capf)))))
 
   ;; https://github.com/minad/cape/discussions/130
@@ -2428,7 +2433,7 @@ The provider is nerd-icons."
               (cape-capf-super #'citar-capf #'bibtex-capf)
               #'cape-dict
               #'cape-dabbrev
-              (cape-capf-inside-string #'cape-file)
+              #'cape-file
               #'yasnippet-capf))))))))
 
   (when (eq sb/lsp-provider 'lsp-mode)
@@ -2451,7 +2456,7 @@ The provider is nerd-icons."
            (cape-capf-super #'citar-capf #'bibtex-capf)
            #'cape-dict
            #'cape-dabbrev
-           (cape-capf-inside-string #'cape-file)
+           #'cape-file
            #'yasnippet-capf))))))
 
   (with-eval-after-load "lsp-mode"
@@ -2487,10 +2492,10 @@ The provider is nerd-icons."
                         #'lsp-completion-at-point
                         #'citre-completion-at-point
                         #'cape-keyword
-                        #'cape-dabbrev))
+                        (cape-capf-prefix-length #'cape-dabbrev 4)))
                       (cape-capf-inside-comment #'cape-dict)
                       #'cape-dabbrev
-                      (cape-capf-inside-string #'cape-file)
+                      #'cape-file
                       #'yasnippet-capf))))))
 
   (with-eval-after-load "eglot"
@@ -2526,11 +2531,29 @@ The provider is nerd-icons."
                         #'eglot-completion-at-point
                         #'citre-completion-at-point
                         #'cape-keyword
-                        #'cape-dabbrev))
+                        (cape-capf-prefix-length #'cape-dabbrev 4)))
                       (cape-capf-inside-comment #'cape-dict)
                       #'cape-dabbrev
-                      (cape-capf-inside-string #'cape-file)
+                      #'cape-file
                       #'yasnippet-capf)))))))
+
+;; Prescient uses frecency (frequency + recency) for sorting. recently used
+;; commands should be sorted first. Only commands that have never been used
+;; before will be sorted by length. Vertico does its own sorting based on
+;; recency, and Corfu has corfu-history. Company has company-statistics. Ivy is
+;; not actively supported with prescient.
+
+(use-package prescient
+  :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+  :hook (emacs-startup . prescient-persist-mode)
+  :custom (prescient-sort-full-matches-first t)
+  :config
+  (with-eval-after-load "corfu"
+    (corfu-prescient-mode 1))
+  (with-eval-after-load "vertico"
+    (vertico-prescient-mode 1))
+  (with-eval-after-load "company"
+    (company-prescient-mode 1)))
 
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
