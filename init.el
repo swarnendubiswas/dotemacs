@@ -589,6 +589,7 @@ The provider is nerd-icons."
      "magit:.*"
      "*Org Help\\*"
      "*lsp-log*"
+     "*ltex-ls*"
      "*bash-ls.*"
      "*marksman.*"
      "*yaml-ls.*"
@@ -903,8 +904,8 @@ The provider is nerd-icons."
    ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
    ("C-c s r" . consult-ripgrep)
    ("C-c s h" . consult-isearch-history)
-   ("<f4>" . consult-line)
-   ("M-g l" . sb/consult-line-symbol-at-point)
+   ("<f4>" . sb/consult-line-symbol-at-point)
+   ("M-g l" . consult-line)
    ([remap multi-occur] . consult-multi-occur)
    ("M-s m" . consult-multi-occur)
    ([remap recentf-open-files] . consult-recent-file)
@@ -966,12 +967,12 @@ The provider is nerd-icons."
    consult-ripgrep
    consult-git-grep
    consult-grep
-   consult-recent-file
    consult-bookmark
    consult-xref
    consult-yank-from-kill-ring
    :preview-key
    '(:debounce 1.5 any)
+   consult-recent-file
    consult-theme
    consult-buffer
    :preview-key
@@ -986,6 +987,15 @@ The provider is nerd-icons."
    :initial
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end))))
+
+  ;; ;; Use thing at point with `consult-line'
+  ;; (consult-customize
+  ;;  consult-line
+  ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
+  ;; (defalias 'consult-line-thing-at-point 'consult-line)
+  ;; (consult-customize
+  ;;  consult-line-thing-at-point
+  ;;  :initial (thing-at-point 'symbol))
 
   (with-eval-after-load "latex"
     (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map)))
@@ -1165,8 +1175,19 @@ The provider is nerd-icons."
   :hook (emacs-startup . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
-(use-package goto-last-change
-  :bind ("C-x C-\\" . goto-last-change))
+;; (use-package goto-last-change
+;;   :bind ("C-x C-\\" . goto-last-change))
+
+(use-package dogears
+  :straight (:host github :repo "alphapapa/dogears.el")
+  :hook (find-file . dogears-mode)
+  :bind
+  (("M-g d" . dogears-go)
+   ("M-g M-b" . dogears-back)
+   ("M-g M-f" . dogears-forward)
+   ("M-g M-d" . dogears-list)
+   ("M-g M-D" . dogears-sidebar))
+  :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
 
 (use-package vundo
   :bind
@@ -2290,8 +2311,8 @@ The provider is nerd-icons."
   :bind
   (:map
    corfu-map
-   ("M-c" . corfu-quick-insert)
-   ("M-q" . corfu-quick-complete)
+   ("TAB" . corfu-quick-insert)
+   ("<tab>" . corfu-quick-insert)
    ("M-d" . corfu-info-documentation)
    ("M-l" . corfu-info-location)
    ("M-n" . corfu-popupinfo-scroll-up)
@@ -4063,17 +4084,6 @@ used in `company-backends'."
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
 
-(use-package dogears
-  :straight (:host github :repo "alphapapa/dogears.el")
-  :hook (find-file . dogears-mode)
-  :bind
-  (("M-g d" . dogears-go)
-   ("M-g M-b" . dogears-back)
-   ("M-g M-f" . dogears-forward)
-   ("M-g M-d" . dogears-list)
-   ("M-g M-D" . dogears-sidebar))
-  :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
-
 (use-package kill-file-path
   :straight (:host github :repo "chyla/kill-file-path")
   :commands
@@ -4617,6 +4627,8 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("C-<tab>" . sb/next-buffer))
 
+(unbind-key [mouse-1] minibuffer-inactive-mode-map)
+
 ;; ;; Clear any previous ESC settings
 ;; (global-unset-key (kbd "<escape>"))
 ;; (define-key key-translation-map [escape] nil)
@@ -4658,6 +4670,18 @@ or the major mode is not in `sb/skippable-modes'."
   ;; ;; Should be remapped to "M-DEL"
   ;; ("M-<backspace>" . backward-kill-word)
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
+
+(use-package nova
+  :straight (:host github :repo "thisisran/nova")
+  :config
+  (require 'nova-vertico)
+  (nova-vertico-mode 1)
+  (require 'nova-corfu)
+  (nova-corfu-mode 1)
+  (require 'nova-corfu-popupinfo)
+  (nova-corfu-popupinfo-mode 1)
+  (require 'nova-eldoc)
+  (nova-eldoc-mode 1))
 
 ;;; init.el ends here
 
