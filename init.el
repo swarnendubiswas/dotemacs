@@ -21,7 +21,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -68,7 +68,7 @@ The provider is nerd-icons."
 ;; Eglot also does not support semantic tokens. However, configuring Eglot is
 ;; simpler and I expect it to receive significant improvements now that it is in
 ;; the Emacs core.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -215,7 +215,7 @@ The provider is nerd-icons."
   (switch-to-buffer-preserve-window-point t)
   (view-read-only t "View mode for read-only buffers")
   (window-combination-resize t "Resize windows proportionally")
-  (max-mini-window-height 0.4)
+  (max-mini-window-height 0.3)
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
   ;; Always trigger an immediate resize of the child frame
   (x-gtk-resize-child-frames 'resize-mode)
@@ -501,6 +501,11 @@ The provider is nerd-icons."
   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
   :bind ("C-c C-o" . goto-address-at-point))
 
+(use-package subword
+  :straight (:type built-in)
+  :hook ((LaTeX-mode latex-mode prog-mode) . subword-mode)
+  :diminish)
+
 ;; (use-package winner
 ;;   :hook (emacs-startup . winner-mode)
 ;;   :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
@@ -759,7 +764,7 @@ The provider is nerd-icons."
   :config
   ;; Obsolete from Emacs 28+
   (unless (> emacs-major-version 27)
-    (setq dired-bind-jump t))
+    (setopt dired-bind-jump t))
 
   (setopt
    dired-omit-files
@@ -904,8 +909,8 @@ The provider is nerd-icons."
    ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
    ("C-c s r" . consult-ripgrep)
    ("C-c s h" . consult-isearch-history)
-   ("<f4>" . sb/consult-line-symbol-at-point)
-   ("M-g l" . consult-line)
+   ("<f4>" . consult-line)
+   ("M-g l" . sb/consult-line-symbol-at-point)
    ([remap multi-occur] . consult-multi-occur)
    ("M-s m" . consult-multi-occur)
    ([remap recentf-open-files] . consult-recent-file)
@@ -1075,8 +1080,9 @@ The provider is nerd-icons."
       (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
-      (setq
-       ispell-program-name "hunspell"
+      (setopt
+       ispell-program-name
+       "hunspell"
        ispell-local-dictionary-alist
        '(("en_US"
           "[[:alpha:]]"
@@ -1086,13 +1092,17 @@ The provider is nerd-icons."
           ("-d" "en_US")
           nil
           utf-8))
-       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
+       ispell-hunspell-dictionary-alist
+       ispell-local-dictionary-alist
+       ispell-hunspell-dict-paths-alist
+       `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
    ((executable-find "aspell")
     (progn
-      (setq
-       ispell-program-name "aspell"
-       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))))
+      (setopt
+       ispell-program-name
+       "aspell"
+       ispell-extra-args
+       '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))))
 
   ;; Skip regions in `org-mode'
   (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC"))
@@ -1206,31 +1216,11 @@ The provider is nerd-icons."
 (use-package iedit
   :bind* ("C-." . iedit-mode))
 
-(use-package hl-todo
-  :hook (emacs-startup . global-hl-todo-mode)
-  :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
-  :config
-  (setq
-   hl-todo-highlight-punctuation ":"
-   hl-todo-keyword-faces
-   (append
-    '(("LATER" . "#d0bf8f")
-      ("IMP" . "#7cb8bb")
-      ("ISSUE" . "#ff8c00")
-      ("DEBUG" . "#ff8c00")
-      ("TEST" . "tomato")
-      ("WARNING" . "#cc0000")
-      ("REFACTOR" . "#cc9393"))
-    hl-todo-keyword-faces)))
-
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
 ;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
 ;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
 (use-package bm
-  :init
-  (setq
-   bm-restore-repository-on-load t
-   bm-verbosity-level 0)
+  :init (setopt bm-restore-repository-on-load t bm-verbosity-level 0)
   :hook
   ((kill-emacs
     .
@@ -1321,13 +1311,16 @@ The provider is nerd-icons."
    ("C-d" . isearch-forward-symbol-at-point)))
 
 (with-eval-after-load "grep"
-  (setq
-   grep-command "grep --color -irHn "
-   grep-highlight-matches t
-   grep-scroll-output t)
+  (setopt
+   grep-command
+   "grep --color -irHn "
+   grep-highlight-matches
+   t
+   grep-scroll-output
+   t)
 
   (when (executable-find "rg")
-    (setq grep-program "rg")
+    (setopt grep-program "rg")
     (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
 
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
@@ -1452,11 +1445,12 @@ The provider is nerd-icons."
   (electric-pair-preserve-balance nil)
   (electric-pair-skip-self nil)
   :config
-  (setq electric-pair-inhibit-predicate
-        (lambda (c)
-          (if (char-equal c ?\")
-              t
-            (electric-pair-default-inhibit c))))
+  (setopt
+   electric-pair-inhibit-predicate
+   (lambda (c)
+     (if (char-equal c ?\")
+         t
+       (electric-pair-default-inhibit c))))
 
   (defvar sb/markdown-pairs '((?` . ?`)))
 
@@ -1506,7 +1500,7 @@ The provider is nerd-icons."
 
   ;; These themes have their own styles for displaying flycheck info.
   (when (eq sb/modeline-theme 'doom-modeline)
-    (setq flycheck-mode-line nil))
+    (setopt flycheck-mode-line nil))
 
   (setq-default
    flycheck-markdown-markdownlint-cli-config
@@ -1617,25 +1611,6 @@ The provider is nerd-icons."
         '("prettier" "--print-width" "80"))
   (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" 4 "-ci")))
 
-;; Provides indentation guide bars with tree-sitter support
-(use-package indent-bars
-  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-  :config
-  (when (and (executable-find "tree-sitter")
-             (fboundp 'treesit-available-p)
-             (treesit-available-p))
-    (setq
-     indent-bars-treesit-support t
-     indent-bars-treesit-ignore-blank-lines-types '("module")
-     indent-bars-treesit-scope
-     '((python
-        function_definition
-        class_definition
-        for_statement
-        if_statement
-        with_statement
-        while_statement)))))
-
 ;; Auto-format elisp code
 (use-package elisp-autofmt
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
@@ -1648,6 +1623,27 @@ The provider is nerd-icons."
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
   (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
+
+;; Provides indentation guide bars with tree-sitter support
+(use-package indent-bars
+  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :config
+  (when (and (executable-find "tree-sitter")
+             (fboundp 'treesit-available-p)
+             (treesit-available-p))
+    (setopt
+     indent-bars-treesit-support
+     t
+     indent-bars-treesit-ignore-blank-lines-types
+     '("module")
+     indent-bars-treesit-scope
+     '((python
+        function_definition
+        class_definition
+        for_statement
+        if_statement
+        with_statement
+        while_statement)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the
 ;; current buffer and presents suggestions for completion.
@@ -1714,18 +1710,18 @@ The provider is nerd-icons."
   ;; Show docstring description for completion candidates in commands like
   ;; `describe-function'.
   (when (boundp 'completions-detailed)
-    (setq completions-detailed t))
+    (setopt completions-detailed t))
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
 
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
-    (setq completion-styles '(orderless substring partial-completion basic)))
+    (setopt completion-styles '(orderless substring partial-completion basic)))
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
-  (setq completion-category-overrides
-        '((file (styles basic partial-completion)))))
+  (setopt
+   completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
@@ -2143,22 +2139,23 @@ The provider is nerd-icons."
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
-  (setq company-backends
-        '(company-files
-          (company-capf
-           :with company-dabbrev-code ;;company-ctags
-           company-yasnippet)
-          ;; If we have `company-dabbrev' first, then other matches from
-          ;; `company-ispell' will be ignored.
-          company-ispell
-          ;;company-dict
-          company-dabbrev)
-        company-transformers
-        '( ;company-sort-by-occurrence
-          delete-dups
-          company-sort-by-statistics
-          ;company-sort-prefer-same-case-prefix
-          ))
+  (setopt
+   company-backends
+   '(company-files
+     (company-capf
+      :with company-dabbrev-code ;;company-ctags
+      company-yasnippet)
+     ;; If we have `company-dabbrev' first, then other matches from
+     ;; `company-ispell' will be ignored.
+     company-ispell
+     ;;company-dict
+     company-dabbrev)
+   company-transformers
+   '( ;company-sort-by-occurrence
+     delete-dups
+     company-sort-by-statistics
+     ;company-sort-prefer-same-case-prefix
+     ))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -2174,25 +2171,26 @@ The provider is nerd-icons."
       ;; `company-capf' with Texlab does not pass to later backends, so it makes
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
-      (setq company-backends
-            '((company-files
-               company-reftex-citations
-               company-auctex-bibs
-               company-reftex-labels
-               company-auctex-labels
-               company-auctex-symbols
-               company-auctex-environments
-               company-auctex-macros
-               company-latex-commands
-               ;; Math latex tags
-               company-math-symbols-latex
-               ;; Math Unicode symbols and sub(super)scripts
-               company-math-symbols-unicode
-               company-yasnippet
-               ;; company-ctags
-               ;; company-dict
-               company-ispell
-               company-dabbrev))))
+      (setopt
+       company-backends
+       '((company-files
+          company-reftex-citations
+          company-auctex-bibs
+          company-reftex-labels
+          company-auctex-labels
+          company-auctex-symbols
+          company-auctex-environments
+          company-auctex-macros
+          company-latex-commands
+          ;; Math latex tags
+          company-math-symbols-latex
+          ;; Math Unicode symbols and sub(super)scripts
+          company-math-symbols-unicode
+          company-yasnippet
+          ;; company-ctags
+          ;; company-dict
+          company-ispell
+          company-dabbrev))))
 
     (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
       (add-hook mode (lambda () (sb/company-latex-mode)))))
@@ -2229,14 +2227,15 @@ The provider is nerd-icons."
   (progn
     (defun sb/company-yaml-mode ()
       (make-local-variable 'company-backends)
-      (setq company-backends
-            '(company-files
-              (company-capf
-               :with
-               company-dabbrev-code ; Useful for variable names
-               company-yasnippet)
-              ;; company-dict
-              company-ispell company-dabbrev)))
+      (setopt
+       company-backends
+       '(company-files
+         (company-capf
+          :with
+          company-dabbrev-code ; Useful for variable names
+          company-yasnippet)
+         ;; company-dict
+         company-ispell company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode (lambda () (sb/company-yaml-mode)))))
@@ -2324,9 +2323,6 @@ The provider is nerd-icons."
   (corfu-auto-prefix 3)
   (corfu-on-exact-match nil) ; Do not auto expand snippets
   :config
-  (with-eval-after-load "savehist"
-    (add-to-list 'savehist-additional-variables 'corfu-history))
-
   ;; Disable `orderless' completion for Corfu
   (add-hook
    'corfu-mode-hook
@@ -2693,7 +2689,7 @@ The provider is nerd-icons."
   (lsp-pylsp-plugins-mypy-enabled t)
   :config
   (when (display-graphic-p)
-    (setq lsp-modeline-code-actions-segments '(count icon name)))
+    (setopt lsp-modeline-code-actions-segments '(count icon name)))
   ;; (dolist (ignore-dirs
   ;;          '("/build\\'"
   ;;            "/\\.metadata\\'"
@@ -2785,7 +2781,7 @@ The provider is nerd-icons."
 (use-package lsp-ltex-plus
   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
   :when (eq sb/lsp-provider 'lsp-mode)
-  :init (setq lsp-ltex-plus-version "18.4.0")
+  :init (setopt lsp-ltex-plus-version "18.4.0")
   :hook
   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
    .
@@ -2816,10 +2812,21 @@ The provider is nerd-icons."
   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
   )
 
-(use-package subword
-  :straight (:type built-in)
-  :hook ((LaTeX-mode latex-mode prog-mode) . subword-mode)
-  :diminish)
+(use-package hl-todo
+  :hook (emacs-startup . global-hl-todo-mode)
+  :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
+  :config
+  (setopt
+   hl-todo-highlight-punctuation ":" hl-todo-keyword-faces
+   (append
+    '(("LATER" . "#d0bf8f")
+      ("IMP" . "#7cb8bb")
+      ("ISSUE" . "#ff8c00")
+      ("DEBUG" . "#ff8c00")
+      ("TEST" . "tomato")
+      ("WARNING" . "#cc0000")
+      ("REFACTOR" . "#cc9393"))
+    hl-todo-keyword-faces)))
 
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
@@ -2872,13 +2879,6 @@ The provider is nerd-icons."
      'company-capf
      'company-abort))
   :diminish)
-
-;; (use-package eldoc-box
-;;   :when (display-graphic-p)
-;;   :commands eldoc-box-help-at-point
-;;   :hook (prog-mode . eldoc-box-hover-mode)
-;;   :custom (eldoc-box-clear-with-C-g t)
-;;   :diminish)
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
@@ -2962,31 +2962,33 @@ The provider is nerd-icons."
      (mapcar #'car treesit-language-source-alist)))
 
   (when (treesit-available-p)
-    (setq major-mode-remap-alist
-          '((sh-mode . bash-ts-mode)
-            (c-mode . c-ts-mode)
-            (c++-mode . c++-ts-mode)
-            (c-or-c++-mode . c-or-c++-ts-mode)
-            (cmake-mode . cmake-ts-mode)
-            (css-mode . css-ts-mode)
-            (dockerfile-mode . dockerfile-ts-mode)
-            (html-mode . html-ts-mode)
-            (java-mode . java-ts-mode)
-            (json-mode . json-ts-mode)
-            (js2-mode . js-ts-mode)
-            (kdl-mode . kdl-ts-mode)
-            (python-mode . python-ts-mode)
-            (toml-mode . toml-ts-mode)
-            (conf-toml-mode . toml-ts-mode)
-            (tsx-mode . tsx-ts-mode)
-            (typescript-mode . typescript-ts-mode)
-            (yaml-mode . yaml-ts-mode)))))
+    (setopt
+     major-mode-remap-alist
+     '((sh-mode . bash-ts-mode)
+       (c-mode . c-ts-mode)
+       (c++-mode . c++-ts-mode)
+       (c-or-c++-mode . c-or-c++-ts-mode)
+       (cmake-mode . cmake-ts-mode)
+       (css-mode . css-ts-mode)
+       (dockerfile-mode . dockerfile-ts-mode)
+       (html-mode . html-ts-mode)
+       (java-mode . java-ts-mode)
+       (json-mode . json-ts-mode)
+       (js2-mode . js-ts-mode)
+       (kdl-mode . kdl-ts-mode)
+       (python-mode . python-ts-mode)
+       (toml-mode . toml-ts-mode)
+       (conf-toml-mode . toml-ts-mode)
+       (tsx-mode . tsx-ts-mode)
+       (typescript-mode . typescript-ts-mode)
+       (yaml-mode . yaml-ts-mode)))))
 
-;; (use-package treesit-auto
-;;   :after treesit
-;;   :config
-;;   (global-treesit-auto-mode 1)
-;;   (treesit-auto-add-to-auto-mode-alist 'all))
+(use-package treesit-auto
+  :after treesit
+  :demand t
+  :config
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load "c++-ts-mode"
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -3110,10 +3112,10 @@ The provider is nerd-icons."
   (pyvenv-post-activate-hooks
    (list
     (lambda ()
-      (setq python-shell-interpreter
-            (concat pyvenv-virtual-env "bin/python")))))
+      (setopt
+       python-shell-interpreter (concat pyvenv-virtual-env "bin/python")))))
   (pyvenv-post-deactivate-hooks
-   (list (lambda () (setq python-shell-interpreter "python3")))))
+   (list (lambda () (setopt python-shell-interpreter "python3")))))
 
 (use-package cperl-mode
   :straight (:type built-in)
@@ -3433,7 +3435,7 @@ The provider is nerd-icons."
   (add-to-list 'org-latex-packages-alist '("" "color"))
   (add-to-list 'org-latex-packages-alist '("" "minted"))
 
-  (setq
+  (setopt
    org-latex-pdf-process
    '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
 
@@ -3489,11 +3491,12 @@ The provider is nerd-icons."
 
 ;; Without auctex
 (with-eval-after-load "tex-mode"
-  (setq tex-command "pdflatex"))
+  (setopt tex-command "pdflatex"))
 
 ;; (use-package lsp-latex
+;;   :when (eq sb/lsp-provider 'lsp-mode)
 ;;   :hook
-;;   ((latex-mode LaTeX-mode bibtex-mode)
+;;   ((LaTeX-mode bibtex-mode)
 ;;    .
 ;;    (lambda ()
 ;;      (require 'lsp-latex)
@@ -3766,32 +3769,32 @@ used in `company-backends'."
 
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
-;; (use-package doom-themes
-;;   :when (eq sb/theme 'doom-nord)
-;;   :init (load-theme 'doom-nord t)
-;;   :config
-;;   ;; Corrects (and improves) org-mode's native fontification.
-;;   (doom-themes-org-config))
+(use-package doom-themes
+  :when (eq sb/theme 'doom-nord)
+  :init (load-theme 'doom-nord t)
+  :config
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi-tinted t))
 
-;; (use-package catppuccin-theme
-;;   :when (eq sb/theme 'catppuccin)
-;;   :init (load-theme 'catppuccin t)
-;;   :custom (catppuccin-flavor 'mocha)
-;;   :config
-;;   (custom-set-faces
-;;    `(diff-hl-change
-;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
-;;   (custom-set-faces
-;;    `(diff-hl-delete
-;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
-;;   (custom-set-faces
-;;    `(diff-hl-insert
-;;      ((t
-;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
+(use-package catppuccin-theme
+  :when (eq sb/theme 'catppuccin)
+  :init (load-theme 'catppuccin t)
+  :custom (catppuccin-flavor 'mocha)
+  :config
+  (custom-set-faces
+   `(diff-hl-change
+     ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
+  (custom-set-faces
+   `(diff-hl-delete
+     ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
+  (custom-set-faces
+   `(diff-hl-insert
+     ((t
+       (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
 (use-package nerd-icons
   :when (bound-and-true-p sb/enable-icons)
@@ -3937,19 +3940,19 @@ used in `company-backends'."
 
 (use-package kdl-ts-mode
   :straight (:host github :repo "dataphract/kdl-ts-mode")
-  :mode ("\\.kdl\\'" . kdl-ts-mode)
-  :hook (kdl-ts-mode . kdl-format-on-save-mode)
-  :config
-  (use-package reformatter
-    :after kdl-ts-mode
-    :demand t
-    :config
-    (reformatter-define
-     kdl-format
-     :program kdlfmt
-     :args '("format")
-     :lighter " KDLFMT"
-     :group 'reformatter)))
+  :mode ("\\.kdl\\'" . kdl-ts-mode))
+
+;; (use-package reformatter
+;;   :after kdl-ts-mode
+;;   :demand t
+;;   :config
+;;   (reformatter-define
+;;    kdl-format
+;;    :program "kdlfmt"
+;;    :args '("format")
+;;    :lighter " KDLFMT"
+;;    :group 'reformatter)
+;;   (add-hook 'kdl-ts-mode-hook #'kdl-format-on-save-mode))
 
 ;; Fontify ssh files
 (use-package ssh-config-mode
@@ -4140,9 +4143,9 @@ used in `company-backends'."
      (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
 
   ;; (dolist (mode '(yaml-mode yaml-ts-mode))
-  ;;   (setq eglot-server-programs (assq-delete-all mode eglot-server-programs)))
+  ;;   (setopt eglot-server-programs (assq-delete-all mode eglot-server-programs)))
 
-  (setq eglot-server-programs nil)
+  (setopt eglot-server-programs nil)
   (add-to-list
    'eglot-server-programs
    '((org-mode markdown-mode text-mode) . ("ltex-ls-plus")))
@@ -4237,8 +4240,9 @@ used in `company-backends'."
                          user-emacs-directory))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq eglot-stay-out-of
-        '(flymake yasnippet company eldoc eldoc-documentation-strategy))
+  (setopt
+   eglot-stay-out-of
+   '(flymake yasnippet company eldoc eldoc-documentation-strategy))
 
   ;; Translation between JSON and Eglot:
   ;; | true  | t           |
@@ -4404,29 +4408,6 @@ used in `company-backends'."
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4)
   :config (eglot-inactive-regions-mode 1))
-
-;; (use-package eglot-ltex-plus
-;;   :straight (:host github :repo "emacs-languagetool/eglot-ltex-plus")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :init
-;;   (setq eglot-ltex-plus-server-path
-;;         (expand-file-name "ltex-ls-plus-18.4.0" user-emacs-directory))
-;;   :hook
-;;   ((text-mode LaTeX-mode org-mode markdown-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'eglot-ltex-plus)
-;;      (eglot-ensure)))
-;;   :custom (eglot-ltex-plus-active-modes '(text-mode LaTex-mode org-mode markdown-mode))
-;;   ;; :config
-;;   ;; (setq eglot-server-programs (delete (car eglot-server-programs) eglot-server-programs))
-;;   ;; (add-to-list
-;;   ;;   'eglot-server-programs
-;;   ;;   `(,eglot-languagetool-active-modes . ,(eglot-languagetool--server-command))
-;;   ;;   'append)
-;;   ;; (add-to-list 'eglot-server-programs (pop eglot-server-programs) 'append)
-;;   ;;   `((:ltex ((:language "en-US") (:disabledRules (:en-US ["MORFOLOGIK_RULE_EN_US"]))))))
-;;   )
 
 ;; Highlight the cursor position after the window scrolls
 (use-package beacon
@@ -4651,9 +4632,9 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   (("C-M-+" . default-text-scale-increase)
 ;;    ("C-M--" . default-text-scale-decrease)))
 
-;; ;; Show free bindings in current buffer
-;; (use-package free-keys
-;;   :commands free-keys)
+;; Show free bindings in current buffer
+(use-package free-keys
+  :commands free-keys)
 
 ;; Displays available keybindings following the currently entered incomplete
 ;; command/prefix in a popup.
@@ -4670,18 +4651,6 @@ or the major mode is not in `sb/skippable-modes'."
   ;; ;; Should be remapped to "M-DEL"
   ;; ("M-<backspace>" . backward-kill-word)
   :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
-
-(use-package nova
-  :straight (:host github :repo "thisisran/nova")
-  :config
-  (require 'nova-vertico)
-  (nova-vertico-mode 1)
-  (require 'nova-corfu)
-  (nova-corfu-mode 1)
-  (require 'nova-corfu-popupinfo)
-  (nova-corfu-popupinfo-mode 1)
-  (require 'nova-eldoc)
-  (nova-eldoc-mode 1))
 
 ;;; init.el ends here
 
