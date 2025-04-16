@@ -560,17 +560,17 @@
 
  (LaTeX-mode
   .
-  ((TeX-master . (expand-file-name "./paper.tex"))
+  ( ;; (TeX-master . (expand-file-name "./paper.tex"))
    (eval .
-         (progn
-           (let ((bibpath (expand-file-name "./references/references.bib"))
-                 (projectroot (expand-file-name "./")))
-             (setq-local
-              reftex-default-bibliography bibpath
-              company-bibtex-bibliography bibpath
-              bibtex-completion-bibliography bibpath
-              bibtex-capf-bibliography bibpath
-              citar-bibliography bibpath))))
+         (let ((bibpath (expand-file-name "./references/references.bib"))
+               (projectroot (expand-file-name "./")))
+           (setq-local
+            reftex-default-bibliography bibpath
+            company-bibtex-bibliography bibpath
+            bibtex-completion-bibliography bibpath
+            bibtex-capf-bibliography bibpath
+            citar-bibliography bibpath)))
+
    ;; (eval .
    ;;       (add-hook
    ;;        'lsp-managed-mode-hook
