@@ -65,7 +65,7 @@ The provider is nerd-icons."
 
 ;; Eglot does not allow multiple servers to connect to a major mode and also
 ;; does not support semantic tokens.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -1374,9 +1374,8 @@ The provider is nerd-icons."
      (git-commit-turn-on-auto-fill)))
   :bind
   (("C-x g" . magit-status)
-   ("C-c M-g" . magit-file-dispatch)
    ;; ("C-x M-g" . magit-dispatch)
-   )
+   ("C-c M-g" . magit-file-dispatch))
   :custom
   ;; Open the status buffer in a full frame
   (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
@@ -1395,8 +1394,8 @@ The provider is nerd-icons."
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-;; Diff-hl looks nicer than git-gutter, and is based on `vc'.
-;; Fringe is unavailable in TTY.
+;; Diff-hl looks nicer than git-gutter, and is based on `vc'. Fringe is
+;; unavailable in TTY.
 (use-package diff-hl
   :hook
   ((find-file . global-diff-hl-mode)
@@ -1496,8 +1495,8 @@ The provider is nerd-icons."
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Chain flycheck checkers with lsp, using per-project directory local
-  ;; variables. https://github.com/flycheck/flycheck/issues/1762
+  ;; Chain checkers with lsp, using per-project directory local variables.
+  ;; https://github.com/flycheck/flycheck/issues/1762
   (defvar-local sb/flycheck-local-checkers nil)
   (defun sb/flycheck-checker-get (fn checker property)
     (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
@@ -2573,6 +2572,7 @@ The provider is nerd-icons."
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
 ;; servers simultaneously and provides helpers to install and uninstall servers.
 (use-package lsp-mode
+  :when (eq sb/lsp-provider 'lsp-mode)
   :bind
   (:map
    lsp-command-map
@@ -2719,6 +2719,7 @@ The provider is nerd-icons."
   :diminish)
 
 (use-package lsp-ui
+  :when (eq sb/lsp-provider 'lsp-mode)
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
@@ -2765,7 +2766,7 @@ The provider is nerd-icons."
 (use-package lsp-ltex-plus
   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
   :when (eq sb/lsp-provider 'lsp-mode)
-  :init (setopt lsp-ltex-plus-version "18.4.0")
+  :init (setopt lsp-ltex-plus-version "18.5.1")
   :hook
   ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
    .
@@ -3030,8 +3031,8 @@ The provider is nerd-icons."
   :mode ("\\.cu\\'" . c++-ts-mode)
   :mode ("\\.cuh\\'" . c++-ts-mode))
 
-;; (use-package opencl-c-mode
-;;   :mode "\\.cl\\'")
+(use-package opencl-c-mode
+  :mode "\\.cl\\'")
 
 (use-package cmake-mode
   :when (executable-find "cmake")
@@ -3176,10 +3177,6 @@ The provider is nerd-icons."
    (lambda ()
      (when buffer-file-name
        (add-hook 'after-save-hook #'check-parens nil t)))))
-
-;; (use-package paren-face
-;;   :straight (:host github :repo "tarsius/paren-face")
-;;   :hook (emacs-startup . global-paren-face-mode))
 
 (use-package ini-mode
   :commands (ini-mode))
@@ -4096,6 +4093,7 @@ used in `company-backends'."
 (use-package eglot
   :straight (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
+  :hook (eglot-managed-mode . eglot-inlay-hints-mode)
   :bind
   (("C-c l l" . eglot)
    ("C-c l q" . eglot-shutdown)
@@ -4106,7 +4104,9 @@ used in `company-backends'."
    ("C-c l r" . eglot-rename)
    ("C-c l f" . eglot-format)
    ("C-c l F" . eglot-format-buffer)
-   ("C-c l x" . eglot-code-actions))
+   ("C-c l x" . eglot-code-actions)
+   ("C-c l k" . eglot-code-action-quickfix)
+   ("C-c l o" . eglot-code-action-organize-imports))
   :hook
   ((dockerfile-ts-mode
     html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
@@ -4116,6 +4116,7 @@ used in `company-backends'."
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
+  (eglot-events-buffer-config '(:size 0 :format full))
   (fset #'jsonrpc--log-event #'ignore)
   ;; (eglot-ignored-server-capabilities
   ;;  '(:codeLensProvider
@@ -4128,8 +4129,9 @@ used in `company-backends'."
   ;;    :documentHighlightProvider
   ;;    ))
   (eglot-report-progress nil)
-  (eglot-mode-line-format
-   '(eglot-mode-line-error eglot-mode-line-action-suggestion))
+  (eglot-advertise-cancellation t)
+  (eglot-mode-line-format '(eglot-mode-line-action-suggestion))
+  (eglot-code-action-indications '(nearby mode-line margin))
   :config
   ;; Show all of the available eldoc information when we want it. This way
   ;; Flymake errors don't just get clobbered by docstrings.
@@ -4377,7 +4379,7 @@ used in `company-backends'."
 (use-package consult-eglot
   :when (eq sb/lsp-provider 'eglot)
   :after (consult eglot)
-  :commands consult-eglot-symbols)
+  :bind ("C-c l g" . consult-eglot-symbols))
 
 (use-package flycheck-eglot
   :when (eq sb/lsp-provider 'eglot)
