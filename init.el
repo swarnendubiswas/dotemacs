@@ -2319,8 +2319,7 @@ The provider is nerd-icons."
                  company-ispell
                  company-dabbrev))))
 
-    (dolist (mode '(latex-mode-hook LaTeX-mode-hook))
-      (add-hook mode (lambda () (sb/company-latex-mode)))))
+    (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
   (progn
     (defun sb/company-org-mode ()
@@ -2332,7 +2331,7 @@ The provider is nerd-icons."
          ;; company-dict
          company-dabbrev)))
 
-    (add-hook 'org-mode-hook (lambda () (sb/company-org-mode))))
+    (add-hook 'org-mode-hook #'sb/company-org-mode))
 
   (progn
     (defun sb/company-text-mode ()
@@ -2364,7 +2363,7 @@ The provider is nerd-icons."
                 company-ispell company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
-      (add-hook mode (lambda () (sb/company-yaml-mode)))))
+      (add-hook mode #'sb/company-yaml-mode)))
 
   (progn
     (defun sb/company-html-mode ()
@@ -2376,7 +2375,7 @@ The provider is nerd-icons."
          company-ispell company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
-      (add-hook hook (lambda () (sb/company-html-mode)))))
+      (add-hook hook #'sb/company-html-mode)))
 
   (progn
     (defun sb/company-prog-mode ()
@@ -2412,7 +2411,7 @@ The provider is nerd-icons."
                     company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-      (add-hook hook (lambda () (sb/company-elisp-mode))))))
+      (add-hook hook #'sb/company-elisp-mode))))
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
