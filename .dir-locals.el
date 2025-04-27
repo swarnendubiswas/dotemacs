@@ -69,13 +69,13 @@
                  (file-name-nondirectory (buffer-name)) "setup_environment"))
            (sh-mode)))))
 
- (dired-mode
-  .
-  ((dired-omit-mode . t)
-   (dired-omit-extensions . (".out" ".vect" ".o"))
-   (dired-omit-files
-    .
-    "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|eln-cache|eglot-java-eclipse-jdt-cache|elisp-autofmt-cache|tree-sitter|share|elpa|\\.directory\\'")))
+ ;; (dired-mode
+ ;;  .
+ ;;  ((dired-omit-mode . t)
+ ;;   (dired-omit-extensions . (".out" ".vect" ".o"))
+ ;;   (dired-omit-files
+ ;;    .
+ ;;    "\\`[.]?#\\|\\`[.][.]?\\'\\|\\.git\\'|\\.cache\\'|eln-cache|eglot-java-eclipse-jdt-cache|elisp-autofmt-cache|tree-sitter|share|elpa|\\.directory\\'")))
 
  (emacs-lisp-mode
   .

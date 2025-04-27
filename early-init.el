@@ -15,7 +15,7 @@
 (defconst sb/emacs-1GB (* 1 1024 1024 1024))
 
 ;; Defer GC during startup
-(setq
+(setopt
  gc-cons-percentage 0.6 ; Portion of heap used for allocation
  ;; Temporarily increase GC threshold during startup
  gc-cons-threshold most-positive-fixnum)
@@ -25,14 +25,14 @@
 ;; this.
 (defun sb/defer-gc ()
   "Defer garbage collection during execution."
-  (setq gc-cons-threshold sb/emacs-64MB))
+  (setopt gc-cons-threshold sb/emacs-64MB))
 
 ;; `lsp-mode' suggests increasing the limit permanently to a reasonable value.
 ;; There will be large pause times with large `gc-cons-threshold' values
 ;; whenever GC eventually happens.
 (defun sb/restore-gc ()
   "Restore garbage collection threshold during execution."
-  (setq
+  (setopt
    gc-cons-threshold sb/emacs-4MB
    gc-cons-percentage 0.3))
 
@@ -47,7 +47,7 @@
  ;; Disable loading of `default.el' at startup
  inhibit-default-init t)
 
-(setq
+(setopt
  ;; Do not resize the frame to preserve the number of columns or lines being
  ;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
  ;; fringes, or scroll bars.
@@ -93,19 +93,23 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (let ((file-name-handler-alist-orig file-name-handler-alist))
-  (setq file-name-handler-alist nil)
+  (setopt file-name-handler-alist nil)
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (setq file-name-handler-alist file-name-handler-alist-orig)
+              (setopt file-name-handler-alist file-name-handler-alist-orig)
               (garbage-collect))
             t))
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
 ;; is also useful if we prefer "straight.el" over "package.el".
-(setq package-enable-at-startup nil)
+(setopt package-enable-at-startup nil)
+
+(setopt
+ warning-minimum-level :error
+ warning-suppress-types '((lexical-binding)))
 
 (when (featurep 'native-compile)
-  (setq
+  (setopt
    native-comp-always-compile t
    ;; Silence compiler warnings as they can be pretty disruptive
    native-comp-async-report-warnings-errors nil

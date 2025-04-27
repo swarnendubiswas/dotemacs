@@ -21,7 +21,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
-(defcustom sb/theme 'catppuccin
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -65,7 +65,7 @@ The provider is nerd-icons."
 
 ;; Eglot does not allow multiple servers to connect to a major mode and also
 ;; does not support semantic tokens.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -106,8 +106,6 @@ The provider is nerd-icons."
 ;; These variables need to be set before loading `use-package'.
 (setopt
  use-package-enable-imenu-support t
- ;; Show everything
- use-package-minimum-reported-time 0
  use-package-expand-minimally t
  use-package-always-defer t)
 (straight-use-package '(use-package))
@@ -116,6 +114,8 @@ The provider is nerd-icons."
   ;; Use "M-x use-package-report" to see results
   (setopt
    use-package-compute-statistics t
+   ;; Show everything
+   use-package-minimum-reported-time 0
    use-package-verbose t))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
@@ -168,7 +168,6 @@ The provider is nerd-icons."
      (auto-encryption-mode -1)))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
-  (warning-minimum-level :error)
   (auto-save-no-message t "Do not print frequent autosave messages")
   ;; Disable autosaving based on number of characters typed
   (auto-save-interval 0)
@@ -244,6 +243,11 @@ The provider is nerd-icons."
   ;; Accelerate scrolling operations when non-nil. Only those portions of the
   ;; buffer which are actually going to be displayed get fontified.
   (fast-but-imprecise-scrolling t)
+  (auto-window-vscroll nil)
+  (hscroll-margin 2)
+  (hscroll-step 1)
+  (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+  (mouse-wheel-scroll-amount-horizontal 1)
   (fringes-outside-margins t)
   :config
   (dolist (exts
@@ -494,7 +498,7 @@ The provider is nerd-icons."
 
 (use-package subword
   :straight (:type built-in)
-  :hook ((LaTeX-mode latex-mode prog-mode) . subword-mode)
+  :hook ((LaTeX-mode prog-mode) . subword-mode)
   :diminish)
 
 ;; (use-package winner
@@ -626,20 +630,17 @@ The provider is nerd-icons."
    :around #'sb/inhibit-message-call-orig-fun))
 
 ;; `pixel-scroll-mode' uses line-by-line scrolling.
-;; (use-package pixel-scroll
-;;   :custom
-;;   (pixel-scroll-precision-use-momentum nil)
-;;   (pixel-scroll-precision-interpolate-page t)
-;;   (auto-window-vscroll nil)
-;;   (hscroll-margin 2)
-;;   (hscroll-step 1)
-;;   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
-;;   (mouse-wheel-scroll-amount-horizontal 1)
-;;   :config
-;;   (when (fboundp 'pixel-scroll-mode)
-;;     (pixel-scroll-mode 1))
-;;   (when (fboundp 'pixel-scroll-precision-mode)
-;;     (pixel-scroll-precision-mode 1)))
+(use-package pixel-scroll
+  :straight (:type built-in)
+  :custom
+  (pixel-scroll-precision-use-momentum nil)
+  (pixel-scroll-precision-interpolate-page t)
+  :config
+  (cond
+   ((fboundp 'pixel-scroll-precision-mode)
+    (pixel-scroll-precision-mode 1))
+   ((fboundp 'pixel-scroll-mode)
+    (pixel-scroll-mode 1))))
 
 ;; Show temporary buffers as a popup window, and close them with "C-g"
 (use-package popwin
@@ -816,7 +817,7 @@ The provider is nerd-icons."
   ;; Start `project-find-file' by default
   (project-switch-commands 'project-find-file))
 
-;; Allows identifying custom projects with a ".project" file
+;; Allows identifying custom projects with a ".project" file (e.g., ~/Dropbox).
 (use-package project-x
   :straight (:host github :repo "karthink/project-x")
   :after project
@@ -857,8 +858,25 @@ The provider is nerd-icons."
       (set-face-attribute 'vertico-current nil
                           :background "#676767"
                           :foreground "#FFFFFF")))
-  (with-eval-after-load "savehist"
-    (add-to-list 'savehist-additional-variables 'vertico-repeat-history)))
+
+  ;; LATER: This is no longer necessary
+  ;; (with-eval-after-load "savehist"
+  ;;   (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
+
+  ;; Customize the display of the current candidate in the completion list. This
+  ;; will prefix the current candidate with “» ” to make it stand out.
+  ;; Reference:
+  ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
+  (advice-add
+   #'vertico--format-candidate
+   :around
+   (lambda (orig cand prefix suffix index _start)
+     (setq cand (funcall orig cand prefix suffix index _start))
+     (concat
+      (if (= vertico--index index)
+          (propertize "» " 'face '(:foreground "#80adf0" :weight bold))
+        "  ")
+      cand))))
 
 (use-package consult
   :preface
@@ -927,7 +945,6 @@ The provider is nerd-icons."
      "\\*Echo Area"
      "\\*Minibuf"
      "\\*Backtrace"
-     "\\*Warning"
      "\\*Help*"
      "Flymake log"
      "\\*Flycheck"
@@ -944,18 +961,20 @@ The provider is nerd-icons."
      "\\*Ediff Registry\\*"
      "COMMIT_EDITMSG"
      "TAGS"
-     "\\*lsp-*"
+     "\\*vc"
+     "\\*tramp"
+     "\\*citre*"
      "\\*EGLOT"
      "\\*pylsp"
-     "\\*vc"
-     "\\*citre*"
      "\\*ltex-ls"
      "\\*texlab"
-     "\\*tramp"
      "\\*bash-ls*"
      "\\*json-ls*"
      "\\*yaml-ls*"
-     "\\*shfmt*"))
+     "\\*shfmt*"
+     "\\*clangd*"
+     "\\*semgrep*"
+     "\\*autotools*"))
   :config
   (consult-customize
    consult-line
@@ -1032,18 +1051,18 @@ The provider is nerd-icons."
 
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
-;; (use-package marginalia
-;;   :after vertico
-;;   :init (marginalia-mode 1)
-;;   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
-;;   :config
-;;   (setq marginalia-annotator-registry
-;;         (assq-delete-all 'file marginalia-annotator-registry))
-;;   (add-to-list
-;;    'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
-;;   (add-to-list
-;;    'marginalia-annotator-registry
-;;    '(project-buffer marginalia-annotate-project-buffer)))
+(use-package marginalia
+  :after vertico
+  :init (marginalia-mode 1)
+  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+  :config
+  (setq marginalia-annotator-registry
+        (assq-delete-all 'file marginalia-annotator-registry))
+  (add-to-list
+   'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
+  (add-to-list
+   'marginalia-annotator-registry
+   '(project-buffer marginalia-annotate-project-buffer)))
 
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
@@ -1801,212 +1820,341 @@ The provider is nerd-icons."
      company-pseudo-tooltip-frontend
      ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend))
-  (company-format-margin-function (bound-and-true-p sb/enable-icons)))
+  :config
+  (unless (bound-and-true-p sb/enable-icons)
+    (setopt company-format-margin-function nil)))
 
-;; (use-package kind-icon
-;;   :when (bound-and-true-p sb/enable-icons)
-;;   :demand t
-;;   :custom
-;;   ;; Compute blended backgrounds correctly
-;;   (kind-icon-default-face 'corfu-default)
-;;   ;; Prefer smaller icons and a more compact popup
-;;   ;; (kind-icon-default-style
-;;   ;;  '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
-;;   (kind-icon-blend-background nil)
-;;   :config
-;;   (when (eq sb/in-buffer-completion 'corfu)
-;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+(use-package nerd-icons
+  :when (bound-and-true-p sb/enable-icons)
+  :demand t
+  :custom (nerd-icons-scale-factor 0.8))
 
-;;   (when (eq sb/in-buffer-completion 'company)
-;;     (require 'svg-lib)
-;;     (add-to-list
-;;      'svg-lib-icon-collections
-;;      '("nerd-fonts-codicons"
-;;        .
-;;        "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
+;; Can be used for both Corfu and Company.
+(use-package kind-icon
+  :when (bound-and-true-p sb/enable-icons)
+  :demand t
+  :custom (kind-icon-blend-background nil)
+  ;; Prefer smaller icons and a more compact popup
+  (kind-icon-default-style
+   '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+  :config
+  (when (eq sb/in-buffer-completion 'corfu)
+    (with-eval-after-load "corfu"
+      ;; Compute blended backgrounds correctly
+      (setopt kind-icon-default-face 'corfu-default)
+      (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
 
-;;     (setq kind-icon-mapping
-;;           '((array
-;;              "a"
-;;              :icon "symbol-array"
-;;              :face font-lock-type-face
-;;              :collection "nerd-fonts-codicons")
-;;             (boolean
-;;              "b"
-;;              :icon "symbol-boolean"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (color
-;;              "#"
-;;              :icon "symbol-color"
-;;              :face success
-;;              :collection "nerd-fonts-codicons")
-;;             (command
-;;              "cm"
-;;              :icon "chevron-right"
-;;              :face default
-;;              :collection "nerd-fonts-codicons")
-;;             (constant
-;;              "co"
-;;              :icon "symbol-constant"
-;;              :face font-lock-constant-face
-;;              :collection "nerd-fonts-codicons")
-;;             (class
-;;              "c"
-;;              :icon "symbol-class"
-;;              :face font-lock-type-face
-;;              :collection "nerd-fonts-codicons")
-;;             (constructor
-;;              "cn"
-;;              :icon "symbol-method"
-;;              :face font-lock-function-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (enum
-;;              "e"
-;;              :icon "symbol-enum"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (enummember
-;;              "em"
-;;              :icon "symbol-enum-member"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (enum-member
-;;              "em"
-;;              :icon "symbol-enum-member"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (event
-;;              "ev"
-;;              :icon "symbol-event"
-;;              :face font-lock-warning-face
-;;              :collection "nerd-fonts-codicons")
-;;             (field
-;;              "fd"
-;;              :icon "symbol-field"
-;;              :face font-lock-variable-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (file
-;;              "f"
-;;              :icon "symbol-file"
-;;              :face font-lock-string-face
-;;              :collection "nerd-fonts-codicons")
-;;             (folder
-;;              "d"
-;;              :icon "folder"
-;;              :face font-lock-doc-face
-;;              :collection "nerd-fonts-codicons")
-;;             (function "f"
-;;                       :icon "symbol-method"
-;;                       :face font-lock-function-name-face
-;;                       :collection "nerd-fonts-codicons")
-;;             (interface
-;;              "if"
-;;              :icon "symbol-interface"
-;;              :face font-lock-type-face
-;;              :collection "nerd-fonts-codicons")
-;;             (keyword
-;;              "kw"
-;;              :icon "symbol-keyword"
-;;              :face font-lock-keyword-face
-;;              :collection "nerd-fonts-codicons")
-;;             (macro "mc" :icon "lambda" :face font-lock-keyword-face)
-;;             (magic
-;;              "ma"
-;;              :icon "lightbulb-autofix"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (method
-;;              "m"
-;;              :icon "symbol-method"
-;;              :face font-lock-function-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (module
-;;              "{"
-;;              :icon "file-code-outline"
-;;              :face font-lock-preprocessor-face)
-;;             (numeric
-;;              "nu"
-;;              :icon "symbol-numeric"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (operator
-;;              "op"
-;;              :icon "symbol-operator"
-;;              :face font-lock-comment-delimiter-face
-;;              :collection "nerd-fonts-codicons")
-;;             (param
-;;              "pa"
-;;              :icon "gear"
-;;              :face default
-;;              :collection "nerd-fonts-codicons")
-;;             (property
-;;              "pr"
-;;              :icon "symbol-property"
-;;              :face font-lock-variable-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (reference
-;;              "rf"
-;;              :icon "library"
-;;              :face font-lock-variable-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (snippet
-;;              "S"
-;;              :icon "symbol-snippet"
-;;              :face font-lock-string-face
-;;              :collection "nerd-fonts-codicons")
-;;             (string
-;;              "s"
-;;              :icon "symbol-string"
-;;              :face font-lock-string-face
-;;              :collection "nerd-fonts-codicons")
-;;             (struct
-;;              "%"
-;;              :icon "symbol-structure"
-;;              :face font-lock-variable-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (text
-;;              "tx"
-;;              :icon "symbol-key"
-;;              :face font-lock-doc-face
-;;              :collection "nerd-fonts-codicons")
-;;             (typeparameter
-;;              "tp"
-;;              :icon "symbol-parameter"
-;;              :face font-lock-type-face
-;;              :collection "nerd-fonts-codicons")
-;;             (type-parameter
-;;              "tp"
-;;              :icon "symbol-parameter"
-;;              :face font-lock-type-face
-;;              :collection "nerd-fonts-codicons")
-;;             (unit
-;;              "u"
-;;              :icon "symbol-ruler"
-;;              :face font-lock-constant-face
-;;              :collection "nerd-fonts-codicons")
-;;             (value
-;;              "v"
-;;              :icon "symbol-enum"
-;;              :face font-lock-builtin-face
-;;              :collection "nerd-fonts-codicons")
-;;             (variable
-;;              "va"
-;;              :icon "symbol-variable"
-;;              :face font-lock-variable-name-face
-;;              :collection "nerd-fonts-codicons")
-;;             (t
-;;              "."
-;;              :icon "question"
-;;              :face font-lock-warning-face
-;;              :collection "nerd-fonts-codicons")))
+  ;; Replace default company
+  (when (eq sb/in-buffer-completion 'company)
+    (require 'svg-lib)
+    (add-to-list
+     'svg-lib-icon-collections
+     '("nerd-fonts-codicons"
+       .
+       "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
 
-;;     (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
-;;            (formatter
-;;             (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
-;;       (defun sb/company-kind-icon-margin (cand _selected)
-;;         (funcall formatter cand))
-;;       (setq company-format-margin-function #'sb/company-kind-icon-margin))))
+    ;; (setopt kind-icon-mapping
+    ;;         '((array
+    ;;            "a"
+    ;;            :icon "symbol-array"
+    ;;            :face font-lock-type-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (boolean
+    ;;            "b"
+    ;;            :icon "symbol-boolean"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (class
+    ;;            "c"
+    ;;            :icon "symbol-class"
+    ;;            :face font-lock-type-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (color
+    ;;            "#"
+    ;;            :icon "symbol-color"
+    ;;            :face success
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (command
+    ;;            "cm"
+    ;;            :icon "chevron-right"
+    ;;            :face default
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (constant
+    ;;            "co"
+    ;;            :icon "symbol-constant"
+    ;;            :face font-lock-constant-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (constructor
+    ;;            "cn"
+    ;;            :icon "symbol-method"
+    ;;            :face font-lock-function-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (enum
+    ;;            "e"
+    ;;            :icon "symbol-enum"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (enummember
+    ;;            "em"
+    ;;            :icon "symbol-enum-member"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (enum-member
+    ;;            "em"
+    ;;            :icon "symbol-enum-member"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (event
+    ;;            "ev"
+    ;;            :icon "symbol-event"
+    ;;            :face font-lock-warning-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (field
+    ;;            "fd"
+    ;;            :icon "symbol-field"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (file
+    ;;            "f"
+    ;;            :icon "symbol-file"
+    ;;            :face font-lock-string-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (folder
+    ;;            "d"
+    ;;            :icon "folder"
+    ;;            :face font-lock-doc-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (function "f"
+    ;;                     :icon "symbol-method"
+    ;;                     :face font-lock-function-name-face
+    ;;                     :collection "nerd-fonts-codicons")
+    ;;           ;; For Python
+    ;;           (instance
+    ;;            "in"
+    ;;            :icon "symbol-variable"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "vscode")
+    ;;           (interface
+    ;;            "if"
+    ;;            :icon "symbol-interface"
+    ;;            :face font-lock-type-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (keyword
+    ;;            "kw"
+    ;;            :icon "symbol-keyword"
+    ;;            :face font-lock-keyword-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (macro "mc" :icon "lambda" :face font-lock-keyword-face)
+    ;;           (magic
+    ;;            "ma"
+    ;;            :icon "lightbulb-autofix"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (method
+    ;;            "m"
+    ;;            :icon "symbol-method"
+    ;;            :face font-lock-function-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (module
+    ;;            "{"
+    ;;            :icon "file-code-outline"
+    ;;            :face font-lock-preprocessor-face)
+    ;;           (namespace
+    ;;            "ns"
+    ;;            :icon "file-code-outline"
+    ;;            :face font-lock-preprocessor-face)
+    ;;           (numeric
+    ;;            "nu"
+    ;;            :icon "symbol-numeric"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (operator
+    ;;            "op"
+    ;;            :icon "symbol-operator"
+    ;;            :face font-lock-comment-delimiter-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (param
+    ;;            "pa"
+    ;;            :icon "gear"
+    ;;            :face default
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (property
+    ;;            "pr"
+    ;;            :icon "symbol-property"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (reference
+    ;;            "rf"
+    ;;            :icon "library"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (snippet
+    ;;            "S"
+    ;;            :icon "symbol-snippet"
+    ;;            :face font-lock-string-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (statement
+    ;;            "st"
+    ;;            :icon "symbol-field"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "vscode")
+    ;;           (string
+    ;;            "s"
+    ;;            :icon "symbol-string"
+    ;;            :face font-lock-string-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (struct
+    ;;            "%"
+    ;;            :icon "symbol-structure"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (text
+    ;;            "tx"
+    ;;            :icon "symbol-key"
+    ;;            :face font-lock-doc-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (typeparameter
+    ;;            "tp"
+    ;;            :icon "symbol-parameter"
+    ;;            :face font-lock-type-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (type-parameter
+    ;;            "tp"
+    ;;            :icon "symbol-parameter"
+    ;;            :face font-lock-type-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (unit
+    ;;            "u"
+    ;;            :icon "symbol-ruler"
+    ;;            :face font-lock-constant-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (value
+    ;;            "v"
+    ;;            :icon "symbol-enum"
+    ;;            :face font-lock-builtin-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (variable
+    ;;            "va"
+    ;;            :icon "symbol-variable"
+    ;;            :face font-lock-variable-name-face
+    ;;            :collection "nerd-fonts-codicons")
+    ;;           (t
+    ;;            "."
+    ;;            :icon "question"
+    ;;            :face font-lock-warning-face
+    ;;            :collection "nerd-fonts-codicons")))
+
+    (setopt kind-icon-mapping
+            `((array
+               ,(nerd-icons-codicon "nf-cod-symbol_array")
+               :face font-lock-type-face)
+              (boolean
+               ,(nerd-icons-codicon "nf-cod-symbol_boolean")
+               :face font-lock-builtin-face)
+              (class
+               ,(nerd-icons-codicon "nf-cod-symbol_class")
+               :face font-lock-type-face)
+              (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+              (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+              (constant
+               ,(nerd-icons-codicon "nf-cod-symbol_constant")
+               :face font-lock-constant-face)
+              (constructor
+               ,(nerd-icons-codicon "nf-cod-triangle_right")
+               :face font-lock-function-name-face)
+              (enummember
+               ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+               :face font-lock-builtin-face)
+              (enum-member
+               ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+               :face font-lock-builtin-face)
+              (enum
+               ,(nerd-icons-codicon "nf-cod-symbol_enum")
+               :face font-lock-builtin-face)
+              (event
+               ,(nerd-icons-codicon "nf-cod-symbol_event")
+               :face font-lock-warning-face)
+              (field
+               ,(nerd-icons-codicon "nf-cod-symbol_field")
+               :face font-lock-variable-name-face)
+              (file
+               ,(nerd-icons-codicon "nf-cod-symbol_file")
+               :face font-lock-string-face)
+              (folder
+               ,(nerd-icons-codicon "nf-cod-folder")
+               :face font-lock-doc-face)
+              (interface
+               ,(nerd-icons-codicon "nf-cod-symbol_interface")
+               :face font-lock-type-face)
+              (keyword
+               ,(nerd-icons-codicon "nf-cod-symbol_keyword")
+               :face font-lock-keyword-face)
+              (macro
+               ,(nerd-icons-codicon "nf-cod-symbol_misc")
+               :face font-lock-keyword-face)
+              (magic
+               ,(nerd-icons-codicon "nf-cod-wand")
+               :face font-lock-builtin-face)
+              (method
+               ,(nerd-icons-codicon "nf-cod-symbol_method")
+               :face font-lock-function-name-face)
+              (function ,(nerd-icons-codicon "nf-cod-symbol_method")
+                        :face font-lock-function-name-face)
+              (module
+               ,(nerd-icons-codicon "nf-cod-file_submodule")
+               :face font-lock-preprocessor-face)
+              (numeric
+               ,(nerd-icons-codicon "nf-cod-symbol_numeric")
+               :face font-lock-builtin-face)
+              (operator
+               ,(nerd-icons-codicon "nf-cod-symbol_operator")
+               :face font-lock-comment-delimiter-face)
+              (param
+               ,(nerd-icons-codicon "nf-cod-symbol_parameter")
+               :face default)
+              (property
+               ,(nerd-icons-codicon "nf-cod-symbol_property")
+               :face font-lock-variable-name-face)
+              (reference
+               ,(nerd-icons-codicon "nf-cod-references")
+               :face font-lock-variable-name-face)
+              (snippet
+               ,(nerd-icons-codicon "nf-cod-symbol_snippet")
+               :face font-lock-string-face)
+              (string
+               ,(nerd-icons-codicon "nf-cod-symbol_string")
+               :face font-lock-string-face)
+              (struct
+               ,(nerd-icons-codicon "nf-cod-symbol_structure")
+               :face font-lock-variable-name-face)
+              (text
+               ,(nerd-icons-codicon "nf-cod-text_size")
+               :face font-lock-doc-face)
+              (typeparameter
+               ,(nerd-icons-codicon "nf-cod-list_unordered")
+               :face font-lock-type-face)
+              (type-parameter
+               ,(nerd-icons-codicon "nf-cod-list_unordered")
+               :face font-lock-type-face)
+              (unit
+               ,(nerd-icons-codicon "nf-cod-symbol_ruler")
+               :face font-lock-constant-face)
+              (value
+               ,(nerd-icons-codicon "nf-cod-symbol_field")
+               :face font-lock-builtin-face)
+              (variable
+               ,(nerd-icons-codicon "nf-cod-symbol_variable")
+               :face font-lock-variable-name-face)
+              (t
+               ,(nerd-icons-codicon "nf-cod-code")
+               :face font-lock-warning-face)))
+
+    (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
+           (formatter
+            (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
+      (defun sb/company-kind-icon-margin (cand _selected)
+        (funcall formatter cand))
+      (setq company-format-margin-function #'sb/company-kind-icon-margin))))
 
 ;; Show documentation popups
 (use-package company-quickhelp
@@ -2594,9 +2742,8 @@ The provider is nerd-icons."
    ("a" . lsp-workspace-folders-add)
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
-  :custom (lsp-keymap-prefix "C-c l")
-  ;; Enable/disable features
-  (lsp-auto-configure nil)
+  :custom
+  (lsp-keymap-prefix "C-c l")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
@@ -2613,7 +2760,7 @@ The provider is nerd-icons."
   ;; projects
   (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-suggest-server-download nil)
-  ;; (lsp-inlay-hint-enable nil)
+  (lsp-inlay-hint-enable t)
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
   ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
@@ -2725,15 +2872,15 @@ The provider is nerd-icons."
   ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
   (lsp-ui-doc-enable nil)
   (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-imenu-auto-refresh 'after-save)
   (lsp-ui-sideline-enable nil)
   ;; Enables understanding when to invoke code actions
   (lsp-ui-sideline-show-code-actions t)
-  ;; Hide diagnostics when typing because they can be intrusive,
-  ;; Flycheck/flymake already highlights errors
+  ;; Hide diagnostics when typing because they can be intrusive, Flycheck and
+  ;; Flymake already highlight errors
   (lsp-ui-sideline-show-diagnostics nil)
-  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
   (lsp-ui-peek-enable nil))
 
 (use-package consult-lsp
@@ -2768,7 +2915,7 @@ The provider is nerd-icons."
   :when (eq sb/lsp-provider 'lsp-mode)
   :init (setopt lsp-ltex-plus-version "18.5.1")
   :hook
-  ((text-mode markdown-mode org-mode LaTeX-mode latex-mode)
+  ((text-mode markdown-mode org-mode LaTeX-mode)
    .
    (lambda ()
      (require 'lsp-ltex-plus)
@@ -3786,10 +3933,6 @@ used in `company-backends'."
      ((t
        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
-(use-package nerd-icons
-  :when (bound-and-true-p sb/enable-icons)
-  :custom (nerd-icons-scale-factor 0.8))
-
 (use-package nerd-icons-corfu
   :straight (:host github :repo "LuigiPiucco/nerd-icons-corfu")
   :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'corfu))
@@ -3801,6 +3944,7 @@ used in `company-backends'."
 (use-package nerd-icons-completion
   :straight (:host github :repo "rainstormstudio/nerd-icons-completion")
   :when (bound-and-true-p sb/enable-icons)
+  :after (:all nerd-icons marginalia)
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
@@ -4014,33 +4158,34 @@ used in `company-backends'."
 ;;   (outline-blank-line t)
 ;;   :diminish (outline-minor-mode outline-indent-minor-mode))
 
-;; (use-package all-the-icons
-;;   :commands all-the-icons-install-fonts
-;;   :custom
-;;   ;; Small icons look nicer
-;;   (all-the-icons-scale-factor 0.9)
-;;   (all-the-icons-faicon-scale-factor 0.9)
-;;   (all-the-icons-wicon-scale-factor 0.9)
-;;   (all-the-icons-octicon-scale-factor 0.9)
-;;   (all-the-icons-fileicon-scale-factor 0.9)
-;;   (all-the-icons-material-scale-factor 0.9)
-;;   (all-the-icons-alltheicon-scale-factor 0.9)
-;;   (all-the-icons-color-icons t))
+(use-package all-the-icons
+  :commands all-the-icons-install-fonts
+  :custom
+  ;; Small icons look nicer
+  (all-the-icons-scale-factor 0.9)
+  (all-the-icons-faicon-scale-factor 0.9)
+  (all-the-icons-wicon-scale-factor 0.9)
+  (all-the-icons-octicon-scale-factor 0.9)
+  (all-the-icons-fileicon-scale-factor 0.9)
+  (all-the-icons-material-scale-factor 0.9)
+  (all-the-icons-alltheicon-scale-factor 0.9)
+  (all-the-icons-color-icons t))
 
 ;; Highlight the cursor position after the window scrolls
 (use-package beacon
   :hook (emacs-startup . beacon-mode)
   :diminish)
 
-;; Allows to easily identify the file path in a project
-;; (use-package project-headerline
-;;   :straight (:host github :repo "gavv/project-headerline")
-;;   :hook (emacs-startup . global-project-headerline-mode))
+;; Allows to easily identify the file path in a project. But does not support
+;; imenu.
+(use-package project-headerline
+  :straight (:host github :repo "gavv/project-headerline")
+  :hook (emacs-startup . global-project-headerline-mode))
 
-(use-package breadcrumb
-  :straight (:host github :repo "joaotavora/breadcrumb")
-  :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
-  :config (breadcrumb-imenu-crumbs))
+;; (use-package breadcrumb
+;;   :straight (:host github :repo "joaotavora/breadcrumb")
+;;   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
+;;   :config (breadcrumb-imenu-crumbs))
 
 ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
 ;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
