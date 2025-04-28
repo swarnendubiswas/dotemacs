@@ -21,6 +21,7 @@
   :type 'boolean
   :group 'sb/emacs)
 
+;; Modus-vivendi is the most complete, while Catppuccin is more colorful.
 (defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
@@ -31,6 +32,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
+;; Powerline looks clean, but doom-modeline is more informative.
 (defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
@@ -59,12 +61,12 @@
 
 (defcustom sb/enable-icons t
   "Should icons be enabled?
-The provider is nerd-icons."
+The provider is `nerd-icons'."
   :type 'boolean
   :group 'sb/emacs)
 
-;; Eglot does not allow multiple servers to connect to a major mode and also
-;; does not support semantic tokens.
+;; Eglot does not allow multiple servers to connect to a major mode, does not
+;; support semantic tokens, but is possibly more lightweight.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
@@ -157,6 +159,7 @@ The provider is nerd-icons."
      ;; Typing with the mark active will overwrite the marked region
      (delete-selection-mode 1)
      ;; Use soft wraps, wrap lines without the ugly continuation marks
+     ;; LATER: Is this why `avy' breaks?
      (global-visual-line-mode 1)
      ;; When you call `find-file', you do not need to clear the existing
      ;; file path before adding the new one. Just start typing the whole
@@ -299,6 +302,9 @@ The provider is nerd-icons."
   ;; when no `ispell' dictionary is set.
   (when (boundp 'text-mode-ispell-word-completion)
     (setopt text-mode-ispell-word-completion nil))
+  ;; Hide "When done with a buffer, type C-x 5" message
+  (when (bound-and-true-p server-client-instructions)
+    (setopt server-client-instructions nil))
 
   ;; Changing buffer-local variables will only affect a single buffer.
   ;; `setq-default' changes the buffer-local variable's default value.
@@ -317,10 +323,6 @@ The provider is nerd-icons."
   (diminish 'auto-fill-function)
 
   (advice-add 'risky-local-variable-p :override #'ignore)
-
-  ;; Hide "When done with a buffer, type C-x 5" message
-  (when (bound-and-true-p server-client-instructions)
-    (setopt server-client-instructions nil))
 
   (when (file-exists-p custom-file)
     (load custom-file 'noerror 'nomessage))
@@ -384,15 +386,6 @@ The provider is nerd-icons."
 
 (use-package imenu
   :straight (:type built-in)
-  :after
-  (:any
-   makefile-mode
-   markdown-mode
-   org-mode
-   yaml-mode
-   yaml-ts-mode
-   prog-mode
-   LaTeX-mode)
   :custom
   (imenu-auto-rescan t)
   (imenu-max-items 1000)
@@ -419,11 +412,10 @@ The provider is nerd-icons."
      "[/\\]archive-contents\\'"
      "[/\\]\\.loaddefs\\.el\\'"
      "[/\\]tmp/.*"
-     ".*/recentf\\'"
-     ".*/recentf-save.el\\'"
+     ".*/recentf.*"
      "~$"
      ".*/TAGS\\'"
-     "*.cache"
+     ".*/\\.cache"
      "*[/\\]straight/repos/"))
   ;; Keep remote file without testing if they still exist
   (recentf-keep '(file-remote-p file-readable-p))
@@ -466,12 +458,6 @@ The provider is nerd-icons."
     (apply save-fn '(t)))
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
-
-;; Use "Shift + direction" arrows for moving around windows.
-;; (use-package windmove
-;;   :straight (:type built-in)
-;;   :when (display-graphic-p)
-;;   :init (windmove-default-keybindings))
 
 ;; (use-package doc-view
 ;;   :straight (:type built-in)
@@ -517,6 +503,12 @@ The provider is nerd-icons."
   :hook ((LaTeX-mode prog-mode) . subword-mode)
   :diminish)
 
+;; Use "Shift + direction" arrows for moving around windows.
+;; (use-package windmove
+;;   :straight (:type built-in)
+;;   :when (display-graphic-p)
+;;   :init (windmove-default-keybindings))
+
 ;; (use-package winner
 ;;   :hook (emacs-startup . winner-mode)
 ;;   :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
@@ -526,6 +518,7 @@ The provider is nerd-icons."
 (use-package ediff
   :straight (:type built-in)
   :commands (ediff-buffers ediff-regions-linewise ediff-regions-wordwise)
+  :bind (("C-c d e" . ediff) ("C-c d b" . ediff-buffers))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -594,23 +587,21 @@ The provider is nerd-icons."
   (ibuffer-never-show-predicates
    '("*Help\\*"
      "*Quick Help\\*"
-     "*Warnings\\*"
      "*Calc Trail\\*"
      "*Compile-Log\\*"
      "*Async-native-compile-log\\*"
      "*Native-compile-log\\*"
      "*Calculator\\*"
      "*Calendar\\*"
-     "*Warning\\*"
-     "magit:.*"
      "*Org Help\\*"
+     "magit.*"
      "*lsp-log*"
      "*ltex-ls*"
      "*bash-ls.*"
      "*marksman.*"
      "*yaml-ls.*"
      "*clangd.*"
-     "*texlab2.*"))
+     "*texlab.*"))
   :config
   (require 'ibuf-ext)
   (defalias 'list-buffers 'ibuffer))
@@ -674,8 +665,8 @@ The provider is nerd-icons."
    ("C-M-c" . avy-copy-line)
    ("C-M-m" . avy-move-line)
    :map isearch-mode-map
-   ;; Use "C-'" in `isearch-mode-map' to use `avy-isearch' to select one of the
-   ;; many currently visible `isearch' candidates.
+   ;; Use "C-'" to select one of the many currently visible `isearch'
+   ;; candidates.
    ("C-'" . avy-isearch)))
 
 ;; Quickly select a window to jump to
@@ -698,8 +689,8 @@ The provider is nerd-icons."
              "stderr\\*$"
              "^\\*Flymake"
              "^\\*vc"
-             "^\\*Warnings"
-             "^\\*eldoc"))
+             "^\\*eldoc"
+             "^\\*Async-native-compile-log\\*"))
     (push regexp frog-jump-buffer-ignore-buffers)))
 
 (use-package dired
@@ -813,9 +804,9 @@ The provider is nerd-icons."
 (use-package xref
   :bind
   (("M-." . xref-find-definitions)
-   ("M-?" . xref-find-references)
+   ("M-," . xref-go-back) ("M-?" . xref-find-references)
    ;; Find all identifiers whose name matches pattern
-   ("C-M-." . xref-find-apropos) ("M-," . xref-go-back))
+   ("C-M-." . xref-find-apropos))
   :custom (xref-search-program 'ripgrep))
 
 (use-package project
@@ -858,9 +849,9 @@ The provider is nerd-icons."
    :map vertico-map
    ;; `vertico-exit' (RET) exits with the currently selected candidate, while
    ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
+   ;; ("C-M-j" . vertico-exit-input)
    ("M-<" . vertico-first)
    ("M->" . vertico-last)
-   ("C-M-j" . vertico-exit-input)
    ("RET" . vertico-directory-enter)
    ("DEL" . vertico-directory-delete-char)
    ("M-DEL" . vertico-directory-delete-word)
@@ -880,7 +871,7 @@ The provider is nerd-icons."
   ;;   (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
 
   ;; Customize the display of the current candidate in the completion list. This
-  ;; will prefix the current candidate with “» ” to make it stand out.
+  ;; will prefix the current candidate with "» " to make it stand out.
   ;; Reference:
   ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
   (advice-add
@@ -984,13 +975,13 @@ The provider is nerd-icons."
      "\\*pylsp"
      "\\*ltex-ls"
      "\\*texlab"
-     "\\*bash-ls*"
-     "\\*json-ls*"
-     "\\*yaml-ls*"
-     "\\*shfmt*"
-     "\\*clangd*"
-     "\\*semgrep*"
-     "\\*autotools*"))
+     "\\*bash-ls.*"
+     "\\*json-ls.*"
+     "\\*yaml-ls.*"
+     "\\*shfmt.*"
+     "\\*clangd.*"
+     "\\*semgrep.*"
+     "\\*autotools.*"))
   :config
   (consult-customize
    consult-line
@@ -1031,39 +1022,39 @@ The provider is nerd-icons."
     (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map)))
 
 ;; Easily add file and directory paths into the minibuffer.
-;; (use-package consult-dir
-;;   :bind
-;;   (("C-x C-d" . consult-dir)
-;;    :map
-;;    vertico-map
-;;    ("C-x C-d" . consult-dir)
-;;    ("C-x C-j" . consult-dir-jump-file))
-;;   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
+(use-package consult-dir
+  :bind
+  (("C-x C-d" . consult-dir)
+   :map
+   vertico-map
+   ("C-x C-d" . consult-dir)
+   ("C-x C-j" . consult-dir-jump-file))
+  :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
 ;; Provide context-dependent actions similar to a content menu.
-;; (use-package embark
-;;   :bind
-;;   ( ;; "C-h b" lists all the bindings available in a buffer
-;;    ([remap describe-bindings] . embark-bindings)
-;;    ("C-`" . embark-act)
-;;    ("C-;" . embark-dwim)
-;;    :map
-;;    minibuffer-local-map
-;;    ("C-`" . embark-act)
-;;    ("C-c C-c" . embark-collect)
-;;    ("C-c C-e" . embark-export)
-;;    :map
-;;    minibuffer-local-completion-map
-;;    ("C-`" . embark-act))
-;;   :custom
-;;   ;; Replace the key help with a completing-read interface
-;;   (prefix-help-command #'embark-prefix-help-command))
+(use-package embark
+  :bind
+  ( ;; "C-h b" lists all the bindings available in a buffer
+   ([remap describe-bindings] . embark-bindings)
+   ("C-`" . embark-act)
+   ("C-;" . embark-dwim)
+   :map
+   minibuffer-local-map
+   ("C-`" . embark-act)
+   ("C-c C-c" . embark-collect)
+   ("C-c C-e" . embark-export)
+   :map
+   minibuffer-local-completion-map
+   ("C-`" . embark-act))
+  :custom
+  ;; Replace the key help with a completing-read interface
+  (prefix-help-command #'embark-prefix-help-command))
 
 ;; Supports exporting search results to a `grep-mode' buffer, on which you can
 ;; use `wgrep'.
-;; (use-package embark-consult
-;;   :after (embark consult)
-;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
+(use-package embark-consult
+  :after (embark consult)
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
@@ -1072,8 +1063,8 @@ The provider is nerd-icons."
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  (setq marginalia-annotator-registry
-        (assq-delete-all 'file marginalia-annotator-registry))
+  (setopt marginalia-annotator-registry
+          (assq-delete-all 'file marginalia-annotator-registry))
   (add-to-list
    'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
   (add-to-list
@@ -1543,7 +1534,7 @@ The provider is nerd-icons."
   :after flycheck
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
-;; Include `hl-todo' keywords in flycheck messages.
+;; Include `hl-todo' keywords in Flycheck messages.
 (use-package flycheck-hl-todo
   :after flycheck
   :init (flycheck-hl-todo-setup))
@@ -1630,7 +1621,7 @@ The provider is nerd-icons."
         '("prettier" "--print-width" "80"))
   (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" 4 "-ci")))
 
-;; Auto-format elisp code
+;; Auto-format Elisp code
 (use-package elisp-autofmt
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
   :custom
@@ -1855,13 +1846,14 @@ The provider is nerd-icons."
   (kind-icon-default-style
    '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
   :config
-  (when (eq sb/in-buffer-completion 'corfu)
-    (with-eval-after-load "corfu"
-      ;; Compute blended backgrounds correctly
-      (setopt kind-icon-default-face 'corfu-default)
-      (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+  ;; Prefer nerd-icons for Corfu with `nerd-icons-corfu'
+  ;; (when (eq sb/in-buffer-completion 'corfu)
+  ;;   (with-eval-after-load "corfu"
+  ;;     ;; Compute blended backgrounds correctly
+  ;;     (setopt kind-icon-default-face 'corfu-default)
+  ;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
 
-  ;; Replace default company
+  ;; Replace default company icons with nerd-icons
   (when (eq sb/in-buffer-completion 'company)
     (with-eval-after-load "company"
       (require 'svg-lib)
@@ -2174,7 +2166,8 @@ The provider is nerd-icons."
               (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
         (defun sb/company-kind-icon-margin (cand _selected)
           (funcall formatter cand))
-        (setq company-format-margin-function #'sb/company-kind-icon-margin)))))
+        (setopt company-format-margin-function
+                #'sb/company-kind-icon-margin)))))
 
 ;; Show documentation popups
 (use-package company-quickhelp
@@ -2290,9 +2283,7 @@ The provider is nerd-icons."
   ;; Override `company-backends' for unhandled major modes.
   (setopt company-backends
           '(company-files
-            (company-capf
-             :with company-dabbrev-code ;;company-ctags
-             company-yasnippet)
+            (company-capf :with company-dabbrev-code company-yasnippet)
             ;; If we have `company-dabbrev' first, then other matches from
             ;; `company-ispell' will be ignored.
             company-dict company-ispell company-dabbrev)
@@ -2703,12 +2694,10 @@ The provider is nerd-icons."
                       #'cape-file
                       #'yasnippet-capf)))))))
 
-;; Prescient uses frecency (frequency + recency) for sorting. recently used
+;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
 ;; before will be sorted by length. Vertico does its own sorting based on
-;; recency, and Corfu has corfu-history. Company has company-statistics. Ivy is
-;; not actively supported with prescient.
-
+;; recency, Corfu has `corfu-history', and Company has `company-statistics'.
 (use-package prescient
   :straight (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
   :hook (emacs-startup . prescient-persist-mode)
@@ -2755,15 +2744,15 @@ The provider is nerd-icons."
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-modeline-diagnostics-enable nil)
-  (lsp-lens-enable nil "Lenses are intrusive")
   ;; (lsp-enable-file-watchers nil "Avoid watcher warnings")
+  (lsp-lens-enable nil "Lenses are intrusive")
   ;; I use `symbol-overlay' to include languages that do not have a language
   ;; server
   (lsp-enable-symbol-highlighting nil)
-  ;; (lsp-enable-snippet t)
   ;; The workspace status icon on the terminal interface is misleading across
   ;; projects
   (lsp-modeline-workspace-status-enable nil)
+  ;; (lsp-enable-snippet t)
   (lsp-enable-suggest-server-download nil)
   (lsp-inlay-hint-enable t)
   ;; Enable integration of custom backends other than `capf'
