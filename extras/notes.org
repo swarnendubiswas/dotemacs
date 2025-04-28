@@ -184,4 +184,8 @@ https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-ma
 - [[https://github.com/skangas/dot-emacs]]
 - [[https://github.com/jeremyf/dotemacs]]
 - [[https://github.com/LionyxML/LEmacs]]
+- [[https://github.com/jamescherti/minimal-emacs.d/blob/main/early-init.el]]
+- [[https://github.com/LionyxML/emacs-solo]]
+- [[https://github.com/flajann2/emacs-config]]
+- [[https://github.com/LionyxML/emacs-kick]]
   

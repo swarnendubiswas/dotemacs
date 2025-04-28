@@ -48,7 +48,7 @@
 ;; more extensive LaTeX support than Corfu. We can set up separate completion
 ;; files with `company-ispell' and `company-dict'. However, `company-ispell'
 ;; does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -183,6 +183,8 @@ The provider is nerd-icons."
   (bookmark-save-flag 1)
   ;; Autofill comments in modes that define them
   (comment-auto-fill-only-comments t)
+  (comment-empty-lines t)
+  (comment-multi-lines t)
   (create-lockfiles nil)
   (backup-inhibited t "Disable backup for a per-file basis")
   (make-backup-files nil "Stop making backup `~' files")
@@ -191,6 +193,7 @@ The provider is nerd-icons."
   (help-window-select t "Makes it easy to close the window")
   (help-enable-autoload nil)
   (help-enable-completion-autoload nil)
+  (help-enable-symbol-autoload nil)
   (history-delete-duplicates t)
   (read-process-output-max (* 4 1024 1024))
   (remote-file-name-inhibit-locks t)
@@ -249,6 +252,8 @@ The provider is nerd-icons."
   (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
   (mouse-wheel-scroll-amount-horizontal 1)
   (fringes-outside-margins t)
+  ;; Improve Emacs' responsiveness by delaying syntax highlighting during input
+  (redisplay-skip-fontification-on-input t)
   :config
   (dolist (exts
            '(".aux"
@@ -290,6 +295,10 @@ The provider is nerd-icons."
               ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
   (when (eq system-type 'windows-nt)
     (setopt w32-get-true-file-attributes nil))
+  ;; In Emacs 30 and newer, disable Ispell completion to avoid annotation errors
+  ;; when no `ispell' dictionary is set.
+  (when (boundp 'text-mode-ispell-word-completion)
+    (setopt text-mode-ispell-word-completion nil))
 
   ;; Changing buffer-local variables will only affect a single buffer.
   ;; `setq-default' changes the buffer-local variable's default value.
@@ -321,6 +330,13 @@ The provider is nerd-icons."
   (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
 
   (put 'overwrite-mode 'disabled t)
+
+  ;; Keep the cursor out of the read-only portions of the.minibuffer
+  (setopt minibuffer-prompt-properties
+          '(read-only
+            t intangible t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
   :diminish visual-line-mode)
 
 (use-package autorevert
@@ -1305,6 +1321,7 @@ The provider is nerd-icons."
   ;; Enable "M-<", "M->", "C-v" and "M-v" to jump among matches
   (isearch-allow-motion t)
   (isearch-motion-changes-direction t)
+  ;; Remove delay before `isearch' highlights matches
   (lazy-highlight-initial-delay 0))
 
 ;; Auto populate `isearch' with the symbol at point
@@ -2169,10 +2186,10 @@ The provider is nerd-icons."
   :unless (display-graphic-p)
   :hook (prog-mode . company-quickhelp-terminal-mode))
 
-(use-package company-statistics
-  :when (eq sb/in-buffer-completion 'company)
-  :after company
-  :init (company-statistics-mode 1))
+;; (use-package company-statistics
+;;   :when (eq sb/in-buffer-completion 'company)
+;;   :after company
+;;   :init (company-statistics-mode 1))
 
 ;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
 ;; active in latex math environments and latex math symbols
@@ -2279,10 +2296,10 @@ The provider is nerd-icons."
             ;;company-dict
             company-dabbrev)
           company-transformers
-          '( ;company-sort-by-occurrence
+          '( ;; company-sort-by-occurrence
             delete-dups
-            company-sort-by-statistics
-            ;company-sort-prefer-same-case-prefix
+            ;; company-sort-by-statistics
+            ;; company-sort-prefer-same-case-prefix
             ))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
@@ -2299,25 +2316,25 @@ The provider is nerd-icons."
       ;; `company-capf' with Texlab does not pass to later backends, so it makes
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
-      (setopt company-backends
-              '((company-files
-                 company-reftex-citations
-                 company-auctex-bibs
-                 company-reftex-labels
-                 company-auctex-labels
-                 company-auctex-symbols
-                 company-auctex-environments
-                 company-auctex-macros
-                 company-latex-commands
-                 ;; Math latex tags
-                 company-math-symbols-latex
-                 ;; Math Unicode symbols and sub(super)scripts
-                 company-math-symbols-unicode
-                 company-yasnippet
-                 ;; company-ctags
-                 ;; company-dict
-                 company-ispell
-                 company-dabbrev))))
+      (setq-local company-backends
+                  '((company-files
+                     company-reftex-citations
+                     company-auctex-bibs
+                     company-reftex-labels
+                     company-auctex-labels
+                     company-auctex-symbols
+                     company-auctex-environments
+                     company-auctex-macros
+                     company-latex-commands
+                     ;; Math latex tags
+                     company-math-symbols-latex
+                     ;; Math Unicode symbols and sub(super)scripts
+                     company-math-symbols-unicode
+                     company-yasnippet
+                     ;; company-ctags
+                     ;; company-dict
+                     company-ispell
+                     company-dabbrev))))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -2353,14 +2370,14 @@ The provider is nerd-icons."
   (progn
     (defun sb/company-yaml-mode ()
       (make-local-variable 'company-backends)
-      (setopt company-backends
-              '(company-files
-                (company-capf
-                 :with
-                 company-dabbrev-code ; Useful for variable names
-                 company-yasnippet)
-                ;; company-dict
-                company-ispell company-dabbrev)))
+      (setq-local company-backends
+                  '(company-files
+                    (company-capf
+                     :with
+                     company-dabbrev-code ; Useful for variable names
+                     company-yasnippet)
+                    ;; company-dict
+                    company-ispell company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode #'sb/company-yaml-mode)))
@@ -4126,7 +4143,10 @@ used in `company-backends'."
   :diminish)
 
 (use-package hl-line
-  :hook (dired-mode . hl-line-mode))
+  :hook (dired-mode . hl-line-mode)
+  :custom
+  ;; Restrict `hl-line-mode' highlighting to the current window
+  (hl-line-sticky-flag nil))
 
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))

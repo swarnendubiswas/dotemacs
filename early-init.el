@@ -48,6 +48,7 @@
  inhibit-default-init t)
 
 (setopt
+ load-prefer-newer t
  ;; Do not resize the frame to preserve the number of columns or lines being
  ;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
  ;; fringes, or scroll bars.
@@ -55,7 +56,7 @@
  frame-resize-pixelwise t
  window-resize-pixelwise t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
- inhibit-startup-echo-area-message t
+ inhibit-startup-echo-area-message user-login-name
  initial-scratch-message nil
  ;; *scratch* is in `lisp-interaction-mode' by default.
  initial-major-mode 'fundamental-mode
@@ -104,11 +105,13 @@
 ;; is also useful if we prefer "straight.el" over "package.el".
 (setopt package-enable-at-startup nil)
 
-(setopt
+(setq
  warning-minimum-level :error
  warning-suppress-types '((lexical-binding)))
 
-(when (featurep 'native-compile)
+(when (and (featurep 'native-compile)
+           (fboundp 'native-comp-available-p)
+           (native-comp-available-p))
   (setopt
    native-comp-always-compile t
    ;; Silence compiler warnings as they can be pretty disruptive
