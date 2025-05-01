@@ -1248,7 +1248,7 @@ The provider is `nerd-icons'."
    (find-file . bm-buffer-restore)
    (emacs-startup . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
-  :custom (bm-buffer-persistence t "Save bookmarks"))
+  :config (setq-default bm-buffer-persistence t))
 
 (use-package crux
   :bind
@@ -4177,7 +4177,10 @@ used in `company-backends'."
 ;; imenu.
 (use-package project-headerline
   :straight (:host github :repo "gavv/project-headerline")
-  :hook (emacs-startup . global-project-headerline-mode))
+  :hook (emacs-startup . global-project-headerline-mode)
+  :custom
+  (project-headerline-segment-separator " > ")
+  (project-headerline-path-separator " > "))
 
 ;; (use-package breadcrumb
 ;;   :straight (:host github :repo "joaotavora/breadcrumb")
