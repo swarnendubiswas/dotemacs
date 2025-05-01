@@ -758,12 +758,12 @@ The provider is `nerd-icons'."
      (dired-omit-mode)))
   :bind ("C-x C-j" . dired-jump)
   :custom (dired-omit-verbose nil "Do not show messages when omitting files")
-  ;; Do not ask whether to kill buffers visiting deleted files
-  (dired-clean-confirm-killing-deleted-buffers nil)
   :config
   ;; Obsolete from Emacs 28+
   (unless (> emacs-major-version 27)
     (setopt dired-bind-jump t))
+
+  (setopt dired-omit-files (concat "\\`[.]\\'"))
 
   (setopt dired-omit-files
           (concat
@@ -4182,50 +4182,51 @@ used in `company-backends'."
   (project-headerline-segment-separator " > ")
   (project-headerline-path-separator " > "))
 
-;; (use-package breadcrumb
-;;   :straight (:host github :repo "joaotavora/breadcrumb")
-;;   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
-;;   :config (breadcrumb-imenu-crumbs))
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb")
+  :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
+  :custom (breadcrumb-project-max-length 0)
+  :config (breadcrumb-imenu-crumbs))
 
 ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
 ;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
 ;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
 ;; @ C-c".
-;; (use-package hideshow
-;;   :preface
-;;   (defun sb/toggle-fold ()
-;;     (interactive)
-;;     (save-excursion
-;;       (end-of-line)
-;;       (hs-toggle-hiding)))
-;;   :hook
-;;   ((c-mode-common
-;;     c-ts-mode
-;;     c++-mode
-;;     c++-ts-mode
-;;     cmake-mode
-;;     cmake-ts-mode
-;;     css-mode
-;;     css-ts-mode
-;;     emacs-lisp-mode
-;;     fish-mode
-;;     html-mode
-;;     java-mode
-;;     java-ts-mode
-;;     makefile-mode
-;;     perl-mode
-;;     python-mode
-;;     python-ts-mode
-;;     sh-mode
-;;     bash-ts-mode
-;;     json-mode
-;;     json-ts-mode
-;;     jsonc-mode
-;;     yaml-mode
-;;     yaml-ts-mode)
-;;    . hs-minor-mode)
-;;   :custom (hs-isearch-open t "Open all folds while searching")
-;;   :diminish hs-minor-mode)
+(use-package hideshow
+  :preface
+  (defun sb/toggle-fold ()
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (hs-toggle-hiding)))
+  :hook
+  ((c-mode-common
+    c-ts-mode
+    c++-mode
+    c++-ts-mode
+    cmake-mode
+    cmake-ts-mode
+    css-mode
+    css-ts-mode
+    emacs-lisp-mode
+    fish-mode
+    html-mode
+    java-mode
+    java-ts-mode
+    makefile-mode
+    perl-mode
+    python-mode
+    python-ts-mode
+    sh-mode
+    bash-ts-mode
+    json-mode
+    json-ts-mode
+    jsonc-mode
+    yaml-mode
+    yaml-ts-mode)
+   . hs-minor-mode)
+  :custom (hs-isearch-open t "Open all folds while searching")
+  :diminish hs-minor-mode)
 
 (use-package kill-file-path
   :straight (:host github :repo "chyla/kill-file-path")
@@ -4278,7 +4279,7 @@ used in `company-backends'."
   (eglot-mode-line-format '(eglot-mode-line-action-suggestion))
   (eglot-code-action-indications '(nearby mode-line margin))
   :config
-  ;; Show all of the available eldoc information when we want it. This way
+  ;; Show all of the available Eldoc information when we want it. This way
   ;; Flymake errors don't just get clobbered by docstrings.
   (add-hook
    'eglot-managed-mode-hook

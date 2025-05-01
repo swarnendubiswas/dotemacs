@@ -136,19 +136,25 @@
   (cond
    ((string= (system-name) "inspiron-7572")
     (progn
-      (set-face-attribute 'default nil :font "JetBrainsMono NF" :height 220)
+      (set-face-attribute 'default nil
+                          :font "JetBrainsMonoNerdFont"
+                          :height 220)
       (set-face-attribute 'mode-line nil :height 160)
       (set-face-attribute 'mode-line-inactive nil :height 160)))
 
    ((string= (system-name) "dell-7506")
     (progn
-      (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 150)
+      (set-face-attribute 'default nil
+                          :font "JetBrainsMonoNerdFont"
+                          :height 150)
       (set-face-attribute 'mode-line nil :height 120)
       (set-face-attribute 'mode-line-inactive nil :height 120)))
 
-   ((string= (system-name) "cseiitk")
+   ((string= (system-name) "office")
     (progn
-      (set-face-attribute 'default nil :font "MesloLGS Nerd Font" :height 210)
+      (set-face-attribute 'default nil
+                          :font "JetBrainsMonoNerdFont"
+                          :height 210)
       (set-face-attribute 'mode-line nil :height 140)
       (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
