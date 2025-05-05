@@ -160,9 +160,6 @@
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
 
-;; Load themes early to avoid flickering during startup
-(load-theme 'modus-vivendi t)
-
 (provide 'early-init)
 
 ;;; early-init.el ends here

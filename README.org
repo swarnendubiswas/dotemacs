@@ -52,7 +52,11 @@ Back up the contents of your =.emacs.d= directory if it is not empty, and then c
 git clone https://github.com/swarnendubiswas/dotemacs.git .emacs.d
 #+end_src
 
-We use [[https://github.com/radian-software/straight.el][straight.el]] as the package manager, and the setup should work on most Linux systems. Try the following resolution in case there is an error trying to connect to "raw.githubusercontent.com:443".
+We use [[https://github.com/radian-software/straight.el][straight.el]] as the package manager, and the setup should work on most Linux systems.
+
+*** Possible build errors
+
+Try the following resolution in case there is an error trying to connect to "raw.githubusercontent.com:443".
 
 #+begin_src shell
 git clone -b develop https://github.com/raxod502/straight.el ~/.emacs.d/straight/repos/straight.el
@@ -65,6 +69,8 @@ Comment the bootstrap code in ~init.el~ and add the following snippet.
 #+end_src
 
 Comment the recipe for =nongnu-elpa= in ~bootstrap.el~ if there is an error while cloning.
+
+Build and install ~texinfo~ if there is an error about the unavailability of ~makeinfo~.
 
 ** Directory structure
 

@@ -866,10 +866,6 @@ The provider is `nerd-icons'."
                           :background "#676767"
                           :foreground "#FFFFFF")))
 
-  ;; LATER: This is no longer necessary
-  ;; (with-eval-after-load "savehist"
-  ;;   (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
-
   ;; Customize the display of the current candidate in the completion list. This
   ;; will prefix the current candidate with "» " to make it stand out.
   ;; Reference:
@@ -953,6 +949,7 @@ The provider is `nerd-icons'."
      "\\*Minibuf"
      "\\*Backtrace"
      "\\*Help*"
+     "\\*Disabled Command\\*"
      "Flymake log"
      "\\*Flycheck"
      "Shell command output"
@@ -1147,6 +1144,8 @@ The provider is `nerd-icons'."
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
 ;; the word at point, even if it is not misspelled.
 (use-package jinx
+  ;; LATER: Presence of the "enchant-2" executable does not imply that the
+  ;; header files are present for compiling jinx
   :when (and (eq system-type 'gnu/linux) (executable-find "enchant-2"))
   :hook ((text-mode conf-mode prog-mode) . jinx-mode)
   :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
@@ -2202,6 +2201,7 @@ The provider is `nerd-icons'."
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-yasnippet nil))
 
+;; LATER: This package seems to trigger loading of `org-mode'
 ;; Use "<" to trigger company completion of org blocks.
 (use-package company-org-block
   :after (company org)
@@ -3729,11 +3729,12 @@ The provider is `nerd-icons'."
   :after (consult LaTeX-mode)
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
+;; LATER: This package seems to require `org'
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
   :straight (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :after (:any LaTeX-mode latex-mode)
+  :after tex
   :demand t)
 
 (use-package math-delimiters
@@ -3745,6 +3746,7 @@ The provider is `nerd-icons'."
   (with-eval-after-load "LaTeX-mode"
     (bind-key "$" #'math-delimiters-insert LaTeX-mode-map)))
 
+;; LATER: This package seems to require `org'
 (use-package citar
   :when (eq sb/in-buffer-completion 'corfu)
   :after tex
@@ -4780,6 +4782,79 @@ or the major mode is not in `sb/skippable-modes'."
 (add-hook 'emacs-startup-hook #'which-key-mode)
 (with-eval-after-load "which-key"
   (diminish 'which-key-mode))
+
+;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
+(which-key-add-key-based-replacements
+ "<f1> 4"
+ "help-other-win"
+ "<f1>"
+ "help"
+ "<f2>"
+ "2-column"
+ "C-c"
+ "mode-and-user"
+ "C-h 4"
+ "help-other-win"
+ "C-h"
+ "help"
+ "C-x 4"
+ "other-window"
+ "C-x 5"
+ "other-frame"
+ "C-x 6"
+ "2-column"
+ "C-x 8"
+ "insert-special"
+ "C-x C-k C-q"
+ "kmacro-counters"
+ "C-x C-k C-r a"
+ "kmacro-add"
+ "C-x C-k C-r"
+ "kmacro-register"
+ "C-x C-k"
+ "keyboard-macros"
+ "C-x RET"
+ "encoding/input"
+ "C-x a i"
+ "abbrevs-inverse-add"
+ "C-x a"
+ "abbrevs"
+ "C-x n"
+ "narrowing"
+ "C-x p"
+ "projects"
+ "C-x r"
+ "reg/rect/bkmks"
+ "C-x t ^"
+ "tab-bar-detach"
+ "C-x t"
+ "tab-bar"
+ "C-x v M"
+ "vc-mergebase"
+ "C-x v b"
+ "vc-branch"
+ "C-x v"
+ "version-control"
+ "C-x w ^"
+ "window-detach"
+ "C-x w"
+ "window-extras"
+ "C-x x"
+ "buffer-extras"
+ "C-x"
+ "extra-commands"
+ "M-g"
+ "goto-map"
+ "M-s h"
+ "search-highlight"
+ "M-s"
+ "search-map")
+
+;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
+;; a prefix-key.  If you know of other built-in packages that have
+;; this behavior, please let me know, so I can add them.
+(with-eval-after-load 'page-ext
+  (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
 
 ;; Support the Kitty Keyboard protocol in Emacs
 (use-package kkp
