@@ -67,7 +67,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -168,7 +168,8 @@ The provider is `nerd-icons'."
      ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
      ;; you there.
      (file-name-shadow-mode 1)
-     (auto-encryption-mode -1)))
+     (auto-encryption-mode -1)
+     (which-function-mode 1)))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (auto-save-no-message t "Do not print frequent autosave messages")
@@ -252,8 +253,6 @@ The provider is `nerd-icons'."
   (auto-window-vscroll nil)
   (hscroll-margin 2)
   (hscroll-step 1)
-  (mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
-  (mouse-wheel-scroll-amount-horizontal 1)
   (fringes-outside-margins t)
   ;; Improve Emacs' responsiveness by delaying syntax highlighting during input
   (redisplay-skip-fontification-on-input t)
@@ -755,7 +754,7 @@ The provider is `nerd-icons'."
    .
    (lambda ()
      (require 'dired-x)
-     (dired-omit-mode)))
+     (dired-omit-mode -1)))
   :bind ("C-x C-j" . dired-jump)
   :custom (dired-omit-verbose nil "Do not show messages when omitting files")
   :config
@@ -866,10 +865,6 @@ The provider is `nerd-icons'."
                           :background "#676767"
                           :foreground "#FFFFFF")))
 
-  ;; LATER: This is no longer necessary
-  ;; (with-eval-after-load "savehist"
-  ;;   (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
-
   ;; Customize the display of the current candidate in the completion list. This
   ;; will prefix the current candidate with "» " to make it stand out.
   ;; Reference:
@@ -953,12 +948,13 @@ The provider is `nerd-icons'."
      "\\*Minibuf"
      "\\*Backtrace"
      "\\*Help*"
+     "\\*Disabled Command\\*"
      "Flymake log"
      "\\*Flycheck"
      "Shell command output"
      "direnv"
      "\\*magit-"
-     "magit-process"
+     "magit-.*"
      ".+-shell*"
      "\\*straight-"
      "\\*Compile-Log"
@@ -1147,6 +1143,8 @@ The provider is `nerd-icons'."
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
 ;; the word at point, even if it is not misspelled.
 (use-package jinx
+  ;; LATER: Presence of the "enchant-2" executable does not imply that the
+  ;; header files are present for compiling jinx
   :when (and (eq system-type 'gnu/linux) (executable-find "enchant-2"))
   :hook ((text-mode conf-mode prog-mode) . jinx-mode)
   :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
@@ -1837,7 +1835,9 @@ The provider is `nerd-icons'."
   :demand t
   :custom (nerd-icons-scale-factor 0.8))
 
-;; Can be used for both Corfu and Company.
+;; `kind-icon' can be used for both Corfu and Company. I set up nerd icons for
+;; Corfu with `nerd-icons-corfu'. I use `kind-icon' to provide nerd icons for
+;; Company.
 (use-package kind-icon
   :when (bound-and-true-p sb/enable-icons)
   :demand t
@@ -2202,6 +2202,7 @@ The provider is `nerd-icons'."
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-yasnippet nil))
 
+;; LATER: This package seems to trigger loading of `org-mode'
 ;; Use "<" to trigger company completion of org blocks.
 (use-package company-org-block
   :after (company org)
@@ -2281,18 +2282,14 @@ The provider is `nerd-icons'."
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
-  (setopt company-backends
-          '(company-files
-            (company-capf :with company-dabbrev-code company-yasnippet)
-            ;; If we have `company-dabbrev' first, then other matches from
-            ;; `company-ispell' will be ignored.
-            company-dict company-ispell company-dabbrev)
-          company-transformers
-          '( ;; company-sort-by-occurrence
-            delete-dups
-            ;; company-sort-by-statistics
-            ;; company-sort-prefer-same-case-prefix
-            ))
+  (setopt
+   company-backends
+   '(company-files
+     (company-capf :with company-dabbrev-code company-yasnippet)
+     ;; If we have `company-dabbrev' first, then other matches from
+     ;; `company-ispell' will be ignored.
+     company-dict company-ispell company-dabbrev)
+   company-transformers '(delete-dups))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
   ;; https://github.com/company-mode/company-mode/issues/358
@@ -2309,23 +2306,21 @@ The provider is `nerd-icons'."
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
       (setq-local company-backends
-                  '((company-files
-                     company-reftex-citations
-                     company-auctex-bibs
-                     company-reftex-labels
-                     company-auctex-labels
-                     company-auctex-symbols
+                  '((company-reftex-citations company-auctex-bibs)
+                    (company-reftex-labels company-auctex-labels)
+                    (company-auctex-symbols
                      company-auctex-environments
                      company-auctex-macros
                      company-latex-commands
                      ;; Math latex tags
                      company-math-symbols-latex
                      ;; Math Unicode symbols and sub(super)scripts
-                     company-math-symbols-unicode
-                     company-yasnippet
-                     company-dict
-                     company-ispell
-                     company-dabbrev))))
+                     company-math-symbols-unicode)
+                    company-files
+                    company-dict
+                    company-ispell
+                    company-dabbrev
+                    company-yasnippet)))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -2343,13 +2338,13 @@ The provider is `nerd-icons'."
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-files (company-dict company-ispell company-dabbrev))))
+       '(company-files company-dict company-ispell company-dabbrev)))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
      'text-mode-hook
      (lambda ()
-       (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'latex-mode))
+       (unless (derived-mode-p 'LaTeX-mode)
          (sb/company-text-mode)))))
 
   (progn
@@ -2392,6 +2387,7 @@ The provider is `nerd-icons'."
      'prog-mode-hook
      (lambda ()
        (unless (or (derived-mode-p 'emacs-lisp-mode)
+                   (derived-mode-p 'lisp-data-mode)
                    (derived-mode-p 'flex-mode)
                    (derived-mode-p 'bison-mode))
          (sb/company-prog-mode)))))
@@ -2404,7 +2400,6 @@ The provider is `nerd-icons'."
                      :with company-keywords
                      company-dabbrev-code ; Useful for variable names
                      company-yasnippet)
-                    ;; company-dict
                     company-ispell company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
@@ -2445,7 +2440,7 @@ The provider is `nerd-icons'."
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-auto-prefix 3)
-  (corfu-on-exact-match nil) ; Do not auto expand snippets
+  (corfu-on-exact-match 'show)
   :config
   ;; Disable `orderless' completion for Corfu
   (add-hook
@@ -3681,9 +3676,30 @@ The provider is `nerd-icons'."
   :config
   ;; Make AUCTeX aware of the multifile document structure, always query for the
   ;; master file
-  (setq-default TeX-master nil)
+  (setq-default
+   TeX-master nil
+   TeX-command-default "LaTexMk")
   (with-eval-after-load "tex-mode"
-    (unbind-key "C-c ;" TeX-mode-map)))
+    (unbind-key "C-c ;" TeX-mode-map))
+
+  ;; Enable correlation with synctex From Okular, press Shift + Left click to go
+  ;; to the desired line.
+  (setopt
+   TeX-source-correlate-method 'synctex
+   TeX-source-correlate-mode t
+   TeX-source-correlate-start-server t
+   ;; Enable synctex generation. Even though the command shows as "latex"
+   ;; pdflatex is actually called
+   LaTeX-command "latex -shell-escape=1 -synctex=1"))
+
+(use-package tex
+  :straight (:type built-in)
+  :config
+  (when (executable-find "okular")
+    (add-to-list
+     'TeX-view-program-list
+     '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+    (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
 
 (use-package reftex
   :straight (:type built-in)
@@ -3729,11 +3745,12 @@ The provider is `nerd-icons'."
   :after (consult LaTeX-mode)
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
+;; LATER: This package seems to require `org'
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
   :straight (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :after (:any LaTeX-mode latex-mode)
+  :after tex
   :demand t)
 
 (use-package math-delimiters
@@ -3745,6 +3762,7 @@ The provider is `nerd-icons'."
   (with-eval-after-load "LaTeX-mode"
     (bind-key "$" #'math-delimiters-insert LaTeX-mode-map)))
 
+;; LATER: This package seems to require `org'
 (use-package citar
   :when (eq sb/in-buffer-completion 'corfu)
   :after tex
@@ -3755,16 +3773,16 @@ The provider is `nerd-icons'."
   :config (citar-embark-mode)
   :diminish)
 
-(use-package auctex-latexmk
-  :after tex
-  :when (executable-find "latexmk")
-  :demand t
-  :custom
-  ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
-  (auctex-latexmk-inherit-TeX-PDF-mode t)
-  :config
-  (setq-default TeX-command-default "LatexMk")
-  (auctex-latexmk-setup))
+;; (use-package auctex-latexmk
+;;   :after tex
+;;   :when (executable-find "latexmk")
+;;   :demand t
+;;   :custom
+;;   ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
+;;   (auctex-latexmk-inherit-TeX-PDF-mode t)
+;;   :config
+;;   ;; (setq-default TeX-command-default "LaTexMk")
+;;   (auctex-latexmk-setup))
 
 (use-package citre
   :preface
@@ -4185,7 +4203,6 @@ used in `company-backends'."
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb")
   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
-  :custom (breadcrumb-project-max-length 0)
   :config (breadcrumb-imenu-crumbs))
 
 ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
@@ -4780,6 +4797,79 @@ or the major mode is not in `sb/skippable-modes'."
 (add-hook 'emacs-startup-hook #'which-key-mode)
 (with-eval-after-load "which-key"
   (diminish 'which-key-mode))
+
+;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
+(which-key-add-key-based-replacements
+ "<f1> 4"
+ "help-other-win"
+ "<f1>"
+ "help"
+ "<f2>"
+ "2-column"
+ "C-c"
+ "mode-and-user"
+ "C-h 4"
+ "help-other-win"
+ "C-h"
+ "help"
+ "C-x 4"
+ "other-window"
+ "C-x 5"
+ "other-frame"
+ "C-x 6"
+ "2-column"
+ "C-x 8"
+ "insert-special"
+ "C-x C-k C-q"
+ "kmacro-counters"
+ "C-x C-k C-r a"
+ "kmacro-add"
+ "C-x C-k C-r"
+ "kmacro-register"
+ "C-x C-k"
+ "keyboard-macros"
+ "C-x RET"
+ "encoding/input"
+ "C-x a i"
+ "abbrevs-inverse-add"
+ "C-x a"
+ "abbrevs"
+ "C-x n"
+ "narrowing"
+ "C-x p"
+ "projects"
+ "C-x r"
+ "reg/rect/bkmks"
+ "C-x t ^"
+ "tab-bar-detach"
+ "C-x t"
+ "tab-bar"
+ "C-x v M"
+ "vc-mergebase"
+ "C-x v b"
+ "vc-branch"
+ "C-x v"
+ "version-control"
+ "C-x w ^"
+ "window-detach"
+ "C-x w"
+ "window-extras"
+ "C-x x"
+ "buffer-extras"
+ "C-x"
+ "extra-commands"
+ "M-g"
+ "goto-map"
+ "M-s h"
+ "search-highlight"
+ "M-s"
+ "search-map")
+
+;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
+;; a prefix-key.  If you know of other built-in packages that have
+;; this behavior, please let me know, so I can add them.
+(with-eval-after-load 'page-ext
+  (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
 
 ;; Support the Kitty Keyboard protocol in Emacs
 (use-package kkp

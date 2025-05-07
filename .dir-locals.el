@@ -14,10 +14,12 @@
    (eval . (add-to-list 'completion-ignored-extensions "auto-save-list/"))
    (eval . (add-to-list 'completion-ignored-extensions "\\.tags/"))
    (eval . (add-to-list 'completion-ignored-extensions "\\.cache/"))
+   (eval . (add-to-list 'completion-ignored-extensions ".pptx"))
+
    (eval . (add-to-list 'completion-ignored-extensions "auto/"))
    (eval . (add-to-list 'completion-ignored-extensions ".xml"))
    (eval . (add-to-list 'completion-ignored-extensions ".drawio"))
-   (eval . (add-to-list 'completion-ignored-extensions ".pptx"))
+
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
 
