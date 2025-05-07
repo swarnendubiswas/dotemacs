@@ -160,7 +160,7 @@ The provider is `nerd-icons'."
      (delete-selection-mode 1)
      ;; Use soft wraps, wrap lines without the ugly continuation marks
      ;; LATER: Is this why `avy' breaks?
-     (global-visual-line-mode 1)
+     ;; (global-visual-line-mode 1)
      ;; When you call `find-file', you do not need to clear the existing
      ;; file path before adding the new one. Just start typing the whole
      ;; path and Emacs will "shadow" the current one. For example, you are
@@ -3555,6 +3555,7 @@ The provider is `nerd-icons'."
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
+  (org-agenda-files '("~/git/org" "~/git/org/client1" "~/git/client2"))
   :config
   (require 'ox-latex)
   (add-to-list 'org-latex-packages-alist '("" "listings"))
