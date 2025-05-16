@@ -154,7 +154,7 @@ The provider is `nerd-icons'."
      (save-place-mode 1)
      (column-number-mode 1)
      (size-indication-mode 1)
-     ;; Auto-save file-visiting buffers at idle time intervals
+     ;; Autosave file-visiting buffers at idle time intervals
      (auto-save-visited-mode 1)
      ;; Typing with the mark active will overwrite the marked region
      (delete-selection-mode 1)
@@ -2239,37 +2239,28 @@ The provider is `nerd-icons'."
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-;; Try completion backends in order until there is a non-empty completion list:
-;; (setq company-backends '(company-xxx company-yyy company-zzz))
+;; Notes on how to set up `company-backends'.
 
-;; Merge completions of all the backends:
-;; (setq company-backends '((company-xxx company-yyy company-zzz)))
-
-;; Merge completions of all the backends but keep the candidates organized in
-;; accordance with the grouped backends order.
-;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
-
-;; A few mode-agnostic backends are applicable to all modes: `company-yasnippet',
-;; `company-ispell', `company-dabbrev-code', and `company-dabbrev'.
-;; `company-yasnippet' is blocking. `company-dabbrev' returns a non-nil prefix
-;; in almost any context (major mode, inside strings or comments). That is why
-;; it is better to put `company-dabbrev' at the end. The ‘prefix’ bool command
-;; always returns non-nil for following backends even when their ‘candidates’
-;; list command is empty: `company-abbrev', `company-dabbrev',
-;; `company-dabbrev-code'.
-
-;; The keyword :with helps to make sure the results from major/minor mode
-;; agnostic backends (such as company-yasnippet, company-dabbrev-code) are
-;; returned without preventing results from context-aware backends (such as
-;; company-capf or company-clang). For this feature to work, put backends
-;; dependent on a mode at the beginning of the grouped backends list, then put a
-;; keyword :with, and then put context agnostic backend(s).
-;; (setq company-backends '((company-capf :with company-yasnippet)))
+;; A few mode-agnostic backends are applicable to all modes:
+;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
+;; `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev' returns
+;; a non-nil prefix in almost any context (major mode, inside strings, or
+;; comments). That is why it is better to put `company-dabbrev' at the end. The
+;; ‘prefix’ bool command always returns non-nil for following backends even when
+;; their ‘candidates’ list command is empty: `company-abbrev',
+;; `company-dabbrev', `company-dabbrev-code'.
 
 ;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
 ;; backends. Only a few backends are specialized on certain major modes or
 ;; certain contexts (e.g. outside of strings and comments), and pass on control
 ;; to later backends when outside of that major mode or context.
+
+;; The keyword ":with" helps to make sure the results from major/minor mode
+;; agnostic backends (such as `company-yasnippet', `company-dabbrev-code') are
+;; returned without preventing results from context-aware backends (such as
+;; `company-capf' or `company-clang'). For this feature to work, put backends
+;; dependent on a mode at the beginning of the grouped backends list, then put a
+;; keyword ":with", and then put context agnostic backend(s).
 
 ;; Company does not support grouping of entirely arbitrary backends, they need
 ;; to be compatible in what `prefix' returns. If the group contains keyword
@@ -2279,6 +2270,18 @@ The provider is `nerd-icons'."
 ;; combined list. That is, with `:separate', the multi-backend-adapter will stop
 ;; sorting and keep the order of completions just like the backends returned
 ;; them.
+
+;; Try completion backends in order until there is a non-empty completion list:
+;; (setq company-backends '(company-xxx company-yyy company-zzz))
+
+;; Merge completions of all the backends:
+;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+
+;; (setq company-backends '((company-capf :with company-yasnippet)))
+
+;; Merge completions of all the backends but keep the candidates organized in
+;; accordance with the grouped backends order.
+;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
 (with-eval-after-load "company"
   ;; Override `company-backends' for unhandled major modes.
@@ -2376,11 +2379,11 @@ The provider is `nerd-icons'."
       (setq-local company-backends
                   '(company-files
                     (company-capf
+                     :separate
                      ;; company-citre-tags
-                     company-c-headers company-ctags
-                     :with company-keywords
+                     company-c-headers company-ctags company-keywords
                      company-dabbrev-code ; Useful for variable names
-                     company-yasnippet)
+                     :with company-yasnippet)
                     company-ispell company-dabbrev)))
 
     (add-hook
@@ -4050,7 +4053,7 @@ used in `company-backends'."
   :hook (emacs-startup . doom-modeline-mode)
   :custom
   (doom-modeline-buffer-encoding nil)
-  (doom-modeline-buffer-file-name-style 'buffer-name)
+  (doom-modeline-buffer-file-name-style 'truncate-all)
   (doom-modeline-unicode-fallback t)
   ;; LSP state is wrong for non-LSP-managed files
   (doom-modeline-lsp nil)
@@ -4193,12 +4196,12 @@ used in `company-backends'."
 
 ;; Allows to easily identify the file path in a project. But does not support
 ;; imenu.
-(use-package project-headerline
-  :straight (:host github :repo "gavv/project-headerline")
-  :hook (emacs-startup . global-project-headerline-mode)
-  :custom
-  (project-headerline-segment-separator " > ")
-  (project-headerline-path-separator " > "))
+;; (use-package project-headerline
+;;   :straight (:host github :repo "gavv/project-headerline")
+;;   :hook (emacs-startup . global-project-headerline-mode)
+;;   :custom
+;;   (project-headerline-segment-separator " > ")
+;;   (project-headerline-path-separator " > "))
 
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb")
@@ -4256,7 +4259,6 @@ used in `company-backends'."
 (use-package eglot
   :straight (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
-  ;; :hook (eglot-managed-mode . eglot-inlay-hints-mode)
   :bind
   (("C-c l l" . eglot)
    ("C-c l q" . eglot-shutdown)
@@ -4282,8 +4284,8 @@ used in `company-backends'."
   (eglot-events-buffer-config '(:size 0 :format full))
   (fset #'jsonrpc--log-event #'ignore)
   (eglot-ignored-server-capabilities
-   '(:inlayHintProvider ; Inlay hints are distracting
-     ;; :codeLensProvider
+   '(:codeLensProvider
+     :inlayHintProvider ; Inlay hints are distracting
      ;; :executeCommandProvider
      ;; :hoverProvider ; Automatic documentation popups can be distracting
      ;; :foldingRangeProvider
@@ -4296,6 +4298,9 @@ used in `company-backends'."
   (eglot-mode-line-format '(eglot-mode-line-action-suggestion))
   (eglot-code-action-indications '(nearby mode-line margin))
   :config
+  (setf (plist-get eglot-events-buffer-config :size) 0)
+  (fset #'jsonrpc--log-event #'ignore)
+
   ;; Show all of the available Eldoc information when we want it. This way
   ;; Flymake errors don't just get clobbered by docstrings.
   (add-hook
@@ -4399,7 +4404,7 @@ used in `company-backends'."
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setopt eglot-stay-out-of
-          '(flymake yasnippet company eldoc eldoc-documentation-strategy))
+          '(flymake yasnippet company-backends eldoc-documentation-strategy))
 
   ;; Translation between JSON and Eglot:
   ;; | true  | t           |

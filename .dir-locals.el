@@ -125,7 +125,8 @@
             flycheck-clang-include-path include-path
             flycheck-gcc-args clang-args
             flycheck-gcc-include-path include-path
-            flycheck-cppcheck-include-path include-path)))
+            flycheck-cppcheck-include-path include-path
+            flycheck-cuda-include-path include-path)))
 
    ;; Alternatively, define clangd-args and set lsp-clients-clangd-args.
    (eval .
@@ -167,7 +168,8 @@
             flycheck-clang-include-path include-path
             flycheck-gcc-args clang-args
             flycheck-gcc-include-path include-path
-            flycheck-cppcheck-include-path include-path)))
+            flycheck-cppcheck-include-path include-path
+            flycheck-cuda-include-path include-path)))
 
    (eval .
          (add-hook
