@@ -67,7 +67,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
   :group 'sb/emacs)
@@ -168,8 +168,7 @@ The provider is `nerd-icons'."
      ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
      ;; you there.
      (file-name-shadow-mode 1)
-     (auto-encryption-mode -1)
-     (which-function-mode 1)))
+     (auto-encryption-mode -1)))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (auto-save-no-message t "Do not print frequent autosave messages")
@@ -1284,9 +1283,9 @@ The provider is `nerd-icons'."
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
-  :diminish)
+;; (use-package ws-butler
+;;   :hook (prog-mode . ws-butler-mode)
+;;   :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
@@ -1630,7 +1629,8 @@ The provider is `nerd-icons'."
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
   :custom
   ;; p: Posix, ci: indent case labels, i: indent with spaces
-  (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci")))
+  (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci"))
+  :diminish shfmt-on-save-mode)
 
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
@@ -2749,7 +2749,7 @@ The provider is `nerd-icons'."
   (lsp-modeline-workspace-status-enable nil)
   ;; (lsp-enable-snippet t)
   (lsp-enable-suggest-server-download nil)
-  (lsp-inlay-hint-enable t)
+  (lsp-inlay-hint-enable nil "Intrusive")
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
   ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
@@ -2953,9 +2953,7 @@ The provider is `nerd-icons'."
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind
-  (:map
-   symbol-overlay-map
-   ("M-p" . symbol-overlay-jump-prev)
+  (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next)
    ("<" . symbol-overlay-jump-first)
    (">" . symbol-overlay-jump-last)
@@ -3797,7 +3795,8 @@ The provider is `nerd-icons'."
          (call-interactively #'xref-find-definitions)))))
   :hook (prog-mode . citre-mode)
   :bind
-  (("C-x c j" . sb/citre-jump+)
+  (("M-'" . sb/citre-jump+)
+   ("C-x c j" . sb/citre-jump+)
    ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c a" . citre-ace-peek)
@@ -3928,7 +3927,7 @@ used in `company-backends'."
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
-  :init (load-theme 'modus-vivendi-tinted t))
+  :init (load-theme 'modus-vivendi t))
 
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
@@ -4257,7 +4256,7 @@ used in `company-backends'."
 (use-package eglot
   :straight (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
-  :hook (eglot-managed-mode . eglot-inlay-hints-mode)
+  ;; :hook (eglot-managed-mode . eglot-inlay-hints-mode)
   :bind
   (("C-c l l" . eglot)
    ("C-c l q" . eglot-shutdown)
@@ -4282,16 +4281,16 @@ used in `company-backends'."
   (eglot-extend-to-xref t)
   (eglot-events-buffer-config '(:size 0 :format full))
   (fset #'jsonrpc--log-event #'ignore)
-  ;; (eglot-ignored-server-capabilities
-  ;;  '(:codeLensProvider
-  ;;    :executeCommandProvider
-  ;;    :hoverProvider ; Automatic documentation popups can be distracting
-  ;;    :foldingRangeProvider
-  ;;    :documentOnTypeFormattingProvider
-  ;;    :documentLinkProvider
-  ;;    :inlayHintProvider ; Inlay hints are distracting
-  ;;    :documentHighlightProvider
-  ;;    ))
+  (eglot-ignored-server-capabilities
+   '(:inlayHintProvider ; Inlay hints are distracting
+     ;; :codeLensProvider
+     ;; :executeCommandProvider
+     ;; :hoverProvider ; Automatic documentation popups can be distracting
+     ;; :foldingRangeProvider
+     ;; :documentOnTypeFormattingProvider
+     ;; :documentLinkProvider
+     ;; :documentHighlightProvider
+     ))
   (eglot-report-progress nil)
   (eglot-advertise-cancellation t)
   (eglot-mode-line-format '(eglot-mode-line-action-suggestion))
