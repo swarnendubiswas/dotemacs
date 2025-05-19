@@ -2341,7 +2341,7 @@ The provider is `nerd-icons'."
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-files company-dict company-ispell company-dabbrev)))
+       '(company-dict company-ispell company-files company-dabbrev)))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -2958,6 +2958,8 @@ The provider is `nerd-icons'."
   :bind
   (("M-p" . symbol-overlay-jump-prev)
    ("M-n" . symbol-overlay-jump-next)
+   :map
+   symbol-overlay-map
    ("<" . symbol-overlay-jump-first)
    (">" . symbol-overlay-jump-last)
    ("d" . symbol-overlay-jump-to-definition)
@@ -3824,18 +3826,6 @@ The provider is `nerd-icons'."
 ;; add dirs/files to scan here, one line per dir/file
 ")
   :config
-  ;; Try LSP first, and then use Citre if the enabled xref backends cannot find
-  ;; a definition
-  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-    (let ((fetcher (apply -fn -args))
-          (citre-fetcher
-           (let ((xref-backend-functions '(citre-xref-backend t)))
-             (apply -fn -args))))
-      (lambda ()
-        (or (with-demoted-errors "%s, fallback to citre"
-              (funcall fetcher))
-            (funcall citre-fetcher)))))
-
   ;; Use `citre' with Emacs Lisp
   ;; https://github.com/universal-ctags/citre/blob/master/docs/user-manual/adapt-an-existing-xref-backend.md
   (citre-register-backend
@@ -4403,8 +4393,7 @@ used in `company-backends'."
                          user-emacs-directory))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setopt eglot-stay-out-of
-          '(flymake yasnippet company-backends eldoc-documentation-strategy))
+  (setopt eglot-stay-out-of '(flymake yasnippet company eldoc))
 
   ;; Translation between JSON and Eglot:
   ;; | true  | t           |
