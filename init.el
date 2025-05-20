@@ -4249,6 +4249,10 @@ used in `company-backends'."
 (use-package eglot
   :straight (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
+  :hook
+  ((dockerfile-ts-mode
+    html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
+   . eglot-ensure)
   :bind
   (("C-c l l" . eglot)
    ("C-c l q" . eglot-shutdown)
@@ -4261,11 +4265,10 @@ used in `company-backends'."
    ("C-c l F" . eglot-format-buffer)
    ("C-c l x" . eglot-code-actions)
    ("C-c l k" . eglot-code-action-quickfix)
+   ("C-c l e" . eglot-code-action-extract)
+   ("C-c l n" . eglot-code-action-inline)
+   ("C-c l w" . eglot-code-action-rewrite)
    ("C-c l o" . eglot-code-action-organize-imports))
-  :hook
-  ((dockerfile-ts-mode
-    html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
-   . eglot-ensure)
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
@@ -4275,11 +4278,11 @@ used in `company-backends'."
   (fset #'jsonrpc--log-event #'ignore)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
+     :documentOnTypeFormattingProvider
      :inlayHintProvider ; Inlay hints are distracting
      ;; :executeCommandProvider
      ;; :hoverProvider ; Automatic documentation popups can be distracting
      ;; :foldingRangeProvider
-     ;; :documentOnTypeFormattingProvider
      ;; :documentLinkProvider
      ;; :documentHighlightProvider
      ))
@@ -4401,17 +4404,24 @@ used in `company-backends'."
   ;; | null  | nil         |
   ;; | {}    | eglot-{}    |
   (setq-default eglot-workspace-configuration
-                '(:pylsp
+                '(:python.analysis
+                  (:autoSearchPaths
+                   t
+                   :useLibraryCodeForTypes t
+                   :typeCheckingMode "basic"
+                   :diagnosticMode "openFilesOnly")
+                  :pylsp
                   (:configurationSources
                    ["setup.cfg"]
                    :plugins
                    (:autopep8
                     (:enabled :json-false)
                     :black
-                    (:enabled :json-false)
+                    (:enabled :json-false :line_length 80 :cache_config t)
                     :flake8
                     (:enabled :json-false :config t :maxLineLength 80)
-                    :jedi (:extra_paths [])
+                    :jedi
+                    (:extra_paths [])
                     :jedi_completion
                     (:fuzzy
                      t
@@ -4421,9 +4431,12 @@ used in `company-backends'."
                      ["pandas" "numpy" "matplotlib"])
                     :jedi_definition
                     (:enabled t :follow_imports t :follow_builtin_imports t)
-                    :jedi_hover (:enabled t)
-                    :jedi_references (:enabled t)
-                    :jedi_signature_help (:enabled t)
+                    :jedi_hover
+                    (:enabled t)
+                    :jedi_references
+                    (:enabled t)
+                    :jedi_signature_help
+                    (:enabled t)
                     :jedi_symbols
                     (:enabled t :all_scopes t :include_import_symbols t)
                     :mccabe
@@ -4433,15 +4446,17 @@ used in `company-backends'."
                     :preload
                     (:enabled t :modules ["pandas" "numpy" "matplotlib"])
                     :pycodestyle
-                    (:enabled :json-false :maxLineLength 8)
+                    (:enabled :json-false :maxLineLength 80)
                     :pydocstyle
                     (:enabled t :convention "numpy")
                     :pyflakes
                     (:enabled :json-false)
-                    :pylint (:enabled t)
+                    :pylint
+                    (:enabled t)
                     :pylsp_black
                     (:enabled :json-false)
-                    :pylsp_isort (:enabled t)
+                    :pylsp_isort
+                    (:enabled t)
                     :pylsp_mypy
                     (:enabled t :report_progress t :live_mode :json-false)
                     :rope_autoimport
@@ -4454,7 +4469,8 @@ used in `company-backends'."
                     (:enabled t :eager :json-false)
                     :ruff
                     (:enabled :json-false :formatEnabled t :lineLength 80)
-                    :yapf (:enabled t)))
+                    :yapf
+                    (:enabled t)))
                   :basedpyright
                   (:checkOnlyOpenFiles
                    t
@@ -4492,6 +4508,7 @@ used in `company-backends'."
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
+  :when (executable-find "emacs-lsp-booster")
   :after eglot
   :demand t
   :config (eglot-booster-mode))
