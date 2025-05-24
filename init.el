@@ -67,9 +67,13 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'none
   "Choose between Lsp-mode and Eglot."
-  :type '(radio (const :tag "lsp-mode" lsp-mode) (const :tag "eglot" eglot))
+  :type
+  '(radio
+    (const :tag "lsp-mode" lsp-mode)
+    (const :tag "eglot" eglot)
+    (const :tag "none" none))
   :group 'sb/emacs)
 
 (defconst sb/user-home-directory (getenv "HOME")
@@ -1502,7 +1506,9 @@ The provider is `nerd-icons'."
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-global-modes '(not csv-mode conf-mode))
   :config
-  (dolist (checkers '(proselint textlint tex-chktex emacs-lisp-checkdoc))
+  ;; Shellcheck is invoked by bash lsp
+  (dolist (checkers
+           '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck))
     (delq checkers flycheck-checkers))
 
   ;; These themes have their own styles for displaying flycheck info.
