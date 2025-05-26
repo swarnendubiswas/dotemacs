@@ -2901,12 +2901,15 @@ The provider is `nerd-icons'."
       c-basic-offset 4
       c-set-style "java")
      (lsp-deferred)))
+  :bind (:map lsp-mode-map ("y" . lsp-java-type-hierarchy))
   :custom
   (lsp-java-save-actions-organize-imports t)
-  (lsp-java-format-settings-profile "Swarnendu")
   (lsp-java-format-settings-url
-   (expand-file-name "github/dotfiles/java/eclipse-format-swarnendu.xml"
-                     sb/user-home-directory)))
+   (concat
+    "file://"
+    (file-truename (locate-user-emacs-file "servers/eclipse-formatter.xml"))))
+  (lsp-java-jdt-download-url
+   "https://github.com/eclipse-jdtls/eclipse.jdt.ls/archive/refs/tags/v1.47.0.tar.gz"))
 
 (use-package lsp-ltex-plus
   :straight (:host github :repo "emacs-languagetool/lsp-ltex-plus")
@@ -2952,11 +2955,8 @@ The provider is `nerd-icons'."
    (append
     '(("LATER" . "#d0bf8f")
       ("IMP" . "#7cb8bb")
-      ("ISSUE" . "#ff8c00")
-      ("DEBUG" . "#ff8c00")
       ("TEST" . "tomato")
-      ("WARNING" . "#cc0000")
-      ("REFACTOR" . "#cc9393"))
+      ("WARNING" . "#cc0000"))
     hl-todo-keyword-faces)))
 
 (use-package symbol-overlay
