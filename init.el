@@ -67,7 +67,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'none
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -1232,10 +1232,7 @@ The provider is `nerd-icons'."
 ;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
 ;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
 (use-package bm
-  :init
-  (setopt
-   bm-restore-repository-on-load t
-   bm-verbosity-level 0)
+  :init (setq bm-restore-repository-on-load t)
   :hook
   ((kill-emacs
     .
@@ -1249,6 +1246,7 @@ The provider is `nerd-icons'."
    (find-file . bm-buffer-restore)
    (emacs-startup . bm-repository-load))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
+  :custom (bm-verbosity-level 0)
   :config (setq-default bm-buffer-persistence t))
 
 (use-package crux
@@ -3564,7 +3562,6 @@ The provider is `nerd-icons'."
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
-  (org-agenda-files '("~/git/org" "~/git/org/client1" "~/git/client2"))
   :config
   (require 'ox-latex)
   (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -4300,13 +4297,6 @@ used in `company-backends'."
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
 
-  ;; Show all of the available Eldoc information when we want it. This way
-  ;; Flymake errors don't just get clobbered by docstrings.
-  (add-hook
-   'eglot-managed-mode-hook
-   (lambda ()
-     (setq-local eldoc-documentation-strategy #'eldoc-documentation-compose)))
-
   (setopt eglot-server-programs nil)
   (add-to-list
    'eglot-server-programs
@@ -4402,7 +4392,7 @@ used in `company-backends'."
                          user-emacs-directory))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setopt eglot-stay-out-of '(flymake yasnippet company eldoc))
+  (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
   ;; Translation between JSON and Eglot:
   ;; | true  | t           |
