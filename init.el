@@ -43,13 +43,13 @@
   :group 'sb/emacs)
 
 ;; Corfu integrates nicely with `orderless' and provides better completion for
-;; Elisp symbols with `cape-symbol'. But `corfu-terminal-mode' has a rendering
-;; problem for completion popups appearing near the right edges with terminal
-;; Emacs. The completion entries wrap around sometimes, and messes up the
-;; completion. Company works better with both Windows and TUI Emacs, and has
-;; more extensive LaTeX support than Corfu. We can set up separate completion
-;; files with `company-ispell' and `company-dict'. However, `company-ispell'
-;; does not keep prefix case when used as a grouped backend.
+;; Elisp symbols with `cape-symbol'. But `corfu-terminal-mode' with Emacs < 30
+;; has a rendering problem for completion popups appearing near the right edges
+;; with terminal Emacs. The completion entries wrap around sometimes, and messes
+;; up the completion. Company works better with both Windows and TUI Emacs, and
+;; has more extensive LaTeX support than Corfu. We can set up separate
+;; completion files with `company-ispell' and `company-dict'. However,
+;; `company-ispell' does not keep prefix case when used as a grouped backend.
 (defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
@@ -120,8 +120,6 @@ The provider is `nerd-icons'."
   ;; Use "M-x use-package-report" to see results
   (setopt
    use-package-compute-statistics t
-   ;; Show everything
-   use-package-minimum-reported-time 0
    use-package-verbose t))
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
@@ -163,8 +161,7 @@ The provider is `nerd-icons'."
      ;; Typing with the mark active will overwrite the marked region
      (delete-selection-mode 1)
      ;; Use soft wraps, wrap lines without the ugly continuation marks
-     ;; LATER: Is this why `avy' breaks?
-     ;; (global-visual-line-mode 1)
+     (global-visual-line-mode 1)
      ;; When you call `find-file', you do not need to clear the existing
      ;; file path before adding the new one. Just start typing the whole
      ;; path and Emacs will "shadow" the current one. For example, you are
@@ -711,7 +708,6 @@ The provider is `nerd-icons'."
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
   :straight (:type built-in)
-  :commands dired
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh `dired' when files change
    (dired-mode . dired-hide-details-mode))
@@ -736,9 +732,8 @@ The provider is `nerd-icons'."
   ;; information, "p" is to append "/" indicator to directories, "v" uses
   ;; natural sort of (version) numbers within text. Check "ls" for additional
   ;; options.
-  ;; (dired-listing-switches
-  ;;  "-aBFghlNopv --group-directories-first --time-style=locale")
-  (dired-listing-switches "--group-directories-first")
+  (dired-listing-switches
+   "-aBFghlNopv --group-directories-first --time-style=locale")
   (dired-ls-F-marks-symlinks t "-F marks links with @")
   (dired-recursive-copies 'always "Single prompt for all n directories")
   (dired-recursive-deletes 'always "Single prompt for all n directories")
@@ -764,8 +759,6 @@ The provider is `nerd-icons'."
   ;; Obsolete from Emacs 28+
   (unless (> emacs-major-version 27)
     (setopt dired-bind-jump t))
-
-  (setopt dired-omit-files (concat "\\`[.]\\'"))
 
   (setopt dired-omit-files
           (concat
@@ -1058,6 +1051,7 @@ The provider is `nerd-icons'."
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
 (use-package marginalia
+  :disabled
   :after vertico
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
@@ -2312,22 +2306,22 @@ The provider is `nerd-icons'."
       ;; `company-capf' with Texlab does not pass to later backends, so it makes
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
-      (setq-local company-backends
-                  '((company-reftex-citations company-auctex-bibs)
-                    (company-reftex-labels company-auctex-labels)
-                    (company-auctex-symbols
-                     company-auctex-environments
-                     company-auctex-macros
-                     company-latex-commands
-                     ;; Math latex tags
-                     company-math-symbols-latex
-                     ;; Math Unicode symbols and sub(super)scripts
-                     company-math-symbols-unicode)
-                    company-files
-                    company-dict
-                    company-ispell
-                    company-dabbrev
-                    company-yasnippet)))
+      (setq company-backends
+            '((company-reftex-citations company-auctex-bibs)
+              (company-reftex-labels company-auctex-labels)
+              (company-auctex-symbols
+               company-auctex-environments
+               company-auctex-macros
+               company-latex-commands
+               ;; Math latex tags
+               company-math-symbols-latex
+               ;; Math Unicode symbols and sub(super)scripts
+               company-math-symbols-unicode)
+              company-files
+              company-dict
+              company-ispell
+              company-dabbrev
+              company-yasnippet)))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -2345,7 +2339,7 @@ The provider is `nerd-icons'."
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-dict company-ispell company-files company-dabbrev)))
+       '(company-files company-dict company-ispell company-dabbrev)))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
