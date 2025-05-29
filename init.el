@@ -2286,10 +2286,14 @@ The provider is `nerd-icons'."
   (setopt
    company-backends
    '(company-files
-     (company-capf :with company-dabbrev-code company-yasnippet)
+     (company-capf
+      :separate
+      company-dabbrev-code
+      company-keywords
+      :with company-yasnippet)
      ;; If we have `company-dabbrev' first, then other matches from
      ;; `company-ispell' will be ignored.
-     company-dict company-ispell company-dabbrev)
+     (company-dict company-ispell) company-dabbrev)
    company-transformers '(delete-dups))
 
   ;; Ignore matches from `company-dabbrev' that consist solely of numbers
@@ -2318,8 +2322,7 @@ The provider is `nerd-icons'."
                ;; Math Unicode symbols and sub(super)scripts
                company-math-symbols-unicode)
               company-files
-              company-dict
-              company-ispell
+              (company-dict company-ispell)
               company-dabbrev
               company-yasnippet)))
 
@@ -2330,7 +2333,9 @@ The provider is `nerd-icons'."
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         company-org-block company-dict company-ispell company-dabbrev)))
+         (company-org-block :with company-yasnippet)
+         (company-dict company-ispell)
+         company-dabbrev)))
 
     (add-hook 'org-mode-hook #'sb/company-org-mode))
 
@@ -2339,7 +2344,7 @@ The provider is `nerd-icons'."
       "Add backends for `text-mode' completion in company mode."
       (set
        (make-local-variable 'company-backends)
-       '(company-files company-dict company-ispell company-dabbrev)))
+       '(company-files (company-dict company-ispell) company-dabbrev)))
 
     ;; Extends to derived modes like `markdown-mode' and `org-mode'
     (add-hook
@@ -2354,10 +2359,10 @@ The provider is `nerd-icons'."
       (setq-local company-backends
                   '(company-files
                     (company-capf
-                     :with
+                     :separate
                      company-dabbrev-code ; Useful for variable names
-                     company-yasnippet)
-                    company-ispell company-dabbrev)))
+                     :with company-yasnippet)
+                    (company-dict company-ispell) company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode #'sb/company-yaml-mode)))
@@ -2367,7 +2372,9 @@ The provider is `nerd-icons'."
       (set
        (make-local-variable 'company-backends)
        '(company-files
-         company-capf company-dict company-ispell company-dabbrev)))
+         (company-capf :with company-yasnippet)
+         (company-dict company-ispell)
+         company-dabbrev)))
 
     (dolist (hook '(html-mode-hook html-ts-mode-hook))
       (add-hook hook #'sb/company-html-mode)))
@@ -2398,10 +2405,10 @@ The provider is `nerd-icons'."
       (setq-local company-backends
                   '(company-files
                     (company-capf
-                     :with company-keywords
+                     :separate company-keywords
                      company-dabbrev-code ; Useful for variable names
-                     company-yasnippet)
-                    company-ispell company-dabbrev)))
+                     :with company-yasnippet)
+                    (company-dict company-ispell) company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
       (add-hook hook #'sb/company-elisp-mode))))
