@@ -22,7 +22,7 @@
   :group 'sb/emacs)
 
 ;; Modus-vivendi is the most complete, while Catppuccin is more colorful.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -1747,6 +1747,338 @@ The provider is `nerd-icons'."
 (use-package consult-yasnippet
   :bind ("C-M-y" . consult-yasnippet))
 
+;; `kind-icon' can be used for both Corfu and Company. I set up nerd icons for
+;; Corfu with `nerd-icons-corfu'. I use `kind-icon' to provide nerd icons for
+;; Company.
+(use-package kind-icon
+  :when (bound-and-true-p sb/enable-icons)
+  :demand t
+  :custom (kind-icon-blend-background nil)
+  ;; Prefer smaller icons and a more compact popup
+  (kind-icon-default-style
+   '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+  :config
+  ;; Prefer nerd-icons for Corfu with `nerd-icons-corfu'
+  ;; (when (eq sb/in-buffer-completion 'corfu)
+  ;;   (with-eval-after-load "corfu"
+  ;;     ;; Compute blended backgrounds correctly
+  ;;     (setopt kind-icon-default-face 'corfu-default)
+  ;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+
+  ;; Replace default company icons with nerd-icons
+  (when (eq sb/in-buffer-completion 'company)
+    (require 'svg-lib)
+    (add-to-list
+     'svg-lib-icon-collections
+     '("nerd-fonts-codicons"
+       .
+       "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
+
+    (setopt kind-icon-mapping
+            '((array
+               "a"
+               :icon "symbol-array"
+               :face font-lock-type-face
+               :collection "nerd-fonts-codicons")
+              (boolean
+               "b"
+               :icon "symbol-boolean"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (class
+               "c"
+               :icon "symbol-class"
+               :face font-lock-type-face
+               :collection "nerd-fonts-codicons")
+              (color
+               "#"
+               :icon "symbol-color"
+               :face success
+               :collection "nerd-fonts-codicons")
+              (command
+               "cm"
+               :icon "chevron-right"
+               :face default
+               :collection "nerd-fonts-codicons")
+              (constant
+               "co"
+               :icon "symbol-constant"
+               :face font-lock-constant-face
+               :collection "nerd-fonts-codicons")
+              (constructor
+               "cn"
+               :icon "symbol-method"
+               :face font-lock-function-name-face
+               :collection "nerd-fonts-codicons")
+              (enum
+               "e"
+               :icon "symbol-enum"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (enummember
+               "em"
+               :icon "symbol-enum-member"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (enum-member
+               "em"
+               :icon "symbol-enum-member"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (event
+               "ev"
+               :icon "symbol-event"
+               :face font-lock-warning-face
+               :collection "nerd-fonts-codicons")
+              (field
+               "fd"
+               :icon "symbol-field"
+               :face font-lock-variable-name-face
+               :collection "nerd-fonts-codicons")
+              (file
+               "f"
+               :icon "symbol-file"
+               :face font-lock-string-face
+               :collection "nerd-fonts-codicons")
+              (folder
+               "d"
+               :icon "folder"
+               :face font-lock-doc-face
+               :collection "nerd-fonts-codicons")
+              (function "f"
+                        :icon "symbol-method"
+                        :face font-lock-function-name-face
+                        :collection "nerd-fonts-codicons")
+              ;; For Python
+              (instance
+               "in"
+               :icon "symbol-variable"
+               :face font-lock-variable-name-face
+               :collection "vscode")
+              (interface
+               "if"
+               :icon "symbol-interface"
+               :face font-lock-type-face
+               :collection "nerd-fonts-codicons")
+              (keyword
+               "kw"
+               :icon "symbol-keyword"
+               :face font-lock-keyword-face
+               :collection "nerd-fonts-codicons")
+              (macro "mc" :icon "lambda" :face font-lock-keyword-face)
+              (magic
+               "ma"
+               :icon "lightbulb-autofix"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (method
+               "m"
+               :icon "symbol-method"
+               :face font-lock-function-name-face
+               :collection "nerd-fonts-codicons")
+              (module
+               "{"
+               :icon "file-code-outline"
+               :face font-lock-preprocessor-face)
+              (namespace
+               "ns"
+               :icon "file-code-outline"
+               :face font-lock-preprocessor-face)
+              (numeric
+               "nu"
+               :icon "symbol-numeric"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (operator
+               "op"
+               :icon "symbol-operator"
+               :face font-lock-comment-delimiter-face
+               :collection "nerd-fonts-codicons")
+              (param
+               "pa"
+               :icon "gear"
+               :face default
+               :collection "nerd-fonts-codicons")
+              (property
+               "pr"
+               :icon "symbol-property"
+               :face font-lock-variable-name-face
+               :collection "nerd-fonts-codicons")
+              (reference
+               "rf"
+               :icon "library"
+               :face font-lock-variable-name-face
+               :collection "nerd-fonts-codicons")
+              (snippet
+               "S"
+               :icon "symbol-snippet"
+               :face font-lock-string-face
+               :collection "nerd-fonts-codicons")
+              (statement
+               "st"
+               :icon "symbol-field"
+               :face font-lock-variable-name-face
+               :collection "vscode")
+              (string
+               "s"
+               :icon "symbol-string"
+               :face font-lock-string-face
+               :collection "nerd-fonts-codicons")
+              (struct
+               "%"
+               :icon "symbol-structure"
+               :face font-lock-variable-name-face
+               :collection "nerd-fonts-codicons")
+              (text
+               "tx"
+               :icon "symbol-key"
+               :face font-lock-doc-face
+               :collection "nerd-fonts-codicons")
+              (typeparameter
+               "tp"
+               :icon "symbol-parameter"
+               :face font-lock-type-face
+               :collection "nerd-fonts-codicons")
+              (type-parameter
+               "tp"
+               :icon "symbol-parameter"
+               :face font-lock-type-face
+               :collection "nerd-fonts-codicons")
+              (unit
+               "u"
+               :icon "symbol-ruler"
+               :face font-lock-constant-face
+               :collection "nerd-fonts-codicons")
+              (value
+               "v"
+               :icon "symbol-enum"
+               :face font-lock-builtin-face
+               :collection "nerd-fonts-codicons")
+              (variable
+               "va"
+               :icon "symbol-variable"
+               :face font-lock-variable-name-face
+               :collection "nerd-fonts-codicons")
+              (t
+               "."
+               :icon "cod"
+               :face font-lock-warning-face
+               :collection "nerd-fonts-codicons")))
+
+    ;; (setopt kind-icon-mapping
+    ;;         `((array
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_array")
+    ;;            :face font-lock-type-face)
+    ;;           (boolean
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_boolean")
+    ;;            :face font-lock-builtin-face)
+    ;;           (class
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_class")
+    ;;            :face font-lock-type-face)
+    ;;           (color
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_color")
+    ;;            :face success)
+    ;;           (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+    ;;           (constant
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_constant")
+    ;;            :face font-lock-constant-face)
+    ;;           (constructor
+    ;;            ,(nerd-icons-codicon "nf-cod-triangle_right")
+    ;;            :face font-lock-function-name-face)
+    ;;           (enummember
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+    ;;            :face font-lock-builtin-face)
+    ;;           (enum-member
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+    ;;            :face font-lock-builtin-face)
+    ;;           (enum
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum")
+    ;;            :face font-lock-builtin-face)
+    ;;           (event
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_event")
+    ;;            :face font-lock-warning-face)
+    ;;           (field
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_field")
+    ;;            :face font-lock-variable-name-face)
+    ;;           (file
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_file")
+    ;;            :face font-lock-string-face)
+    ;;           (folder
+    ;;            ,(nerd-icons-codicon "nf-cod-folder")
+    ;;            :face font-lock-doc-face)
+    ;;           (interface
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_interface")
+    ;;            :face font-lock-type-face)
+    ;;           (keyword
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_keyword")
+    ;;            :face font-lock-keyword-face)
+    ;;           (macro
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_misc")
+    ;;            :face font-lock-keyword-face)
+    ;;           (magic
+    ;;            ,(nerd-icons-codicon "nf-cod-wand")
+    ;;            :face font-lock-builtin-face)
+    ;;           (method
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_method")
+    ;;            :face font-lock-function-name-face)
+    ;;           (function ,(nerd-icons-codicon "nf-cod-symbol_method")
+    ;;                     :face font-lock-function-name-face)
+    ;;           (module
+    ;;            ,(nerd-icons-codicon "nf-cod-file_submodule")
+    ;;            :face font-lock-preprocessor-face)
+    ;;           (numeric
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_numeric")
+    ;;            :face font-lock-builtin-face)
+    ;;           (operator
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_operator")
+    ;;            :face font-lock-comment-delimiter-face)
+    ;;           (param
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_parameter")
+    ;;            :face default)
+    ;;           (property
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_property")
+    ;;            :face font-lock-variable-name-face)
+    ;;           (reference
+    ;;            ,(nerd-icons-codicon "nf-cod-references")
+    ;;            :face font-lock-variable-name-face)
+    ;;           (snippet
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_snippet")
+    ;;            :face font-lock-string-face)
+    ;;           (string
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_string")
+    ;;            :face font-lock-string-face)
+    ;;           (struct
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_structure")
+    ;;            :face font-lock-variable-name-face)
+    ;;           (text
+    ;;            ,(nerd-icons-codicon "nf-cod-text_size")
+    ;;            :face font-lock-doc-face)
+    ;;           (typeparameter
+    ;;            ,(nerd-icons-codicon "nf-cod-list_unordered")
+    ;;            :face font-lock-type-face)
+    ;;           (type-parameter
+    ;;            ,(nerd-icons-codicon "nf-cod-list_unordered")
+    ;;            :face font-lock-type-face)
+    ;;           (unit
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_ruler")
+    ;;            :face font-lock-constant-face)
+    ;;           (value
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_field")
+    ;;            :face font-lock-builtin-face)
+    ;;           (variable
+    ;;            ,(nerd-icons-codicon "nf-cod-symbol_variable")
+    ;;            :face font-lock-variable-name-face)
+    ;;           (t
+    ;;            ,(nerd-icons-codicon "nf-cod-code")
+    ;;            :face font-lock-warning-face)))
+
+    (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
+           (formatter
+            (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
+      (defun sb/company-kind-icon-margin (cand _selected)
+        (funcall formatter cand))
+      (setopt company-format-margin-function #'sb/company-kind-icon-margin))))
+
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the
 ;; backend used for the last completion. Try "M-x company-complete-common" when
 ;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
@@ -1832,340 +2164,6 @@ The provider is `nerd-icons'."
   :when (bound-and-true-p sb/enable-icons)
   :demand t
   :custom (nerd-icons-scale-factor 0.8))
-
-;; `kind-icon' can be used for both Corfu and Company. I set up nerd icons for
-;; Corfu with `nerd-icons-corfu'. I use `kind-icon' to provide nerd icons for
-;; Company.
-(use-package kind-icon
-  :when (bound-and-true-p sb/enable-icons)
-  :demand t
-  :custom (kind-icon-blend-background nil)
-  ;; Prefer smaller icons and a more compact popup
-  (kind-icon-default-style
-   '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
-  :config
-  ;; Prefer nerd-icons for Corfu with `nerd-icons-corfu'
-  ;; (when (eq sb/in-buffer-completion 'corfu)
-  ;;   (with-eval-after-load "corfu"
-  ;;     ;; Compute blended backgrounds correctly
-  ;;     (setopt kind-icon-default-face 'corfu-default)
-  ;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
-
-  ;; Replace default company icons with nerd-icons
-  (when (eq sb/in-buffer-completion 'company)
-    (with-eval-after-load "company"
-      (require 'svg-lib)
-      (add-to-list
-       'svg-lib-icon-collections
-       '("nerd-fonts-codicons"
-         .
-         "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
-
-      ;; (setopt kind-icon-mapping
-      ;;         '((array
-      ;;            "a"
-      ;;            :icon "symbol-array"
-      ;;            :face font-lock-type-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (boolean
-      ;;            "b"
-      ;;            :icon "symbol-boolean"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (class
-      ;;            "c"
-      ;;            :icon "symbol-class"
-      ;;            :face font-lock-type-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (color
-      ;;            "#"
-      ;;            :icon "symbol-color"
-      ;;            :face success
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (command
-      ;;            "cm"
-      ;;            :icon "chevron-right"
-      ;;            :face default
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (constant
-      ;;            "co"
-      ;;            :icon "symbol-constant"
-      ;;            :face font-lock-constant-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (constructor
-      ;;            "cn"
-      ;;            :icon "symbol-method"
-      ;;            :face font-lock-function-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (enum
-      ;;            "e"
-      ;;            :icon "symbol-enum"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (enummember
-      ;;            "em"
-      ;;            :icon "symbol-enum-member"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (enum-member
-      ;;            "em"
-      ;;            :icon "symbol-enum-member"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (event
-      ;;            "ev"
-      ;;            :icon "symbol-event"
-      ;;            :face font-lock-warning-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (field
-      ;;            "fd"
-      ;;            :icon "symbol-field"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (file
-      ;;            "f"
-      ;;            :icon "symbol-file"
-      ;;            :face font-lock-string-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (folder
-      ;;            "d"
-      ;;            :icon "folder"
-      ;;            :face font-lock-doc-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (function "f"
-      ;;                     :icon "symbol-method"
-      ;;                     :face font-lock-function-name-face
-      ;;                     :collection "nerd-fonts-codicons")
-      ;;           ;; For Python
-      ;;           (instance
-      ;;            "in"
-      ;;            :icon "symbol-variable"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "vscode")
-      ;;           (interface
-      ;;            "if"
-      ;;            :icon "symbol-interface"
-      ;;            :face font-lock-type-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (keyword
-      ;;            "kw"
-      ;;            :icon "symbol-keyword"
-      ;;            :face font-lock-keyword-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (macro "mc" :icon "lambda" :face font-lock-keyword-face)
-      ;;           (magic
-      ;;            "ma"
-      ;;            :icon "lightbulb-autofix"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (method
-      ;;            "m"
-      ;;            :icon "symbol-method"
-      ;;            :face font-lock-function-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (module
-      ;;            "{"
-      ;;            :icon "file-code-outline"
-      ;;            :face font-lock-preprocessor-face)
-      ;;           (namespace
-      ;;            "ns"
-      ;;            :icon "file-code-outline"
-      ;;            :face font-lock-preprocessor-face)
-      ;;           (numeric
-      ;;            "nu"
-      ;;            :icon "symbol-numeric"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (operator
-      ;;            "op"
-      ;;            :icon "symbol-operator"
-      ;;            :face font-lock-comment-delimiter-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (param
-      ;;            "pa"
-      ;;            :icon "gear"
-      ;;            :face default
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (property
-      ;;            "pr"
-      ;;            :icon "symbol-property"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (reference
-      ;;            "rf"
-      ;;            :icon "library"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (snippet
-      ;;            "S"
-      ;;            :icon "symbol-snippet"
-      ;;            :face font-lock-string-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (statement
-      ;;            "st"
-      ;;            :icon "symbol-field"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "vscode")
-      ;;           (string
-      ;;            "s"
-      ;;            :icon "symbol-string"
-      ;;            :face font-lock-string-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (struct
-      ;;            "%"
-      ;;            :icon "symbol-structure"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (text
-      ;;            "tx"
-      ;;            :icon "symbol-key"
-      ;;            :face font-lock-doc-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (typeparameter
-      ;;            "tp"
-      ;;            :icon "symbol-parameter"
-      ;;            :face font-lock-type-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (type-parameter
-      ;;            "tp"
-      ;;            :icon "symbol-parameter"
-      ;;            :face font-lock-type-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (unit
-      ;;            "u"
-      ;;            :icon "symbol-ruler"
-      ;;            :face font-lock-constant-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (value
-      ;;            "v"
-      ;;            :icon "symbol-enum"
-      ;;            :face font-lock-builtin-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (variable
-      ;;            "va"
-      ;;            :icon "symbol-variable"
-      ;;            :face font-lock-variable-name-face
-      ;;            :collection "nerd-fonts-codicons")
-      ;;           (t
-      ;;            "."
-      ;;            :icon "question"
-      ;;            :face font-lock-warning-face
-      ;;            :collection "nerd-fonts-codicons")))
-
-      (setopt kind-icon-mapping
-              `((array
-                 ,(nerd-icons-codicon "nf-cod-symbol_array")
-                 :face font-lock-type-face)
-                (boolean
-                 ,(nerd-icons-codicon "nf-cod-symbol_boolean")
-                 :face font-lock-builtin-face)
-                (class
-                 ,(nerd-icons-codicon "nf-cod-symbol_class")
-                 :face font-lock-type-face)
-                (color
-                 ,(nerd-icons-codicon "nf-cod-symbol_color")
-                 :face success)
-                (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-                (constant
-                 ,(nerd-icons-codicon "nf-cod-symbol_constant")
-                 :face font-lock-constant-face)
-                (constructor
-                 ,(nerd-icons-codicon "nf-cod-triangle_right")
-                 :face font-lock-function-name-face)
-                (enummember
-                 ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-                 :face font-lock-builtin-face)
-                (enum-member
-                 ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-                 :face font-lock-builtin-face)
-                (enum
-                 ,(nerd-icons-codicon "nf-cod-symbol_enum")
-                 :face font-lock-builtin-face)
-                (event
-                 ,(nerd-icons-codicon "nf-cod-symbol_event")
-                 :face font-lock-warning-face)
-                (field
-                 ,(nerd-icons-codicon "nf-cod-symbol_field")
-                 :face font-lock-variable-name-face)
-                (file
-                 ,(nerd-icons-codicon "nf-cod-symbol_file")
-                 :face font-lock-string-face)
-                (folder
-                 ,(nerd-icons-codicon "nf-cod-folder")
-                 :face font-lock-doc-face)
-                (interface
-                 ,(nerd-icons-codicon "nf-cod-symbol_interface")
-                 :face font-lock-type-face)
-                (keyword
-                 ,(nerd-icons-codicon "nf-cod-symbol_keyword")
-                 :face font-lock-keyword-face)
-                (macro
-                 ,(nerd-icons-codicon "nf-cod-symbol_misc")
-                 :face font-lock-keyword-face)
-                (magic
-                 ,(nerd-icons-codicon "nf-cod-wand")
-                 :face font-lock-builtin-face)
-                (method
-                 ,(nerd-icons-codicon "nf-cod-symbol_method")
-                 :face font-lock-function-name-face)
-                (function ,(nerd-icons-codicon "nf-cod-symbol_method")
-                          :face font-lock-function-name-face)
-                (module
-                 ,(nerd-icons-codicon "nf-cod-file_submodule")
-                 :face font-lock-preprocessor-face)
-                (numeric
-                 ,(nerd-icons-codicon "nf-cod-symbol_numeric")
-                 :face font-lock-builtin-face)
-                (operator
-                 ,(nerd-icons-codicon "nf-cod-symbol_operator")
-                 :face font-lock-comment-delimiter-face)
-                (param
-                 ,(nerd-icons-codicon "nf-cod-symbol_parameter")
-                 :face default)
-                (property
-                 ,(nerd-icons-codicon "nf-cod-symbol_property")
-                 :face font-lock-variable-name-face)
-                (reference
-                 ,(nerd-icons-codicon "nf-cod-references")
-                 :face font-lock-variable-name-face)
-                (snippet
-                 ,(nerd-icons-codicon "nf-cod-symbol_snippet")
-                 :face font-lock-string-face)
-                (string
-                 ,(nerd-icons-codicon "nf-cod-symbol_string")
-                 :face font-lock-string-face)
-                (struct
-                 ,(nerd-icons-codicon "nf-cod-symbol_structure")
-                 :face font-lock-variable-name-face)
-                (text
-                 ,(nerd-icons-codicon "nf-cod-text_size")
-                 :face font-lock-doc-face)
-                (typeparameter
-                 ,(nerd-icons-codicon "nf-cod-list_unordered")
-                 :face font-lock-type-face)
-                (type-parameter
-                 ,(nerd-icons-codicon "nf-cod-list_unordered")
-                 :face font-lock-type-face)
-                (unit
-                 ,(nerd-icons-codicon "nf-cod-symbol_ruler")
-                 :face font-lock-constant-face)
-                (value
-                 ,(nerd-icons-codicon "nf-cod-symbol_field")
-                 :face font-lock-builtin-face)
-                (variable
-                 ,(nerd-icons-codicon "nf-cod-symbol_variable")
-                 :face font-lock-variable-name-face)
-                (t
-                 ,(nerd-icons-codicon "nf-cod-code")
-                 :face font-lock-warning-face)))
-
-      (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
-             (formatter
-              (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
-        (defun sb/company-kind-icon-margin (cand _selected)
-          (funcall formatter cand))
-        (setopt company-format-margin-function
-                #'sb/company-kind-icon-margin)))))
 
 ;; Show documentation popups
 (use-package company-quickhelp
@@ -2311,7 +2309,8 @@ The provider is `nerd-icons'."
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
       (setq company-backends
-            '((company-reftex-citations company-auctex-bibs)
+            '(:separate
+              (company-reftex-citations company-auctex-bibs)
               (company-reftex-labels company-auctex-labels)
               (company-auctex-symbols
                company-auctex-environments
@@ -2324,7 +2323,8 @@ The provider is `nerd-icons'."
               company-files
               (company-dict company-ispell)
               company-dabbrev
-              company-yasnippet)))
+              company-yasnippet
+              company-capf)))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -2789,6 +2789,7 @@ The provider is `nerd-icons'."
    '("-j=4"
      "--all-scopes-completion"
      "--background-index"
+     ;; Unsupported option with Clangd 14
      "--background-index-priority=low"
      "--clang-tidy"
      "--completion-style=detailed"
@@ -4319,6 +4320,7 @@ used in `company-backends'."
       "--compile-commands-dir=./."
       "--all-scopes-completion"
       "--background-index"
+      ;; Unsupported option with Clangd 14
       "--background-index-priority=low"
       "--clang-tidy"
       "--completion-style=detailed"
