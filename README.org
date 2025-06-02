@@ -134,13 +134,11 @@ dir3
 Use GNU Global with =counsel-gtags=: ~gtags -cv --gtagslabel=new-ctags~
 
 #+begin_src shell
-find -L . -type f -iname "*.cpp" -o -iname "*.c" -o -iname "*.cc" -o -iname "*.h" -o -iname "*.hpp" -o -iname "*.py" ! -iname "*.cu" -o -iname "*.proto" | gtags -cv --gtagslabel=new-ctags -f -
-
-find ./src -type f -iname "*.py" ! -iname "__init__.py" | gtags -cv --gtagslabel=new-ctags -f -
-
+# Generate tags for LaTeX draft
 find . -type f -iname "*.tex" | gtags -vc --gtagslabel=new-ctags -f -
 
-find . -type d \( -path ./etc -o -path ./var -o -path ./eln-cache -o -path ./.cache \) -prune | gtags -cv --gtagslabel=new-ctags -f -
+# Generate tags for .emacs.d directory
+find . \( -path "./servers" -o -path "./etc" -o -path "./var" -o -path "./tree-sitter" -o -path "./.cache" -o -path "./eglot-java-eclipse-jdt-cache" -o -path "./eln-cache" -o -path "./straight/build" -o -path "./snippets" -o -path "./company-dict" -o -path "./**/.git" -o -path "./.git" -o -path "./share" \) -prune -o \( -type f ! -name "*.elc" ! -name "*.js" ! -name "*.png" ! -name "*.svg" ! -name "*.gif" ! -name "*.txt" ! -name "*.rst" ! -name "*.html" \) -print | gtags -cv --gtagslabel=new-ctags -f -
 #+end_src
 
 ** Configuring Emacs Daemon

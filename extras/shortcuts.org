@@ -419,7 +419,9 @@ Use ~magit-status~ to display information about the current Git repository and ~
 - ~b~ - Copy text from the right-hand file B to the left-hand file A
 - ~wa~ - Save buffer A if it was modified
 - ~wb~ - Save buffer B if it was modified
-- ~r~ - Undo (revert) the application of A/B hunk  
+- ~r~ - Undo (revert) the application of A/B hunk
+- ~ra~ - Restore the old content in buffer A
+- ~rb~ - Restore the old content in buffer B
 - ~!~ - Recompute the difference regions, bringing them up to date
 - ~*~ - Forces refinement of the current difference region, which highlights the exact words of disagreement among the buffers
 - ~|~ - Toggles the horizontal/vertical split of the display
