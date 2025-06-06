@@ -3819,7 +3819,7 @@ The provider is `nerd-icons'."
       (error
        (let* ((xref-prompt-for-identifier nil))
          (call-interactively #'xref-find-definitions)))))
-  :hook (find-file . citre-auto-enable-citre-mode)
+  :hook (prog-mode . citre-mode)
   :bind* ("M-." . sb/citre-jump+)
   :bind
   (("C-x c j" . sb/citre-jump+)
@@ -3856,9 +3856,20 @@ The provider is `nerd-icons'."
      (lambda () (derived-mode-p 'emacs-lisp-mode))))
   ;; Register the backend, which means to bind it with the symbol `elisp'.
   (citre-register-backend 'elisp citre-elisp-backend)
-  ;; Add Elisp to the backend lists.
+
   (setq citre-find-definition-backends '(elisp eglot tags global))
   (setq citre-find-reference-backends '(elisp eglot global))
+
+  ;; Integrate with `lsp-mode' and `eglot'
+  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+    (let ((fetcher (apply -fn -args))
+          (citre-fetcher
+           (let ((xref-backend-functions '(citre-xref-backend t)))
+             (apply -fn -args))))
+      (lambda ()
+        (or (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher)))))
 
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
