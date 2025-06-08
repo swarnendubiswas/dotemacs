@@ -1967,8 +1967,8 @@ The provider is `nerd-icons'."
                :collection "nerd-fonts-codicons")
               (t
                "."
-               :icon "cod"
-               :face font-lock-warning-face
+               :icon "symbol-text_size"
+               :face font-lock-builtin-face
                :collection "nerd-fonts-codicons")))
 
     ;; (setopt kind-icon-mapping
@@ -2075,7 +2075,7 @@ The provider is `nerd-icons'."
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_variable")
     ;;            :face font-lock-variable-name-face)
     ;;           (t
-    ;;            ,(nerd-icons-codicon "nf-cod-code")
+    ;;            ,(nerd-icons-codicon "nf-cod-text_size")
     ;;            :face font-lock-warning-face)))
 
     (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
@@ -3820,12 +3820,13 @@ The provider is `nerd-icons'."
        (let* ((xref-prompt-for-identifier nil))
          (call-interactively #'xref-find-definitions)))))
   :hook (prog-mode . citre-mode)
-  :bind* ("M-." . sb/citre-jump+)
   :bind
-  (("C-x c j" . sb/citre-jump+)
+  (("M-'" . sb/citre-jump+)
+   ("C-x c j" . sb/citre-jump+)
    ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c a" . citre-ace-peek)
+   ("C-x c r" . citre-jump-to-reference)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-tags-file)
    ("C-x c e" . citre-edit-tags-file-recipe))
@@ -3845,7 +3846,8 @@ The provider is `nerd-icons'."
 ;; add exclude by: --exclude=target or by --exclude=@./.ctagsignore
 ;; add dirs/files to scan here, one line per dir/file
 ")
-  :config (setq-default citre-enable-imenu-integration nil)
+  :config
+  ;; (setq-default citre-enable-imenu-integration nil)
 
   ;; Use `citre' with Emacs Lisp
   (defvar citre-elisp-backend
@@ -4053,6 +4055,10 @@ PAD can be left (`l') or right (`r')."
   :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
   :diminish)
+
+;; (use-package kdl-mode
+;;   :straight (:host github :repo "taquangtrung/emacs-kdl-mode")
+;;   :mode ("\\.kdl\\'" . kdl-mode))
 
 (use-package kdl-ts-mode
   :straight (:host github :repo "dataphract/kdl-ts-mode")
@@ -4859,7 +4865,9 @@ or the major mode is not in `sb/skippable-modes'."
   ;; :bind
   ;; ;; Should be remapped to "M-DEL"
   ;; ("M-<backspace>" . backward-kill-word)
-  :config (define-key key-translation-map (kbd "M-S-4") (kbd "M-$")))
+  :config
+  (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
+  (define-key key-translation-map (kbd "M-S-/") (kbd "M-?")))
 
 ;;; init.el ends here
 
