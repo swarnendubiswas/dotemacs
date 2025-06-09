@@ -2076,7 +2076,7 @@ The provider is `nerd-icons'."
     ;;            :face font-lock-variable-name-face)
     ;;           (t
     ;;            ,(nerd-icons-codicon "nf-cod-text_size")
-    ;;            :face font-lock-warning-face)))
+    ;;            :face font-lock-builtin-face)))
 
     (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
            (formatter
@@ -3836,15 +3836,13 @@ The provider is `nerd-icons'."
   (citre-ctags-default-options
    "-o
 %TAGSFILE%
--L
-%LISTFILE%
 --languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
 --kinds-all=*
 --fields=*
 --extras=*
 --recurse
-;; add exclude by: --exclude=target or by --exclude=@./.ctagsignore
-;; add dirs/files to scan here, one line per dir/file
+# add exclude by: --exclude=target or by --exclude=@./.ctagsignore
+# add dirs/files to scan here, one line per dir/file
 ")
   :config
   ;; (setq-default citre-enable-imenu-integration nil)
@@ -3858,9 +3856,9 @@ The provider is `nerd-icons'."
      (lambda () (derived-mode-p 'emacs-lisp-mode))))
   ;; Register the backend, which means to bind it with the symbol `elisp'.
   (citre-register-backend 'elisp citre-elisp-backend)
-
-  (setq citre-find-definition-backends '(elisp eglot tags global))
-  (setq citre-find-reference-backends '(elisp eglot global))
+  ;; Add Elisp to the backend lists.
+  (setopt citre-find-definition-backends '(elisp eglot tags global))
+  (setopt citre-find-reference-backends '(elisp eglot global))
 
   ;; Integrate with `lsp-mode' and `eglot'
   (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
