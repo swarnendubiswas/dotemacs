@@ -516,13 +516,12 @@ The provider is `nerd-icons'."
 ;; for larger regions.
 (use-package ediff
   :straight (:type built-in)
-  :commands (ediff-buffers ediff-regions-linewise ediff-regions-wordwise)
-  :bind
-  (("C-c d e" . ediff)
-   ("C-c d b" . ediff-buffers)
-   :map
-   ediff-mode-map
-   ("x" . ediff-revert-buffers-then-recompute-diffs))
+  :commands
+  (ediff-buffers
+   ediff-regions-linewise
+   ediff-regions-wordwise
+   ediff-revert-buffers-then-recompute-diffs)
+  :bind (("C-c d e" . ediff) ("C-c d b" . ediff-buffers))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -2908,6 +2907,7 @@ The provider is `nerd-icons'."
      (lsp-deferred)))
   :bind (:map lsp-mode-map ("y" . lsp-java-type-hierarchy))
   :custom
+  (lsp-java-progress-reports-enabled nil)
   (lsp-java-save-actions-organize-imports t)
   (lsp-java-format-settings-url
    (concat
@@ -3845,7 +3845,8 @@ The provider is `nerd-icons'."
 # add dirs/files to scan here, one line per dir/file
 ")
   :config
-  ;; (setq-default citre-enable-imenu-integration nil)
+  ;; Conflicts with Elisp imenu entries
+  (setq-default citre-enable-imenu-integration nil)
 
   ;; Use `citre' with Emacs Lisp
   (defvar citre-elisp-backend
@@ -3940,6 +3941,13 @@ The provider is `nerd-icons'."
   :when (bound-and-true-p sb/enable-icons)
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
   :custom (nerd-icons-ibuffer-icon-size 1.0))
+
+(use-package nerd-icons-grep
+  :straight (:host github :repo "hron/nerd-icons-grep")
+  :when (bound-and-true-p sb/enable-icons)
+  :after grep
+  :init (nerd-icons-grep-mode)
+  :custom (grep-use-headings t))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline.
 ;; It does not show lsp status, flycheck information, and Python virtualenv
@@ -4127,6 +4135,9 @@ PAD can be left (`l') or right (`r')."
   :hook (emacs-startup . global-clipetty-mode)
   :diminish)
 
+(use-package ztree
+  :commands (ztree-diff))
+
 ;; Provides pixel-precise smooth scrolling which can keep up with the very high
 ;; event rates of modern trackpads and high-precision wheel mice.
 ;; (use-package ultra-scroll
@@ -4271,6 +4282,7 @@ PAD can be left (`l') or right (`r')."
   (eglot-advertise-cancellation t)
   (eglot-mode-line-format '(eglot-mode-line-action-suggestion))
   (eglot-code-action-indications '(nearby mode-line margin))
+  (eglot-events-buffer-config '(:size 0 :format full))
   :config
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
@@ -4344,6 +4356,9 @@ PAD can be left (`l') or right (`r')."
   (add-to-list
    'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
+  ;; Download the source from
+  ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
+  ;; clean verify -DskipTests=true".
   (add-to-list
    'eglot-server-programs
    '((java-mode java-ts-mode)
@@ -4362,6 +4377,11 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
   (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
+  ;; Download the latest milestone from
+  ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
+  ;; verify -DskipTests=true". After successful compilation, the resulting
+  ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
+  ;; "org.eclipse.lemminx/target".
   (add-to-list
    'eglot-server-programs
    `((nxml-mode xml-mode)
