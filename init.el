@@ -33,7 +33,7 @@
   :group 'sb/emacs)
 
 ;; Powerline looks clean, but doom-modeline is more informative.
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -808,6 +808,7 @@ The provider is `nerd-icons'."
    ("C-M-." . xref-find-apropos))
   :custom (xref-search-program 'ripgrep))
 
+;; Exclude project roots with `project-list-exclude'.
 (use-package project
   :bind
   (("<f5>" . project-switch-project)
@@ -2196,6 +2197,12 @@ The provider is `nerd-icons'."
 (use-package company-math
   :after (:all tex-mode company)
   :demand t)
+
+;; ;; Complete in the middle of words
+;; (use-package company-anywhere
+;;   :straight (:host github :repo "zk-phi/company-anywhere")
+;;   :after company
+;;   :demand t)
 
 (use-package company-dict
   :after company
@@ -4279,9 +4286,9 @@ PAD can be left (`l') or right (`r')."
      ;; :documentHighlightProvider
      ))
   (eglot-report-progress nil)
-  (eglot-advertise-cancellation t)
-  (eglot-mode-line-format '(eglot-mode-line-action-suggestion))
-  (eglot-code-action-indications '(nearby mode-line margin))
+  (eglot-mode-line-format
+   '(eglot-mode-line-session eglot-mode-line-action-suggestion))
+  (eglot-code-action-indications '(nearby mode-line margin eldoc-hint))
   (eglot-events-buffer-config '(:size 0 :format full))
   :config
   (setf (plist-get eglot-events-buffer-config :size) 0)
