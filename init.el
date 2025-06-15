@@ -1022,10 +1022,11 @@ The provider is `nerd-icons'."
 (use-package consult-dir
   :bind
   (("C-x C-d" . consult-dir)
-   :map
-   vertico-map
-   ("C-x C-d" . consult-dir)
-   ("C-x C-j" . consult-dir-jump-file))
+   ;; :map
+   ;; vertico-map
+   ;; ("C-x C-d" . consult-dir)
+   ;; ("C-x C-j" . consult-dir-jump-file)
+   )
   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
 ;; Provide context-dependent actions similar to a content menu.
@@ -1040,9 +1041,10 @@ The provider is `nerd-icons'."
    ("C-`" . embark-act)
    ("C-c C-c" . embark-collect)
    ("C-c C-e" . embark-export)
-   :map
-   minibuffer-local-completion-map
-   ("C-`" . embark-act))
+   ;; :map
+   ;; minibuffer-local-completion-map
+   ;; ("C-`" . embark-act)
+   )
   :custom
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command))
@@ -1056,7 +1058,6 @@ The provider is `nerd-icons'."
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
 (use-package marginalia
-  :disabled
   :after vertico
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
@@ -4033,9 +4034,9 @@ PAD can be left (`l') or right (`r')."
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (emacs-startup . doom-modeline-mode)
-  :custom
-  (doom-modeline-buffer-encoding nil)
-  (doom-modeline-buffer-file-name-style 'truncate-all)
+  :custom (doom-modeline-buffer-encoding nil)
+  ;; All other choices can lead to the modeline text overflowing
+  (doom-modeline-buffer-file-name-style 'buffer-name)
   (doom-modeline-unicode-fallback t)
   ;; LSP state is wrong for non-LSP-managed files
   (doom-modeline-lsp nil)
@@ -4078,16 +4079,17 @@ PAD can be left (`l') or right (`r')."
   :mode ("\\.kdl\\'" . kdl-ts-mode))
 
 ;; (use-package reformatter
-;;   :after kdl-ts-mode
+;;   :after (:any kdl-ts-mode kdl-mode)
 ;;   :demand t
 ;;   :config
 ;;   (reformatter-define
 ;;    kdl-format
 ;;    :program "kdlfmt"
-;;    :args '("format")
+;;    :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
 ;;    :lighter " KDLFMT"
 ;;    :group 'reformatter)
-;;   (add-hook 'kdl-ts-mode-hook #'kdl-format-on-save-mode))
+;;   (add-hook 'kdl-ts-mode-hook #'kdl-format-on-save-mode)
+;;   (add-hook 'kdl-mode-hook #'kdl-format-on-save-mode))
 
 ;; Fontify ssh files
 (use-package ssh-config-mode
