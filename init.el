@@ -499,7 +499,7 @@ The provider is `nerd-icons'."
 
 (use-package subword
   :straight (:type built-in)
-  :hook ((LaTeX-mode prog-mode) . subword-mode)
+  :hook ((LaTeX-mode prog-mode conf-unix-mode) . subword-mode)
   :diminish)
 
 ;; Use "Shift + direction" arrows for moving around windows.
@@ -1205,11 +1205,18 @@ The provider is `nerd-icons'."
   :hook (find-file . dogears-mode)
   :bind
   (("M-g d" . dogears-go)
-   ("M-g M-b" . dogears-back)
-   ("M-g M-f" . dogears-forward)
-   ("M-g M-d" . dogears-list)
-   ("M-g M-D" . dogears-sidebar))
-  :config (add-to-list 'dogears-hooks 'xref-after-jump-hook))
+   ("M-g r" . dogears-remember)
+   ("M-g b" . dogears-back)
+   ("M-g f" . dogears-forward)
+   ("M-g t" . dogears-list))
+  :custom
+  (dogears-idle 2)
+  (dogears-hooks
+   '(imenu-after-jump-hook
+     xref-after-jump-hook
+     xref-after-return-hook
+     consult-after-jump-hook
+     before-save-hook)))
 
 (use-package vundo
   :bind
