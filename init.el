@@ -1639,9 +1639,7 @@ The provider is `nerd-icons'."
 
 (use-package shfmt
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-  :custom
-  ;; p: Posix, ci: indent case labels, i: indent with spaces
-  (shfmt-arguments '("-i" "4" "-ln" "bash" "-ci"))
+  :custom (shfmt-arguments '("-i" "4" "-ci"))
   :diminish shfmt-on-save-mode)
 
 ;; Provides indentation guide bars with tree-sitter support
@@ -3136,6 +3134,7 @@ The provider is `nerd-icons'."
 (use-package treesit-auto
   :after treesit
   :demand t
+  :custom (treesit-auto-install t)
   :config
   (global-treesit-auto-mode 1)
   (treesit-auto-add-to-auto-mode-alist 'all))
@@ -3584,16 +3583,6 @@ The provider is `nerd-icons'."
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
-  :config
-  (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "listings"))
-  (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
-
-  (setopt
-   org-latex-pdf-process
-   '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
-
   :bind-keymap ("C-c o" . org-mode-map)
   :bind
   (:map
@@ -3611,7 +3600,16 @@ The provider is `nerd-icons'."
    ("M-{" . org-backward-element)
    ("M-}" . org-forward-element)
    ("C-c C-," . org-insert-structure-template)
-   ("C-c C-j" . consult-outline)))
+   ("C-c C-j" . consult-outline))
+  :config
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+
+  (setopt
+   org-latex-pdf-process
+   '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f")))
 
 ;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
 (use-package org-appear
