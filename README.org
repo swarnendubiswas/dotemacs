@@ -1,6 +1,5 @@
-#+TITLE: My GNU Emacs Configuration
 #+AUTHOR: Swarnendu Biswas
-#+EMAIL: swarnendu_cse@yahoo
+#+EMAIL: swarnendu_cse@yahoo.com
 #+DATE: 21 Feb 2025
 #+STARTUP: showeverything nofold noindent nonum align inlineimages showstars oddeven nohideblocks latexpreview entitiesplain
 #+OPTIONS: author:t date:t ^:{} ':t

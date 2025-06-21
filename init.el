@@ -521,14 +521,17 @@ The provider is `nerd-icons'."
    ediff-regions-linewise
    ediff-regions-wordwise
    ediff-revert-buffers-then-recompute-diffs)
+  :hook
+  ;; Offer to clean up files from ediff sessions. 
+  (ediff-cleanup . (lambda () (ediff-janitor t nil)))
   :bind (("C-c d e" . ediff) ("C-c d b" . ediff-buffers))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
   ;; Split diffs side by side
   (ediff-split-window-function #'split-window-horizontally)
-  ;; Prompt and kill file variants on quitting an Ediff session
-  (ediff-keep-variants nil)
+  ;; ;; Prompt and kill file variants on quitting an Ediff session
+  ;; (ediff-keep-variants nil)
   :config
   (ediff-set-diff-options 'ediff-diff-options "-w")
   (with-eval-after-load "winner"
@@ -657,6 +660,13 @@ The provider is `nerd-icons'."
   :hook (emacs-startup . popwin-mode)
   :config
   (push '(helpful-mode :noselect t :position bottom :height 0.5)
+        popwin:special-display-config)
+  (push '(*EGLOT
+          workspace
+          configuration*
+          :noselect nil
+          :position bottom
+          :height 0.5)
         popwin:special-display-config))
 
 ;; Jump to visible text using a char-based decision tree
@@ -1514,7 +1524,18 @@ The provider is `nerd-icons'."
   :config
   ;; Shellcheck is invoked by bash lsp
   (dolist (checkers
-           '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck))
+           '(proselint
+             textlint
+             tex-chktex
+             emacs-lisp-checkdoc
+             ;; Prefer linters packaged with lsp
+             sh-shellcheck
+             python-flake8
+             python-pylint
+             python-mypy
+             python-ruff
+             python-pycompile
+             python-pyright))
     (delq checkers flycheck-checkers))
 
   ;; These themes have their own styles for displaying flycheck info.
@@ -3518,8 +3539,8 @@ The provider is `nerd-icons'."
 
 (use-package json-mode
   :mode
-  (("\\.json\\'" . json-ts-mode)
-   ("pyrightconfig.json" . jsonc-mode)
+  (("pyrightconfig.json" . jsonc-mode)
+   ("\\.json\\'" . json-ts-mode)
    (".*/vscode/settings.json$" . jsonc-mode)
    (".*/\\.vscode/settings.json$" . jsonc-mode)
    ("User/settings.json$" . jsonc-mode))
@@ -3847,7 +3868,8 @@ The provider is `nerd-icons'."
                (call-interactively #'xref-find-definitions)))))
       (condition-case _
           (citre-jump)
-        (error (funcall ofn)))))
+        (error
+         (funcall ofn)))))
 
   (defun sb/jump-back-citre-xref ()
     "Go back to the position before last `citre-jump'.
@@ -4435,108 +4457,158 @@ PAD can be left (`l') or right (`r')."
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
+  ;; FIXME: `eglot-workspace-configuration' should be set as a directory-local
+  ;; variable, but it is not working for me.
+
+  ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
+  ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
+
   ;; Translation between JSON and Eglot:
   ;; | true  | t           |
   ;; | false | :json-false |
   ;; | null  | nil         |
   ;; | {}    | eglot-{}    |
-  (setq-default eglot-workspace-configuration
-                '(:python.analysis
-                  (:autoSearchPaths
-                   t
-                   :useLibraryCodeForTypes t
-                   :typeCheckingMode "basic"
-                   :diagnosticMode "openFilesOnly")
-                  :pylsp
-                  (:configurationSources
-                   ["setup.cfg"]
-                   :plugins
-                   (:autopep8
-                    (:enabled :json-false)
-                    :black
-                    (:enabled :json-false :line_length 80 :cache_config t)
-                    :flake8
-                    (:enabled :json-false :config t :maxLineLength 80)
-                    :jedi
-                    (:extra_paths [])
-                    :jedi_completion
-                    (:fuzzy
-                     t
-                     :include_params t
-                     :include_class_objects t
-                     :cache_for
-                     ["pandas" "numpy" "matplotlib"])
-                    :jedi_definition
-                    (:enabled t :follow_imports t :follow_builtin_imports t)
-                    :jedi_hover
-                    (:enabled t)
-                    :jedi_references
-                    (:enabled t)
-                    :jedi_signature_help
-                    (:enabled t)
-                    :jedi_symbols
-                    (:enabled t :all_scopes t :include_import_symbols t)
-                    :mccabe
-                    (:enabled :json-false :threshold 15)
-                    :mypy
-                    (:enabled :json-false)
-                    :preload
-                    (:enabled t :modules ["pandas" "numpy" "matplotlib"])
-                    :pycodestyle
-                    (:enabled :json-false :maxLineLength 80)
-                    :pydocstyle
-                    (:enabled t :convention "numpy")
-                    :pyflakes
-                    (:enabled :json-false)
-                    :pylint
-                    (:enabled t)
-                    :pylsp_black
-                    (:enabled :json-false)
-                    :pylsp_isort
-                    (:enabled t)
-                    :pylsp_mypy
-                    (:enabled t :report_progress t :live_mode :json-false)
-                    :rope_autoimport
-                    (:code_actions
-                     (:enabled t)
-                     :completions
-                     (:enabled t)
-                     :enabled t)
-                    :rope_completion
-                    (:enabled t :eager :json-false)
-                    :ruff
-                    (:enabled :json-false :formatEnabled t :lineLength 80)
-                    :yapf
-                    (:enabled t)))
-                  :basedpyright
-                  (:checkOnlyOpenFiles
-                   t
-                   :reportDuplicateImport t
-                   :typeCheckingMode "recommended"
-                   :useLibraryCodeForTypes t)
-                  :basedpyright.analysis
-                  (:diagnosticSeverityOverrides
-                   (:reportUnusedCallResult "none")
-                   :inlayHints (:callArgumentNames :json-false))
-                  :pyright
-                  (:checkOnlyOpenFiles
-                   t
-                   :reportDuplicateImport t
-                   :typeCheckingMode "recommended"
-                   :useLibraryCodeForTypes t)
-                  :ltex-ls-plus
-                  (:language
-                   "en-US"
-                   :disabledRules
-                   ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
-                   :additionalRules (:enablePickyRules t))
-                  :yaml
-                  (:format
-                   (:enable t :singleQuote nil :bracketSpacing t)
-                   :validate t
-                   :hover t
-                   :completion t)
-                  :vscode-json-language-server (:provideFormatter t)))
+
+  (setq-default
+   eglot-workspace-configuration
+   '(
+     ;; :python.analysis
+     ;; (:autoSearchPaths
+     ;;  t
+     ;;  :useLibraryCodeForTypes t
+     ;;  :typeCheckingMode "basic"
+     ;;  :diagnosticMode "openFilesOnly")
+     :pylsp
+     (:configurationSources
+      ["setup.cfg"]
+      :plugins
+      (:autopep8
+       (:enabled :json-false)
+       :black (:cache_config t :enabled :json-false :line_length 80)
+       :flake8
+       (:config
+        t
+        :enabled
+        :json-false
+        :exclude []
+        :executable "flake8"
+        :extendIgnore []
+        :filename nil ; string: null (default)
+        :hangClosing nil
+        :ignore []
+        :indentSize nil
+        :maxComplexity nil
+        :maxLineLength 80
+        :perFileIgnores [] ; e.g. ["file_path.py:W305,W304"]
+        :select nil)
+       :jedi
+       (:auto_import_modules
+        ["numpy" "scipy" "pandas" "matplotlib"]
+        :env_vars nil ; (:SOME_ENV_VAR "/some/path")
+        :environment nil ; "./.venv/"
+        :extra_paths [])
+       :jedi_completion
+       (:cache_for
+        ["numpy" "scipy" "pandas" "matplotlib"]
+        :eager
+        :json-false
+        :enabled t
+        :fuzzy t
+        :include_class_objects
+        :json-false
+        :include_function_objects
+        :json-false
+        :include_params t
+        :resolve_at_most 25)
+       :jedi_definition
+       (:enabled
+        t
+        :follow_builtin_definitions t
+        :follow_builtin_imports t
+        :follow_imports t)
+       :jedi_hover (:enabled t)
+       :jedi_references (:enabled t)
+       :jedi_signature_help (:enabled t)
+       :jedi_symbols (:all_scopes t :enabled t :include_import_symbols t)
+       :mccabe (:enabled :json-false :threshold 15)
+       :mypy (:enabled :json-false)
+       :preload (:enabled t :modules ["numpy" "scipy" "pandas" "matplotlib"])
+       :pycodestyle
+       (:enabled
+        :json-false
+        :exclude []
+        :filename []
+        :hangClosing nil
+        :ignore []
+        :indentSize nil
+        :maxLineLength 80
+        :select nil)
+       :pydocstyle
+       (:addIgnore
+        []
+        :convention "numpy"
+        :enabled
+        :json-false
+        :ignore []
+        :match "(?!test_).*\\.py"
+        :matchDir "[^\\.].*"
+        :select nil)
+       :pyflakes (:enabled :json-false)
+       :pylint (:args [] :enabled t :executable "pylint")
+       :pylsp_black (:enabled :json-false)
+       :pylsp_isort (:enabled t)
+       :pylsp_mypy (:enabled t :live_mode :json-false :report_progress t)
+       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
+       :rope_autoimport
+       (:code_actions
+        (:enabled t)
+        :completions (:enabled t)
+        :enabled t
+        :memory
+        :json-false)
+       :rope_completion (:eager :json-false :enabled t)
+       :ruff (:enabled :json-false :formatEnabled t :lineLength 80)
+       :yapf
+       (
+        ;; :based_on_style
+        ;;       ;; "pep8"
+        :column_limit
+        80
+        :enabled t
+        :indent_width 4
+        :split_before_logical_operator
+        :json-false
+        :use_tabs
+        :json-false))
+      :rope (:extensionModules nil :ropeFolder nil))
+     :basedpyright
+     (:checkOnlyOpenFiles
+      t
+      :reportDuplicateImport t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t)
+     :basedpyright.analysis
+     (:diagnosticSeverityOverrides
+      (:reportUnusedCallResult "none")
+      :inlayHints (:callArgumentNames :json-false))
+     :pyright
+     (:checkOnlyOpenFiles
+      t
+      :reportDuplicateImport t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t)
+     :ltex-ls-plus
+     (:language
+      "en-US"
+      :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
+      :additionalRules (:enablePickyRules t))
+     :yaml
+     (:format
+      (:enable t :singleQuote nil :bracketSpacing t)
+      :validate t
+      :hover t
+      :completion t)
+     :vscode-json-language-server (:provideFormatter t)))
 
   (with-eval-after-load "eglot"
     (setq-default
@@ -4928,6 +5000,15 @@ or the major mode is not in `sb/skippable-modes'."
   :config
   (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
   (define-key key-translation-map (kbd "M-S-/") (kbd "M-?")))
+
+(use-package keyfreq
+  :straight (:host github :repo "dacap/keyfreq")
+  :hook
+  (emacs-startup
+   .
+   (lambda ()
+     (keyfreq-mode 1)
+     (keyfreq-autosave-mode 1))))
 
 ;;; init.el ends here
 
