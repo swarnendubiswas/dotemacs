@@ -2204,11 +2204,11 @@ The provider is `nerd-icons'."
   :after (:all tex-mode company)
   :demand t)
 
-;; ;; Complete in the middle of words
-;; (use-package company-anywhere
-;;   :straight (:host github :repo "zk-phi/company-anywhere")
-;;   :after company
-;;   :demand t)
+;; Complete in the middle of words
+(use-package company-anywhere
+  :straight (:host github :repo "zk-phi/company-anywhere")
+  :after company
+  :demand t)
 
 (use-package company-dict
   :after company
@@ -3253,6 +3253,9 @@ The provider is `nerd-icons'."
   :hook (python-mode . python-docstring-mode)
   :diminish)
 
+(use-package pip-requirements
+  :commands (pip-requirements-mode))
+
 (use-package pyvenv
   :hook ((python-mode python-ts-mode) . pyvenv-mode)
   :custom
@@ -3600,7 +3603,9 @@ The provider is `nerd-icons'."
    ("M-{" . org-backward-element)
    ("M-}" . org-forward-element)
    ("C-c C-," . org-insert-structure-template)
-   ("C-c C-j" . consult-outline))
+   ("C-c C-j" . consult-outline)
+   ("C-c C-l" . org-store-link)
+   ("C-c l" . org-insert-link))
   :config
   (require 'ox-latex)
   (add-to-list 'org-latex-packages-alist '("" "listings"))
@@ -3824,7 +3829,7 @@ The provider is `nerd-icons'."
 
 (use-package citre
   :preface
-  (defun sb/citre-jump+ ()
+  (defun sb/jump-citre-xref ()
     "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
     (interactive)
     (condition-case _
@@ -3832,17 +3837,40 @@ The provider is `nerd-icons'."
       (error
        (let* ((xref-prompt-for-identifier nil))
          (call-interactively #'xref-find-definitions)))))
-  :hook (prog-mode . citre-mode)
+
+  (defun sb/jump-xref-citre ()
+    "Jump to the definition of the symbol at point using `xref-find-definitions' first. Falls back to `citre-jump' on failure."
+    (interactive)
+    (let ((ofn
+           (lambda ()
+             (let* ((xref-prompt-for-identifier nil))
+               (call-interactively #'xref-find-definitions)))))
+      (condition-case _
+          (citre-jump)
+        (error (funcall ofn)))))
+
+  (defun sb/jump-back-citre-xref ()
+    "Go back to the position before last `citre-jump'.
+Fallback to `xref-go-back'."
+    (interactive)
+    (condition-case _
+        (citre-jump-back)
+      (error
+       (if (fboundp #'xref-go-back)
+           (call-interactively #'xref-go-back)
+         (call-interactively #'xref-pop-marker-stack)))))
+  :hook ((prog-mode LaTeX-mode) . citre-mode)
+  :bind* (("M-." . sb/jump-xref-citre) ("M-," . sb/jump-back-citre-xref))
   :bind
-  (("M-'" . sb/citre-jump+)
-   ("C-x c j" . sb/citre-jump+)
+  (("C-x c j" . sb/jump-citre-xref)
    ("C-x c b" . citre-jump-back)
    ("C-x c p" . citre-peek)
    ("C-x c a" . citre-ace-peek)
    ("C-x c r" . citre-jump-to-reference)
    ("C-x c c" . citre-create-tags-file)
    ("C-x c u" . citre-update-tags-file)
-   ("C-x c e" . citre-edit-tags-file-recipe))
+   ("C-x c e" . citre-edit-tags-file-recipe)
+   ("C-x c g" . citre-global-update-database))
   :custom
   (citre-default-create-tags-file-location 'in-dir)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
