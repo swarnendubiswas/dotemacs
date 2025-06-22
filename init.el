@@ -67,7 +67,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -1545,7 +1545,8 @@ The provider is `nerd-icons'."
    (expand-file-name ".markdownlint.json" sb/user-home-directory)
    flycheck-pylintrc '("setup.cfg" "pylintrc")
    flycheck-python-pylint-executable "python3"
-   flycheck-shellcheck-follow-sources nil)
+   flycheck-shellcheck-follow-sources nil
+   flycheck-shellcheck-excluded-warnings '("SC1091"))
 
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
@@ -3246,6 +3247,7 @@ The provider is `nerd-icons'."
   ((python-mode python-ts-mode)
    .
    (lambda ()
+     (setq-local tab-width 4)
      (cond
       ((eq sb/lsp-provider 'eglot)
        (eglot-ensure))
@@ -4327,7 +4329,7 @@ PAD can be left (`l') or right (`r')."
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
-  (eglot-send-changes-idle-time 3)
+  (eglot-send-changes-idle-time 2)
   (eglot-extend-to-xref t)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
@@ -4341,16 +4343,20 @@ PAD can be left (`l') or right (`r')."
      ))
   (eglot-report-progress nil)
   (eglot-mode-line-format
-   '(eglot-mode-line-session eglot-mode-line-action-suggestion))
-  (eglot-code-action-indications '(nearby mode-line margin eldoc-hint))
+   '(eglot-mode-line-session
+     eglot-mode-line-error eglot-mode-line-action-suggestion))
   :config
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
 
   (setopt eglot-server-programs nil)
+  (add-to-list 'eglot-server-programs '(text-mode . ("harper-ls" "--stdio")))
   (add-to-list
    'eglot-server-programs
-   '((org-mode markdown-mode text-mode) . ("ltex-ls-plus")))
+   '((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus")))
+  (add-to-list
+   'eglot-server-programs
+   '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
   (add-to-list
    'eglot-server-programs
    '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -4415,6 +4421,9 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
   (add-to-list
    'eglot-server-programs
+   '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
   ;; Download the source from
   ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
@@ -4433,9 +4442,6 @@ PAD can be left (`l') or right (`r')."
      .
      ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run")))
   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
-  (add-to-list
-   'eglot-server-programs
-   '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
   (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
   ;; Download the latest milestone from
   ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
@@ -4476,7 +4482,7 @@ PAD can be left (`l') or right (`r')."
      ;;  :diagnosticMode "openFilesOnly")
      :pylsp
      (:configurationSources
-      ["setup.cfg"]
+      ["pyproject.toml"]
       :plugins
       (:autopep8
        (:enabled :json-false)
@@ -4528,7 +4534,8 @@ PAD can be left (`l') or right (`r')."
        :jedi_symbols (:all_scopes t :enabled t :include_import_symbols t)
        :mccabe (:enabled :json-false :threshold 15)
        :mypy (:enabled :json-false)
-       :preload (:enabled t :modules ["numpy" "scipy" "pandas" "matplotlib"])
+       :preload
+       (:enabled t :modules ["numpy" "scipy" "pandas" "matplotlib"])
        :pycodestyle
        (:enabled
         :json-false
@@ -4550,11 +4557,12 @@ PAD can be left (`l') or right (`r')."
         :matchDir "[^\\.].*"
         :select nil)
        :pyflakes (:enabled :json-false)
-       :pylint (:args [] :enabled t :executable "pylint")
+       :pylint (:args [] :enabled :json-false :executable "pylint")
        :pylsp_black (:enabled :json-false)
        :pylsp_isort (:enabled t)
        :pylsp_mypy (:enabled t :live_mode :json-false :report_progress t)
-       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
+       :pylsp_ruff
+       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
        :rope_autoimport
        (:code_actions
         (:enabled t)
@@ -4563,18 +4571,20 @@ PAD can be left (`l') or right (`r')."
         :memory
         :json-false)
        :rope_completion (:eager :json-false :enabled t)
-       :ruff (:enabled :json-false :formatEnabled t :lineLength 80)
+       :ruff
+       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
        :yapf
        (:based_on_style
         "pep8"
         :column_limit 80
         :enabled t
         :indent_width 4
-        :split_before_logical_operator
-        :json-false
+        :split_before_logical_operator t
         :use_tabs
         :json-false))
       :rope (:extensionModules nil :ropeFolder nil))
+     ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
+     ;; LSP configuration for basedpyright.
      :basedpyright
      (:checkOnlyOpenFiles
       t
@@ -4583,8 +4593,16 @@ PAD can be left (`l') or right (`r')."
       :useLibraryCodeForTypes t)
      :basedpyright.analysis
      (:diagnosticSeverityOverrides
-      (:reportUnusedCallResult "none")
-      :inlayHints (:callArgumentNames :json-false))
+      (:reportUnusedCallResult :json-false :reportInvalidCast :json-false)
+      :inlayHints
+      (:callArgumentNames
+       :json-false
+       :functionReturnTypes
+       :json-false
+       :variableTypes
+       :json-false
+       :genericTypes
+       :json-false))
      :pyright
      (:checkOnlyOpenFiles
       t
@@ -4602,7 +4620,31 @@ PAD can be left (`l') or right (`r')."
       :validate t
       :hover t
       :completion t)
-     :vscode-json-language-server (:provideFormatter t)))
+     :vscode-json-language-server (:provideFormatter t)
+     :harper-ls
+     (:userDictPath
+      "~/"
+      :fileDictPath ""
+      :linters
+      (:SpellCheck
+       :json-false
+       :SpelledNumbers
+       :json-false
+       :AnA t
+       :UnclosedQuotes t
+       :WrongQuotes
+       :json-false
+       :LongSentences t
+       :RepeatedWords t
+       :Spaces t
+       :Matcher t
+       :CorrectNumberSuffix t
+       :SentenceCapitalization
+       :json-false)
+      :diagnosticSeverity "hint"
+      :isolateEnglish
+      :json-false
+      :dialect "American")))
 
   (with-eval-after-load "eglot"
     (setq-default
