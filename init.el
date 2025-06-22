@@ -67,7 +67,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -661,9 +661,7 @@ The provider is `nerd-icons'."
   :config
   (push '(helpful-mode :noselect t :position bottom :height 0.5)
         popwin:special-display-config)
-  (push '(*EGLOT
-          workspace
-          configuration*
+  (push '("*EGLOT workspace configuration*"
           :noselect nil
           :position bottom
           :height 0.5)
@@ -1660,7 +1658,7 @@ The provider is `nerd-icons'."
 
 (use-package shfmt
   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-  :custom (shfmt-arguments '("-i" "4" "-ci"))
+  ;; :custom (shfmt-arguments '("-i" "4" "-ci"))
   :diminish shfmt-on-save-mode)
 
 ;; Provides indentation guide bars with tree-sitter support
@@ -2854,6 +2852,7 @@ The provider is `nerd-icons'."
   (lsp-pylsp-plugins-flake8-enabled nil)
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
+  (lsp-pylsp-plugins-ruff-enabled t)
   :config
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
@@ -4330,8 +4329,6 @@ PAD can be left (`l') or right (`r')."
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
-  (eglot-events-buffer-config '(:size 0 :format full))
-  (fset #'jsonrpc--log-event #'ignore)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
      :documentOnTypeFormattingProvider
@@ -4346,7 +4343,6 @@ PAD can be left (`l') or right (`r')."
   (eglot-mode-line-format
    '(eglot-mode-line-session eglot-mode-line-action-suggestion))
   (eglot-code-action-indications '(nearby mode-line margin eldoc-hint))
-  (eglot-events-buffer-config '(:size 0 :format full))
   :config
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
@@ -4569,11 +4565,9 @@ PAD can be left (`l') or right (`r')."
        :rope_completion (:eager :json-false :enabled t)
        :ruff (:enabled :json-false :formatEnabled t :lineLength 80)
        :yapf
-       (
-        ;; :based_on_style
-        ;;       ;; "pep8"
-        :column_limit
-        80
+       (:based_on_style
+        "pep8"
+        :column_limit 80
         :enabled t
         :indent_width 4
         :split_before_logical_operator
