@@ -3869,8 +3869,7 @@ The provider is `nerd-icons'."
                (call-interactively #'xref-find-definitions)))))
       (condition-case _
           (citre-jump)
-        (error
-         (funcall ofn)))))
+        (error (funcall ofn)))))
 
   (defun sb/jump-back-citre-xref ()
     "Go back to the position before last `citre-jump'.
@@ -4350,7 +4349,10 @@ PAD can be left (`l') or right (`r')."
   (fset #'jsonrpc--log-event #'ignore)
 
   (setopt eglot-server-programs nil)
-  (add-to-list 'eglot-server-programs '(text-mode . ("harper-ls" "--stdio")))
+  (add-to-list
+   'eglot-server-programs
+   '(text-mode
+     . ,(eglot-alternatives '(("harper-ls" "--stdio") ("ltex-ls-plus")))))
   (add-to-list
    'eglot-server-programs
    '((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus")))
@@ -4391,12 +4393,18 @@ PAD can be left (`l') or right (`r')."
   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
   (add-to-list
    'eglot-server-programs
-   '((css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio")))
+   '((scss-mode less-mode sass-mode css-mode css-ts-mode)
+     .
+     ,(eglot-alternatives
+       '(("vscode-css-language-server" "--stdio")
+         ("css-languageserver" "--stdio")))))
   (add-to-list
    'eglot-server-programs
-   '((html-mode html-ts-mode web-mode)
+   '((web-mode html-mode html-ts-mode)
      .
-     ("vscode-html-language-server" "--stdio")))
+     ,(eglot-alternatives
+       '(("vscode-html-language-server" "--stdio")
+         ("html-languageserver" "--stdio")))))
   (add-to-list
    'eglot-server-programs
    '((js-mode js-ts-mode tsx-ts-mode typescript-mode typescript-ts-mode)
@@ -4405,23 +4413,29 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    '((js-json-mode json-mode json-ts-mode jsonc-mode)
      .
-     ("vscode-json-language-server" "--stdio")))
+     ,(eglot-alternatives
+       '(("vscode-json-language-server" "--stdio")
+         ("vscode-json-languageserver" "--stdio")
+         ("json-languageserver" "--stdio")))))
   (add-to-list
    'eglot-server-programs
    '((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
-   '((php-mode php-ts-mode) . ("intelephense" "--stdio")))
+   '((php-mode php-ts-mode phps-mode)
+     .
+     ,(eglot-alternatives
+       '(("intelephense" "--stdio") ("phpactor" "language-server")))))
   (add-to-list
    'eglot-server-programs '((rust-ts-mode rust-mode) . ("rust-analyzer")))
   (add-to-list
    'eglot-server-programs
    '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
   (add-to-list
-   'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
-  (add-to-list
    'eglot-server-programs
-   '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio")))
+   `((python-mode python-ts-mode)
+     .
+     ,(eglot-alternatives '(("basedpyright-langserver" "--stdio") "pylsp"))))
   (add-to-list
    'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
@@ -4473,14 +4487,7 @@ PAD can be left (`l') or right (`r')."
 
   (setq-default
    eglot-workspace-configuration
-   '(
-     ;; :python.analysis
-     ;; (:autoSearchPaths
-     ;;  t
-     ;;  :useLibraryCodeForTypes t
-     ;;  :typeCheckingMode "basic"
-     ;;  :diagnosticMode "openFilesOnly")
-     :pylsp
+   '(:pylsp
      (:configurationSources
       ["pyproject.toml"]
       :plugins
