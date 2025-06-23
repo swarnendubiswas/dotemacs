@@ -201,6 +201,7 @@ The provider is `nerd-icons'."
   (history-delete-duplicates t)
   (read-process-output-max (* 4 1024 1024))
   (remote-file-name-inhibit-locks t)
+  (remote-file-name-inhibit-auto-save-visited t)
   (ring-bell-function 'ignore "Disable beeping sound")
   (visible-bell nil)
   (save-interprogram-paste-before-kill t)
@@ -661,7 +662,9 @@ The provider is `nerd-icons'."
   :config
   (push '(helpful-mode :noselect t :position bottom :height 0.5)
         popwin:special-display-config)
-  (push '("*EGLOT workspace configuration*"
+  ;; (push '(deadgrep-mode :noselect nil :position bottom :height 0.75)
+  ;;       popwin:special-display-config)
+  (push '("\\*EGLOT workspace configuration\\*"
           :noselect nil
           :position bottom
           :height 0.5)
@@ -955,7 +958,6 @@ The provider is `nerd-icons'."
      "^:"
      "\\*Echo Area"
      "\\*Minibuf"
-     "\\*Backtrace"
      "\\*Help*"
      "\\*Disabled Command\\*"
      "Flymake log"
@@ -969,14 +971,11 @@ The provider is `nerd-icons'."
      "\\*Compile-Log"
      "\\*Native-*"
      "\\*Async-"
-     "\\*format-all-error"
      "\\*Ediff Registry\\*"
-     "COMMIT_EDITMSG"
      "TAGS"
      "\\*vc"
      "\\*tramp"
      "\\*citre*"
-     "\\*EGLOT"
      "\\*pylsp"
      "\\*ltex-ls"
      "\\*texlab"
@@ -1070,13 +1069,16 @@ The provider is `nerd-icons'."
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  (setopt marginalia-annotator-registry
-          (assq-delete-all 'file marginalia-annotator-registry))
+  ;; Columns are unaligned and look ugly
+  (setopt marginalia-annotators (assq-delete-all 'file marginalia-annotators))
+  (setopt marginalia-annotators
+          (assq-delete-all 'project-file marginalia-annotators))
   (add-to-list
-   'marginalia-annotator-registry '(symbol-help marginalia-annotate-variable))
-  (add-to-list
-   'marginalia-annotator-registry
-   '(project-buffer marginalia-annotate-project-buffer)))
+   'marginalia-annotators '(symbol-help marginalia-annotate-variable))
+  ;; (add-to-list
+  ;;  'marginalia-annotator-registry
+  ;;  '(project-buffer marginalia-annotate-project-buffer))
+  )
 
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
@@ -1358,9 +1360,12 @@ The provider is `nerd-icons'."
 ;; search hits with "n" and "p", and move between files with "M-n" and "M-p".
 ;; Change the search term with "S" and enable incremental search with "I".
 (use-package deadgrep
+  :when (executable-find "rg")
   :commands deadgrep-edit-mode
   :bind ("C-c s d" . deadgrep)
-  :custom (deadgrep-max-buffers 1))
+  :custom
+  (deadgrep-max-buffers 1)
+  (deadgrep-display-buffer-function 'switch-to-buffer-other-frame))
 
 (use-package wgrep
   :bind
@@ -1416,7 +1421,7 @@ The provider is `nerd-icons'."
      (git-commit-turn-on-auto-fill)))
   :bind
   (("C-x g" . magit-status)
-   ;; ("C-x M-g" . magit-dispatch)
+   ("C-x M-g" . magit-dispatch)
    ("C-c M-g" . magit-file-dispatch))
   :custom
   ;; Open the status buffer in a full frame
@@ -1426,6 +1431,8 @@ The provider is `nerd-icons'."
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
+  ;; Do not show the diff by default in the commit buffer. 
+  (magit-commit-show-diff nil)
   (with-eval-after-load "magit-diff"
     ;; Show fine differences for the current diff hunk only
     (magit-diff-refine-hunk t)
@@ -4483,7 +4490,7 @@ PAD can be left (`l') or right (`r')."
    eglot-workspace-configuration
    '(:pylsp
      (:configurationSources
-      ["pyproject.toml"]
+      ["pyproject.toml" "setup.cfg"]
       :plugins
       (:autopep8
        (:enabled :json-false)
