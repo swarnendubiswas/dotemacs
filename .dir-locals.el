@@ -5,6 +5,7 @@
   ((fill-column . 80)
 
    (make-local-variable 'completion-ignored-extensions)
+   ;; Directories
    (eval . (add-to-list 'completion-ignored-extensions "eln-cache/"))
    (eval . (add-to-list 'completion-ignored-extensions "tree-sitter/"))
    (eval .
@@ -12,14 +13,14 @@
           'completion-ignored-extensions "eglot-java-eclipse-jdt-cache/"))
    (eval . (add-to-list 'completion-ignored-extensions "share/"))
    (eval . (add-to-list 'completion-ignored-extensions "auto-save-list/"))
-   (eval . (add-to-list 'completion-ignored-extensions "\\.tags/"))
    (eval . (add-to-list 'completion-ignored-extensions "\\.cache/"))
-   (eval . (add-to-list 'completion-ignored-extensions ".pptx"))
-
    (eval . (add-to-list 'completion-ignored-extensions "auto/"))
+
+   ;; Files
+   (eval . (add-to-list 'completion-ignored-extensions "\\.tags/"))
+   (eval . (add-to-list 'completion-ignored-extensions ".pptx"))
    (eval . (add-to-list 'completion-ignored-extensions ".xml"))
    (eval . (add-to-list 'completion-ignored-extensions ".drawio"))
-
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
 

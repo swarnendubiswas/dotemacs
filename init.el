@@ -3869,7 +3869,8 @@ The provider is `nerd-icons'."
                (call-interactively #'xref-find-definitions)))))
       (condition-case _
           (citre-jump)
-        (error (funcall ofn)))))
+        (error
+         (funcall ofn)))))
 
   (defun sb/jump-back-citre-xref ()
     "Go back to the position before last `citre-jump'.
@@ -4345,8 +4346,8 @@ PAD can be left (`l') or right (`r')."
    '(eglot-mode-line-session
      eglot-mode-line-error eglot-mode-line-action-suggestion))
   :config
-  (setf (plist-get eglot-events-buffer-config :size) 0)
-  (fset #'jsonrpc--log-event #'ignore)
+  ;; (setf (plist-get eglot-events-buffer-config :size) 0)
+  ;; (fset #'jsonrpc--log-event #'ignore)
 
   (setopt eglot-server-programs nil)
   (add-to-list
@@ -4393,7 +4394,7 @@ PAD can be left (`l') or right (`r')."
   (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
   (add-to-list
    'eglot-server-programs
-   '((scss-mode less-mode sass-mode css-mode css-ts-mode)
+   '((scss-mode css-mode css-ts-mode)
      .
      ,(eglot-alternatives
        '(("vscode-css-language-server" "--stdio")
@@ -4405,29 +4406,22 @@ PAD can be left (`l') or right (`r')."
      ,(eglot-alternatives
        '(("vscode-html-language-server" "--stdio")
          ("html-languageserver" "--stdio")))))
+  ;; (add-to-list
+  ;;  'eglot-server-programs
+  ;;  '((json-mode json-ts-mode jsonc-mode)
+  ;;    .
+  ;;    ,(eglot-alternatives
+  ;;      '(("vscode-json-language-server" "--stdio")
+  ;;        ("vscode-json-languageserver" "--stdio")
+  ;;        ("json-languageserver" "--stdio")))))
   (add-to-list
    'eglot-server-programs
-   '((js-mode js-ts-mode tsx-ts-mode typescript-mode typescript-ts-mode)
-     . ("typescript-language-server" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((js-json-mode json-mode json-ts-mode jsonc-mode)
+   '((json-mode json-ts-mode jsonc-mode)
      .
-     ,(eglot-alternatives
-       '(("vscode-json-language-server" "--stdio")
-         ("vscode-json-languageserver" "--stdio")
-         ("json-languageserver" "--stdio")))))
+     ("vscode-json-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
    '((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((php-mode php-ts-mode phps-mode)
-     .
-     ,(eglot-alternatives
-       '(("intelephense" "--stdio") ("phpactor" "language-server")))))
-  (add-to-list
-   'eglot-server-programs '((rust-ts-mode rust-mode) . ("rust-analyzer")))
   (add-to-list
    'eglot-server-programs
    '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
@@ -4435,7 +4429,7 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    `((python-mode python-ts-mode)
      .
-     ,(eglot-alternatives '(("basedpyright-langserver" "--stdio") "pylsp"))))
+     ,(eglot-alternatives '("pylsp" ("basedpyright-langserver" "--stdio")))))
   (add-to-list
    'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
@@ -4512,13 +4506,13 @@ PAD can be left (`l') or right (`r')."
         :select nil)
        :jedi
        (:auto_import_modules
-        ["numpy" "scipy" "pandas" "matplotlib"]
+        []
         :env_vars nil ; (:SOME_ENV_VAR "/some/path")
         :environment nil ; "./.venv/"
         :extra_paths [])
        :jedi_completion
        (:cache_for
-        ["numpy" "scipy" "pandas" "matplotlib"]
+        []
         :eager
         :json-false
         :enabled t
@@ -4538,11 +4532,11 @@ PAD can be left (`l') or right (`r')."
        :jedi_hover (:enabled t)
        :jedi_references (:enabled t)
        :jedi_signature_help (:enabled t)
-       :jedi_symbols (:all_scopes t :enabled t :include_import_symbols t)
+       :jedi_symbols
+       (:all_scopes t :enabled t :include_import_symbols :json-false)
        :mccabe (:enabled :json-false :threshold 15)
        :mypy (:enabled :json-false)
-       :preload
-       (:enabled t :modules ["numpy" "scipy" "pandas" "matplotlib"])
+       :preload (:enabled t :modules [])
        :pycodestyle
        (:enabled
         :json-false
@@ -4564,20 +4558,21 @@ PAD can be left (`l') or right (`r')."
         :matchDir "[^\\.].*"
         :select nil)
        :pyflakes (:enabled :json-false)
-       :pylint (:args [] :enabled :json-false :executable "pylint")
+       :pylint (:args [] :enabled t :executable "pylint")
        :pylsp_black (:enabled :json-false)
        :pylsp_isort (:enabled t)
-       :pylsp_mypy (:enabled t :live_mode :json-false :report_progress t)
-       :pylsp_ruff
-       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :pylsp_mypy
+       (:enabled t :live_mode :json-false :report_progress :json-false)
+       :pylsp_ruff (:enabled t :formatEnabled t :lineLength 80)
        :rope_autoimport
        (:code_actions
-        (:enabled t)
-        :completions (:enabled t)
-        :enabled t
+        (:enabled :json-false)
+        :completions (:enabled :json-false)
+        :enabled
+        :json-false
         :memory
         :json-false)
-       :rope_completion (:eager :json-false :enabled t)
+       :rope_completion (:eager :json-false :enabled :json-false)
        :ruff
        (:enabled :json-false :formatEnabled :json-false :lineLength 80)
        :yapf
