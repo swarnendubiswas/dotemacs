@@ -76,6 +76,15 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
+(defcustom sb/python-langserver 'basedpyright
+  "Choose the Python Language Server implementation."
+  :type
+  '(radio
+    (const :tag "pylsp" pylsp)
+    (const :tag "basedpyright" basedpyright)
+    (const :tag "none" none))
+  :group 'sb/emacs)
+
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -1529,19 +1538,23 @@ The provider is `nerd-icons'."
   :config
   ;; Shellcheck is invoked by bash lsp
   (dolist (checkers
-           '(proselint
-             textlint
-             tex-chktex
-             emacs-lisp-checkdoc
-             ;; Prefer linters packaged with lsp
-             sh-shellcheck
-             python-flake8
-             python-pylint
-             python-mypy
-             python-ruff
-             python-pycompile
-             python-pyright))
+           '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck))
     (delq checkers flycheck-checkers))
+  ;; Prefer linters packaged with pylsp
+  (when (eq sb/python-langserver 'pylsp)
+    (dolist (checkers
+             '(python-flake8
+               python-pylint
+               python-mypy
+               python-ruff
+               python-pycompile
+               python-pyright))
+      (delq checkers flycheck-checkers)))
+  (when (eq sb/python-langserver 'basedpyright)
+    (dolist (checkers
+             '(python-flake8
+               python-pylint python-mypy python-pycompile python-pyright))
+      (delq checkers flycheck-checkers)))
 
   ;; These themes have their own styles for displaying flycheck info.
   (when (eq sb/modeline-theme 'doom-modeline)
@@ -2991,6 +3004,33 @@ The provider is `nerd-icons'."
   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
   )
 
+(use-package lsp-pyright
+  :when
+  (and (eq sb/lsp-provider 'lsp-mode)
+       (eq sb/python-langserver 'basedpyright)
+       (executable-find "basedpyright"))
+  :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
+  :hook ((python-mode python-ts-mode) . (lambda () (require 'lsp-pyright)))
+  :custom
+  (lsp-pyright-python-executable-cmd "python3")
+  (lsp-pyright-typechecking-mode "basic")
+  (lsp-pyright-auto-import-completions t)
+  (lsp-pyright-auto-search-paths t))
+
+;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
+;; `basedpyright' since it does not support document formatting.
+
+;; Yapfify works on the original file, so that any project settings supported by
+;; YAPF itself are used.
+;; (use-package yapfify
+;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
+;;   :hook ((python-mode python-ts-mode) . yapf-mode)
+;;   :diminish yapf-mode)
+
+(use-package ruff-format
+  :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
+  :diminish ruff-format-on-save-mode)
+
 (use-package hl-todo
   :hook (emacs-startup . global-hl-todo-mode)
   :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
@@ -4432,11 +4472,12 @@ PAD can be left (`l') or right (`r')."
   (add-to-list
    'eglot-server-programs
    '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
-  (add-to-list
-   'eglot-server-programs
-   `((python-mode python-ts-mode)
-     .
-     ,(eglot-alternatives '("pylsp" ("basedpyright-langserver" "--stdio")))))
+  (if (equal sb/python-langserver 'pyls)
+      (add-to-list
+       'eglot-server-programs `((python-mode python-ts-mode) . ("pylsp")))
+    (add-to-list
+     'eglot-server-programs
+     `((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
   (add-to-list
    'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
@@ -4602,7 +4643,7 @@ PAD can be left (`l') or right (`r')."
       :useLibraryCodeForTypes t)
      :basedpyright.analysis
      (:diagnosticSeverityOverrides
-      (:reportUnusedCallResult :json-false :reportInvalidCast :json-false)
+      (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
       :inlayHints
       (:callArgumentNames
        :json-false
