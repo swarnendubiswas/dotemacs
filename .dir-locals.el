@@ -31,6 +31,7 @@
      (lambda ()
        ;; (add-to-list lsp-file-watch-ignored-directories "/build")
 
+       ;; Update the chain of checkers based on requirement
        (when (derived-mode-p 'markdown-mode)
          (setq sb/flycheck-local-checkers
                '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))
@@ -45,7 +46,7 @@
 
        (when (derived-mode-p 'python-mode)
          (setq sb/flycheck-local-checkers
-               '((lsp . ((next-checkers . (python-pylint)))))))
+               '((lsp . ((next-checkers . (python-pylint . (python-mypy))))))))
 
        (when (derived-mode-p 'c++-mode)
          (setq sb/flycheck-local-checkers
@@ -103,6 +104,7 @@
 
  (c-mode . ((mode . c++)))
 
+ ;; Some systems may not have treesitter libraries installed
  (c++-mode
   .
   ((clang-format-style . "file")
@@ -193,10 +195,8 @@
 
  (python-mode
   .
-  ((python-shell-exec-path . "/usr/bin/python3")
-   (python-shell-interpreter . "/usr/bin/python3")
-   (flycheck-pylintrc . "setup.cfg")
-   (py-isort-options . '("--settings-path=setup.cfg"))
+  ((python-shell-exec-path . "python3")
+   (python-shell-interpreter . "python3") (flycheck-pylintrc . "setup.cfg")
    ;; (pyvenv-workon . "./")
    ;; (pyvenv-activate . "./venv/")
 
@@ -215,75 +215,63 @@
           (lambda ()
             (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-            (add-hook 'before-save-hook #'lsp-organize-imports nil t))))
+            ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
+            )))
 
    ;;  https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
    (eglot-workspace-configuration
     .
-    ((:python
-      (:pythonPath "./.venv/bin/python")
-      (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
-      (:analysis
-       (:diagnosticMode
-        "openFilesOnly"
-        :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
+    ( ;; (:python
+     ;;  (:pythonPath "./.venv/bin/python")
+     ;;  (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+     ;;  (:analysis
+     ;;   (:diagnosticMode
+     ;;    "openFilesOnly"
+     ;;    :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
      (:pylsp
       (:configurationSources
-       ["setup.cfg"]
+       ["pyproject.toml" "setup.cfg"]
        :plugins
        (:autopep8
         (:enabled :json-false)
-        :black
-        (:enabled :json-false)
+        :black (:enabled :json-false)
         :flake8
         (:enabled :json-false :config t :maxLineLength 80)
-        :jedi
-        (:environment "./.venv/" :extra_paths [])
+        :jedi (:environment "" :extra_paths [])
         :jedi_completion
-        (:fuzzy
-         t
-         :include_params t
-         :include_class_objects t
-         :cache_for
-         ["pandas" "numpy" "matplotlib"])
+        (:fuzzy t :include_params t :include_class_objects t :cache_for [])
         :jedi_definition
         (:enabled t :follow_imports t :follow_builtin_imports t)
-        :jedi_hover
-        (:enabled t)
-        :jedi_references
-        (:enabled t)
-        :jedi_signature_help
-        (:enabled t)
+        :jedi_hover (:enabled t)
+        :jedi_references (:enabled t)
+        :jedi_signature_help (:enabled t)
         :jedi_symbols
         (:enabled t :all_scopes t :include_import_symbols t)
         :mccabe
         (:enabled :json-false :threshold 15)
-        :mypy
-        (:enabled :json-false)
-        :preload
-        (:enabled t :modules ["pandas" "numpy" "matplotlib"])
+        :mypy (:enabled :json-false)
+        :preload (:enabled t :modules [])
         :pycodestyle
         (:enabled :json-false :maxLineLength 80)
         :pydocstyle
-        (:enabled t :convention "numpy")
-        :pyflakes
-        (:enabled :json-false)
-        :pylint
-        (:enabled t)
-        :pylsp_black
-        (:enabled :json-false)
-        :pylsp_isort
-        (:enabled t)
+        (:enabled :json-false :convention "numpy")
+        :pyflakes (:enabled :json-false)
+        :pylint (:enabled t)
+        :pylsp_black (:enabled :json-false)
+        :pylsp_isort (:enabled t)
         :pylsp_mypy
         (:enabled t :report_progress t :live_mode :json-false)
         :rope_autoimport
-        (:code_actions (:enabled t) :completions (:enabled t) :enabled t)
+        (:code_actions
+         (:enabled :json-false)
+         :completions (:enabled :json-false)
+         :enabled
+         :json-false)
         :rope_completion
-        (:enabled t :eager :json-false)
+        (:enabled :json-false :eager :json-false)
         :ruff
-        (:enabled :json-false :formatEnabled t :lineLength 80)
-        :yapf
-        (:enabled t))))))
+        (:enabled t :formatEnabled t :lineLength 80)
+        :yapf (:enabled t))))))
 
    (eval .
          (add-hook
@@ -291,15 +279,14 @@
           (lambda ()
             (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)
-            (add-hook
-             'before-save-hook #'eglot-code-action-organize-imports))))))
+            ;; (add-hook
+            ;;  'before-save-hook #'eglot-code-action-organize-imports)
+            )))))
 
  (python-ts-mode
   .
-  ((python-shell-exec-path . "/usr/bin/python3")
-   (python-shell-interpreter . "/usr/bin/python3")
-   (flycheck-pylintrc . "setup.cfg")
-   (py-isort-options . '("--settings-path=setup.cfg"))
+  ((python-shell-exec-path . "python3")
+   (python-shell-interpreter . "python3") (flycheck-pylintrc . "setup.cfg")
    ;; (pyvenv-workon . "./")
    ;; (pyvenv-activate . "./venv/")
 
@@ -318,74 +305,99 @@
           (lambda ()
             (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-            (add-hook 'before-save-hook #'lsp-organize-imports nil t))))
+            ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
+            )))
 
    (eglot-workspace-configuration
     .
-    ((:python
-      (:pythonPath "./.venv/bin/python")
-      (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
-      (:analysis
-       (:diagnosticMode
-        "openFilesOnly"
-        :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
+    ( ;; (:python
+     ;;  (:pythonPath "./.venv/bin/python")
+     ;;  (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
+     ;;  (:analysis
+     ;;   (:diagnosticMode
+     ;;    "openFilesOnly"
+     ;;    :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
      (:pylsp
       (:configurationSources
-       ["setup.cfg"]
+       ["pyproject.toml" "setup.cfg"]
        :plugins
        (:autopep8
         (:enabled :json-false)
         :black
-        (:enabled :json-false)
+        (:cache_config t :enabled :json-false :line_length 80)
         :flake8
         (:enabled :json-false :config t :maxLineLength 80)
-        :jedi
-        (:environment "./.venv/" :extra_paths [])
+        :jedi (:environment nil :extra_paths [])
         :jedi_completion
         (:fuzzy
          t
          :include_params t
-         :include_class_objects t
-         :cache_for
-         ["pandas" "numpy" "matplotlib"])
+         :include_class_objects
+         :json-false
+         :cache_for [])
         :jedi_definition
-        (:enabled t :follow_imports t :follow_builtin_imports t)
-        :jedi_hover
-        (:enabled t)
-        :jedi_references
-        (:enabled t)
-        :jedi_signature_help
-        (:enabled t)
+        (:enabled
+         t
+         :follow_imports t
+         :follow_builtin_imports t
+         :follow_builtin_definitions t)
+        :jedi_hover (:enabled t)
+        :jedi_references (:enabled t)
+        :jedi_signature_help (:enabled t)
         :jedi_symbols
-        (:enabled t :all_scopes t :include_import_symbols t)
-        :mccabe
-        (:enabled :json-false :threshold 15)
-        :mypy
-        (:enabled :json-false)
-        :preload
-        (:enabled t :modules ["pandas" "numpy" "matplotlib"])
-        :pycodestyle
-        (:enabled :json-false :maxLineLength 80)
+        (:enabled t :all_scopes t :include_import_symbols :json-false)
+        :mccabe (:enabled :json-false :threshold 15)
+        :mypy (:enabled :json-false)
+        :preload (:enabled t :modules [])
+        :pycodestyle (:enabled :json-false :maxLineLength 80)
         :pydocstyle
-        (:enabled t :convention "numpy")
-        :pyflakes
-        (:enabled :json-false)
-        :pylint
-        (:enabled t)
-        :pylsp_black
-        (:enabled :json-false)
-        :pylsp_isort
-        (:enabled t)
+        (:enabled :json-false :convention "numpy")
+        :pyflakes (:enabled :json-false)
+        :pylint (:enabled t)
+        :pylsp_black (:enabled :json-false)
+        :pylsp_isort (:enabled t)
         :pylsp_mypy
-        (:enabled t :report_progress t :live_mode :json-false)
+        (:enabled t :report_progress :json-false :live_mode :json-false)
         :rope_autoimport
-        (:code_actions (:enabled t) :completions (:enabled t) :enabled t)
+        (:code_actions
+         (:enabled :json-false)
+         :completions (:enabled :json-false)
+         :enabled
+         :json-false)
         :rope_completion
-        (:enabled t :eager :json-false)
+        (:enabled :json-false :eager :json-false)
         :ruff
-        (:enabled :json-false :formatEnabled t :lineLength 80)
+        (:enabled t :formatEnabled t :lineLength 80)
         :yapf
-        (:enabled t))))))
+        (:enabled
+         t
+         :based_on_style "pep8"
+         :column_limit 80
+         :indent_width 4
+         :split_before_logical_operator t
+         :use_tabs
+         :json-false))
+       :rope (:extensionModules nil :ropeFolder nil))
+      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
+      ;; LSP configuration for basedpyright.
+      :basedpyright
+      (:checkOnlyOpenFiles
+       t
+       :reportDuplicateImport t
+       :typeCheckingMode "recommended"
+       :useLibraryCodeForTypes t)
+      :basedpyright.analysis
+      (:diagnosticSeverityOverrides
+       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+       :inlayHints
+       (:callArgumentNames
+        :json-false
+        :functionReturnTypes
+        :json-false
+        :variableTypes
+        :json-false
+        :genericTypes
+        :json-false)))))
 
    (eval .
          (add-hook
@@ -393,8 +405,10 @@
           (lambda ()
             (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)
-            (add-hook
-             'before-save-hook #'eglot-code-action-organize-imports))))))
+            ;; (add-hook 'before-save-hook #'eglot-code-action-organize-imports
+            ;;           nil
+            ;;           t)
+            )))))
 
  (sh-mode . ((subdirs . nil)))
 
@@ -402,7 +416,20 @@
 
  (yaml-mode
   .
-  ((eval .
+  ((eglot-workspace-configuration
+    .
+    (:yaml
+     (:format
+      (:enable
+       t
+       :singleQuote nil
+       :bracketSpacing t
+       :proseWrap "preserve"
+       :printWidth 80)
+      :validate t
+      :hover t
+      :completion t)))
+   (eval .
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
@@ -597,6 +624,13 @@
    ;;        (lambda ()
    ;;          (make-local-variable 'before-save-hook)
    ;;          (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+   ;; (eval .
+   ;;       (add-hook
+   ;;        'eglot-managed-mode-hook
+   ;;        (lambda ()
+   ;;          (make-local-variable 'before-save-hook)
+   ;;          (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
    ))
 
  (kdl-ts-mode . (mode . kdl-format-on-save))
@@ -610,8 +644,8 @@
       (:sourcePaths ["src"] :referencedLibraries ["lib/*.jar"])
       :dependencies
       ["libs/**/*.jar" "libs/*.jar"]
-      :output-dir "build")))
-   (jdtls (:workspaceFolder "~/java/"))
+      :output-dir "build")
+     :jdtls (:workspaceFolder "~/java/")))
    (eval .
          (add-hook
           'lsp-managed-mode-hook

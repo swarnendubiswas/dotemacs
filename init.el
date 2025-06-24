@@ -570,6 +570,7 @@ The provider is `nerd-icons'."
   (remote-file-name-inhibit-cache nil)
   (tramp-verbose 1 "Only errors and warnings")
   (tramp-default-method "ssh")
+  (tramp-copy-size-limit (* 1024 1024)) ; 1MB
   :config
   (when (boundp 'tramp-use-connection-share)
     (setopt tramp-use-connection-share nil))
@@ -578,7 +579,16 @@ The provider is `nerd-icons'."
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-  (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors)))
+  (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
+
+  ;; https://coredumped.dev/2025/06/18/making-tramp-go-brrrr./
+  ;; Newer versions of TRAMP will use SSH connection sharing for much faster
+  ;; connections. These don’t require you to reenter your password each time you
+  ;; connect. The compile command disables this feature, so we want to turn it
+  ;; back on.
+  (with-eval-after-load 'compile
+    (remove-hook
+     'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
 
 (use-package whitespace
   :straight (:type built-in)
@@ -1663,12 +1673,38 @@ The provider is `nerd-icons'."
 ;;   :diminish)
 
 (use-package apheleia
-  :hook ((markdown-mode markdown-ts-mode) . apheleia-mode)
+  :hook
+  ((markdown-mode
+    markdown-ts-mode sh-mode bash-ts-mode python-mode python-ts-mode)
+   . apheleia-mode)
   :custom (apheleia-formatters-respect-fill-column t)
   :config
   (setf (alist-get 'prettier apheleia-formatters)
         '("prettier" "--print-width" "80"))
-  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" 4 "-ci")))
+  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "4" "-ci"))
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
+  :diminish apheleia-mode)
+
+;; FIXME: Why is this not working while apheleia works?
+;; (use-package shfmt
+;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
+;;   :custom (shfmt-arguments '("-i" "4" "-ci"))
+;;   :diminish shfmt-on-save-mode)
+
+;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
+;; `basedpyright' since it does not support document formatting.
+
+;; Yapfify works on the original file, so that any project settings supported by
+;; YAPF itself are used.
+;; (use-package yapfify
+;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
+;;   :hook ((python-mode python-ts-mode) . yapf-mode)
+;;   :diminish yapf-mode)
+
+;; (use-package ruff-format
+;;   :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
+;;   :diminish ruff-format-on-save-mode)
 
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
@@ -1676,11 +1712,6 @@ The provider is `nerd-icons'."
   :custom
   (elisp-autofmt-python-bin "python3")
   (elisp-autofmt-on-save-p 'always))
-
-(use-package shfmt
-  :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-  ;; :custom (shfmt-arguments '("-i" "4" "-ci"))
-  :diminish shfmt-on-save-mode)
 
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
@@ -3016,20 +3047,6 @@ The provider is `nerd-icons'."
   (lsp-pyright-typechecking-mode "basic")
   (lsp-pyright-auto-import-completions t)
   (lsp-pyright-auto-search-paths t))
-
-;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
-;; `basedpyright' since it does not support document formatting.
-
-;; Yapfify works on the original file, so that any project settings supported by
-;; YAPF itself are used.
-;; (use-package yapfify
-;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
-;;   :hook ((python-mode python-ts-mode) . yapf-mode)
-;;   :diminish yapf-mode)
-
-(use-package ruff-format
-  :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
-  :diminish ruff-format-on-save-mode)
 
 (use-package hl-todo
   :hook (emacs-startup . global-hl-todo-mode)
@@ -4399,8 +4416,8 @@ PAD can be left (`l') or right (`r')."
   (setopt eglot-server-programs nil)
   (add-to-list
    'eglot-server-programs
-   '(text-mode
-     . ,(eglot-alternatives '(("harper-ls" "--stdio") ("ltex-ls-plus")))))
+   `(text-mode
+     . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus"))))
   (add-to-list
    'eglot-server-programs
    '((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus")))
@@ -4443,24 +4460,12 @@ PAD can be left (`l') or right (`r')."
    'eglot-server-programs
    '((scss-mode css-mode css-ts-mode)
      .
-     ,(eglot-alternatives
-       '(("vscode-css-language-server" "--stdio")
-         ("css-languageserver" "--stdio")))))
+     ("vscode-css-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
    '((web-mode html-mode html-ts-mode)
      .
-     ,(eglot-alternatives
-       '(("vscode-html-language-server" "--stdio")
-         ("html-languageserver" "--stdio")))))
-  ;; (add-to-list
-  ;;  'eglot-server-programs
-  ;;  '((json-mode json-ts-mode jsonc-mode)
-  ;;    .
-  ;;    ,(eglot-alternatives
-  ;;      '(("vscode-json-language-server" "--stdio")
-  ;;        ("vscode-json-languageserver" "--stdio")
-  ;;        ("json-languageserver" "--stdio")))))
+     ("vscode-html-language-server" "--stdio")))
   (add-to-list
    'eglot-server-programs
    '((json-mode json-ts-mode jsonc-mode)
@@ -4474,10 +4479,10 @@ PAD can be left (`l') or right (`r')."
    '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
   (if (equal sb/python-langserver 'pyls)
       (add-to-list
-       'eglot-server-programs `((python-mode python-ts-mode) . ("pylsp")))
+       'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
     (add-to-list
      'eglot-server-programs
-     `((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
+     '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
   (add-to-list
    'eglot-server-programs
    '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
@@ -4621,8 +4626,7 @@ PAD can be left (`l') or right (`r')."
         :memory
         :json-false)
        :rope_completion (:eager :json-false :enabled :json-false)
-       :ruff
-       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :ruff (:enabled t :formatEnabled t :lineLength 80)
        :yapf
        (:based_on_style
         "pep8"
@@ -4672,9 +4676,10 @@ PAD can be left (`l') or right (`r')."
       :completion t)
      :vscode-json-language-server (:provideFormatter t)
      :harper-ls
-     (:userDictPath
-      "~/"
-      :fileDictPath ""
+     (
+      ;; :userDictPath
+      ;; ""
+      ;; :fileDictPath ""
       :linters
       (:SpellCheck
        :json-false
@@ -4692,6 +4697,7 @@ PAD can be left (`l') or right (`r')."
        :SentenceCapitalization
        :json-false)
       :diagnosticSeverity "hint"
+      :markdown (:IgnoreLinkTitle :json-false)
       :isolateEnglish
       :json-false
       :dialect "American")))
@@ -4699,7 +4705,9 @@ PAD can be left (`l') or right (`r')."
   (with-eval-after-load "eglot"
     (setq-default
      completion-category-defaults nil
-     completion-category-overrides '((eglot (styles orderless)) (eglot-capf (styles orderless))))))
+     completion-category-overrides
+     '((eglot (styles basic substring orderless))
+       (eglot-capf (styles orderless))))))
 
 (use-package eglot-booster
   :straight (:type git :host github :repo "jdtsmith/eglot-booster")
