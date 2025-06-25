@@ -67,7 +67,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -995,7 +995,8 @@ The provider is `nerd-icons'."
      "\\*vc"
      "\\*tramp"
      "\\*citre*"
-     "\\*pylsp"
+     "\\*pylsp.*"
+     "\\*pyright.*"
      "\\*ltex-ls"
      "\\*texlab"
      "\\*bash-ls.*"
@@ -2489,6 +2490,7 @@ The provider is `nerd-icons'."
                    (derived-mode-p 'flex-mode)
                    (derived-mode-p 'bison-mode)
                    (derived-mode-p 'cmake-ts-mode))
+         (setq-local company-minimum-prefix-length 2)
          (sb/company-prog-mode)))))
 
   (progn
@@ -2548,7 +2550,8 @@ The provider is `nerd-icons'."
      (setq-local
       completion-styles '(basic)
       completion-category-defaults nil
-      completion-category-overrides '((consult-location (styles . (orderless))))))))
+      completion-category-overrides '((consult-location (styles . (orderless)))))))
+  (add-hook 'python-ts-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
@@ -2895,16 +2898,21 @@ The provider is `nerd-icons'."
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-xml-logs-client nil)
-  (lsp-pylsp-configuration-sources ["setup.cfg"])
+  (lsp-pylsp-configuration-sources ["pyproject.toml"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
-  (lsp-pylsp-plugins-preload-modules ["numpy" "csv" "pandas" "statistics"])
+  (lsp-pylsp-plugins-preload-enabled nil)
+  (lsp-pylsp-plugins-preload-modules [])
+  (lsp-pylsp-plugins-pydocstyle-enabled nil)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
   (lsp-pylsp-plugins-pylint-enabled t)
-  (lsp-pylsp-plugins-yapf-enabled t)
+  (lsp-pylsp-plugins-yapf-enabled nil)
   (lsp-pylsp-plugins-flake8-enabled nil)
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
   (lsp-pylsp-plugins-ruff-enabled t)
+  (lsp-pylsp-plugins-ruff-config "pyproject.toml")
+  (lsp-pylsp-plugins-ruff-format nil "Using Apheleia")
+  (lsp-pylsp-plugins-ruff-line-length 80)
   :config
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
@@ -2990,7 +2998,7 @@ The provider is `nerd-icons'."
       c-basic-offset 4
       c-set-style "java")
      (lsp-deferred)))
-  :bind (:map lsp-mode-map ("y" . lsp-java-type-hierarchy))
+  :bind (:map lsp-command-map ("y" . lsp-java-type-hierarchy))
   :custom
   (lsp-java-progress-reports-enabled nil)
   (lsp-java-save-actions-organize-imports t)
@@ -3035,18 +3043,22 @@ The provider is `nerd-icons'."
   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
   )
 
+;; Use a "pyrightconfig.json" file for configuring the language server. 
 (use-package lsp-pyright
   :when
   (and (eq sb/lsp-provider 'lsp-mode)
        (eq sb/python-langserver 'basedpyright)
        (executable-find "basedpyright"))
   :commands (lsp-pyright-locate-python lsp-pyright-locate-venv)
-  :hook ((python-mode python-ts-mode) . (lambda () (require 'lsp-pyright)))
+  :hook
+  ((python-mode python-ts-mode)
+   .
+   (lambda ()
+     (require 'lsp-pyright)
+     (lsp-deferred)))
   :custom
-  (lsp-pyright-python-executable-cmd "python3")
-  (lsp-pyright-typechecking-mode "basic")
-  (lsp-pyright-auto-import-completions t)
-  (lsp-pyright-auto-search-paths t))
+  (lsp-pyright-langserver-command "basedpyright")
+  (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package hl-todo
   :hook (emacs-startup . global-hl-todo-mode)
@@ -3315,8 +3327,13 @@ The provider is `nerd-icons'."
      (cond
       ((eq sb/lsp-provider 'eglot)
        (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
+      ((and (eq sb/lsp-provider 'lsp-mode) (eq sb/python-langserver 'pylsp))
        (lsp-deferred)))))
+  :bind*
+  (:map
+   python-mode-map
+   ("C-M-n" . python-nav-forward-defun)
+   ("C-M-p" . python-nav-backward-defun))
   :bind
   (:map
    python-mode-map
@@ -4302,6 +4319,7 @@ PAD can be left (`l') or right (`r')."
 
 ;; Highlight the cursor position after the window scrolls
 (use-package beacon
+  :disabled
   :hook (emacs-startup . beacon-mode)
   :diminish)
 
@@ -4393,7 +4411,7 @@ PAD can be left (`l') or right (`r')."
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
-  (eglot-send-changes-idle-time 2)
+  (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
@@ -4477,7 +4495,7 @@ PAD can be left (`l') or right (`r')."
   (add-to-list
    'eglot-server-programs
    '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
-  (if (equal sb/python-langserver 'pyls)
+  (if (equal sb/python-langserver 'pylsp)
       (add-to-list
        'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
     (add-to-list
