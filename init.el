@@ -4335,6 +4335,7 @@ PAD can be left (`l') or right (`r')."
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb")
   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
+  :bind ("C-M-j" . breadcrumb-jump)
   :config (breadcrumb-imenu-crumbs))
 
 ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all

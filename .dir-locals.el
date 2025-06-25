@@ -44,9 +44,24 @@
          (setq sb/flycheck-local-checkers
                '((lsp . ((next-checkers . (json-jsonlint)))))))
 
-       (when (derived-mode-p 'python-mode)
+       ;; Basedpyright checks types, so we ignore mypy.
+       (when (and (eq sb/python-langserver 'basedpyright)
+                  (or (derived-mode-p 'python-mode)
+                      (derived-mode-p 'python-ts-mode)))
          (setq sb/flycheck-local-checkers
-               '((lsp . ((next-checkers . (python-pylint . (python-mypy))))))))
+               '((lsp
+                  .
+                  ((next-checkers
+                    .
+                    (python-pylint . (python-ruff . (hl-todo)))))))))
+
+       ;; Other linters (pylint, mypy, and ruff) are included as plugins in
+       ;; `pylsp' and are configured through the `lsp-mode' package.
+       (when (and (eq sb/python-langserver 'pylsp)
+                  (or (derived-mode-p 'python-mode)
+                      (derived-mode-p 'python-ts-mode)))
+         (setq sb/flycheck-local-checkers
+               '((lsp . ((next-checkers . (hl-todo)))))))
 
        (when (derived-mode-p 'c++-mode)
          (setq sb/flycheck-local-checkers
@@ -218,60 +233,133 @@
             ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
             )))
 
+   ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
+   ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
    ;;  https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
    (eglot-workspace-configuration
     .
-    ( ;; (:python
-     ;;  (:pythonPath "./.venv/bin/python")
-     ;;  (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
-     ;;  (:analysis
-     ;;   (:diagnosticMode
-     ;;    "openFilesOnly"
-     ;;    :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
-     (:pylsp
-      (:configurationSources
-       ["pyproject.toml" "setup.cfg"]
-       :plugins
-       (:autopep8
+    (:pylsp
+     (:configurationSources
+      ["pyproject.toml" "setup.cfg"]
+      :plugins
+      (:autopep8
+       (:enabled :json-false)
+       :black (:cache_config t :enabled :json-false :line_length 80)
+       :flake8
+       (:config
+        t
+        :enabled
+        :json-false
+        :exclude []
+        :executable "flake8"
+        :extendIgnore []
+        :filename nil ; string: null (default)
+        :hangClosing nil
+        :ignore []
+        :indentSize nil
+        :maxComplexity nil
+        :maxLineLength 80
+        :perFileIgnores [] ; e.g. ["file_path.py:W305,W304"]
+        :select nil)
+       :jedi
+       (:auto_import_modules
+        []
+        :env_vars nil ; (:SOME_ENV_VAR "/some/path")
+        :environment nil ; "./.venv/"
+        :extra_paths [])
+       :jedi_completion
+       (:cache_for
+        []
+        :eager
+        :json-false
+        :enabled t
+        :fuzzy t
+        :include_class_objects
+        :json-false
+        :include_function_objects
+        :json-false
+        :include_params t
+        :resolve_at_most 25)
+       :jedi_definition
+       (:enabled
+        t
+        :follow_builtin_definitions t
+        :follow_builtin_imports t
+        :follow_imports t)
+       :jedi_hover (:enabled t)
+       :jedi_references (:enabled t)
+       :jedi_signature_help (:enabled t)
+       :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
+       :mccabe (:enabled :json-false :threshold 15)
+       :mypy (:enabled :json-false)
+       :preload (:enabled :json-false :modules [])
+       :pycodestyle
+       (:enabled
+        :json-false
+        :exclude []
+        :filename []
+        :hangClosing nil
+        :ignore []
+        :indentSize nil
+        :maxLineLength 80
+        :select nil)
+       :pydocstyle
+       (:addIgnore
+        []
+        :addSelect []
+        :convention "numpy"
+        :enabled
+        :json-false
+        :ignore []
+        :match "(?!test_).*\\.py"
+        :matchDir "[^\\.].*"
+        :select nil)
+       :pyflakes (:enabled :json-false)
+       :pylint (:args [] :enabled t)
+       :pylsp_black (:cache_config t :enabled :json-false :line_length 80)
+       :pylsp_isort (:enabled t)
+       :pylsp_mypy (:enabled t :live_mode :json-false :report_progress t)
+       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
+       :rope_autoimport
+       (:code_actions
         (:enabled :json-false)
-        :black (:enabled :json-false)
-        :flake8
-        (:enabled :json-false :config t :maxLineLength 80)
-        :jedi (:environment "" :extra_paths [])
-        :jedi_completion
-        (:fuzzy t :include_params t :include_class_objects t :cache_for [])
-        :jedi_definition
-        (:enabled t :follow_imports t :follow_builtin_imports t)
-        :jedi_hover (:enabled t)
-        :jedi_references (:enabled t)
-        :jedi_signature_help (:enabled t)
-        :jedi_symbols
-        (:enabled t :all_scopes t :include_import_symbols t)
-        :mccabe
-        (:enabled :json-false :threshold 15)
-        :mypy (:enabled :json-false)
-        :preload (:enabled t :modules [])
-        :pycodestyle
-        (:enabled :json-false :maxLineLength 80)
-        :pydocstyle
-        (:enabled :json-false :convention "numpy")
-        :pyflakes (:enabled :json-false)
-        :pylint (:enabled t)
-        :pylsp_black (:enabled :json-false)
-        :pylsp_isort (:enabled t)
-        :pylsp_mypy
-        (:enabled t :report_progress t :live_mode :json-false)
-        :rope_autoimport
-        (:code_actions
-         (:enabled :json-false)
-         :completions (:enabled :json-false)
-         :enabled
-         :json-false)
-        :rope_completion
-        (:enabled :json-false :eager :json-false)
-        :ruff
-        (:enabled t :formatEnabled t :lineLength 80)
-        :yapf (:enabled t))))))
+        :completions (:enabled :json-false)
+        :enabled
+        :json-false
+        :memory
+        :json-false)
+       :rope_completion (:eager :json-false :enabled :json-false)
+       :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :yapf
+       (:enabled
+        t
+        :based_on_style "pep8"
+        :column_limit 80
+        :indent_width 4
+        :split_before_logical_operator t
+        :use_tabs
+        :json-false)
+       :rope (:extensionModules nil :ropeFolder nil))
+      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
+      ;; LSP configuration for basedpyright.
+      :basedpyright
+      (:checkOnlyOpenFiles
+       t
+       :reportDuplicateImport t
+       :typeCheckingMode "recommended"
+       :useLibraryCodeForTypes t)
+      :basedpyright.analysis
+      (:diagnosticSeverityOverrides
+       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+       :inlayHints
+       (:callArgumentNames
+        :json-false
+        :functionReturnTypes
+        :json-false
+        :variableTypes
+        :json-false
+        :genericTypes
+        :json-false)))))
 
    (eval .
          (add-hook
@@ -279,8 +367,9 @@
           (lambda ()
             (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)
-            ;; (add-hook
-            ;;  'before-save-hook #'eglot-code-action-organize-imports)
+            ;; (add-hook 'before-save-hook #'eglot-code-action-organize-imports
+            ;;           nil
+            ;;           t)
             )))))
 
  (python-ts-mode
@@ -308,75 +397,112 @@
             ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
             )))
 
+   ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
+   ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
+   ;;  https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md   
    (eglot-workspace-configuration
     .
-    ( ;; (:python
-     ;;  (:pythonPath "./.venv/bin/python")
-     ;;  (:venvPath (expand-absolute-name "~/.local/share/conda/envs"))
-     ;;  (:analysis
-     ;;   (:diagnosticMode
-     ;;    "openFilesOnly"
-     ;;    :stubPath (expand-absolute-name "~/.local/lib/python-type-stubs"))))
-     (:pylsp
-      (:configurationSources
-       ["pyproject.toml" "setup.cfg"]
-       :plugins
-       (:autopep8
+    (:pylsp
+     (:configurationSources
+      ["pyproject.toml" "setup.cfg"]
+      :plugins
+      (:autopep8
+       (:enabled :json-false)
+       :black (:cache_config t :enabled :json-false :line_length 80)
+       :flake8
+       (:config
+        t
+        :enabled
+        :json-false
+        :exclude []
+        :executable "flake8"
+        :extendIgnore []
+        :filename nil ; string: null (default)
+        :hangClosing nil
+        :ignore []
+        :indentSize nil
+        :maxComplexity nil
+        :maxLineLength 80
+        :perFileIgnores [] ; e.g. ["file_path.py:W305,W304"]
+        :select nil)
+       :jedi
+       (:auto_import_modules
+        []
+        :env_vars nil ; (:SOME_ENV_VAR "/some/path")
+        :environment nil ; "./.venv/"
+        :extra_paths [])
+       :jedi_completion
+       (:cache_for
+        []
+        :eager
+        :json-false
+        :enabled t
+        :fuzzy t
+        :include_class_objects
+        :json-false
+        :include_function_objects
+        :json-false
+        :include_params t
+        :resolve_at_most 25)
+       :jedi_definition
+       (:enabled
+        t
+        :follow_builtin_definitions t
+        :follow_builtin_imports t
+        :follow_imports t)
+       :jedi_hover (:enabled t)
+       :jedi_references (:enabled t)
+       :jedi_signature_help (:enabled t)
+       :jedi_symbols (:all_scopes t :enabled t :include_import_symbols t)
+       :mccabe (:enabled :json-false :threshold 15)
+       :mypy (:enabled :json-false)
+       :preload (:enabled :json-false :modules [])
+       :pycodestyle
+       (:enabled
+        :json-false
+        :exclude []
+        :filename []
+        :hangClosing nil
+        :ignore []
+        :indentSize nil
+        :maxLineLength 80
+        :select nil)
+       :pydocstyle
+       (:addIgnore
+        []
+        :addSelect []
+        :convention "numpy"
+        :enabled
+        :json-false
+        :ignore []
+        :match "(?!test_).*\\.py"
+        :matchDir "[^\\.].*"
+        :select nil)
+       :pyflakes (:enabled :json-false)
+       :pylint (:args [] :enabled t)
+       :pylsp_black (:cache_config t :enabled :json-false :line_length 80)
+       :pylsp_isort (:enabled t)
+       :pylsp_mypy (:enabled t :live_mode :json-false :report_progress t)
+       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
+       :rope_autoimport
+       (:code_actions
         (:enabled :json-false)
-        :black
-        (:cache_config t :enabled :json-false :line_length 80)
-        :flake8
-        (:enabled :json-false :config t :maxLineLength 80)
-        :jedi (:environment nil :extra_paths [])
-        :jedi_completion
-        (:fuzzy
-         t
-         :include_params t
-         :include_class_objects
-         :json-false
-         :cache_for [])
-        :jedi_definition
-        (:enabled
-         t
-         :follow_imports t
-         :follow_builtin_imports t
-         :follow_builtin_definitions t)
-        :jedi_hover (:enabled t)
-        :jedi_references (:enabled t)
-        :jedi_signature_help (:enabled t)
-        :jedi_symbols
-        (:enabled t :all_scopes t :include_import_symbols :json-false)
-        :mccabe (:enabled :json-false :threshold 15)
-        :mypy (:enabled :json-false)
-        :preload (:enabled t :modules [])
-        :pycodestyle (:enabled :json-false :maxLineLength 80)
-        :pydocstyle
-        (:enabled :json-false :convention "numpy")
-        :pyflakes (:enabled :json-false)
-        :pylint (:enabled t)
-        :pylsp_black (:enabled :json-false)
-        :pylsp_isort (:enabled t)
-        :pylsp_mypy
-        (:enabled t :report_progress :json-false :live_mode :json-false)
-        :rope_autoimport
-        (:code_actions
-         (:enabled :json-false)
-         :completions (:enabled :json-false)
-         :enabled
-         :json-false)
-        :rope_completion
-        (:enabled :json-false :eager :json-false)
-        :ruff
-        (:enabled t :formatEnabled t :lineLength 80)
-        :yapf
-        (:enabled
-         t
-         :based_on_style "pep8"
-         :column_limit 80
-         :indent_width 4
-         :split_before_logical_operator t
-         :use_tabs
-         :json-false))
+        :completions (:enabled :json-false)
+        :enabled
+        :json-false
+        :memory
+        :json-false)
+       :rope_completion (:eager :json-false :enabled :json-false)
+       :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :yapf
+       (:enabled
+        t
+        :based_on_style "pep8"
+        :column_limit 80
+        :indent_width 4
+        :split_before_logical_operator t
+        :use_tabs
+        :json-false)
        :rope (:extensionModules nil :ropeFolder nil))
       ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
       ;; LSP configuration for basedpyright.
