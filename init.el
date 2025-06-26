@@ -346,7 +346,13 @@ The provider is `nerd-icons'."
   (setopt minibuffer-prompt-properties
           '(read-only
             t intangible t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+  (add-hook
+   'minibuffer-setup-hook
+   (lambda ()
+     (cursor-intangible-mode 1)
+     ;; Allow Flycheck to show long error messages in the minibuffer
+     (setq truncate-lines nil)
+     (visual-line-mode 1)))
 
   :diminish visual-line-mode)
 
@@ -2832,23 +2838,34 @@ The provider is `nerd-icons'."
    ("b" . lsp-workspace-blacklist-remove))
   :custom
   (lsp-keymap-prefix "C-c l")
-  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
+  (lsp-use-plists t)
+  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
+  ;; Tramp which is slower
+  (lsp-auto-register-remote-clients nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-progess-via-spinner nil)
+  ;; Avoid annoying questions, we expect a server restart to succeed
+  (lsp-restart 'auto-restart)
+  ;; Avoid warning messages for unsupported modes like `csv-mode'
+  (lsp-warn-no-matched-clients nil)
+  (lsp-enable-suggest-server-download nil)
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
-  (lsp-modeline-diagnostics-enable nil)
   ;; (lsp-enable-file-watchers nil "Avoid watcher warnings")
   (lsp-lens-enable nil "Lenses are intrusive")
   ;; I use `symbol-overlay' to include languages that do not have a language
   ;; server
   (lsp-enable-symbol-highlighting nil)
+  (lsp-modeline-diagnostics-enable nil)
   ;; The workspace status icon on the terminal interface is misleading across
   ;; projects
   (lsp-modeline-workspace-status-enable nil)
-  ;; (lsp-enable-snippet t)
-  (lsp-enable-suggest-server-download nil)
+  ;; Simpler to focus on the errors at hand
+  (lsp-modeline-diagnostics-scope :file)
   (lsp-inlay-hint-enable nil "Intrusive")
+  ;; (lsp-enable-snippet t)
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
   ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
@@ -2858,22 +2875,12 @@ The provider is `nerd-icons'."
   ;; Show/hide description of completion candidates
   (lsp-completion-show-label-description t)
   (lsp-completion-default-behaviour :insert)
-  (lsp-use-plists t)
-  ;; I mostly SSH into the remote machine and launch Emacs, rather than using
-  ;; Tramp which is slower
-  (lsp-auto-register-remote-clients nil)
-  (lsp-keep-workspace-alive nil)
-  (lsp-progess-via-spinner nil)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
-  ;; Simpler to focus on the errors at hand
-  (lsp-modeline-diagnostics-scope :file)
+  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   ;; Sudden changes in the height of the echo area causes the cursor to lose
   ;; position, manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
-  ;; Avoid annoying questions, we expect a server restart to succeed
-  (lsp-restart 'auto-restart)
-  ;; Avoid warning messages for unsupported modes like `csv-mode'
-  (lsp-warn-no-matched-clients nil)
+  (lsp-signature-render-documentation t)
   ;; Client-specific configuration
   (lsp-clangd-version "19.1.2")
   (lsp-clients-clangd-args
@@ -2914,6 +2921,52 @@ The provider is `nerd-icons'."
   (lsp-pylsp-plugins-ruff-format nil "Using Apheleia")
   (lsp-pylsp-plugins-ruff-line-length 80)
   :config
+  (defcustom sb/lsp-harper-active-modes
+    '(text-mode org-mode markdown-mode markdown-ts-mode)
+    "List of major modes that work with harper-ls."
+    :type 'list
+    :group 'lsp-harper)
+
+  (defcustom sb/lsp-harper-configuration
+    '( ;; :userDictPath
+      ;; ""
+      ;; :fileDictPath ""
+      :linters
+      (:SpellCheck
+       :json-false
+       :SpelledNumbers
+       :json-false
+       :AnA t
+       :UnclosedQuotes t
+       :WrongQuotes
+       :json-false
+       :LongSentences t
+       :RepeatedWords t
+       :Spaces t
+       :Matcher t
+       :CorrectNumberSuffix t
+       :SentenceCapitalization
+       :json-false)
+      :codeActions (:ForceStable :json-false)
+      :diagnosticSeverity "hint"
+      :markdown (:IgnoreLinkTitle :json-false)
+      :isolateEnglish
+      :json-false
+      :dialect "American")
+    "Harper configuration structure"
+    :type 'dictionary
+    :group 'lsp-harper)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection
+    (lsp-stdio-connection '("harper-ls" "--stdio"))
+    :major-modes sb/lsp-harper-active-modes
+    :initialization-options sb/lsp-harper-configuration
+    :add-on? 't
+    :priority -3
+    :server-id 'lsp-harper))
+
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
   ;; (dolist (ignore-dirs
@@ -2982,7 +3035,7 @@ The provider is `nerd-icons'."
   :after (consult lsp)
   :demand t
   :commands consult-lsp-diagnostics
-  :bind
+  :bind*
   (:map
    lsp-command-map
    ("g" . consult-lsp-symbols)
@@ -4715,6 +4768,7 @@ PAD can be left (`l') or right (`r')."
        :CorrectNumberSuffix t
        :SentenceCapitalization
        :json-false)
+      :codeActions (:ForceStable :json-false)
       :diagnosticSeverity "hint"
       :markdown (:IgnoreLinkTitle :json-false)
       :isolateEnglish
@@ -5103,6 +5157,14 @@ or the major mode is not in `sb/skippable-modes'."
 ;; this behavior, please let me know, so I can add them.
 (with-eval-after-load 'page-ext
   (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
+
+;; ;; Alacritty and Ghostty are my preferred terminals for using Emacs. This
+;; ;; package is to allow using Konsole.
+;; (use-package term-keys
+;;   :straight (:host github :repo "CyberShadow/term-keys")
+;;   :unless (display-graphic-p)
+;;   :hook (emacs-startup . term-keys-mode)
+;;   :config (require 'term-keys-konsole))
 
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
