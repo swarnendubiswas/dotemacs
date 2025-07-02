@@ -3,8 +3,8 @@
 ((nil
   .
   ((fill-column . 80)
-
    (make-local-variable 'completion-ignored-extensions)
+
    ;; Directories
    (eval . (add-to-list 'completion-ignored-extensions "eln-cache/"))
    (eval . (add-to-list 'completion-ignored-extensions "tree-sitter/"))
@@ -14,6 +14,7 @@
    (eval . (add-to-list 'completion-ignored-extensions "share/"))
    (eval . (add-to-list 'completion-ignored-extensions "auto-save-list/"))
    (eval . (add-to-list 'completion-ignored-extensions "\\.cache/"))
+   (eval . (add-to-list 'completion-ignored-extensions "\\.ctags\.d/"))
    (eval . (add-to-list 'completion-ignored-extensions "auto/"))
 
    ;; Files
@@ -21,17 +22,23 @@
    (eval . (add-to-list 'completion-ignored-extensions ".pptx"))
    (eval . (add-to-list 'completion-ignored-extensions ".xml"))
    (eval . (add-to-list 'completion-ignored-extensions ".drawio"))
+   (eval . (add-to-list 'completion-ignored-extensions ".out"))
+   (eval . (add-to-list 'completion-ignored-extensions ".vect"))
+   (eval . (add-to-list 'completion-ignored-extensions "GPATH"))
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
+
+   (eval .
+         (with-eval-after-load 'lsp-mode
+           (add-to-list 'lsp-file-watch-ignored-directories "/\\.clangd\\'")
+           (add-to-list 'lsp-file-watch-ignored-directories "/\\.git$")
+           (add-to-list 'lsp-file-watch-ignored-directories "/\\.cache\\'")))
 
    (eval
     .
     (add-hook
      'lsp-managed-mode-hook
      (lambda ()
-       ;; (add-to-list lsp-file-watch-ignored-directories "/build")
-
-       ;; Update the chain of checkers based on requirement
        (when (derived-mode-p 'markdown-mode)
          (setq sb/flycheck-local-checkers
                '((lsp . ((next-checkers . (markdown-markdownlint-cli)))))))

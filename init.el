@@ -1011,7 +1011,9 @@ The provider is `nerd-icons'."
      "\\*shfmt.*"
      "\\*clangd.*"
      "\\*semgrep.*"
-     "\\*autotools.*"))
+     "\\*autotools.*"
+     "\\*lsp-harper*"
+     "\\*taplo*"))
   :config
   (consult-customize
    consult-line
@@ -1775,6 +1777,7 @@ The provider is `nerd-icons'."
 
 ;; Use "M-SPC" for space-separated completion lookups.
 (use-package orderless
+  :when (eq sb/in-buffer-completion 'corfu)
   :demand t
   :config
   (with-eval-after-load "company"
@@ -1782,6 +1785,10 @@ The provider is `nerd-icons'."
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
+
+(use-package hotfuzz
+  :when (eq sb/in-buffer-completion 'company)
+  :demand t)
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -1811,6 +1818,9 @@ The provider is `nerd-icons'."
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
     (setopt completion-styles '(orderless substring partial-completion basic)))
+
+  (with-eval-after-load "hotfuzz"
+    (setopt completion-styles '(hotfuzz)))
 
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
@@ -2815,6 +2825,7 @@ The provider is `nerd-icons'."
 ;; servers simultaneously and provides helpers to install and uninstall servers.
 (use-package lsp-mode
   :when (eq sb/lsp-provider 'lsp-mode)
+  :bind-keymap ("C-c l" . lsp-command-map)
   :bind
   (:map
    lsp-command-map
@@ -2837,7 +2848,7 @@ The provider is `nerd-icons'."
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
   :custom
-  (lsp-keymap-prefix "C-c l")
+  ;; (lsp-keymap-prefix "C-c l")
   (lsp-use-plists t)
   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
   ;; Tramp which is slower
@@ -2921,51 +2932,57 @@ The provider is `nerd-icons'."
   (lsp-pylsp-plugins-ruff-format nil "Using Apheleia")
   (lsp-pylsp-plugins-ruff-line-length 80)
   :config
-  (defcustom sb/lsp-harper-active-modes
-    '(text-mode org-mode markdown-mode markdown-ts-mode)
-    "List of major modes that work with harper-ls."
-    :type 'list
-    :group 'lsp-harper)
-
-  (defcustom sb/lsp-harper-configuration
-    '( ;; :userDictPath
-      ;; ""
-      ;; :fileDictPath ""
-      :linters
-      (:SpellCheck
-       :json-false
-       :SpelledNumbers
-       :json-false
-       :AnA t
-       :UnclosedQuotes t
-       :WrongQuotes
-       :json-false
-       :LongSentences t
-       :RepeatedWords t
-       :Spaces t
-       :Matcher t
-       :CorrectNumberSuffix t
-       :SentenceCapitalization
-       :json-false)
-      :codeActions (:ForceStable :json-false)
-      :diagnosticSeverity "hint"
-      :markdown (:IgnoreLinkTitle :json-false)
-      :isolateEnglish
-      :json-false
-      :dialect "American")
-    "Harper configuration structure"
-    :type 'dictionary
-    :group 'lsp-harper)
-
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection
-    (lsp-stdio-connection '("harper-ls" "--stdio"))
-    :major-modes sb/lsp-harper-active-modes
-    :initialization-options sb/lsp-harper-configuration
-    :add-on? 't
-    :priority -3
-    :server-id 'lsp-harper))
+  ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
+  ;; (defgroup lsp-harper nil
+  ;;   "Settings for Harper grammar language server."
+  ;;   :prefix "sb/lsp-harper-"
+  ;;   :group 'lsp-mode)
+  ;; 
+  ;; (defcustom sb/lsp-harper-active-modes
+  ;;   '(text-mode org-mode markdown-mode markdown-ts-mode)
+  ;;   "List of major modes that work with harper-ls."
+  ;;   :type 'list
+  ;;   :group 'lsp-harper)
+  ;; 
+  ;; (defcustom sb/lsp-harper-configuration
+  ;;   '( ;; :userDictPath
+  ;;     ;; ""
+  ;;     ;; :fileDictPath ""
+  ;;     :linters
+  ;;     (:SpellCheck
+  ;;      :json-false
+  ;;      :SpelledNumbers
+  ;;      :json-false
+  ;;      :AnA t
+  ;;      :UnclosedQuotes t
+  ;;      :WrongQuotes
+  ;;      :json-false
+  ;;      :LongSentences t
+  ;;      :RepeatedWords t
+  ;;      :Spaces t
+  ;;      :Matcher t
+  ;;      :CorrectNumberSuffix t
+  ;;      :SentenceCapitalization
+  ;;      :json-false)
+  ;;     :codeActions (:ForceStable :json-false)
+  ;;     :diagnosticSeverity "hint"
+  ;;     :markdown (:IgnoreLinkTitle :json-false)
+  ;;     :isolateEnglish
+  ;;     :json-false
+  ;;     :dialect "American")
+  ;;   "Harper configuration structure"
+  ;;   :type 'dictionary
+  ;;   :group 'lsp-harper)
+  ;; 
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection
+  ;;   (lsp-stdio-connection '("harper-ls" "--stdio"))
+  ;;   :major-modes sb/lsp-harper-active-modes
+  ;;   :initialization-options sb/lsp-harper-configuration
+  ;;   :add-on? 't
+  ;;   :priority -3
+  ;;   :server-id 'lsp-harper))
 
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
@@ -3836,8 +3853,8 @@ The provider is `nerd-icons'."
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-   ;; Revert PDF buffer after TeX compilation has finished
-   (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+   ;; Revert "PDF Tools" buffer after TeX compilation has finished
+   ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
    ;; (TeX-update-style . rainbow-delimiters-mode)
    (LaTeX-mode . TeX-source-correlate-mode)
@@ -4256,7 +4273,7 @@ PAD can be left (`l') or right (`r')."
 
 ;; Center the text environment
 (use-package olivetti
-  :hook ((text-mode prog-mode conf-mode) . olivetti-mode)
+  :hook ((text-mode prog-mode conf-mode org-mode) . olivetti-mode)
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
   :diminish)
 
@@ -5184,6 +5201,10 @@ or the major mode is not in `sb/skippable-modes'."
    (lambda ()
      (keyfreq-mode 1)
      (keyfreq-autosave-mode 1))))
+
+;; (use-package wingman
+;;   :straight (:host github :repo "mjrusso/wingman")
+;;   :hook (prog-mode . wingman-mode))
 
 ;;; init.el ends here
 
