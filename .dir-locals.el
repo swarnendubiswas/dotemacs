@@ -32,7 +32,8 @@
          (with-eval-after-load 'lsp-mode
            (add-to-list 'lsp-file-watch-ignored-directories "/\\.clangd\\'")
            (add-to-list 'lsp-file-watch-ignored-directories "/\\.git$")
-           (add-to-list 'lsp-file-watch-ignored-directories "/\\.cache\\'")))
+           (add-to-list 'lsp-file-watch-ignored-directories "/\\.cache\\'")
+           (add-to-list 'lsp-file-watch-ignored-directories "/\\.ctags\.d\\'")))
 
    (eval
     .

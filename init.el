@@ -198,6 +198,8 @@ The provider is `nerd-icons'."
   (comment-auto-fill-only-comments t)
   (comment-empty-lines t)
   (comment-multi-lines t)
+  ;; Show the actual symbol name in the *customize* buffer
+  (custom-unlispify-menu-entries nil)
   (create-lockfiles nil)
   (backup-inhibited t "Disable backup for a per-file basis")
   (make-backup-files nil "Stop making backup `~' files")
@@ -266,6 +268,8 @@ The provider is `nerd-icons'."
   (fringes-outside-margins t)
   ;; Improve Emacs' responsiveness by delaying syntax highlighting during input
   (redisplay-skip-fontification-on-input t)
+  ;; Show contextual lines around a match
+  (list-matching-lines-default-context-lines 1)
   :config
   (dolist (exts
            '(".aux"
@@ -3084,7 +3088,7 @@ The provider is `nerd-icons'."
   :when (eq sb/lsp-provider 'lsp-mode)
   :init (setopt lsp-ltex-plus-version "18.5.1")
   :hook
-  ((text-mode markdown-mode org-mode LaTeX-mode)
+  ((text-mode markdown-mode markdown-ts-mode org-mode LaTeX-mode)
    .
    (lambda ()
      (require 'lsp-ltex-plus)
@@ -3104,8 +3108,8 @@ The provider is `nerd-icons'."
       "WANT"
       "EN_DIACRITICS_REPLACE"]))
   ;; :config
-  ;; ;; Disable spell checking since we cannot get `lsp-ltex' to work with custom
-  ;; ;; dict words.
+  ;; ;; Disable spell checking since we cannot get `lsp-ltex-plus' to work with 
+  ;; ;; custom dict words.
   ;; (setq lsp-ltex-plus-disabled-rules
   ;;       #s(hash-table
   ;;          size 30 data
@@ -3113,7 +3117,8 @@ The provider is `nerd-icons'."
   ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
   )
 
-;; Use a "pyrightconfig.json" file for configuring the language server. 
+;; Use a per-project "pyrightconfig.json" file for configuring the language
+;; server.
 (use-package lsp-pyright
   :when
   (and (eq sb/lsp-provider 'lsp-mode)
@@ -3210,8 +3215,12 @@ The provider is `nerd-icons'."
        (fboundp 'treesit-available-p)
        (treesit-available-p))
   :demand t
-  :commands treesit-install-language-grammar
-  :bind (("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+  :commands (treesit-install-language-grammar)
+  :bind
+  (("C-M-a" . treesit-beginning-of-defun)
+   ("C-M-e" . treesit-end-of-defun)
+   ("C-M-<up>" . treesit-up-list)
+   ("C-M-<down>" . treesit-down-list))
   :custom
   ;; Increased default font locking may hurt performance
   (treesit-font-lock-level 4)
@@ -3614,13 +3623,13 @@ The provider is `nerd-icons'."
 (use-package markdown-mode
   :mode ("README\\.md\\'" . gfm-mode)
   :hook
-  (markdown-mode
+  ((markdown-mode markdown-ts-mode)
    .
    (lambda ()
      (cond
       ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
-      ;; ((eq sb/lsp-provider 'eglot)
-      ;;  (eglot-ensure))
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
       ((eq sb/lsp-provider 'lsp-mode)
        (progn
          (require 'lsp-marksman)
@@ -3778,7 +3787,7 @@ The provider is `nerd-icons'."
    ("C-c C-," . org-insert-structure-template)
    ("C-c C-j" . consult-outline)
    ("C-c C-l" . org-store-link)
-   ("C-c l" . org-insert-link))
+   ("C-c C-k" . org-insert-link))
   :config
   (require 'ox-latex)
   (add-to-list 'org-latex-packages-alist '("" "listings"))
