@@ -542,7 +542,7 @@ The provider is `nerd-icons'."
    ediff-regions-wordwise
    ediff-revert-buffers-then-recompute-diffs)
   :hook
-  ;; Offer to clean up files from ediff sessions. 
+  ;; Offer to clean up files from ediff sessions.
   (ediff-cleanup . (lambda () (ediff-janitor t nil)))
   :bind (("C-c d e" . ediff) ("C-c d b" . ediff-buffers))
   :custom
@@ -1303,7 +1303,8 @@ The provider is `nerd-icons'."
   (("C-c d s" . crux-sudo-edit)
    ("C-<f9>" . crux-recentf-find-directory)
    ("C-<f11>" . crux-kill-other-buffers)
-   ([remap keyboard-quit] . crux-keyboard-quit-dwim))
+   ([remap keyboard-quit] . crux-keyboard-quit-dwim)
+   ("C-c d i" . crux-ispell-word-then-abbrev))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 ;; (use-package rainbow-mode
@@ -1335,9 +1336,9 @@ The provider is `nerd-icons'."
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-;; (use-package ws-butler
-;;   :hook (prog-mode . ws-butler-mode)
-;;   :diminish)
+(use-package ws-butler
+  :hook (prog-mode . ws-butler-mode)
+  :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
@@ -1463,7 +1464,7 @@ The provider is `nerd-icons'."
   (magit-section-initial-visibility-alist
    '((stashes . show) (untracked . show) (unpushed . show) (unpulled . show)))
   (magit-save-repository-buffers 'dontask)
-  ;; Do not show the diff by default in the commit buffer. 
+  ;; Do not show the diff by default in the commit buffer.
   (magit-commit-show-diff nil)
   (with-eval-after-load "magit-diff"
     ;; Show fine differences for the current diff hunk only
@@ -2941,13 +2942,13 @@ The provider is `nerd-icons'."
   ;;   "Settings for Harper grammar language server."
   ;;   :prefix "sb/lsp-harper-"
   ;;   :group 'lsp-mode)
-  ;; 
+  ;;
   ;; (defcustom sb/lsp-harper-active-modes
   ;;   '(text-mode org-mode markdown-mode markdown-ts-mode)
   ;;   "List of major modes that work with harper-ls."
   ;;   :type 'list
   ;;   :group 'lsp-harper)
-  ;; 
+  ;;
   ;; (defcustom sb/lsp-harper-configuration
   ;;   '( ;; :userDictPath
   ;;     ;; ""
@@ -2977,7 +2978,7 @@ The provider is `nerd-icons'."
   ;;   "Harper configuration structure"
   ;;   :type 'dictionary
   ;;   :group 'lsp-harper)
-  ;; 
+  ;;
   ;; (lsp-register-client
   ;;  (make-lsp-client
   ;;   :new-connection
@@ -3108,7 +3109,7 @@ The provider is `nerd-icons'."
       "WANT"
       "EN_DIACRITICS_REPLACE"]))
   ;; :config
-  ;; ;; Disable spell checking since we cannot get `lsp-ltex-plus' to work with 
+  ;; ;; Disable spell checking since we cannot get `lsp-ltex-plus' to work with
   ;; ;; custom dict words.
   ;; (setq lsp-ltex-plus-disabled-rules
   ;;       #s(hash-table
@@ -5093,23 +5094,19 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
 ;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
-;; (use-package default-text-scale
-;;   :when (display-graphic-p)
-;;   :bind
-;;   (("C-M-+" . default-text-scale-increase)
-;;    ("C-M--" . default-text-scale-decrease)))
-
 ;; Show free bindings in current buffer
 (use-package free-keys
   :commands free-keys)
 
-;; Displays available keybindings following the currently entered incomplete
-;; command/prefix in a popup.
-(when (< emacs-major-version 30)
-  (use-package which-key))
-(add-hook 'emacs-startup-hook #'which-key-mode)
-(with-eval-after-load "which-key"
-  (diminish 'which-key-mode))
+;; I prefer Embark to show help about keybindings.
+
+;; ;; Displays available keybindings following the currently entered incomplete
+;; ;; command/prefix in a popup.
+;; (when (< emacs-major-version 30)
+;;   (use-package which-key))
+;; (add-hook 'emacs-startup-hook #'which-key-mode)
+;; (with-eval-after-load "which-key"
+;;   (diminish 'which-key-mode))
 
 ;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
 (which-key-add-key-based-replacements
