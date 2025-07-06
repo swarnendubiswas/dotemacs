@@ -1336,9 +1336,9 @@ The provider is `nerd-icons'."
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
-  :diminish)
+;; (use-package ws-butler
+;;   :hook (prog-mode . ws-butler-mode)
+;;   :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
