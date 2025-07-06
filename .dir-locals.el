@@ -161,8 +161,6 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (let ((compdir (file-name-directory buffer-file-name)))
               (add-to-list
                'lsp-clients-clangd-args (concat "--compile-commands-dir=./.")
@@ -203,8 +201,6 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (let ((compdir (file-name-directory buffer-file-name)))
               (add-to-list
                'lsp-clients-clangd-args (concat "--compile-commands-dir=./.")
@@ -231,15 +227,6 @@
    ;; (eval .
    ;;       (let ((paths (vconcat (list "./src/python" "ext/ply" "src/sim"))))
    ;;         (setq lsp-pyright-extra-paths paths)))
-
-   (eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-            ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
-            )))
 
    ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
    ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
@@ -396,18 +383,9 @@
    ;;       (let ((paths (vconcat (list "./src/python" "ext/ply" "src/sim"))))
    ;;         (setq lsp-pyright-extra-paths paths)))
 
-   (eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t)
-            ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
-            )))
-
    ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
    ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
-   ;;  https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md   
+   ;;  https://github.com/python-lsp/python-lsp-server/blob/develop/CONFIGURATION.md
    (eglot-workspace-configuration
     .
     (:pylsp
@@ -608,12 +586,6 @@
   .
   ((eval .
          (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
-         (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
@@ -622,12 +594,6 @@
  (toml-ts-mode
   .
   ((eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
@@ -638,12 +604,6 @@
   .
   ((eval .
          (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
-         (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
@@ -652,12 +612,6 @@
  (json-ts-mode
   .
   ((eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
@@ -668,12 +622,6 @@
   .
   ((eval .
          (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
-         (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
@@ -682,12 +630,6 @@
  (html-mode
   .
   ((eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
@@ -698,12 +640,6 @@
   .
   ((eval .
          (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
-         (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
@@ -713,12 +649,6 @@
   .
   ((eval .
          (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
-         (add-hook
           'eglot-managed-mode-hook
           (lambda ()
             (make-local-variable 'before-save-hook)
@@ -727,12 +657,6 @@
  (cmake-ts-mode
   .
   ((eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
@@ -750,22 +674,7 @@
             company-bibtex-bibliography bibpath
             bibtex-completion-bibliography bibpath
             bibtex-capf-bibliography bibpath
-            citar-bibliography bibpath)))
-
-   ;; (eval .
-   ;;       (add-hook
-   ;;        'lsp-managed-mode-hook
-   ;;        (lambda ()
-   ;;          (make-local-variable 'before-save-hook)
-   ;;          (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-
-   ;; (eval .
-   ;;       (add-hook
-   ;;        'eglot-managed-mode-hook
-   ;;        (lambda ()
-   ;;          (make-local-variable 'before-save-hook)
-   ;;          (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
-   ))
+            citar-bibliography bibpath)))))
 
  (kdl-ts-mode . (mode . kdl-format-on-save))
 
@@ -778,14 +687,9 @@
       (:sourcePaths ["src"] :referencedLibraries ["lib/*.jar"])
       :dependencies
       ["libs/**/*.jar" "libs/*.jar"]
-      :output-dir "build")
-     :jdtls (:workspaceFolder "~/java/")))
-   (eval .
-         (add-hook
-          'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+      :output-dir "build")))
+   (jdtls (:workspaceFolder "~/java/"))
+
    (eval .
          (add-hook
           'eglot-managed-mode-hook
