@@ -3263,9 +3263,6 @@ The provider is `nerd-icons'."
   :init (fancy-compilation-mode 1)
   :custom (fancy-compilation-scroll-output 'first-error))
 
-;; (use-package rainbow-delimiters
-;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
-
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
 ;; languages for tree-sitter. Many treesitter modes are derived from their based
@@ -3887,6 +3884,13 @@ The provider is `nerd-icons'."
   :ensure (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
+;; Use "<" to trigger org block completion at point.
+(use-package org-block-capf
+  :straight (:host github :repo "xenodium/org-block-capf")
+  :after corfu
+  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+  :custom (org-block-capf-edit-style 'inline))
+
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
 ;; is an alias to `latex-mode'. Auctex overrides the tex package.
@@ -3977,18 +3981,6 @@ The provider is `nerd-icons'."
   :bind
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
-
-;; (use-package auctex-latexmk
-;;   :after tex-mode
-;;   :when (executable-find "latexmk")
-;;   :demand t
-;;   :custom
-;;   (auctex-latexmk-inherit-TeX-PDF-mode
-;;    t "Pass the '-pdf' flag when `TeX-PDF-mode' is active")
-;;   :config
-;;   (auctex-latexmk-setup)
-;;   (add-hook
-;;    'TeX-mode-hook (lambda () (setq-default TeX-command-default "LatexMk"))))
 
 (use-package math-delimiters
   :ensure (:host github :repo "oantolin/math-delimiters")
