@@ -3263,6 +3263,22 @@ The provider is `nerd-icons'."
   :init (fancy-compilation-mode 1)
   :custom (fancy-compilation-scroll-output 'first-error))
 
+(use-package eldoc
+  :ensure nil
+  :hook (find-file . global-eldoc-mode)
+  :custom
+  (eldoc-area-prefer-doc-buffer t "Disable popups")
+  (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+  :config
+  ;; Allow Eldoc to trigger after completions
+  (with-eval-after-load "company"
+    (eldoc-add-command
+     'company-complete-selection
+     'company-complete-common
+     'company-capf
+     'company-abort))
+  :diminish)
+
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
 ;; languages for tree-sitter. Many treesitter modes are derived from their based
@@ -3886,15 +3902,41 @@ The provider is `nerd-icons'."
 
 ;; Use "<" to trigger org block completion at point.
 (use-package org-block-capf
-  :straight (:host github :repo "xenodium/org-block-capf")
+  :ensure (:host github :repo "xenodium/org-block-capf")
   :after corfu
   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
   :custom (org-block-capf-edit-style 'inline))
 
+;; Without auctex
+(with-eval-after-load "tex-mode"
+  (setopt tex-command "pdflatex"))
+
+;; (use-package lsp-latex
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+;;   :hook
+;;   ((LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter "latexindent")
+;;   (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load "tex-mode"
+;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
-;; is an alias to `latex-mode'. Auctex overrides the tex package.
-(use-package tex
+;; is an alias to `latex-mode'. Auctex overrides the tex package. "P" in the
+;; modeline highlighter "LaTeX/MPS" is due to `TeX-PDF-mode'.
+(use-package auctex
   :ensure
   (auctex
    :repo "https://git.savannah.gnu.org/git/auctex.git"
@@ -3959,6 +4001,29 @@ The provider is `nerd-icons'."
      '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
      TeX-view-program-selection '((output-pdf "Okular")))))
 
+(use-package reftex
+  :ensure nil
+  :hook (LaTeX-mode . turn-on-reftex)
+  :bind
+  (("C-c [" . reftex-citation)
+   ("C-c )" . reftex-reference)
+   ("C-c (" . reftex-label)
+   ("C-c &" . reftex-view-crossref))
+  :custom
+  (reftex-plug-into-AUCTeX t)
+  (reftex-enable-partial-scans t)
+  (reftex-highlight-selection 'both)
+  ;; Save parse info to avoid reparsing every time a file is visited
+  (reftex-save-parse-info t)
+  ;; Revisit files if necessary when browsing toc
+  (reftex-revisit-to-follow t)
+  (reftex-ref-macro-prompt nil) ; No unnecessary prompts
+  (reftex-guess-label-type t "Try to guess the label type before prompting")
+  (reftex-use-fonts t "Use nice fonts for TOC")
+  ;; Cache selection buffers for faster access
+  (reftex-use-multiple-selection-buffers t)
+  :diminish)
+
 (use-package bibtex
   :ensure nil
   :hook
@@ -3977,7 +4042,7 @@ The provider is `nerd-icons'."
 
 (use-package consult-reftex
   :ensure (:host github :repo "karthink/consult-reftex")
-  :after (consult tex-mode)
+  :after (consult LaTeX-mode)
   :bind
   (("C-c [" . consult-reftex-insert-reference)
    ("C-c )" . consult-reftex-goto-label)))
