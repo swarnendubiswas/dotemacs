@@ -1,5 +1,4 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding: utf-8; no-byte-compile: t; fill-column: 80; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
@@ -5258,6 +5257,11 @@ or the major mode is not in `sb/skippable-modes'."
      (keyfreq-mode 1)
      (keyfreq-autosave-mode 1))))
 
+(use-package flyover
+  :straight (:host github :repo "konrad1977/flyover")
+  :when (display-graphic-p)
+  :hook (flycheck-mode . flyover-mode))
+
 ;; (use-package wingman
 ;;   :straight (:host github :repo "mjrusso/wingman")
 ;;   :hook (prog-mode . wingman-mode))
@@ -5265,5 +5269,8 @@ or the major mode is not in `sb/skippable-modes'."
 ;;; init.el ends here
 
 ;; Local variables:
+;; no-byte-compile: t
+;; no-native-compile: t
+;; no-update-autoloads: t
 ;; elisp-autofmt-load-packages-local: ("use-package-core")
-;; end:
+;; End:

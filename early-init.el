@@ -1,5 +1,4 @@
-;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode:
-;;; emacs-lisp; coding: utf-8; no-byte-compile: t; fill-column: 80; -*-
+;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
@@ -103,7 +102,9 @@
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
 ;; is also useful if we prefer "straight.el" over "package.el".
-(setopt package-enable-at-startup nil)
+(setopt
+ package-enable-at-startup nil
+ package-archives nil)
 
 (setq
  warning-minimum-level :error
@@ -165,3 +166,10 @@
 (provide 'early-init)
 
 ;;; early-init.el ends here
+
+;; Local variables:
+;; no-byte-compile: t
+;; no-native-compile: t
+;; no-update-autoloads: t
+;; elisp-autofmt-load-packages-local: ("use-package-core")
+;; End:
