@@ -1,5 +1,5 @@
 ;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding: utf-8; no-byte-compile: t; fill-column: 80 -*-
+;;; coding: utf-8; no-byte-compile: t; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
@@ -1208,12 +1208,14 @@ The provider is `nerd-icons'."
    ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
    :map helpful-mode-map ("q" . helpful-kill-buffers)))
 
+;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
   :hook
   ((emacs-startup . global-hungry-delete-mode)
    (minibuffer-setup . (lambda () (hungry-delete-mode -1))))
   :diminish)
 
+;; Move lines with "M-<up>" and "M-<down>"
 (use-package move-text
   :bind (("M-<down>" . move-text-down) ("M-<up>" . move-text-up)))
 
@@ -1331,6 +1333,7 @@ The provider is `nerd-icons'."
 ;; (use-package rainbow-delimiters
 ;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
 
+;; Allow GC to happen after a period of idle time
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
   :diminish)
@@ -1348,7 +1351,7 @@ The provider is `nerd-icons'."
   :straight (:type built-in)
   :bind
   (("C-s")
-   ("C-M-f")
+   ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
    ("C-f" . isearch-forward-regexp)
    ("C-r" . isearch-backward-regexp)
    :map
@@ -1419,6 +1422,7 @@ The provider is `nerd-icons'."
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
 (use-package re-builder
+  :straight (:type built-in)
   :commands re-builder
   :custom (reb-re-syntax 'string))
 

@@ -1,5 +1,5 @@
 ;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode:
-;;; emacs-lisp; coding: utf-8; no-byte-compile: t; fill-column: 80 -*-
+;;; emacs-lisp; coding: utf-8; no-byte-compile: t; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
