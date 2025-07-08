@@ -119,10 +119,10 @@ The provider is `nerd-icons'."
   (load bootstrap-file nil 'nomessage))
 
 ;; These variables need to be set before loading `use-package'.
-;; (setopt use-package-enable-imenu-support t
-;;         ;; use-package-expand-minimally t
-;;         ;; use-package-always-defer t
-;;         )
+(setopt use-package-enable-imenu-support t
+        ;; use-package-expand-minimally t
+        ;; use-package-always-defer t
+        )
 (straight-use-package '(use-package))
 
 (when (bound-and-true-p sb/debug-init-perf)
@@ -3618,7 +3618,7 @@ The provider is `nerd-icons'."
 ;;        (lsp-deferred)))))
 ;;   :custom (css-indent-offset 2))
 
-(use-package autoconf-mode
+(use-package autoconf
   :straight (:type built-in)
   :hook
   (autoconf-mode
@@ -4893,6 +4893,8 @@ PAD can be left (`l') or right (`r')."
   :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
   :straight (:host github :repo "dolmens/eglot-hierarchy"))
 
 (use-package consult-eglot
