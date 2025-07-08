@@ -16,7 +16,7 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-perf nil
+(defcustom sb/debug-init-perf t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -119,10 +119,10 @@ The provider is `nerd-icons'."
   (load bootstrap-file nil 'nomessage))
 
 ;; These variables need to be set before loading `use-package'.
-(setopt
- use-package-enable-imenu-support t
- use-package-expand-minimally t
- use-package-always-defer t)
+;; (setopt use-package-enable-imenu-support t
+;;         ;; use-package-expand-minimally t
+;;         ;; use-package-always-defer t
+;;         )
 (straight-use-package '(use-package))
 
 (when (bound-and-true-p sb/debug-init-perf)
@@ -1339,9 +1339,9 @@ The provider is `nerd-icons'."
   :diminish)
 
 ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
-  :diminish)
+;; (use-package ws-butler
+;;   :hook (prog-mode . ws-butler-mode)
+;;   :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
@@ -1691,15 +1691,13 @@ The provider is `nerd-icons'."
 ;;   :diminish)
 
 (use-package apheleia
-  :hook
-  ((markdown-mode
-    markdown-ts-mode sh-mode bash-ts-mode python-mode python-ts-mode)
-   . apheleia-mode)
+  ;; Basedpyright does not provide formatting feature
+  :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
   :custom (apheleia-formatters-respect-fill-column t)
   :config
   (setf (alist-get 'prettier apheleia-formatters)
         '("prettier" "--print-width" "80"))
-  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "4" "-ci"))
+  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
   :diminish apheleia-mode)
@@ -1707,7 +1705,7 @@ The provider is `nerd-icons'."
 ;; FIXME: Why is this not working while apheleia works?
 ;; (use-package shfmt
 ;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-;;   :custom (shfmt-arguments '("-i" "4" "-ci"))
+;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
 ;;   :diminish shfmt-on-save-mode)
 
 ;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
@@ -2870,6 +2868,25 @@ The provider is `nerd-icons'."
   (lsp-warn-no-matched-clients nil)
   (lsp-enable-suggest-server-download nil)
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
+  (lsp-format-buffer-on-save t)
+  (lsp-format-buffer-on-save-list
+   '(bash-ts-mode
+     c-mode
+     c-ts-mode
+     c++-mode
+     c++-ts-mode
+     cmake-mode
+     cmake-ts-mode
+     java-mode
+     java-ts-mode
+     json-mode
+     json-ts-mode
+     jsonc-mode
+     python-mode
+     python-ts-mode
+     sh-mode
+     yaml-mode
+     yaml-ts-mode))
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
@@ -2925,21 +2942,26 @@ The provider is `nerd-icons'."
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-xml-logs-client nil)
-  (lsp-pylsp-configuration-sources ["pyproject.toml"])
+  ;; List of configuration sources
+  (lsp-pylsp-configuration-sources ["pyproject.toml" "setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   (lsp-pylsp-plugins-preload-enabled nil)
   (lsp-pylsp-plugins-preload-modules [])
   (lsp-pylsp-plugins-pydocstyle-enabled nil)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
   (lsp-pylsp-plugins-pylint-enabled t)
-  (lsp-pylsp-plugins-yapf-enabled nil)
+  (lsp-pylsp-plugins-yapf-enabled nil "Using Apheleia")
   (lsp-pylsp-plugins-flake8-enabled nil)
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
+  ;; Delay checking for types till the changes are saved
+  (lsp-pylsp-plugins-mypy-live-mode nil)
   (lsp-pylsp-plugins-ruff-enabled t)
   (lsp-pylsp-plugins-ruff-config "pyproject.toml")
   (lsp-pylsp-plugins-ruff-format nil "Using Apheleia")
   (lsp-pylsp-plugins-ruff-line-length 80)
+  (lsp-pylsp-plugins-ruff-target-version "py310")
+  (lsp-semgrep-metrics-enabled nil)
   :config
   ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
   ;; (defgroup lsp-harper nil
@@ -3247,9 +3269,14 @@ The provider is `nerd-icons'."
      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
      (latex "https://github.com/latex-lsp/tree-sitter-latex")
      (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (markdown
+      "https://github.com/ikatyang/tree-sitter-markdown"
+      "split_parser"
+      "tree-sitter-markdown/src")
      (markdown-inline
-      "https://github.com/tree-sitter-grammars/tree-sitter-markdown")
+      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+      "split_parser"
+      "tree-sitter-markdown-inline/src")
      (org "https://github.com/milisims/tree-sitter-org")
      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
      (php "https://github.com/tree-sitter/tree-sitter-php")
@@ -3591,6 +3618,18 @@ The provider is `nerd-icons'."
 ;;        (lsp-deferred)))))
 ;;   :custom (css-indent-offset 2))
 
+(use-package autoconf-mode
+  :straight (:type built-in)
+  :hook
+  (autoconf-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
+
 (use-package make-mode
   :straight (:type built-in)
   :mode
@@ -3628,7 +3667,7 @@ The provider is `nerd-icons'."
 (use-package markdown-mode
   :mode ("README\\.md\\'" . gfm-mode)
   :hook
-  ((markdown-mode markdown-ts-mode)
+  (markdown-mode
    .
    (lambda ()
      (cond
@@ -3656,29 +3695,28 @@ The provider is `nerd-icons'."
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
 
-;; (use-package markdown-ts-mode
-;;   :mode ("\\.md\\'" . markdown-ts-mode)
-;;   :config
-;;   (add-to-list
-;;    'treesit-language-source-alist
-;;    '(markdown
-;;      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-;;      "split_parser"
-;;      "tree-sitter-markdown/src"))
-;;   (add-to-list
-;;    'treesit-language-source-alist
-;;    '(markdown-inline
-;;      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-;;      "split_parser"
-;;      "tree-sitter-markdown-inline/src")))
+(use-package markdown-ts-mode
+  :mode ("\\.md\\'" . markdown-ts-mode)
+  :hook
+  (markdown-ts-mode
+   .
+   (lambda ()
+     (cond
+      ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (progn
+         (require 'lsp-marksman)
+         (lsp-deferred)))))))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
-;; input-file.md"
-;; (use-package pandoc-mode
-;;   :hook (markdown-mode . pandoc-mode)
-;;   :config (pandoc-load-default-settings)
-;;   :diminish)
+;; input-file.md".
+(use-package pandoc-mode
+  :hook ((markdown-mode markdown-ts-mode) . pandoc-mode)
+  :config (pandoc-load-default-settings)
+  :diminish)
 
 (use-package nxml-mode
   :straight (:type built-in)
@@ -5097,6 +5135,12 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (define-key special-event-map [escape] 'sb/keyboard-quit-immediately)
 ;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
 ;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
+
+(use-package default-text-scale
+  :when (display-graphic-p)
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
 (use-package free-keys
