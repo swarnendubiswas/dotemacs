@@ -1,5 +1,4 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding: utf-8; fill-column: 80; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
@@ -161,33 +160,7 @@ The provider is `nerd-icons'."
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-;; Wait for Elpaca to finish loading
-(elpaca-wait)
-
-;; Uncomment for systems which cannot create symlinks:
-;; (elpaca-no-symlink-mode)
-
-;; Install a package via the elpaca macro
-;; See the "recipes" section of the manual for more details.
-
-;;When installing a package used in the init file itself,
-;;e.g. a package which adds a use-package key word,
-;;use the :wait recipe keyword to block until that package is installed/configured.
-;;For example:
-;;(use-package general :ensure (:wait t) :demand t)
-
-;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
-;; which provides a much prettier API for manipulating keymaps than `define-key'
-;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
-;; "C-h m" shows the keybindings for the major and the minor modes.
-(elpaca bind-key)
-
-(elpaca-wait)
-
-(with-eval-after-load "bind-key"
-  (bind-key "C-c d k" #'describe-personal-keybindings))
-
-;; Install `use-package' support
+;; Install use-package support
 (elpaca
  elpaca-use-package
  ;; Enable `use-package :ensure' support for Elpaca.
@@ -210,6 +183,19 @@ The provider is `nerd-icons'."
 ;; keywords.
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
+
+;; ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
+;; ;; which provides a much prettier API for manipulating keymaps than `define-key'
+;; ;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
+;; ;; "C-h m" shows the keybindings for the major and the minor modes.
+;; (elpaca bind-key)
+;; (elpaca-wait)
+;; (with-eval-after-load "bind-key"
+;;   (bind-key "C-c d k" #'describe-personal-keybindings))
+
+;; (use-package bind-key
+;;   :ensure (:wait t)
+;;   :demand t)
 
 (use-package diminish
   :ensure (:wait t)
