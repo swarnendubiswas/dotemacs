@@ -1,5 +1,4 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
-;;; coding: utf-8; fill-column: 80; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
@@ -161,36 +160,18 @@ The provider is `nerd-icons'."
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-;; Wait for Elpaca to finish loading
-(elpaca-wait)
+(require 'elpaca-menu-elpa)
+(setf
+ (alist-get 'packages-url (alist-get 'gnu elpaca-menu-elpas))
+ "https://raw.githubusercontent.com/emacsmirror/gnu_elpa/refs/heads/main/elpa-packages"
+ (alist-get 'remote (alist-get 'gnu elpaca-menu-elpas)) "https://github.com/emacsmirror/gnu_elpa"
+ (alist-get 'packages-url (alist-get 'nongnu elpaca-menu-elpas)) "https://raw.githubusercontent.com/emacsmirror/nongnu_elpa/refs/heads/main/elpa-packages"
+ (alist-get 'remote (alist-get 'nongnu elpaca-menu-elpas)) "https://github.com/emacsmirror/nongnu_elpa")
 
-;; Uncomment for systems which cannot create symlinks:
-;; (elpaca-no-symlink-mode)
-
-;; Install a package via the elpaca macro
-;; See the "recipes" section of the manual for more details.
-
-;;When installing a package used in the init file itself,
-;;e.g. a package which adds a use-package key word,
-;;use the :wait recipe keyword to block until that package is installed/configured.
-;;For example:
-;;(use-package general :ensure (:wait t) :demand t)
-
-;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
-;; which provides a much prettier API for manipulating keymaps than `define-key'
-;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
-;; "C-h m" shows the keybindings for the major and the minor modes.
-(elpaca bind-key)
-
-(elpaca-wait)
-
-(with-eval-after-load "bind-key"
-  (bind-key "C-c d k" #'describe-personal-keybindings))
-
-;; Install `use-package' support
+;; Install use-package support
 (elpaca
  elpaca-use-package
- ;; Enable `use-package :ensure' support for Elpaca.
+ ;; Enable use-package :ensure support for Elpaca.
  (elpaca-use-package-mode))
 
 (eval-and-compile
@@ -210,6 +191,19 @@ The provider is `nerd-icons'."
 ;; keywords.
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
+
+;; ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
+;; ;; which provides a much prettier API for manipulating keymaps than `define-key'
+;; ;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
+;; ;; "C-h m" shows the keybindings for the major and the minor modes.
+;; (elpaca bind-key)
+;; (elpaca-wait)
+;; (with-eval-after-load "bind-key"
+;;   (bind-key "C-c d k" #'describe-personal-keybindings))
+
+;; (use-package bind-key
+;;   :ensure (:wait t)
+;;   :demand t)
 
 (use-package diminish
   :ensure (:wait t)
@@ -765,7 +759,7 @@ The provider is `nerd-icons'."
   (push '(helpful-mode :noselect t :position bottom :height 0.5)
         popwin:special-display-config)
   ;; (push '(deadgrep-mode :noselect nil :position bottom :height 0.75)
-  ;;       popwin:special-display-config)
+  ;;         popwin:special-display-config)
   (push '("\\*EGLOT workspace configuration\\*"
           :noselect nil
           :position bottom
@@ -793,6 +787,7 @@ The provider is `nerd-icons'."
 
 ;; Jump around buffers in few keystrokes
 (use-package frog-jump-buffer
+  :ensure (:host github :repo "waymondo/frog-jump-buffer")
   :bind ("C-b" . frog-jump-buffer)
   :config
   (dolist (regexp
@@ -914,6 +909,7 @@ The provider is `nerd-icons'."
 ;; functions and variables from Lisp packages which are loaded into the current
 ;; Emacs session or are auto-loaded.
 (use-package xref
+  :ensure nil
   :bind
   (("M-." . xref-find-definitions)
    ("M-," . xref-go-back) ("M-?" . xref-find-references)
@@ -923,6 +919,7 @@ The provider is `nerd-icons'."
 
 ;; Exclude project roots with `project-list-exclude'.
 (use-package project
+  :ensure nil
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
@@ -1119,8 +1116,8 @@ The provider is `nerd-icons'."
      (buffer-substring-no-properties (region-beginning) (region-end))))
 
   ;; ;; Use thing at point with `consult-line'
-  ;; (consult-customize
-  ;;  consult-line
+  ;;   (consult-customize
+  ;;    consult-line
   ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
   ;; (defalias 'consult-line-thing-at-point 'consult-line)
   ;; (consult-customize
@@ -1153,9 +1150,9 @@ The provider is `nerd-icons'."
    ("C-`" . embark-act)
    ("C-c C-c" . embark-collect)
    ("C-c C-e" . embark-export)
-   ;; :map
+   ;;    :map
    ;; minibuffer-local-completion-map
-   ;; ("C-`" . embark-act)
+   ;;    ("C-`" . embark-act)
    )
   :custom
   ;; Replace the key help with a completing-read interface
@@ -1180,7 +1177,7 @@ The provider is `nerd-icons'."
           (assq-delete-all 'project-file marginalia-annotators))
   (add-to-list
    'marginalia-annotators '(symbol-help marginalia-annotate-variable))
-  ;; (add-to-list
+  ;;   (add-to-list
   ;;  'marginalia-annotator-registry
   ;;  '(project-buffer marginalia-annotate-project-buffer))
   )
@@ -1236,8 +1233,7 @@ The provider is `nerd-icons'."
   (add-to-list 'ispell-skip-region-alist '("~" "~"))
   (add-to-list 'ispell-skip-region-alist '("=" "="))
   (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
-  ;; Footnotes in org that have http links that are line breaked should not be
-  ;; ispelled
+  ;; Footnotes in org that have http links that are line breaked should not be ispelled
   (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
   (add-to-list 'ispell-skip-region-alist '("`" "`"))
   (add-to-list 'ispell-skip-region-alist '("cite:" . "[[:space:]]"))
@@ -1314,9 +1310,6 @@ The provider is `nerd-icons'."
   :hook (elpaca-after-init . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
-;; (use-package goto-last-change
-;;   :bind ("C-x C-\\" . goto-last-change))
-
 (use-package dogears
   :ensure (:host github :repo "alphapapa/dogears.el")
   :hook (find-file . dogears-mode)
@@ -1350,6 +1343,7 @@ The provider is `nerd-icons'."
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
+  :ensure nil
   :bind* ("C-." . iedit-mode))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
@@ -1411,10 +1405,10 @@ The provider is `nerd-icons'."
   :hook (elpaca-after-init . gcmh-mode)
   :diminish)
 
-;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
-  :diminish)
+;; ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+;; (use-package ws-butler
+;;   :hook (prog-mode . ws-butler-mode)
+;;   :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
@@ -1582,7 +1576,7 @@ The provider is `nerd-icons'."
 
 (use-package elec-pair
   :ensure nil
-  :hook (elpaca-after-init . electric-pair-mode)
+  :hook (emacs-startup . electric-pair-mode)
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
@@ -1607,7 +1601,7 @@ The provider is `nerd-icons'."
 
   ;; (defun sb/add-latex-pairs ()
   ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
-  ;;   (setq-local electric-pair-text-pairs electric-pair-pairs))
+  ;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
 
   ;;   (add-hook 'LaTeX-mode-hook #'sb/add-latex-pairs)
   )
@@ -1624,7 +1618,7 @@ The provider is `nerd-icons'."
   :commands mode-minder)
 
 (use-package flycheck
-  :hook (elpaca-after-init . global-flycheck-mode)
+  :hook (emacs-startup . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we
   ;; want the `flycheck-idle-change-delay' to be in effect while editing.
@@ -1764,15 +1758,13 @@ The provider is `nerd-icons'."
 ;;   :diminish)
 
 (use-package apheleia
-  :hook
-  ((markdown-mode
-    markdown-ts-mode sh-mode bash-ts-mode python-mode python-ts-mode)
-   . apheleia-mode)
+  ;; Basedpyright does not provide formatting feature
+  :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
   :custom (apheleia-formatters-respect-fill-column t)
   :config
   (setf (alist-get 'prettier apheleia-formatters)
         '("prettier" "--print-width" "80"))
-  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "4" "-ci"))
+  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
   :diminish apheleia-mode)
@@ -1780,7 +1772,7 @@ The provider is `nerd-icons'."
 ;; FIXME: Why is this not working while apheleia works?
 ;; (use-package shfmt
 ;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-;;   :custom (shfmt-arguments '("-i" "4" "-ci"))
+;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
 ;;   :diminish shfmt-on-save-mode)
 
 ;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
@@ -1896,7 +1888,6 @@ The provider is `nerd-icons'."
     (setopt completions-detailed t))
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
-
   (with-eval-after-load "orderless"
     ;; substring is needed to complete common prefix, orderless does not
     (setopt completion-styles '(orderless substring partial-completion basic)))
@@ -2147,110 +2138,110 @@ The provider is `nerd-icons'."
                :face font-lock-builtin-face
                :collection "nerd-fonts-codicons")))
 
-    ;; (setopt kind-icon-mapping
+    ;;     (setopt kind-icon-mapping
     ;;         `((array
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_array")
     ;;            :face font-lock-type-face)
-    ;;           (boolean
+    ;;               (boolean
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_boolean")
     ;;            :face font-lock-builtin-face)
-    ;;           (class
+    ;;               (class
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_class")
     ;;            :face font-lock-type-face)
-    ;;           (color
+    ;;               (color
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_color")
     ;;            :face success)
     ;;           (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-    ;;           (constant
+    ;;               (constant
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_constant")
     ;;            :face font-lock-constant-face)
-    ;;           (constructor
+    ;;               (constructor
     ;;            ,(nerd-icons-codicon "nf-cod-triangle_right")
     ;;            :face font-lock-function-name-face)
-    ;;           (enummember
+    ;;               (enummember
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
     ;;            :face font-lock-builtin-face)
-    ;;           (enum-member
+    ;;               (enum-member
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
     ;;            :face font-lock-builtin-face)
     ;;           (enum
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum")
     ;;            :face font-lock-builtin-face)
-    ;;           (event
+    ;;               (event
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_event")
     ;;            :face font-lock-warning-face)
-    ;;           (field
+    ;;               (field
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_field")
     ;;            :face font-lock-variable-name-face)
-    ;;           (file
+    ;;               (file
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_file")
     ;;            :face font-lock-string-face)
-    ;;           (folder
+    ;;               (folder
     ;;            ,(nerd-icons-codicon "nf-cod-folder")
     ;;            :face font-lock-doc-face)
-    ;;           (interface
+    ;;               (interface
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_interface")
     ;;            :face font-lock-type-face)
-    ;;           (keyword
+    ;;               (keyword
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_keyword")
     ;;            :face font-lock-keyword-face)
     ;;           (macro
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_misc")
     ;;            :face font-lock-keyword-face)
-    ;;           (magic
+    ;;               (magic
     ;;            ,(nerd-icons-codicon "nf-cod-wand")
     ;;            :face font-lock-builtin-face)
-    ;;           (method
+    ;;               (method
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_method")
     ;;            :face font-lock-function-name-face)
     ;;           (function ,(nerd-icons-codicon "nf-cod-symbol_method")
     ;;                     :face font-lock-function-name-face)
-    ;;           (module
+    ;;               (module
     ;;            ,(nerd-icons-codicon "nf-cod-file_submodule")
-    ;;            :face font-lock-preprocessor-face)
-    ;;           (numeric
+    ;;                :face font-lock-preprocessor-face)
+    ;;               (numeric
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_numeric")
     ;;            :face font-lock-builtin-face)
-    ;;           (operator
+    ;;               (operator
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_operator")
     ;;            :face font-lock-comment-delimiter-face)
-    ;;           (param
+    ;;               (param
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_parameter")
     ;;            :face default)
-    ;;           (property
+    ;;               (property
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_property")
     ;;            :face font-lock-variable-name-face)
-    ;;           (reference
+    ;;               (reference
     ;;            ,(nerd-icons-codicon "nf-cod-references")
     ;;            :face font-lock-variable-name-face)
-    ;;           (snippet
+    ;;               (snippet
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_snippet")
     ;;            :face font-lock-string-face)
-    ;;           (string
+    ;;               (string
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_string")
     ;;            :face font-lock-string-face)
-    ;;           (struct
+    ;;               (struct
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_structure")
     ;;            :face font-lock-variable-name-face)
-    ;;           (text
+    ;;               (text
     ;;            ,(nerd-icons-codicon "nf-cod-text_size")
     ;;            :face font-lock-doc-face)
-    ;;           (typeparameter
+    ;;               (typeparameter
     ;;            ,(nerd-icons-codicon "nf-cod-list_unordered")
     ;;            :face font-lock-type-face)
-    ;;           (type-parameter
+    ;;               (type-parameter
     ;;            ,(nerd-icons-codicon "nf-cod-list_unordered")
     ;;            :face font-lock-type-face)
-    ;;           (unit
+    ;;               (unit
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_ruler")
     ;;            :face font-lock-constant-face)
-    ;;           (value
+    ;;               (value
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_field")
     ;;            :face font-lock-builtin-face)
-    ;;           (variable
+    ;;               (variable
     ;;            ,(nerd-icons-codicon "nf-cod-symbol_variable")
     ;;            :face font-lock-variable-name-face)
-    ;;           (t
+    ;;               (t
     ;;            ,(nerd-icons-codicon "nf-cod-text_size")
     ;;            :face font-lock-builtin-face)))
 
@@ -2267,7 +2258,7 @@ The provider is `nerd-icons'."
 ;; search.
 (use-package company
   :when (eq sb/in-buffer-completion 'company)
-  :hook (elpaca-after-init . global-company-mode)
+  :hook (emacs-startup . global-company-mode)
   :bind
   (("C-M-/" . company-other-backend) ; Invoke the next backend
    :map
@@ -2292,12 +2283,12 @@ The provider is `nerd-icons'."
       (company-complete-common-or-cycle -1)))
    ;; ([escape]
    ;;  .
-   ;;  (lambda ()
-   ;;    (interactive)
+   ;;     (lambda ()
+   ;;       (interactive)
    ;;    (company-abort)))
    ;; ("ESCAPE" .
-   ;;  (lambda ()
-   ;;    (interactive)
+   ;;     (lambda ()
+   ;;       (interactive)
    ;;    (company-abort)))
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
@@ -2615,7 +2606,7 @@ The provider is `nerd-icons'."
     corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
   :when (eq sb/in-buffer-completion 'corfu)
   :hook
-  ((elpaca-after-init . global-corfu-mode)
+  ((emacs-startup . global-corfu-mode)
    (corfu-mode
     .
     (lambda ()
@@ -2892,7 +2883,7 @@ The provider is `nerd-icons'."
 ;; recency, Corfu has `corfu-history', and Company has `company-statistics'.
 (use-package prescient
   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
-  :hook (elpaca-after-init . prescient-persist-mode)
+  :hook (emacs-startup . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t)
   :config
   (with-eval-after-load "corfu"
@@ -2943,6 +2934,25 @@ The provider is `nerd-icons'."
   (lsp-warn-no-matched-clients nil)
   (lsp-enable-suggest-server-download nil)
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
+  (lsp-format-buffer-on-save t)
+  (lsp-format-buffer-on-save-list
+   '(bash-ts-mode
+     c-mode
+     c-ts-mode
+     c++-mode
+     c++-ts-mode
+     cmake-mode
+     cmake-ts-mode
+     java-mode
+     java-ts-mode
+     json-mode
+     json-ts-mode
+     jsonc-mode
+     python-mode
+     python-ts-mode
+     sh-mode
+     yaml-mode
+     yaml-ts-mode))
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
@@ -2998,21 +3008,26 @@ The provider is `nerd-icons'."
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-xml-logs-client nil)
-  (lsp-pylsp-configuration-sources ["pyproject.toml"])
+  ;; List of configuration sources
+  (lsp-pylsp-configuration-sources ["pyproject.toml" "setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   (lsp-pylsp-plugins-preload-enabled nil)
   (lsp-pylsp-plugins-preload-modules [])
   (lsp-pylsp-plugins-pydocstyle-enabled nil)
   (lsp-pylsp-plugins-pydocstyle-convention "pep257")
   (lsp-pylsp-plugins-pylint-enabled t)
-  (lsp-pylsp-plugins-yapf-enabled nil)
+  (lsp-pylsp-plugins-yapf-enabled nil "Using Apheleia")
   (lsp-pylsp-plugins-flake8-enabled nil)
   (lsp-pylsp-plugins-isort-enabled t)
   (lsp-pylsp-plugins-mypy-enabled t)
+  ;; Delay checking for types till the changes are saved
+  (lsp-pylsp-plugins-mypy-live-mode nil)
   (lsp-pylsp-plugins-ruff-enabled t)
   (lsp-pylsp-plugins-ruff-config "pyproject.toml")
   (lsp-pylsp-plugins-ruff-format nil "Using Apheleia")
   (lsp-pylsp-plugins-ruff-line-length 80)
+  (lsp-pylsp-plugins-ruff-target-version "py310")
+  (lsp-semgrep-metrics-enabled nil)
   :config
   ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
   ;; (defgroup lsp-harper nil
@@ -3028,29 +3043,29 @@ The provider is `nerd-icons'."
   ;;
   ;; (defcustom sb/lsp-harper-configuration
   ;;   '( ;; :userDictPath
-  ;;     ;; ""
-  ;;     ;; :fileDictPath ""
-  ;;     :linters
-  ;;     (:SpellCheck
-  ;;      :json-false
-  ;;      :SpelledNumbers
-  ;;      :json-false
-  ;;      :AnA t
-  ;;      :UnclosedQuotes t
-  ;;      :WrongQuotes
-  ;;      :json-false
-  ;;      :LongSentences t
-  ;;      :RepeatedWords t
-  ;;      :Spaces t
-  ;;      :Matcher t
-  ;;      :CorrectNumberSuffix t
-  ;;      :SentenceCapitalization
-  ;;      :json-false)
-  ;;     :codeActions (:ForceStable :json-false)
-  ;;     :diagnosticSeverity "hint"
-  ;;     :markdown (:IgnoreLinkTitle :json-false)
-  ;;     :isolateEnglish
-  ;;     :json-false
+  ;;       ;; ""
+  ;;       ;; :fileDictPath ""
+  ;;       :linters
+  ;;       (:SpellCheck
+  ;;        :json-false
+  ;;        :SpelledNumbers
+  ;;        :json-false
+  ;;        :AnA t
+  ;;        :UnclosedQuotes t
+  ;;        :WrongQuotes
+  ;;        :json-false
+  ;;        :LongSentences t
+  ;;        :RepeatedWords t
+  ;;        :Spaces t
+  ;;        :Matcher t
+  ;;        :CorrectNumberSuffix t
+  ;;        :SentenceCapitalization
+  ;;        :json-false)
+  ;;       :codeActions (:ForceStable :json-false)
+  ;;       :diagnosticSeverity "hint"
+  ;;       :markdown (:IgnoreLinkTitle :json-false)
+  ;;       :isolateEnglish
+  ;;       :json-false
   ;;     :dialect "American")
   ;;   "Harper configuration structure"
   ;;   :type 'dictionary
@@ -3214,7 +3229,7 @@ The provider is `nerd-icons'."
   (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package hl-todo
-  :hook (elpaca-after-init . global-hl-todo-mode)
+  :hook (emacs-startup . global-hl-todo-mode)
   :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setopt
@@ -3320,9 +3335,14 @@ The provider is `nerd-icons'."
      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
      (latex "https://github.com/latex-lsp/tree-sitter-latex")
      (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (markdown
+      "https://github.com/ikatyang/tree-sitter-markdown"
+      "split_parser"
+      "tree-sitter-markdown/src")
      (markdown-inline
-      "https://github.com/tree-sitter-grammars/tree-sitter-markdown")
+      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+      "split_parser"
+      "tree-sitter-markdown-inline/src")
      (org "https://github.com/milisims/tree-sitter-org")
      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
      (php "https://github.com/tree-sitter/tree-sitter-php")
@@ -3664,6 +3684,18 @@ The provider is `nerd-icons'."
 ;;        (lsp-deferred)))))
 ;;   :custom (css-indent-offset 2))
 
+(use-package autoconf
+  :ensure nil
+  :hook
+  (autoconf-mode
+   .
+   (lambda ()
+     (cond
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (lsp-deferred))))))
+
 (use-package make-mode
   :ensure nil
   :mode
@@ -3701,7 +3733,7 @@ The provider is `nerd-icons'."
 (use-package markdown-mode
   :mode ("README\\.md\\'" . gfm-mode)
   :hook
-  ((markdown-mode markdown-ts-mode)
+  (markdown-mode
    .
    (lambda ()
      (cond
@@ -3729,29 +3761,28 @@ The provider is `nerd-icons'."
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
 
-;; (use-package markdown-ts-mode
-;;   :mode ("\\.md\\'" . markdown-ts-mode)
-;;   :config
-;;   (add-to-list
-;;    'treesit-language-source-alist
-;;    '(markdown
-;;      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-;;      "split_parser"
-;;      "tree-sitter-markdown/src"))
-;;   (add-to-list
-;;    'treesit-language-source-alist
-;;    '(markdown-inline
-;;      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-;;      "split_parser"
-;;      "tree-sitter-markdown-inline/src")))
+(use-package markdown-ts-mode
+  :mode ("\\.md\\'" . markdown-ts-mode)
+  :hook
+  (markdown-ts-mode
+   .
+   (lambda ()
+     (cond
+      ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
+      ((eq sb/lsp-provider 'eglot)
+       (eglot-ensure))
+      ((eq sb/lsp-provider 'lsp-mode)
+       (progn
+         (require 'lsp-marksman)
+         (lsp-deferred)))))))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
-;; input-file.md"
-;; (use-package pandoc-mode
-;;   :hook (markdown-mode . pandoc-mode)
-;;   :config (pandoc-load-default-settings)
-;;   :diminish)
+;; input-file.md".
+(use-package pandoc-mode
+  :hook ((markdown-mode markdown-ts-mode) . pandoc-mode)
+  :config (pandoc-load-default-settings)
+  :diminish)
 
 (use-package nxml-mode
   :ensure nil
@@ -3937,17 +3968,6 @@ The provider is `nerd-icons'."
 ;; is an alias to `latex-mode'. Auctex overrides the tex package. "P" in the
 ;; modeline highlighter "LaTeX/MPS" is due to `TeX-PDF-mode'.
 (use-package auctex
-  :ensure
-  (auctex
-   :repo "https://git.savannah.gnu.org/git/auctex.git"
-   :branch "main"
-   :pre-build (("make" "elpa"))
-   :build (:not elpaca--compile-info) ;; Make will take care of this step
-   :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
-   :version
-   (lambda (_)
-     (require 'tex-site)
-     AUCTeX-version))
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
@@ -3993,13 +4013,16 @@ The provider is `nerd-icons'."
    TeX-source-correlate-start-server t
    ;; Enable synctex generation. Even though the command shows as "latex"
    ;; pdflatex is actually called
-   LaTeX-command "latex -shell-escape=1 -synctex=1")
+   LaTeX-command "latex -shell-escape=1 -synctex=1"))
 
+(use-package tex
+  :ensure nil
+  :config
   (when (executable-find "okular")
-    (setq
-     TeX-view-program-list
-     '(("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-     TeX-view-program-selection '((output-pdf "Okular")))))
+    (add-to-list
+     'TeX-view-program-list
+     '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+    (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
 
 (use-package reftex
   :ensure nil
@@ -4043,9 +4066,7 @@ The provider is `nerd-icons'."
 (use-package consult-reftex
   :ensure (:host github :repo "karthink/consult-reftex")
   :after (consult LaTeX-mode)
-  :bind
-  (("C-c [" . consult-reftex-insert-reference)
-   ("C-c )" . consult-reftex-goto-label)))
+  :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
 (use-package math-delimiters
   :ensure (:host github :repo "oantolin/math-delimiters")
@@ -4326,7 +4347,7 @@ PAD can be left (`l') or right (`r')."
                         (powerline-fill nil (powerline-width rhs))
                         (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :hook (elpaca-after-init . sb/powerline-nano-theme)
+  :hook (emacs-startup . sb/powerline-nano-theme)
   :custom
   ;; Visualization of the buffer position is not useful
   (powerline-display-hud nil)
@@ -4337,7 +4358,7 @@ PAD can be left (`l') or right (`r')."
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
-  :hook (elpaca-after-init . doom-modeline-mode)
+  :hook (emacs-startup . doom-modeline-mode)
   :custom (doom-modeline-buffer-encoding nil)
   ;; All other choices can lead to the modeline text overflowing
   (doom-modeline-buffer-file-name-style 'buffer-name)
@@ -4347,7 +4368,7 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-minor-modes t))
 
 ;; (use-package centaur-tabs
-;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
+;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
 ;;   :bind*
 ;;   (("M-<right>" . centaur-tabs-forward-tab)
 ;;    ("C-<tab>" . centaur-tabs-forward-tab)
@@ -4442,11 +4463,11 @@ PAD can be left (`l') or right (`r')."
 
 (use-package xclip
   :when (or (executable-find "xclip") (executable-find "xsel"))
-  :hook (elpaca-after-init . xclip-mode))
+  :hook (emacs-startup . xclip-mode))
 
 ;; Send every kill from a TTY frame to the system clipboard
 (use-package clipetty
-  :hook (elpaca-after-init . global-clipetty-mode)
+  :hook (emacs-startup . global-clipetty-mode)
   :diminish)
 
 (use-package ztree
@@ -4488,14 +4509,14 @@ PAD can be left (`l') or right (`r')."
 ;; Highlight the cursor position after the window scrolls
 (use-package beacon
   :disabled
-  :hook (elpaca-after-init . beacon-mode)
+  :hook (emacs-startup . beacon-mode)
   :diminish)
 
 ;; Allows to easily identify the file path in a project. But does not support
 ;; imenu.
 ;; (use-package project-headerline
 ;;   :ensure (:host github :repo "gavv/project-headerline")
-;;   :hook (elpaca-after-init . global-project-headerline-mode)
+;;   :hook (emacs-startup . global-project-headerline-mode)
 ;;   :custom
 ;;   (project-headerline-segment-separator " > ")
 ;;   (project-headerline-path-separator " > "))
@@ -4940,6 +4961,8 @@ PAD can be left (`l') or right (`r')."
   :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
   :ensure (:host github :repo "dolmens/eglot-hierarchy"))
 
 (use-package consult-eglot
@@ -5183,6 +5206,12 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
 ;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
+(use-package default-text-scale
+  :when (display-graphic-p)
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
+
 ;; Show free bindings in current buffer
 (use-package free-keys
   :commands free-keys)
@@ -5193,7 +5222,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; ;; command/prefix in a popup.
 ;; (when (< emacs-major-version 30)
 ;;   (use-package which-key))
-;; (add-hook 'elpaca-after-init-hook #'which-key-mode)
+;; (add-hook 'emacs-startup-hook #'which-key-mode)
 ;; (with-eval-after-load "which-key"
 ;;   (diminish 'which-key-mode))
 
@@ -5275,12 +5304,12 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (use-package term-keys
 ;;   :ensure (:host github :repo "CyberShadow/term-keys")
 ;;   :unless (display-graphic-p)
-;;   :hook (elpaca-after-init . term-keys-mode)
+;;   :hook (emacs-startup . term-keys-mode)
 ;;   :config (require 'term-keys-konsole))
 
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
-  :hook (elpaca-after-init . global-kkp-mode)
+  :hook (emacs-startup . global-kkp-mode)
   ;; :bind
   ;; ;; Should be remapped to "M-DEL"
   ;; ("M-<backspace>" . backward-kill-word)
@@ -5291,11 +5320,16 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package keyfreq
   :ensure (:host github :repo "dacap/keyfreq")
   :hook
-  (elpaca-after-init
+  (emacs-startup
    .
    (lambda ()
      (keyfreq-mode 1)
      (keyfreq-autosave-mode 1))))
+
+(use-package flyover
+  :ensure (:host github :repo "konrad1977/flyover")
+  :when (display-graphic-p)
+  :hook (flycheck-mode . flyover-mode))
 
 ;; (use-package wingman
 ;;   :ensure (:host github :repo "mjrusso/wingman")
@@ -5312,7 +5346,7 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;;; init.el ends here
 
-;; Local variables:
+;; Local Variables:
 ;; no-byte-compile: t
 ;; no-native-compile: t
 ;; no-update-autoloads: t

@@ -1,5 +1,4 @@
-;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode:
-;;; emacs-lisp; coding: utf-8; fill-column: 80; -*-
+;;; early-init.el --- Emacs Customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
@@ -93,17 +92,9 @@
 ;; Applies to every Emacs frame
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-(let ((file-name-handler-alist-orig file-name-handler-alist))
-  (setopt file-name-handler-alist nil)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (setopt file-name-handler-alist file-name-handler-alist-orig)
-              (garbage-collect))
-            t))
-
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
-;; is also useful if we prefer "straight.el" over "package.el".
-(setopt package-enable-at-startup nil)
+;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
+(setq package-enable-at-startup nil)
 
 (setq
  warning-minimum-level :error
@@ -170,4 +161,5 @@
 ;; no-byte-compile: t
 ;; no-native-compile: t
 ;; no-update-autoloads: t
+;; elisp-autofmt-load-packages-local: ("use-package-core")
 ;; End:
