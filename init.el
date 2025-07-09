@@ -160,14 +160,6 @@ The provider is `nerd-icons'."
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-(require 'elpaca-menu-elpa)
-(setf
- (alist-get 'packages-url (alist-get 'gnu elpaca-menu-elpas))
- "https://raw.githubusercontent.com/emacsmirror/gnu_elpa/refs/heads/main/elpa-packages"
- (alist-get 'remote (alist-get 'gnu elpaca-menu-elpas)) "https://github.com/emacsmirror/gnu_elpa"
- (alist-get 'packages-url (alist-get 'nongnu elpaca-menu-elpas)) "https://raw.githubusercontent.com/emacsmirror/nongnu_elpa/refs/heads/main/elpa-packages"
- (alist-get 'remote (alist-get 'nongnu elpaca-menu-elpas)) "https://github.com/emacsmirror/nongnu_elpa")
-
 ;; Install use-package support
 (elpaca
  elpaca-use-package
@@ -192,18 +184,12 @@ The provider is `nerd-icons'."
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
 
-;; ;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
-;; ;; which provides a much prettier API for manipulating keymaps than `define-key'
-;; ;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
-;; ;; "C-h m" shows the keybindings for the major and the minor modes.
-;; (elpaca bind-key)
-;; (elpaca-wait)
-;; (with-eval-after-load "bind-key"
-;;   (bind-key "C-c d k" #'describe-personal-keybindings))
-
-;; (use-package bind-key
-;;   :ensure (:wait t)
-;;   :demand t)
+;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
+;; which provides a much prettier API for manipulating keymaps than `define-key'
+;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
+;; "C-h m" shows the keybindings for the major and the minor modes.
+(with-eval-after-load "bind-key"
+  (bind-key "C-c d k" #'describe-personal-keybindings))
 
 (use-package diminish
   :ensure (:wait t)
