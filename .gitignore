@@ -47,10 +47,9 @@ tramp
 /checks.json
 
 /straight/*
-!/straight/versions
 /.cask/
 /eglot-java-eclipse-jdt-cache/
-/server/
+/servers/
 /hunspell/
 /elisp-autofmt-cache/
 /tree-sitter/

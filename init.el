@@ -15,7 +15,7 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-perf nil
+(defcustom sb/debug-init-perf t
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -200,7 +200,8 @@ The provider is `nerd-icons'."
   :custom
   (auto-save-file-name-transforms
    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-  (custom-file (no-littering-expand-var-file-name "custom.el")))
+  (custom-file (no-littering-expand-var-file-name "custom.el"))
+  :config (no-littering-theme-backups))
 
 (elpaca-wait)
 
@@ -1539,9 +1540,15 @@ The provider is `nerd-icons'."
   :hook
   ((find-file . global-diff-hl-mode)
    (dired-mode . diff-hl-dired-mode-unless-remote)
-   (diff-hl-mode-on . diff-hl-margin-local-mode))
+   (diff-hl-mode
+    .
+    (lambda ()
+      (unless (display-graphic-p)
+        (diff-hl-margin-local-mode)))))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
-  :custom (diff-hl-draw-borders nil "Highlight without a border looks nicer")
+  :custom
+  (diff-hl-draw-borders nil "Highlight without a border looks nicer")
+  (diff-hl-update-async t)
   :config
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
@@ -1609,6 +1616,8 @@ The provider is `nerd-icons'."
   ;; Remove newline checks, since they would trigger an immediate check when we
   ;; want the `flycheck-idle-change-delay' to be in effect while editing.
   (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
+  ;; Eager popping of the *Flycheck error messages* buffer is irritating
+  (flycheck-auto-display-errors-after-checking nil)
   (flycheck-checker-error-threshold nil)
   ;; Increase the time (s) to allow for quick transitions
   (flycheck-idle-buffer-switch-delay 2)
@@ -1616,6 +1625,8 @@ The provider is `nerd-icons'."
   (flycheck-idle-change-delay 2)
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-global-modes '(not csv-mode conf-mode))
+  ;; Left fringe does not work in the terminal mode
+  (flycheck-indication-mode 'left-margin)
   :config
   ;; Shellcheck is invoked by bash lsp
   (dolist (checkers
@@ -4561,6 +4572,9 @@ PAD can be left (`l') or right (`r')."
    kill-file-path-basename-without-extension
    kill-file-path-dirname
    kill-file-path))
+
+;; Allow fetching the latest version to satisfy Eglot requirements
+(use-package flymake)
 
 (use-package eglot
   :ensure (:source (gnu-elpa-mirror))
