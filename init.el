@@ -146,9 +146,10 @@ The provider is `nerd-icons'."
           (progn
             (message "%s" (buffer-string))
             (kill-buffer buffer))
-          (error "%s"
-                 (with-current-buffer buffer
-                   (buffer-string))))
+          (error
+           "%s"
+           (with-current-buffer buffer
+             (buffer-string))))
       ((error)
        (warn "%s" err)
        (delete-directory repo 'recursive))))
@@ -2327,9 +2328,10 @@ The provider is `nerd-icons'."
      ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend))
   :config
-  (unless (bound-and-true-p sb/enable-icons)
-    (setopt company-format-margin-function nil))
-  :diminish)
+  ;; Autocompletion icons are distracting.
+  ;; (unless (bound-and-true-p sb/enable-icons)
+  ;;   (setopt company-format-margin-function nil))
+  (setopt company-format-margin-function nil))
 
 (use-package nerd-icons
   :when (bound-and-true-p sb/enable-icons)
@@ -2895,10 +2897,11 @@ The provider is `nerd-icons'."
 ;; servers simultaneously and provides helpers to install and uninstall servers.
 (use-package lsp-mode
   :when (eq sb/lsp-provider 'lsp-mode)
-  :bind-keymap ("C-c l" . lsp-command-map)
+  ;;:bind-keymap ("C-c l" . lsp-command-map)
   :bind
   (:map
    lsp-command-map
+   ("g")
    ("l" . lsp)
    ("q" . lsp-disconnect)
    ("Q" . lsp-workspace-shutdown)
@@ -2918,7 +2921,7 @@ The provider is `nerd-icons'."
    ("v" . lsp-workspace-folders-remove)
    ("b" . lsp-workspace-blacklist-remove))
   :custom
-  ;; (lsp-keymap-prefix "C-c l")
+  (lsp-keymap-prefix "C-c l")
   (lsp-use-plists t)
   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
   ;; Tramp which is slower
@@ -2954,29 +2957,32 @@ The provider is `nerd-icons'."
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
   ;; (lsp-enable-file-watchers nil "Avoid watcher warnings")
-  (lsp-lens-enable nil "Lenses are intrusive")
-  ;; I use `symbol-overlay' to include languages that do not have a language
-  ;; server
+  (lsp-lens-enable nil "Lenses are distracting")
+  ;; Highlight references of the symbol at point. I use `symbol-overlay' to
+  ;; include languages that do not have a language server.
   (lsp-enable-symbol-highlighting nil)
+  (lsp-semantic-tokens-enable nil)
+  ;; We already show Flycheck status on the modeline
   (lsp-modeline-diagnostics-enable nil)
   ;; The workspace status icon on the terminal interface is misleading across
   ;; projects
   (lsp-modeline-workspace-status-enable nil)
   ;; Simpler to focus on the errors at hand
   (lsp-modeline-diagnostics-scope :file)
-  (lsp-inlay-hint-enable nil "Intrusive")
-  ;; (lsp-enable-snippet t)
+  (lsp-inlay-hint-enable nil)
+  (lsp-enable-snippet t)
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
-  ;; Show/hide completion metadata, e.g., "java.util.ArrayList"
-  (lsp-completion-show-detail t)
+  ;; Show/hide completion metadata, e.g., "java.util.ArrayList". This increases
+  ;; the width of the completion popup.
+  (lsp-completion-show-detail nil)
   ;; Show/hide completion kind, e.g., interface/class
   (lsp-completion-show-kind t)
   ;; Show/hide description of completion candidates
   (lsp-completion-show-label-description t)
   (lsp-completion-default-behaviour :insert)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
-  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
+  (lsp-eldoc-enable-hover t "Do not show noisy hover info with mouse")
   ;; Sudden changes in the height of the echo area causes the cursor to lose
   ;; position, manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
@@ -3146,7 +3152,7 @@ The provider is `nerd-icons'."
   :after (consult lsp)
   :demand t
   :commands consult-lsp-diagnostics
-  :bind*
+  :bind
   (:map
    lsp-command-map
    ("g" . consult-lsp-symbols)
@@ -4976,12 +4982,12 @@ PAD can be left (`l') or right (`r')."
   :init (global-flycheck-eglot-mode 1)
   :custom (flycheck-eglot-exclusive nil))
 
-(use-package eglot-semantic-tokens
-  :ensure (:host github :repo "eownerdead/eglot-semantic-tokens")
-  :when (eq sb/lsp-provider 'eglot)
-  :after eglot
-  :demand t
-  :custom (eglot-enable-semantic-tokens t))
+;; (use-package eglot-semantic-tokens
+;;   :ensure (:host github :repo "eownerdead/eglot-semantic-tokens")
+;;   :when (eq sb/lsp-provider 'eglot)
+;;   :after eglot
+;;   :demand t
+;;   :custom (eglot-enable-semantic-tokens t))
 
 (use-package eglot-inactive-regions
   :when (eq sb/lsp-provider 'eglot)
