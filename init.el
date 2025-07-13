@@ -2561,6 +2561,21 @@ The provider is `nerd-icons'."
       (add-hook hook #'sb/company-html-mode)))
 
   (progn
+    (defun sb/company-c-family-mode ()
+      (setq-local company-backends
+                  '(company-files
+                    (company-capf :separate company-c-headers)
+                    company-ispell
+                    company-dabbrev)))
+
+    (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
+      (add-hook
+       hook
+       (lambda ()
+         (setq-local company-minimum-prefix-length 2)
+         (sb/company-c-family-mode)))))
+
+  (progn
     (defun sb/company-prog-mode ()
       (setq-local company-backends
                   '(company-files
@@ -3149,14 +3164,15 @@ The provider is `nerd-icons'."
   (lsp-ui-peek-enable nil))
 
 (use-package consult-lsp
-  :after (consult lsp)
+  :after (consult lsp-mode)
+  :when (eq sb/lsp-provider 'lsp-mode)
   :demand t
-  :commands consult-lsp-diagnostics
   :bind
   (:map
    lsp-command-map
    ("g" . consult-lsp-symbols)
-   ("h" . consult-lsp-file-symbols)))
+   ("h" . consult-lsp-file-symbols)
+   ("s" . consult-lsp--diagnostics)))
 
 (use-package lsp-java
   :when (eq sb/lsp-provider 'lsp-mode)
