@@ -1322,7 +1322,7 @@ The provider is `nerd-icons'."
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
-  :ensure nil
+  :ensure (:host github :repo "victorhge/iedit")
   :bind* ("C-." . iedit-mode))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
@@ -2552,19 +2552,25 @@ The provider is `nerd-icons'."
       (add-hook hook #'sb/company-html-mode)))
 
   (progn
-    (defun sb/company-c-family-mode ()
+    (defun sb/company-lsp-mode ()
       (setq-local company-backends
                   '(company-files
                     (company-capf :separate company-c-headers)
                     company-ispell
                     company-dabbrev)))
 
-    (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
+    (dolist (hook
+             '(c-mode-hook
+               c-ts-mode-hook
+               c++-mode-hook
+               c++-ts-mode-hook
+               python-mode-hook
+               python-ts-mode-hook))
       (add-hook
        hook
        (lambda ()
          (setq-local company-minimum-prefix-length 2)
-         (sb/company-c-family-mode)))))
+         (sb/company-lsp-mode)))))
 
   (progn
     (defun sb/company-prog-mode ()
@@ -4606,8 +4612,8 @@ PAD can be left (`l') or right (`r')."
    '(eglot-mode-line-session
      eglot-mode-line-error eglot-mode-line-action-suggestion))
   :config
-  ;; (setf (plist-get eglot-events-buffer-config :size) 0)
-  ;; (fset #'jsonrpc--log-event #'ignore)
+  (setf (plist-get eglot-events-buffer-config :size) 0)
+  (fset #'jsonrpc--log-event #'ignore)
 
   (setopt eglot-server-programs nil)
   (add-to-list
@@ -5342,30 +5348,31 @@ or the major mode is not in `sb/skippable-modes'."
      ("h" "Consult isearch history" consult-isearch-history)]])
   (bind-key "C-c s" #'sb/search-commands-transient)
 
-  (transient-define-prefix
-   sb/lsp-commands-transient () "lsp menu"
-   [["Lsp functions"
-     ("l" "Start Lsp" lsp)
-     ("q" "Disconnect Lsp" lsp-disconnect)
-     ("w" "Workspace shutdown" lsp-workspace-shutdown)
-     ("R" "Workspace restart" lsp-workspace-restart)
-     ("d" "Find declaration" lsp-find-declaration)
-     ("e" "Find declaration" lsp-find-definition)
-     ("i" "Find implementation" lsp-find-implementation)
-     ("r" "Find references" lsp-find-references)
-     ("I" "Go to implementation" lsp-goto-implementation)
-     ("t" "Go to type definition" lsp-goto-type-definition)
-     ("x" "Execute code action" lsp-execute-code-action)
-     ("a" "Add folder to workspace" lsp-workspace-folders-add)
-     ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
-     ("b" "Blacklist and remove workspace" lsp-workspace-blacklist-remove)
-     ("r" "Rename" lsp-rename)
-     ("f" "Format buffer" lsp-format-buffer)
-     ("y" "Java type hierarchy" lsp-java-type-hierarchy)
-     ("g" "Workspace symbols" consult-lsp-symbols)
-     ("h" "File symbols" consult-lsp-file-symbols)
-     ("s" "Diagnostics" consult-lsp-diagnostics)]])
-  (bind-key "C-c l" #'sb/lsp-commands-transient)
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (transient-define-prefix
+     sb/lsp-commands-transient () "lsp menu"
+     [["Lsp functions"
+       ("l" "Start Lsp" lsp)
+       ("q" "Disconnect Lsp" lsp-disconnect)
+       ("w" "Workspace shutdown" lsp-workspace-shutdown)
+       ("R" "Workspace restart" lsp-workspace-restart)
+       ("d" "Find declaration" lsp-find-declaration)
+       ("e" "Find declaration" lsp-find-definition)
+       ("i" "Find implementation" lsp-find-implementation)
+       ("r" "Find references" lsp-find-references)
+       ("I" "Go to implementation" lsp-goto-implementation)
+       ("t" "Go to type definition" lsp-goto-type-definition)
+       ("x" "Execute code action" lsp-execute-code-action)
+       ("a" "Add folder to workspace" lsp-workspace-folders-add)
+       ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
+       ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)
+       ("r" "Rename" lsp-rename)
+       ("f" "Format buffer" lsp-format-buffer)
+       ("y" "Java type hierarchy" lsp-java-type-hierarchy)
+       ("g" "Workspace symbols" consult-lsp-symbols)
+       ("h" "File symbols" consult-lsp-file-symbols)
+       ("s" "Diagnostics" consult-lsp-diagnostics)]])
+    (bind-key "C-c l" #'sb/lsp-commands-transient))
 
   (transient-define-prefix
    sb/imenu-transient () "Imenu commands"
