@@ -97,7 +97,7 @@
 ;; cannot use `setq' for the following variable.
 (setq package-enable-at-startup nil)
 
-(setq
+(setopt
  warning-minimum-level :error
  warning-suppress-types '((lexical-binding))
  warning-suppress-log-types '((files missing-lexbind-cookie)))

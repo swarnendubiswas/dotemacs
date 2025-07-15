@@ -5472,7 +5472,7 @@ or the major mode is not in `sb/skippable-modes'."
      ]])
   (global-set-key (kbd "M-g s") 'sb/symbol-overlay-transient)
 
-  (define-transient-command
+  (transient-define-prefix
    sb/ediff-transient () "Launch Ediff in all it's variants"
    ["Ediff" ["2 Way"
      ("b" "Buffers" ediff-buffers)
