@@ -146,10 +146,9 @@ The provider is `nerd-icons'."
           (progn
             (message "%s" (buffer-string))
             (kill-buffer buffer))
-          (error
-           "%s"
-           (with-current-buffer buffer
-             (buffer-string))))
+          (error "%s"
+                 (with-current-buffer buffer
+                   (buffer-string))))
       ((error)
        (warn "%s" err)
        (delete-directory repo 'recursive))))
@@ -1498,6 +1497,7 @@ The provider is `nerd-icons'."
   :custom (visual-replace-display-total t))
 
 (use-package transient
+  :demand t
   :custom (transient-semantic-coloring t)
   :config (transient-bind-q-to-quit))
 
@@ -2977,6 +2977,8 @@ The provider is `nerd-icons'."
   ;; include languages that do not have a language server.
   (lsp-enable-symbol-highlighting nil)
   (lsp-semantic-tokens-enable nil)
+  ;; I do not use mouse with TUI, so showing code actions is not useful.
+  (lsp-modeline-code-actions-enable nil)
   ;; We already show Flycheck status on the modeline
   (lsp-modeline-diagnostics-enable nil)
   ;; The workspace status icon on the terminal interface is misleading across
@@ -5351,11 +5353,147 @@ or the major mode is not in `sb/skippable-modes'."
 (use-package flyover
   :ensure (:host github :repo "konrad1977/flyover")
   :when (display-graphic-p)
-  :hook (flycheck-mode . flyover-mode))
+  :hook (flycheck-mode . flyover-mode)
+  :diminish)
 
 ;; (use-package wingman
 ;;   :ensure (:host github :repo "mjrusso/wingman")
 ;;   :hook (prog-mode . wingman-mode))
+
+(use-package transient-showcase
+  :ensure (:host github :repo "positron-solutions/transient-showcase")
+  :demand t)
+
+(with-eval-after-load 'transient
+  (transient-define-prefix
+   sb/search-commands () "Search commands"
+   [["Search functions"
+     ("d" "Deadgrep" deadgrep)
+     ("r" "Consult-ripgrep" consult-ripgrep)]])
+
+  (transient-define-prefix
+   sb/lsp-commands () "lsp menu"
+   [["Lsp functions"
+     ("l" "Start Lsp" lsp)
+     ("q" "Disconnect Lsp" lsp-disconnect)
+     ("w" "Workspace shutdown" lsp-workspace-shutdown)
+     ("R" "Workspace restart" lsp-workspace-restart)
+     ("d" "Find declaration" lsp-find-declaration)
+     ("e" "Find declaration" lsp-find-definition)
+     ("i" "Find implementation" lsp-find-implementation)
+     ("r" "Rename" lsp-rename)
+     ("f" "Format buffer" lsp-format-buffer)]])
+
+  (transient-define-prefix
+   sb/describe-commands () "Describe"
+   [["Describe"
+     ("f" "Function" describe-function)
+     ("v" "Variable" describe-variable)
+     ("s" "Symbol" describe-symbol)
+     ("y" "Syntax" describe-syntax)
+     ("c" "Categories" describe-categories)]])
+
+  (transient-define-prefix
+   sb/isearch-commands () "isearch Menu"
+   [["Edit Search String"
+     ("e"
+      "Edit the search string (recursive)"
+      isearch-edit-string
+      :transient nil)
+     ("w"
+      "Pull next word or character word from buffer"
+      isearch-yank-word-or-char
+      :transient nil)
+     ("s"
+      "Pull next symbol or character from buffer"
+      isearch-yank-symbol-or-char
+      :transient nil)
+     ("l" "Pull rest of line from buffer" isearch-yank-line :transient nil)
+     ("y" "Pull string from kill ring" isearch-yank-kill :transient nil)
+     ("t"
+      "Pull thing from buffer"
+      isearch-forward-thing-at-point
+      :transient nil)]
+
+    ["Replace" ("q"
+      "Start ‘query-replace’"
+      isearch-query-replace
+      :if-nil buffer-read-only
+      :transient nil)
+     ("x"
+      "Start ‘query-replace-regexp’"
+      isearch-query-replace-regexp
+      :if-nil buffer-read-only
+      :transient nil)]]
+
+   [["Toggle"
+     ("X" "Toggle regexp searching" isearch-toggle-regexp :transient nil)
+     ("S" "Toggle symbol searching" isearch-toggle-symbol :transient nil)
+     ("W" "Toggle word searching" isearch-toggle-word :transient nil)
+     ("F" "Toggle case fold" isearch-toggle-case-fold :transient nil)
+     ("L" "Toggle lax whitespace" isearch-toggle-lax-whitespace :transient nil)]
+
+    ["Misc" ("o" "occur" isearch-occur :transient nil)]])
+
+  ;; A transient makes symbol-overlay easy to use Include the overlay keymap
+  ;; bindings for quick reference symbol-overlay-remove-all behaves differently
+  ;; when called interactively which calling from the transient doesn't do, so
+  ;; write a command that explicitly calls it interactively
+
+  (defun hrm-symbol-overlay-remove-all ()
+    "Remove all highlighted symbols in the buffer, always reset
+  `symbol-overlay-keywords-alist'."
+    (interactive)
+    (call-interactively 'symbol-overlay-remove-all))
+
+  (transient-define-prefix
+   sb/symbol-overlay-transient () "Symbol Overlay transient"
+   ["Symbol Overlay" ["Manage" ("." "Toggle" symbol-overlay-put)
+     ("k" "Remove All" hrm-symbol-overlay-remove-all) ; for called-interactively-p check
+     ("m" "Auto Highlight" symbol-overlay-mode) ; a minor mode to highlight symbol-at-point
+     ]
+    ["Move"
+     ("n" "Next" symbol-overlay-switch-forward)
+     ("p" "Previous" symbol-overlay-switch-backward)]
+    ["On Overlay"
+     ("<" "First" symbol-overlay-jump-first)
+     (">" "Last" symbol-overlay-jump-last)
+     ("d" "Definition" symbol-overlay-jump-to-definition)
+     ("e" "Mark" symbol-overlay-echo-mark)
+     ("M" "MC Mark-All" symbol-overlay-mc-mark-all) ; from symbol-overlay-mc
+     ]
+    ["On Overlay"
+     ("t" "Toggle Scope" symbol-overlay-toggle-in-scope)
+     ("w" "Copy" symbol-overlay-save-symbol)
+     ("r" "Rename" symbol-overlay-rename)
+     ("q" "Query Replace" symbol-overlay-query-replace)
+     ("s" "ISearch" symbol-overlay-isearch-literally)
+     ("g" "Grep" rg-dwim) ; from rg.el
+     ]])
+  (global-set-key (kbd "M-g s") 'sb/symbol-overlay-transient)
+
+  (define-transient-command
+   sb/ediff-transient () "Launch Ediff in all it's variants"
+   ["Ediff" ["2 Way"
+     ("b" "Buffers" ediff-buffers)
+     ("f" "Files" ediff-files)
+     ("d" "Directories" ediff-directories)
+     ("c" "Buffer vs File" ediff-current-file)
+     ("~" "File vs Backup" ediff-backup)]
+    ["3 Way"
+     ("3b" "Buffers" ediff-buffers3)
+     ("3f" "Files" ediff-files3)
+     ("3d" "Directories" ediff-directories3)]
+    ["Patches"
+     ("pb" "Buffer" ediff-patch-buffer)
+     ("pf" "File" ediff-patch-file)]
+    ["Regions"
+     ("rl" "Linewise" ediff-regions-linewise)
+     ("rw" "Wordwise" ediff-regions-wordwise)]
+    ["Windows"
+     ("wl" "Linewise" ediff-windows-linewise)
+     ("ww" "Wordwise" ediff-windows-wordwise)]])
+  (global-set-key (kbd "s-e") 'sb/ediff-transient))
 
 (add-hook
  'elpaca-after-init-hook

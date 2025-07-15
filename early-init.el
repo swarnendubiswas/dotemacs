@@ -93,12 +93,14 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
-;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
+;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el". We
+;; cannot use `setq' for the following variable.
 (setq package-enable-at-startup nil)
 
 (setq
  warning-minimum-level :error
- warning-suppress-types '((lexical-binding)))
+ warning-suppress-types '((lexical-binding))
+ warning-suppress-log-types '((files missing-lexbind-cookie)))
 
 (when (and (featurep 'native-compile)
            (fboundp 'native-comp-available-p)
