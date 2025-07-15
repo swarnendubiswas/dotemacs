@@ -15,7 +15,7 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-perf t
+(defcustom sb/debug-init-perf nil
   "Enable features to debug errors and performance bottlenecks."
   :type 'boolean
   :group 'sb/emacs)
@@ -905,7 +905,6 @@ The provider is `nerd-icons'."
 
 ;; Exclude project roots with `project-list-exclude'.
 (use-package project
-  :ensure nil
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
@@ -1549,15 +1548,7 @@ The provider is `nerd-icons'."
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
 
 (use-package smerge-mode
-  :ensure nil
-  :bind
-  (:map
-   smerge-mode-map
-   ("M-g n" . smerge-next)
-   ("M-g p" . smerge-prev)
-   ("M-g u" . smerge-keep-upper)
-   ("M-g l" . smerge-keep-lower)
-   ("M-g a" . smerge-keep-all)))
+  :ensure nil)
 
 (use-package elec-pair
   :ensure nil
@@ -4514,7 +4505,6 @@ PAD can be left (`l') or right (`r')."
 (use-package breadcrumb
   :ensure (:host github :repo "joaotavora/breadcrumb")
   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
-  :bind ("C-M-j" . breadcrumb-jump)
   :config (breadcrumb-imenu-crumbs))
 
 ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
@@ -4576,22 +4566,6 @@ PAD can be left (`l') or right (`r')."
   ((dockerfile-ts-mode
     html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
    . eglot-ensure)
-  :bind
-  (("C-c l l" . eglot)
-   ("C-c l q" . eglot-shutdown)
-   ("C-c l Q" . eglot-shutdown-all)
-   ("C-c l d" . eglot-find-declaration)
-   ("C-c l i" . eglot-find-implementation)
-   ("C-c l t" . eglot-find-typeDefinition)
-   ("C-c l r" . eglot-rename)
-   ("C-c l f" . eglot-format)
-   ("C-c l F" . eglot-format-buffer)
-   ("C-c l x" . eglot-code-actions)
-   ("C-c l k" . eglot-code-action-quickfix)
-   ("C-c l e" . eglot-code-action-extract)
-   ("C-c l n" . eglot-code-action-inline)
-   ("C-c l w" . eglot-code-action-rewrite)
-   ("C-c l o" . eglot-code-action-organize-imports))
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
@@ -4600,10 +4574,10 @@ PAD can be left (`l') or right (`r')."
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
      :documentOnTypeFormattingProvider
+     :foldingRangeProvider
      :inlayHintProvider ; Inlay hints are distracting
      ;; :executeCommandProvider
      ;; :hoverProvider ; Automatic documentation popups can be distracting
-     ;; :foldingRangeProvider
      ;; :documentLinkProvider
      ;; :documentHighlightProvider
      ))
@@ -5335,63 +5309,95 @@ or the major mode is not in `sb/skippable-modes'."
 
 (with-eval-after-load 'transient
   (transient-define-prefix
-   sb/search-commands-transient () "Search commands"
-   [["Search functions"
+   sb/search-transient () "Search commands"
+   [["Isearch functions"
+     ("i" "Isearch forward" isearch-forward)
+     ("b" "Isearch backward" isearch-backward)
+     ("w" "Isearch symbol at point" isearch-symbol-at-point)
+     ("o" "occur" isearch-occur :transient nil)
+     ("h" "Consult isearch history" consult-isearch-history)]
+    ["Other search tools for a buffer"
      ("d" "Deadgrep" deadgrep)
      ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
-     ("r" "Consult-ripgrep" consult-ripgrep)
-     ("f" "Consult find" consult-find)
-     ("d" "Consult fd" consult-fd)
-     ("l" "Consult locate" consult-locate)
+     ("r" "Consult ripgrep" consult-ripgrep)
      ("g" "Consult grep" consult-grep)
-     ("t" "Consult git grep" consult-git-grep)
-     ("h" "Consult isearch history" consult-isearch-history)]])
-  (bind-key "C-c s" #'sb/search-commands-transient)
+     ("t" "Consult git grep" consult-git-grep)]
+    ["Search locations"
+     ("n" "Consult find" consult-find)
+     ("f" "Consult fd" consult-fd)
+     ("l" "Consult locate" consult-locate)]])
+  (bind-key "C-c s" #'sb/search-transient)
+
+  (transient-define-prefix
+   sb/smerge-transient () "smerge menu"
+   [["Navigation"
+     ("n" "Next conflict" smerge-next)
+     ("p" "Previous conflict" smerge-prev)]
+    ["Merge"
+     ("u" "Keep upper" smerge-keep-upper)
+     ("l" "Keep lowerr" smerge-keep-lower)
+     ("a" "Keep both" smerge-keep-all)]])
+  (bind-key "C-c g" #'sb/smerge-transient)
 
   (when (eq sb/lsp-provider 'lsp-mode)
     (transient-define-prefix
-     sb/lsp-commands-transient () "lsp menu"
-     [["Lsp functions"
+     sb/lsp-transient () "Lsp menu"
+     [["Lsp functionality"
        ("l" "Start Lsp" lsp)
        ("q" "Disconnect Lsp" lsp-disconnect)
        ("w" "Workspace shutdown" lsp-workspace-shutdown)
        ("R" "Workspace restart" lsp-workspace-restart)
+       ("a" "Add folder to workspace" lsp-workspace-folders-add)
+       ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
+       ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
+      ["Browsing functionality"
        ("d" "Find declaration" lsp-find-declaration)
        ("e" "Find declaration" lsp-find-definition)
        ("i" "Find implementation" lsp-find-implementation)
        ("r" "Find references" lsp-find-references)
        ("I" "Go to implementation" lsp-goto-implementation)
-       ("t" "Go to type definition" lsp-goto-type-definition)
-       ("x" "Execute code action" lsp-execute-code-action)
-       ("a" "Add folder to workspace" lsp-workspace-folders-add)
-       ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
-       ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)
+       ("t" "Go to type definition" lsp-goto-type-definition)]
+      ["Code actions"
        ("r" "Rename" lsp-rename)
        ("f" "Format buffer" lsp-format-buffer)
-       ("y" "Java type hierarchy" lsp-java-type-hierarchy)
-       ("g" "Workspace symbols" consult-lsp-symbols)
-       ("h" "File symbols" consult-lsp-file-symbols)
-       ("s" "Diagnostics" consult-lsp-diagnostics)]])
-    (bind-key "C-c l" #'sb/lsp-commands-transient))
+       ("x" "Execute code action" lsp-execute-code-action)
+       ("y" "Java type hierarchy" lsp-java-type-hierarchy)]
+      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
+    (bind-key "C-c l" #'sb/lsp-transient))
+
+  (when (eq sb/lsp-provider 'eglot)
+    (transient-define-prefix
+     sb/eglot-transient () "Eglot menu"
+     [["Lsp functionality"
+       ("l" "Start Eglot" eglot)
+       ("q" "Disconnect Eglot" eglot-shutdown)]
+      ["Browsing functionality"
+       ("d" "Find declaration" eglot-find-declaration)
+       ("i" "Find implementation" eglot-find-implementation)
+       ("t" "Find type definition" eglot-find-type-definition)]
+      ["Code actions"
+       ("r" "Rename" eglot-rename)
+       ("f" "Format buffer" eglot-format)
+       ("x" "Execute code action" eglot-code-actions)
+       ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
+       ("e" "Execution code action: extract" eglot-code-action-extract)
+       ("n" "Execution code action: inline" eglot-code-action-inline)
+       ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
+       ("o"
+        "Execution code action: organize imports"
+        eglot-code-action-organize-imports)]
+      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
+    (bind-key "C-c l" #'sb/eglot-transient))
 
   (transient-define-prefix
    sb/imenu-transient () "Imenu commands"
-   [["Imenu" ("j" "Imenu" consult-imenu)
-     ;; sorts the items by kind.
-     ("c" "Create categorized imenu index" lsp-imenu-create-categorised-index)
-     ;; sorts the items by position
-     ("u"
-      "Create uncategorized imenu index"
-      lsp-imenu-create-uncategorised-index)]])
-
-  (transient-define-prefix
-   sb/describe-commands () "Describe"
-   [["Describe"
-     ("f" "Function" describe-function)
-     ("v" "Variable" describe-variable)
-     ("s" "Symbol" describe-symbol)
-     ("y" "Syntax" describe-syntax)
-     ("c" "Categories" describe-categories)]])
+   [["Imenu"
+     ("j" "Imenu" consult-imenu)
+     ("b" "Breadcrumb jump" breadcrumb-jump)]
+    ["Lsp imenu"
+     ("g" "File symbols" consult-lsp-file-symbols)
+     ("h" "Workspace symbols" consult-lsp-symbols)]])
+  (bind-key "C-c i" #'sb/imenu-transient)
 
   (transient-define-prefix
    sb/isearch-commands () "isearch Menu"
@@ -5493,7 +5499,7 @@ or the major mode is not in `sb/skippable-modes'."
     ["Windows"
      ("wl" "Linewise" ediff-windows-linewise)
      ("ww" "Wordwise" ediff-windows-wordwise)]])
-  (global-set-key (kbd "C-c e") 'sb/ediff-transient))
+  (bind-key "C-c e" #'sb/ediff-transient))
 
 (add-hook
  'elpaca-after-init-hook
