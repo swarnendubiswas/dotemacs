@@ -598,7 +598,6 @@ The provider is `nerd-icons'."
   :hook
   ;; Offer to clean up files from ediff sessions.
   (ediff-cleanup . (lambda () (ediff-janitor t nil)))
-  :bind (("C-c d e" . ediff) ("C-c d b" . ediff-buffers))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -984,7 +983,7 @@ The provider is `nerd-icons'."
     (interactive)
     (consult-line (thing-at-point 'symbol)))
   :after vertico
-  :commands consult-fd
+  :commands (consult-fd consult-isearch-forward)
   :bind
   ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
    ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
@@ -1004,19 +1003,12 @@ The provider is `nerd-icons'."
    ("C-c C-j" . consult-imenu)
    ([remap customize] . consult-customize)
    ([remap load-theme] . consult-theme)
-   ("C-c s f" . consult-find)
    ([remap locate] . consult-locate)
-   ("C-c s l" . consult-locate)
    ;; Prefix argument "C-u" allows to specify the directory. You can pass
    ;; additional grep flags to `consult-grep' with the "--" separator. E.g.:
    ;; "foo bar -- -A3" to get matches with 3 lines of 'after' context.
    ([remap rgrep] . consult-grep)
-   ("C-c s g" . consult-grep)
    ([remap vc-git-grep] . consult-git-grep)
-   ("C-c s G" . consult-git-grep)
-   ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
-   ("C-c s r" . consult-ripgrep)
-   ("C-c s h" . consult-isearch-history)
    ("<f4>" . consult-line)
    ("M-g l" . sb/consult-line-symbol-at-point)
    ([remap multi-occur] . consult-multi-occur)
@@ -1452,7 +1444,6 @@ The provider is `nerd-icons'."
 (use-package deadgrep
   :when (executable-find "rg")
   :commands deadgrep-edit-mode
-  :bind ("C-c s d" . deadgrep)
   :custom
   (deadgrep-max-buffers 1)
   (deadgrep-display-buffer-function 'switch-to-buffer-other-frame))
@@ -2913,30 +2904,9 @@ The provider is `nerd-icons'."
 (use-package lsp-mode
   :when (eq sb/lsp-provider 'lsp-mode)
   ;;:bind-keymap ("C-c l" . lsp-command-map)
-  :bind
-  (:map
-   lsp-command-map
-   ("g")
-   ("l" . lsp)
-   ("q" . lsp-disconnect)
-   ("Q" . lsp-workspace-shutdown)
-   ("R" . lsp-workspace-restart)
-   ("d" . lsp-find-declaration)
-   ("e" . lsp-find-definition)
-   ("r" . lsp-find-references)
-   ("i" . lsp-find-implementation)
-   ("I" . lsp-goto-implementation)
-   ("t" . lsp-goto-type-definition)
-   ("r" . lsp-rename)
-   ("f" . lsp-format-buffer)
-   ("x" . lsp-execute-code-action)
-   ("c" . lsp-imenu-create-categorised-index) ; sorts the items by kind.
-   ("u" . lsp-imenu-create-uncategorised-index) ; sorts the items by position
-   ("a" . lsp-workspace-folders-add)
-   ("v" . lsp-workspace-folders-remove)
-   ("b" . lsp-workspace-blacklist-remove))
+  :bind (:map lsp-command-map ("g"))
   :custom
-  (lsp-keymap-prefix "C-c l")
+  ;; (lsp-keymap-prefix "C-c l")
   (lsp-use-plists t)
   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
   ;; Tramp which is slower
@@ -3168,13 +3138,7 @@ The provider is `nerd-icons'."
 (use-package consult-lsp
   :after (consult lsp-mode)
   :when (eq sb/lsp-provider 'lsp-mode)
-  :demand t
-  :bind
-  (:map
-   lsp-command-map
-   ("g" . consult-lsp-symbols)
-   ("h" . consult-lsp-file-symbols)
-   ("s" . consult-lsp--diagnostics)))
+  :demand t)
 
 (use-package lsp-java
   :when (eq sb/lsp-provider 'lsp-mode)
@@ -3186,7 +3150,6 @@ The provider is `nerd-icons'."
       c-basic-offset 4
       c-set-style "java")
      (lsp-deferred)))
-  :bind (:map lsp-command-map ("y" . lsp-java-type-hierarchy))
   :custom
   (lsp-java-progress-reports-enabled nil)
   (lsp-java-save-actions-organize-imports t)
@@ -5366,13 +5329,21 @@ or the major mode is not in `sb/skippable-modes'."
 
 (with-eval-after-load 'transient
   (transient-define-prefix
-   sb/search-commands () "Search commands"
+   sb/search-commands-transient () "Search commands"
    [["Search functions"
      ("d" "Deadgrep" deadgrep)
-     ("r" "Consult-ripgrep" consult-ripgrep)]])
+     ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
+     ("r" "Consult-ripgrep" consult-ripgrep)
+     ("f" "Consult find" consult-find)
+     ("d" "Consult fd" consult-fd)
+     ("l" "Consult locate" consult-locate)
+     ("g" "Consult grep" consult-grep)
+     ("t" "Consult git grep" consult-git-grep)
+     ("h" "Consult isearch history" consult-isearch-history)]])
+  (bind-key "C-c s" #'sb/search-commands-transient)
 
   (transient-define-prefix
-   sb/lsp-commands () "lsp menu"
+   sb/lsp-commands-transient () "lsp menu"
    [["Lsp functions"
      ("l" "Start Lsp" lsp)
      ("q" "Disconnect Lsp" lsp-disconnect)
@@ -5381,8 +5352,30 @@ or the major mode is not in `sb/skippable-modes'."
      ("d" "Find declaration" lsp-find-declaration)
      ("e" "Find declaration" lsp-find-definition)
      ("i" "Find implementation" lsp-find-implementation)
+     ("r" "Find references" lsp-find-references)
+     ("I" "Go to implementation" lsp-goto-implementation)
+     ("t" "Go to type definition" lsp-goto-type-definition)
+     ("x" "Execute code action" lsp-execute-code-action)
+     ("a" "Add folder to workspace" lsp-workspace-folders-add)
+     ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
+     ("b" "Blacklist and remove workspace" lsp-workspace-blacklist-remove)
      ("r" "Rename" lsp-rename)
-     ("f" "Format buffer" lsp-format-buffer)]])
+     ("f" "Format buffer" lsp-format-buffer)
+     ("y" "Java type hierarchy" lsp-java-type-hierarchy)
+     ("g" "Workspace symbols" consult-lsp-symbols)
+     ("h" "File symbols" consult-lsp-file-symbols)
+     ("s" "Diagnostics" consult-lsp-diagnostics)]])
+  (bind-key "C-c l" #'sb/lsp-commands-transient)
+
+  (transient-define-prefix
+   sb/imenu-transient () "Imenu commands"
+   [["Imenu" ("j" "Imenu" consult-imenu)
+     ;; sorts the items by kind.
+     ("c" "Create categorized imenu index" lsp-imenu-create-categorised-index)
+     ;; sorts the items by position
+     ("u"
+      "Create uncategorized imenu index"
+      lsp-imenu-create-uncategorised-index)]])
 
   (transient-define-prefix
    sb/describe-commands () "Describe"
@@ -5493,7 +5486,7 @@ or the major mode is not in `sb/skippable-modes'."
     ["Windows"
      ("wl" "Linewise" ediff-windows-linewise)
      ("ww" "Wordwise" ediff-windows-wordwise)]])
-  (global-set-key (kbd "s-e") 'sb/ediff-transient))
+  (global-set-key (kbd "C-c e") 'sb/ediff-transient))
 
 (add-hook
  'elpaca-after-init-hook

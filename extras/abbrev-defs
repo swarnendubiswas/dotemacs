@@ -1,4 +1,4 @@
-;;-*-coding: utf-8;-*-
+;; -*- coding: utf-8; lexical-binding: t -*-
 (define-abbrev-table 'LaTeX-mode-abbrev-table
   '(
     ("aentored" "mentored" nil :count 0)
@@ -1175,6 +1175,7 @@
     ("reveiw" "review" nil :count 0)
     ("reveiwing" "reviewing" nil :count 0)
     ("rleated" "related" nil :count 0)
+    ("rmeove" "remove" nil :count 0)
     ("rquire" "require" nil :count 1)
     ("rumers" "rumors" nil :count 0)
     ("runnning" "running" nil :count 0)
