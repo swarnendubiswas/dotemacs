@@ -21,7 +21,7 @@
   :group 'sb/emacs)
 
 ;; Modus-vivendi is the most complete, while Catppuccin is more colorful.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -2303,17 +2303,16 @@ The provider is `nerd-icons'."
   ;; only choice, `company-echo-metadata-frontend' shows selected candidate docs
   ;; in echo area, and `company-pseudo-tooltip-frontend' which always shows the
   ;; candidates in an overlay.
-  (company-frontends
-   '(
-     ;; Always show candidates in overlay tooltip
-     company-pseudo-tooltip-frontend
-     ;; Show selected candidate docs in echo area
-     company-echo-metadata-frontend))
+  ;; (company-frontends
+  ;;  '(
+  ;;    ;; Always show candidates in overlay tooltip
+  ;;    company-pseudo-tooltip-frontend
+  ;;    ;; Show selected candidate docs in echo area
+  ;;    company-echo-metadata-frontend))
   :config
   ;; Autocompletion icons are distracting.
-  ;; (unless (bound-and-true-p sb/enable-icons)
-  ;;   (setopt company-format-margin-function nil))
-  (setopt company-format-margin-function nil))
+  (unless (bound-and-true-p sb/enable-icons)
+    (setopt company-format-margin-function nil)))
 
 (use-package nerd-icons
   :when (bound-and-true-p sb/enable-icons)
@@ -2954,7 +2953,7 @@ The provider is `nerd-icons'."
   ;; Simpler to focus on the errors at hand
   (lsp-modeline-diagnostics-scope :file)
   (lsp-inlay-hint-enable nil)
-  (lsp-enable-snippet t)
+  (lsp-enable-snippet nil)
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
   ;; Show/hide completion metadata, e.g., "java.util.ArrayList". This increases
@@ -5111,10 +5110,6 @@ or the major mode is not in `sb/skippable-modes'."
  ("<f7>" . previous-error) ; "M-g p" is the default keybinding
  ("<f8>" . next-error) ; "M-g n" is the default keybinding
 
- ("C-x x a" . find-alternate-file)
- ("C-x x g" . revert-buffer-quick)
- ("C-x x r" . rename-file)
-
  ;; In a line with comments, "C-u M-;" removes the comments altogether. That
  ;; means deleting the comment, NOT UNCOMMENTING but removing all commented text
  ;; and the comment marker itself.
@@ -5398,6 +5393,23 @@ or the major mode is not in `sb/skippable-modes'."
      ("g" "File symbols" consult-lsp-file-symbols)
      ("h" "Workspace symbols" consult-lsp-symbols)]])
   (bind-key "C-c i" #'sb/imenu-transient)
+
+  (transient-define-prefix
+   sb/file-buffer-transient () "File and Buffer commands"
+   [["File"
+     ("r" "Rename" rename-file)
+     ("a" "Find alternate" find-alternate-file)
+     ("o" "FFAP find other" ff-find-other-file)]
+    ["Buffer"] ("g" "Revert quick" revert-buffer-quick)])
+  (bind-key "C-c x" #'sb/file-buffer-transient)
+
+  (transient-define-prefix
+   sb/navigation-transient () "Jump commands"
+   [["Parentheses"
+     ("b" "Backward sexp" backward-sexp)
+     ("f" "Forward sexp" forward-sexp)
+     ("k" "Kill sexp" kill-sexp)]])
+  (bind-key "C-c n" #'sb/navigation-transient)
 
   (transient-define-prefix
    sb/isearch-commands () "isearch Menu"
