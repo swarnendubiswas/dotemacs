@@ -3348,10 +3348,7 @@ The provider is `nerd-icons'."
                      (treesit-language-available-p 'javascript)
                      (treesit-language-available-p 'json)
                      (treesit-language-available-p 'kdl)
-                     (treesit-language-available-p 'latex)
                      (treesit-language-available-p 'make)
-                     (treesit-language-available-p 'markdown)
-                     (treesit-language-available-p 'org)
                      (treesit-language-available-p 'perl)
                      (treesit-language-available-p 'php)
                      (treesit-language-available-p 'python)
@@ -3376,13 +3373,10 @@ The provider is `nerd-icons'."
               (html-mode . html-ts-mode)
               (java-mode . java-ts-mode)
               (json-mode . json-ts-mode)
-              (js2-mode . js-ts-mode)
               (kdl-mode . kdl-ts-mode)
               (python-mode . python-ts-mode)
               (toml-mode . toml-ts-mode)
               (conf-toml-mode . toml-ts-mode)
-              (tsx-mode . tsx-ts-mode)
-              (typescript-mode . typescript-ts-mode)
               (yaml-mode . yaml-ts-mode)))))
 
 (use-package treesit-auto
@@ -3741,20 +3735,20 @@ The provider is `nerd-icons'."
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
 
-(use-package markdown-ts-mode
-  :mode ("\\.md\\'" . markdown-ts-mode)
-  :hook
-  (markdown-ts-mode
-   .
-   (lambda ()
-     (cond
-      ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (progn
-         (require 'lsp-marksman)
-         (lsp-deferred)))))))
+;; (use-package markdown-ts-mode
+;;   :mode ("\\.md\\'" . markdown-ts-mode)
+;;   :hook
+;;   (markdown-ts-mode
+;;    .
+;;    (lambda ()
+;;      (cond
+;;       ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
+;;       ((eq sb/lsp-provider 'eglot)
+;;        (eglot-ensure))
+;;       ((eq sb/lsp-provider 'lsp-mode)
+;;        (progn
+;;          (require 'lsp-marksman)
+;;          (lsp-deferred)))))))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
@@ -5400,7 +5394,7 @@ or the major mode is not in `sb/skippable-modes'."
      ("r" "Rename" rename-file)
      ("a" "Find alternate" find-alternate-file)
      ("o" "FFAP find other" ff-find-other-file)]
-    ["Buffer"] ("g" "Revert quick" revert-buffer-quick)])
+    ["Buffer" ("g" "Revert quick" revert-buffer-quick)]])
   (bind-key "C-c x" #'sb/file-buffer-transient)
 
   (transient-define-prefix
@@ -5412,9 +5406,20 @@ or the major mode is not in `sb/skippable-modes'."
   (bind-key "C-c n" #'sb/navigation-transient)
 
   (transient-define-prefix
+   sb/treesit-transient () "Treesit commands"
+   [["Functions" ("a"
+      "Function beginning"
+      treesit-beginning-of-defun)
+     ("e" "Function end" treesit-end-of-defun)]
+    ["Expressions"
+     ("u" "Up list" treesit-up-list)
+     ("d" "Down list" treesit-down-list)
+     ("f" "Forward sexp" treesit-forward-sexp)]])
+  (bind-key "C-c t" #'sb/treesit-transient)
+
+  (transient-define-prefix
    sb/isearch-commands () "isearch Menu"
-   [["Edit Search String"
-     ("e"
+   [["Edit Search String" ("e"
       "Edit the search string (recursive)"
       isearch-edit-string
       :transient nil)
@@ -5432,7 +5437,6 @@ or the major mode is not in `sb/skippable-modes'."
       "Pull thing from buffer"
       isearch-forward-thing-at-point
       :transient nil)]
-
     ["Replace" ("q"
       "Start ‘query-replace’"
       isearch-query-replace
@@ -5443,14 +5447,14 @@ or the major mode is not in `sb/skippable-modes'."
       isearch-query-replace-regexp
       :if-nil buffer-read-only
       :transient nil)]]
-
-   [["Toggle"
-     ("X" "Toggle regexp searching" isearch-toggle-regexp :transient nil)
+   [["Toggle" ("X"
+      "Toggle regexp searching"
+      isearch-toggle-regexp
+      :transient nil)
      ("S" "Toggle symbol searching" isearch-toggle-symbol :transient nil)
      ("W" "Toggle word searching" isearch-toggle-word :transient nil)
      ("F" "Toggle case fold" isearch-toggle-case-fold :transient nil)
      ("L" "Toggle lax whitespace" isearch-toggle-lax-whitespace :transient nil)]
-
     ["Misc" ("o" "occur" isearch-occur :transient nil)]])
 
   ;; A transient makes symbol-overlay easy to use Include the overlay keymap
@@ -5467,9 +5471,10 @@ or the major mode is not in `sb/skippable-modes'."
   (transient-define-prefix
    sb/symbol-overlay-transient () "Symbol Overlay transient"
    ["Symbol Overlay" ["Manage" ("." "Toggle" symbol-overlay-put)
-     ("k" "Remove All" hrm-symbol-overlay-remove-all) ; for called-interactively-p check
-     ("m" "Auto Highlight" symbol-overlay-mode) ; a minor mode to highlight symbol-at-point
-     ]
+     ;; for called-interactively-p check
+     ("k" "Remove All" hrm-symbol-overlay-remove-all)
+     ;; a minor mode to highlight symbol-at-point
+     ("m" "Auto Highlight" symbol-overlay-mode)]
     ["Move"
      ("n" "Next" symbol-overlay-switch-forward)
      ("p" "Previous" symbol-overlay-switch-backward)]
@@ -5477,18 +5482,14 @@ or the major mode is not in `sb/skippable-modes'."
      ("<" "First" symbol-overlay-jump-first)
      (">" "Last" symbol-overlay-jump-last)
      ("d" "Definition" symbol-overlay-jump-to-definition)
-     ("e" "Mark" symbol-overlay-echo-mark)
-     ("M" "MC Mark-All" symbol-overlay-mc-mark-all) ; from symbol-overlay-mc
-     ]
+     ("e" "Mark" symbol-overlay-echo-mark)]
     ["On Overlay"
      ("t" "Toggle Scope" symbol-overlay-toggle-in-scope)
      ("w" "Copy" symbol-overlay-save-symbol)
      ("r" "Rename" symbol-overlay-rename)
      ("q" "Query Replace" symbol-overlay-query-replace)
-     ("s" "ISearch" symbol-overlay-isearch-literally)
-     ("g" "Grep" rg-dwim) ; from rg.el
-     ]])
-  (global-set-key (kbd "M-g s") 'sb/symbol-overlay-transient)
+     ("s" "ISearch" symbol-overlay-isearch-literally)]])
+  (bind-key "M-g s" #'sb/symbol-overlay-transient)
 
   (transient-define-prefix
    sb/ediff-transient () "Launch Ediff in all it's variants"
