@@ -318,6 +318,9 @@ The provider is `nerd-icons'."
   (redisplay-skip-fontification-on-input t)
   ;; Show contextual lines around a match
   (list-matching-lines-default-context-lines 1)
+  (imenu-auto-rescan t)
+  (imenu-use-popup-menu nil)
+
   :config
   (dolist (exts
            '(".aux"
@@ -406,6 +409,11 @@ The provider is `nerd-icons'."
      (setq truncate-lines nil)
      (visual-line-mode 1)))
 
+  ;; This puts the buffer in read-only mode and disables font locking, revert
+  ;; with "C-c C-c".
+  (unless (version<= emacs-version "27")
+    (add-hook 'elpaca-after-init-hook #'global-so-long-mode))
+
   :diminish visual-line-mode)
 
 (use-package autorevert
@@ -443,20 +451,6 @@ The provider is `nerd-icons'."
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
   (save-abbrevs 'silently)
   :diminish)
-
-;; This puts the buffer in read-only mode and disables font locking, revert with
-;; "C-c C-c".
-(use-package so-long
-  :ensure nil
-  :unless (version<= emacs-version "27")
-  :hook (elpaca-after-init . global-so-long-mode))
-
-(use-package imenu
-  :ensure nil
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-items 1000)
-  (imenu-use-popup-menu nil))
 
 (use-package recentf
   :ensure nil
@@ -1438,7 +1432,8 @@ The provider is `nerd-icons'."
   :commands deadgrep-edit-mode
   :custom
   (deadgrep-max-buffers 1)
-  (deadgrep-display-buffer-function 'switch-to-buffer-other-frame))
+  (deadgrep-display-buffer-function 'switch-to-buffer-other-frame)
+  (deadgrep-extra-arguments '()))
 
 (use-package wgrep
   :bind
@@ -1897,6 +1892,7 @@ The provider is `nerd-icons'."
 ;; Company.
 (use-package kind-icon
   :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'company))
+  :after nerd-icons
   :demand t
   :custom
   ;; Prefer smaller icons and a more compact popup
@@ -1910,6 +1906,11 @@ The provider is `nerd-icons'."
      :scale 0.6
      :background nil))
   :config
+  (add-to-list
+   'svg-lib-icon-collections
+   '("vscode-codicons"
+     .
+     "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
   (add-to-list
    'svg-lib-icon-collections
    '("nerd-fonts-codicons"
