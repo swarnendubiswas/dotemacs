@@ -161,10 +161,10 @@ The provider is `nerd-icons'."
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-;; Install use-package support
+;; Install `use-package' support
 (elpaca
  elpaca-use-package
- ;; Enable use-package :ensure support for Elpaca.
+ ;; Enable support for the `:ensure' keyword in `use-package' for Elpaca.
  (elpaca-use-package-mode))
 
 (eval-and-compile
@@ -175,7 +175,7 @@ The provider is `nerd-icons'."
    use-package-always-ensure t)
 
   (when (bound-and-true-p sb/debug-init-perf)
-    ;; Use "M-x use-package-report" to see results
+    ;; Use "M-x use-package-report" to see package load times.
     (setopt
      use-package-compute-statistics t
      use-package-verbose t)))
@@ -219,41 +219,41 @@ The provider is `nerd-icons'."
    .
    (lambda ()
      (save-place-mode 1)
+     ;; There is mostly no benefit in seeing the file size on the modeline. Therefore, it is better to save modeline space.
+     ;; (size-indication-mode 1)
      (column-number-mode 1)
-     (size-indication-mode 1)
-     ;; Autosave file-visiting buffers at idle time intervals
+     ;; `auto-save-mode' saves to a separate auto-save file, while
+     ;; `auto-save-visited-mode' saves directly to the visited file and runs all
+     ;; save-related hooks. We disable `auto-save-mode' and prefer
+     ;; `auto-save-visited-mode' instead. Autosave file-visiting buffers at idle
+     ;; time intervals instead of based on the number of characters typed.
      (auto-save-visited-mode 1)
      ;; Typing with the mark active will overwrite the marked region
      (delete-selection-mode 1)
      ;; Use soft wraps, wrap lines without the ugly continuation marks
      (global-visual-line-mode 1)
-     ;; When you call `find-file', you do not need to clear the existing
-     ;; file path before adding the new one. Just start typing the whole
-     ;; path and Emacs will "shadow" the current one. For example, you are
-     ;; at "~/Documents/notes/file.txt" and you want to go to
-     ;; "~/.emacs.d/init.el", type the latter directly and Emacs will take
-     ;; you there.
-     (file-name-shadow-mode 1)
-     (auto-encryption-mode -1)))
+     ;; Add a prefix to continuation lines to prevent them from being indented
+     ;; too far or wrapping awkwardly
+     (global-visual-wrap-prefix-mode 1)
+     ;; When you call `find-file', you do not need to clear the existing file
+     ;; path before adding the new one. Just start typing the whole path and
+     ;; Emacs will "shadow" the current one. For example, you are at
+     ;; "~/Documents/notes/file.txt" and you want to go to "~/.emacs.d/init.el",
+     ;; type the latter directly and Emacs will take you there.
+     (file-name-shadow-mode 1)))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (auto-save-no-message t "Do not print frequent autosave messages")
   ;; Disable autosaving based on number of characters typed
   (auto-save-interval 0)
-  ;; Unlike `auto-save-mode', `auto-save-visited-mode' saves the buffer contents
-  ;; to the visiting file and runs all save-related hooks. We disable
-  ;; `auto-save-mode' and prefer `auto-save-visited-mode' instead.
-  (auto-save-default nil)
-  ;; Save buffer to file after idling for some time, the default of 5s may be
-  ;; too frequent since it runs all the save-related hooks.
-  (auto-save-visited-interval 30)
+  ;; Save buffer to file after idling for 10s. The default of 5s may be too
+  ;; frequent since it runs all the save-related hooks.
+  (auto-save-visited-interval 10)
   (apropos-do-all t "Make `apropos' search more extensively")
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
   ;; Autofill comments in modes that define them
   (comment-auto-fill-only-comments t)
-  (comment-empty-lines t)
-  (comment-multi-lines t)
   ;; Show the actual symbol name in the *customize* buffer
   (custom-unlispify-menu-entries nil)
   (create-lockfiles nil)
@@ -262,17 +262,15 @@ The provider is `nerd-icons'."
   (custom-safe-themes t)
   (delete-by-moving-to-trash t)
   (help-window-select t "Makes it easy to close the window")
-  (help-enable-autoload nil)
-  (help-enable-completion-autoload nil)
-  (help-enable-symbol-autoload nil)
-  (history-delete-duplicates t)
-  (read-process-output-max (* 4 1024 1024))
+  (read-process-output-max (* 4 1024 1024)) ; 4 MB as recommended by `lsp-mode'
   (remote-file-name-inhibit-locks t)
+  ;; Do not auto-save remote files using `auto-save-visited-mode'
   (remote-file-name-inhibit-auto-save-visited t)
   (ring-bell-function 'ignore "Disable beeping sound")
   (visible-bell nil)
   (save-interprogram-paste-before-kill t)
   (select-enable-clipboard t)
+  (history-delete-duplicates t)
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (sentence-end-double-space nil)
   (shift-select-mode nil)
@@ -283,16 +281,10 @@ The provider is `nerd-icons'."
   (window-combination-resize t "Resize windows proportionally")
   (max-mini-window-height 0.3)
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
-  ;; Always trigger an immediate resize of the child frame
-  (x-gtk-resize-child-frames 'resize-mode)
-  (x-underline-at-descent-line t)
-  (tags-add-tables nil)
   (tags-case-fold-search nil "case-sensitive")
-  (tags-revert-without-query t)
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
   (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
-  (confirm-nonexistent-file-or-buffer t)
   (confirm-kill-emacs nil)
   ;; Prevent 'Active processes exist' when you quit Emacs
   (confirm-kill-processes nil)
@@ -983,7 +975,6 @@ The provider is `nerd-icons'."
     (interactive)
     (consult-line (thing-at-point 'symbol)))
   :after vertico
-  :commands (consult-fd consult-isearch-forward)
   :bind
   ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
    ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
@@ -1066,7 +1057,8 @@ The provider is `nerd-icons'."
      "\\*semgrep.*"
      "\\*autotools.*"
      "\\*lsp-harper*"
-     "\\*taplo*"))
+     "\\*taplo*"
+     "\\*ruff.*"))
   :config
   (consult-customize
    consult-line
@@ -1609,8 +1601,8 @@ The provider is `nerd-icons'."
   (flycheck-idle-change-delay 2)
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-global-modes '(not csv-mode conf-mode))
-  ;; Left fringe does not work in the terminal mode
-  (flycheck-indication-mode 'left-margin)
+  ;; Left fringe does not work in the terminal mode. Disable indication because it is noisy.
+  (flycheck-indication-mode nil)
   :config
   ;; Shellcheck is invoked by bash lsp
   (dolist (checkers
@@ -1861,7 +1853,6 @@ The provider is `nerd-icons'."
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
   (read-buffer-completion-ignore-case t)
-  (completion-cycle-threshold 3 "TAB cycle if there are only few candidates")
   :config
   ;; Show docstring description for completion candidates in commands like
   ;; `describe-function'.
@@ -1905,29 +1896,26 @@ The provider is `nerd-icons'."
 ;; Corfu with `nerd-icons-corfu'. I use `kind-icon' to provide nerd icons for
 ;; Company.
 (use-package kind-icon
-  :when (bound-and-true-p sb/enable-icons)
+  :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'company))
   :demand t
-  :custom (kind-icon-blend-background nil)
+  :custom
   ;; Prefer smaller icons and a more compact popup
   (kind-icon-default-style
-   '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 0.8 :scale 0.6))
+   '(:padding
+     0
+     :stroke 0
+     :margin 0
+     :radius 0
+     :height 0.8
+     :scale 0.6
+     :background nil))
   :config
-  ;; Prefer nerd-icons for Corfu with `nerd-icons-corfu'
-  ;; (when (eq sb/in-buffer-completion 'corfu)
-  ;;   (with-eval-after-load "corfu"
-  ;;     ;; Compute blended backgrounds correctly
-  ;;     (setopt kind-icon-default-face 'corfu-default)
-  ;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+  (add-to-list
+   'svg-lib-icon-collections
+   '("nerd-fonts-codicons"
+     .
+     "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
 
-  ;; Replace default company icons with nerd-icons
-  ;; (when (eq sb/in-buffer-completion 'company)
-  ;;   (require 'svg-lib)
-  ;;   (add-to-list
-  ;;    'svg-lib-icon-collections
-  ;;    '("nerd-fonts-codicons"
-  ;;      .
-  ;;      "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
-  ;; 
   ;;   (setopt kind-icon-mapping
   ;;           '((array
   ;;              "a"
@@ -2119,121 +2107,120 @@ The provider is `nerd-icons'."
   ;;              :face font-lock-builtin-face
   ;;              :collection "nerd-fonts-codicons")))
   ;; 
-  ;;   ;;     (setopt kind-icon-mapping
-  ;;   ;;         `((array
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_array")
-  ;;   ;;            :face font-lock-type-face)
-  ;;   ;;               (boolean
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_boolean")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;               (class
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_class")
-  ;;   ;;            :face font-lock-type-face)
-  ;;   ;;               (color
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_color")
-  ;;   ;;            :face success)
-  ;;   ;;           (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-  ;;   ;;               (constant
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_constant")
-  ;;   ;;            :face font-lock-constant-face)
-  ;;   ;;               (constructor
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-triangle_right")
-  ;;   ;;            :face font-lock-function-name-face)
-  ;;   ;;               (enummember
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;               (enum-member
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;           (enum
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_enum")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;               (event
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_event")
-  ;;   ;;            :face font-lock-warning-face)
-  ;;   ;;               (field
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_field")
-  ;;   ;;            :face font-lock-variable-name-face)
-  ;;   ;;               (file
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_file")
-  ;;   ;;            :face font-lock-string-face)
-  ;;   ;;               (folder
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-folder")
-  ;;   ;;            :face font-lock-doc-face)
-  ;;   ;;               (interface
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_interface")
-  ;;   ;;            :face font-lock-type-face)
-  ;;   ;;               (keyword
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_keyword")
-  ;;   ;;            :face font-lock-keyword-face)
-  ;;   ;;           (macro
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_misc")
-  ;;   ;;            :face font-lock-keyword-face)
-  ;;   ;;               (magic
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-wand")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;               (method
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_method")
-  ;;   ;;            :face font-lock-function-name-face)
-  ;;   ;;           (function ,(nerd-icons-codicon "nf-cod-symbol_method")
-  ;;   ;;                     :face font-lock-function-name-face)
-  ;;   ;;               (module
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-file_submodule")
-  ;;   ;;                :face font-lock-preprocessor-face)
-  ;;   ;;               (numeric
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_numeric")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;               (operator
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_operator")
-  ;;   ;;            :face font-lock-comment-delimiter-face)
-  ;;   ;;               (param
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_parameter")
-  ;;   ;;            :face default)
-  ;;   ;;               (property
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_property")
-  ;;   ;;            :face font-lock-variable-name-face)
-  ;;   ;;               (reference
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-references")
-  ;;   ;;            :face font-lock-variable-name-face)
-  ;;   ;;               (snippet
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_snippet")
-  ;;   ;;            :face font-lock-string-face)
-  ;;   ;;               (string
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_string")
-  ;;   ;;            :face font-lock-string-face)
-  ;;   ;;               (struct
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_structure")
-  ;;   ;;            :face font-lock-variable-name-face)
-  ;;   ;;               (text
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-text_size")
-  ;;   ;;            :face font-lock-doc-face)
-  ;;   ;;               (typeparameter
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-list_unordered")
-  ;;   ;;            :face font-lock-type-face)
-  ;;   ;;               (type-parameter
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-list_unordered")
-  ;;   ;;            :face font-lock-type-face)
-  ;;   ;;               (unit
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_ruler")
-  ;;   ;;            :face font-lock-constant-face)
-  ;;   ;;               (value
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_field")
-  ;;   ;;            :face font-lock-builtin-face)
-  ;;   ;;               (variable
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-symbol_variable")
-  ;;   ;;            :face font-lock-variable-name-face)
-  ;;   ;;               (t
-  ;;   ;;            ,(nerd-icons-codicon "nf-cod-text_size")
-  ;;   ;;            :face font-lock-builtin-face)))
-  ;; 
-  ;;   (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
-  ;;          (formatter
-  ;;           (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
-  ;;     (defun sb/company-kind-icon-margin (cand _selected)
-  ;;       (funcall formatter cand))
-  ;;     (setopt company-format-margin-function #'sb/company-kind-icon-margin)))
-  )
 
+  (setopt kind-icon-mapping
+          `((array
+             ,(nerd-icons-codicon "nf-cod-symbol_array")
+             :face font-lock-type-face)
+            (boolean
+             ,(nerd-icons-codicon "nf-cod-symbol_boolean")
+             :face font-lock-builtin-face)
+            (class
+             ,(nerd-icons-codicon "nf-cod-symbol_class")
+             :face font-lock-type-face)
+            (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+            (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+            (constant
+             ,(nerd-icons-codicon "nf-cod-symbol_constant")
+             :face font-lock-constant-face)
+            (constructor
+             ,(nerd-icons-codicon "nf-cod-triangle_right")
+             :face font-lock-function-name-face)
+            (enummember
+             ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+             :face font-lock-builtin-face)
+            (enum-member
+             ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+             :face font-lock-builtin-face)
+            (enum
+             ,(nerd-icons-codicon "nf-cod-symbol_enum")
+             :face font-lock-builtin-face)
+            (event
+             ,(nerd-icons-codicon "nf-cod-symbol_event")
+             :face font-lock-warning-face)
+            (field
+             ,(nerd-icons-codicon "nf-cod-symbol_field")
+             :face font-lock-variable-name-face)
+            (file
+             ,(nerd-icons-codicon "nf-cod-symbol_file")
+             :face font-lock-string-face)
+            (folder
+             ,(nerd-icons-codicon "nf-cod-folder")
+             :face font-lock-doc-face)
+            (interface
+             ,(nerd-icons-codicon "nf-cod-symbol_interface")
+             :face font-lock-type-face)
+            (keyword
+             ,(nerd-icons-codicon "nf-cod-symbol_keyword")
+             :face font-lock-keyword-face)
+            (macro
+             ,(nerd-icons-codicon "nf-cod-symbol_misc")
+             :face font-lock-keyword-face)
+            (magic
+             ,(nerd-icons-codicon "nf-cod-wand")
+             :face font-lock-builtin-face)
+            (method
+             ,(nerd-icons-codicon "nf-cod-symbol_method")
+             :face font-lock-function-name-face)
+            (function ,(nerd-icons-codicon "nf-cod-symbol_method")
+                      :face font-lock-function-name-face)
+            (module
+             ,(nerd-icons-codicon "nf-cod-file_submodule")
+             :face font-lock-preprocessor-face)
+            (numeric
+             ,(nerd-icons-codicon "nf-cod-symbol_numeric")
+             :face font-lock-builtin-face)
+            (operator
+             ,(nerd-icons-codicon "nf-cod-symbol_operator")
+             :face font-lock-comment-delimiter-face)
+            (param
+             ,(nerd-icons-codicon "nf-cod-symbol_parameter")
+             :face default)
+            (property
+             ,(nerd-icons-codicon "nf-cod-symbol_property")
+             :face font-lock-variable-name-face)
+            (reference
+             ,(nerd-icons-codicon "nf-cod-references")
+             :face font-lock-variable-name-face)
+            (snippet
+             ,(nerd-icons-codicon "nf-cod-symbol_snippet")
+             :face font-lock-string-face)
+            (string
+             ,(nerd-icons-codicon "nf-cod-symbol_string")
+             :face font-lock-string-face)
+            (struct
+             ,(nerd-icons-codicon "nf-cod-symbol_structure")
+             :face font-lock-variable-name-face)
+            (text
+             ,(nerd-icons-codicon "nf-cod-text_size")
+             :face font-lock-doc-face)
+            (typeparameter
+             ,(nerd-icons-codicon "nf-cod-list_unordered")
+             :face font-lock-type-face)
+            (type-parameter
+             ,(nerd-icons-codicon "nf-cod-list_unordered")
+             :face font-lock-type-face)
+            (unit
+             ,(nerd-icons-codicon "nf-cod-symbol_ruler")
+             :face font-lock-constant-face)
+            (value
+             ,(nerd-icons-codicon "nf-cod-symbol_field")
+             :face font-lock-builtin-face)
+            (variable
+             ,(nerd-icons-codicon "nf-cod-symbol_variable")
+             :face font-lock-variable-name-face)
+            (t
+             ,(nerd-icons-codicon "nf-cod-text_size")
+             :face font-lock-builtin-face)))
+
+  (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
+         (formatter
+          (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
+    (defun sb/company-kind-icon-margin (cand _selected)
+      (funcall formatter cand))
+    (setopt company-format-margin-function #'sb/company-kind-icon-margin)))
+
+;; FIXME: Company on terminal with `nerd-icons'
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the
 ;; backend used for the last completion. Try "M-x company-complete-common" when
 ;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
@@ -2911,6 +2898,8 @@ The provider is `nerd-icons'."
   (lsp-auto-register-remote-clients nil)
   (lsp-keep-workspace-alive nil)
   (lsp-progess-via-spinner nil)
+  ;; Increase the delay to allow transient changes and avoid getting flooded with LSP errors.
+  (lsp-idle-delay 1.5)
   ;; Avoid annoying questions, we expect a server restart to succeed
   (lsp-restart 'auto-restart)
   ;; Avoid warning messages for unsupported modes like `csv-mode'
@@ -3212,7 +3201,7 @@ The provider is `nerd-icons'."
 
 (use-package hl-todo
   :hook (emacs-startup . global-hl-todo-mode)
-  :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
+  ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setopt
    hl-todo-highlight-punctuation ":"
@@ -3291,11 +3280,7 @@ The provider is `nerd-icons'."
        (treesit-available-p))
   :demand t
   :commands (treesit-install-language-grammar)
-  :bind
-  (("C-M-a" . treesit-beginning-of-defun)
-   ("C-M-e" . treesit-end-of-defun)
-   ("C-M-<up>" . treesit-up-list)
-   ("C-M-<down>" . treesit-down-list))
+  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
   :custom
   ;; Increased default font locking may hurt performance
   (treesit-font-lock-level 4)
@@ -5305,6 +5290,10 @@ or the major mode is not in `sb/skippable-modes'."
      ("i" "Isearch forward" isearch-forward)
      ("b" "Isearch backward" isearch-backward)
      ("w" "Isearch symbol at point" isearch-symbol-at-point)
+     ;; During an Isearch session, this command picks a search string from
+     ;; history and continues the search with the newly selected string. Outside
+     ;; of Isearch, the command allows you to pick a string from the history and
+     ;; starts a new Isearch.
      ("h" "Consult isearch history" consult-isearch-history)]
     ["Occur" ("o" "occur" isearch-occur :transient nil)]
     ["Other tools"
@@ -5409,13 +5398,12 @@ or the major mode is not in `sb/skippable-modes'."
      ("b" "Backward sexp" backward-sexp)
      ("f" "Forward sexp" forward-sexp)
      ("k" "Kill sexp" kill-sexp)]
-    ["Functions" ("a"
-      "Function beginning"
-      treesit-beginning-of-defun)
+    ["Functions"
+     ("a" "Function beginning" treesit-beginning-of-defun)
      ("e" "Function end" treesit-end-of-defun)]
     ["Expressions"
-     ("u" "Up list" treesit-up-list)
-     ("d" "Down list" treesit-down-list)
+     ;; ("u" "Up list" treesit-up-list)
+     ;; ("d" "Down list" treesit-down-list)
      ("f" "Forward sexp" treesit-forward-sexp)]])
   (bind-key "C-c n" #'sb/navigation-transient)
 

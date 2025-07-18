@@ -102,6 +102,14 @@
  warning-suppress-types '((lexical-binding))
  warning-suppress-log-types '((files missing-lexbind-cookie)))
 
+;; Move native compilation files to directory used by `no-littering'
+(when (and (fboundp 'startup-redirect-eln-cache)
+           (fboundp 'native-comp-available-p)
+           (native-comp-available-p))
+  (startup-redirect-eln-cache
+   (convert-standard-filename
+    (expand-file-name "var/eln-cache/" user-emacs-directory))))
+
 (when (and (featurep 'native-compile)
            (fboundp 'native-comp-available-p)
            (native-comp-available-p))
