@@ -1897,6 +1897,7 @@ The provider is `nerd-icons'."
 ;; Company.
 (use-package kind-icon
   :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'company))
+  :after nerd-icons
   :demand t
   :custom
   ;; Prefer smaller icons and a more compact popup
@@ -1910,6 +1911,11 @@ The provider is `nerd-icons'."
      :scale 0.6
      :background nil))
   :config
+  (add-to-list
+   'svg-lib-icon-collections
+   '("vscode-codicons"
+     .
+     "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
   (add-to-list
    'svg-lib-icon-collections
    '("nerd-fonts-codicons"
