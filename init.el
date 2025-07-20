@@ -146,10 +146,9 @@ The provider is `nerd-icons'."
           (progn
             (message "%s" (buffer-string))
             (kill-buffer buffer))
-          (error
-           "%s"
-           (with-current-buffer buffer
-             (buffer-string))))
+          (error "%s"
+                 (with-current-buffer buffer
+                   (buffer-string))))
       ((error)
        (warn "%s" err)
        (delete-directory repo 'recursive))))
@@ -583,8 +582,9 @@ The provider is `nerd-icons'."
    ediff-regions-wordwise
    ediff-revert-buffers-then-recompute-diffs)
   :hook
-  ;; Offer to clean up files from ediff sessions.
-  (ediff-cleanup . (lambda () (ediff-janitor t nil)))
+  ( ;; Offer to clean up files from ediff sessions.
+   (ediff-cleanup . (lambda () (ediff-janitor t nil)))
+   (ediff-startup . ediff-next-difference))
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -2462,7 +2462,8 @@ The provider is `nerd-icons'."
       ;; majority.
       (setq company-backends
             '(:separate
-              (company-reftex-citations company-auctex-bibs)
+              ;; company-reftex-citations
+              company-auctex-bibs
               (company-reftex-labels company-auctex-labels)
               (company-auctex-symbols
                company-auctex-environments
@@ -2475,8 +2476,8 @@ The provider is `nerd-icons'."
               company-files
               (company-dict company-ispell)
               company-dabbrev
-              company-yasnippet
-              company-capf)))
+              company-yasnippet)
+            company-capf))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -3930,10 +3931,22 @@ The provider is `nerd-icons'."
 ;; is an alias to `latex-mode'. Auctex overrides the tex package. "P" in the
 ;; modeline highlighter "LaTeX/MPS" is due to `TeX-PDF-mode'.
 (use-package auctex
+  :ensure
+  (auctex
+   :repo "https://git.savannah.gnu.org/git/auctex.git"
+   :branch "main"
+   :pre-build (("make" "elpa"))
+   :build (:not elpaca--compile-info) ;; Make will take care of this step
+   :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
+   :version
+   (lambda (_)
+     (require 'auctex)
+     AUCTeX-version))
+  :init (require 'tex-site)
   :hook
   ((LaTeX-mode . LaTeX-math-mode)
    (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-   ;; Revert "PDF Tools" buffer after TeX compilation has finished
+   ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
    ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
    ;; Enable rainbow mode after applying styles to the buffer
    ;; (TeX-update-style . rainbow-delimiters-mode)
