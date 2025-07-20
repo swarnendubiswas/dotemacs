@@ -2370,6 +2370,7 @@ The provider is `nerd-icons'."
 
 (use-package company-auctex
   :after (company tex)
+  :demand t
   :commands
   (company-auctex-bibs
    company-auctex-environments
@@ -2386,6 +2387,10 @@ The provider is `nerd-icons'."
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
+
+(use-package company-bibtex
+  :after (company tex)
+  :demand t)
 
 ;; Notes on how to set up `company-backends'.
 
@@ -2461,23 +2466,24 @@ The provider is `nerd-icons'."
       ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
       ;; majority.
       (setq company-backends
-            '(:separate
+            '( ;;company-bibtex
+              ;; company-auctex-bibs
               ;; company-reftex-citations
-              company-auctex-bibs
-              (company-reftex-labels company-auctex-labels)
-              (company-auctex-symbols
-               company-auctex-environments
-               company-auctex-macros
-               company-latex-commands
-               ;; Math latex tags
-               company-math-symbols-latex
-               ;; Math Unicode symbols and sub(super)scripts
-               company-math-symbols-unicode)
-              company-files
-              (company-dict company-ispell)
-              company-dabbrev
-              company-yasnippet)
-            company-capf))
+              ;; (company-reftex-labels company-auctex-labels)
+              ;; (company-latex-commands
+              ;; company-auctex-symbols company-auctex-environments
+              ;; company-auctex-macros
+              ;; Math latex tags
+              ;; company-math-symbols-latex
+              ;; Math Unicode symbols and sub(super)scripts
+              ;; company-math-symbols-unicode)
+              (company-capf
+               company-files
+               company-dict
+               company-ispell
+               company-dabbrev
+               company-yasnippet
+               :separate))))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -3930,7 +3936,7 @@ The provider is `nerd-icons'."
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
 ;; is an alias to `latex-mode'. Auctex overrides the tex package. "P" in the
 ;; modeline highlighter "LaTeX/MPS" is due to `TeX-PDF-mode'.
-(use-package auctex
+(use-package latex
   :ensure
   (auctex
    :repo "https://git.savannah.gnu.org/git/auctex.git"
