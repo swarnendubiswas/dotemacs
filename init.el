@@ -87,79 +87,6 @@ The provider is `nerd-icons'."
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
-(defvar elpaca-installer-version 0.11)
-(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
-(defvar elpaca-order
-  '(elpaca
-    :repo "https://github.com/progfolio/elpaca.git"
-    :ref nil
-    :depth 1
-    :inherit ignore
-    :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-    :build (:not elpaca--activate-package)))
-(let* ((repo (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
-  (add-to-list
-   'load-path
-   (if (file-exists-p build)
-       build
-     repo))
-  (unless (file-exists-p repo)
-    (make-directory repo t)
-    (when (<= emacs-major-version 28)
-      (require 'subr-x))
-    (condition-case-unless-debug err
-        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                  ((zerop
-                    (apply #'call-process
-                           `("git" nil ,buffer t "clone" ,@
-                             (when-let* ((depth (plist-get order :depth)))
-                               (list
-                                (format "--depth=%d" depth)
-                                "--no-single-branch"))
-                             ,(plist-get order :repo) ,repo))))
-                  ((zerop
-                    (call-process "git"
-                                  nil
-                                  buffer
-                                  t
-                                  "checkout"
-                                  (or (plist-get order :ref) "--"))))
-                  (emacs (concat invocation-directory invocation-name))
-                  ((zerop
-                    (call-process emacs
-                                  nil
-                                  buffer
-                                  nil
-                                  "-Q"
-                                  "-L"
-                                  "."
-                                  "--batch"
-                                  "--eval"
-                                  "(byte-recompile-directory \".\" 0 'force)")))
-                  ((require 'elpaca))
-                  ((elpaca-generate-autoloads "elpaca" repo)))
-          (progn
-            (message "%s" (buffer-string))
-            (kill-buffer buffer))
-          (error "%s"
-                 (with-current-buffer buffer
-                   (buffer-string))))
-      ((error)
-       (warn "%s" err)
-       (delete-directory repo 'recursive))))
-  (unless (require 'elpaca-autoloads nil t)
-    (require 'elpaca)
-    (elpaca-generate-autoloads "elpaca" repo)
-    (let ((load-source-file-function nil))
-      (load "./elpaca-autoloads"))))
-(add-hook 'after-init-hook #'elpaca-process-queues)
-(elpaca `(,@elpaca-order))
-
 ;; Install `use-package' support
 (elpaca
  elpaca-use-package
@@ -1222,9 +1149,20 @@ The provider is `nerd-icons'."
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
 ;; the word at point, even if it is not misspelled.
 (use-package jinx
-  ;; LATER: Presence of the "enchant-2" executable does not imply that the
-  ;; header files are present for compiling jinx
-  :when (and (eq system-type 'gnu/linux) (executable-find "enchant-2"))
+  ;; Presence of the "enchant-2" executable does not imply that the header files
+  ;; are present for compiling jinx.
+  :preface
+  (defun sb/libenchant-installed-p ()
+    "Return t if libenchant-2-dev is installed, nil otherwise."
+    (string=
+     "INSTALLED"
+     (string-trim
+      (shell-command-to-string
+       "dpkg -s libenchant-2-dev 2>/dev/null | grep -q '^Status: install' && echo INSTALLED || echo NOT-INSTALLED"))))
+  :when
+  (and (eq system-type 'gnu/linux)
+       (executable-find "enchant-2")
+       (sb/libenchant-installed-p))
   :hook ((text-mode conf-mode prog-mode) . jinx-mode)
   :bind (([remap ispell-word] . jinx-correct) ("C-M-$" . jinx-languages))
   :custom (jinx-languages "en_US")
@@ -2221,7 +2159,6 @@ The provider is `nerd-icons'."
       (funcall formatter cand))
     (setopt company-format-margin-function #'sb/company-kind-icon-margin)))
 
-;; FIXME: Company on terminal with `nerd-icons'
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the
 ;; backend used for the last completion. Try "M-x company-complete-common" when
 ;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
@@ -2234,8 +2171,9 @@ The provider is `nerd-icons'."
    :map
    company-active-map
    ("C-M-/" . company-other-backend)
+   ("C-;" . company-other-backend)
    ("C-s" . company-search-candidates)
-   ("C-M-s" . company-filter-candidates)
+   ("C-f" . company-filter-candidates)
    ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
    ;; "TAB"). First TAB keypress will complete the common part of all
    ;; completions, and the next will switch to the next completion in a cyclic
@@ -2274,7 +2212,8 @@ The provider is `nerd-icons'."
   (company-dabbrev-code-completion-styles '(basic flex))
   (company-ispell-dictionary
    (expand-file-name "wordlist.5" sb/extras-directory))
-  (company-show-quick-access t "Speed up selecting a completion")
+  ;; Speed up selecting a completion, showing the access keys on the left makes them easily discernible.
+  (company-show-quick-access 'left)
   (company-tooltip-align-annotations t)
   (company-global-modes
    '(not dired-mode
@@ -2327,13 +2266,13 @@ The provider is `nerd-icons'."
 ;;   :after company
 ;;   :init (company-statistics-mode 1))
 
-;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
-;; active in latex math environments and latex math symbols
-;; (`company-math-symbols-latex') is not available outside of math latex
-;; environments
-(use-package company-math
-  :after (:all tex-mode company)
-  :demand t)
+;; ;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
+;; ;; active in latex math environments and latex math symbols
+;; ;; (`company-math-symbols-latex') is not available outside of math latex
+;; ;; environments
+;; (use-package company-math
+;;   :after (:all tex-mode company)
+;;   :demand t)
 
 ;; Complete in the middle of words
 (use-package company-anywhere
@@ -2356,11 +2295,18 @@ The provider is `nerd-icons'."
 
 ;; Enables completion of C/C++ header file names
 (use-package company-c-headers
+  :preface
+  (defun sb/directory-exists-p (dir)
+    "Return non-nil if DIR exists and is a directory.
+DIR can be relative or absolute."
+    (and (stringp dir) (file-directory-p (expand-file-name dir))))
   :after (company cc-mode)
   :demand t
-  :custom
-  (company-c-headers-path-system
-   '("/usr/include/c++/11" "/usr/include" "/usr/local/include")))
+  :config
+  (when (sb/directory-exists-p "/usr/include/c++/13")
+    (add-to-list 'company-c-headers-path-system "/usr/include/c++/13"))
+  (when (sb/directory-exists-p "/usr/include/c++/11")
+    (add-to-list 'company-c-headers-path-system "/usr/include/c++/11")))
 
 ;; Incompatible with the tags file generated by Citre, works if the tags file is
 ;; generated independently with "ctags -R .".
@@ -2368,29 +2314,29 @@ The provider is `nerd-icons'."
 ;;   :after (company prog-mode)
 ;;   :demand t)
 
-(use-package company-auctex
-  :after (company tex)
-  :demand t
-  :commands
-  (company-auctex-bibs
-   company-auctex-environments
-   company-auctex-labels
-   company-auctex-macros
-   company-auctex-symbols))
+;; (use-package company-auctex
+;;   :after (company tex)
+;;   :demand t
+;;   :commands
+;;   (company-auctex-bibs
+;;    company-auctex-environments
+;;    company-auctex-labels
+;;    company-auctex-macros
+;;    company-auctex-symbols))
 
-;; Uses RefTeX to complete label references and citations. When working with
-;; multi-file documents, ensure that the variable `TeX-master' is appropriately
-;; set in all files, so that RefTeX can find citations across documents.
-(use-package company-reftex
-  :after (company tex)
-  :demand t
-  :custom
-  ;; https://github.com/TheBB/company-reftex/pull/13
-  (company-reftex-labels-parse-all nil))
+;; ;; Uses RefTeX to complete label references and citations. When working with
+;; ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
+;; ;; set in all files, so that RefTeX can find citations across documents.
+;; (use-package company-reftex
+;;   :after (company tex)
+;;   :demand t
+;;   :custom
+;;   ;; https://github.com/TheBB/company-reftex/pull/13
+;;   (company-reftex-labels-parse-all nil))
 
-(use-package company-bibtex
-  :after (company tex)
-  :demand t)
+;; (use-package company-bibtex
+;;   :after (company tex)
+;;   :demand t)
 
 ;; Notes on how to set up `company-backends'.
 
@@ -2462,28 +2408,32 @@ The provider is `nerd-icons'."
     (defun sb/company-latex-mode ()
       (make-local-variable 'company-backends)
 
-      ;; `company-capf' with Texlab does not pass to later backends, so it makes
-      ;; it difficult to complete non-LaTeX commands (e.g. words) which is the
-      ;; majority.
-      (setq company-backends
-            '( ;;company-bibtex
-              ;; company-auctex-bibs
-              ;; company-reftex-citations
-              ;; (company-reftex-labels company-auctex-labels)
-              ;; (company-latex-commands
-              ;; company-auctex-symbols company-auctex-environments
-              ;; company-auctex-macros
-              ;; Math latex tags
-              ;; company-math-symbols-latex
-              ;; Math Unicode symbols and sub(super)scripts
-              ;; company-math-symbols-unicode)
-              (company-capf
-               company-files
-               company-dict
-               company-ispell
-               company-dabbrev
-               company-yasnippet
-               :separate))))
+      ;; `company-capf' with Texlab does not pass to later backends if it
+      ;; returns any result (even an empty list). So it makes it difficult to
+      ;; complete non-LaTeX commands (e.g., words) which is the majority. By
+      ;; combining it in a single group with :separate, the following code
+      ;; forces all listed backends to be queried regardless of what
+      ;; `company-capf' returns.
+
+      (setq-local company-backends
+                  '( ;;company-bibtex
+                    ;; company-auctex-bibs
+                    ;; company-reftex-citations
+                    ;; (company-reftex-labels company-auctex-labels)
+                    ;; (company-latex-commands
+                    ;; company-auctex-symbols company-auctex-environments
+                    ;; company-auctex-macros
+                    ;; Math latex tags
+                    ;; company-math-symbols-latex
+                    ;; Math Unicode symbols and sub(super)scripts
+                    ;; company-math-symbols-unicode)
+                    (company-capf
+                     company-files
+                     company-dict
+                     company-ispell
+                     company-dabbrev
+                     company-yasnippet
+                     :separate))))
 
     (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
 
@@ -5327,6 +5277,15 @@ or the major mode is not in `sb/skippable-modes'."
      ("f" "Consult fd" consult-fd)
      ("l" "Consult locate" consult-locate)]])
   (bind-key "C-c s" #'sb/search-transient)
+
+  (transient-define-prefix
+   sb/dotemacs-transient () "Config-specific keybindings"
+   [["Config-specific keybindings" ("k"
+      "Describe personal keybindings"
+      describe-personal-keybindings)
+     ("t" "Tramp targets" consult-tramp) ("s" "Sudo edit" crux-sudo-edit)
+     ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)]])
+  (bind-key "C-c d" #'sb/dotemacs-transient)
 
   (with-eval-after-load "smerge-mode"
     (transient-define-prefix
