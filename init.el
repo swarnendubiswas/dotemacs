@@ -115,8 +115,6 @@ The provider is `nerd-icons'."
 ;; which provides a much prettier API for manipulating keymaps than `define-key'
 ;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
 ;; "C-h m" shows the keybindings for the major and the minor modes.
-(with-eval-after-load "bind-key"
-  (bind-key "C-c d k" #'describe-personal-keybindings))
 
 (use-package diminish
   :ensure (:wait t)
@@ -1078,7 +1076,7 @@ The provider is `nerd-icons'."
 ;; config, known hosts, and docker containers.
 (use-package consult-tramp
   :ensure (:host github :repo "Ladicle/consult-tramp")
-  :bind ("C-c d t" . consult-tramp))
+  :commands consult-tramp)
 
 (use-package ispell
   :ensure nil
@@ -1195,13 +1193,15 @@ The provider is `nerd-icons'."
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
-;; `change-inner "' allows to kill the string contents, `change-outer "' will
-;; kill the entire string.
+;; Change the contents inside pairs like parentheses, quotes, brackets, or
+;; custom delimiters. `change-inner "' allows to kill the string contents,
+;; `change-outer "' will kill the entire string including quotes.
 (use-package change-inner
   :commands (change-inner change-outer))
 
+;; Mark current line. 
 (use-package expand-line
-  :bind ("M-i" . turn-on-expand-line-mode)
+  :bind ("M-i" . expand-line-mark-line)
   :diminish)
 
 ;; Restore point to the initial location with "C-g" after marking a region
@@ -1272,11 +1272,9 @@ The provider is `nerd-icons'."
 
 (use-package crux
   :bind
-  (("C-c d s" . crux-sudo-edit)
-   ("C-<f9>" . crux-recentf-find-directory)
+  (("C-<f9>" . crux-recentf-find-directory)
    ("C-<f11>" . crux-kill-other-buffers)
-   ([remap keyboard-quit] . crux-keyboard-quit-dwim)
-   ("C-c d i" . crux-ispell-word-then-abbrev))
+   ([remap keyboard-quit] . crux-keyboard-quit-dwim))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 ;; (use-package rainbow-mode
@@ -1340,13 +1338,14 @@ The provider is `nerd-icons'."
 
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
-  :commands isearch-backward-symbol-at-point
-  :bind
-  (("M-s ." . isearch-symbol-at-point)
-   ("M-s _" . isearch-forward-symbol)
-   :map
-   isearch-mode-map
-   ("C-d" . isearch-forward-symbol-at-point)))
+  :commands
+  ( ;; Starts an incremental search using the symbol under point as the initial
+   ;; search string and searches forward by default unless `isearch-backward' was active.
+   isearch-symbol-at-point
+   ;; Will not match substrings, so foo will not match foobar.
+   isearch-forward-symbol
+   isearch-forward-symbol-at-point
+   isearch-backward-symbol-at-point))
 
 (with-eval-after-load "grep"
   (setopt
@@ -1755,9 +1754,13 @@ The provider is `nerd-icons'."
   (hippie-expand-verbose nil)
   :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
 
+;; `hotfuzz' is faster than `flex' (built-in) for large candidate sets
+(use-package hotfuzz
+  :demand t)
+
 ;; Use "M-SPC" for space-separated completion lookups.
 (use-package orderless
-  :when (eq sb/in-buffer-completion 'corfu)
+  :after hotfuzz
   :demand t
   :config
   (with-eval-after-load "company"
@@ -1765,10 +1768,6 @@ The provider is `nerd-icons'."
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
     (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
-
-(use-package hotfuzz
-  :when (eq sb/in-buffer-completion 'company)
-  :demand t)
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -1778,6 +1777,7 @@ The provider is `nerd-icons'."
 ;; "orderless" can match search terms in any order.
 (use-package minibuffer
   :ensure nil
+  :after orderless
   :bind
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
@@ -1793,17 +1793,13 @@ The provider is `nerd-icons'."
     (setopt completions-detailed t))
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
-  (with-eval-after-load "orderless"
-    ;; substring is needed to complete common prefix, orderless does not
-    (setopt completion-styles '(orderless substring partial-completion basic)))
 
-  (with-eval-after-load "hotfuzz"
-    (setopt completion-styles '(hotfuzz)))
-
-  ;; The "basic" completion style needs to be tried first for TRAMP hostname
-  ;; completion to work. I also want substring matching for file names.
-  (setopt completion-category-overrides
-          '((file (styles basic partial-completion)))))
+  (setopt
+   completion-styles '(hotfuzz orderless)
+   completion-category-defaults nil
+   ;; The "basic" completion style needs to be tried first for TRAMP hostname
+   ;; completion to work. I also want substring matching for file names.
+   completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
@@ -2167,15 +2163,14 @@ The provider is `nerd-icons'."
   :when (eq sb/in-buffer-completion 'company)
   :hook (emacs-startup . global-company-mode)
   :bind
-  (("C-M-/" . company-other-backend) ; Invoke the next backend
-   :map
+  (:map
    company-active-map
-   ("C-M-/" . company-other-backend)
+   ("C-M-/" . company-other-backend) ; Invoke the next backend
    ("C-;" . company-other-backend)
    ("C-s" . company-search-candidates)
    ("C-f" . company-filter-candidates)
    ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
-   ;; "TAB"). First TAB keypress will complete the common part of all
+   ;; "TAB"). First TAB key press will complete the common part of all
    ;; completions, and the next will switch to the next completion in a cyclic
    ;; fashion, meaning that if you reach the end you continue from the top.
    ;; S-TAB will go in reverse direction.
@@ -2189,15 +2184,7 @@ The provider is `nerd-icons'."
     (lambda ()
       (interactive)
       (company-complete-common-or-cycle -1)))
-   ;; ([escape]
-   ;;  .
-   ;;     (lambda ()
-   ;;       (interactive)
-   ;;    (company-abort)))
-   ;; ("ESCAPE" .
-   ;;     (lambda ()
-   ;;       (interactive)
-   ;;    (company-abort)))
+   ([escape] . company-abort)
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
    :map
@@ -2591,10 +2578,8 @@ DIR can be relative or absolute."
   (add-hook
    'corfu-mode-hook
    (lambda ()
-     (setq-local
-      completion-styles '(basic)
-      completion-category-defaults nil
-      completion-category-overrides '((consult-location (styles . (orderless)))))))
+     (setq-local completion-category-overrides
+                 '((consult-location (styles . (orderless)))))))
   (add-hook 'python-ts-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
@@ -5264,9 +5249,10 @@ or the major mode is not in `sb/skippable-modes'."
   (transient-define-prefix
    sb/search-transient () "Search commands"
    [["Isearch"
-     ("i" "Isearch forward" isearch-forward)
-     ("b" "Isearch backward" isearch-backward)
-     ("w" "Isearch symbol at point" isearch-symbol-at-point)
+     ("i" "Forward" isearch-forward)
+     ("b" "Backward" isearch-backward)
+     ("s" "Symbol at point" isearch-symbol-at-point)
+     ("w" "Forward symbol at point" isearch-forward-symbol-at-point)
      ;; During an Isearch session, this command picks a search string from
      ;; history and continues the search with the newly selected string. Outside
      ;; of Isearch, the command allows you to pick a string from the history and
