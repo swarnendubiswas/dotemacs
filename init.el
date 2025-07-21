@@ -2540,6 +2540,12 @@ DIR can be relative or absolute."
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
 (use-package corfu
+  :preface
+  (defun sb/corfu-default-setup ()
+    ;; The right edge is getting cut off with `corfu-indexed-mode'
+    (corfu-history-mode 1)
+    (corfu-echo-mode 1)
+    (corfu-popupinfo-mode 1))
   :ensure
   (corfu
    :files (:defaults "extensions/*")
@@ -2547,17 +2553,7 @@ DIR can be relative or absolute."
    (corfu-info
     corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
   :when (eq sb/in-buffer-completion 'corfu)
-  :hook
-  ((emacs-startup . global-corfu-mode)
-   (corfu-mode
-    .
-    (lambda ()
-      (corfu-history-mode 1)
-      (corfu-echo-mode 1)
-      (corfu-popupinfo-mode 1)
-      ;; The right edge is getting cut off
-      ;; (corfu-indexed-mode 1)
-      )))
+  :hook ((emacs-startup . global-corfu-mode) (corfu-mode . sb/corfu-default-setup))
   :bind
   (:map
    corfu-map
@@ -2599,6 +2595,7 @@ DIR can be relative or absolute."
   :after (yasnippet corfu)
   :demand t)
 
+;; CAPE for composable CAPFs (with LSP + extra sources)
 (use-package cape
   :after corfu
   :demand t
@@ -2609,23 +2606,9 @@ DIR can be relative or absolute."
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   :config
-  ;; Make the capf composable
-  (with-eval-after-load "lsp-mode"
-    (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
-    (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
-    (advice-add #'lsp-completion-at-point :around #'cape-wrap-buster))
-
-  (with-eval-after-load "eglot"
-    (advice-add
-     #'eglot-completion-at-point
-     :around #'cape-wrap-noninterruptible)
-    (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
-    (advice-add #'eglot-completion-at-point :around #'cape-wrap-buster))
-
-  ;; Initialize for all generic languages that are not specifically handled. The
-  ;; order of the functions matters, unless they are merged, the first function
-  ;; returning a result wins. Note that the list of buffer-local completion
-  ;; functions takes precedence over the global list.
+  (defun sb/setup-capf (&rest capfs)
+    "Set `completion-at-point-functions' buffer-locally."
+    (setq-local completion-at-point-functions capfs))
 
   ;; File completion with `cape-file' is available in comments and string
   ;; literals, but not in normal code.
@@ -2634,152 +2617,96 @@ DIR can be relative or absolute."
   ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
   ;; completions like `cape-file'.
 
-  (add-hook
-   'prog-mode-hook
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  (cape-capf-inside-code
-                   (cape-capf-super
-                    #'cape-keyword (cape-capf-prefix-length #'cape-dabbrev 4)))
-                  (cape-capf-inside-comment #'cape-dict)
-                  #'cape-dabbrev
-                  #'cape-file
-                  #'yasnippet-capf))))
-
-  ;; Override CAPFS for specific major modes
-  (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local completion-at-point-functions
-                   (list
-                    (cape-capf-inside-code
-                     (cape-capf-super
-                      #'elisp-completion-at-point
-                      #'cape-elisp-symbol
-                      (cape-capf-prefix-length #'cape-dabbrev 4)))
-                    (cape-capf-inside-comment #'cape-dict)
-                    #'cape-dabbrev
-                    #'cape-file
-                    #'yasnippet-capf)))))
+  ;; Initialize for all generic languages that are not specifically handled. The
+  ;; order of the functions matters, unless they are merged, the first function
+  ;; returning a result wins. Note that the list of buffer-local completion
+  ;; functions takes precedence over the global list.
 
   ;; https://github.com/minad/cape/discussions/130
   ;; There is no mechanism to force deduplication if candidates from `cape-dict'
   ;; and `cape-dabbrev' are not exactly equal (equal string and equal text
   ;; properties).
 
-  (setq completion-at-point-functions
-        (list #'cape-dict #'cape-dabbrev #'cape-file))
+  (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file)
 
-  (add-hook
-   'text-mode-hook
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
+  (dolist (hook (text-mode-hook markdown-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       (sb/setup-capf
+        #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
    (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  #'cape-elisp-block
-                  #'cape-dict
-                  #'cape-dabbrev
-                  #'cape-file
-                  #'yasnippet-capf))))
+     (sb/setup-capf
+      #'cape-elisp-block
+      #'cape-dict
+      #'cape-dabbrev
+      #'cape-file
+      #'yasnippet-capf)))
 
-  (when (eq sb/lsp-provider 'eglot)
-    (dolist (mode '(LaTeX-mode-hook bibtex-mode-hook))
-      (add-hook
-       mode
-       (lambda ()
-         (add-hook
-          'eglot-managed-mode-hook
-          (lambda ()
-            (setq-local
-             completion-at-point-functions
-             (list
-              (cape-capf-super
-               ;; Math latex tags
-               (cape-company-to-capf #'company-math-symbols-latex)
-               ;; Math Unicode symbols and sub(super)scripts
-               (cape-company-to-capf #'company-math-symbols-unicode)
-               (cape-company-to-capf #'company-latex-commands)
-               ;; Used for Unicode symbols and not for the corresponding LaTeX
-               ;; names.
-               #'cape-tex)
-              (cape-capf-super #'citar-capf #'bibtex-capf)
-              #'cape-dict
-              #'cape-dabbrev
-              #'cape-file
-              #'yasnippet-capf))))))))
+  (add-hook
+   'prog-mode-hook
+   (lambda ()
+     (sb/setup-capf
+      (cape-capf-inside-code (cape-capf-super #'cape-keyword #'cape-dabbrev))
+      (cape-capf-inside-comment #'cape-dict)
+      #'cape-dabbrev
+      #'cape-file
+      #'yasnippet-capf)))
 
-  (when (eq sb/lsp-provider 'lsp-mode)
-    (dolist (mode '(LaTeX-mode-hook bibtex-mode-hook))
-      (add-hook
-       mode
-       (lambda ()
-         (setq-local
-          completion-at-point-functions
-          (list
-           (cape-capf-super
-            ;; Math latex tags
-            (cape-company-to-capf #'company-math-symbols-latex)
-            ;; Math Unicode symbols and sub(super)scripts
-            (cape-company-to-capf #'company-math-symbols-unicode)
-            (cape-company-to-capf #'company-latex-commands)
-            ;; Used for Unicode symbols and not for the corresponding LaTeX
-            ;; names.
-            #'cape-tex)
-           (cape-capf-super #'citar-capf #'bibtex-capf)
-           #'cape-dict
-           #'cape-dabbrev
-           #'cape-file
-           #'yasnippet-capf))))))
+  ;; LaTeX-specific CAPFs (math + bibtex)
+  (defun sb/latex-capfs ()
+    (sb/setup-capf
+     #'cape-tex
+     (cape-capf-super #'citar-capf #'bibtex-capf)
+     #'cape-dict
+     #'cape-file
+     #'cape-dabbrev
+     #'yasnippet-capf))
+  (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
+    (add-hook hook #'sb/latex-capfs))
+
+  (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (sb/setup-capf
+        (cape-capf-inside-code
+         (cape-capf-super
+          #'elisp-completion-at-point #'cape-elisp-symbol #'cape-dabbrev))
+        (cape-capf-inside-comment #'cape-dict)
+        #'cape-dabbrev
+        #'cape-file
+        #'yasnippet-capf))))
+
+  ;; ;; Make the capf composable
+  ;; (with-eval-after-load "lsp-mode"
+  ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
+  ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
+  ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-buster))
+
+  ;; (with-eval-after-load "eglot"
+  ;;   (advice-add
+  ;;    #'eglot-completion-at-point
+  ;;    :around #'cape-wrap-noninterruptible)
+  ;;   (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
+  ;;   (advice-add #'eglot-completion-at-point :around #'cape-wrap-buster))
+
+  ;; Integrate with LSP & Eglot
+  (defun sb/lsp-capfs (backend)
+    (sb/setup-capf
+     (cape-capf-inside-code
+      (cape-capf-super
+       backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
+     (cape-capf-inside-comment #'cape-dict)
+     #'cape-dabbrev
+     #'cape-file
+     #'yasnippet-capf))
 
   (with-eval-after-load "lsp-mode"
-    (dolist (mode
-             '(bash-ts-mode-hook
-               c-mode-hook
-               c-ts-mode-hook
-               c++-mode-hook
-               c++-ts-mode-hook
-               cmake-mode-hook
-               cmake-ts-mode-hook
-               css-mode-hook
-               css-ts-mode-hook
-               fish-mode-hook
-               java-mode-hook
-               java-ts-mode-hook
-               json-mode-hook
-               json-ts-mode-hook
-               jsonc-mode-hook
-               makefile-mode
-               python-mode-hook
-               python-ts-mode-hook
-               sh-mode-hook
-               yaml-mode-hook
-               yaml-ts-mode-hook))
-      (add-hook
-       mode
-       (lambda ()
-         (setq-local completion-at-point-functions
-                     (list
-                      (cape-capf-inside-code
-                       (cape-capf-super
-                        #'lsp-completion-at-point
-                        #'citre-completion-at-point
-                        #'cape-keyword
-                        (cape-capf-prefix-length #'cape-dabbrev 4)))
-                      (cape-capf-inside-comment #'cape-dict)
-                      #'cape-dabbrev
-                      #'cape-file
-                      #'yasnippet-capf))))))
-
-  (with-eval-after-load "eglot"
-    (dolist (mode
+    (dolist (hook
              '(bash-ts-mode-hook
                c-mode-hook
                c-ts-mode-hook
@@ -2801,21 +2728,32 @@ DIR can be relative or absolute."
                sh-mode-hook
                yaml-mode-hook
                yaml-ts-mode-hook))
-      (add-hook
-       mode
-       (lambda ()
-         (setq-local completion-at-point-functions
-                     (list
-                      (cape-capf-inside-code
-                       (cape-capf-super
-                        #'eglot-completion-at-point
-                        #'citre-completion-at-point
-                        #'cape-keyword
-                        (cape-capf-prefix-length #'cape-dabbrev 4)))
-                      (cape-capf-inside-comment #'cape-dict)
-                      #'cape-dabbrev
-                      #'cape-file
-                      #'yasnippet-capf)))))))
+      (add-hook hook (lambda () (sb/lsp-capfs #'lsp-completion-at-point)))))
+
+  (with-eval-after-load "eglot"
+    (dolist (hook
+             '(bash-ts-mode-hook
+               c-mode-hook
+               c-ts-mode-hook
+               c++-mode-hook
+               c++-ts-mode-hook
+               cmake-mode-hook
+               cmake-ts-mode-hook
+               css-mode-hook
+               css-ts-mode-hook
+               fish-mode-hook
+               java-mode-hook
+               java-ts-mode-hook
+               json-mode-hook
+               json-ts-mode-hook
+               jsonc-mode-hook
+               makefile-mode-hook
+               python-mode-hook
+               python-ts-mode-hook
+               sh-mode-hook
+               yaml-mode-hook
+               yaml-ts-mode-hook))
+      (add-hook hook (lambda () (sb/lsp-capfs #'eglot-completion-at-point))))))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
