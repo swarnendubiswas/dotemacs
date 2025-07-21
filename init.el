@@ -2238,6 +2238,7 @@ The provider is `nerd-icons'."
   ;;    company-pseudo-tooltip-frontend
   ;;    ;; Show selected candidate docs in echo area
   ;;    company-echo-metadata-frontend))
+  (company-require-match nil)
   :config
   ;; Autocompletion icons are distracting.
   (unless (bound-and-true-p sb/enable-icons)
@@ -2406,119 +2407,109 @@ DIR can be relative or absolute."
   ;;                        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)))
   ;;       company-transformers)
 
-  (progn
-    (defun sb/company-latex-mode ()
-      (make-local-variable 'company-backends)
+  (defun sb/company-latex-mode ()
+    ;; `company-capf' with Texlab does not pass to later backends if it
+    ;; returns any result (even an empty list). So it makes it difficult to
+    ;; complete non-LaTeX commands (e.g., words) which is the majority. By
+    ;; combining it in a single group with :separate, the following code
+    ;; forces all listed backends to be queried regardless of what
+    ;; `company-capf' returns.
 
-      ;; `company-capf' with Texlab does not pass to later backends if it
-      ;; returns any result (even an empty list). So it makes it difficult to
-      ;; complete non-LaTeX commands (e.g., words) which is the majority. By
-      ;; combining it in a single group with :separate, the following code
-      ;; forces all listed backends to be queried regardless of what
-      ;; `company-capf' returns.
+    (setq-local company-backends
+                '( ;;company-bibtex
+                  ;; company-auctex-bibs
+                  ;; company-reftex-citations
+                  ;; (company-reftex-labels company-auctex-labels)
+                  ;; (company-latex-commands
+                  ;; company-auctex-symbols company-auctex-environments
+                  ;; company-auctex-macros
+                  ;; Math latex tags
+                  ;; company-math-symbols-latex
+                  ;; Math Unicode symbols and sub(super)scripts
+                  ;; company-math-symbols-unicode)
+                  (company-capf
+                   (company-dict company-ispell)
+                   company-files
+                   company-dabbrev
+                   company-yasnippet))))
 
-      (setq-local company-backends
-                  '( ;;company-bibtex
-                    ;; company-auctex-bibs
-                    ;; company-reftex-citations
-                    ;; (company-reftex-labels company-auctex-labels)
-                    ;; (company-latex-commands
-                    ;; company-auctex-symbols company-auctex-environments
-                    ;; company-auctex-macros
-                    ;; Math latex tags
-                    ;; company-math-symbols-latex
-                    ;; Math Unicode symbols and sub(super)scripts
-                    ;; company-math-symbols-unicode)
-                    (company-capf
-                     (company-dict company-ispell)
-                     company-files
-                     company-dabbrev
-                     company-yasnippet
-                     :separate))))
+  (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
 
-    (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode))
+  (defun sb/company-org-mode ()
+    (set
+     (make-local-variable 'company-backends)
+     '(company-files
+       (company-org-block :with company-yasnippet)
+       (company-dict company-ispell)
+       company-dabbrev)))
 
-  (progn
-    (defun sb/company-org-mode ()
-      (set
-       (make-local-variable 'company-backends)
-       '(company-files
-         (company-org-block :with company-yasnippet)
-         (company-dict company-ispell)
-         company-dabbrev)))
+  (add-hook 'org-mode-hook #'sb/company-org-mode)
 
-    (add-hook 'org-mode-hook #'sb/company-org-mode))
+  (defun sb/company-text-mode ()
+    "Add backends for `text-mode' completion in company mode."
+    (set
+     (make-local-variable 'company-backends)
+     '(company-files (company-dict company-ispell) company-dabbrev)))
 
-  (progn
-    (defun sb/company-text-mode ()
-      "Add backends for `text-mode' completion in company mode."
-      (set
-       (make-local-variable 'company-backends)
-       '(company-files (company-dict company-ispell) company-dabbrev)))
+  ;; Extends to derived modes like `markdown-mode' 
+  (add-hook
+   'text-mode-hook
+   (lambda ()
+     (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
+       (sb/company-text-mode))))
 
-    ;; Extends to derived modes like `markdown-mode' 
+  ;; (defun sb/company-yaml-mode ()
+  ;;   (setq-local company-backends
+  ;;               '((company-capf
+  ;;                  company-dabbrev-code ; Useful for variable names
+  ;;                  :with company-yasnippet)
+  ;;                 company-files
+  ;;                 (company-dict company-ispell)
+  ;;                 company-dabbrev)))
+
+  ;; (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
+  ;;   (add-hook mode #'sb/company-yaml-mode))
+
+  ;; (defun sb/company-html-mode ()
+  ;;   (set
+  ;;    (make-local-variable 'company-backends)
+  ;;    '((company-capf :with company-yasnippet)
+  ;;      company-files
+  ;;      (company-dict company-ispell)
+  ;;      company-dabbrev)))
+
+  ;; (dolist (hook '(html-mode-hook html-ts-mode-hook))
+  ;;   (add-hook hook #'sb/company-html-mode))
+
+  (defun sb/company-c-mode ()
+    (setq-local company-backends
+                '(company-capf
+                  company-c-headers
+                  company-files
+                  (company-dict company-ispell)
+                  company-dabbrev)))
+
+  (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
     (add-hook
-     'text-mode-hook
+     hook
      (lambda ()
-       (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
-         (sb/company-text-mode)))))
+       (setq-local company-minimum-prefix-length 2)
+       (sb/company-c-mode))))
 
-  (progn
-    (defun sb/company-yaml-mode ()
-      (make-local-variable 'company-backends)
-      (setq-local company-backends
-                  '((company-capf
-                     company-dabbrev-code ; Useful for variable names
-                     :with company-yasnippet)
-                    company-files
-                    (company-dict company-ispell)
-                    company-dabbrev)))
+  ;; (progn
+  ;;   (defun sb/company-python-mode ()
+  ;;     (setq-local company-backends
+  ;;                 '(company-capf
+  ;;                   company-files
+  ;;                   (company-dict company-ispell)
+  ;;                   company-dabbrev)))
 
-    (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
-      (add-hook mode #'sb/company-yaml-mode)))
-
-  (progn
-    (defun sb/company-html-mode ()
-      (set
-       (make-local-variable 'company-backends)
-       '((company-capf :with company-yasnippet)
-         company-files
-         (company-dict company-ispell)
-         company-dabbrev)))
-
-    (dolist (hook '(html-mode-hook html-ts-mode-hook))
-      (add-hook hook #'sb/company-html-mode)))
-
-  (progn
-    (defun sb/company-c-mode ()
-      (setq-local company-backends
-                  '(company-capf
-                    company-c-headers
-                    company-files
-                    (company-dict company-ispell)
-                    company-dabbrev)))
-
-    (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
-      (add-hook
-       hook
-       (lambda ()
-         (setq-local company-minimum-prefix-length 2)
-         (sb/company-c-mode)))))
-
-  (progn
-    (defun sb/company-python-mode ()
-      (setq-local company-backends
-                  '(company-capf
-                    company-files
-                    (company-dict company-ispell)
-                    company-dabbrev)))
-
-    (dolist (hook '(python-mode-hook python-ts-mode-hook))
-      (add-hook
-       hook
-       (lambda ()
-         (setq-local company-minimum-prefix-length 2)
-         (sb/company-python-mode)))))
+  ;;   (dolist (hook '(python-mode-hook python-ts-mode-hook))
+  ;;     (add-hook
+  ;;      hook
+  ;;      (lambda ()
+  ;;        (setq-local company-minimum-prefix-length 2)
+  ;;        (sb/company-python-mode)))))
 
   ;; (progn
   ;;   (defun sb/company-prog-mode ()
@@ -2542,22 +2533,22 @@ DIR can be relative or absolute."
   ;;        (setq-local company-minimum-prefix-length 2)
   ;;        (sb/company-prog-mode)))))
 
-  (progn
-    (defun sb/company-elisp-mode ()
-      (setq-local company-backends
-                  '((company-capf :with company-yasnippet)
-                    company-keywords
-                    company-dabbrev-code ; Useful for variable names
-                    company-files
-                    (company-dict company-ispell)
-                    company-dabbrev)))
+  ;; (defun sb/company-elisp-mode ()
+  ;;   (setq-local company-backends
+  ;;               '((company-capf :with company-yasnippet)
+  ;;                 company-keywords
+  ;;                 company-dabbrev-code ; Useful for variable names
+  ;;                 company-files
+  ;;                 (company-dict company-ispell)
+  ;;                 company-dabbrev)))
 
-    (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-      (add-hook
-       hook
-       (lambda ()
-         (setq-local company-minimum-prefix-length 2)
-         (sb/company-elisp-mode))))))
+  ;; (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
+  ;;   (add-hook
+  ;;    hook
+  ;;    (lambda ()
+  ;;      (setq-local company-minimum-prefix-length 2)
+  ;;      (sb/company-elisp-mode))))
+  )
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
