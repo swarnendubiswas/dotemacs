@@ -2346,12 +2346,12 @@ DIR can be relative or absolute."
 ;; a non-nil prefix in almost any context (major mode, inside strings, or
 ;; comments). That is why it is better to put `company-dabbrev' at the end. The
 ;; ‘prefix’ bool command always returns non-nil for following backends even when
-;; their ‘candidates’ list command is empty: `company-abbrev',
-;; `company-dabbrev', `company-dabbrev-code'.
+;; their candidates list command is empty: `company-abbrev', `company-dabbrev',
+;; `company-dabbrev-code'.
 
 ;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
 ;; backends. Only a few backends are specialized on certain major modes or
-;; certain contexts (e.g. outside of strings and comments), and pass on control
+;; certain contexts (e.g., outside of strings and comments), and pass on control
 ;; to later backends when outside of that major mode or context.
 
 ;; The keyword ":with" helps to make sure the results from major/minor mode
@@ -2359,12 +2359,12 @@ DIR can be relative or absolute."
 ;; returned without preventing results from context-aware backends (such as
 ;; `company-capf' or `company-clang'). For this feature to work, put backends
 ;; dependent on a mode at the beginning of the grouped backends list, then put a
-;; keyword ":with", and then put context agnostic backend(s).
+;; keyword ":with", and then put context-agnostic backend(s).
 
 ;; Company does not support grouping of entirely arbitrary backends, they need
 ;; to be compatible in what `prefix' returns. If the group contains keyword
-;; `:with', the backends listed after this keyword are ignored for the purpose
-;; of the `prefix' command. If the group contains keyword `:separate', the
+;; `:with', the backends listed after the keyword are ignored for the purpose of
+;; the `prefix' command. If the group contains keyword `:separate', the
 ;; candidates that come from different backends are sorted separately in the
 ;; combined list. That is, with `:separate', the multi-backend-adapter will stop
 ;; sorting and keep the order of completions just like the backends returned
@@ -2376,6 +2376,9 @@ DIR can be relative or absolute."
 ;; Merge completions of all the backends:
 ;; (setq company-backends '((company-xxx company-yyy company-zzz)))
 
+;; Both the backends will generate completions at the same time, and their
+;; results will be merged. Company treats the result as coming from a single
+;; backend.
 ;; (setq company-backends '((company-capf :with company-yasnippet)))
 
 ;; Merge completions of all the backends but keep the candidates organized in
@@ -2386,12 +2389,11 @@ DIR can be relative or absolute."
   ;; Override `company-backends' for unhandled major modes.
   (setopt
    company-backends
-   '(company-files
-     (company-capf
-      :separate
-      company-dabbrev-code
+   '((company-capf
       company-keywords
+      company-dabbrev-code
       :with company-yasnippet)
+     company-files
      ;; If we have `company-dabbrev' first, then other matches from
      ;; `company-ispell' will be ignored.
      (company-dict company-ispell) company-dabbrev)
@@ -2428,9 +2430,8 @@ DIR can be relative or absolute."
                     ;; Math Unicode symbols and sub(super)scripts
                     ;; company-math-symbols-unicode)
                     (company-capf
+                     (company-dict company-ispell)
                      company-files
-                     company-dict
-                     company-ispell
                      company-dabbrev
                      company-yasnippet
                      :separate))))
@@ -2455,23 +2456,23 @@ DIR can be relative or absolute."
        (make-local-variable 'company-backends)
        '(company-files (company-dict company-ispell) company-dabbrev)))
 
-    ;; Extends to derived modes like `markdown-mode' and `org-mode'
+    ;; Extends to derived modes like `markdown-mode' 
     (add-hook
      'text-mode-hook
      (lambda ()
-       (unless (derived-mode-p 'LaTeX-mode)
+       (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
          (sb/company-text-mode)))))
 
   (progn
     (defun sb/company-yaml-mode ()
       (make-local-variable 'company-backends)
       (setq-local company-backends
-                  '(company-files
-                    (company-capf
-                     :separate
+                  '((company-capf
                      company-dabbrev-code ; Useful for variable names
                      :with company-yasnippet)
-                    (company-dict company-ispell) company-dabbrev)))
+                    company-files
+                    (company-dict company-ispell)
+                    company-dabbrev)))
 
     (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
       (add-hook mode #'sb/company-yaml-mode)))
@@ -2480,8 +2481,8 @@ DIR can be relative or absolute."
     (defun sb/company-html-mode ()
       (set
        (make-local-variable 'company-backends)
-       '(company-files
-         (company-capf :with company-yasnippet)
+       '((company-capf :with company-yasnippet)
+         company-files
          (company-dict company-ispell)
          company-dabbrev)))
 
@@ -2489,59 +2490,74 @@ DIR can be relative or absolute."
       (add-hook hook #'sb/company-html-mode)))
 
   (progn
-    (defun sb/company-lsp-mode ()
+    (defun sb/company-c-mode ()
       (setq-local company-backends
-                  '(company-files
-                    (company-capf :separate company-c-headers)
-                    company-ispell
+                  '(company-capf
+                    company-c-headers
+                    company-files
+                    (company-dict company-ispell)
                     company-dabbrev)))
 
-    (dolist (hook
-             '(c-mode-hook
-               c-ts-mode-hook
-               c++-mode-hook
-               c++-ts-mode-hook
-               python-mode-hook
-               python-ts-mode-hook))
+    (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
       (add-hook
        hook
        (lambda ()
          (setq-local company-minimum-prefix-length 2)
-         (sb/company-lsp-mode)))))
+         (sb/company-c-mode)))))
 
   (progn
-    (defun sb/company-prog-mode ()
+    (defun sb/company-python-mode ()
       (setq-local company-backends
-                  '(company-files
-                    (company-capf
-                     :separate company-keywords company-c-headers
-                     company-dabbrev-code ; Useful for variable names
-                     :with company-yasnippet)
-                    company-ispell company-dabbrev)))
+                  '(company-capf
+                    company-files
+                    (company-dict company-ispell)
+                    company-dabbrev)))
 
-    (add-hook
-     'prog-mode-hook
-     (lambda ()
-       (unless (or (derived-mode-p 'emacs-lisp-mode)
-                   (derived-mode-p 'lisp-data-mode)
-                   (derived-mode-p 'flex-mode)
-                   (derived-mode-p 'bison-mode)
-                   (derived-mode-p 'cmake-ts-mode))
+    (dolist (hook '(python-mode-hook python-ts-mode-hook))
+      (add-hook
+       hook
+       (lambda ()
          (setq-local company-minimum-prefix-length 2)
-         (sb/company-prog-mode)))))
+         (sb/company-python-mode)))))
+
+  ;; (progn
+  ;;   (defun sb/company-prog-mode ()
+  ;;     (setq-local company-backends
+  ;;                 '((company-capf
+  ;;                    company-keywords
+  ;;                    company-dabbrev-code ; Useful for variable names
+  ;;                    :with company-yasnippet)
+  ;;                   company-files
+  ;;                   (company-ispell company-dict)
+  ;;                   company-dabbrev)))
+
+  ;;   (add-hook
+  ;;    'prog-mode-hook
+  ;;    (lambda ()
+  ;;      (unless (or (derived-mode-p 'emacs-lisp-mode)
+  ;;                  (derived-mode-p 'lisp-data-mode)
+  ;;                  (derived-mode-p 'flex-mode)
+  ;;                  (derived-mode-p 'bison-mode)
+  ;;                  (derived-mode-p 'cmake-ts-mode))
+  ;;        (setq-local company-minimum-prefix-length 2)
+  ;;        (sb/company-prog-mode)))))
 
   (progn
     (defun sb/company-elisp-mode ()
       (setq-local company-backends
-                  '(company-files
-                    (company-capf
-                     :separate company-keywords
-                     company-dabbrev-code ; Useful for variable names
-                     :with company-yasnippet)
-                    (company-dict company-ispell) company-dabbrev)))
+                  '((company-capf :with company-yasnippet)
+                    company-keywords
+                    company-dabbrev-code ; Useful for variable names
+                    company-files
+                    (company-dict company-ispell)
+                    company-dabbrev)))
 
     (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-      (add-hook hook #'sb/company-elisp-mode))))
+      (add-hook
+       hook
+       (lambda ()
+         (setq-local company-minimum-prefix-length 2)
+         (sb/company-elisp-mode))))))
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
