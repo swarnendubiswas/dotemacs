@@ -519,7 +519,7 @@ The provider is `nerd-icons'."
   ;; (ediff-keep-variants nil)
   :config
   (ediff-set-diff-options 'ediff-diff-options "-w")
-  (with-eval-after-load "winner"
+  (with-eval-after-load 'winner
     (add-hook 'ediff-cleanup-hook #'winner-undo)))
 
 ;; To edit remote files, use "/method:user@host#port:filename".
@@ -1014,7 +1014,7 @@ The provider is `nerd-icons'."
   ;;  consult-line-thing-at-point
   ;;  :initial (thing-at-point 'symbol))
 
-  (with-eval-after-load "latex"
+  (with-eval-after-load 'latex
     (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map)))
 
 ;; Easily add file and directory paths into the minibuffer.
@@ -1347,7 +1347,7 @@ The provider is `nerd-icons'."
    isearch-forward-symbol-at-point
    isearch-backward-symbol-at-point))
 
-(with-eval-after-load "grep"
+(with-eval-after-load 'grep
   (setopt
    grep-command "grep --color -irHn "
    grep-highlight-matches t
@@ -1382,7 +1382,7 @@ The provider is `nerd-icons'."
    ("C-x C-q" . wgrep-exit))
   :custom (wgrep-auto-save-buffer t)
   :config
-  (with-eval-after-load "deadgrep"
+  (with-eval-after-load 'deadgrep
     (bind-key "e" #'wgrep-change-to-wgrep-mode deadgrep-mode-map)))
 
 ;; Allows you to edit a deadgrep buffer and apply those changes to the file
@@ -1440,7 +1440,7 @@ The provider is `nerd-icons'."
   (magit-save-repository-buffers 'dontask)
   ;; Do not show the diff by default in the commit buffer.
   (magit-commit-show-diff nil)
-  (with-eval-after-load "magit-diff"
+  (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
     (magit-diff-refine-hunk t)
     (magit-format-file-function #'magit-format-file-nerd-icons)))
@@ -1468,7 +1468,7 @@ The provider is `nerd-icons'."
   :config
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
-  (with-eval-after-load "magit"
+  (with-eval-after-load 'magit
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
 
@@ -1656,9 +1656,9 @@ The provider is `nerd-icons'."
 ;;                   ("Shell" (shfmt "-i" "4" "-ci"))
 ;;                   ("XML" tidy)
 ;;                   ("YAML" prettier "--print-width" "80")))
-;;   (with-eval-after-load "markdown-mode"
+;;   (with-eval-after-load 'markdown-mode
 ;;     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
-;;   (with-eval-after-load "tex"
+;;   (with-eval-after-load 'tex
 ;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 ;;   :diminish)
 
@@ -1763,7 +1763,7 @@ The provider is `nerd-icons'."
   :after hotfuzz
   :demand t
   :config
-  (with-eval-after-load "company"
+  (with-eval-after-load 'company
     (defun sb/just-one-face (fn &rest args)
       (let ((orderless-match-faces [completions-common-part]))
         (apply fn args)))
@@ -1809,7 +1809,7 @@ The provider is `nerd-icons'."
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
   :config
-  (with-eval-after-load "hippie-expand"
+  (with-eval-after-load 'hippie-expand
     (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
   (unbind-key "<tab>" yas-minor-mode-map)
   :diminish yas-minor-mode)
@@ -2373,7 +2373,7 @@ DIR can be relative or absolute."
 ;; accordance with the grouped backends order.
 ;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
-(with-eval-after-load "company"
+(with-eval-after-load 'company
   ;; Override `company-backends' for unhandled major modes.
   (setopt
    company-backends
@@ -2682,12 +2682,12 @@ DIR can be relative or absolute."
         #'yasnippet-capf))))
 
   ;; ;; Make the capf composable
-  ;; (with-eval-after-load "lsp-mode"
+  ;; (with-eval-after-load 'lsp-mode
   ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
   ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
   ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-buster))
 
-  ;; (with-eval-after-load "eglot"
+  ;; (with-eval-after-load 'eglot
   ;;   (advice-add
   ;;    #'eglot-completion-at-point
   ;;    :around #'cape-wrap-noninterruptible)
@@ -2705,7 +2705,7 @@ DIR can be relative or absolute."
      #'cape-file
      #'yasnippet-capf))
 
-  (with-eval-after-load "lsp-mode"
+  (with-eval-after-load 'lsp-mode
     (dolist (hook
              '(bash-ts-mode-hook
                c-mode-hook
@@ -2730,7 +2730,7 @@ DIR can be relative or absolute."
                yaml-ts-mode-hook))
       (add-hook hook (lambda () (sb/lsp-capfs #'lsp-completion-at-point)))))
 
-  (with-eval-after-load "eglot"
+  (with-eval-after-load 'eglot
     (dolist (hook
              '(bash-ts-mode-hook
                c-mode-hook
@@ -2764,11 +2764,11 @@ DIR can be relative or absolute."
   :hook (emacs-startup . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t)
   :config
-  (with-eval-after-load "corfu"
+  (with-eval-after-load 'corfu
     (corfu-prescient-mode 1))
-  (with-eval-after-load "vertico"
+  (with-eval-after-load 'vertico
     (vertico-prescient-mode 1))
-  (with-eval-after-load "company"
+  (with-eval-after-load 'company
     (company-prescient-mode 1)))
 
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
@@ -3128,7 +3128,7 @@ DIR can be relative or absolute."
   (compilation-auto-jump-to-first-error t)
   (compilation-max-output-line-length nil)
   :config
-  (with-eval-after-load "LaTeX-mode"
+  (with-eval-after-load 'LaTeX-mode
     (bind-key "<f10>" #'compile LaTeX-mode-map)
     (bind-key "<f11>" #'recompile LaTeX-mode-map)))
 
@@ -3145,7 +3145,7 @@ DIR can be relative or absolute."
   (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   :config
   ;; Allow Eldoc to trigger after completions
-  (with-eval-after-load "company"
+  (with-eval-after-load 'company
     (eldoc-add-command
      'company-complete-selection
      'company-complete-common
@@ -3262,11 +3262,11 @@ DIR can be relative or absolute."
   (global-treesit-auto-mode 1)
   (treesit-auto-add-to-auto-mode-alist 'all))
 
-;; (with-eval-after-load "c++-ts-mode"
+;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
 ;;   (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map))
 
-;; (with-eval-after-load "treesit"
+;; (with-eval-after-load 'treesit
 ;;   ;; Improves performance with large files without significantly diminishing
 ;;   ;; highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
@@ -3442,7 +3442,7 @@ DIR can be relative or absolute."
      (when (eq sb/lsp-provider 'eglot)
        (eglot-ensure))
      (when (eq sb/lsp-provider 'lsp-mode)
-       (with-eval-after-load "lsp-mode"
+       (with-eval-after-load 'lsp-mode
          (lsp-register-client
           (make-lsp-client
            :new-connection
@@ -3788,7 +3788,7 @@ DIR can be relative or absolute."
   :custom (org-block-capf-edit-style 'inline))
 
 ;; Without auctex
-(with-eval-after-load "tex-mode"
+(with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
 
 ;; (use-package lsp-latex
@@ -3809,7 +3809,7 @@ DIR can be relative or absolute."
 ;;   (lsp-latex-forward-search-executable "okular")
 ;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
 ;;   :config
-;;   (with-eval-after-load "tex-mode"
+;;   (with-eval-after-load 'tex-mode
 ;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
@@ -3863,7 +3863,7 @@ DIR can be relative or absolute."
   (setq-default
    TeX-master nil
    TeX-command-default "LaTexMk")
-  (with-eval-after-load "tex-mode"
+  (with-eval-after-load 'tex-mode
     (unbind-key "C-c ;" TeX-mode-map))
 
   ;; Enable correlation with synctex From Okular, press Shift + Left click to go
@@ -3935,7 +3935,7 @@ DIR can be relative or absolute."
   :demand t
   :commands (math-delimiters-no-dollars math-delimiters-toggle)
   :config
-  (with-eval-after-load "LaTeX-mode"
+  (with-eval-after-load 'LaTeX-mode
     (bind-key "$" #'math-delimiters-insert LaTeX-mode-map)))
 
 ;; LATER: This package seems to require `org'
@@ -4759,7 +4759,7 @@ PAD can be left (`l') or right (`r')."
       :json-false
       :dialect "American")))
 
-  (with-eval-after-load "eglot"
+  (with-eval-after-load 'eglot
     (setq-default
      completion-category-defaults nil
      completion-category-overrides
@@ -5066,7 +5066,7 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (when (< emacs-major-version 30)
 ;;   (use-package which-key))
 ;; (add-hook 'emacs-startup-hook #'which-key-mode)
-;; (with-eval-after-load "which-key"
+;; (with-eval-after-load 'which-key
 ;;   (diminish 'which-key-mode))
 
 ;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
@@ -5218,7 +5218,7 @@ or the major mode is not in `sb/skippable-modes'."
      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)]])
   (bind-key "C-c d" #'sb/dotemacs-transient)
 
-  (with-eval-after-load "smerge-mode"
+  (with-eval-after-load 'smerge-mode
     (transient-define-prefix
      sb/smerge-transient () "Smerge menu"
      [["Navigation"
@@ -5231,7 +5231,7 @@ or the major mode is not in `sb/skippable-modes'."
       ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
     (bind-key "C-c g" #'sb/smerge-transient))
 
-  (with-eval-after-load "lsp-mode"
+  (with-eval-after-load 'lsp-mode
     (transient-define-prefix
      sb/lsp-transient () "Lsp menu"
      [["Lsp functionality"
@@ -5258,7 +5258,7 @@ or the major mode is not in `sb/skippable-modes'."
       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
     (bind-key "C-c l" #'sb/lsp-transient))
 
-  (with-eval-after-load "eglot"
+  (with-eval-after-load 'eglot
     (transient-define-prefix
      sb/eglot-transient () "Eglot menu"
      [["Lsp functionality"
