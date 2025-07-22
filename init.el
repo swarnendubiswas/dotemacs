@@ -66,7 +66,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -2415,7 +2415,8 @@ DIR can be relative or absolute."
                   ;; Math Unicode symbols and sub(super)scripts
                   ;; company-math-symbols-unicode)
                   (company-capf
-                   (company-dict company-ispell)
+                   company-dict
+                   company-ispell
                    company-files
                    company-dabbrev
                    company-yasnippet))))
@@ -3791,26 +3792,26 @@ DIR can be relative or absolute."
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
 
-;; (use-package lsp-latex
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-;;   :hook
-;;   ((LaTeX-mode bibtex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'lsp-latex)
-;;      (lsp-deferred)))
-;;   :custom
-;;   (lsp-latex-bibtex-formatter "latexindent")
-;;   (lsp-latex-latex-formatter "latexindent")
-;;   (lsp-latex-bibtex-formatter-line-length fill-column)
-;;   (lsp-latex-diagnostics-delay 2000)
-;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
-;;   ;; in the PDF.
-;;   (lsp-latex-forward-search-executable "okular")
-;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-;;   :config
-;;   (with-eval-after-load 'tex-mode
-;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+(use-package lsp-latex
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :hook
+  ((LaTeX-mode bibtex-mode)
+   .
+   (lambda ()
+     (require 'lsp-latex)
+     (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
+  (lsp-latex-bibtex-formatter-line-length fill-column)
+  (lsp-latex-diagnostics-delay 2000)
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click
+  ;; in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+  :config
+  (with-eval-after-load 'tex-mode
+    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -4582,12 +4583,8 @@ PAD can be left (`l') or right (`r')."
   ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
   ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
 
-  ;; Translation between JSON and Eglot:
-  ;; | true  | t           |
-  ;; | false | :json-false |
-  ;; | null  | nil         |
-  ;; | {}    | eglot-{}    |
-
+  ;; :json-false is the correct way to send false to LSP servers (instead of nil,
+  ;; which would remove the key).
   (setq-default
    eglot-workspace-configuration
    '(:pylsp
@@ -4596,23 +4593,8 @@ PAD can be left (`l') or right (`r')."
       :plugins
       (:autopep8
        (:enabled :json-false)
-       :black (:cache_config t :enabled :json-false :line_length 80)
-       :flake8
-       (:config
-        t
-        :enabled
-        :json-false
-        :exclude []
-        :executable "flake8"
-        :extendIgnore []
-        :filename nil ; string: null (default)
-        :hangClosing nil
-        :ignore []
-        :indentSize nil
-        :maxComplexity nil
-        :maxLineLength 80
-        :perFileIgnores [] ; e.g. ["file_path.py:W305,W304"]
-        :select nil)
+       :black (:enabled :json-false)
+       :flake8 (:enabled :json-false)
        :jedi
        (:auto_import_modules
         []
@@ -4643,55 +4625,28 @@ PAD can be left (`l') or right (`r')."
        :jedi_signature_help (:enabled t)
        :jedi_symbols
        (:all_scopes t :enabled t :include_import_symbols :json-false)
-       :mccabe (:enabled :json-false :threshold 15)
+       :mccabe (:enabled t :threshold 15)
        :mypy (:enabled :json-false)
-       :preload (:enabled t :modules [])
-       :pycodestyle
-       (:enabled
-        :json-false
-        :exclude []
-        :filename []
-        :hangClosing nil
-        :ignore []
-        :indentSize nil
-        :maxLineLength 80
-        :select nil)
-       :pydocstyle
-       (:addIgnore
-        []
-        :convention "numpy"
-        :enabled
-        :json-false
-        :ignore []
-        :match "(?!test_).*\\.py"
-        :matchDir "[^\\.].*"
-        :select nil)
+       :preload (:enabled :json-false :modules [])
+       :pycodestyle (:enabled :json-false)
+       :pydocstyle (:enabled :json-false)
        :pyflakes (:enabled :json-false)
-       :pylint (:args [] :enabled t :executable "pylint")
+       :pylint (:args [] :enabled t)
        :pylsp_black (:enabled :json-false)
        :pylsp_isort (:enabled t)
        :pylsp_mypy
        (:enabled t :live_mode :json-false :report_progress :json-false)
-       :pylsp_ruff (:enabled t :formatEnabled t :lineLength 80)
+       ;; We use ruff from `apheleia-mode' because `basedpyright' does not support formatting.
+       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
        :rope_autoimport
        (:code_actions
         (:enabled :json-false)
         :completions (:enabled :json-false)
         :enabled
-        :json-false
-        :memory
         :json-false)
-       :rope_completion (:eager :json-false :enabled :json-false)
-       :ruff (:enabled t :formatEnabled t :lineLength 80)
-       :yapf
-       (:based_on_style
-        "pep8"
-        :column_limit 80
-        :enabled t
-        :indent_width 4
-        :split_before_logical_operator t
-        :use_tabs
-        :json-false))
+       :rope_completion (:enabled :json-false)
+       :ruff (:enabled :json-false)
+       :yapf (:enabled :json-false))
       :rope (:extensionModules nil :ropeFolder nil))
      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
      ;; LSP configuration for basedpyright.
@@ -4700,29 +4655,24 @@ PAD can be left (`l') or right (`r')."
       t
       :reportDuplicateImport t
       :typeCheckingMode "recommended"
-      :useLibraryCodeForTypes t)
-     :basedpyright.analysis
-     (:diagnosticSeverityOverrides
-      (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
-      :inlayHints
-      (:callArgumentNames
-       :json-false
-       :functionReturnTypes
-       :json-false
-       :variableTypes
-       :json-false
-       :genericTypes
-       :json-false))
-     :pyright
-     (:checkOnlyOpenFiles
-      t
-      :reportDuplicateImport t
-      :typeCheckingMode "recommended"
-      :useLibraryCodeForTypes t)
+      :useLibraryCodeForTypes t
+      :analysis
+      (:diagnosticSeverityOverrides
+       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+       :inlayHints
+       (:callArgumentNames
+        :json-false
+        :functionReturnTypes
+        :json-false
+        :variableTypes
+        :json-false
+        :genericTypes
+        :json-false)))
      :ltex-ls-plus
      (:language
       "en-US"
       :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
+      ;; Keep grammar and style checking
       :additionalRules (:enablePickyRules t))
      :yaml
      (:format
@@ -4763,8 +4713,8 @@ PAD can be left (`l') or right (`r')."
     (setq-default
      completion-category-defaults nil
      completion-category-overrides
-     '((eglot (styles basic substring orderless))
-       (eglot-capf (styles orderless))))))
+     '((eglot (styles hotfuzz basic substring orderless))
+       (eglot-capf (styles hotfuzz orderless))))))
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
