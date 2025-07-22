@@ -66,7 +66,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -2901,7 +2901,7 @@ DIR can be relative or absolute."
   ;;   :group 'lsp-mode)
   ;;
   ;; (defcustom sb/lsp-harper-active-modes
-  ;;   '(text-mode org-mode markdown-mode markdown-ts-mode)
+  ;;   '(text-mode org-mode markdown-mode)
   ;;   "List of major modes that work with harper-ls."
   ;;   :type 'list
   ;;   :group 'lsp-harper)
@@ -4814,8 +4814,7 @@ PAD can be left (`l') or right (`r')."
 
 (use-package consult-eglot
   :when (eq sb/lsp-provider 'eglot)
-  :after (consult eglot)
-  :bind ("C-c l g" . consult-eglot-symbols))
+  :after (consult eglot))
 
 (use-package flycheck-eglot
   :when (eq sb/lsp-provider 'eglot)
@@ -5256,7 +5255,17 @@ or the major mode is not in `sb/skippable-modes'."
        ;; ("y" "Java type hierarchy" lsp-java-type-hierarchy)
        ]
       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
-    (bind-key "C-c l" #'sb/lsp-transient))
+    (bind-key "C-c l" #'sb/lsp-transient)
+
+    (transient-define-prefix
+     sb/imenu-transient () "Imenu commands"
+     [["Imenu"
+       ("j" "Imenu" consult-imenu)
+       ("b" "Breadcrumb jump" breadcrumb-jump)]
+      ["Lsp imenu"
+       ("g" "File symbols" consult-lsp-file-symbols)
+       ("h" "Workspace symbols" consult-lsp-symbols)]])
+    (bind-key "C-c i" #'sb/imenu-transient))
 
   (with-eval-after-load 'eglot
     (transient-define-prefix
@@ -5280,17 +5289,15 @@ or the major mode is not in `sb/skippable-modes'."
         "Execution code action: organize imports"
         eglot-code-action-organize-imports)]
       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
-    (bind-key "C-c l" #'sb/eglot-transient))
+    (bind-key "C-c l" #'sb/eglot-transient)
 
-  (transient-define-prefix
-   sb/imenu-transient () "Imenu commands"
-   [["Imenu"
-     ("j" "Imenu" consult-imenu)
-     ("b" "Breadcrumb jump" breadcrumb-jump)]
-    ["Lsp imenu"
-     ("g" "File symbols" consult-lsp-file-symbols)
-     ("h" "Workspace symbols" consult-lsp-symbols)]])
-  (bind-key "C-c i" #'sb/imenu-transient)
+    (transient-define-prefix
+     sb/imenu-transient () "Imenu commands"
+     [["Imenu"
+       ("j" "Imenu" consult-imenu)
+       ("b" "Breadcrumb jump" breadcrumb-jump)]
+      ["Lsp imenu" ("h" "Workspace symbols" consult-eglot-symbols)]])
+    (bind-key "C-c i" #'sb/imenu-transient))
 
   (transient-define-prefix
    sb/file-buffer-transient () "File and Buffer commands"
