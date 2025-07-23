@@ -1477,7 +1477,7 @@ The provider is `nerd-icons'."
 
 (use-package elec-pair
   :ensure nil
-  :hook (emacs-startup . electric-pair-mode)
+  :hook (elpaca-after-init . electric-pair-mode)
   :custom
   ;; Avoid balancing parentheses since they can be both irritating and slow
   (electric-pair-preserve-balance nil)
@@ -1519,7 +1519,7 @@ The provider is `nerd-icons'."
   :commands mode-minder)
 
 (use-package flycheck
-  :hook (emacs-startup . global-flycheck-mode)
+  :hook (elpaca-after-init . global-flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we
   ;; want the `flycheck-idle-change-delay' to be in effect while editing.
@@ -2161,7 +2161,7 @@ The provider is `nerd-icons'."
 ;; search.
 (use-package company
   :when (eq sb/in-buffer-completion 'company)
-  :hook (emacs-startup . global-company-mode)
+  :hook (elpaca-after-init . global-company-mode)
   :bind
   (:map
    company-active-map
@@ -2554,7 +2554,9 @@ DIR can be relative or absolute."
    (corfu-info
     corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
   :when (eq sb/in-buffer-completion 'corfu)
-  :hook ((emacs-startup . global-corfu-mode) (corfu-mode . sb/corfu-default-setup))
+  :hook
+  ((elpaca-after-init . global-corfu-mode)
+   (corfu-mode . sb/corfu-default-setup))
   :bind
   (:map
    corfu-map
@@ -2630,7 +2632,7 @@ DIR can be relative or absolute."
 
   (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file)
 
-  (dolist (hook (text-mode-hook markdown-mode-hook))
+  (dolist (hook '(text-mode-hook markdown-mode-hook))
     (add-hook
      hook
      (lambda ()
@@ -2762,7 +2764,7 @@ DIR can be relative or absolute."
 ;; recency, Corfu has `corfu-history', and Company has `company-statistics'.
 (use-package prescient
   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
-  :hook (emacs-startup . prescient-persist-mode)
+  :hook (elpaca-after-init . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t)
   :config
   (with-eval-after-load 'corfu
@@ -3089,7 +3091,6 @@ DIR can be relative or absolute."
   (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package hl-todo
-  :hook (emacs-startup . global-hl-todo-mode)
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setopt
@@ -4186,7 +4187,7 @@ PAD can be left (`l') or right (`r')."
                         (powerline-fill nil (powerline-width rhs))
                         (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :hook (emacs-startup . sb/powerline-nano-theme)
+  :hook (elpaca-after-init . sb/powerline-nano-theme)
   :custom
   ;; Visualization of the buffer position is not useful
   (powerline-display-hud nil)
@@ -4197,7 +4198,7 @@ PAD can be left (`l') or right (`r')."
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
-  :hook (emacs-startup . doom-modeline-mode)
+  :hook (elpaca-after-init . doom-modeline-mode)
   :custom (doom-modeline-buffer-encoding nil)
   ;; All other choices can lead to the modeline text overflowing
   (doom-modeline-buffer-file-name-style 'buffer-name)
@@ -4207,7 +4208,7 @@ PAD can be left (`l') or right (`r')."
   (doom-modeline-minor-modes t))
 
 ;; (use-package centaur-tabs
-;;   :hook ((emacs-startup . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
+;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
 ;;   :bind*
 ;;   (("M-<right>" . centaur-tabs-forward-tab)
 ;;    ("C-<tab>" . centaur-tabs-forward-tab)
@@ -4300,14 +4301,18 @@ PAD can be left (`l') or right (`r')."
   ;; Restrict `hl-line-mode' highlighting to the current window
   (hl-line-sticky-flag nil))
 
-(use-package xclip
-  :when (or (executable-find "xclip") (executable-find "xsel"))
-  :hook (emacs-startup . xclip-mode))
-
-;; Send every kill from a TTY frame to the system clipboard
+;; Combined clipboard integration for terminal & GUI. Sends every kill from a
+;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
 (use-package clipetty
-  :hook (emacs-startup . global-clipetty-mode)
+  :hook (elpaca-after-init . global-clipetty-mode)
   :diminish)
+
+;; Only enable xclip in TTY under X11
+(use-package xclip
+  :when
+  (and (unless (and (display-graphic-p) (getenv "WAYLAND_DISPLAY")))
+       (or (executable-find "xclip") (executable-find "xsel")))
+  :hook (elpaca-after-init . xclip-mode))
 
 (use-package ztree
   :commands (ztree-diff))
@@ -4348,14 +4353,14 @@ PAD can be left (`l') or right (`r')."
 ;; Highlight the cursor position after the window scrolls
 (use-package beacon
   :disabled
-  :hook (emacs-startup . beacon-mode)
+  :hook (elpaca-after-init . beacon-mode)
   :diminish)
 
 ;; Allows to easily identify the file path in a project. But does not support
 ;; imenu.
 ;; (use-package project-headerline
 ;;   :ensure (:host github :repo "gavv/project-headerline")
-;;   :hook (emacs-startup . global-project-headerline-mode)
+;;   :hook (elpaca-after-init . global-project-headerline-mode)
 ;;   :custom
 ;;   (project-headerline-segment-separator " > ")
 ;;   (project-headerline-path-separator " > "))
@@ -4975,11 +4980,11 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
 ;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
-(use-package default-text-scale
-  :when (display-graphic-p)
-  :bind
-  (("C-M-+" . default-text-scale-increase)
-   ("C-M--" . default-text-scale-decrease)))
+;; (use-package default-text-scale
+;;   :when (display-graphic-p)
+;;   :bind
+;;   (("C-M-+" . default-text-scale-increase)
+;;    ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
 (use-package free-keys
@@ -4991,94 +4996,86 @@ or the major mode is not in `sb/skippable-modes'."
 ;; ;; command/prefix in a popup.
 ;; (when (< emacs-major-version 30)
 ;;   (use-package which-key))
-;; (add-hook 'emacs-startup-hook #'which-key-mode)
+;; (add-hook 'elpaca-after-init-hook #'which-key-mode)
 ;; (with-eval-after-load 'which-key
 ;;   (diminish 'which-key-mode))
 
-;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
-(which-key-add-key-based-replacements
- "<f1> 4"
- "help-other-win"
- "<f1>"
- "help"
- "<f2>"
- "2-column"
- "C-c"
- "mode-and-user"
- "C-h 4"
- "help-other-win"
- "C-h"
- "help"
- "C-x 4"
- "other-window"
- "C-x 5"
- "other-frame"
- "C-x 6"
- "2-column"
- "C-x 8"
- "insert-special"
- "C-x C-k C-q"
- "kmacro-counters"
- "C-x C-k C-r a"
- "kmacro-add"
- "C-x C-k C-r"
- "kmacro-register"
- "C-x C-k"
- "keyboard-macros"
- "C-x RET"
- "encoding/input"
- "C-x a i"
- "abbrevs-inverse-add"
- "C-x a"
- "abbrevs"
- "C-x n"
- "narrowing"
- "C-x p"
- "projects"
- "C-x r"
- "reg/rect/bkmks"
- "C-x t ^"
- "tab-bar-detach"
- "C-x t"
- "tab-bar"
- "C-x v M"
- "vc-mergebase"
- "C-x v b"
- "vc-branch"
- "C-x v"
- "version-control"
- "C-x w ^"
- "window-detach"
- "C-x w"
- "window-extras"
- "C-x x"
- "buffer-extras"
- "C-x"
- "extra-commands"
- "M-g"
- "goto-map"
- "M-s h"
- "search-highlight"
- "M-s"
- "search-map")
+;; ;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
+;; (which-key-add-key-based-replacements
+;;  "<f1> 4"
+;;  "help-other-win"
+;;  "<f1>"
+;;  "help"
+;;  "<f2>"
+;;  "2-column"
+;;  "C-c"
+;;  "mode-and-user"
+;;  "C-h 4"
+;;  "help-other-win"
+;;  "C-h"
+;;  "help"
+;;  "C-x 4"
+;;  "other-window"
+;;  "C-x 5"
+;;  "other-frame"
+;;  "C-x 6"
+;;  "2-column"
+;;  "C-x 8"
+;;  "insert-special"
+;;  "C-x C-k C-q"
+;;  "kmacro-counters"
+;;  "C-x C-k C-r a"
+;;  "kmacro-add"
+;;  "C-x C-k C-r"
+;;  "kmacro-register"
+;;  "C-x C-k"
+;;  "keyboard-macros"
+;;  "C-x RET"
+;;  "encoding/input"
+;;  "C-x a i"
+;;  "abbrevs-inverse-add"
+;;  "C-x a"
+;;  "abbrevs"
+;;  "C-x n"
+;;  "narrowing"
+;;  "C-x p"
+;;  "projects"
+;;  "C-x r"
+;;  "reg/rect/bkmks"
+;;  "C-x t ^"
+;;  "tab-bar-detach"
+;;  "C-x t"
+;;  "tab-bar"
+;;  "C-x v M"
+;;  "vc-mergebase"
+;;  "C-x v b"
+;;  "vc-branch"
+;;  "C-x v"
+;;  "version-control"
+;;  "C-x w ^"
+;;  "window-detach"
+;;  "C-x w"
+;;  "window-extras"
+;;  "C-x x"
+;;  "buffer-extras"
+;;  "C-x"
+;;  "extra-commands"
+;;  "M-g"
+;;  "goto-map"
+;;  "M-s h"
+;;  "search-highlight"
+;;  "M-s"
+;;  "search-map")
 
-;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
-;; a prefix-key.  If you know of other built-in packages that have
-;; this behavior, please let me know, so I can add them.
-(with-eval-after-load 'page-ext
-  (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
-
-;; ;; Alacritty and Ghostty are my preferred terminals for using Emacs. This
-;; ;; package is to allow using Konsole.
-;; (use-package term-keys
-;;   :ensure (:host github :repo "CyberShadow/term-keys")
-;;   :unless (display-graphic-p)
-;;   :hook (emacs-startup . term-keys-mode)
-;;   :config (require 'term-keys-konsole))
+;; ;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
+;; ;; a prefix-key.  If you know of other built-in packages that have
+;; ;; this behavior, please let me know, so I can add them.
+;; (with-eval-after-load 'page-ext
+;;   (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
 
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
-  :hook (emacs-startup . global-kkp-mode)
+  :hook (elpaca-after-init . global-kkp-mode)
   ;; :bind
   ;; ;; Should be remapped to "M-DEL"
   ;; ("M-<backspace>" . backward-kill-word)
@@ -5086,14 +5083,14 @@ or the major mode is not in `sb/skippable-modes'."
   (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
   (define-key key-translation-map (kbd "M-S-/") (kbd "M-?")))
 
-(use-package keyfreq
-  :ensure (:host github :repo "dacap/keyfreq")
-  :hook
-  (emacs-startup
-   .
-   (lambda ()
-     (keyfreq-mode 1)
-     (keyfreq-autosave-mode 1))))
+;; (use-package keyfreq
+;;   :ensure (:host github :repo "dacap/keyfreq")
+;;   :hook
+;;   (elpaca-after-init
+;;    .
+;;    (lambda ()
+;;      (keyfreq-mode 1)
+;;      (keyfreq-autosave-mode 1))))
 
 (use-package flyover
   :ensure (:host github :repo "konrad1977/flyover")
