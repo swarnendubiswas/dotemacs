@@ -65,7 +65,7 @@ The provider is `nerd-icons'."
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight.
+;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX.
 (defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
@@ -3402,15 +3402,6 @@ DIR can be relative or absolute."
 (use-package cperl-mode
   :ensure nil
   :mode "latexmkrc\\'"
-  :hook
-  (cperl-mode
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred)))))
   :config (fset 'perl-mode 'cperl-mode))
 
 (use-package sh-script
@@ -3611,21 +3602,6 @@ DIR can be relative or absolute."
   (markdown-split-window-direction 'horizontal)
   (markdown-hide-urls t))
 
-;; (use-package markdown-ts-mode
-;;   :mode ("\\.md\\'" . markdown-ts-mode)
-;;   :hook
-;;   (markdown-ts-mode
-;;    .
-;;    (lambda ()
-;;      (cond
-;;       ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
-;;       ((eq sb/lsp-provider 'eglot)
-;;        (eglot-ensure))
-;;       ((eq sb/lsp-provider 'lsp-mode)
-;;        (progn
-;;          (require 'lsp-marksman)
-;;          (lsp-deferred)))))))
-
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
 ;; input-file.md".
@@ -3663,7 +3639,8 @@ DIR can be relative or absolute."
    ("\\.json\\'" . json-ts-mode)
    (".*/vscode/settings.json$" . jsonc-mode)
    (".*/\\.vscode/settings.json$" . jsonc-mode)
-   ("User/settings.json$" . jsonc-mode))
+   ("User/settings.json$" . jsonc-mode)
+   ("\\.htmlhintrc" . json-mode))
   :hook
   ((json-mode json-ts-mode jsonc-mode)
    .
