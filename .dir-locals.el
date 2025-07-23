@@ -3,37 +3,36 @@
 ((nil
   .
   ((fill-column . 80)
-   (make-local-variable 'completion-ignored-extensions)
 
    ;; Directories
-   (eval . (add-to-list 'completion-ignored-extensions "eln-cache/"))
-   (eval . (add-to-list 'completion-ignored-extensions "tree-sitter/"))
    (eval .
-         (add-to-list
-          'completion-ignored-extensions "eglot-java-eclipse-jdt-cache/"))
-   (eval . (add-to-list 'completion-ignored-extensions "share/"))
-   (eval . (add-to-list 'completion-ignored-extensions "auto-save-list/"))
-   (eval . (add-to-list 'completion-ignored-extensions "\\.cache/"))
-   (eval . (add-to-list 'completion-ignored-extensions "\\.ctags\.d/"))
-   (eval . (add-to-list 'completion-ignored-extensions "auto/"))
+         (dolist (ext
+                  '("eln-cache/"
+                    "tree-sitter/"
+                    "eglot-java-eclipse-jdt-cache/"
+                    "share/"
+                    "auto-save-list/"
+                    "\\.cache/"
+                    "\\.ctags.d/"
+                    "auto/"))
+           (add-to-list 'completion-ignored-extensions ext)))
 
    ;; Files
-   (eval . (add-to-list 'completion-ignored-extensions "\\.tags/"))
-   (eval . (add-to-list 'completion-ignored-extensions ".pptx"))
-   (eval . (add-to-list 'completion-ignored-extensions ".xml"))
-   (eval . (add-to-list 'completion-ignored-extensions ".drawio"))
-   (eval . (add-to-list 'completion-ignored-extensions ".out"))
-   (eval . (add-to-list 'completion-ignored-extensions ".vect"))
-   (eval . (add-to-list 'completion-ignored-extensions "GPATH"))
+   (eval .
+         (dolist (ext
+                  '("\\.tags/" ".pptx" ".xml" ".drawio" ".out" ".vect" "GPATH"))
+           (add-to-list 'completion-ignored-extensions ext)))
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
 
    (eval .
          (with-eval-after-load 'lsp-mode
-           (add-to-list 'lsp-file-watch-ignored-directories "/\\.clangd\\'")
-           (add-to-list 'lsp-file-watch-ignored-directories "/\\.git$")
-           (add-to-list 'lsp-file-watch-ignored-directories "/\\.cache\\'")
-           (add-to-list 'lsp-file-watch-ignored-directories "/\\.ctags\.d\\'")))
+           (dolist (dir
+                    '("/\\.clangd\\'"
+                      "/\\.git$"
+                      "/\\.cache\\'"
+                      "/\\.ctags.d\\'"))
+             (add-to-list 'lsp-file-watch-ignored-directories dir))))
 
    (eval
     .
@@ -161,7 +160,6 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (let ((compdir (file-name-directory buffer-file-name)))
               (add-to-list
@@ -171,7 +169,6 @@
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (c++-ts-mode
@@ -203,7 +200,6 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             (let ((compdir (file-name-directory buffer-file-name)))
               (add-to-list
@@ -213,7 +209,6 @@
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (python-mode
@@ -236,7 +231,6 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
             )))
@@ -373,7 +367,6 @@
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)
             ;; (add-hook 'before-save-hook #'eglot-code-action-organize-imports
             ;;           nil
@@ -400,7 +393,6 @@
          (add-hook
           'lsp-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'lsp-format-buffer nil t)
             ;; (add-hook 'before-save-hook #'lsp-organize-imports nil t)
             )))
@@ -537,7 +529,6 @@
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)
             ;; (add-hook 'before-save-hook #'eglot-code-action-organize-imports
             ;;           nil
@@ -566,14 +557,11 @@
    (eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (yaml-ts-mode
@@ -594,14 +582,11 @@
    (eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (toml-mode
@@ -609,14 +594,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (toml-ts-mode
@@ -624,14 +606,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (json-mode
@@ -639,14 +618,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (json-ts-mode
@@ -654,14 +630,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (jsonc-mode
@@ -669,14 +642,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (html-mode
@@ -684,14 +654,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (html-ts-mode
@@ -699,14 +666,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (cmake-mode
@@ -714,14 +678,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (cmake-ts-mode
@@ -729,14 +690,11 @@
   ((eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (LaTeX-mode
@@ -756,14 +714,12 @@
    ;;       (add-hook
    ;;        'lsp-managed-mode-hook
    ;;        (lambda ()
-   ;;          (make-local-variable 'before-save-hook)
    ;;          (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
    ;; (eval .
    ;;       (add-hook
    ;;        'eglot-managed-mode-hook
    ;;        (lambda ()
-   ;;          (make-local-variable 'before-save-hook)
    ;;          (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
    ))
 
@@ -783,14 +739,11 @@
    (eval .
          (add-hook
           'lsp-managed-mode-hook
-          (lambda ()
-            (make-local-variable 'before-save-hook)
-            (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
    (eval .
          (add-hook
           'eglot-managed-mode-hook
           (lambda ()
-            (make-local-variable 'before-save-hook)
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)))))))
 
 
