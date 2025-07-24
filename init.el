@@ -963,7 +963,7 @@ The provider is `nerd-icons'."
      "TAGS"
      "\\*vc"
      "\\*tramp"
-     "\\*citre*"
+     "\\*citre.*"
      "\\*pylsp.*"
      "\\*pyright.*"
      "\\*ltex-ls"
@@ -977,7 +977,8 @@ The provider is `nerd-icons'."
      "\\*autotools.*"
      "\\*lsp-harper*"
      "\\*taplo*"
-     "\\*ruff.*"))
+     "\\*ruff.*"
+     "\\*marksman.*"))
   :config
   (consult-customize
    consult-line
@@ -1019,13 +1020,8 @@ The provider is `nerd-icons'."
 
 ;; Easily add file and directory paths into the minibuffer.
 (use-package consult-dir
-  :bind
-  (("C-x C-d" . consult-dir)
-   ;; :map
-   ;; vertico-map
-   ;; ("C-x C-d" . consult-dir)
-   ;; ("C-x C-j" . consult-dir-jump-file)
-   )
+  :commands consult-dir-jump-file
+  :bind ("C-x C-d" . consult-dir)
   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
 ;; Provide context-dependent actions similar to a content menu.
@@ -1039,11 +1035,7 @@ The provider is `nerd-icons'."
    minibuffer-local-map
    ("C-`" . embark-act)
    ("C-c C-c" . embark-collect)
-   ("C-c C-e" . embark-export)
-   ;;    :map
-   ;; minibuffer-local-completion-map
-   ;;    ("C-`" . embark-act)
-   )
+   ("C-c C-e" . embark-export))
   :custom
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command))
@@ -1223,6 +1215,7 @@ The provider is `nerd-icons'."
    ("M-g f" . dogears-forward)
    ("M-g t" . dogears-list))
   :custom
+  (dogears-message nil)
   (dogears-idle 2)
   (dogears-hooks
    '(imenu-after-jump-hook
@@ -1704,6 +1697,9 @@ The provider is `nerd-icons'."
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :custom
+  (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
+
   :config
   (when (and (executable-find "tree-sitter")
              (fboundp 'treesit-available-p)
@@ -1718,7 +1714,8 @@ The provider is `nerd-icons'."
         for_statement
         if_statement
         with_statement
-        while_statement)))))
+        while_statement)
+       (yaml block_mapping_pair comment)))))
 
 ;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the
 ;; current buffer and presents suggestions for completion.
@@ -3048,7 +3045,7 @@ DIR can be relative or absolute."
   :when (eq sb/lsp-provider 'lsp-mode)
   :init (setopt lsp-ltex-plus-version "18.5.1")
   :hook
-  ((text-mode markdown-mode markdown-ts-mode org-mode LaTeX-mode)
+  ((text-mode markdown-mode org-mode LaTeX-mode)
    .
    (lambda ()
      (require 'lsp-ltex-plus)
@@ -4001,16 +3998,6 @@ Fallback to `xref-go-back'."
          (call-interactively #'xref-pop-marker-stack)))))
   :hook ((prog-mode LaTeX-mode) . citre-mode)
   :bind* (("M-." . sb/jump-xref-citre) ("M-," . sb/jump-back-citre-xref))
-  :bind
-  (("C-x c j" . sb/jump-citre-xref)
-   ("C-x c b" . citre-jump-back)
-   ("C-x c p" . citre-peek)
-   ("C-x c a" . citre-ace-peek)
-   ("C-x c r" . citre-jump-to-reference)
-   ("C-x c c" . citre-create-tags-file)
-   ("C-x c u" . citre-update-tags-file)
-   ("C-x c e" . citre-edit-tags-file-recipe)
-   ("C-x c g" . citre-global-update-database))
   :custom
   (citre-default-create-tags-file-location 'in-dir)
   (citre-auto-enable-citre-mode-modes '(prog-mode))
@@ -4239,7 +4226,7 @@ PAD can be left (`l') or right (`r')."
 
 ;; Center the text environment
 (use-package olivetti
-  :hook ((text-mode prog-mode conf-mode org-mode) . olivetti-mode)
+  :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
   :diminish)
 
@@ -5134,6 +5121,11 @@ or the major mode is not in `sb/skippable-modes'."
      ("r" "Consult ripgrep" consult-ripgrep)
      ("g" "Consult grep" consult-grep)
      ("t" "Consult git grep" consult-git-grep)]
+    ["Wgrep"
+     ("C-p" "Enable wgrep mode" wgrep-change-to-wgrep-mode)
+     ("C-s" "Finish edit" wgrep-finish-edit)
+     ("C-k" "Abort changes" wgrep-abort-changes)
+     ("C-q" "Exit" wgrep-exit)]
     ["Search locations"
      ("n" "Consult find" consult-find)
      ("f" "Consult fd" consult-fd)
@@ -5277,7 +5269,22 @@ or the major mode is not in `sb/skippable-modes'."
     ["Windows"
      ("wl" "Linewise" ediff-windows-linewise)
      ("ww" "Wordwise" ediff-windows-wordwise)]])
-  (bind-key "C-c e" #'sb/ediff-transient))
+  (bind-key "C-c e" #'sb/ediff-transient)
+
+  (transient-define-prefix
+   sb/citre-transient () "Citre commands"
+   [["Jump"
+     ("j" "Jump" sb/jump-citre-xref)
+     ("b" "Jump back" citre-jump-back)
+     ("p" "Peek" citre-peek)
+     ("a" "Ace peek" citre-ace-peek)
+     ("r" "Reference" citre-jump-to-reference)]
+    ["Manage"
+     ("c" "Create tags" citre-create-tags-file)
+     ("u" "Update tags" citre-update-tags-file)
+     ("e" "Edit recipe" citre-edit-tags-file-recipe)
+     ("g" "Update global db" citre-global-update-database)]])
+  (bind-key "C-c c" #'sb/citre-transient))
 
 (add-hook
  'elpaca-after-init-hook
