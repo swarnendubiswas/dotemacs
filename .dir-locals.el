@@ -197,23 +197,8 @@
       :plugins
       (:autopep8
        (:enabled :json-false)
-       :black (:cache_config t :enabled :json-false :line_length 80)
-       :flake8
-       (:config
-        t
-        :enabled
-        :json-false
-        :exclude []
-        :executable "flake8"
-        :extendIgnore []
-        :filename nil ; string: null (default)
-        :hangClosing nil
-        :ignore []
-        :indentSize nil
-        :maxComplexity nil
-        :maxLineLength 80
-        :perFileIgnores [] ; e.g. ["file_path.py:W305,W304"]
-        :select nil)
+       :black (:enabled :json-false)
+       :flake8 (:enabled :json-false)
        :jedi
        (:auto_import_modules
         []
@@ -243,35 +228,17 @@
        :jedi_references (:enabled t)
        :jedi_signature_help (:enabled t)
        :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
-       :mccabe (:enabled :json-false :threshold 15)
+       :mccabe (:enabled t :threshold 15)
        :mypy (:enabled :json-false)
        :preload (:enabled :json-false :modules [])
-       :pycodestyle
-       (:enabled
-        :json-false
-        :exclude []
-        :filename []
-        :hangClosing nil
-        :ignore []
-        :indentSize nil
-        :maxLineLength 80
-        :select nil)
-       :pydocstyle
-       (:addIgnore
-        []
-        :addSelect []
-        :convention "numpy"
-        :enabled
-        :json-false
-        :ignore []
-        :match "(?!test_).*\\.py"
-        :matchDir "[^\\.].*"
-        :select nil)
+       :pycodestyle (:enabled :json-false)
+       :pydocstyle (:enabled :json-false)
        :pyflakes (:enabled :json-false)
        :pylint (:args [] :enabled t)
-       :pylsp_black (:cache_config t :enabled :json-false :line_length 80)
+       :pylsp_black (:enabled :json-false)
        :pylsp_isort (:enabled t)
-       :pylsp_mypy (:enabled t :live_mode :json-false :report_progress t)
+       :pylsp_mypy (:enabled t :live_mode :json-false :report_progress :json-false)
+       ;; We use ruff from `apheleia-mode' because `basedpyright' does not support formatting.
        :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
        :rope_autoimport
        (:code_actions
@@ -300,19 +267,19 @@
        t
        :reportDuplicateImport t
        :typeCheckingMode "recommended"
-       :useLibraryCodeForTypes t)
-      :basedpyright.analysis
-      (:diagnosticSeverityOverrides
-       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
-       :inlayHints
-       (:callArgumentNames
-        :json-false
-        :functionReturnTypes
-        :json-false
-        :variableTypes
-        :json-false
-        :genericTypes
-        :json-false)))))))
+       :useLibraryCodeForTypes t
+       :analysis
+       (:diagnosticSeverityOverrides
+        (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+        :inlayHints
+        (:callArgumentNames
+         :json-false
+         :functionReturnTypes
+         :json-false
+         :variableTypes
+         :json-false
+         :genericTypes
+         :json-false))))))))
 
  ((sh-mode bash-ts-mode) . ((subdirs . nil)))
 

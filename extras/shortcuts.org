@@ -230,7 +230,7 @@ Specify extra flags to the search commands with ~C-u~ (~universal-argument~) bef
 - ~C-c @ C-f~ - Move Forward to next heading at the same level (~outline-forward-same-level~)
 - ~C-c @ C-b~ - Move Backward to previous heading at the same level (~outline-backward-same-level~)
 - ~C-c C-s~ - Insert sectioning command (~LaTeX-section~)
-- ~C-c C-e~ - Make LaTeX environment (~\begin{...}-\end{...}~ pair) (~LaTeX-environment~). Change the current environment with ~C-u C-c C-e~.
+- ~C-c C-e~ - Insert LaTeX environment (~\begin{...}-\end{...}~ pair) (~LaTeX-environment~). Change the current environment with ~C-u C-c C-e~.
 - ~C-c C-m~ - Insert macros ()
 - ~C-c ]~ - Close LaTeX environment (~LaTeX-close-environment~)
 - ~C-c C-o C-f~ - Toggle folding mode (~TeX-fold-mode~)
