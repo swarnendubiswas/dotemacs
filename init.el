@@ -2219,12 +2219,12 @@ The provider is `nerd-icons'."
   ;; only choice, `company-echo-metadata-frontend' shows selected candidate docs
   ;; in echo area, and `company-pseudo-tooltip-frontend' which always shows the
   ;; candidates in an overlay.
-  ;; (company-frontends
-  ;;  '(
-  ;;    ;; Always show candidates in overlay tooltip
-  ;;    company-pseudo-tooltip-frontend
-  ;;    ;; Show selected candidate docs in echo area
-  ;;    company-echo-metadata-frontend))
+  (company-frontends
+   '(
+     ;; Always show candidates in overlay tooltip
+     company-pseudo-tooltip-frontend
+     ;; Show selected candidate docs in echo area
+     company-echo-metadata-frontend))
   (company-require-match nil)
   :config
   ;; Autocompletion icons are distracting.
@@ -2254,13 +2254,13 @@ The provider is `nerd-icons'."
 ;;   :after company
 ;;   :init (company-statistics-mode 1))
 
-;; ;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
-;; ;; active in latex math environments and latex math symbols
-;; ;; (`company-math-symbols-latex') is not available outside of math latex
-;; ;; environments
-;; (use-package company-math
-;;   :after (:all tex-mode company)
-;;   :demand t)
+;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
+;; active in latex math environments and latex math symbols
+;; (`company-math-symbols-latex') is not available outside of math latex
+;; environments
+(use-package company-math
+  :after (:all tex-mode company)
+  :demand t)
 
 ;; Complete in the middle of words
 (use-package company-anywhere
@@ -2302,29 +2302,33 @@ DIR can be relative or absolute."
 ;;   :after (company prog-mode)
 ;;   :demand t)
 
-;; (use-package company-auctex
-;;   :after (company tex)
-;;   :demand t
-;;   :commands
-;;   (company-auctex-bibs
-;;    company-auctex-environments
-;;    company-auctex-labels
-;;    company-auctex-macros
-;;    company-auctex-symbols))
+(use-package company-auctex
+  :after (company tex)
+  :demand t
+  :commands
+  (company-auctex-bibs
+   company-auctex-environments
+   company-auctex-labels
+   company-auctex-macros
+   company-auctex-symbols))
 
-;; ;; Uses RefTeX to complete label references and citations. When working with
-;; ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
-;; ;; set in all files, so that RefTeX can find citations across documents.
-;; (use-package company-reftex
-;;   :after (company tex)
-;;   :demand t
-;;   :custom
-;;   ;; https://github.com/TheBB/company-reftex/pull/13
-;;   (company-reftex-labels-parse-all nil))
+;; Uses RefTeX to complete label references and citations. When working with
+;; multi-file documents, ensure that the variable `TeX-master' is appropriately
+;; set in all files, so that RefTeX can find citations across documents.
+(use-package company-reftex
+  :after (company tex)
+  :demand t
+  :custom
+  ;; https://github.com/TheBB/company-reftex/pull/13
+  (company-reftex-labels-parse-all nil))
 
-;; (use-package company-bibtex
-;;   :after (company tex)
-;;   :demand t)
+(use-package bibtex-completion
+  :after (company tex)
+  :demand t)
+
+(use-package company-bibtex
+  :after bibtex-completion
+  :demand t)
 
 ;; Notes on how to set up `company-backends'.
 
@@ -2402,24 +2406,25 @@ DIR can be relative or absolute."
     ;; forces all listed backends to be queried regardless of what
     ;; `company-capf' returns.
 
+    ;; Order citations -> macros -> math -> text/dictionary without duplicates.
+    ;; Always query all the following backends
     (setq-local company-backends
-                '( ;;company-bibtex
-                  ;; company-auctex-bibs
-                  ;; company-reftex-citations
-                  ;; (company-reftex-labels company-auctex-labels)
-                  ;; (company-latex-commands
-                  ;; company-auctex-symbols company-auctex-environments
-                  ;; company-auctex-macros
-                  ;; Math latex tags
-                  ;; company-math-symbols-latex
-                  ;; Math Unicode symbols and sub(super)scripts
-                  ;; company-math-symbols-unicode)
-                  (company-capf
-                   company-dict
-                   company-ispell
-                   company-files
-                   company-dabbrev
-                   company-yasnippet))))
+                '((:separate
+                   company-capf
+                   ;;company-bibtex
+                   ;; company-auctex-bibs
+                   (company-reftex-citations company-reftex-labels)
+                   ;; LaTeX structure
+                   (company-auctex-labels
+                    ;; company-auctex-macros
+                    company-auctex-environments)
+                   (company-latex-commands company-auctex-symbols)
+                   ( ;; Math latex tags
+                    company-math-symbols-latex
+                    ;; Math Unicode symbols and sub (super) scripts
+                    company-math-symbols-unicode)
+                   company-dict company-ispell company-dabbrev)
+                  company-files company-yasnippet)))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
 
@@ -3770,26 +3775,29 @@ DIR can be relative or absolute."
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
 
-(use-package lsp-latex
-  :when (eq sb/lsp-provider 'lsp-mode)
-  :hook
-  ((LaTeX-mode bibtex-mode)
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length fill-column)
-  (lsp-latex-diagnostics-delay 2000)
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click
-  ;; in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-  :config
-  (with-eval-after-load 'tex-mode
-    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+;; The LSP setup seems to work very poorly with large LaTeX files, leading to
+;; frequent hangs while communicating with Emacs.
+
+;; (use-package lsp-latex
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+;;   :hook
+;;   ((LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter "latexindent")
+;;   (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load 'tex-mode
+;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -3841,7 +3849,7 @@ DIR can be relative or absolute."
   ;; master file
   (setq-default
    TeX-master nil
-   TeX-command-default "LaTexMk")
+   TeX-command-default "LaTeXMk")
   (with-eval-after-load 'tex-mode
     (unbind-key "C-c ;" TeX-mode-map))
 
