@@ -4332,24 +4332,24 @@ PAD can be left (`l') or right (`r')."
 ;;   (outline-blank-line t)
 ;;   :diminish (outline-minor-mode outline-indent-minor-mode))
 
-(use-package all-the-icons
-  :commands all-the-icons-install-fonts
-  :custom
-  ;; Small icons look nicer
-  (all-the-icons-scale-factor 0.9)
-  (all-the-icons-faicon-scale-factor 0.9)
-  (all-the-icons-wicon-scale-factor 0.9)
-  (all-the-icons-octicon-scale-factor 0.9)
-  (all-the-icons-fileicon-scale-factor 0.9)
-  (all-the-icons-material-scale-factor 0.9)
-  (all-the-icons-alltheicon-scale-factor 0.9)
-  (all-the-icons-color-icons t))
+;; (use-package all-the-icons
+;;   :commands all-the-icons-install-fonts
+;;   :custom
+;;   ;; Small icons look nicer
+;;   (all-the-icons-scale-factor 0.9)
+;;   (all-the-icons-faicon-scale-factor 0.9)
+;;   (all-the-icons-wicon-scale-factor 0.9)
+;;   (all-the-icons-octicon-scale-factor 0.9)
+;;   (all-the-icons-fileicon-scale-factor 0.9)
+;;   (all-the-icons-material-scale-factor 0.9)
+;;   (all-the-icons-alltheicon-scale-factor 0.9)
+;;   (all-the-icons-color-icons t))
 
-;; Highlight the cursor position after the window scrolls
-(use-package beacon
-  :disabled
-  :hook (elpaca-after-init . beacon-mode)
-  :diminish)
+;; ;; Highlight the cursor position after the window scrolls
+;; (use-package beacon
+;;   :disabled
+;;   :hook (elpaca-after-init . beacon-mode)
+;;   :diminish)
 
 ;; Allows to easily identify the file path in a project. But does not support
 ;; imenu.
@@ -4365,46 +4365,46 @@ PAD can be left (`l') or right (`r')."
   :hook ((prog-mode conf-mode org-mode markdown-mode LaTeX-mode) . breadcrumb-mode)
   :config (breadcrumb-imenu-crumbs))
 
-;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
-;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
-;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
-;; @ C-c".
-(use-package hideshow
-  :preface
-  (defun sb/toggle-fold ()
-    (interactive)
-    (save-excursion
-      (end-of-line)
-      (hs-toggle-hiding)))
-  :ensure nil
-  :hook
-  ((c-mode-common
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    cmake-mode
-    cmake-ts-mode
-    css-mode
-    css-ts-mode
-    emacs-lisp-mode
-    fish-mode
-    html-mode
-    java-mode
-    java-ts-mode
-    makefile-mode
-    perl-mode
-    python-mode
-    python-ts-mode
-    sh-mode
-    bash-ts-mode
-    json-mode
-    json-ts-mode
-    jsonc-mode
-    yaml-mode
-    yaml-ts-mode)
-   . hs-minor-mode)
-  :custom (hs-isearch-open t "Open all folds while searching")
-  :diminish hs-minor-mode)
+;; ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
+;; ;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
+;; ;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
+;; ;; @ C-c".
+;; (use-package hideshow
+;;   :preface
+;;   (defun sb/toggle-fold ()
+;;     (interactive)
+;;     (save-excursion
+;;       (end-of-line)
+;;       (hs-toggle-hiding)))
+;;   :ensure nil
+;;   :hook
+;;   ((c-mode-common
+;;     c-ts-mode
+;;     c++-mode
+;;     c++-ts-mode
+;;     cmake-mode
+;;     cmake-ts-mode
+;;     css-mode
+;;     css-ts-mode
+;;     emacs-lisp-mode
+;;     fish-mode
+;;     html-mode
+;;     java-mode
+;;     java-ts-mode
+;;     makefile-mode
+;;     perl-mode
+;;     python-mode
+;;     python-ts-mode
+;;     sh-mode
+;;     bash-ts-mode
+;;     json-mode
+;;     json-ts-mode
+;;     jsonc-mode
+;;     yaml-mode
+;;     yaml-ts-mode)
+;;    . hs-minor-mode)
+;;   :custom (hs-isearch-open t "Open all folds while searching")
+;;   :diminish hs-minor-mode)
 
 (use-package kill-file-path
   :ensure (:host github :repo "chyla/kill-file-path")
@@ -4431,13 +4431,13 @@ PAD can be left (`l') or right (`r')."
   (eglot-extend-to-xref t)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
+     :documentHighlightProvider
      :documentOnTypeFormattingProvider
      :foldingRangeProvider
+     :hoverProvider ; Automatic documentation popups can be distracting
      :inlayHintProvider ; Inlay hints are distracting
      ;; :executeCommandProvider
-     ;; :hoverProvider ; Automatic documentation popups can be distracting
      ;; :documentLinkProvider
-     ;; :documentHighlightProvider
      ))
   (eglot-report-progress nil)
   (eglot-mode-line-format
@@ -5087,19 +5087,19 @@ or the major mode is not in `sb/skippable-modes'."
 ;;      (keyfreq-mode 1)
 ;;      (keyfreq-autosave-mode 1))))
 
-(use-package flyover
-  :ensure (:host github :repo "konrad1977/flyover")
-  :when (display-graphic-p)
-  :hook (flycheck-mode . flyover-mode)
-  :diminish)
+;; (use-package flyover
+;;   :ensure (:host github :repo "konrad1977/flyover")
+;;   :when (display-graphic-p)
+;;   :hook (flycheck-mode . flyover-mode)
+;;   :diminish)
 
 ;; (use-package wingman
 ;;   :ensure (:host github :repo "mjrusso/wingman")
 ;;   :hook (prog-mode . wingman-mode))
 
-(use-package transient-showcase
-  :ensure (:host github :repo "positron-solutions/transient-showcase")
-  :demand t)
+;; (use-package transient-showcase
+;;   :ensure (:host github :repo "positron-solutions/transient-showcase")
+;;   :demand t)
 
 (with-eval-after-load 'transient
   (transient-define-prefix
