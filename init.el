@@ -2776,6 +2776,15 @@ DIR can be relative or absolute."
   (with-eval-after-load 'company
     (company-prescient-mode 1)))
 
+(defun sb/setup-lsp-provider ()
+  "Set up LSP based on `sb/lsp-provider`.
+Uses `eglot` or `lsp-mode` depending on configuration."
+  (cond
+   ((eq sb/lsp-provider 'eglot)
+    (eglot-ensure))
+   ((eq sb/lsp-provider 'lsp-mode)
+    (lsp-deferred))))
+
 ;; It is tempting to use `eglot' because it is built in to Emacs. However,
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
 ;; servers simultaneously and provides helpers to install and uninstall servers.
@@ -3282,11 +3291,7 @@ DIR can be relative or absolute."
    .
    (lambda ()
      (setq-local c-basic-offset 4)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+     (sb/setup-lsp-provider))))
 
 (use-package c-ts-mode
   :ensure nil
@@ -3307,11 +3312,7 @@ DIR can be relative or absolute."
       c-electric-flag nil
       c-enable-auto-newline nil
       c-syntactic-indentation nil)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred)))))
+     (sb/setup-lsp-provider)))
   :bind
   (:map
    c++-ts-mode-map
@@ -3335,13 +3336,9 @@ DIR can be relative or absolute."
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (progn
-         (setq-local lsp-disabled-clients '(ltex-ls-plus))
-         (lsp-deferred)))))))
+     (when (eq sb/lsp-provider 'lsp-mode)
+       (setq-local lsp-disabled-clients '(ltex-ls-plus)))
+     (sb/setup-lsp-provider))))
 
 (use-package python
   :ensure nil
@@ -3354,11 +3351,7 @@ DIR can be relative or absolute."
    .
    (lambda ()
      (setq-local tab-width 4)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((and (eq sb/lsp-provider 'lsp-mode) (eq sb/python-langserver 'pylsp))
-       (lsp-deferred)))))
+     (sb/setup-lsp-provider)))
   :bind*
   (:map
    python-mode-map
@@ -3481,15 +3474,7 @@ DIR can be relative or absolute."
 (use-package toml-ts-mode
   :ensure nil
   :mode ("\\.toml\\'" "Cargo\\.lock\\'")
-  :hook
-  (toml-ts-mode
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+  :hook (toml-ts-mode . sb/setup-lsp-provider))
 
 (use-package yaml-mode
   :mode
@@ -3504,13 +3489,9 @@ DIR can be relative or absolute."
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (progn
-         (setq-local lsp-disabled-clients '(ltex-ls-plus))
-         (lsp-deferred)))))))
+     (when (eq sb/lsp-provider 'lsp-mode)
+       (setq-local lsp-disabled-clients '(ltex-ls-plus)))
+     (sb/setup-lsp-provider))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
@@ -3580,14 +3561,9 @@ DIR can be relative or absolute."
   (markdown-mode
    .
    (lambda ()
-     (cond
-      ;; Eglot does not support multiple servers, so we use `ltex-ls-plus'.
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (progn
-         (require 'lsp-marksman)
-         (lsp-deferred))))))
+     (when (eq sb/lsp-provider 'lsp-mode)
+       (require 'lsp-marksman))
+     (sb/setup-lsp-provider)))
   :bind
   (:map
    markdown-mode-map
@@ -4259,15 +4235,7 @@ PAD can be left (`l') or right (`r')."
 
 (use-package asm-mode
   :ensure nil
-  :hook
-  (asm-mode
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+  :hook (asm-mode . sb/setup-lsp-provider))
 
 ;; Guess the indentation offset originally used in foreign source code files and
 ;; transparently adjust the corresponding settings in Emacs making it more
