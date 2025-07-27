@@ -32,7 +32,7 @@
   :group 'sb/emacs)
 
 ;; Powerline looks clean, but doom-modeline is more informative.
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -1745,6 +1745,7 @@ The provider is `nerd-icons'."
 
 ;; `hotfuzz' is faster than `flex' (built-in) for large candidate sets
 (use-package hotfuzz
+  :after (:any company corfu)
   :demand t)
 
 ;; Use "M-SPC" for space-separated completion lookups.
@@ -2621,14 +2622,14 @@ DIR can be relative or absolute."
   ;; and `cape-dabbrev' are not exactly equal (equal string and equal text
   ;; properties).
 
-  (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file)
+  (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf)
 
-  (dolist (hook '(text-mode-hook markdown-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (sb/setup-capf
-        #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
+  ;; (dolist (hook '(text-mode-hook markdown-mode-hook))
+  ;;   (add-hook
+  ;;    hook
+  ;;    (lambda ()
+  ;;      (sb/setup-capf
+  ;;       #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2644,7 +2645,9 @@ DIR can be relative or absolute."
    'prog-mode-hook
    (lambda ()
      (sb/setup-capf
-      (cape-capf-inside-code (cape-capf-super #'cape-keyword #'cape-dabbrev))
+      (cape-capf-inside-code
+       (cape-capf-super
+        #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
       (cape-capf-inside-comment #'cape-dict)
       #'cape-dabbrev
       #'cape-file
@@ -2669,13 +2672,18 @@ DIR can be relative or absolute."
        (sb/setup-capf
         (cape-capf-inside-code
          (cape-capf-super
-          #'elisp-completion-at-point #'cape-elisp-symbol #'cape-dabbrev))
+          #'elisp-completion-at-point
+          #'citre-completion-at-point
+          #'cape-elisp-symbol
+          ;; #'cape-dabbrev
+          ))
         (cape-capf-inside-comment #'cape-dict)
         #'cape-dabbrev
         #'cape-file
         #'yasnippet-capf))))
 
   ;; ;; Make the capf composable
+
   ;; (with-eval-after-load 'lsp-mode
   ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
   ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
@@ -2755,6 +2763,7 @@ DIR can be relative or absolute."
 ;; recency, Corfu has `corfu-history', and Company has `company-statistics'.
 (use-package prescient
   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+  :after cape
   :hook (elpaca-after-init . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t)
   :config
@@ -4082,65 +4091,79 @@ Fallback to `xref-go-back'."
 ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
 (use-package powerline
   :preface
-  (defun sb/powerline-raw (str &optional face pad)
-    "Render STR as mode-line data using FACE and optionally PAD import.
-PAD can be left (`l') or right (`r')."
-    (when str
-      (let* ((rendered-str (format-mode-line str))
-             (padded-str
-              (concat
-               (when (and (> (length rendered-str) 0) (eq pad 'l))
-                 "")
-               (if (listp str)
-                   rendered-str
-                 str)
-               (when (and (> (length rendered-str) 0) (eq pad 'r))
-                 ""))))
-        (if face
-            (pl/add-text-property padded-str 'face face)
-          padded-str))))
+  ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
+  (defun sb/flycheck-status ()
+    "Return Flycheck status with red for errors and yellow for warnings.
+Shows both colors when errors and warnings are present."
+    (when (bound-and-true-p flycheck-mode)
+      (let-alist
+       (flycheck-count-errors flycheck-current-errors)
+       (cond
+        ;; Both errors and warnings
+        ((and .error .warning)
+         (concat
+          (propertize (format "E:%s" .error) 'face '(:foreground "red"))
+          " "
+          (propertize (format "W:%s" .warning) 'face '(:foreground "gold"))))
+        ;; Only errors
+        (.error
+         (propertize (format "E:%s" .error) 'face '(:foreground "red")))
+        ;; Only warnings
+        (.warning
+         (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
+        ;; Clean: show nothing
+        (t
+         (propertize "✔" 'face '(:foreground "green")))))))
 
   (defun sb/powerline-nano-theme ()
     "Setup a Nano-like modeline"
     (interactive)
-    (setq-default mode-line-format
-                  '("%e" (:eval
-                     (let* ((active (powerline-selected-window-active))
-                            (face0
-                             (if active
-                                 'powerline-active0
-                               'powerline-inactive0))
-                            (lhs
-                             (list
-                              (powerline-raw
-                               (concat
-                                "GNU Emacs "
-                                (number-to-string emacs-major-version)
-                                "."
-                                (number-to-string emacs-minor-version))
-                               nil 'l)))
-                            (rhs
-                             (list
-                              (when which-function-mode
-                                (sb/powerline-raw which-func-format nil 'l))
-                              (powerline-vc nil 'l)
-                              (powerline-raw "")
-                              (powerline-raw "%4l" nil 'l)
-                              (powerline-raw ",")
-                              (powerline-raw "%3c" nil 'r)
-                              (if (buffer-modified-p)
-                                  (powerline-raw " ⠾" nil 'r)
-                                (powerline-raw "  " nil 'r))))
-                            (center (list (powerline-raw "%b" nil 'r))))
-                       (concat
-                        (powerline-render lhs)
-                        (powerline-fill-center
-                         nil (/ (powerline-width center) 2.0))
-                        (powerline-render center)
-                        (powerline-fill nil (powerline-width rhs))
-                        (powerline-render rhs)))))))
+    (setq-default
+     mode-line-format
+     '("%e" (:eval
+        (let*
+            ((active (powerline-selected-window-active))
+             (face0
+              (if active
+                  'powerline-active0
+                'powerline-inactive0))
+             ;; Left-hand side (GNU Emacs version)
+             (lhs
+              (list
+               (powerline-raw
+                (concat
+                 "GNU Emacs "
+                 (number-to-string emacs-major-version)
+                 "."
+                 (number-to-string emacs-minor-version))
+                nil 'l)))
+             ;; Center (buffer name)
+             (center (list (powerline-raw "%b" face0 'r)))
+             ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
+             (rhs
+              (list
+               (when which-function-mode
+                 (powerline-raw which-func-format nil 'l))
+               (powerline-vc nil 'l)
+               (powerline-raw "%4l" face0 'l)
+               (powerline-raw ",")
+               (powerline-raw "%3c" face0 'r)
+               (if (buffer-modified-p)
+                   (powerline-raw "⠾" face0 'r)
+                 (powerline-raw "" face0 'r))
+               (let ((status (sb/flycheck-status)))
+                 (when status
+                   (powerline-raw (format "  %s" status) face0 'r))))))
+          (concat
+           (powerline-render lhs)
+           (powerline-fill-center face0 (/ (powerline-width center) 2.0))
+           (powerline-render center)
+           (powerline-fill nil (powerline-width rhs))
+           (powerline-render rhs)))))))
   :when (eq sb/modeline-theme 'powerline)
-  :hook (elpaca-after-init . sb/powerline-nano-theme)
+  :hook
+  ((elpaca-after-init . sb/powerline-nano-theme)
+   ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
   :custom
   ;; Visualization of the buffer position is not useful
   (powerline-display-hud nil)
@@ -4238,10 +4261,6 @@ PAD can be left (`l') or right (`r')."
   :hook (find-file . buffer-terminator-mode)
   :custom (buffer-terminator-verbose nil)
   :diminish)
-
-(use-package bufferlo
-  :init (bufferlo-mode)
-  :diminish bufferlo-mode)
 
 (use-package hl-line
   :ensure nil
