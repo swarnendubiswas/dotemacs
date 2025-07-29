@@ -1761,7 +1761,9 @@ The provider is `nerd-icons'."
   :bind
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
-  :custom (completion-ignore-case t)
+  :custom
+  (enable-recursive-minibuffers t)
+  (completion-ignore-case t)
   ;; Ignore case when reading a file name
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
@@ -1779,7 +1781,15 @@ The provider is `nerd-icons'."
    completion-category-defaults nil
    ;; The "basic" completion style needs to be tried first for TRAMP hostname
    ;; completion to work. I also want substring matching for file names.
-   completion-category-overrides '((file (styles basic partial-completion)))))
+   completion-category-overrides '((file (styles basic partial-completion))))
+
+  (defun sb/decrease-minibuffer-font ()
+    "Decrease minibuffer font size."
+    (set (make-local-variable 'face-remapping-alist) '((default :height 0.95))))
+  (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font)
+
+  ;; Do not open the *Messages* buffer when clicking in the Echo area.
+  (unbind-key [mouse-1] minibuffer-inactive-mode-map))
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
@@ -2585,7 +2595,6 @@ DIR can be relative or absolute."
   :after corfu
   :demand t
   :custom
-  (cape-dabbrev-min-length 3)
   (cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
@@ -3749,16 +3758,17 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      AUCTeX-version))
   :init (require 'tex-site)
   :hook
-  ((LaTeX-mode . LaTeX-math-mode)
-   (LaTeX-mode . TeX-PDF-mode) ; Use `pdflatex'
-   ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
-   ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-   ;; Enable rainbow mode after applying styles to the buffer
-   ;; (TeX-update-style . rainbow-delimiters-mode)
-   (LaTeX-mode . TeX-source-correlate-mode)
-   ;; (LaTeX-mode . sb/add-latex-pairs)
-   (LaTeX-mode . (lambda () (turn-on-reftex)))
-   (LaTeX-mode . sb/add-latex-pairs))
+  (LaTeX-mode
+   .
+   (lambda ()
+     (LaTeX-math-mode 1)
+     (TeX-PDF-mode) ; Use `pdflatex'
+     (turn-on-reftex)
+     (TeX-source-correlate-mode)))
+  ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
+  ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+  ;; Enable rainbow mode after applying styles to the buffer
+  ;; (TeX-update-style . rainbow-delimiters-mode)
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
   (TeX-auto-save t)
@@ -3980,12 +3990,6 @@ Fallback to `xref-go-back'."
                            citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
   :diminish)
-
-(progn
-  (defun sb/decrease-minibuffer-font ()
-    "Decrease minibuffer font size."
-    (set (make-local-variable 'face-remapping-alist) '((default :height 0.95))))
-  (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
 ;; (use-package doom-themes
 ;;   :init (load-theme 'doom-nord t)
@@ -4890,9 +4894,6 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("C-<tab>" . sb/next-buffer))
 
-;; Do not open the *Messages* buffer when clicking in the Echo area.
-(unbind-key [mouse-1] minibuffer-inactive-mode-map)
-
 ;; ;; Make ESC quit everything
 ;; ;; Clear any previous ESC settings
 ;; (global-unset-key (kbd "<escape>"))
@@ -5026,14 +5027,6 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   :when (display-graphic-p)
 ;;   :hook (flycheck-mode . flyover-mode)
 ;;   :diminish)
-
-;; (use-package wingman
-;;   :ensure (:host github :repo "mjrusso/wingman")
-;;   :hook (prog-mode . wingman-mode))
-
-;; (use-package transient-showcase
-;;   :ensure (:host github :repo "positron-solutions/transient-showcase")
-;;   :demand t)
 
 (with-eval-after-load 'transient
   (transient-define-prefix
