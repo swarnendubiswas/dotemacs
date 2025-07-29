@@ -2665,7 +2665,7 @@ DIR can be relative or absolute."
        (sb/setup-capf
         (cape-capf-inside-code
          (cape-capf-super
-          #'elisp-completion-at-point
+          ;; #'elisp-completion-at-point
           ;; #'citre-completion-at-point
           #'cape-elisp-symbol
           ;; #'cape-dabbrev
@@ -3394,15 +3394,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package sh-script
   :ensure nil
   :mode ("\\bashrc\\'" . bash-ts-mode)
-  :hook
-  ((sh-mode bash-ts-mode)
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred)))))
+  :hook ((sh-mode bash-ts-mode) . sb/setup-lsp-provider)
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
@@ -3487,30 +3479,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
 
-;; (use-package css-mode
-;;   :ensure nil
-;;   :hook
-;;   ((css-mode css-ts-mode)
-;;    .
-;;    (lambda ()
-;;      (cond
-;;       ((eq sb/lsp-provider 'eglot)
-;;        (eglot-ensure))
-;;       ((eq sb/lsp-provider 'lsp-mode)
-;;        (lsp-deferred)))))
-;;   :custom (css-indent-offset 2))
+(use-package css-mode
+  :ensure nil
+  :hook ((css-mode css-ts-mode) . sb/setup-lsp-provider)
+  :custom (css-indent-offset 2))
 
 (use-package autoconf
   :ensure nil
-  :hook
-  (autoconf-mode
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+  :hook (autoconf-mode . sb/setup-lsp-provider))
 
 (use-package make-mode
   :ensure nil
@@ -3523,11 +3499,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (setq-local indent-tabs-mode t)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+     (sb/setup-lsp-provider))))
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -3594,13 +3566,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (progn
-         (setq-local lsp-disabled-clients '(ltex-ls-plus))
-         (lsp-deferred))))))
+     (when (eq sb/lsp-provider 'lsp-mode)
+       (setq-local lsp-disabled-clients '(ltex-ls-plus)))
+     (sb/setup-lsp-provider)))
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -3620,11 +3588,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (setq-local js-indent-level 2)
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred))))))
+     (sb/setup-lsp-provider))))
 
 ;; Links in org-mode by default are displayed as "descriptive" links, meaning
 ;; they hide their target URLs. While this looks great, it makes it a bit tricky
@@ -3872,15 +3836,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package bibtex
   :ensure nil
-  :hook
-  (bibtex-mode
-   .
-   (lambda ()
-     (cond
-      ((eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-      ((eq sb/lsp-provider 'lsp-mode)
-       (lsp-deferred)))))
+  :hook (bibtex-mode . sb/setup-lsp-provider)
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
