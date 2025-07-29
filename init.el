@@ -25,7 +25,6 @@
   "Specify which Emacs theme to use."
   :type
   '(radio
-    (const :tag "doom-nord" doom-nord)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "catppuccin" catppuccin)
     (const :tag "none" none))
@@ -1402,6 +1401,7 @@ The provider is `nerd-icons'."
   :custom (visual-replace-display-total t))
 
 (use-package transient
+  :demand t
   :custom (transient-semantic-coloring t)
   :config (transient-bind-q-to-quit))
 
@@ -1465,6 +1465,10 @@ The provider is `nerd-icons'."
   :ensure nil)
 
 (use-package elec-pair
+  :preface
+  (defun sb/add-pairs (pairs)
+    (setq-local electric-pair-pairs (append electric-pair-pairs pairs))
+    (setq-local electric-pair-text-pairs electric-pair-pairs))
   :ensure nil
   :hook (elpaca-after-init . electric-pair-mode)
   :custom
@@ -1476,21 +1480,7 @@ The provider is `nerd-icons'."
           (lambda (c)
             (if (char-equal c ?\")
                 t
-              (electric-pair-default-inhibit c))))
-
-  (defvar sb/markdown-pairs '((?` . ?`)))
-
-  (defun sb/add-markdown-pairs ()
-    (setq-local electric-pair-pairs
-                (append electric-pair-pairs sb/markdown-pairs))
-    (setq-local electric-pair-text-pairs electric-pair-pairs))
-
-  ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
-
-  ;; (defun sb/add-latex-pairs ()
-  ;;   (setq-local electric-pair-pairs (append electric-pair-pairs sb/latex-pairs))
-  ;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
-  )
+              (electric-pair-default-inhibit c)))))
 
 ;; "C-h m" or `describe-mode' shows all the active minor modes (and major mode)
 ;; and a brief description of each.
@@ -2617,19 +2607,22 @@ DIR can be relative or absolute."
   ;; returning a result wins. Note that the list of buffer-local completion
   ;; functions takes precedence over the global list.
 
-  ;; https://github.com/minad/cape/discussions/130
-  ;; There is no mechanism to force deduplication if candidates from `cape-dict'
-  ;; and `cape-dabbrev' are not exactly equal (equal string and equal text
-  ;; properties).
+  ;; https://github.com/minad/cape/discussions/130 There is no mechanism to
+  ;; force deduplication if candidates from `cape-dict' and `cape-dabbrev' are
+  ;; not exactly equal (both equal string and equal text properties).
 
-  (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf)
+  (defun sb/setup-capf (&rest capfs)
+    "Set `completion-at-point-functions' buffer-locally."
+    (setq-local completion-at-point-functions capfs))
 
-  ;; (dolist (hook '(text-mode-hook markdown-mode-hook))
-  ;;   (add-hook
-  ;;    hook
-  ;;    (lambda ()
-  ;;      (sb/setup-capf
-  ;;       #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
+  ;; (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf)
+
+  (dolist (hook '(text-mode-hook markdown-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       (sb/setup-capf
+        #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2673,7 +2666,7 @@ DIR can be relative or absolute."
         (cape-capf-inside-code
          (cape-capf-super
           #'elisp-completion-at-point
-          #'citre-completion-at-point
+          ;; #'citre-completion-at-point
           #'cape-elisp-symbol
           ;; #'cape-dabbrev
           ))
@@ -2701,7 +2694,9 @@ DIR can be relative or absolute."
     (sb/setup-capf
      (cape-capf-inside-code
       (cape-capf-super
-       backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
+       backend
+       ;; #'citre-completion-at-point #'cape-keyword #'cape-dabbrev
+       ))
      (cape-capf-inside-comment #'cape-dict)
      #'cape-dabbrev
      #'cape-file
@@ -2788,13 +2783,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; servers simultaneously and provides helpers to install and uninstall servers.
 (use-package lsp-mode
   :when (eq sb/lsp-provider 'lsp-mode)
-  ;;:bind-keymap ("C-c l" . lsp-command-map)
   :bind (:map lsp-command-map ("g"))
-  :custom
-  ;; (lsp-keymap-prefix "C-c l")
-  (lsp-use-plists t)
+  :custom (lsp-use-plists t)
   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
-  ;; Tramp which is slower
+  ;; Tramp which is slower.
   (lsp-auto-register-remote-clients nil)
   (lsp-keep-workspace-alive nil)
   (lsp-progess-via-spinner nil)
@@ -2804,9 +2796,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-restart 'auto-restart)
   ;; Avoid warning messages for unsupported modes like `csv-mode'
   (lsp-warn-no-matched-clients nil)
-  (lsp-enable-suggest-server-download nil)
+  ;; (lsp-enable-suggest-server-download nil)
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
-  (lsp-format-buffer-on-save t)
+  ;; (lsp-format-buffer-on-save t)
   (lsp-format-buffer-on-save-list
    '(bash-ts-mode
      c-mode
@@ -2838,8 +2830,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-modeline-code-actions-enable nil)
   ;; We already show Flycheck status on the modeline
   (lsp-modeline-diagnostics-enable nil)
-  ;; The workspace status icon on the terminal interface is misleading across
-  ;; projects
+  ;; The workspace status icon on the terminal interface persists across projects and hence is misleading
   (lsp-modeline-workspace-status-enable nil)
   ;; Simpler to focus on the errors at hand
   (lsp-modeline-diagnostics-scope :file)
@@ -2852,11 +2843,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-completion-show-detail nil)
   ;; Show/hide completion kind, e.g., interface/class
   (lsp-completion-show-kind t)
-  ;; Show/hide description of completion candidates
-  (lsp-completion-show-label-description t)
   (lsp-completion-default-behaviour :insert)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
-  (lsp-eldoc-enable-hover t "Do not show noisy hover info with mouse")
+  (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   ;; Sudden changes in the height of the echo area causes the cursor to lose
   ;; position, manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
@@ -2885,7 +2874,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
   (lsp-xml-logs-client nil)
-  ;; List of configuration sources
   (lsp-pylsp-configuration-sources ["pyproject.toml" "setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   (lsp-pylsp-plugins-preload-enabled nil)
@@ -2896,7 +2884,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pylsp-plugins-yapf-enabled nil "Using Apheleia")
   (lsp-pylsp-plugins-flake8-enabled nil)
   (lsp-pylsp-plugins-isort-enabled t)
-  (lsp-pylsp-plugins-mypy-enabled t)
   ;; Delay checking for types till the changes are saved
   (lsp-pylsp-plugins-mypy-live-mode nil)
   (lsp-pylsp-plugins-ruff-enabled t)
@@ -2906,6 +2893,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pylsp-plugins-ruff-target-version "py310")
   (lsp-semgrep-metrics-enabled nil)
   :config
+  (cond
+   ((eq sb/python-langserver 'pylsp)
+    (setopt lsp-pylsp-plugins-mypy-enabled t))
+   ((eq sb/python-langserver 'basedpyright)
+    (setopt lsp-pylsp-plugins-mypy-enabled nil)))
+
   ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
   ;; (defgroup lsp-harper nil
   ;;   "Settings for Harper grammar language server."
@@ -2960,6 +2953,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
+
   ;; (dolist (ignore-dirs
   ;;          '("/build\\'"
   ;;            "/\\.metadata\\'"
@@ -2968,6 +2962,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;;            "/\\.cache\\'"
   ;;            "/__pycache__\\'"))
   ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
+
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
     (or (when (equal (following-char) ?#)
@@ -3265,6 +3260,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package treesit-auto
   :after treesit
+  :demand t
   :custom (treesit-auto-install t)
   :config
   (global-treesit-auto-mode 1)
@@ -3574,7 +3570,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (markdown-indent-on-enter 'indent-and-new-item)
   (markdown-list-indent-width 2)
   (markdown-split-window-direction 'horizontal)
-  (markdown-hide-urls t))
+  (markdown-hide-urls t)
+
+  (defvar sb/markdown-pairs '((?` . ?`)))
+  ;; Auto-pair backticks
+  (add-hook 'markdown-mode-hook (lambda () (sb/add-pairs '((?` . ?`))))))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
@@ -3793,7 +3793,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ;; (TeX-update-style . rainbow-delimiters-mode)
    (LaTeX-mode . TeX-source-correlate-mode)
    ;; (LaTeX-mode . sb/add-latex-pairs)
-   (LaTeX-mode . (lambda () (turn-on-reftex))))
+   (LaTeX-mode . (lambda () (turn-on-reftex)))
+   (LaTeX-mode . sb/add-latex-pairs))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
   (TeX-auto-save t)
@@ -3830,7 +3831,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    TeX-source-correlate-start-server t
    ;; Enable synctex generation. Even though the command shows as "latex"
    ;; pdflatex is actually called
-   LaTeX-command "latex -shell-escape=1 -synctex=1"))
+   LaTeX-command "latex -shell-escape=1 -synctex=1")
+
+  (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
+  (add-hook
+   'LaTeX-mode-hook
+   (lambda () (sb/add-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\)))))))
 
 (use-package tex
   :ensure nil
@@ -4025,12 +4031,11 @@ Fallback to `xref-go-back'."
     (set (make-local-variable 'face-remapping-alist) '((default :height 0.95))))
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font))
 
-(use-package doom-themes
-  :when (eq sb/theme 'doom-nord)
-  :init (load-theme 'doom-nord t)
-  :config
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+;; (use-package doom-themes
+;;   :init (load-theme 'doom-nord t)
+;;   :config
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
@@ -4145,15 +4150,15 @@ Shows both colors when errors and warnings are present."
                (when which-function-mode
                  (powerline-raw which-func-format nil 'l))
                (powerline-vc nil 'l)
-               (powerline-raw "%4l" face0 'l)
+               (powerline-raw " %4l" nil 'l)
                (powerline-raw ",")
-               (powerline-raw "%3c" face0 'r)
+               (powerline-raw "%3c" nil 'r)
                (if (buffer-modified-p)
-                   (powerline-raw "⠾" face0 'r)
-                 (powerline-raw "" face0 'r))
+                   (powerline-raw "⠾" nil 'r)
+                 (powerline-raw "" nil 'r))
                (let ((status (sb/flycheck-status)))
                  (when status
-                   (powerline-raw (format "  %s" status) face0 'r))))))
+                   (powerline-raw (format "  %s" status) nil 'r))))))
           (concat
            (powerline-render lhs)
            (powerline-fill-center face0 (/ (powerline-width center) 2.0))
@@ -4219,18 +4224,18 @@ Shows both colors when errors and warnings are present."
   :ensure (:host github :repo "dataphract/kdl-ts-mode")
   :mode ("\\.kdl\\'" . kdl-ts-mode))
 
-;; (use-package reformatter
-;;   :after (:any kdl-ts-mode kdl-mode)
-;;   :demand t
-;;   :config
-;;   (reformatter-define
-;;    kdl-format
-;;    :program "kdlfmt"
-;;    :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
-;;    :lighter " KDLFMT"
-;;    :group 'reformatter)
-;;   (add-hook 'kdl-ts-mode-hook #'kdl-format-on-save-mode)
-;;   (add-hook 'kdl-mode-hook #'kdl-format-on-save-mode))
+(use-package reformatter
+  :after (:any kdl-ts-mode kdl-mode)
+  :demand t
+  :config
+  (reformatter-define
+   kdlformat
+   :program "kdlfmt"
+   :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
+   :lighter " KDLFMT"
+   :group 'reformatter)
+  (add-hook 'kdl-ts-mode-hook #'kdl-format-on-save-mode)
+  (add-hook 'kdl-mode-hook #'kdl-format-on-save-mode))
 
 ;; Fontify ssh files
 (use-package ssh-config-mode
