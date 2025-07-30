@@ -21,7 +21,7 @@
   :group 'sb/emacs)
 
 ;; Modus-vivendi is the most complete, while Catppuccin is more colorful.
-(defcustom sb/theme 'catppuccin
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -48,7 +48,7 @@
 ;; has more extensive LaTeX support than Corfu. We can set up separate
 ;; completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -2394,7 +2394,7 @@ DIR can be relative or absolute."
     (setq-local company-backends
                 '((:separate
                    company-capf
-                   ;;company-bibtex
+                   ;; company-bibtex
                    ;; company-auctex-bibs
                    company-reftex-citations
                    company-reftex-labels
@@ -2562,16 +2562,18 @@ DIR can be relative or absolute."
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-prefix 3)
+  (corfu-auto-prefix 2)
   (corfu-on-exact-match 'show)
+  ;; Do not close popup when adjacent to other characters
+  (corfu-quit-at-boundary nil)
   :config
-  ;; Disable `orderless' completion for Corfu
-  (add-hook
-   'corfu-mode-hook
-   (lambda ()
-     (setq-local completion-category-overrides
-                 '((consult-location (styles . (orderless)))))))
-  (add-hook 'python-ts-mode-hook (lambda () (setq-local corfu-auto-prefix 2))))
+  ;; ;; Disable `orderless' completion for Corfu
+  ;; (add-hook
+  ;;  'corfu-mode-hook
+  ;;  (lambda ()
+  ;;    (setq-local completion-category-overrides
+  ;;                '((consult-location (styles . (orderless)))))))
+  )
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
@@ -2655,17 +2657,17 @@ DIR can be relative or absolute."
       #'cape-file
       #'yasnippet-capf)))
 
-  ;; LaTeX-specific CAPFs (math + bibtex)
-  (defun sb/latex-capfs ()
-    (sb/setup-capf
-     #'cape-tex
-     (cape-capf-super #'citar-capf #'bibtex-capf)
-     #'cape-dict
-     #'cape-file
-     #'cape-dabbrev
-     #'yasnippet-capf))
   (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
-    (add-hook hook #'sb/latex-capfs))
+    (add-hook
+     hook
+     (lambda ()
+       (sb/setup-capf
+        #'cape-tex
+        #'bibtex-capf
+        #'cape-dict
+        #'cape-file
+        #'cape-dabbrev
+        #'yasnippet-capf))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2767,7 +2769,6 @@ DIR can be relative or absolute."
 ;; recency, Corfu has `corfu-history', and Company has `company-statistics'.
 (use-package prescient
   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
-  :after cape
   :hook (elpaca-after-init . prescient-persist-mode)
   :custom (prescient-sort-full-matches-first t)
   :config
@@ -3166,6 +3167,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      'company-capf
      'company-abort))
   :diminish)
+
+(use-package eldoc-box
+  :ensure t
+  :after eldoc
+  :demand t)
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
@@ -3719,26 +3725,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; The LSP setup seems to work very poorly with large LaTeX files, leading to
 ;; frequent hangs while communicating with Emacs.
 
-;; (use-package lsp-latex
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-;;   :hook
-;;   ((LaTeX-mode bibtex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'lsp-latex)
-;;      (lsp-deferred)))
-;;   :custom
-;;   (lsp-latex-bibtex-formatter "latexindent")
-;;   (lsp-latex-latex-formatter "latexindent")
-;;   (lsp-latex-bibtex-formatter-line-length fill-column)
-;;   (lsp-latex-diagnostics-delay 2000)
-;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
-;;   ;; in the PDF.
-;;   (lsp-latex-forward-search-executable "okular")
-;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-;;   :config
-;;   (with-eval-after-load 'tex-mode
-;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+(use-package lsp-latex
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :hook
+  ((LaTeX-mode bibtex-mode)
+   .
+   (lambda ()
+     (require 'lsp-latex)
+     (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
+  (lsp-latex-bibtex-formatter-line-length fill-column)
+  (lsp-latex-diagnostics-delay 2000)
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click
+  ;; in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+  :config
+  (with-eval-after-load 'tex-mode
+    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -4056,6 +4062,24 @@ Fallback to `xref-go-back'."
 ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
 (use-package powerline
   :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let* ((rendered-str (format-mode-line str))
+             (padded-str
+              (concat
+               (when (and (> (length rendered-str) 0) (eq pad 'l))
+                 "")
+               (if (listp str)
+                   rendered-str
+                 str)
+               (when (and (> (length rendered-str) 0) (eq pad 'r))
+                 ""))))
+        (if face
+            (pl/add-text-property padded-str 'face face)
+          padded-str))))
+
   ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
   (defun sb/flycheck-status ()
     "Return Flycheck status with red for errors and yellow for warnings.
@@ -4103,7 +4127,7 @@ Shows both colors when errors and warnings are present."
                  (number-to-string emacs-minor-version))
                 nil 'l)))
              ;; Center (buffer name)
-             (center (list (powerline-raw "%b" face0 'r)))
+             (center (list (powerline-raw "%b" nil 'r)))
              ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
              (rhs
               (list
@@ -5079,7 +5103,7 @@ or the major mode is not in `sb/skippable-modes'."
        ("l" "Keep lower" smerge-keep-lower)
        ("a" "Keep both" smerge-keep-all)]
       ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
-    (bind-key "C-c g" #'sb/smerge-transient))
+    (bind-key "C-c ^" #'sb/smerge-transient))
 
   (with-eval-after-load 'lsp-mode
     (transient-define-prefix
