@@ -1401,7 +1401,8 @@ The provider is `nerd-icons'."
   :custom (visual-replace-display-total t))
 
 (use-package transient
-  :demand t
+  :commands transient-define-prefix
+  :demand t ; Required so that transient keybindings are available
   :custom (transient-semantic-coloring t)
   :config (transient-bind-q-to-quit))
 
@@ -1817,6 +1818,7 @@ The provider is `nerd-icons'."
 (use-package kind-icon
   :when (and (bound-and-true-p sb/enable-icons) (eq sb/in-buffer-completion 'company))
   :after nerd-icons
+  :demand t ; Required to load the library because there are no other triggers
   :custom
   ;; Prefer smaller icons and a more compact popup
   (kind-icon-default-style
@@ -2313,6 +2315,9 @@ DIR can be relative or absolute."
 (use-package company-bibtex
   :after bibtex-completion)
 
+(use-package company-wordfreq
+  :after company)
+
 ;; Notes on how to set up `company-backends'.
 
 ;; A few mode-agnostic backends are applicable to all modes:
@@ -2409,6 +2414,7 @@ DIR can be relative or absolute."
                    ;; Math Unicode symbols and sub (super) scripts
                    company-math-symbols-unicode
                    company-dict
+                   company-wordfreq
                    company-ispell
                    company-dabbrev)
                   company-files company-yasnippet)))
@@ -2429,7 +2435,8 @@ DIR can be relative or absolute."
     "Add backends for `text-mode' completion in company mode."
     (set
      (make-local-variable 'company-backends)
-     '(company-files (company-dict company-ispell) company-dabbrev)))
+     '(company-files
+       (company-dict company-wordfreq company-ispell) company-dabbrev)))
 
   ;; Extends to derived modes like `markdown-mode' 
   (add-hook
@@ -2592,6 +2599,11 @@ DIR can be relative or absolute."
   :after (yasnippet corfu)
   :demand t)
 
+(use-package capf-wordfreq
+  :ensure (:host github :repo "johannes-mueller/capf-wordfreq.el")
+  :after corfu
+  :demand t)
+
 ;; CAPE for composable CAPFs (with LSP + extra sources)
 (use-package cape
   :after corfu
@@ -2633,7 +2645,11 @@ DIR can be relative or absolute."
      hook
      (lambda ()
        (sb/setup-capf
-        #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
+        #'cape-dict
+        #'capf-wordfreq-completion-at-point-function
+        #'cape-dabbrev
+        #'cape-file
+        #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2665,6 +2681,7 @@ DIR can be relative or absolute."
         #'cape-tex
         #'bibtex-capf
         #'cape-dict
+        #'capf-wordfreq-completion-at-point-function
         #'cape-file
         #'cape-dabbrev
         #'yasnippet-capf))))
@@ -3723,28 +3740,28 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (setopt tex-command "pdflatex"))
 
 ;; The LSP setup seems to work very poorly with large LaTeX files, leading to
-;; frequent hangs while communicating with Emacs.
+;; frequent hangs while communicating with Emacs. Furthermore, this package is not required for completions with `company-mode'.
 
-(use-package lsp-latex
-  :when (eq sb/lsp-provider 'lsp-mode)
-  :hook
-  ((LaTeX-mode bibtex-mode)
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length fill-column)
-  (lsp-latex-diagnostics-delay 2000)
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click
-  ;; in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-  :config
-  (with-eval-after-load 'tex-mode
-    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+;; (use-package lsp-latex
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+;;   :hook
+;;   ((LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter "latexindent")
+;;   (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load 'tex-mode
+;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -3958,8 +3975,9 @@ Fallback to `xref-go-back'."
 # add dirs/files to scan here, one line per dir/file
 ")
   :config
-  ;; Conflicts with Elisp imenu entries
-  (setq-default citre-enable-imenu-integration nil)
+  (setq-default
+   citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
+   citre-enable-capf-integration nil)
 
   ;; Use `citre' with Emacs Lisp
   (defvar citre-elisp-backend
@@ -4102,10 +4120,11 @@ Shows both colors when errors and warnings are present."
          (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
         ;; Clean: show nothing
         (t
-         (propertize "✔" 'face '(:foreground "green")))))))
+         (propertize "✔ " 'face '(:foreground "green")))))))
 
+  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
   (defun sb/powerline-nano-theme ()
-    "Setup a Nano-like modeline"
+    "Setup a nano-like modeline"
     (interactive)
     (setq-default
      mode-line-format
@@ -4134,18 +4153,20 @@ Shows both colors when errors and warnings are present."
                (when which-function-mode
                  (powerline-raw which-func-format nil 'l))
                (powerline-vc nil 'l)
-               (powerline-raw " %4l" nil 'l)
+               (powerline-raw "")
+               (powerline-raw "%4l" nil 'l)
                (powerline-raw ",")
                (powerline-raw "%3c" nil 'r)
                (if (buffer-modified-p)
-                   (powerline-raw "⠾" nil 'r)
-                 (powerline-raw "" nil 'r))
+                   (powerline-raw " ⠾" nil 'r)
+                 (powerline-raw "  " nil 'r))
                (let ((status (sb/flycheck-status)))
                  (when status
-                   (powerline-raw (format "  %s" status) nil 'r))))))
+                   (powerline-raw (format "  %s" status) nil 'r)))
+               (powerline-raw " "))))
           (concat
            (powerline-render lhs)
-           (powerline-fill-center face0 (/ (powerline-width center) 2.0))
+           (powerline-fill-center nil (/ (powerline-width center) 2.0))
            (powerline-render center)
            (powerline-fill nil (powerline-width rhs))
            (powerline-render rhs)))))))
@@ -4934,11 +4955,11 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
 ;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
-;; (use-package default-text-scale
-;;   :when (display-graphic-p)
-;;   :bind
-;;   (("C-M-+" . default-text-scale-increase)
-;;    ("C-M--" . default-text-scale-decrease)))
+(use-package default-text-scale
+  :when (display-graphic-p)
+  :bind
+  (("C-M-+" . default-text-scale-increase)
+   ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
 (use-package free-keys
@@ -5046,11 +5067,11 @@ or the major mode is not in `sb/skippable-modes'."
 ;;      (keyfreq-mode 1)
 ;;      (keyfreq-autosave-mode 1))))
 
-;; (use-package flyover
-;;   :ensure (:host github :repo "konrad1977/flyover")
-;;   :when (display-graphic-p)
-;;   :hook (flycheck-mode . flyover-mode)
-;;   :diminish)
+(use-package flyover
+  :ensure (:host github :repo "konrad1977/flyover")
+  :when (display-graphic-p)
+  :hook (flycheck-mode . flyover-mode)
+  :diminish)
 
 (with-eval-after-load 'transient
   (transient-define-prefix
