@@ -832,6 +832,7 @@ The provider is `nerd-icons'."
 (use-package project-x
   :ensure (:host github :repo "karthink/project-x")
   :after project
+  :demand t ; Required so that transient keybindings are available
   :config (add-hook 'project-find-functions #'project-x-try-local 90))
 
 (use-package vertico
@@ -1430,10 +1431,11 @@ The provider is `nerd-icons'."
   (magit-save-repository-buffers 'dontask)
   ;; Do not show the diff by default in the commit buffer.
   (magit-commit-show-diff nil)
+  (magit-format-file-function #'magit-format-file-nerd-icons)
+  :config
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
-    (magit-diff-refine-hunk t)
-    (magit-format-file-function #'magit-format-file-nerd-icons)))
+    (setopt magit-diff-refine-hunk t)))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -2316,7 +2318,7 @@ DIR can be relative or absolute."
   :after bibtex-completion)
 
 (use-package company-wordfreq
-  :after company)
+  :after (:any company corfu))
 
 ;; Notes on how to set up `company-backends'.
 
@@ -2571,8 +2573,8 @@ DIR can be relative or absolute."
   (corfu-auto t "Enable auto completion")
   (corfu-auto-prefix 2)
   (corfu-on-exact-match 'show)
-  ;; Do not close popup when adjacent to other characters
-  (corfu-quit-at-boundary nil)
+  ;; ;; Do not close popup when adjacent to other characters
+  ;; (corfu-quit-at-boundary nil)
   :config
   ;; ;; Disable `orderless' completion for Corfu
   ;; (add-hook
@@ -2646,7 +2648,7 @@ DIR can be relative or absolute."
      (lambda ()
        (sb/setup-capf
         #'cape-dict
-        #'capf-wordfreq-completion-at-point-function
+        (cape-company-to-capf #'company-wordfreq)
         #'cape-dabbrev
         #'cape-file
         #'yasnippet-capf))))
@@ -5071,6 +5073,9 @@ or the major mode is not in `sb/skippable-modes'."
   :ensure (:host github :repo "konrad1977/flyover")
   :when (display-graphic-p)
   :hook (flycheck-mode . flyover-mode)
+  :custom
+  (flyover-hide-checker-name nil)
+  (flyover-background-lightness 40)
   :diminish)
 
 (with-eval-after-load 'transient
