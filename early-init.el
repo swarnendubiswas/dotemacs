@@ -114,10 +114,16 @@
 
 ;; The run-time load order is: (1) file described by `site-run-file' if non-nil,
 ;; (2) `user-init-file', and (3) `default.el'.
+
+;; Disable site-wide run-time initialization. Customizing size-run-file with
+;; `setopt' does not work.
 (setq
- site-run-file nil ; Disable site-wide run-time initialization
+ site-run-file nil
  ;; Disable loading of `default.el' at startup
- inhibit-default-init t)
+ inhibit-default-init t
+ ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
+ ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
+ package-enable-at-startup nil)
 
 (setopt
  load-prefer-newer t
@@ -154,9 +160,16 @@
 (when (fboundp 'tooltip-mode)
   (tooltip-mode -1))
 
-;; Set a hint of transparency, works with GUI frames
+;; Set a hint of transparency, works with GUI frames.
+
+;; Sets the active and inactive frame transparency to 97% for the currently selected frame.
 (set-frame-parameter (selected-frame) 'alpha '(97 . 97))
+;; Ensures new frames are created with 97% opacity.
 (add-to-list 'default-frame-alist '(alpha . (97 . 97)))
+
+;; Only for Emacs 29+, and applies when using pgtk or Wayland
+;; (set-frame-parameter nil 'alpha-background 50)
+;; (add-to-list 'default-frame-alist '(alpha-background . 50))
 
 ;; Maximize Emacs on startup.
 
@@ -164,11 +177,6 @@
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 ;; Applies to every Emacs frame
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-;; Avoid loading packages twice, this is set during `(package-initialize)'. This
-;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el". We
-;; cannot use `setq' for the following variable.
-(setq package-enable-at-startup nil)
 
 (setopt
  warning-minimum-level :error
@@ -205,14 +213,13 @@
 
 ;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
 
-;; Alternate options: "Hack Nerd Font", "MesloLGS Nerd Font"
 (defun sb/init-fonts-graphic ()
   (cond
    ((string= (system-name) "inspiron-7572")
     (progn
       (set-face-attribute 'default nil
                           :font "JetBrainsMonoNerdFont"
-                          :height 220)
+                          :height 200)
       (set-face-attribute 'mode-line nil :height 160)
       (set-face-attribute 'mode-line-inactive nil :height 160)))
 
@@ -233,8 +240,6 @@
       (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
 (add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
-
-;; (set-frame-parameter nil 'alpha-background 50)
 
 (provide 'early-init)
 

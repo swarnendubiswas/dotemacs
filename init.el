@@ -48,7 +48,7 @@
 ;; has more extensive LaTeX support than Corfu. We can set up separate
 ;; completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -130,7 +130,20 @@ The provider is `nerd-icons'."
 (use-package exec-path-from-shell
   :when (eq system-type 'gnu/linux)
   :init
-  (setopt exec-path-from-shell-arguments nil)
+  (setopt
+   exec-path-from-shell-check-startup-files nil
+   exec-path-from-shell-variables
+   '("PATH"
+     "JAVA_HOME"
+     "TERM"
+     "PYTHONPATH"
+     "LANG"
+     "LC_CTYPE"
+     "XAUTHORITY"
+     "LSP_USE_PLISTS"
+     "CONDA_PREFIX"
+     "CONDA_EXE")
+   exec-path-from-shell-arguments '("-l"))
   (exec-path-from-shell-initialize))
 
 (use-package emacs
@@ -536,7 +549,6 @@ The provider is `nerd-icons'."
       (tramp-cleanup-all-buffers)
       (tramp-cleanup-all-connections)))
   :ensure nil
-  :bind ("C-M-g" . sb/cleanup-tramp)
   :custom
   ;; Remote files are not updated outside of Tramp
   (remote-file-name-inhibit-cache nil)
@@ -663,6 +675,28 @@ The provider is `nerd-icons'."
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
+  :preface
+  (defun sb/avy-goto-visual-line-column-0 ()
+    "Jump to the beginning (column 0) of each visible visual line."
+    (interactive)
+    (avy-with
+     avy-goto-line
+     (avy-process
+      (save-excursion
+        (let ((start (window-start))
+              (end (window-end nil t))
+              (positions '()))
+          (goto-char start)
+          (while (< (point) end)
+            ;; Move to beginning of visual line
+            (let ((bol
+                   (save-excursion
+                     (vertical-motion 0) ;; stay on current visual line
+                     (line-beginning-position))))
+              (push (cons bol bol) positions))
+            (vertical-motion 1)) ;; move to next visual line
+          (nreverse positions)))
+      (avy--style-fn avy-style))))
   :bind
   (("C-\\" . avy-goto-word-1)
    ("C-'" . avy-goto-char-timer)
@@ -805,12 +839,16 @@ The provider is `nerd-icons'."
 ;; Emacs session or are auto-loaded.
 (use-package xref
   :ensure nil
+  :after consult
   :bind
   (("M-." . xref-find-definitions)
    ("M-," . xref-go-back) ("M-?" . xref-find-references)
    ;; Find all identifiers whose name matches pattern
    ("C-M-." . xref-find-apropos))
-  :custom (xref-search-program 'ripgrep))
+  :custom
+  (xref-search-program 'ripgrep)
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref))
 
 ;; Exclude project roots with `project-list-exclude'.
 (use-package project
@@ -925,10 +963,7 @@ The provider is `nerd-icons'."
    :map
    isearch-mode-map
    ("M-s e" . consult-isearch-history))
-  :custom
-  (consult-line-start-from-top t "Start search from the beginning")
-  (xref-show-xrefs-function #'consult-xref)
-  (xref-show-definitions-function #'consult-xref)
+  :custom (consult-line-start-from-top t "Start search from the beginning")
   ;; Disable preview by default, enable for selected commands
   (consult-preview-key nil)
   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
@@ -975,7 +1010,8 @@ The provider is `nerd-icons'."
      "\\*lsp-harper*"
      "\\*taplo*"
      "\\*ruff.*"
-     "\\*marksman.*"))
+     "\\*marksman.*"
+     "\\*html-ls.*"))
   :config
   (consult-customize
    consult-line
@@ -1219,7 +1255,12 @@ The provider is `nerd-icons'."
      xref-after-jump-hook
      xref-after-return-hook
      consult-after-jump-hook
-     before-save-hook)))
+     before-save-hook))
+  :config
+  (setq dogears-list
+        (sort dogears-list
+              (lambda (a b)
+                (time-less-p (alist-get 'time b) (alist-get 'time a))))))
 
 (use-package vundo
   :bind
@@ -1684,7 +1725,6 @@ The provider is `nerd-icons'."
   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
   :custom
   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
-
   :config
   (when (and (executable-find "tree-sitter")
              (fboundp 'treesit-available-p)
@@ -1765,7 +1805,7 @@ The provider is `nerd-icons'."
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
   :custom
-  (enable-recursive-minibuffers t)
+  (enable-recursive-minibuffers nil)
   (completion-ignore-case t)
   ;; Ignore case when reading a file name
   (read-file-name-completion-ignore-case t)
@@ -2545,6 +2585,7 @@ DIR can be relative or absolute."
   :preface
   (defun sb/corfu-default-setup ()
     ;; The right edge is getting cut off with `corfu-indexed-mode'
+    (corfu-indexed-mode 1)
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
     (corfu-popupinfo-mode 1))
@@ -2567,7 +2608,8 @@ DIR can be relative or absolute."
    ("M-l" . corfu-info-location)
    ("M-n" . corfu-popupinfo-scroll-up)
    ("M-p" . corfu-popupinfo-scroll-down)
-   ([remap corfu-show-documentation] . corfu-popupinfo-toggle))
+   ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
+   ("[escape]" . corfu-quit))
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
@@ -2575,13 +2617,6 @@ DIR can be relative or absolute."
   (corfu-on-exact-match 'show)
   ;; ;; Do not close popup when adjacent to other characters
   ;; (corfu-quit-at-boundary nil)
-  :config
-  ;; ;; Disable `orderless' completion for Corfu
-  ;; (add-hook
-  ;;  'corfu-mode-hook
-  ;;  (lambda ()
-  ;;    (setq-local completion-category-overrides
-  ;;                '((consult-location (styles . (orderless)))))))
   )
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
@@ -2601,10 +2636,10 @@ DIR can be relative or absolute."
   :after (yasnippet corfu)
   :demand t)
 
-(use-package capf-wordfreq
-  :ensure (:host github :repo "johannes-mueller/capf-wordfreq.el")
-  :after corfu
-  :demand t)
+;; (use-package capf-wordfreq
+;;   :ensure (:host github :repo "johannes-mueller/capf-wordfreq.el")
+;;   :after corfu
+;;   :demand t)
 
 ;; CAPE for composable CAPFs (with LSP + extra sources)
 (use-package cape
@@ -2616,10 +2651,6 @@ DIR can be relative or absolute."
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   :config
-  (defun sb/setup-capf (&rest capfs)
-    "Set `completion-at-point-functions' buffer-locally."
-    (setq-local completion-at-point-functions capfs))
-
   ;; File completion with `cape-file' is available in comments and string
   ;; literals, but not in normal code.
 
@@ -2642,16 +2673,33 @@ DIR can be relative or absolute."
 
   ;; (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf)
 
+  (with-eval-after-load 'lsp-mode
+    ;; Ensures that completion does not get interrupted by the user pressing
+    ;; keys or other operations
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
+    ;; Make the capf composable, allow falling back to other backends 
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
+    ;; Clean completion metadata
+    (advice-add #'lsp-completion-at-point :around #'cape-wrap-buster))
+
+  (with-eval-after-load 'eglot
+    ;; Ensures that completion does not get interrupted by the user pressing
+    ;; keys or other operations    
+    (advice-add
+     #'eglot-completion-at-point
+     :around #'cape-wrap-noninterruptible)
+    ;; Make the capf composable, allow falling back to other backends
+    (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
+    ;; Clean completion metadata    
+    (advice-add #'eglot-completion-at-point :around #'cape-wrap-buster))
+
+  ;; We do not merge `cape-dict' and `cape-dabbrev' in `text-mode' because there will be duplicates and we expect `cape-dict' to mostly suffice.
   (dolist (hook '(text-mode-hook markdown-mode-hook))
     (add-hook
      hook
      (lambda ()
        (sb/setup-capf
-        #'cape-dict
-        (cape-company-to-capf #'company-wordfreq)
-        #'cape-dabbrev
-        #'cape-file
-        #'yasnippet-capf))))
+        #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
@@ -2675,58 +2723,61 @@ DIR can be relative or absolute."
       #'cape-file
       #'yasnippet-capf)))
 
+  ;; (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
+  ;;   (add-hook
+  ;;    hook
+  ;;    (lambda ()
+  ;;      (sb/setup-capf
+  ;;       #'cape-tex
+  ;;       #'bibtex-capf
+  ;;       #'cape-dict
+  ;;       #'cape-dabbrev
+  ;;       #'cape-file
+  ;;       #'yasnippet-capf))))
+
+  (defun sb/latex-capf-setup ()
+    "Set up CAPF chain combining LSP + Cape + fallback for AUCTeX."
+    (advice-add #'TeX--completion-at-point :around #'cape-wrap-nonexclusive)
+    ;; Clean completion metadata    
+    (advice-add #'TeX--completion-at-point :around #'cape-wrap-buster)
+
+    (setq-local completion-at-point-functions
+                (list
+                 (cape-capf-super
+                  ;; AUCTeX provides capf for cite/ref/etc
+                  #'TeX--completion-at-point #'cape-tex)
+                 #'bibtex-capf
+                 #'cape-dict
+                 #'cape-dabbrev
+                 #'cape-file
+                 #'yasnippet-capf)))
   (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (sb/setup-capf
-        #'cape-tex
-        #'bibtex-capf
-        #'cape-dict
-        #'capf-wordfreq-completion-at-point-function
-        #'cape-file
-        #'cape-dabbrev
-        #'yasnippet-capf))))
+    (add-hook hook #'sb/latex-capf-setup))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
      mode
      (lambda ()
        (sb/setup-capf
-        (cape-capf-inside-code
-         (cape-capf-super
-          ;; #'elisp-completion-at-point
-          ;; #'citre-completion-at-point
-          #'cape-elisp-symbol
-          ;; #'cape-dabbrev
-          ))
+        #'cape-elisp-symbol
+        ;; (cape-capf-inside-code
+        ;;  (cape-capf-super
+        ;;   #'elisp-completion-at-point
+        ;;   #'citre-completion-at-point
+        ;;   #'cape-elisp-symbol
+        ;;   #'cape-dabbrev))
         (cape-capf-inside-comment #'cape-dict)
         #'cape-dabbrev
         #'cape-file
         #'yasnippet-capf))))
 
-  ;; ;; Make the capf composable
-
-  ;; (with-eval-after-load 'lsp-mode
-  ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
-  ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
-  ;;   (advice-add #'lsp-completion-at-point :around #'cape-wrap-buster))
-
-  ;; (with-eval-after-load 'eglot
-  ;;   (advice-add
-  ;;    #'eglot-completion-at-point
-  ;;    :around #'cape-wrap-noninterruptible)
-  ;;   (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
-  ;;   (advice-add #'eglot-completion-at-point :around #'cape-wrap-buster))
-
   ;; Integrate with LSP & Eglot
   (defun sb/lsp-capfs (backend)
     (sb/setup-capf
-     (cape-capf-inside-code
-      (cape-capf-super
-       backend
-       ;; #'citre-completion-at-point #'cape-keyword #'cape-dabbrev
-       ))
+     ;; (cape-capf-inside-code
+     ;;  (cape-capf-super
+     ;;   backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
+     backend
      (cape-capf-inside-comment #'cape-dict)
      #'cape-dabbrev
      #'cape-file
@@ -2744,6 +2795,8 @@ DIR can be relative or absolute."
                css-mode-hook
                css-ts-mode-hook
                fish-mode-hook
+               html-mode-hook
+               html-ts-mode-hook
                java-mode-hook
                java-ts-mode-hook
                json-mode-hook
@@ -2753,6 +2806,7 @@ DIR can be relative or absolute."
                python-mode-hook
                python-ts-mode-hook
                sh-mode-hook
+               web-mode-hook
                yaml-mode-hook
                yaml-ts-mode-hook))
       (add-hook hook (lambda () (sb/lsp-capfs #'lsp-completion-at-point)))))
@@ -2769,6 +2823,8 @@ DIR can be relative or absolute."
                css-mode-hook
                css-ts-mode-hook
                fish-mode-hook
+               html-mode-hook
+               html-ts-mode-hook
                java-mode-hook
                java-ts-mode-hook
                json-mode-hook
@@ -2778,6 +2834,7 @@ DIR can be relative or absolute."
                python-mode-hook
                python-ts-mode-hook
                sh-mode-hook
+               web-mode-hook
                yaml-mode-hook
                yaml-ts-mode-hook))
       (add-hook hook (lambda () (sb/lsp-capfs #'eglot-completion-at-point))))))
@@ -3078,8 +3135,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ((text-mode markdown-mode org-mode LaTeX-mode)
    .
    (lambda ()
-     (require 'lsp-ltex-plus)
-     (lsp-deferred)))
+     (unless (string-equal (buffer-name) "COMMIT_EDITMSG")
+       (require 'lsp-ltex-plus)
+       (lsp-deferred))))
   :custom
   ;; Recommended to set a generic language to disable spell check
   (lsp-ltex-plus-plus-language "en")
@@ -3093,16 +3151,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       "OXFORD_SPELLING_Z_NOT_S"
       "MORFOLOGIK_RULE_EN_US"
       "WANT"
-      "EN_DIACRITICS_REPLACE"]))
-  ;; :config
-  ;; ;; Disable spell checking since we cannot get `lsp-ltex-plus' to work with
-  ;; ;; custom dict words.
-  ;; (setq lsp-ltex-plus-disabled-rules
-  ;;       #s(hash-table
-  ;;          size 30 data
-  ;;          ("en-US"
-  ;;           ["MORFOLOGIK_RULE_EN_US,WANT,EN_QUOTES,EN_DIACRITICS_REPLACE"])))
-  )
+      "EN_DIACRITICS_REPLACE"])))
 
 ;; Use a per-project "pyrightconfig.json" file for configuring the language
 ;; server.
@@ -3512,6 +3561,32 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
+
+(use-package web-mode
+  :mode "\\.html?\\'"
+  :hook (web-mode . sb/setup-lsp-provider)
+  :bind ("C-c C-d")
+  :custom
+  (web-mode-enable-auto-closing t)
+  (web-mode-enable-auto-pairing t)
+  (web-mode-enable-auto-quoting t)
+  (web-mode-enable-block-face t)
+  (web-mode-enable-css-colorization t)
+  ;; Highlight the element under the cursor
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-current-column-highlight t)
+  (web-mode-markup-indent-offset 2) ; HTML
+  (web-mode-css-indent-offset 2) ; CSS
+  (web-mode-code-indent-offset 2) ; Script
+  (web-mode-style-padding 2) ; For <style> tag
+  (web-mode-script-padding 2) ; For <script> tag
+  )
+
+(use-package emmet-mode
+  :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
+  :custom
+  (emmet-move-cursor-between-quote t)
+  (emmet-self-closing-tag-style " /"))
 
 (use-package css-mode
   :ensure nil
@@ -5069,14 +5144,14 @@ or the major mode is not in `sb/skippable-modes'."
 ;;      (keyfreq-mode 1)
 ;;      (keyfreq-autosave-mode 1))))
 
-(use-package flyover
-  :ensure (:host github :repo "konrad1977/flyover")
-  :when (display-graphic-p)
-  :hook (flycheck-mode . flyover-mode)
-  :custom
-  (flyover-hide-checker-name nil)
-  (flyover-background-lightness 40)
-  :diminish)
+;; (use-package flyover
+;;   :ensure (:host github :repo "konrad1977/flyover")
+;;   :when (display-graphic-p)
+;;   :hook (flycheck-mode . flyover-mode)
+;;   :custom
+;;   (flyover-hide-checker-name nil)
+;;   (flyover-background-lightness 40)
+;;   :diminish)
 
 (with-eval-after-load 'transient
   (transient-define-prefix
@@ -5114,8 +5189,10 @@ or the major mode is not in `sb/skippable-modes'."
    [["Config-specific keybindings" ("k"
       "Describe personal keybindings"
       describe-personal-keybindings)
-     ("t" "Tramp targets" consult-tramp) ("s" "Sudo edit" crux-sudo-edit)
-     ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)]])
+     ("s" "Sudo edit" crux-sudo-edit)
+     ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)]
+    ["" ("t" "Tramp targets" consult-tramp)
+     ("q" "Tramp cleanup connections" sb/cleanup-tramp)]])
   (bind-key "C-c d" #'sb/dotemacs-transient)
 
   (with-eval-after-load 'smerge-mode
@@ -5261,7 +5338,23 @@ or the major mode is not in `sb/skippable-modes'."
      ("u" "Update tags" citre-update-tags-file)
      ("e" "Edit recipe" citre-edit-tags-file-recipe)
      ("g" "Update global db" citre-global-update-database)]])
-  (bind-key "C-c c" #'sb/citre-transient))
+  (bind-key "C-c c" #'sb/citre-transient)
+
+  (when (eq sb/in-buffer-completion 'corfu)
+    (transient-define-prefix
+     sb/corfu-transient () "Corfu commands"
+     [["Capf"
+       ("d" "Dict" cape-dict)
+       ("v" "Dabbrev" cape-dabbrev)
+       ("h" "History" cape-history)
+       ("f" "File" cape-file)]
+      [""
+       ("t" "TeX" cape-tex)
+       ("a" "Abbrev" cape-capf-super)
+       ("l" "Line" cape-line)
+       ("e" "Elisp symbol" cape-elisp-symbol)]
+      ["" ("j" "Emoji" cape-emoji)]])
+    (bind-key "C-c p" #'sb/corfu-transient)))
 
 (add-hook
  'elpaca-after-init-hook
