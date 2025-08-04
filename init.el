@@ -1047,9 +1047,7 @@ The provider is `nerd-icons'."
   ;; (consult-customize
   ;;  consult-line-thing-at-point
   ;;  :initial (thing-at-point 'symbol))
-
-  (with-eval-after-load 'latex
-    (bind-key "C-c C-j" #'consult-outline LaTeX-mode-map)))
+  )
 
 ;; Easily add file and directory paths into the minibuffer.
 (use-package consult-dir
@@ -2669,7 +2667,8 @@ DIR can be relative or absolute."
 
   (defun sb/setup-capf (&rest capfs)
     "Set `completion-at-point-functions' buffer-locally."
-    (setq-local completion-at-point-functions capfs))
+    (setq-local completion-at-point-functions
+                (mapcar #'cape-capf-buster capfs)))
 
   ;; (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf)
 
@@ -3586,7 +3585,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
   :custom
   (emmet-move-cursor-between-quote t)
-  (emmet-self-closing-tag-style " /"))
+  (emmet-self-closing-tag-style " /")
+  :config (emmet-preview-mode 1))
 
 (use-package css-mode
   :ensure nil
@@ -3819,26 +3819,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; The LSP setup seems to work very poorly with large LaTeX files, leading to
 ;; frequent hangs while communicating with Emacs. Furthermore, this package is not required for completions with `company-mode'.
 
-;; (use-package lsp-latex
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-;;   :hook
-;;   ((LaTeX-mode bibtex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'lsp-latex)
-;;      (lsp-deferred)))
-;;   :custom
-;;   (lsp-latex-bibtex-formatter "latexindent")
-;;   (lsp-latex-latex-formatter "latexindent")
-;;   (lsp-latex-bibtex-formatter-line-length fill-column)
-;;   (lsp-latex-diagnostics-delay 2000)
-;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
-;;   ;; in the PDF.
-;;   (lsp-latex-forward-search-executable "okular")
-;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-;;   :config
-;;   (with-eval-after-load 'tex-mode
-;;     (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+(use-package lsp-latex
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :hook
+  ((LaTeX-mode bibtex-mode)
+   .
+   (lambda ()
+     (require 'lsp-latex)
+     (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
+  (lsp-latex-bibtex-formatter-line-length fill-column)
+  (lsp-latex-diagnostics-delay 2000)
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click
+  ;; in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+  :config
+  (with-eval-after-load 'tex-mode
+    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -3864,11 +3864,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (LaTeX-math-mode 1)
      (TeX-PDF-mode) ; Use `pdflatex'
      (turn-on-reftex)
-     (TeX-source-correlate-mode)))
-  ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
-  ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-  ;; Enable rainbow mode after applying styles to the buffer
-  ;; (TeX-update-style . rainbow-delimiters-mode)
+     (TeX-source-correlate-mode)
+     ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
+     ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+     ;; Enable rainbow mode after applying styles to the buffer
+     ;; (TeX-update-style . rainbow-delimiters-mode)
+     ))
+  :bind (:map LaTeX-mode-map ("C-c C-j" . consult-outline))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
   (TeX-auto-save t)
@@ -3907,19 +3909,25 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ;; pdflatex is actually called
    LaTeX-command "latex -shell-escape=1 -synctex=1")
 
+  (when (executable-find "okular")
+    (add-to-list
+     'TeX-view-program-list
+     '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+    (add-to-list 'TeX-view-program-selection '(output-pdf "Okular")))
+
   (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
   (add-hook
    'LaTeX-mode-hook
    (lambda () (sb/add-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\)))))))
 
-(use-package tex
-  :ensure nil
-  :config
-  (when (executable-find "okular")
-    (add-to-list
-     'TeX-view-program-list
-     '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-    (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
+;; (use-package tex
+;;   :ensure nil
+;;   :config
+;;   (when (executable-find "okular")
+;;     (add-to-list
+;;      'TeX-view-program-list
+;;      '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
+;;     (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
 
 (use-package reftex
   :ensure nil
@@ -3959,9 +3967,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package math-delimiters
   :ensure (:host github :repo "oantolin/math-delimiters")
-  :after latex
+  :after LaTeX-mode
+  :demand t
   :commands (math-delimiters-no-dollars math-delimiters-toggle)
-  :config (bind-key "$" #'math-delimiters-insert LaTeX-mode-map))
+  :bind (:map LaTeX-mode-map ("$" . math-delimiters-insert)))
 
 ;; LATER: This package seems to require `org'
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
@@ -4037,20 +4046,18 @@ Fallback to `xref-go-back'."
          (call-interactively #'xref-pop-marker-stack)))))
   :hook ((prog-mode LaTeX-mode) . citre-mode)
   :bind* (("M-." . sb/jump-xref-citre) ("M-," . sb/jump-back-citre-xref))
-  :custom
-  (citre-default-create-tags-file-location 'in-dir)
-  (citre-auto-enable-citre-mode-modes '(prog-mode))
+  :custom (citre-default-create-tags-file-location 'in-dir)
+  ;; Add exclude by: --exclude=target or by --exclude=@./.ctagsignore
+  ;; Add dirs/files to scan here, one line per dir/file
   (citre-ctags-default-options
-   "-o
-%TAGSFILE%
---languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX
---kinds-all=*
---fields=*
---extras=*
---recurse
-# add exclude by: --exclude=target or by --exclude=@./.ctagsignore
-# add dirs/files to scan here, one line per dir/file
-")
+   (string-join
+    '("-o %TAGSFILE%"
+      "--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX"
+      "--kinds-all=*"
+      "--fields=*"
+      "--extras=*"
+      "--recurse")
+    " "))
   :config
   (setq-default
    citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
@@ -5355,6 +5362,18 @@ or the major mode is not in `sb/skippable-modes'."
        ("e" "Elisp symbol" cape-elisp-symbol)]
       ["" ("j" "Emoji" cape-emoji)]])
     (bind-key "C-c p" #'sb/corfu-transient)))
+
+(defun sb/jump-choose-definition ()
+  "Interactive jump menu with iconified options."
+  (interactive)
+  (let* ((options
+          `(("🔍 LSP: go to definition" . lsp-find-definition)
+            ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
+            ("📚 Citre: jump" . citre-jump)
+            ("📎 Xref: find definitions" . xref-find-definitions)
+            ("🗂 Imenu (consult)" . consult-imenu)))
+         (choice (completing-read "Jump using: " (mapcar #'car options))))
+    (call-interactively (cdr (assoc choice options)))))
 
 (add-hook
  'elpaca-after-init-hook
