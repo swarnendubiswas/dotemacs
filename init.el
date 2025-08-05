@@ -3559,7 +3559,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package web-mode
   :mode "\\.html?\\'"
   :hook (web-mode . sb/setup-lsp-provider)
-  :bind ("C-c C-d" :map html-mode-map ("M-o") :map html-ts-mode-map ("M-o"))
+  :bind (("C-c C-d") :map html-mode-map ("M-o") :map html-ts-mode-map ("M-o"))
   :custom
   (web-mode-enable-auto-closing t)
   (web-mode-enable-auto-pairing t)
