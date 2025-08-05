@@ -9,7 +9,8 @@
              (text-mode))
            (when (boundp 'lsp-disabled-clients)
              (setq-local lsp-disabled-clients
-                         (append '(ltex-ls-plus) lsp-disabled-clients))))))))
+                         (append '(ltex-ls-plus) lsp-disabled-clients)))))))
+ ("wordlist.5" . ((jinx-mode . nil))))
 
 ;; Local Variables:
 ;; eval: (flycheck-mode -1)
