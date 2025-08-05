@@ -128,7 +128,8 @@ The provider is `nerd-icons'."
 (elpaca-wait)
 
 (use-package exec-path-from-shell
-  :when (eq system-type 'gnu/linux)
+  :when (and (eq system-type 'gnu/linux) (display-graphic-p))
+  :demand t
   :init
   (setopt
    exec-path-from-shell-check-startup-files nil
@@ -142,8 +143,7 @@ The provider is `nerd-icons'."
      "XAUTHORITY"
      "LSP_USE_PLISTS"
      "CONDA_PREFIX"
-     "CONDA_EXE")
-   exec-path-from-shell-arguments '("-l"))
+     "CONDA_DEFAULT_ENV"))
   (exec-path-from-shell-initialize))
 
 (use-package emacs
@@ -2698,29 +2698,27 @@ DIR can be relative or absolute."
      hook
      (lambda ()
        (sb/setup-capf
-        #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf))))
+        #'cape-file #'cape-dict #'cape-dabbrev #'yasnippet-capf))))
 
   (add-hook
    'org-mode-hook
    (lambda ()
      (sb/setup-capf
+      #'cape-file
       #'cape-elisp-block
       #'cape-dict
       #'cape-dabbrev
-      #'cape-file
       #'yasnippet-capf)))
 
   (add-hook
    'prog-mode-hook
    (lambda ()
      (sb/setup-capf
+      #'cape-file
       (cape-capf-inside-code
        (cape-capf-super
         #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
-      (cape-capf-inside-comment #'cape-dict)
-      #'cape-dabbrev
-      #'cape-file
-      #'yasnippet-capf)))
+      (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev #'yasnippet-capf)))
 
   ;; (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
   ;;   (add-hook
@@ -2742,14 +2740,11 @@ DIR can be relative or absolute."
 
     (setq-local completion-at-point-functions
                 (list
+                 #'cape-file
                  (cape-capf-super
                   ;; AUCTeX provides capf for cite/ref/etc
                   #'TeX--completion-at-point #'cape-tex)
-                 #'bibtex-capf
-                 #'cape-dict
-                 #'cape-dabbrev
-                 #'cape-file
-                 #'yasnippet-capf)))
+                 #'bibtex-capf #'cape-dict #'cape-dabbrev #'yasnippet-capf)))
   (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
     (add-hook hook #'sb/latex-capf-setup))
 
@@ -2758,6 +2753,7 @@ DIR can be relative or absolute."
      mode
      (lambda ()
        (sb/setup-capf
+        #'cape-file
         #'cape-elisp-symbol
         ;; (cape-capf-inside-code
         ;;  (cape-capf-super
@@ -2767,19 +2763,18 @@ DIR can be relative or absolute."
         ;;   #'cape-dabbrev))
         (cape-capf-inside-comment #'cape-dict)
         #'cape-dabbrev
-        #'cape-file
         #'yasnippet-capf))))
 
   ;; Integrate with LSP & Eglot
   (defun sb/lsp-capfs (backend)
     (sb/setup-capf
+     #'cape-file
      ;; (cape-capf-inside-code
      ;;  (cape-capf-super
      ;;   backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
      backend
      (cape-capf-inside-comment #'cape-dict)
      #'cape-dabbrev
-     #'cape-file
      #'yasnippet-capf))
 
   (with-eval-after-load 'lsp-mode
@@ -3564,7 +3559,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package web-mode
   :mode "\\.html?\\'"
   :hook (web-mode . sb/setup-lsp-provider)
-  :bind ("C-c C-d")
+  :bind ("C-c C-d" :map html-mode-map ("M-o") :map html-ts-mode-map ("M-o"))
   :custom
   (web-mode-enable-auto-closing t)
   (web-mode-enable-auto-pairing t)
@@ -3585,8 +3580,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
   :custom
   (emmet-move-cursor-between-quote t)
-  (emmet-self-closing-tag-style " /")
-  :config (emmet-preview-mode 1))
+  (emmet-self-closing-tag-style " /"))
 
 (use-package css-mode
   :ensure nil
@@ -3837,8 +3831,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-latex-forward-search-executable "okular")
   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
   :config
-  (with-eval-after-load 'tex-mode
-    (bind-key "C-c C-c" #'lsp-latex-build tex-mode-map)))
+  (with-eval-after-load 'latex
+    (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -5193,13 +5187,17 @@ or the major mode is not in `sb/skippable-modes'."
 
   (transient-define-prefix
    sb/dotemacs-transient () "Config-specific keybindings"
-   [["Config-specific keybindings" ("k"
-      "Describe personal keybindings"
-      describe-personal-keybindings)
+   [["Utilities"
+     ("k" "Describe personal keybindings" describe-personal-keybindings)
      ("s" "Sudo edit" crux-sudo-edit)
      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)]
-    ["" ("t" "Tramp targets" consult-tramp)
-     ("q" "Tramp cleanup connections" sb/cleanup-tramp)]])
+    ["Tramp" ("t" "Choose target" consult-tramp)
+     ;; We use `q' to quit transient
+     ("Q" "Cleanup connections" sb/cleanup-tramp)]
+    ["Emacs config"
+     ("e" "Edit init.el" (find-file user-init-file))
+     ("r" "Reload init.el" (load-file user-init-file))
+     ("d" "Open .emacs.d" (dired user-emacs-directory))]])
   (bind-key "C-c d" #'sb/dotemacs-transient)
 
   (with-eval-after-load 'smerge-mode
