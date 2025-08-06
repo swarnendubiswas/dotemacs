@@ -48,7 +48,7 @@
 ;; has more extensive LaTeX support than Corfu. We can set up separate
 ;; completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -1692,10 +1692,10 @@ The provider is `nerd-icons'."
   :diminish apheleia-mode)
 
 ;; FIXME: Why is this not working while apheleia works?
-;; (use-package shfmt
-;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
-;;   :diminish shfmt-on-save-mode)
+(use-package shfmt
+  :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
+  :custom (shfmt-arguments '("-i" "2" "-ci"))
+  :diminish shfmt-on-save-mode)
 
 ;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
 ;; `basedpyright' since it does not support document formatting.
@@ -2187,9 +2187,8 @@ The provider is `nerd-icons'."
     (setopt company-format-margin-function #'sb/company-kind-icon-margin)))
 
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the
-;; backend used for the last completion. Try "M-x company-complete-common" when
-;; there are no completions. Use "C-M-i" for `complete-symbol' with regex
-;; search.
+;; backend used for the last completion. Use "C-M-i" for `complete-symbol' with
+;; regex search.
 (use-package company
   :when (eq sb/in-buffer-completion 'company)
   :hook (elpaca-after-init . global-company-mode)
@@ -2227,7 +2226,7 @@ The provider is `nerd-icons'."
   :custom
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-code-ignore-case t)
-  (company-dabbrev-code-completion-styles '(basic flex))
+  (company-dabbrev-code-completion-styles '(basic hotfuzz))
   (company-ispell-dictionary
    (expand-file-name "wordlist.5" sb/extras-directory))
   ;; Speed up selecting a completion, showing the access keys on the left makes them easily discernible.
@@ -2258,7 +2257,6 @@ The provider is `nerd-icons'."
      company-echo-metadata-frontend))
   (company-require-match nil)
   :config
-  ;; Autocompletion icons are distracting.
   (unless (bound-and-true-p sb/enable-icons)
     (setopt company-format-margin-function nil)))
 
@@ -2306,11 +2304,24 @@ The provider is `nerd-icons'."
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-yasnippet nil))
 
-;; LATER: This package seems to trigger loading of `org-mode'
 ;; Use "<" to trigger company completion of org blocks.
 (use-package company-org-block
-  :after (company org)
-  :demand t)
+  :preface
+  (defun sb/org-block-setup ()
+    (when (and (derived-mode-p 'org-mode) (fboundp 'company-org-block))
+      (setq-local company-backends
+                  (append
+                   '((company-org-block :with company-dabbrev-code))
+                   company-backends))))
+
+  (add-hook 'org-mode-hook #'my/org-block-completion-setup)
+  :after company
+  :hook
+  (org-mode
+   .
+   (lambda ()
+     (require 'company-org-block)
+     (sb/org-block-setup))))
 
 ;; Enables completion of C/C++ header file names
 (use-package company-c-headers
@@ -2434,8 +2445,6 @@ DIR can be relative or absolute."
        (cl-remove-if
         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
 
-  (company-tng-mode 1)
-
   (defun sb/company-latex-mode ()
     ;; `company-capf' with Texlab does not pass to later backends if it
     ;; returns any result (even an empty list). So it makes it difficult to
@@ -2470,16 +2479,6 @@ DIR can be relative or absolute."
                   company-files company-yasnippet)))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
-
-  (defun sb/company-org-mode ()
-    (set
-     (make-local-variable 'company-backends)
-     '(company-files
-       (company-org-block :with company-yasnippet)
-       (company-dict company-ispell)
-       company-dabbrev)))
-
-  (add-hook 'org-mode-hook #'sb/company-org-mode)
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
@@ -2532,21 +2531,6 @@ DIR can be relative or absolute."
      (lambda ()
        (setq-local company-minimum-prefix-length 2)
        (sb/company-c-mode))))
-
-  ;; (progn
-  ;;   (defun sb/company-python-mode ()
-  ;;     (setq-local company-backends
-  ;;                 '(company-capf
-  ;;                   company-files
-  ;;                   (company-dict company-ispell)
-  ;;                   company-dabbrev)))
-
-  ;;   (dolist (hook '(python-mode-hook python-ts-mode-hook))
-  ;;     (add-hook
-  ;;      hook
-  ;;      (lambda ()
-  ;;        (setq-local company-minimum-prefix-length 2)
-  ;;        (sb/company-python-mode)))))
 
   ;; (progn
   ;;   (defun sb/company-prog-mode ()
@@ -2901,7 +2885,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; Tramp which is slower.
   (lsp-auto-register-remote-clients nil)
   (lsp-keep-workspace-alive nil)
-  (lsp-progess-via-spinner nil)
+  (lsp-progress-via-spinner nil)
   ;; Increase the delay to allow transient changes and avoid getting flooded with LSP errors.
   (lsp-idle-delay 1.5)
   ;; Avoid annoying questions, we expect a server restart to succeed
@@ -2910,7 +2894,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-warn-no-matched-clients nil)
   ;; (lsp-enable-suggest-server-download nil)
   (lsp-enable-dap-auto-configure nil "I do not use dap-mode")
-  ;; (lsp-format-buffer-on-save t)
+  (lsp-format-buffer-on-save nil "Enable per-project")
   (lsp-format-buffer-on-save-list
    '(bash-ts-mode
      c-mode
@@ -3280,6 +3264,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
        (treesit-available-p))
+  :demand t
   :commands (treesit-install-language-grammar)
   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
   :custom
@@ -3321,51 +3306,50 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (rust "https://github.com/tree-sitter/tree-sitter-rust")
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-  (when (unless (and (treesit-language-available-p 'bash)
-                     (treesit-language-available-p 'bibtex)
-                     (treesit-language-available-p 'c)
-                     (treesit-language-available-p 'cpp)
-                     (treesit-language-available-p 'cmake)
-                     (treesit-language-available-p 'css)
-                     (treesit-language-available-p 'cuda)
-                     (treesit-language-available-p 'docker)
-                     (treesit-language-available-p 'elisp)
-                     (treesit-language-available-p 'go)
-                     (treesit-language-available-p 'html)
-                     (treesit-language-available-p 'java)
-                     (treesit-language-available-p 'javascript)
-                     (treesit-language-available-p 'json)
-                     (treesit-language-available-p 'kdl)
-                     (treesit-language-available-p 'make)
-                     (treesit-language-available-p 'perl)
-                     (treesit-language-available-p 'php)
-                     (treesit-language-available-p 'python)
-                     (treesit-language-available-p 'toml)
-                     (treesit-language-available-p 'tsx)
-                     (treesit-language-available-p 'typescript)
-                     (treesit-language-available-p 'rust)
-                     (treesit-language-available-p 'yaml)))
-    (mapc
-     #'treesit-install-language-grammar
-     (mapcar #'car treesit-language-source-alist)))
+  ;; (when (unless (and (treesit-language-available-p 'bash)
+  ;;                    (treesit-language-available-p 'bibtex)
+  ;;                    (treesit-language-available-p 'c)
+  ;;                    (treesit-language-available-p 'cpp)
+  ;;                    (treesit-language-available-p 'cmake)
+  ;;                    (treesit-language-available-p 'css)
+  ;;                    (treesit-language-available-p 'cuda)
+  ;;                    (treesit-language-available-p 'docker)
+  ;;                    (treesit-language-available-p 'elisp)
+  ;;                    (treesit-language-available-p 'go)
+  ;;                    (treesit-language-available-p 'html)
+  ;;                    (treesit-language-available-p 'java)
+  ;;                    (treesit-language-available-p 'javascript)
+  ;;                    (treesit-language-available-p 'json)
+  ;;                    (treesit-language-available-p 'kdl)
+  ;;                    (treesit-language-available-p 'make)
+  ;;                    (treesit-language-available-p 'perl)
+  ;;                    (treesit-language-available-p 'php)
+  ;;                    (treesit-language-available-p 'python)
+  ;;                    (treesit-language-available-p 'toml)
+  ;;                    (treesit-language-available-p 'tsx)
+  ;;                    (treesit-language-available-p 'typescript)
+  ;;                    (treesit-language-available-p 'rust)
+  ;;                    (treesit-language-available-p 'yaml)))
+  ;;   (mapc
+  ;;    #'treesit-install-language-grammar
+  ;;    (mapcar #'car treesit-language-source-alist)))
 
-  (when (treesit-available-p)
-    (setopt major-mode-remap-alist
-            '((sh-mode . bash-ts-mode)
-              (c-mode . c-ts-mode)
-              (c++-mode . c++-ts-mode)
-              (c-or-c++-mode . c-or-c++-ts-mode)
-              (cmake-mode . cmake-ts-mode)
-              (css-mode . css-ts-mode)
-              (dockerfile-mode . dockerfile-ts-mode)
-              (html-mode . html-ts-mode)
-              (java-mode . java-ts-mode)
-              (json-mode . json-ts-mode)
-              (kdl-mode . kdl-ts-mode)
-              (python-mode . python-ts-mode)
-              (toml-mode . toml-ts-mode)
-              (conf-toml-mode . toml-ts-mode)
-              (yaml-mode . yaml-ts-mode)))))
+  (setopt major-mode-remap-alist
+          '((sh-mode . bash-ts-mode)
+            (c-mode . c-ts-mode)
+            (c++-mode . c++-ts-mode)
+            (c-or-c++-mode . c-or-c++-ts-mode)
+            (cmake-mode . cmake-ts-mode)
+            (css-mode . css-ts-mode)
+            (dockerfile-mode . dockerfile-ts-mode)
+            (html-mode . html-ts-mode)
+            (java-mode . java-ts-mode)
+            (json-mode . json-ts-mode)
+            (kdl-mode . kdl-ts-mode)
+            (python-mode . python-ts-mode)
+            (toml-mode . toml-ts-mode)
+            (conf-toml-mode . toml-ts-mode)
+            (yaml-mode . yaml-ts-mode))))
 
 (use-package treesit-auto
   :after treesit
@@ -4003,23 +3987,24 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package bibtex-capf
   :ensure (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :after tex)
+  :after latex
+  :hook (LaTeX-mode . bibtex-capf-setup))
 
-;; LATER: This package seems to require `org'
-(use-package citar
-  :when (eq sb/in-buffer-completion 'corfu)
-  :after tex
-  :custom
-  (citar-major-mode-functions
-   '(((latex-mode)
-      .
-      ((local-bib-files . citar-latex-local-bib-files)
-       (insert-citation . citar-latex-insert-citation)
-       (insert-edit . citar-latex-insert-edit)
-       (key-at-point . citar-latex-key-at-point)
-       (citation-at-point . citar-latex-citation-at-point)
-       (list-keys . citar-latex-list-keys)))
-     (t . ((insert-keys . citar--insert-keys-comma-space-separated))))))
+;; ;; LATER: This package seems to require `org'
+;; (use-package citar
+;;   :when (eq sb/in-buffer-completion 'corfu)
+;;   :after tex
+;;   :custom
+;;   (citar-major-mode-functions
+;;    '(((latex-mode)
+;;       .
+;;       ((local-bib-files . citar-latex-local-bib-files)
+;;        (insert-citation . citar-latex-insert-citation)
+;;        (insert-edit . citar-latex-insert-edit)
+;;        (key-at-point . citar-latex-key-at-point)
+;;        (citation-at-point . citar-latex-citation-at-point)
+;;        (list-keys . citar-latex-list-keys)))
+;;      (t . ((insert-keys . citar--insert-keys-comma-space-separated))))))
 
 (use-package citar-embark
   :after (citar embark)
@@ -4349,8 +4334,8 @@ Shows both colors when errors and warnings are present."
    :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
    :lighter " KDLFMT"
    :group 'reformatter)
-  (add-hook 'kdl-ts-mode-hook #'kdl-format-on-save-mode)
-  (add-hook 'kdl-mode-hook #'kdl-format-on-save-mode))
+  (add-hook 'kdl-ts-mode-hook #'kdlformat-on-save-mode)
+  (add-hook 'kdl-mode-hook #'kdlformat-on-save-mode))
 
 ;; Fontify ssh files
 (use-package ssh-config-mode
