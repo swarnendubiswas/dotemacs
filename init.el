@@ -142,8 +142,6 @@ The provider is `nerd-icons'."
      "LSP_USE_PLISTS"
      "CONDA_PREFIX"
      "CONDA_DEFAULT_ENV"))
-  (unless (display-graphic-p)
-    (setopt exec-path-from-shell-arguments nil))
   (exec-path-from-shell-initialize))
 
 (use-package emacs
@@ -4525,109 +4523,76 @@ Shows both colors when errors and warnings are present."
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
 
-  (setopt eglot-server-programs nil)
-  (add-to-list
-   'eglot-server-programs
-   `(text-mode
-     . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus"))))
-  (add-to-list
-   'eglot-server-programs
-   '((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus")))
-  (add-to-list
-   'eglot-server-programs
-   '((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
-     . ("autotools-language-server")))
-  (add-to-list 'eglot-server-programs '(fish-mode . ("fish-lsp" "start")))
-  (add-to-list
-   'eglot-server-programs
-   '((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp")))
-  (add-to-list
-   'eglot-server-programs
-   '((c++-mode c++-ts-mode c-mode c-ts-mode)
-     .
-     ("clangd"
-      "-j=4"
-      "--compile-commands-dir=./."
-      "--all-scopes-completion"
-      "--background-index"
-      ;; Unsupported option with Clangd 14
-      "--background-index-priority=low"
-      "--clang-tidy"
-      "--completion-style=detailed"
-      "--fallback-style=LLVM"
-      "--header-insertion=never"
-      "--header-insertion-decorators"
-      "--log=error"
-      ;; Unsupported option with Clangd 10: malloc-trim and enable-config
-      "--malloc-trim" ; Release memory periodically
-      ;; Project config is from a .clangd file in the project directory
-      "--enable-config"
-      "--pch-storage=memory" ; Increases memory usage but can improve performance
-      "--pretty")))
-  (add-to-list 'eglot-server-programs '(awk-mode . ("awk-language-server")))
-  (add-to-list
-   'eglot-server-programs
-   '((scss-mode css-mode css-ts-mode)
-     .
-     ("vscode-css-language-server" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((web-mode html-mode html-ts-mode)
-     .
-     ("vscode-html-language-server" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((json-mode json-ts-mode jsonc-mode)
-     .
-     ("vscode-json-language-server" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((cmake-mode cmake-ts-mode) . ("cmake-language-server")))
+  (setopt
+   eglot-server-programs
+   `((text-mode
+      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+     ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
+     ((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
+   ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
+    .
+    ("autotools-language-server"))
+   (fish-mode . ("fish-lsp" "start"))
+   ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
+   ((c++-mode c++-ts-mode c-mode c-ts-mode)
+    .
+    ("clangd"
+     "-j=4"
+     "--compile-commands-dir=./."
+     "--all-scopes-completion"
+     "--background-index"
+     ;; Unsupported option with Clangd 14
+     "--background-index-priority=low"
+     "--clang-tidy"
+     "--completion-style=detailed"
+     "--fallback-style=LLVM"
+     "--header-insertion=never"
+     "--header-insertion-decorators"
+     "--log=error"
+     ;; Unsupported option with Clangd 10: malloc-trim and enable-config
+     "--malloc-trim" ; Release memory periodically
+     ;; Project config is from a .clangd file in the project directory
+     "--enable-config"
+     "--pch-storage=memory" ; Increases memory usage but can improve performance
+     "--pretty"))
+   (awk-mode . ("awk-language-server")) ((scss-mode css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio"))
+   ((web-mode html-mode html-ts-mode)
+    .
+    ("vscode-html-language-server" "--stdio"))
+   ((json-mode json-ts-mode jsonc-mode)
+    .
+    ("vscode-json-language-server" "--stdio"))
+   ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")) ((cmake-mode cmake-ts-mode) . ("cmake-language-server"))
+   ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
+   ;; Download the source from
+   ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
+   ;; clean verify -DskipTests=true".
+   ((java-mode java-ts-mode)
+    .
+    ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
+   ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
+   ((perl-mode cperl-mode)
+    .
+    ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
+   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
+   (bibtex-mode . ("texlab"))
+   ;; Download the latest milestone from
+   ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
+   ;; verify -DskipTests=true". After successful compilation, the resulting
+   ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
+   ;; "org.eclipse.lemminx/target".
+   ((nxml-mode xml-mode)
+    .
+    ("java" "-jar"
+     ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
+                        user-emacs-directory)))))
+
   (if (equal sb/python-langserver 'pylsp)
       (add-to-list
        'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
     (add-to-list
      'eglot-server-programs
      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
-  (add-to-list
-   'eglot-server-programs
-   '((bash-ts-mode sh-mode) . ("bash-language-server" "start")))
-  ;; Download the source from
-  ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
-  ;; clean verify -DskipTests=true".
-  (add-to-list
-   'eglot-server-programs
-   '((java-mode java-ts-mode)
-     .
-     ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G")))
-  (add-to-list
-   'eglot-server-programs
-   '((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio")))
-  (add-to-list
-   'eglot-server-programs
-   '((perl-mode cperl-mode)
-     .
-     ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run")))
-  ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
-  (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab")))
-  ;; Download the latest milestone from
-  ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
-  ;; verify -DskipTests=true". After successful compilation, the resulting
-  ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
-  ;; "org.eclipse.lemminx/target".
-  (add-to-list
-   'eglot-server-programs
-   `((nxml-mode xml-mode)
-     .
-     ("java" "-jar"
-      ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
-                         user-emacs-directory))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
@@ -4765,11 +4730,9 @@ Shows both colors when errors and warnings are present."
       :dialect "American")))
 
   (with-eval-after-load 'eglot
-    (setq-default
-     completion-category-defaults nil
-     completion-category-overrides
-     '((eglot (styles hotfuzz basic substring orderless))
-       (eglot-capf (styles hotfuzz orderless))))))
+    (setq-default completion-category-overrides
+                  '((eglot (styles hotfuzz basic substring orderless))
+                    (eglot-capf (styles hotfuzz orderless))))))
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
