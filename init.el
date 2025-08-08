@@ -2311,8 +2311,6 @@ The provider is `nerd-icons'."
                   (append
                    '((company-org-block :with company-dabbrev-code))
                    company-backends))))
-
-  (add-hook 'org-mode-hook #'my/org-block-completion-setup)
   :after company
   :hook
   (org-mode
@@ -3573,7 +3571,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package web-mode
   :mode "\\.html?\\'"
   :hook (web-mode . sb/setup-lsp-provider)
-  :bind (("C-c C-d") :map html-mode-map ("M-o") :map html-ts-mode-map ("M-o"))
+  :bind ("C-c C-d")
   :custom
   (web-mode-enable-auto-closing t)
   (web-mode-enable-auto-pairing t)
@@ -3588,7 +3586,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (web-mode-code-indent-offset 2) ; Script
   (web-mode-style-padding 2) ; For <style> tag
   (web-mode-script-padding 2) ; For <script> tag
-  )
+  :config
+  (with-eval-after-load 'html-mode
+    (unbind-key "M-o" html-mode-map)
+    (unbind-key "M-o" html-ts-mode-map)))
 
 (use-package emmet-mode
   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
@@ -4004,10 +4005,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;        (list-keys . citar-latex-list-keys)))
 ;;      (t . ((insert-keys . citar--insert-keys-comma-space-separated))))))
 
-(use-package citar-embark
-  :after (citar embark)
-  :config (citar-embark-mode)
-  :diminish)
+;; (use-package citar-embark
+;;   :after (citar embark)
+;;   :config (citar-embark-mode)
+;;   :diminish)
 
 ;; (use-package auctex-latexmk
 ;;   :after tex
@@ -4526,66 +4527,70 @@ Shows both colors when errors and warnings are present."
   (setopt
    eglot-server-programs
    `((text-mode
-      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+      .
+      ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      ((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-   ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
-    .
-    ("autotools-language-server"))
-   (fish-mode . ("fish-lsp" "start"))
-   ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
-   ((c++-mode c++-ts-mode c-mode c-ts-mode)
-    .
-    ("clangd"
-     "-j=4"
-     "--compile-commands-dir=./."
-     "--all-scopes-completion"
-     "--background-index"
-     ;; Unsupported option with Clangd 14
-     "--background-index-priority=low"
-     "--clang-tidy"
-     "--completion-style=detailed"
-     "--fallback-style=LLVM"
-     "--header-insertion=never"
-     "--header-insertion-decorators"
-     "--log=error"
-     ;; Unsupported option with Clangd 10: malloc-trim and enable-config
-     "--malloc-trim" ; Release memory periodically
-     ;; Project config is from a .clangd file in the project directory
-     "--enable-config"
-     "--pch-storage=memory" ; Increases memory usage but can improve performance
-     "--pretty"))
-   (awk-mode . ("awk-language-server")) ((scss-mode css-mode css-ts-mode) . ("vscode-css-language-server" "--stdio"))
-   ((web-mode html-mode html-ts-mode)
-    .
-    ("vscode-html-language-server" "--stdio"))
-   ((json-mode json-ts-mode jsonc-mode)
-    .
-    ("vscode-json-language-server" "--stdio"))
-   ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio")) ((cmake-mode cmake-ts-mode) . ("cmake-language-server"))
-   ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
-   ;; Download the source from
-   ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
-   ;; clean verify -DskipTests=true".
-   ((java-mode java-ts-mode)
-    .
-    ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
-   ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
-   ((perl-mode cperl-mode)
-    .
-    ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
-   ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
-   (bibtex-mode . ("texlab"))
-   ;; Download the latest milestone from
-   ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
-   ;; verify -DskipTests=true". After successful compilation, the resulting
-   ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
-   ;; "org.eclipse.lemminx/target".
-   ((nxml-mode xml-mode)
-    .
-    ("java" "-jar"
-     ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
-                        user-emacs-directory)))))
+     ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
+      . ("autotools-language-server"))
+     (fish-mode . ("fish-lsp" "start"))
+     ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
+     ((c++-mode c++-ts-mode c-mode c-ts-mode)
+      .
+      ("clangd"
+       "-j=4"
+       "--compile-commands-dir=./."
+       "--all-scopes-completion"
+       "--background-index"
+       ;; Unsupported option with Clangd 14
+       "--background-index-priority=low"
+       "--clang-tidy"
+       "--completion-style=detailed"
+       "--fallback-style=LLVM"
+       "--header-insertion=never"
+       "--header-insertion-decorators"
+       "--log=error"
+       ;; Unsupported option with Clangd 10: malloc-trim and enable-config
+       "--malloc-trim" ; Release memory periodically
+       ;; Project config is from a .clangd file in the project directory
+       "--enable-config"
+       "--pch-storage=memory" ; Increases memory usage but can improve performance
+       "--pretty"))
+     (awk-mode . ("awk-language-server"))
+     ((scss-mode css-mode css-ts-mode)
+      .
+      ("vscode-css-language-server" "--stdio"))
+     ((web-mode html-mode html-ts-mode)
+      .
+      ("vscode-html-language-server" "--stdio"))
+     ((json-mode json-ts-mode jsonc-mode)
+      .
+      ("vscode-json-language-server" "--stdio"))
+     ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
+     ((cmake-mode cmake-ts-mode) . ("cmake-language-server"))
+     ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
+     ;; Download the source from
+     ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
+     ;; clean verify -DskipTests=true".
+     ((java-mode java-ts-mode)
+      .
+      ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
+     ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
+     ((perl-mode cperl-mode)
+      .
+      ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
+     ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
+     (bibtex-mode . ("texlab"))
+     ;; Download the latest milestone from
+     ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
+     ;; verify -DskipTests=true". After successful compilation, the resulting
+     ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
+     ;; "org.eclipse.lemminx/target".
+     ((nxml-mode xml-mode)
+      .
+      ("java" "-jar"
+       ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
+                          user-emacs-directory)))))
 
   (if (equal sb/python-langserver 'pylsp)
       (add-to-list
