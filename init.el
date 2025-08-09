@@ -31,7 +31,7 @@
   :group 'sb/emacs)
 
 ;; Powerline looks clean, but doom-modeline is more informative.
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -127,6 +127,7 @@ The provider is `nerd-icons'."
 
 (elpaca-wait)
 
+;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient. 
 (use-package exec-path-from-shell
   :when (and (eq system-type 'gnu/linux) (display-graphic-p))
   :demand t
@@ -141,7 +142,9 @@ The provider is `nerd-icons'."
      "LC_CTYPE"
      "LSP_USE_PLISTS"
      "CONDA_PREFIX"
-     "CONDA_DEFAULT_ENV"))
+     "CONDA_DEFAULT_ENV")
+   ;; Reduce the start up time for GUI Emacs
+   exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
 (use-package emacs
@@ -1677,23 +1680,35 @@ The provider is `nerd-icons'."
 ;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 ;;   :diminish)
 
+;; Basedpyright does not provide formatting feature
 (use-package apheleia
-  ;; Basedpyright does not provide formatting feature
-  :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
+  :hook
+  ((markdown-mode
+    markdown-ts-mode
+    python-mode
+    python-ts-mode
+    kdl-mode
+    kdl-ts-mode
+    sh-mode
+    bash-ts-mode)
+   . apheleia-mode)
   :custom (apheleia-formatters-respect-fill-column t)
   :config
-  (setf (alist-get 'prettier apheleia-formatters)
-        '("prettier" "--print-width" "80"))
+  (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
   (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (when (executable-find "kdlfmt")
+    (setf (alist-get 'kdlfmt apheleia-formatters)
+          '("kdlfmt" "format" "--stdin"))
+    (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
+    (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
   :diminish apheleia-mode)
 
-;; FIXME: Why is this not working while apheleia works?
-(use-package shfmt
-  :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-  :custom (shfmt-arguments '("-i" "2" "-ci"))
-  :diminish shfmt-on-save-mode)
+;; (use-package shfmt
+;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
+;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
+;;   :diminish shfmt-on-save-mode)
 
 ;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
 ;; `basedpyright' since it does not support document formatting.
@@ -3302,33 +3317,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (rust "https://github.com/tree-sitter/tree-sitter-rust")
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-  ;; (when (unless (and (treesit-language-available-p 'bash)
-  ;;                    (treesit-language-available-p 'bibtex)
-  ;;                    (treesit-language-available-p 'c)
-  ;;                    (treesit-language-available-p 'cpp)
-  ;;                    (treesit-language-available-p 'cmake)
-  ;;                    (treesit-language-available-p 'css)
-  ;;                    (treesit-language-available-p 'cuda)
-  ;;                    (treesit-language-available-p 'docker)
-  ;;                    (treesit-language-available-p 'elisp)
-  ;;                    (treesit-language-available-p 'go)
-  ;;                    (treesit-language-available-p 'html)
-  ;;                    (treesit-language-available-p 'java)
-  ;;                    (treesit-language-available-p 'javascript)
-  ;;                    (treesit-language-available-p 'json)
-  ;;                    (treesit-language-available-p 'kdl)
-  ;;                    (treesit-language-available-p 'make)
-  ;;                    (treesit-language-available-p 'perl)
-  ;;                    (treesit-language-available-p 'php)
-  ;;                    (treesit-language-available-p 'python)
-  ;;                    (treesit-language-available-p 'toml)
-  ;;                    (treesit-language-available-p 'tsx)
-  ;;                    (treesit-language-available-p 'typescript)
-  ;;                    (treesit-language-available-p 'rust)
-  ;;                    (treesit-language-available-p 'yaml)))
-  ;;   (mapc
-  ;;    #'treesit-install-language-grammar
-  ;;    (mapcar #'car treesit-language-source-alist)))
+  ;; Install grammars if missing
+  (unless (seq-every-p
+           #'treesit-language-available-p
+           (mapcar #'car treesit-language-source-alist))
+    (mapc
+     #'treesit-install-language-grammar
+     (mapcar #'car treesit-language-source-alist)))
 
   (setopt major-mode-remap-alist
           '((sh-mode . bash-ts-mode)
@@ -4246,6 +4241,8 @@ Shows both colors when errors and warnings are present."
               (list
                (when which-function-mode
                  (powerline-raw which-func-format nil 'l))
+               (when-let ((proj (project-current)))
+                 (powerline-raw (format "[%s]" (project-name proj)) nil 'l))
                (powerline-vc nil 'l)
                (powerline-raw "")
                (powerline-raw "%4l" nil 'l)
@@ -4323,18 +4320,18 @@ Shows both colors when errors and warnings are present."
   :ensure (:host github :repo "dataphract/kdl-ts-mode")
   :mode ("\\.kdl\\'" . kdl-ts-mode))
 
-(use-package reformatter
-  :after (:any kdl-ts-mode kdl-mode)
-  :demand t
-  :config
-  (reformatter-define
-   kdlformat
-   :program "kdlfmt"
-   :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
-   :lighter " KDLFMT"
-   :group 'reformatter)
-  (add-hook 'kdl-ts-mode-hook #'kdlformat-on-save-mode)
-  (add-hook 'kdl-mode-hook #'kdlformat-on-save-mode))
+;; (use-package reformatter
+;;   :after (:any kdl-ts-mode kdl-mode)
+;;   :demand t
+;;   :config
+;;   (reformatter-define
+;;    kdlformat
+;;    :program "kdlfmt"
+;;    :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
+;;    :lighter " KDLFMT"
+;;    :group 'reformatter)
+;;   (add-hook 'kdl-ts-mode-hook #'kdlformat-on-save-mode)
+;;   (add-hook 'kdl-mode-hook #'kdlformat-on-save-mode))
 
 ;; Fontify ssh files
 (use-package ssh-config-mode
