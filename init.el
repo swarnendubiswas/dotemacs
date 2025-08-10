@@ -2596,7 +2596,8 @@ DIR can be relative or absolute."
     (corfu-indexed-mode 1)
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
-    (corfu-popupinfo-mode 1))
+    (corfu-popupinfo-mode 1)
+    (set-window-fringes nil 8 8))
   :ensure
   (corfu
    :files (:defaults "extensions/*")
@@ -2625,7 +2626,8 @@ DIR can be relative or absolute."
   (corfu-on-exact-match 'show)
   ;; ;; Do not close popup when adjacent to other characters
   ;; (corfu-quit-at-boundary nil)
-  )
+  ;; Add space at the right edge so characters do not get cut off in the terminal interface.
+  (corfu-right-margin-width 2))
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
@@ -2702,51 +2704,23 @@ DIR can be relative or absolute."
       #'cape-dabbrev
       #'yasnippet-capf)))
 
+  ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
+  ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
+  ;; Ensures that completion does not get interrupted by the user pressing keys
+  ;; or other operations with `cape-wrap-noninterruptible'.
   (with-eval-after-load 'lsp-mode
-    ;;   (advice-add
-    ;;    #'lsp-completion-at-point
-    ;;    :around
-    ;;    (lambda (orig-fun &rest args)
-    ;;      (let ((fn
-    ;;             (
-    ;;              ;; Clean completion metadata
-    ;;              cape-wrap-buster
-    ;;              (
-    ;;               ;; Make the capf composable, allow falling back to other
-    ;;               ;; backends
-    ;;               cape-wrap-nonexclusive
-    ;;               (
-    ;;                ;; Ensures that completion does not get interrupted by the user
-    ;;                ;; pressing keys or other operations
-    ;;                cape-wrap-noninterruptible
-    ;;                orig-fun)))))
-    ;;        (apply fn args))))
-
-    ;; Make the capf composable, allow falling back to other backends
-    (advice-add #'lsp-completion-at-point :around #'cape-capf-nonexclusive))
+    (advice-add
+     #'lsp-completion-at-point
+     :around
+     (lambda (orig-fun &rest args)
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
 
   (with-eval-after-load 'eglot
-    ;;   (advice-add
-    ;;    #'eglot-completion-at-point
-    ;;    :around
-    ;;    (lambda (orig-fun &rest args)
-    ;;      (let ((fn
-    ;;             (
-    ;;              ;; Clean completion metadata    
-    ;;              cape-wrap-buster
-    ;;              (
-    ;;               ;; Make the capf composable, allow falling back to other
-    ;;               ;; backends
-    ;;               cape-wrap-nonexclusive
-    ;;               (
-    ;;                ;; Ensures that completion does not get interrupted by the user
-    ;;                ;; pressing keys or other operations
-    ;;                cape-wrap-noninterruptible
-    ;;                orig-fun)))))
-    ;;        (apply fn args))))
-
-    ;; Make the capf composable, allow falling back to other backends
-    (advice-add #'eglot-completion-at-point :around #'cape-capf-nonexclusive))
+    (advice-add
+     #'eglot-completion-at-point
+     :around
+     (lambda (orig-fun &rest args)
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
 
   (add-hook
    'prog-mode-hook
