@@ -48,7 +48,7 @@
 ;; has more extensive LaTeX support than Corfu. We can set up separate
 ;; completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -1519,11 +1519,16 @@ The provider is `nerd-icons'."
   (electric-pair-preserve-balance nil)
   (electric-pair-skip-self nil)
   :config
-  (setopt electric-pair-inhibit-predicate
-          (lambda (c)
-            (if (char-equal c ?\")
-                t
-              (electric-pair-default-inhibit c)))))
+  (setopt
+   electric-pair-inhibit-predicate
+   (lambda (char)
+     (or
+      ;; Inhibit for $ or " if point is after or before a word/symbol constituent
+      (and (memq char '(?$ ?\"))
+           (or (looking-back "\\(?:\\sw\\|\\s_\\)+" (line-beginning-position))
+               (looking-at "\\(?:\\sw\\|\\s_\\)+")))
+      ;; Fallback to default behavior
+      (electric-pair-default-inhibit char)))))
 
 ;; "C-h m" or `describe-mode' shows all the active minor modes (and major mode)
 ;; and a brief description of each.
@@ -2355,7 +2360,7 @@ DIR can be relative or absolute."
 ;;   :after (company prog-mode))
 
 (use-package company-auctex
-  :after (company tex)
+  :after tex
   :commands
   (company-auctex-bibs
    company-auctex-environments
@@ -2367,13 +2372,13 @@ DIR can be relative or absolute."
 ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
 ;; set in all files, so that RefTeX can find citations across documents.
 (use-package company-reftex
-  :after (company tex)
+  :after tex
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
 (use-package bibtex-completion
-  :after (company tex))
+  :after tex)
 
 (use-package company-bibtex
   :after bibtex-completion)
@@ -2672,54 +2677,14 @@ DIR can be relative or absolute."
   ;; properties).
   ;; https://github.com/minad/cape/discussions/130
 
+  ;; `cape-capf-buster' cleans completion metadata
   (defun sb/setup-capf (&rest capfs)
     "Set `completion-at-point-functions' buffer-locally."
     (setq-local completion-at-point-functions
                 (mapcar #'cape-capf-buster capfs)))
 
-  ;; (sb/setup-capf #'cape-dict #'cape-dabbrev #'cape-file #'yasnippet-capf)
-
-  (with-eval-after-load 'lsp-mode
-    (advice-add
-     #'lsp-completion-at-point
-     :around
-     (lambda (orig-fun &rest args)
-       (let ((fn
-              (
-               ;; Clean completion metadata
-               cape-wrap-buster
-               (
-                ;; Make the capf composable, allow falling back to other
-                ;; backends
-                cape-wrap-nonexclusive
-                (
-                 ;; Ensures that completion does not get interrupted by the user
-                 ;; pressing keys or other operations
-                 cape-wrap-noninterruptible
-                 orig-fun)))))
-         (apply fn args)))))
-
-  (with-eval-after-load 'eglot
-    (advice-add
-     #'eglot-completion-at-point
-     :around
-     (lambda (orig-fun &rest args)
-       (let ((fn
-              (
-               ;; Clean completion metadata    
-               cape-wrap-buster
-               (
-                ;; Make the capf composable, allow falling back to other
-                ;; backends
-                cape-wrap-nonexclusive
-                (
-                 ;; Ensures that completion does not get interrupted by the user
-                 ;; pressing keys or other operations
-                 cape-wrap-noninterruptible
-                 orig-fun)))))
-         (apply fn args)))))
-
-  ;; We do not merge `cape-dict' and `cape-dabbrev' in `text-mode' because there will be duplicates and we expect `cape-dict' to mostly suffice.
+  ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
+  ;; duplicates and we expect `cape-dict' to mostly suffice.
   (dolist (hook '(text-mode-hook markdown-mode-hook))
     (add-hook
      hook
@@ -2737,6 +2702,52 @@ DIR can be relative or absolute."
       #'cape-dabbrev
       #'yasnippet-capf)))
 
+  (with-eval-after-load 'lsp-mode
+    ;;   (advice-add
+    ;;    #'lsp-completion-at-point
+    ;;    :around
+    ;;    (lambda (orig-fun &rest args)
+    ;;      (let ((fn
+    ;;             (
+    ;;              ;; Clean completion metadata
+    ;;              cape-wrap-buster
+    ;;              (
+    ;;               ;; Make the capf composable, allow falling back to other
+    ;;               ;; backends
+    ;;               cape-wrap-nonexclusive
+    ;;               (
+    ;;                ;; Ensures that completion does not get interrupted by the user
+    ;;                ;; pressing keys or other operations
+    ;;                cape-wrap-noninterruptible
+    ;;                orig-fun)))))
+    ;;        (apply fn args))))
+
+    ;; Make the capf composable, allow falling back to other backends
+    (advice-add #'lsp-completion-at-point :around #'cape-capf-nonexclusive))
+
+  (with-eval-after-load 'eglot
+    ;;   (advice-add
+    ;;    #'eglot-completion-at-point
+    ;;    :around
+    ;;    (lambda (orig-fun &rest args)
+    ;;      (let ((fn
+    ;;             (
+    ;;              ;; Clean completion metadata    
+    ;;              cape-wrap-buster
+    ;;              (
+    ;;               ;; Make the capf composable, allow falling back to other
+    ;;               ;; backends
+    ;;               cape-wrap-nonexclusive
+    ;;               (
+    ;;                ;; Ensures that completion does not get interrupted by the user
+    ;;                ;; pressing keys or other operations
+    ;;                cape-wrap-noninterruptible
+    ;;                orig-fun)))))
+    ;;        (apply fn args))))
+
+    ;; Make the capf composable, allow falling back to other backends
+    (advice-add #'eglot-completion-at-point :around #'cape-capf-nonexclusive))
+
   (add-hook
    'prog-mode-hook
    (lambda ()
@@ -2747,50 +2758,47 @@ DIR can be relative or absolute."
         #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
       (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev #'yasnippet-capf)))
 
-  ;; (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
-  ;;   (add-hook
-  ;;    hook
-  ;;    (lambda ()
-  ;;      (sb/setup-capf
-  ;;       #'cape-tex
-  ;;       #'bibtex-capf
-  ;;       #'cape-dict
-  ;;       #'cape-dabbrev
-  ;;       #'cape-file
-  ;;       #'yasnippet-capf))))
-
-  (defun sb/latex-capf-setup ()
-    "Set up CAPF chain combining LSP + Cape + fallback for AUCTeX."
-    (advice-add #'TeX--completion-at-point :around #'cape-wrap-nonexclusive)
-    ;; Clean completion metadata    
-    (advice-add #'TeX--completion-at-point :around #'cape-wrap-buster)
-
-    (setq-local completion-at-point-functions
-                (list
-                 #'cape-file
-                 (cape-capf-super
-                  ;; AUCTeX provides capf for cite/ref/etc
-                  #'TeX--completion-at-point #'cape-tex)
-                 #'bibtex-capf #'cape-dict #'cape-dabbrev #'yasnippet-capf)))
   (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
-    (add-hook hook #'sb/latex-capf-setup))
+    (add-hook
+     hook
+     (lambda ()
+       (setq-local
+        completion-at-point-functions
+        (list
+         #'cape-file
+         (cape-capf-super
+          ;; Math latex tags
+          (cape-company-to-capf #'company-math-symbols-latex)
+          (cape-company-to-capf #'company-latex-commands)
+          (cape-company-to-capf #'company-reftex-labels)
+          (cape-company-to-capf #'company-auctex-environments)
+          (cape-company-to-capf #'company-auctex-macros)
+          (cape-company-to-capf #'company-auctex-labels)
+          ;; Math unicode symbols and sub(super)scripts
+          (cape-company-to-capf #'company-math-symbols-unicode)
+          (cape-company-to-capf #'company-auctex-symbols)
+          ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+          #'cape-tex)
+         #'bibtex-capf #'cape-dict #'cape-dabbrev #'yasnippet-capf)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
      mode
      (lambda ()
-       (sb/setup-capf
-        #'cape-file
-        #'cape-elisp-symbol
-        ;; (cape-capf-inside-code
-        ;;  (cape-capf-super
-        ;;   #'elisp-completion-at-point
-        ;;   #'citre-completion-at-point
-        ;;   #'cape-elisp-symbol
-        ;;   #'cape-dabbrev))
-        (cape-capf-inside-comment #'cape-dict)
-        #'cape-dabbrev
-        #'yasnippet-capf))))
+       (setq-local completion-at-point-functions
+                   (list
+                    #'cape-file
+                    (cape-capf-nonexclusive #'elisp-completion-at-point)
+                    ;; (cape-capf-inside-code
+                    ;;  (cape-capf-super
+                    ;;   #'elisp-completion-at-point
+                    ;;   #'citre-completion-at-point
+                    ;;   #'cape-elisp-symbol
+                    ;;   #'cape-dabbrev))
+                    #'cape-elisp-symbol
+                    (cape-capf-inside-comment #'cape-dict)
+                    #'cape-dabbrev
+                    #'yasnippet-capf)))))
 
   ;; Integrate with LSP & Eglot
   (defun sb/lsp-capfs (backend)
@@ -3976,13 +3984,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :commands (math-delimiters-no-dollars math-delimiters-toggle)
   :bind (:map LaTeX-mode-map ("$" . math-delimiters-insert)))
 
-;; LATER: This package seems to require `org'
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
   :ensure (:host github :repo "mclear-tools/bibtex-capf")
   :when (eq sb/in-buffer-completion 'corfu)
-  :after latex
-  :hook (LaTeX-mode . bibtex-capf-setup))
+  :after latex)
 
 ;; ;; LATER: This package seems to require `org'
 ;; (use-package citar
