@@ -2643,8 +2643,9 @@ DIR can be relative or absolute."
 
 (use-package yasnippet-capf
   :ensure (:host github :repo "elken/yasnippet-capf")
-  :after (yasnippet corfu)
-  :demand t)
+  :after (yasnippet cape)
+  :demand t
+  :config (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
 ;; (use-package capf-wordfreq
 ;;   :ensure (:host github :repo "johannes-mueller/capf-wordfreq.el")
@@ -2689,20 +2690,12 @@ DIR can be relative or absolute."
   ;; duplicates and we expect `cape-dict' to mostly suffice.
   (dolist (hook '(text-mode-hook markdown-mode-hook))
     (add-hook
-     hook
-     (lambda ()
-       (sb/setup-capf
-        #'cape-file #'cape-dict #'cape-dabbrev #'yasnippet-capf))))
+     hook (lambda () (sb/setup-capf #'cape-file #'cape-dict #'cape-dabbrev))))
 
   (add-hook
    'org-mode-hook
    (lambda ()
-     (sb/setup-capf
-      #'cape-file
-      #'cape-elisp-block
-      #'cape-dict
-      #'cape-dabbrev
-      #'yasnippet-capf)))
+     (sb/setup-capf #'cape-file #'cape-elisp-block #'cape-dict #'cape-dabbrev)))
 
   ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
   ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
@@ -2730,7 +2723,7 @@ DIR can be relative or absolute."
       (cape-capf-inside-code
        (cape-capf-super
         #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
-      (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev #'yasnippet-capf)))
+      (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev)))
 
   (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
     (add-hook
@@ -2753,7 +2746,7 @@ DIR can be relative or absolute."
           (cape-company-to-capf #'company-auctex-symbols)
           ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
           #'cape-tex)
-         #'bibtex-capf #'cape-dict #'cape-dabbrev #'yasnippet-capf)))))
+         #'bibtex-capf #'cape-dict #'cape-dabbrev)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2771,8 +2764,7 @@ DIR can be relative or absolute."
                     ;;   #'cape-dabbrev))
                     #'cape-elisp-symbol
                     (cape-capf-inside-comment #'cape-dict)
-                    #'cape-dabbrev
-                    #'yasnippet-capf)))))
+                    #'cape-dabbrev)))))
 
   ;; Integrate with LSP & Eglot
   (defun sb/lsp-capfs (backend)
@@ -2781,10 +2773,7 @@ DIR can be relative or absolute."
      ;; (cape-capf-inside-code
      ;;  (cape-capf-super
      ;;   backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
-     backend
-     (cape-capf-inside-comment #'cape-dict)
-     #'cape-dabbrev
-     #'yasnippet-capf))
+     backend (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))
 
   (with-eval-after-load 'lsp-mode
     (dolist (hook
@@ -3956,7 +3945,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :after LaTeX-mode
   :demand t
   :commands (math-delimiters-no-dollars math-delimiters-toggle)
-  :bind (:map LaTeX-mode-map ("$" . math-delimiters-insert)))
+  :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
 ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 (use-package bibtex-capf
@@ -5212,9 +5201,7 @@ or the major mode is not in `sb/skippable-modes'."
       ["Code actions"
        ("r" "Rename" lsp-rename)
        ("f" "Format buffer" lsp-format-buffer)
-       ("x" "Execute code action" lsp-execute-code-action)
-       ;; ("y" "Java type hierarchy" lsp-java-type-hierarchy)
-       ]
+       ("x" "Execute code action" lsp-execute-code-action)]
       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
     (bind-key "C-c l" #'sb/lsp-transient)
 
