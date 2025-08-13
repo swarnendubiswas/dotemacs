@@ -1084,15 +1084,31 @@ The provider is `nerd-icons'."
   :init (marginalia-mode 1)
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
   :config
-  ;; Columns are unaligned and look ugly
-  (setopt marginalia-annotators (assq-delete-all 'file marginalia-annotators))
+  ;; Reduce noise by removing annotations for files otherwise columns become
+  ;; unaligned and look ugly.
   (setopt marginalia-annotators
-          (assq-delete-all 'project-file marginalia-annotators))
+          (cl-remove-if
+           (lambda (pair) (memq (car pair) '(file project-file)))
+           marginalia-annotators))
+
+  (defun sb/marginalia-annotate-variable (cand)
+    "Annotate function CAND with its documentation string."
+    (when-let (sym
+               (intern-soft cand))
+      (marginalia--fields
+       ((marginalia--variable-value sym) :truncate 0.5)
+       ((documentation-property sym 'variable-documentation)
+        :truncate 1.0
+        :face 'marginalia-documentation))))
+
+  ;; Override the annotators for the variable category.
   (add-to-list
-   'marginalia-annotators '(symbol-help marginalia-annotate-variable))
-  ;;   (add-to-list
-  ;;  'marginalia-annotator-registry
-  ;;  '(project-buffer marginalia-annotate-project-buffer))
+   'marginalia-annotators
+   '(variable sb/marginalia-annotate-variable builtin none))
+
+  ;; (add-to-list
+  ;;  'marginalia-annotators
+  ;;  '(symbol marginalia-annotate-variable marginalia-align))
   )
 
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
