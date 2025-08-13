@@ -64,8 +64,8 @@ The provider is `nerd-icons'."
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX.
-(defcustom sb/lsp-provider 'lsp-mode
+;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot if I do not have to use Texalb.
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -720,32 +720,31 @@ The provider is `nerd-icons'."
   :ensure (:host github :repo "waymondo/frog-jump-buffer")
   :bind ("C-b" . frog-jump-buffer)
   :config
-  (dolist (regexp
-           '("TAGS"
-             "^\\*Compile-log"
-             "^\\:"
-             "errors\\*$"
-             "^\\*Backtrace"
-             "-ls\\*$"
-             "stderr\\*$"
-             "^\\*Flymake"
-             "^\\*vc"
-             "^\\*eldoc"
-             "^\\*Async-native-compile-log\\*"))
-    (push regexp frog-jump-buffer-ignore-buffers)))
+  (dolist
+      (regexp
+       '("^TAGS$"
+         "^:" ; temp buffers
+         "errors\\*$" ; errors* buffer
+         "stderr\\*$" ; stderr* buffer
+         "-ls\\*$" ; -ls* buffer
+         "^\\*\\(?:Compile-log\\|Backtrace\\|Flymake\\|vc\\|eldoc\\|Async-native-compile-log\\)\\*?$"))
+    (add-to-list 'frog-jump-buffer-ignore-buffers regexp)))
 
 (use-package dired
   :preface
   (defun sb/dired-go-home ()
+    "Go to home directory in Dired."
     (interactive)
     (dired sb/user-home-directory))
 
   (defun sb/dired-jump-to-top ()
+    "Move to the topmost file in Dired."
     (interactive)
     (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
     (dired-next-line 1))
 
   (defun sb/dired-jump-to-bottom ()
+    "Move to the last file in Dired."
     (interactive)
     (goto-char (point-max)) ; Faster than `(end-of-buffer)'
     (dired-next-line -1))
@@ -843,7 +842,7 @@ The provider is `nerd-icons'."
   :after consult
   :bind
   (("M-." . xref-find-definitions)
-   ("M-," . xref-go-back) ("M-?" . xref-find-references)
+   ("M-," . xref-pop-marker-stack) ("M-?" . xref-find-references)
    ;; Find all identifiers whose name matches pattern
    ("C-M-." . xref-find-apropos))
   :custom
@@ -892,7 +891,6 @@ The provider is `nerd-icons'."
    :map vertico-map
    ;; `vertico-exit' (RET) exits with the currently selected candidate, while
    ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
-   ;; ("C-M-j" . vertico-exit-input)
    ("M-<" . vertico-first)
    ("M->" . vertico-last)
    ("RET" . vertico-directory-enter)
@@ -904,10 +902,9 @@ The provider is `nerd-icons'."
   :config
   (vertico-indexed-mode 1)
   (when (eq sb/theme 'catppuccin)
-    (with-eval-after-load 'vertico
-      (set-face-attribute 'vertico-current nil
-                          :background "#676767"
-                          :foreground "#FFFFFF")))
+    (set-face-attribute 'vertico-current nil
+                        :background "#676767"
+                        :foreground "#FFFFFF"))
 
   ;; Customize the display of the current candidate in the completion list. This
   ;; will prefix the current candidate with "» " to make it stand out.
@@ -924,11 +921,53 @@ The provider is `nerd-icons'."
         "  ")
       cand))))
 
+(defconst sb/consult-buffer-filter
+  '("^ "
+    "\\` "
+    "^:"
+    "\\*Echo Area"
+    "\\*Minibuf"
+    "\\*Help*"
+    "\\*Disabled Command\\*"
+    "Flymake log"
+    "\\*Flycheck"
+    "Shell command output"
+    "direnv"
+    "\\*magit-"
+    "magit-.*"
+    ".+-shell*"
+    "\\*straight-"
+    "\\*Compile-Log"
+    "\\*Native-*"
+    "\\*Async-"
+    "\\*Ediff Registry\\*"
+    "TAGS"
+    "\\*vc"
+    "\\*tramp"
+    "\\*citre.*"
+    "\\*pylsp.*"
+    "\\*pyright.*"
+    "\\*ltex-ls"
+    "\\*texlab"
+    "\\*bash-ls.*"
+    "\\*json-ls.*"
+    "\\*yaml-ls.*"
+    "\\*shfmt.*"
+    "\\*clangd.*"
+    "\\*semgrep.*"
+    "\\*autotools.*"
+    "\\*lsp-harper*"
+    "\\*taplo*"
+    "\\*ruff.*"
+    "\\*marksman.*"
+    "\\*html-ls.*")
+  "Regexps to filter from `consult-buffer'.")
+
 (use-package consult
   :preface
   (defun sb/consult-line-symbol-at-point ()
     (interactive)
-    (consult-line (thing-at-point 'symbol)))
+    (consult-line (or (thing-at-point 'symbol) "")))
   :after vertico
   :bind
   ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
@@ -940,7 +979,6 @@ The provider is `nerd-icons'."
    ([remap yank-pop] . consult-yank-from-kill-ring)
    ([remap goto-line] . consult-goto-line)
    ([remap bookmark-jump] . consult-bookmark)
-   ([remap bookmark-set] . consult-bookmark)
    ([remap list-bookmarks] . consult-bookmark)
    ([remap bookmark-bmenu-list] . consult-bookmark)
    ("M-g o" . consult-outline)
@@ -973,46 +1011,7 @@ The provider is `nerd-icons'."
   ;; (consult-buffer-sources '(consult--source-buffer))
   (consult-narrow-key "<")
   (consult-widen-key ">")
-  (consult-buffer-filter
-   '("^ "
-     "\\` "
-     "^:"
-     "\\*Echo Area"
-     "\\*Minibuf"
-     "\\*Help*"
-     "\\*Disabled Command\\*"
-     "Flymake log"
-     "\\*Flycheck"
-     "Shell command output"
-     "direnv"
-     "\\*magit-"
-     "magit-.*"
-     ".+-shell*"
-     "\\*straight-"
-     "\\*Compile-Log"
-     "\\*Native-*"
-     "\\*Async-"
-     "\\*Ediff Registry\\*"
-     "TAGS"
-     "\\*vc"
-     "\\*tramp"
-     "\\*citre.*"
-     "\\*pylsp.*"
-     "\\*pyright.*"
-     "\\*ltex-ls"
-     "\\*texlab"
-     "\\*bash-ls.*"
-     "\\*json-ls.*"
-     "\\*yaml-ls.*"
-     "\\*shfmt.*"
-     "\\*clangd.*"
-     "\\*semgrep.*"
-     "\\*autotools.*"
-     "\\*lsp-harper*"
-     "\\*taplo*"
-     "\\*ruff.*"
-     "\\*marksman.*"
-     "\\*html-ls.*"))
+  (consult-buffer-filter sb/consult-buffer-filter)
   :config
   (consult-customize
    consult-line
@@ -1119,8 +1118,7 @@ The provider is `nerd-icons'."
    ((executable-find "hunspell")
     (progn
       (setenv "LANG" "en_US")
-      (setenv "DICTIONARY" "en_US")
-      (setenv "DICPATH" `,(concat user-emacs-directory "hunspell"))
+      (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
       (setopt
        ispell-program-name "hunspell"
        ispell-local-dictionary-alist
@@ -1133,32 +1131,32 @@ The provider is `nerd-icons'."
           nil
           utf-8))
        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.aff"))))))
+       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
    ((executable-find "aspell")
     (progn
       (setopt
        ispell-program-name "aspell"
-       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--size=90")))))
+       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
 
   ;; Skip regions in `org-mode'
-  (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC"))
-  (add-to-list
-   'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE"))
-  (add-to-list 'ispell-skip-region-alist '("~" "~"))
-  (add-to-list 'ispell-skip-region-alist '("=" "="))
-  (add-to-list 'ispell-skip-region-alist '("\:PROPERTIES\:$" . "\:END\:$"))
-  ;; Footnotes in org that have http links that are line breaked should not be ispelled
-  (add-to-list 'ispell-skip-region-alist '("^http" . "\\]"))
-  (add-to-list 'ispell-skip-region-alist '("`" "`"))
-  (add-to-list 'ispell-skip-region-alist '("cite:" . "[[:space:]]"))
-  (add-to-list 'ispell-skip-region-alist '("label:" . "[[:space:]]"))
-  (add-to-list 'ispell-skip-region-alist '("ref:" . "[[:space:]]"))
-  (add-to-list
-   'ispell-skip-region-alist '("\\\\begin{multline}" . "\\\\end{multline}"))
-  (add-to-list
-   'ispell-skip-region-alist '("\\\\begin{equation}" . "\\\\end{equation}"))
-  (add-to-list
-   'ispell-skip-region-alist '("\\\\begin{align}" . "\\\\end{align}"))
+
+  (dolist
+      (skip-pair
+       '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+         ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+         ("~" . "~")
+         ("=" . "=")
+         ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+         ;; Footnotes in org that have http links that are line breaked should not be ispelled
+         ("^http" . "\\]")
+         ("`" . "`")
+         ("cite:" . "[[:space:]]")
+         ("label:" . "[[:space:]]")
+         ("ref:" . "[[:space:]]")
+         ("\\\\begin{multline}" . "\\\\end{multline}")
+         ("\\\\begin{equation}" . "\\\\end{equation}")
+         ("\\\\begin{align}" . "\\\\end{align}")))
+    (add-to-list 'ispell-skip-region-alist skip-pair))
 
   ;; Hide the "Starting new Ispell process" message
   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
@@ -1238,14 +1236,23 @@ The provider is `nerd-icons'."
   :diminish whole-line-or-region-local-mode)
 
 (use-package dogears
+  :preface
+  (defun sb/dogears-list-sorted ()
+    "Show Dogears list sorted by most recent first."
+    (interactive)
+    (let ((dogears-list
+           (sort (copy-sequence dogears-list)
+                 (lambda (a b)
+                   (time-less-p (alist-get 'time b) (alist-get 'time a))))))
+      (dogears-list)))
   :ensure (:host github :repo "alphapapa/dogears.el")
-  :hook (find-file . dogears-mode)
+  :hook (elpaca-after-init . dogears-mode)
   :bind
   (("M-g d" . dogears-go)
    ("M-g r" . dogears-remember)
    ("M-g b" . dogears-back)
    ("M-g f" . dogears-forward)
-   ("M-g t" . dogears-list))
+   ("M-g t" . sb/dogears-list-sorted))
   :custom
   (dogears-message nil)
   (dogears-idle 2)
@@ -1254,12 +1261,7 @@ The provider is `nerd-icons'."
      xref-after-jump-hook
      xref-after-return-hook
      consult-after-jump-hook
-     before-save-hook))
-  :config
-  (setq dogears-list
-        (sort dogears-list
-              (lambda (a b)
-                (time-less-p (alist-get 'time b) (alist-get 'time a))))))
+     before-save-hook)))
 
 (use-package vundo
   :bind
@@ -1560,24 +1562,28 @@ The provider is `nerd-icons'."
   (flycheck-indication-mode nil)
   :config
   ;; Shellcheck is invoked by bash lsp
-  (dolist (checkers
-           '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck))
-    (delq checkers flycheck-checkers))
+  (setq flycheck-checkers
+        (seq-difference
+         flycheck-checkers
+         '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck)))
   ;; Prefer linters packaged with pylsp
-  (when (eq sb/python-langserver 'pylsp)
-    (dolist (checkers
-             '(python-flake8
-               python-pylint
-               python-mypy
-               python-ruff
-               python-pycompile
-               python-pyright))
-      (delq checkers flycheck-checkers)))
-  (when (eq sb/python-langserver 'basedpyright)
-    (dolist (checkers
-             '(python-flake8
-               python-pylint python-mypy python-pycompile python-pyright))
-      (delq checkers flycheck-checkers)))
+  (pcase sb/python-langserver
+    ('pylsp
+     (setq flycheck-checkers
+           (seq-difference
+            flycheck-checkers
+            '(python-flake8
+              python-pylint
+              python-mypy
+              python-ruff
+              python-pycompile
+              python-pyright))))
+    ('basedpyright
+     (setq flycheck-checkers
+           (seq-difference
+            flycheck-checkers
+            '(python-flake8
+              python-pylint python-mypy python-pycompile python-pyright)))))
 
   ;; These themes have their own styles for displaying flycheck info.
   (when (eq sb/modeline-theme 'doom-modeline)
@@ -1685,7 +1691,8 @@ The provider is `nerd-icons'."
 ;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 ;;   :diminish)
 
-;; Basedpyright does not provide formatting feature
+;; Basedpyright does not provide formatting feature. So, we cannot use
+;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
 (use-package apheleia
   :hook
   ((markdown-mode
@@ -1714,9 +1721,6 @@ The provider is `nerd-icons'."
 ;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
 ;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
 ;;   :diminish shfmt-on-save-mode)
-
-;; We cannot use `lsp-format-buffer' or `eglot-format-buffer' with
-;; `basedpyright' since it does not support document formatting.
 
 ;; Yapfify works on the original file, so that any project settings supported by
 ;; YAPF itself are used.
@@ -2652,7 +2656,6 @@ DIR can be relative or absolute."
 ;;   :after corfu
 ;;   :demand t)
 
-;; CAPE for composable CAPFs (with LSP + extra sources)
 (use-package cape
   :after corfu
   :demand t
@@ -3214,7 +3217,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package eldoc
   :ensure nil
-  :hook (find-file . global-eldoc-mode)
+  :hook (elpaca-after-init . global-eldoc-mode)
   :custom
   (eldoc-area-prefer-doc-buffer t "Disable popups")
   (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
@@ -3690,6 +3693,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package org
   :defer 2
   :mode ("\\.org\\'" . org-mode)
+  :bind-keymap ("C-c o" . org-mode-map)
+  :bind
+  (:map
+   org-mode-map
+   ("M-<left>")
+   ("M-<right>")
+   ("M-<up>")
+   ("M-<down>")
+   ("C-'")
+   ("C-c C-d")
+   ("C-c C-j")
+   ("M-e")
+   ("<tab>" . org-indent-item)
+   ("<backtab>" . org-outdent-item)
+   ("M-{" . org-backward-element)
+   ("M-}" . org-forward-element)
+   ("C-c C-," . org-insert-structure-template)
+   ("C-c C-j" . consult-outline)
+   ("C-c C-l" . org-store-link)
+   ("C-c C-k" . org-insert-link))
   :custom
   (org-fontify-quote-and-verse-blocks t)
   (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
@@ -3726,35 +3749,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
-  :bind-keymap ("C-c o" . org-mode-map)
-  :bind
-  (:map
-   org-mode-map
-   ("M-<left>")
-   ("M-<right>")
-   ("M-<up>")
-   ("M-<down>")
-   ("C-'")
-   ("C-c C-d")
-   ("C-c C-j")
-   ("M-e")
-   ("<tab>" . org-indent-item)
-   ("<backtab>" . org-outdent-item)
-   ("M-{" . org-backward-element)
-   ("M-}" . org-forward-element)
-   ("C-c C-," . org-insert-structure-template)
-   ("C-c C-j" . consult-outline)
-   ("C-c C-l" . org-store-link)
-   ("C-c C-k" . org-insert-link))
+  (org-latex-pdf-process
+   '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
   :config
   (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "listings"))
   (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
-
-  (setopt
-   org-latex-pdf-process
-   '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f")))
+  (add-to-list 'org-latex-packages-alist '("" "minted")))
 
 ;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
 (use-package org-appear
@@ -4109,7 +4109,7 @@ Fallback to `xref-go-back'."
 (use-package nerd-icons-completion
   :ensure (:host github :repo "rainstormstudio/nerd-icons-completion")
   :when (bound-and-true-p sb/enable-icons)
-  :after (:all nerd-icons marginalia)
+  :after (nerd-icons marginalia)
   :init (nerd-icons-completion-mode 1)
   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
@@ -4566,7 +4566,8 @@ Shows both colors when errors and warnings are present."
      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
+  (setq eglot-stay-out-of
+        '(flymake yasnippet company eldoc completion-at-point))
 
   ;; FIXME: `eglot-workspace-configuration' should be set as a directory-local
   ;; variable, but it is not working for me.
@@ -4807,7 +4808,8 @@ If region is active, apply to active region instead."
     "*prettier (local)*"
     "*emacs*"
     "*Warnings*"
-    "*Compile-Log* *lsp-log*"
+    "*Compile-Log*"
+    "*lsp-log*"
     "*pyright*"
     "*texlab::stderr*"
     "*texlab*"
@@ -4854,7 +4856,7 @@ If region is active, apply to active region instead."
     ediff-meta-mode
     native-comp-limple-mode)
   "List of major modes to skip over when calling `change-buffer'."
-  :type '(repeat string)
+  :type '(repeat symbol)
   :group 'sb/emacs)
 
 (defun sb/change-buffer (change-buffer)
