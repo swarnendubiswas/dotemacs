@@ -1784,11 +1784,11 @@ The provider is `nerd-icons'."
 ;; current buffer and presents suggestions for completion.
 (use-package dabbrev
   :ensure nil
-  :bind ("C-M-;" . dabbrev-completion)
+  :bind ("C-M-;" . dabbrev-completionetion)
   :custom
   (dabbrev-ignored-buffer-regexps
-   '("^ "
-     "\\.\\(?:jpe?g\\|png\\|pdf\\)\\'"
+   '("^ " ;; internal or hidden buffers starting with space
+     "\\.\\(?:jpe?g\\|png\\|pdf\\)\\'" ;; image/PDF files
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
   :config
@@ -2463,7 +2463,7 @@ DIR can be relative or absolute."
   ;; Override `company-backends' for unhandled major modes.
   (setopt company-backends
           (if (or (bound-and-true-p lsp-mode)
-                  (bound-and-true-p eglot--managed-mode))
+                  (bound-and-true-p eglot-managed-mode))
               '((company-capf
                  company-keywords
                  company-dabbrev-code
@@ -2828,8 +2828,8 @@ DIR can be relative or absolute."
     (add-hook
      hook
      (lambda ()
-       ((sb/setup-capf
-         #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))))
+       (sb/setup-capf
+        #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev)))))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
@@ -3127,7 +3127,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ((text-mode markdown-mode org-mode LaTeX-mode)
    .
    (lambda ()
-     (unless (string-equal (buffer-name) "COMMIT_EDITMSG")
+     (unless (string-equal
+              (file-name-nondirectory (or buffer-file-name ""))
+              "COMMIT_EDITMSG")
        (require 'lsp-ltex-plus)
        (lsp-deferred))))
   :custom
@@ -4467,7 +4469,11 @@ Shows both colors when errors and warnings are present."
   :hook
   ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
    .
-   eglot-ensure)
+   (lambda ()
+     (unless (string-equal
+              (file-name-nondirectory (or buffer-file-name ""))
+              "COMMIT_EDITMSG")
+       (eglot-ensure))))
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
@@ -4493,11 +4499,10 @@ Shows both colors when errors and warnings are present."
 
   (setopt
    eglot-server-programs
-   `((text-mode
-      .
-      ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+   `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
+     (text-mode
+      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
-     ((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
       . ("autotools-language-server"))
      (fish-mode . ("fish-lsp" "start"))
@@ -4741,7 +4746,7 @@ Shows both colors when errors and warnings are present."
   :when (eq sb/lsp-provider 'eglot)
   :hook
   ((java-mode . eglot-ensure)
-   (eglot--managed-mode
+   (eglot-managed-mode
     .
     (lambda ()
       (when (derived-mode-p 'java-mode)
@@ -4780,7 +4785,7 @@ Shows both colors when errors and warnings are present."
   :when (eq sb/lsp-provider 'eglot)
   :after eglot
   :demand t
-  :hook (eglot--managed-mode . eglot-inactive-regions-mode)
+  :hook (eglot-managed-mode . eglot-inactive-regions-mode)
   :custom
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4))
@@ -4876,7 +4881,7 @@ or the major mode is not in `sb/skippable-modes'."
       (catch 'loop
         (while (or (member (buffer-name) sb/skippable-buffers)
                    (member
-                    (sb/get-buffer-major-mode (buffer-name))
+                    (sb/get-buffer-major-mode (current-buffer))
                     sb/skippable-modes))
           (funcall change-buffer)
           (when (eq (current-buffer) first-change)

@@ -326,11 +326,13 @@
            (add-hook
             hook
             (lambda ()
-              (add-hook 'before-save-hook
-                        (if (eq hook 'lsp-managed-mode-hook)
-                            #'lsp-format-buffer
-                          #'eglot-format-buffer)
-                        nil t)))))))
+              ;; `toml-mode' derives from `text-mode'
+              (unless (derived-mode-p 'text-mode)
+                (add-hook 'before-save-hook
+                          (if (eq hook 'lsp-managed-mode-hook)
+                              #'lsp-format-buffer
+                            #'eglot-format-buffer)
+                          nil t))))))))
 
  (LaTeX-mode
   .
@@ -344,7 +346,7 @@
             bibtex-capf-bibliography bibpath
             citar-bibliography bibpath)))))
 
- (kdl-ts-mode . (mode . kdl-format-on-save))
+ ;; (kdl-ts-mode . (mode . kdlformat-on-save))
 
  ((java-mode java-ts-mode)
   .
