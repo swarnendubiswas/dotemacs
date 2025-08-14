@@ -3480,6 +3480,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
 
+(defun sb/indent-elisp-buffer ()
+  "Indent the current Emacs Lisp buffer."
+  (interactive)
+  (when (derived-mode-p 'emacs-lisp-mode)
+    (indent-region (point-min) (point-max))))
+
 (use-package lisp-mode
   :ensure nil
   :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode)
@@ -3589,7 +3595,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :mode ("\\.flex\\'" . flex-mode)
   :mode ("\\.bison\\'" . bison-mode)
   :hook
-  (flex-mode
+  ((flex-mode bison-mode)
    .
    (lambda ()
      ;; Disable electric indentation and on-type formatting
@@ -3608,6 +3614,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (markdown-mode
    .
    (lambda ()
+     ;; Auto-pair backticks
+     (sb/add-pairs '((?` . ?`)))
      (when (eq sb/lsp-provider 'lsp-mode)
        (require 'lsp-marksman))
      (sb/setup-lsp-provider)))
@@ -3626,11 +3634,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (markdown-indent-on-enter 'indent-and-new-item)
   (markdown-list-indent-width 2)
   (markdown-split-window-direction 'horizontal)
-  (markdown-hide-urls t)
-
-  (defvar sb/markdown-pairs '((?` . ?`)))
-  ;; Auto-pair backticks
-  (add-hook 'markdown-mode-hook (lambda () (sb/add-pairs '((?` . ?`))))))
+  (markdown-hide-urls t))
 
 ;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
 ;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
@@ -3642,7 +3646,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package nxml-mode
   :ensure nil
-  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom$" "\\.drawio$")
+  :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom\\'" "\\.drawio\\'")
   :hook
   (nxml-mode
    .
@@ -3661,12 +3665,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package json-mode
   :mode
-  (("pyrightconfig.json" . jsonc-mode)
+  (("pyrightconfig\\.json\\'" . jsonc-mode)
    ("\\.json\\'" . json-ts-mode)
-   (".*/vscode/settings.json$" . jsonc-mode)
-   (".*/\\.vscode/settings.json$" . jsonc-mode)
-   ("User/settings.json$" . jsonc-mode)
-   ("\\.htmlhintrc" . json-mode))
+   (".*/vscode/settings.json\\'" . jsonc-mode)
+   (".*/\\.vscode/settings.json\\'" . jsonc-mode)
+   ("User/settings\\.json\\'" . jsonc-mode)
+   ("\\.htmlhintrc\\'" . json-mode))
   :hook
   ((json-mode json-ts-mode jsonc-mode)
    .
@@ -4461,9 +4465,9 @@ Shows both colors when errors and warnings are present."
   :ensure (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
   :hook
-  ((dockerfile-ts-mode
-    html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
-   . eglot-ensure)
+  ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
+   .
+   eglot-ensure)
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
