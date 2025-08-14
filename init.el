@@ -122,7 +122,10 @@ The provider is `nerd-icons'."
   :custom
   (auto-save-file-name-transforms
    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  (backup-directory-alist
+   `((".*" . ,(no-littering-expand-var-file-name "backup/"))))
   (custom-file (no-littering-expand-var-file-name "custom.el"))
+  (url-history-file (no-littering-expand-var-file-name "url/history"))
   :config (no-littering-theme-backups))
 
 (elpaca-wait)
@@ -546,7 +549,7 @@ The provider is `nerd-icons'."
   :preface
   (defun sb/cleanup-tramp ()
     (interactive)
-    (progn
+    (ignore-errors
       (tramp-cleanup-all-buffers)
       (tramp-cleanup-all-connections)))
   :ensure nil
@@ -562,7 +565,7 @@ The provider is `nerd-icons'."
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path t)
   ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
   (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
 
@@ -594,25 +597,24 @@ The provider is `nerd-icons'."
   (ibuffer-show-empty-filter-groups nil)
   (ibuffer-formats
    '((mark
-      modified read-only locked " " (name 24 24 :left :elide) " " filename)))
+      modified read-only locked " " (name 30 -1 :left :elide) " " filename)))
   (ibuffer-never-show-predicates
-   '("*Help\\*"
-     "*Quick Help\\*"
-     "*Calc Trail\\*"
-     "*Compile-Log\\*"
-     "*Async-native-compile-log\\*"
-     "*Native-compile-log\\*"
-     "*Calculator\\*"
-     "*Calendar\\*"
-     "*Org Help\\*"
-     "magit.*"
-     "*lsp-log*"
-     "*ltex-ls*"
-     "*bash-ls.*"
-     "*marksman.*"
-     "*yaml-ls.*"
-     "*clangd.*"
-     "*texlab.*"))
+   '("\\*Help\\*"
+     "\\*Quick Help\\*"
+     "\\*Calc Trail\\*"
+     "\\*Compile-Log\\*"
+     "\\*Async-native-compile-log\\*"
+     "\\*Native-compile-log\\*"
+     "\\*Calculator\\*"
+     "\\*Calendar\\*"
+     "\\*Org Help\\*"
+     "^magit.*"
+     "\\*ltex-ls.*"
+     "\\*bash-ls.*"
+     "\\*marksman.*"
+     "\\*yaml-ls.*"
+     "\\*clangd.*"
+     "\\*texlab.*"))
   :config
   (require 'ibuf-ext)
   (defalias 'list-buffers 'ibuffer))
@@ -678,7 +680,7 @@ The provider is `nerd-icons'."
 (use-package avy
   :preface
   (defun sb/avy-goto-visual-line-column-0 ()
-    "Jump to the beginning (column 0) of each visible visual line."
+    "Jump to column 0 of each visible visual line in the current window."
     (interactive)
     (avy-with
      avy-goto-line
@@ -686,22 +688,27 @@ The provider is `nerd-icons'."
       (save-excursion
         (let ((start (window-start))
               (end (window-end nil t))
-              (positions '()))
-          (goto-char start)
-          (while (< (point) end)
-            ;; Move to beginning of visual line
-            (let ((bol
-                   (save-excursion
-                     (vertical-motion 0) ;; stay on current visual line
-                     (line-beginning-position))))
-              (push (cons bol bol) positions))
-            (vertical-motion 1)) ;; move to next visual line
+              positions)
+          ;; Restrict search to visible region for speed
+          (save-restriction
+            (narrow-to-region start end)
+            (goto-char (point-min))
+            (while (not (eobp))
+              (let ((bol
+                     (save-excursion
+                       (vertical-motion 0) ; stay on current visual line
+                       (line-beginning-position))))
+                ;; Avoid duplicates (folds/overlays can cause repeats)
+                (unless (and positions (= bol (caar positions)))
+                  (push (cons bol bol) positions)))
+              (vertical-motion 1))) ; move to next visual line
           (nreverse positions)))
       (avy--style-fn avy-style))))
   :bind
   (("C-\\" . avy-goto-word-1)
    ("C-'" . avy-goto-char-timer)
    ("C-/" . avy-goto-line)
+   ("M-/" . sb/avy-goto-visual-line-column-0)
    ("C-M-c" . avy-copy-line)
    ("C-M-m" . avy-move-line)
    :map isearch-mode-map
@@ -788,40 +795,36 @@ The provider is `nerd-icons'."
 
 (use-package dired-x
   :ensure nil
-  :hook
-  (dired-mode
-   .
-   (lambda ()
-     (require 'dired-x)
-     (dired-omit-mode -1)))
+  :hook (dired-mode . dired-omit-mode)
   :bind ("C-x C-j" . dired-jump)
-  :custom (dired-omit-verbose nil "Do not show messages when omitting files")
+  :custom
+  (dired-omit-verbose nil "Do not show messages when omitting files")
+  (dired-omit-files
+   (rx
+    (or (seq bol "." (not (any "."))) ; dotfiles
+        ".DS_Store"
+        ".project"
+        (optional "ile")
+        ".svn"
+        ".git"
+        ".cache"
+        ".ccls-cache"
+        "__pycache__"
+        "eln-cache"
+        ".ctags.d"
+        ".git"
+        (seq (optional ".js") ".meta")
+        (seq "." (or "elc" "o" "pyo" "swp" "class")))))
   :config
   ;; Obsolete from Emacs 28+
   (unless (> emacs-major-version 27)
     (setopt dired-bind-jump t))
 
-  (setopt dired-omit-files
-          (concat
-           dired-omit-files
-           "\\|^\\..*$" ; Hide all dotfiles
-           "\\|^.DS_Store\\'"
-           "\\|^.project\\(?:ile\\)?\\'"
-           "\\|^.\\(svn\\|git\\)\\'"
-           "\\|^.cache\\'"
-           "\\|^.ccls-cache\\'"
-           "\\|^__pycache__\\'"
-           "\\|^eln-cache\\'"
-           "\\|^.ctags.d\\'"
-           "\\|^.git\\'"
-           "\\|\\(?:\\.js\\)?\\.meta\\'"
-           "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
-
   ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  (defadvice dired-omit-startup (after diminish-dired-omit activate)
-    "Remove 'Omit' from the modeline."
-    (diminish 'dired-omit-mode)
-    dired-mode-map))
+  ;; Remove 'Omit' from the modeline.
+  (advice-add
+   'dired-omit-startup
+   :after (lambda () (diminish 'dired-omit-mode))))
 
 (use-package dired-narrow
   :after dired
@@ -1366,9 +1369,7 @@ The provider is `nerd-icons'."
 (use-package isearch
   :ensure nil
   :bind
-  (("C-s")
-   ("C-M-f") ; Was bound to `isearch-forward-regexp', but we use it for `forward-sexp'
-   ("C-f" . isearch-forward-regexp)
+  (("C-f" . isearch-forward-regexp)
    ("C-r" . isearch-backward-regexp)
    :map
    isearch-mode-map
@@ -1503,14 +1504,15 @@ The provider is `nerd-icons'."
 ;; Diff-hl looks nicer than git-gutter, and is based on `vc'. Fringe is
 ;; unavailable in TTY.
 (use-package diff-hl
+  :preface
+  (defun sb/diff-hl-maybe-margin ()
+    "Enable margin mode for diff-hl when in TTY."
+    (unless (display-graphic-p)
+      (diff-hl-margin-local-mode)))
   :hook
-  ((find-file . global-diff-hl-mode)
+  ((elpaca-after-init . global-diff-hl-mode)
    (dired-mode . diff-hl-dired-mode-unless-remote)
-   (diff-hl-mode
-    .
-    (lambda ()
-      (unless (display-graphic-p)
-        (diff-hl-margin-local-mode)))))
+   (diff-hl-mode . sb/diff-hl-maybe-margin))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
@@ -1519,8 +1521,8 @@ The provider is `nerd-icons'."
   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
   (with-eval-after-load 'magit
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
-    (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)))
+    ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 (use-package smerge-mode
   :ensure nil)
@@ -1790,29 +1792,29 @@ The provider is `nerd-icons'."
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
   :config
-  (dolist (exclude
-           '(doc-view-mode
-             pdf-view-mode tags-table-mode image-mode archive-mode))
-    (add-to-list 'dabbrev-ignored-buffer-modes exclude)))
+  (setopt dabbrev-ignored-buffer-modes
+          (append
+           '(doc-view-mode pdf-view-mode tags-table-mode)
+           dabbrev-ignored-buffer-modes)))
 
 (use-package hippie-exp
   :ensure nil
+  :bind (("C-M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand))
   :custom
   (hippie-expand-try-functions-list
-   '(try-expand-dabbrev
-     try-expand-dabbrev-all-buffers
-     try-expand-dabbrev-from-kill
-     try-complete-file-name-partially
-     try-complete-file-name
+   '(try-expand-dabbrev ; current buffer
+     try-expand-dabbrev-all-buffers ; any buffer 
+     try-complete-file-name-partially ; partial path 
+     try-expand-dabbrev-from-kill ; recent kills
+     try-complete-file-name ; full path 
+     try-complete-lisp-symbol-partially
+     try-complete-lisp-symbol
      try-expand-all-abbrevs
      try-expand-list
-     try-expand-line
-     try-complete-lisp-symbol-partially
-     try-complete-lisp-symbol))
-  (hippie-expand-verbose nil)
-  :bind (("M-/" . hippie-expand) ([remap dabbrev-expand] . hippie-expand)))
+     try-expand-line))
+  (hippie-expand-verbose nil))
 
-;; `hotfuzz' is faster than `flex' (built-in) for large candidate sets
+;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
 (use-package hotfuzz
   :after (:any company corfu)
   :demand t)
@@ -1864,7 +1866,7 @@ The provider is `nerd-icons'."
 
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
-    (set (make-local-variable 'face-remapping-alist) '((default :height 0.95))))
+    (setq-local face-remapping-alist '((default :height 0.95))))
   (add-hook 'minibuffer-setup-hook #'sb/decrease-minibuffer-font)
 
   ;; Do not open the *Messages* buffer when clicking in the Echo area.
@@ -1877,10 +1879,13 @@ The provider is `nerd-icons'."
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
+  (yas-wrap-around-region t) ; Allows snippets to wrap around selected text
+  (yas-triggers-in-field t) ; Enable nested snippet expansion
   :config
   (with-eval-after-load 'hippie-expand
-    (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand))
+    (add-to-list 'hippie-expand-try-functions-list #'yas-hippie-try-expand t))
   (unbind-key "<tab>" yas-minor-mode-map)
+  (unbind-key "TAB" yas-minor-mode-map)
   :diminish yas-minor-mode)
 
 (use-package yasnippet-snippets
@@ -2326,7 +2331,7 @@ The provider is `nerd-icons'."
 ;; (`company-math-symbols-latex') is not available outside of math latex
 ;; environments
 (use-package company-math
-  :after (:all tex-mode company)
+  :after (tex-mode company)
   :demand t)
 
 ;; Complete in the middle of words
@@ -2398,7 +2403,8 @@ DIR can be relative or absolute."
   (company-reftex-labels-parse-all nil))
 
 (use-package bibtex-completion
-  :after tex)
+  :after tex
+  :commands bibtex-completion-insert-citation)
 
 (use-package company-bibtex
   :after bibtex-completion)
@@ -2792,63 +2798,38 @@ DIR can be relative or absolute."
      ;; (cape-capf-inside-code
      ;;  (cape-capf-super
      ;;   backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
-     backend (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))
+     (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))
 
-  (with-eval-after-load 'lsp-mode
-    (dolist (hook
-             '(bash-ts-mode-hook
-               c-mode-hook
-               c-ts-mode-hook
-               c++-mode-hook
-               c++-ts-mode-hook
-               cmake-mode-hook
-               cmake-ts-mode-hook
-               css-mode-hook
-               css-ts-mode-hook
-               fish-mode-hook
-               html-mode-hook
-               html-ts-mode-hook
-               java-mode-hook
-               java-ts-mode-hook
-               json-mode-hook
-               json-ts-mode-hook
-               jsonc-mode-hook
-               makefile-mode-hook
-               python-mode-hook
-               python-ts-mode-hook
-               sh-mode-hook
-               web-mode-hook
-               yaml-mode-hook
-               yaml-ts-mode-hook))
-      (add-hook hook (lambda () (sb/lsp-capfs #'lsp-completion-at-point)))))
-
-  (with-eval-after-load 'eglot
-    (dolist (hook
-             '(bash-ts-mode-hook
-               c-mode-hook
-               c-ts-mode-hook
-               c++-mode-hook
-               c++-ts-mode-hook
-               cmake-mode-hook
-               cmake-ts-mode-hook
-               css-mode-hook
-               css-ts-mode-hook
-               fish-mode-hook
-               html-mode-hook
-               html-ts-mode-hook
-               java-mode-hook
-               java-ts-mode-hook
-               json-mode-hook
-               json-ts-mode-hook
-               jsonc-mode-hook
-               makefile-mode-hook
-               python-mode-hook
-               python-ts-mode-hook
-               sh-mode-hook
-               web-mode-hook
-               yaml-mode-hook
-               yaml-ts-mode-hook))
-      (add-hook hook (lambda () (sb/lsp-capfs #'eglot-completion-at-point))))))
+  (dolist (hook
+           '(bash-ts-mode-hook
+             c-mode-hook
+             c-ts-mode-hook
+             c++-mode-hook
+             c++-ts-mode-hook
+             cmake-mode-hook
+             cmake-ts-mode-hook
+             css-mode-hook
+             css-ts-mode-hook
+             fish-mode-hook
+             html-mode-hook
+             html-ts-mode-hook
+             java-mode-hook
+             java-ts-mode-hook
+             json-mode-hook
+             json-ts-mode-hook
+             jsonc-mode-hook
+             makefile-mode-hook
+             python-mode-hook
+             python-ts-mode-hook
+             sh-mode-hook
+             web-mode-hook
+             yaml-mode-hook
+             yaml-ts-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       ((sb/setup-capf
+         #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
@@ -3393,7 +3374,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package cmake-mode
   :when (executable-find "cmake")
-  :mode ("\(CMakeLists\.txt|\.cmake\)$" . cmake-ts-mode)
+  :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode) ("\\.cmake\\'" . cmake-ts-mode))
   :hook
   ((cmake-mode cmake-ts-mode)
    .
@@ -3408,7 +3389,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package python
   :ensure nil
   :mode
-  (("SCon\(struct\|script\)$" . python-ts-mode)
+  (("SCon\\(struct\\|script\\)\\'" . python-ts-mode)
    ("[./]flake8\\'" . conf-mode)
    ("/Pipfile\\'" . conf-mode))
   :hook
@@ -3536,9 +3517,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package yaml-mode
   :mode
   (("\\.ya?ml\\'" . yaml-ts-mode)
-   (".clang-format" . yaml-ts-mode)
-   (".clang-tidy" . yaml-ts-mode)
-   (".clangd" . yaml-ts-mode))
+   ("\\.clang-format\\'" . yaml-ts-mode)
+   ("\\.clang-tidy\\'" . yaml-ts-mode)
+   ("\\.clangd\\'" . yaml-ts-mode))
   :hook
   ((yaml-mode yaml-ts-mode)
    .
@@ -4733,7 +4714,7 @@ Shows both colors when errors and warnings are present."
   :preface
   (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
     "Custom options that will be merged with any default settings."
-    '( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
+    `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
       :settings
       (:java
        (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
@@ -4741,36 +4722,42 @@ Shows both colors when errors and warnings are present."
        (:runtimes
         [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
          (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
-       (:completion
-        (:guessMethodArguments t)
-        :format
-        (:enabled
-         t
-         :comments (:enabled t)
-         :onType (:enabled :json-false)
-         :tabSize 4
-         :insertSpaces t
-         :settings
-         (:url
-          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml")))
+       :completion (:guessMethodArguments t)
+       :format
+       (:enabled
+        t
+        :comments (:enabled t)
+        :onType (:enabled :json-false)
+        :tabSize 4
+        :insertSpaces t
+        :settings
+        (:url
+         "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
        :extendedClientCapabilities (:classFileContentsSupport t))))
   :when (eq sb/lsp-provider 'eglot)
   :hook
-  (java-mode
-   .
-   (lambda ()
-     (eglot-ensure)
-     (eglot-java-mode)))
+  ((java-mode . eglot-ensure)
+   (eglot--managed-mode
+    .
+    (lambda ()
+      (when (derived-mode-p 'java-mode)
+        (eglot-java-mode)))))
   :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
+  :ensure (:host github :repo "dolmens/eglot-hierarchy")
   :when (eq sb/lsp-provider 'eglot)
   :after eglot
-  :ensure (:host github :repo "dolmens/eglot-hierarchy"))
+  :commands
+  (eglot-hierarchy-call-hierarchy
+   eglot-hierarchy-incoming-calls
+   eglot-hierarchy-outgoing-calls
+   eglot-hierarchy-type-hierarchy))
 
 (use-package consult-eglot
   :when (eq sb/lsp-provider 'eglot)
-  :after (consult eglot))
+  :after (consult eglot)
+  :commands (consult-eglot-symbols consult-eglot-file-symbols))
 
 (use-package flycheck-eglot
   :when (eq sb/lsp-provider 'eglot)
@@ -4789,10 +4776,10 @@ Shows both colors when errors and warnings are present."
   :when (eq sb/lsp-provider 'eglot)
   :after eglot
   :demand t
+  :hook (eglot--managed-mode . eglot-inactive-regions-mode)
   :custom
   (eglot-inactive-regions-style 'darken-foreground)
-  (eglot-inactive-regions-opacity 0.4)
-  :config (eglot-inactive-regions-mode 1))
+  (eglot-inactive-regions-opacity 0.4))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
