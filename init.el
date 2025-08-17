@@ -15,12 +15,8 @@
   :type 'string
   :group 'sb/emacs)
 
-(defcustom sb/debug-init-perf nil
-  "Enable features to debug errors and performance bottlenecks."
-  :type 'boolean
-  :group 'sb/emacs)
-
-;; Modus-vivendi is the most complete, while Catppuccin is more colorful.
+;; Modus-vivendi is the most complete and integrates well with all terminals,
+;; while Catppuccin is more colorful.
 (defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
@@ -30,7 +26,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Powerline looks clean, but doom-modeline is more informative.
+;; Powerline looks clean and nerdy, but doom-modeline is more informative.
 (defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
@@ -40,13 +36,15 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
+;; So far, `lsp-mode' with `company' works best for me. The other alternatives are `eglot' and `corfu'.
+
 ;; Corfu integrates nicely with `orderless' and provides better completion for
-;; Elisp symbols with `cape-symbol'. But `corfu-terminal-mode' with Emacs < 30
-;; has a rendering problem for completion popups appearing near the right edges
-;; with terminal Emacs. The completion entries wrap around sometimes, and messes
-;; up the completion. Company works better with both Windows and TUI Emacs, and
-;; has more extensive LaTeX support than Corfu. We can set up separate
-;; completion files with `company-ispell' and `company-dict'. However,
+;; Elisp symbols with `cape-elisp-symbol'. But `corfu-terminal-mode' with Emacs
+;; < 31 has a rendering problem for completion popups appearing near the right
+;; edges with terminal Emacs. The completion entries wrap around sometimes, and
+;; messes up the completion. Company works better with both Windows and TUI
+;; Emacs, and has more extensive LaTeX support than Corfu. We can set up
+;; separate completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend.
 (defcustom sb/in-buffer-completion 'corfu
   "Choose the framework to use for completion at point."
@@ -64,8 +62,8 @@ The provider is `nerd-icons'."
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot if I do not have to use Texalb.
-(defcustom sb/lsp-provider 'eglot
+;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I would prefer Eglot if I do not have to use Texlab.
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -86,7 +84,7 @@ The provider is `nerd-icons'."
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
-;; Install `use-package' support
+;; Install `use-package' support for Elpaca.
 (elpaca
  elpaca-use-package
  ;; Enable support for the `:ensure' keyword in `use-package' for Elpaca.
@@ -97,16 +95,7 @@ The provider is `nerd-icons'."
    use-package-enable-imenu-support t
    use-package-expand-minimally t
    use-package-always-defer t
-   use-package-always-ensure t)
-
-  (when (bound-and-true-p sb/debug-init-perf)
-    ;; Use "M-x use-package-report" to see package load times.
-    (setopt
-     use-package-compute-statistics t
-     use-package-verbose t)))
-
-;; Check "use-package-keywords.org" for a suggested order of `use-package'
-;; keywords.
+   use-package-always-ensure t))
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
 
@@ -114,6 +103,9 @@ The provider is `nerd-icons'."
 ;; which provides a much prettier API for manipulating keymaps than `define-key'
 ;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
 ;; "C-h m" shows the keybindings for the major and the minor modes.
+
+;; Check "use-package-keywords.org" for a suggested order of `use-package'
+;; keywords.
 
 (use-package diminish
   :ensure (:wait t))
@@ -132,6 +124,7 @@ The provider is `nerd-icons'."
 
 ;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient. 
 (use-package exec-path-from-shell
+  ;; Emacs launched in the terminal gets to see $PATH.
   :when (and (eq system-type 'gnu/linux) (display-graphic-p))
   :demand t
   :init
@@ -146,7 +139,8 @@ The provider is `nerd-icons'."
      "LSP_USE_PLISTS"
      "CONDA_PREFIX"
      "CONDA_DEFAULT_ENV")
-   ;; Reduce the start up time for GUI Emacs
+   ;; Reduce the start up time for GUI Emacs. Exporting $PATH should still work
+   ;; if the shell rc files have been correctly setup.
    exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
@@ -157,7 +151,7 @@ The provider is `nerd-icons'."
    .
    (lambda ()
      (save-place-mode 1)
-     ;; There is mostly no benefit in seeing the file size on the modeline. Therefore, it is better to save modeline space.
+     ;; There is mostly no benefit in seeing the file size on the modeline. 
      ;; (size-indication-mode 1)
      (column-number-mode 1)
      ;; `auto-save-mode' saves to a separate auto-save file, while
@@ -258,7 +252,6 @@ The provider is `nerd-icons'."
   (list-matching-lines-default-context-lines 1)
   (imenu-auto-rescan t)
   (imenu-use-popup-menu nil)
-
   :config
   (dolist (exts
            '(".aux"
@@ -864,17 +857,20 @@ The provider is `nerd-icons'."
    ("b" . project-switch-to-buffer)
    ("c" . project-compile)
    ("k" . project-kill-buffers)
+   ("s" . project-find-regexp)
    ("r" . project-query-replace-regexp))
   :custom
   ;; Start `project-find-file' by default
-  (project-switch-commands 'project-find-file))
+  (project-switch-commands 'project-find-file)
+  (project-vc-extra-root-markers
+   '(".project" "pyproject.toml" "CMakeLists.txt")))
 
-;; Allows identifying custom projects with a ".project" file (e.g., ~/Dropbox).
-(use-package project-x
-  :ensure (:host github :repo "karthink/project-x")
-  :after project
-  :demand t ; Required so that transient keybindings are available
-  :config (add-hook 'project-find-functions #'project-x-try-local 90))
+;; ;; Allows identifying custom projects with a ".project" file (e.g., ~/Dropbox).
+;; (use-package project-x
+;;   :ensure (:host github :repo "karthink/project-x")
+;;   :after project
+;;   :demand t ; Required so that transient keybindings are available
+;;   :config (add-hook 'project-find-functions #'project-x-try-local 90))
 
 (use-package vertico
   :ensure
@@ -1137,6 +1133,7 @@ The provider is `nerd-icons'."
    ((executable-find "hunspell")
     (progn
       (setenv "LANG" "en_US")
+      (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
       (setopt
        ispell-program-name "hunspell"
@@ -2274,7 +2271,6 @@ The provider is `nerd-icons'."
    (expand-file-name "wordlist.5" sb/extras-directory))
   ;; Speed up selecting a completion, showing the access keys on the left makes them easily discernible.
   (company-show-quick-access 'left)
-  (company-tooltip-align-annotations t)
   (company-global-modes
    '(not dired-mode
          magit-status-mode
@@ -2299,7 +2295,11 @@ The provider is `nerd-icons'."
      ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend))
   (company-require-match nil)
+  (company-insertion-triggers '())
   :config
+  (when (display-graphic-p)
+    (setopt company-tooltip-align-annotations t))
+
   (unless (bound-and-true-p sb/enable-icons)
     (setopt company-format-margin-function nil)))
 
@@ -2332,12 +2332,6 @@ The provider is `nerd-icons'."
 ;; environments
 (use-package company-math
   :after (tex-mode company)
-  :demand t)
-
-;; Complete in the middle of words
-(use-package company-anywhere
-  :ensure (:host github :repo "zk-phi/company-anywhere")
-  :after company
   :demand t)
 
 (use-package company-dict
@@ -2407,12 +2401,12 @@ DIR can be relative or absolute."
   :commands bibtex-completion-insert-citation)
 
 (use-package company-bibtex
-  :after bibtex-completion)
+  :after bibtex-completion
+  :commands company-bibtex)
 
 (use-package company-wordfreq
-  :after (:any company corfu))
-
-;; Notes on how to set up `company-backends'.
+  :after (:any company corfu)
+  :commands company-wordfreq)
 
 ;; A few mode-agnostic backends are applicable to all modes:
 ;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
@@ -2497,28 +2491,34 @@ DIR can be relative or absolute."
 
     ;; Order citations -> macros -> math -> text/dictionary without duplicates.
     ;; Always query all the following backends
-    (setq-local company-backends
-                '((:separate
-                   company-capf
-                   ;; company-bibtex
-                   ;; company-auctex-bibs
-                   company-reftex-citations
-                   company-reftex-labels
-                   ;; LaTeX structure
-                   company-auctex-labels
-                   ;; company-auctex-macros
-                   company-auctex-environments
-                   company-latex-commands
-                   company-auctex-symbols
-                   ;; Math latex tags
-                   company-math-symbols-latex
-                   ;; Math Unicode symbols and sub (super) scripts
-                   company-math-symbols-unicode
-                   company-dict
-                   company-wordfreq
-                   company-ispell
-                   company-dabbrev)
-                  company-files company-yasnippet)))
+    (when (eq sb/lsp-provider 'lsp-mode)
+      (setq-local company-backends
+                  '((:separate
+                     company-capf company-dict company-ispell company-dabbrev)
+                    company-files company-yasnippet)))
+
+    (when (eq sb/lsp-provider 'eglot)
+      (setq-local company-backends
+                  '((:separate
+                     company-capf
+                     ;; company-bibtex
+                     ;; company-auctex-bibs
+                     company-reftex-citations
+                     company-reftex-labels
+                     ;; LaTeX structure
+                     company-auctex-labels
+                     ;; company-auctex-macros
+                     company-auctex-environments
+                     company-latex-commands
+                     company-auctex-symbols
+                     ;; Math latex tags
+                     company-math-symbols-latex
+                     ;; Math Unicode symbols and sub (super) scripts
+                     company-math-symbols-unicode
+                     company-dict
+                     company-ispell
+                     company-dabbrev)
+                    company-files company-yasnippet))))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
 
@@ -2622,8 +2622,7 @@ DIR can be relative or absolute."
     (corfu-indexed-mode 1)
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
-    (corfu-popupinfo-mode 1)
-    (set-window-fringes nil 8 8))
+    (corfu-popupinfo-mode 1))
   :ensure
   (corfu
    :files (:defaults "extensions/*")
@@ -2652,8 +2651,10 @@ DIR can be relative or absolute."
   (corfu-on-exact-match 'show)
   ;; ;; Do not close popup when adjacent to other characters
   ;; (corfu-quit-at-boundary nil)
+  :config
   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
-  (corfu-right-margin-width 2))
+  (unless (display-graphic-p)
+    (setopt corfu-right-margin-width 1.5)))
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
@@ -2669,58 +2670,27 @@ DIR can be relative or absolute."
 
 (use-package yasnippet-capf
   :ensure (:host github :repo "elken/yasnippet-capf")
-  :after (yasnippet cape)
-  :demand t
-  :config (add-to-list 'completion-at-point-functions #'yasnippet-capf))
-
-;; (use-package capf-wordfreq
-;;   :ensure (:host github :repo "johannes-mueller/capf-wordfreq.el")
-;;   :after corfu
-;;   :demand t)
+  :when (eq sb/in-buffer-completion 'corfu)
+  :after yasnippet
+  :commands yasnippet-capf)
 
 (use-package cape
   :after corfu
   :demand t
-  :commands cape-capf-super
   :custom
-  (cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (cape-dict-file
    `(,(expand-file-name "wordlist.5" sb/extras-directory)
      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
   :config
-  ;; File completion with `cape-file' is available in comments and string
-  ;; literals, but not in normal code.
-
   ;; `cape-capf-super' works for static completion functions like
   ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
-  ;; completions like `cape-file'.
-
-  ;; Initialize for all generic languages that are not specifically handled. The
-  ;; order of the functions matters, unless they are merged, the first function
-  ;; returning a result wins. Note that the list of buffer-local completion
-  ;; functions takes precedence over the global list.
+  ;; completions like `cape-file'. File completion with `cape-file' is available
+  ;; in comments and string literals, but not in normal code.
 
   ;; There is no mechanism to force deduplication if candidates from `cape-dict'
   ;; and `cape-dabbrev' are not exactly equal (both equal string and equal text
   ;; properties).
   ;; https://github.com/minad/cape/discussions/130
-
-  ;; `cape-capf-buster' cleans completion metadata
-  (defun sb/setup-capf (&rest capfs)
-    "Set `completion-at-point-functions' buffer-locally."
-    (setq-local completion-at-point-functions
-                (mapcar #'cape-capf-buster capfs)))
-
-  ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
-  ;; duplicates and we expect `cape-dict' to mostly suffice.
-  (dolist (hook '(text-mode-hook markdown-mode-hook))
-    (add-hook
-     hook (lambda () (sb/setup-capf #'cape-file #'cape-dict #'cape-dabbrev))))
-
-  (add-hook
-   'org-mode-hook
-   (lambda ()
-     (sb/setup-capf #'cape-file #'cape-elisp-block #'cape-dict #'cape-dabbrev)))
 
   ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
   ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
@@ -2740,24 +2710,51 @@ DIR can be relative or absolute."
      (lambda (orig-fun &rest args)
        (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
 
+  ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
+  ;; duplicates and we expect `cape-dict' to mostly suffice.
+  (dolist (hook '(text-mode-hook markdown-mode-hook bibtex-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       (setq completion-at-point-functions
+             (list
+              #'cape-file
+              (cape-company-to-capf #'company-wordfreq)
+              #'cape-dict
+              #'cape-dabbrev)))))
+
+  (add-hook
+   'org-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  #'cape-file
+                  #'cape-elisp-block
+                  #'cape-dict
+                  #'cape-dabbrev
+                  #'yasnippet-capf))))
+
   (add-hook
    'prog-mode-hook
    (lambda ()
-     (sb/setup-capf
-      #'cape-file
-      (cape-capf-inside-code
-       (cape-capf-super
-        #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
-      (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev)))
+     (setq-local completion-at-point-functions
+                 (list
+                  #'cape-file
+                  (cape-capf-inside-code
+                   (cape-capf-super
+                    #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
+                  (cape-capf-inside-comment #'cape-dict)
+                  #'cape-dabbrev
+                  #'yasnippet-capf))))
 
-  (dolist (hook '(LaTeX-mode-hook bibtex-mode-hook))
+  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
     (add-hook
      hook
      (lambda ()
        (setq-local
         completion-at-point-functions
         (list
-         #'cape-file
+         #'cape-file #'citar-capf
          (cape-capf-super
           ;; Math latex tags
           (cape-company-to-capf #'company-math-symbols-latex)
@@ -2771,7 +2768,7 @@ DIR can be relative or absolute."
           (cape-company-to-capf #'company-auctex-symbols)
           ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
           #'cape-tex)
-         #'bibtex-capf #'cape-dict #'cape-dabbrev)))))
+         #'cape-dict #'cape-dabbrev #'yasnippet-capf)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2780,56 +2777,44 @@ DIR can be relative or absolute."
        (setq-local completion-at-point-functions
                    (list
                     #'cape-file
-                    (cape-capf-nonexclusive #'elisp-completion-at-point)
-                    ;; (cape-capf-inside-code
-                    ;;  (cape-capf-super
-                    ;;   #'elisp-completion-at-point
-                    ;;   #'citre-completion-at-point
-                    ;;   #'cape-elisp-symbol
-                    ;;   #'cape-dabbrev))
-                    #'cape-elisp-symbol
                     (cape-capf-inside-comment #'cape-dict)
-                    #'cape-dabbrev)))))
+                    (cape-capf-inside-code
+                     (cape-capf-nonexclusive #'elisp-completion-at-point))
+                    (cape-capf-inside-code #'cape-elisp-symbol)
+                    #'cape-dabbrev
+                    #'yasnippet-capf)))))
 
-  ;; Integrate with LSP & Eglot
-  (defun sb/lsp-capfs (backend)
-    (sb/setup-capf
-     #'cape-file
-     ;; (cape-capf-inside-code
-     ;;  (cape-capf-super
-     ;;   backend #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
-     (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))
-
-  (dolist (hook
-           '(bash-ts-mode-hook
-             c-mode-hook
-             c-ts-mode-hook
-             c++-mode-hook
-             c++-ts-mode-hook
-             cmake-mode-hook
-             cmake-ts-mode-hook
-             css-mode-hook
-             css-ts-mode-hook
-             fish-mode-hook
-             html-mode-hook
-             html-ts-mode-hook
-             java-mode-hook
-             java-ts-mode-hook
-             json-mode-hook
-             json-ts-mode-hook
-             jsonc-mode-hook
-             makefile-mode-hook
-             python-mode-hook
-             python-ts-mode-hook
-             sh-mode-hook
-             web-mode-hook
-             yaml-mode-hook
-             yaml-ts-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (sb/setup-capf
-        #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev)))))
+  ;; (dolist (hook
+  ;;          '(bash-ts-mode-hook
+  ;;            c-mode-hook
+  ;;            c-ts-mode-hook
+  ;;            c++-mode-hook
+  ;;            c++-ts-mode-hook
+  ;;            cmake-mode-hook
+  ;;            cmake-ts-mode-hook
+  ;;            css-mode-hook
+  ;;            css-ts-mode-hook
+  ;;            fish-mode-hook
+  ;;            html-mode-hook
+  ;;            html-ts-mode-hook
+  ;;            java-mode-hook
+  ;;            java-ts-mode-hook
+  ;;            json-mode-hook
+  ;;            json-ts-mode-hook
+  ;;            jsonc-mode-hook
+  ;;            makefile-mode-hook
+  ;;            python-mode-hook
+  ;;            python-ts-mode-hook
+  ;;            sh-mode-hook
+  ;;            web-mode-hook
+  ;;            yaml-mode-hook
+  ;;            yaml-ts-mode-hook))
+  ;;   (add-hook
+  ;;    hook
+  ;;    (lambda ()
+  ;;      (sb/setup-capf
+  ;;       #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))
+  )
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
@@ -3443,10 +3428,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (pyvenv-post-deactivate-hooks
    (list (lambda () (setopt python-shell-interpreter "python3")))))
 
+;; `cperl-mode' derives from `perl-mode' which derives from `prog-mode' which derives from `fundamental-mode'.
 (use-package cperl-mode
   :ensure nil
-  :mode "latexmkrc\\'"
-  :config (fset 'perl-mode 'cperl-mode))
+  :mode ("^latexmkrc\\'" . cperl-mode)
+  :interpreter ("perl" . cperl-mode)
+  :init (defalias 'perl-mode 'cperl-mode))
 
 (use-package sh-script
   :ensure nil
@@ -3847,7 +3834,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
      ;; Enable rainbow mode after applying styles to the buffer
      ;; (TeX-update-style . rainbow-delimiters-mode)
-     ))
+     (setq TeX-command-default "LaTeXMk")))
   :bind (:map LaTeX-mode-map ("C-c C-j" . consult-outline))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
@@ -3950,32 +3937,58 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :commands (math-delimiters-no-dollars math-delimiters-toggle)
   :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
 
-;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
-(use-package bibtex-capf
-  :ensure (:host github :repo "mclear-tools/bibtex-capf")
-  :when (eq sb/in-buffer-completion 'corfu)
-  :after latex)
-
-;; ;; LATER: This package seems to require `org'
-;; (use-package citar
+;; ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
+;; (use-package bibtex-capf
+;;   :ensure (:host github :repo "mclear-tools/bibtex-capf")
 ;;   :when (eq sb/in-buffer-completion 'corfu)
-;;   :after tex
-;;   :custom
-;;   (citar-major-mode-functions
-;;    '(((latex-mode)
-;;       .
-;;       ((local-bib-files . citar-latex-local-bib-files)
-;;        (insert-citation . citar-latex-insert-citation)
-;;        (insert-edit . citar-latex-insert-edit)
-;;        (key-at-point . citar-latex-key-at-point)
-;;        (citation-at-point . citar-latex-citation-at-point)
-;;        (list-keys . citar-latex-list-keys)))
-;;      (t . ((insert-keys . citar--insert-keys-comma-space-separated))))))
+;;   :after latex
+;;   :commands bibtex-capf)
 
-;; (use-package citar-embark
-;;   :after (citar embark)
-;;   :config (citar-embark-mode)
-;;   :diminish)
+(use-package citar
+  :preface
+  (defun sb/citar-format-key-title (key entry)
+    "Format Citar completion candidate showing only citation KEY and title."
+    (let ((title (citar-get-value "title" entry)))
+      (concat key " — " (truncate-string-to-width title 80))))
+  (defun sb/citar-annotate-key-title (key entry)
+    "Custom annotation for Citar: only show title, no authors."
+    (let ((title (citar-get-value "title" entry)))
+      ;; Corfu displays: COMPLETION  ANNOTATION
+      ;; key comes from the completion itself, so we just return title here
+      (concat " " (truncate-string-to-width (or title "") 80))))
+  (defun sb/citar-affixation-key-title (keys)
+    "Only show KEY and TITLE in completion (no authors)."
+    (mapcar
+     (lambda (key)
+       (let* ((entry (citar-get-entry key))
+              (title (citar-get-value "title" entry)))
+         ;; Return a (completion annotation summary) triple
+         (list
+          key
+          "" ; no annotation
+          (truncate-string-to-width (or title "") 80))))
+     keys))
+  :when (eq sb/in-buffer-completion 'corfu)
+  :after (tex cape)
+  :custom
+  ;; Remove support for `org-mode' and `markdown-mode'
+  (citar-major-mode-functions
+   '(((latex-mode LaTeX-mode)
+      .
+      ((local-bib-files . citar-latex-local-bib-files)
+       (insert-citation . citar-latex-insert-citation)
+       (insert-edit . citar-latex-insert-edit)
+       (key-at-point . citar-latex-key-at-point)
+       (citation-at-point . citar-latex-citation-at-point)
+       (list-keys . citar-latex-list-keys)))
+     (t . ((insert-keys . citar--insert-keys-comma-space-separated)))))
+  ;; Only show key and title in Corfu popup
+  (citar-format-reference-function 'citar-citeproc-format-reference))
+
+(use-package citar-embark
+  :after (citar embark)
+  :config (citar-embark-mode)
+  :diminish)
 
 ;; (use-package auctex-latexmk
 ;;   :after tex
@@ -4066,6 +4079,14 @@ Fallback to `xref-go-back'."
 
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
+
+  (advice-add
+   'xref-find-definitions
+   :before #'sb/push-point-to-xref-marker-stack)
+  (advice-add
+   'xref-find-references
+   :before #'sb/push-point-to-xref-marker-stack)
+
   (dolist (func
            '(find-function consult-imenu
                            project-grep
@@ -4326,6 +4347,7 @@ Shows both colors when errors and warnings are present."
 ;; Navigate the xref stack with consult
 (use-package consult-xref-stack
   :ensure (:host github :repo "brett-lempereur/consult-xref-stack")
+  :commands consult-xref-stack-forward
   :bind ("C-," . consult-xref-stack-backward))
 
 ;; Kill Emacs buffers automatically after a timeout
@@ -4464,6 +4486,15 @@ Shows both colors when errors and warnings are present."
 (use-package flymake)
 
 (use-package eglot
+  :preface
+  ;; It seems there is a race condition between Eglot shutting down the servers and closing the project buffers. 
+  (defun sb/project-kill-buffers-disconnect-eglot ()
+    "Shutdown Eglot before killing all project buffers."
+    (interactive)
+    (when (bound-and-true-p eglot-managed-mode)
+      (ignore-errors
+        (eglot-shutdown-all)))
+    (project-kill-buffers))
   :ensure (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
   :hook
@@ -4494,15 +4525,15 @@ Shows both colors when errors and warnings are present."
    '(eglot-mode-line-session
      eglot-mode-line-error eglot-mode-line-action-suggestion))
   :config
-  (setf (plist-get eglot-events-buffer-config :size) 0)
-  (fset #'jsonrpc--log-event #'ignore)
+  ;; (setf (plist-get eglot-events-buffer-config :size) 0)
+  ;; (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
+     ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      (text-mode
       . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
-     ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
       . ("autotools-language-server"))
      (fish-mode . ("fish-lsp" "start"))
@@ -4548,11 +4579,13 @@ Shows both colors when errors and warnings are present."
       .
       ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
      ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
+     ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
      ((perl-mode cperl-mode)
       .
       ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
-     ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
-     (bibtex-mode . ("texlab"))
+     ;; Texlab does not work well with Corfu, but works reasonably with my current company configuration.
+     ;; (LaTeX-mode . ("texlab"))
+     ;; (bibtex-mode . ("texlab"))
      ;; Download the latest milestone from
      ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
      ;; verify -DskipTests=true". After successful compilation, the resulting
@@ -4570,6 +4603,10 @@ Shows both colors when errors and warnings are present."
     (add-to-list
      'eglot-server-programs
      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
+
+  ;; (when (eq sb/in-buffer-completion 'company)
+  ;;   (add-to-list 'eglot-server-programs '((latex-mode LaTeX-mode) . ("texlab")))
+  ;;   (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab"))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of
@@ -4679,11 +4716,12 @@ Shows both colors when errors and warnings are present."
       :hover t
       :completion t)
      :vscode-json-language-server (:provideFormatter t)
+     ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
      :harper-ls
-     (
-      ;; :userDictPath
-      ;; ""
-      ;; :fileDictPath ""
+     (:userDictPath
+      "~/.emacs.d/company-dict/text-mode"
+      :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
+      :fileDictPath ""
       :linters
       (:SpellCheck
        :json-false
@@ -4707,10 +4745,13 @@ Shows both colors when errors and warnings are present."
       :json-false
       :dialect "American")))
 
-  (with-eval-after-load 'eglot
-    (setq-default completion-category-overrides
-                  '((eglot (styles hotfuzz basic substring orderless))
-                    (eglot-capf (styles hotfuzz orderless))))))
+  (setq-default completion-category-overrides
+                '((eglot (styles hotfuzz basic substring orderless))
+                  (eglot-capf (styles hotfuzz orderless))))
+
+  (with-eval-after-load 'project
+    (bind-key
+     "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map)))
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
@@ -4766,7 +4807,7 @@ Shows both colors when errors and warnings are present."
 (use-package consult-eglot
   :when (eq sb/lsp-provider 'eglot)
   :after (consult eglot)
-  :commands (consult-eglot-symbols consult-eglot-file-symbols))
+  :commands consult-eglot-symbols)
 
 (use-package flycheck-eglot
   :when (eq sb/lsp-provider 'eglot)
@@ -5153,7 +5194,6 @@ or the major mode is not in `sb/skippable-modes'."
   (transient-define-prefix
    sb/dotemacs-transient () "Config-specific keybindings"
    [["Utilities"
-     ("k" "Describe personal keybindings" describe-personal-keybindings)
      ("s" "Sudo edit" crux-sudo-edit)
      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
      ("w" "Whitespace" whitespace-mode)
@@ -5166,7 +5206,8 @@ or the major mode is not in `sb/skippable-modes'."
     ["Tramp" ("t" "Choose target" consult-tramp)
      ;; We use `q' to quit transient
      ("Q" "Cleanup connections" sb/cleanup-tramp)]
-    ["Emacs config" ("e" "Edit init.el"
+    ["Emacs config"
+     ("e" "Edit init.el"
       (lambda ()
         (interactive)
         (find-file user-init-file)))
@@ -5178,7 +5219,9 @@ or the major mode is not in `sb/skippable-modes'."
       (lambda ()
         (interactive)
         (dired user-emacs-directory)))
-     ("r" "Restart" restart-emacs)]])
+     ("r" "Restart" restart-emacs)
+     ("k" "Describe personal keybindings" describe-personal-keybindings)
+     ("b" "Describe keybindings" embark-bindings)]])
   (bind-key "C-c d" #'sb/dotemacs-transient)
 
   (with-eval-after-load 'smerge-mode
@@ -5334,11 +5377,18 @@ or the major mode is not in `sb/skippable-modes'."
        ("f" "File" cape-file)]
       [""
        ("t" "TeX" cape-tex)
-       ("a" "Abbrev" cape-capf-super)
+       ("a" "Abbrev" cape-abbrev)
        ("l" "Line" cape-line)
        ("e" "Elisp symbol" cape-elisp-symbol)]
       ["" ("j" "Emoji" cape-emoji)]])
-    (bind-key "C-c p" #'sb/corfu-transient)))
+    (bind-key "C-c p" #'sb/corfu-transient))
+
+  (transient-define-prefix
+   sb/latex-transient () "LaTeX commands"
+   [[""
+     ("(" "Insert label" reftex-label)
+     ("b" "Insert block" latex-insert-block)
+     ("r" "Insert reference" consult-reftex-insert-reference)]]))
 
 (defun sb/jump-choose-definition ()
   "Interactive jump menu with iconified options."
