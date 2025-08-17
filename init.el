@@ -2623,6 +2623,9 @@ DIR can be relative or absolute."
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
     (corfu-popupinfo-mode 1))
+  (defun sb/corfu-prog-setup ()
+    "Use shorter prefix for corfu in prog-mode."
+    (setq-local corfu-auto-prefix 2))
   :ensure
   (corfu
    :files (:defaults "extensions/*")
@@ -2632,7 +2635,8 @@ DIR can be relative or absolute."
   :when (eq sb/in-buffer-completion 'corfu)
   :hook
   ((elpaca-after-init . global-corfu-mode)
-   (corfu-mode . sb/corfu-default-setup))
+   (corfu-mode . sb/corfu-default-setup)
+   (prog-mode . sb/corfu-prog-setup))
   :bind
   (:map
    corfu-map
@@ -2647,7 +2651,6 @@ DIR can be relative or absolute."
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-auto-prefix 2)
   (corfu-on-exact-match 'show)
   ;; ;; Do not close popup when adjacent to other characters
   ;; (corfu-quit-at-boundary nil)
@@ -2885,8 +2888,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-headerline-breadcrumb-enable nil)
   ;; (lsp-enable-file-watchers nil "Avoid watcher warnings")
   (lsp-lens-enable nil "Lenses are distracting")
-  ;; Highlight references of the symbol at point. I use `symbol-overlay' to
-  ;; include languages that do not have a language server.
+  ;; Disable highlighting references of the symbol at point. I use
+  ;; `symbol-overlay' to include languages that do not have a language server.
   (lsp-enable-symbol-highlighting nil)
   (lsp-semantic-tokens-enable nil)
   ;; I do not use mouse with TUI, so showing code actions is not useful.
@@ -2961,70 +2964,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     (setopt lsp-pylsp-plugins-mypy-enabled t))
    ((eq sb/python-langserver 'basedpyright)
     (setopt lsp-pylsp-plugins-mypy-enabled nil)))
-
-  ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
-  ;; (defgroup lsp-harper nil
-  ;;   "Settings for Harper grammar language server."
-  ;;   :prefix "sb/lsp-harper-"
-  ;;   :group 'lsp-mode)
-  ;;
-  ;; (defcustom sb/lsp-harper-active-modes
-  ;;   '(text-mode org-mode markdown-mode)
-  ;;   "List of major modes that work with harper-ls."
-  ;;   :type 'list
-  ;;   :group 'lsp-harper)
-  ;;
-  ;; (defcustom sb/lsp-harper-configuration
-  ;;   '( ;; :userDictPath
-  ;;       ;; ""
-  ;;       ;; :fileDictPath ""
-  ;;       :linters
-  ;;       (:SpellCheck
-  ;;        :json-false
-  ;;        :SpelledNumbers
-  ;;        :json-false
-  ;;        :AnA t
-  ;;        :UnclosedQuotes t
-  ;;        :WrongQuotes
-  ;;        :json-false
-  ;;        :LongSentences t
-  ;;        :RepeatedWords t
-  ;;        :Spaces t
-  ;;        :Matcher t
-  ;;        :CorrectNumberSuffix t
-  ;;        :SentenceCapitalization
-  ;;        :json-false)
-  ;;       :codeActions (:ForceStable :json-false)
-  ;;       :diagnosticSeverity "hint"
-  ;;       :markdown (:IgnoreLinkTitle :json-false)
-  ;;       :isolateEnglish
-  ;;       :json-false
-  ;;     :dialect "American")
-  ;;   "Harper configuration structure"
-  ;;   :type 'dictionary
-  ;;   :group 'lsp-harper)
-  ;;
-  ;; (lsp-register-client
-  ;;  (make-lsp-client
-  ;;   :new-connection
-  ;;   (lsp-stdio-connection '("harper-ls" "--stdio"))
-  ;;   :major-modes sb/lsp-harper-active-modes
-  ;;   :initialization-options sb/lsp-harper-configuration
-  ;;   :add-on? 't
-  ;;   :priority -3
-  ;;   :server-id 'lsp-harper))
-
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
-
-  ;; (dolist (ignore-dirs
-  ;;          '("/build\\'"
-  ;;            "/\\.metadata\\'"
-  ;;            "/\\.recommenders\\'"
-  ;;            "/\\.clangd\\'"
-  ;;            "/\\.cache\\'"
-  ;;            "/__pycache__\\'"))
-  ;;   (add-to-list 'lsp-file-watch-ignored-directories ignore-dirs))
 
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
@@ -3075,6 +3016,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-ui-sideline-enable nil)
   ;; Enables understanding when to invoke code actions
   (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-hover nil)
   ;; Hide diagnostics when typing because they can be intrusive, Flycheck and
   ;; Flymake already highlight errors
   (lsp-ui-sideline-show-diagnostics nil)
@@ -4743,7 +4685,16 @@ Shows both colors when errors and warnings are present."
       :markdown (:IgnoreLinkTitle :json-false)
       :isolateEnglish
       :json-false
-      :dialect "American")))
+      :dialect "American")
+     :texlab
+     (:build
+      (:onSave :json-false :forwardSearchAfter t)
+      (:chktex (:onEdit nil))
+      (:diagnosticsDelay 500)
+      (:experimental (:selector "relative"))
+      (:forwardSearch (:executable "okular"))
+      (:latexFormatter "latexindent")
+      (:formatterLineLength 80))))
 
   (setq-default completion-category-overrides
                 '((eglot (styles hotfuzz basic substring orderless))
