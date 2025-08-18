@@ -2721,7 +2721,7 @@ DIR can be relative or absolute."
      (lambda ()
        (setq completion-at-point-functions
              (list
-              #'cape-file
+              (cape-capf-inside-string #'cape-file)
               (cape-company-to-capf #'company-wordfreq)
               #'cape-dict
               #'cape-dabbrev)))))
@@ -2731,7 +2731,7 @@ DIR can be relative or absolute."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'cape-file
+                  (cape-capf-inside-string #'cape-file)
                   #'cape-elisp-block
                   #'cape-dict
                   #'cape-dabbrev
@@ -2742,11 +2742,11 @@ DIR can be relative or absolute."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'cape-file
                   (cape-capf-inside-code
                    (cape-capf-super
                     #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
+                  (cape-capf-inside-string #'cape-file)
                   #'cape-dabbrev
                   #'yasnippet-capf))))
 
@@ -2757,21 +2757,22 @@ DIR can be relative or absolute."
        (setq-local
         completion-at-point-functions
         (list
-         #'cape-file #'citar-capf
-         (cape-capf-super
-          ;; Math latex tags
-          (cape-company-to-capf #'company-math-symbols-latex)
-          (cape-company-to-capf #'company-latex-commands)
-          (cape-company-to-capf #'company-reftex-labels)
-          (cape-company-to-capf #'company-auctex-environments)
-          (cape-company-to-capf #'company-auctex-macros)
-          (cape-company-to-capf #'company-auctex-labels)
-          ;; Math unicode symbols and sub(super)scripts
-          (cape-company-to-capf #'company-math-symbols-unicode)
-          (cape-company-to-capf #'company-auctex-symbols)
-          ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-          #'cape-tex)
-         #'cape-dict #'cape-dabbrev #'yasnippet-capf)))))
+         (cape-capf-inside-string #'cape-file) #'citar-capf
+         (cape-company-to-capf
+          (apply-partially #'company--multi-backend-adapter
+                           '(
+                             ;; Math latex tags
+                             company-math-symbols-latex
+                             company-latex-commands
+                             company-reftex-labels
+                             company-auctex-environments
+                             company-auctex-macros
+                             company-auctex-labels
+                             ;; Math Unicode symbols and sub(super)scripts
+                             company-math-symbols-unicode
+                             company-auctex-symbols)))
+         ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+         #'cape-tex #'cape-dict #'cape-dabbrev #'yasnippet-capf)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2779,11 +2780,11 @@ DIR can be relative or absolute."
      (lambda ()
        (setq-local completion-at-point-functions
                    (list
-                    #'cape-file
-                    (cape-capf-inside-comment #'cape-dict)
                     (cape-capf-inside-code
                      (cape-capf-nonexclusive #'elisp-completion-at-point))
                     (cape-capf-inside-code #'cape-elisp-symbol)
+                    (cape-capf-inside-string #'cape-file)
+                    (cape-capf-inside-comment #'cape-dict)
                     #'cape-dabbrev
                     #'yasnippet-capf)))))
 
@@ -5329,9 +5330,13 @@ or the major mode is not in `sb/skippable-modes'."
       [""
        ("t" "TeX" cape-tex)
        ("a" "Abbrev" cape-abbrev)
-       ("l" "Line" cape-line)
+       ("k" "Keyword" cape-keyword)
        ("e" "Elisp symbol" cape-elisp-symbol)]
-      ["" ("j" "Emoji" cape-emoji)]])
+      [""
+       ("j" "Emoji" cape-emoji)
+       ("l" "Line" cape-line)
+       ("b" "Elisp block" cape-elisp-block)]
+      ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
     (bind-key "C-c p" #'sb/corfu-transient))
 
   (transient-define-prefix
