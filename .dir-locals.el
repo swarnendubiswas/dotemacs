@@ -22,7 +22,7 @@
    ;; Files
    (eval .
          (dolist (ext
-                  '("\\.tags/" ".pptx" ".xml" ".drawio" ".out" ".vect" "GPATH"))
+                  '("\\.tags" ".pptx" ".xml" ".drawio" ".out" ".vect" "GPATH"))
            (add-to-list 'completion-ignored-extensions ext)))
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
@@ -76,7 +76,8 @@
              ((derived-mode-p 'xml-mode)
               (setq sb/flycheck-local-checkers
                     '((lsp . ((next-checkers . (xml-xmllint)))))))))))
-   ;; Force `sh-mode' for setup_environment
+   
+   ;; Force `sh-mode' for file "setup_environment" in GPGPU-Sim
    (eval .
          (when (and
                 (buffer-file-name) ; Ensure the buffer is visiting a file
@@ -90,19 +91,10 @@
    (dired-omit-extensions
     . (".fasl" ".bbl" ".toc" ".fdb_latexmk" ".aux" ".fls" ".out" ".o" ".exe"))))
 
- (emacs-lisp-mode
+ ((emacs-lisp-mode lisp-data-mode)
   .
   ((no-byte-compile . t)
    (elisp-autofmt-on-save-p . always)
-   (elisp-autofmt-load-packages-local . ("use-package-core"))
-   ;; The special `subdirs' element is not a variable, but a special keyword
-   ;; which indicates that the mode settings are only to be applied in the
-   ;; current directory, not in any subdirectories.
-   (subdirs . nil)))
-
- (lisp-data-mode
-  .
-  ((elisp-autofmt-on-save-p . always)
    (elisp-autofmt-load-packages-local . ("use-package-core"))
    ;; The special `subdirs' element is not a variable, but a special keyword
    ;; which indicates that the mode settings are only to be applied in the
@@ -141,16 +133,15 @@
             flycheck-cppcheck-include-path include-path
             flycheck-cuda-include-path include-path)))
 
-   ;; Alternatively, define clangd-args and set lsp-clients-clangd-args.
    (eval .
-         (dolist (hook '(lsp-managed-mode-hook eglot-managed-mode-hook))
            (add-hook
-            (lambda ()
-              (add-hook 'before-save-hook
-                        (if (eq hook 'lsp-managed-mode-hook)
-                            #'lsp-format-buffer
-                          #'eglot-format-buffer)
-                        nil t)))))
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+   
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
 
    ;; (let ((compdir (file-name-directory buffer-file-name)))
    ;;            (add-to-list
@@ -175,16 +166,14 @@
    ;;         (setq lsp-pyright-extra-paths paths)))
 
    (eval .
-         (dolist (hook '(lsp-managed-mode-hook eglot-managed-mode-hook))
            (add-hook
-            hook
-            (lambda ()
-              (make-local-variable 'before-save-hook)
-              (add-hook 'before-save-hook
-                        (if (eq hook 'lsp-managed-mode-hook)
-                            #'lsp-format-buffer
-                          #'eglot-format-buffer)
-                        nil t)))))
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'eglot-format-buffer nil t))))
 
    ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
    ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
@@ -227,7 +216,7 @@
        :jedi_hover (:enabled t)
        :jedi_references (:enabled t)
        :jedi_signature_help (:enabled t)
-       :jedi_symbols (:enabled t :all_scopes t :include_import_symbols t)
+       :jedi_symbols (:all_scopes t :enabled t :include_import_symbols :json-false)
        :mccabe (:enabled t :threshold 15)
        :mypy (:enabled :json-false)
        :preload (:enabled :json-false :modules [])
@@ -250,16 +239,8 @@
         :json-false)
        :rope_completion (:eager :json-false :enabled :json-false)
        :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
-       :yapf
-       (:enabled
-        t
-        :based_on_style "pep8"
-        :column_limit 80
-        :indent_width 4
-        :split_before_logical_operator t
-        :use_tabs
-        :json-false)
-       :rope (:extensionModules nil :ropeFolder nil))
+       :yapf (:enabled :json-false)
+       :rope (:extensionModules nil :ropeFolder nil)))
       ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
       ;; LSP configuration for basedpyright.
       :basedpyright
@@ -279,7 +260,7 @@
          :variableTypes
          :json-false
          :genericTypes
-         :json-false))))))))
+         :json-false)))))))
 
  ((sh-mode bash-ts-mode) . ((subdirs . nil)))
 
@@ -299,16 +280,15 @@
       :hover t
       :completion t)))
    (eval .
-         (dolist (hook '(lsp-managed-mode-hook eglot-managed-mode-hook))
            (add-hook
-            hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
             (lambda ()
-              (make-local-variable 'before-save-hook)
-              (add-hook 'before-save-hook
-                        (if (eq hook 'lsp-managed-mode-hook)
-                            #'lsp-format-buffer
-                          #'eglot-format-buffer)
-                        nil t)))))))
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  ((toml-mode
    toml-ts-mode
@@ -321,18 +301,15 @@
    cmake-ts-mode)
   .
   ((eval .
-
-         (dolist (hook '(lsp-managed-mode-hook eglot-managed-mode-hook))
            (add-hook
-            hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
             (lambda ()
-              ;; `toml-mode' derives from `text-mode'
-              (unless (derived-mode-p 'text-mode)
-                (add-hook 'before-save-hook
-                          (if (eq hook 'lsp-managed-mode-hook)
-                              #'lsp-format-buffer
-                            #'eglot-format-buffer)
-                          nil t))))))))
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (LaTeX-mode
   .
@@ -360,15 +337,15 @@
       :output-dir "build")
      :jdtls (:workspaceFolder "~/java/")))
    (eval .
-         (dolist (hook '(lsp-managed-mode-hook eglot-managed-mode-hook))
            (add-hook
-            hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
+
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
             (lambda ()
-              (add-hook 'before-save-hook
-                        (if (eq hook 'lsp-managed-mode-hook)
-                            #'lsp-format-buffer
-                          #'eglot-format-buffer)
-                        nil t))))))))
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t)))))))
 
 
 ;; Local Variables:

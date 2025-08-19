@@ -797,7 +797,9 @@ The provider is `nerd-icons'."
 
 (use-package dired-x
   :ensure nil
-  :hook (dired-mode . dired-omit-mode)
+  ;; :hook (dired-mode . (lambda ()
+  ;;                       (require 'dired-x)
+  ;;                       (dired-omit-mode -1)))
   :bind ("C-x C-j" . dired-jump)
   :custom
   (dired-omit-verbose nil "Do not show messages when omitting files")
@@ -3244,7 +3246,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
      (rust "https://github.com/tree-sitter/tree-sitter-rust")
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-
+  :config
+  (setopt treesit-language-source-alist
+          '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
+  
   ;; Install grammars if missing
   (unless (seq-every-p
            #'treesit-language-available-p
@@ -4553,14 +4558,11 @@ Shows both colors when errors and warnings are present."
      ((java-mode java-ts-mode)
       .
       ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
-     ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
      ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
      ((perl-mode cperl-mode)
       .
       ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
-     ;; Texlab does not work well with Corfu, but works reasonably with my current company configuration.
-     ;; (LaTeX-mode . ("texlab"))
-     ;; (bibtex-mode . ("texlab"))
+     ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
      ;; Download the latest milestone from
      ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
      ;; verify -DskipTests=true". After successful compilation, the resulting
@@ -4579,13 +4581,14 @@ Shows both colors when errors and warnings are present."
      'eglot-server-programs
      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
 
+       ;; Texlab does not work well with Corfu, but works reasonably with `company-mode'.
   ;; (when (eq sb/in-buffer-completion 'company)
   ;;   (add-to-list 'eglot-server-programs '((latex-mode LaTeX-mode) . ("texlab")))
   ;;   (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab"))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of
-        '(flymake yasnippet company eldoc completion-at-point))
+        '(flymake yasnippet company eldoc))
 
   ;; FIXME: `eglot-workspace-configuration' should be set as a directory-local
   ;; variable, but it is not working for me.
@@ -4653,11 +4656,13 @@ Shows both colors when errors and warnings are present."
         (:enabled :json-false)
         :completions (:enabled :json-false)
         :enabled
+        :json-false
+        :memory
         :json-false)
-       :rope_completion (:enabled :json-false)
-       :ruff (:enabled :json-false)
-       :yapf (:enabled :json-false))
-      :rope (:extensionModules nil :ropeFolder nil))
+       :rope_completion (:eager :json-false :enabled :json-false)
+       :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :yapf (:enabled :json-false)
+      :rope (:extensionModules nil :ropeFolder nil)))
      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
      ;; LSP configuration for basedpyright.
      :basedpyright
