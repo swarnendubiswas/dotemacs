@@ -15,7 +15,7 @@
   :type 'string
   :group 'sb/emacs)
 
-;; Modus-vivendi is the most complete and integrates well with all terminals,
+;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
 (defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
@@ -26,7 +26,7 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Powerline looks clean and nerdy, but doom-modeline is more informative.
+;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative.
 (defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
@@ -72,7 +72,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I would prefer Eglot if I do not have to use Texlab.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -2434,10 +2434,6 @@ DIR can be relative or absolute."
   :after bibtex-completion
   :commands company-bibtex)
 
-(use-package company-wordfreq
-  :after (:any company corfu)
-  :commands company-wordfreq)
-
 ;; A few mode-agnostic backends are applicable to all modes:
 ;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
 ;; `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev' returns
@@ -2556,8 +2552,7 @@ DIR can be relative or absolute."
     "Add backends for `text-mode' completion in company mode."
     (set
      (make-local-variable 'company-backends)
-     '(company-files
-       (company-dict company-wordfreq company-ispell) company-dabbrev)))
+     '(company-files (company-dict company-ispell) company-dabbrev)))
 
   ;; Extends to derived modes like `markdown-mode' 
   (add-hook
@@ -2752,7 +2747,6 @@ DIR can be relative or absolute."
        (setq completion-at-point-functions
              (list
               (cape-capf-inside-string #'cape-file)
-              (cape-company-to-capf #'company-wordfreq)
               #'cape-dict
               #'cape-dabbrev)))))
 
@@ -3249,7 +3243,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :config
   (setopt treesit-language-source-alist
           '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
-  
+
   ;; Install grammars if missing
   (unless (seq-every-p
            #'treesit-language-available-p
@@ -3259,21 +3253,21 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (mapcar #'car treesit-language-source-alist)))
 
   (setopt major-mode-remap-alist
-          '((sh-mode . bash-ts-mode)
-            (c-mode . c-ts-mode)
-            (c++-mode . c++-ts-mode)
-            (c-or-c++-mode . c-or-c++-ts-mode)
-            (cmake-mode . cmake-ts-mode)
-            (css-mode . css-ts-mode)
-            (dockerfile-mode . dockerfile-ts-mode)
-            (html-mode . html-ts-mode)
-            (java-mode . java-ts-mode)
-            (json-mode . json-ts-mode)
-            (kdl-mode . kdl-ts-mode)
-            (python-mode . python-ts-mode)
-            (toml-mode . toml-ts-mode)
-            (conf-toml-mode . toml-ts-mode)
-            (yaml-mode . yaml-ts-mode))))
+          '((sh-mode . #'bash-ts-mode)
+            (c-mode . #'c-ts-mode)
+            (c++-mode . #'c++-ts-mode)
+            (c-or-c++-mode . #'c-or-c++-ts-mode)
+            (cmake-mode . #'cmake-ts-mode)
+            (css-mode . #'css-ts-mode)
+            (dockerfile-mode . #'dockerfile-ts-mode)
+            (html-mode . #'html-ts-mode)
+            (java-mode . #'java-ts-mode)
+            (json-mode . #'json-ts-mode)
+            (kdl-mode . #'kdl-ts-mode)
+            (python-mode . #'python-ts-mode)
+            (toml-mode . #'toml-ts-mode)
+            (conf-toml-mode . #'toml-ts-mode)
+            (yaml-mode . #'yaml-ts-mode))))
 
 (use-package treesit-auto
   :after treesit
@@ -3905,12 +3899,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :after (consult LaTeX-mode)
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
-(use-package math-delimiters
-  :ensure (:host github :repo "oantolin/math-delimiters")
-  :after LaTeX-mode
-  :demand t
-  :commands (math-delimiters-no-dollars math-delimiters-toggle)
-  :bind (:map TeX-mode-map ("$" . math-delimiters-insert)))
+;; (use-package math-delimiters
+;;   :ensure (:host github :repo "oantolin/math-delimiters")
+;;   :demand t
+;;   :commands (math-delimiters-no-dollars math-delimiters-toggle)
+;;   :bind
+;;   (:map
+;;    TeX-mode-map ("$" . math-delimiters-insert)
+;;    :map LaTeX-mode-map ("$" . math-delimiters-insert)))
 
 ;; ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 ;; (use-package bibtex-capf
@@ -4247,7 +4243,8 @@ Shows both colors when errors and warnings are present."
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (elpaca-after-init . doom-modeline-mode)
-  :custom (doom-modeline-buffer-encoding nil)
+  :custom
+  (doom-modeline-buffer-encoding nil)
   (doom-modeline-unicode-fallback t)
   ;; LSP state is wrong for non-LSP-managed files
   (doom-modeline-lsp nil)
@@ -4255,7 +4252,7 @@ Shows both colors when errors and warnings are present."
   :config
   (unless (display-graphic-p)
     ;; All other choices can lead to the modeline text overflowing
-  (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
+    (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -4581,14 +4578,13 @@ Shows both colors when errors and warnings are present."
      'eglot-server-programs
      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
 
-       ;; Texlab does not work well with Corfu, but works reasonably with `company-mode'.
+  ;; Texlab does not work well with Corfu, but works reasonably with `company-mode'.
   ;; (when (eq sb/in-buffer-completion 'company)
   ;;   (add-to-list 'eglot-server-programs '((latex-mode LaTeX-mode) . ("texlab")))
   ;;   (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab"))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq eglot-stay-out-of
-        '(flymake yasnippet company eldoc))
+  (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
   ;; FIXME: `eglot-workspace-configuration' should be set as a directory-local
   ;; variable, but it is not working for me.
@@ -4660,9 +4656,10 @@ Shows both colors when errors and warnings are present."
         :memory
         :json-false)
        :rope_completion (:eager :json-false :enabled :json-false)
-       :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :ruff
+       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
        :yapf (:enabled :json-false)
-      :rope (:extensionModules nil :ropeFolder nil)))
+       :rope (:extensionModules nil :ropeFolder nil)))
      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
      ;; LSP configuration for basedpyright.
      :basedpyright
@@ -4723,16 +4720,7 @@ Shows both colors when errors and warnings are present."
       :markdown (:IgnoreLinkTitle :json-false)
       :isolateEnglish
       :json-false
-      :dialect "American")
-     :texlab
-     (:build
-      (:onSave :json-false :forwardSearchAfter t)
-      (:chktex (:onEdit nil))
-      (:diagnosticsDelay 500)
-      (:experimental (:selector "relative"))
-      (:forwardSearch (:executable "okular"))
-      (:latexFormatter "latexindent")
-      (:formatterLineLength 80))))
+      :dialect "American")))
 
   (setq-default completion-category-overrides
                 '((eglot (styles hotfuzz basic substring orderless))
@@ -5270,7 +5258,7 @@ or the major mode is not in `sb/skippable-modes'."
       ["Browsing functionality"
        ("d" "Find declaration" eglot-find-declaration)
        ("i" "Find implementation" eglot-find-implementation)
-       ("t" "Find type definition" eglot-find-type-definition)]
+       ("t" "Find type definition" eglot-find-typeDefinition)]
       ["Code actions"
        ("r" "Rename" eglot-rename)
        ("f" "Format buffer" eglot-format)

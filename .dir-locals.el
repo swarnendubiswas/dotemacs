@@ -76,7 +76,7 @@
              ((derived-mode-p 'xml-mode)
               (setq sb/flycheck-local-checkers
                     '((lsp . ((next-checkers . (xml-xmllint)))))))))))
-   
+
    ;; Force `sh-mode' for file "setup_environment" in GPGPU-Sim
    (eval .
          (when (and
@@ -134,10 +134,10 @@
             flycheck-cuda-include-path include-path)))
 
    (eval .
-           (add-hook
+         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
-   
+
    (eval .
          (add-hook
           'eglot-managed-mode-hook
@@ -166,7 +166,7 @@
    ;;         (setq lsp-pyright-extra-paths paths)))
 
    (eval .
-           (add-hook
+         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
@@ -241,26 +241,26 @@
        :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
        :yapf (:enabled :json-false)
        :rope (:extensionModules nil :ropeFolder nil)))
-      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
-      ;; LSP configuration for basedpyright.
-      :basedpyright
-      (:checkOnlyOpenFiles
-       t
-       :reportDuplicateImport t
-       :typeCheckingMode "recommended"
-       :useLibraryCodeForTypes t
-       :analysis
-       (:diagnosticSeverityOverrides
-        (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
-        :inlayHints
-        (:callArgumentNames
-         :json-false
-         :functionReturnTypes
-         :json-false
-         :variableTypes
-         :json-false
-         :genericTypes
-         :json-false)))))))
+     ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
+     ;; LSP configuration for basedpyright.
+     :basedpyright
+     (:checkOnlyOpenFiles
+      t
+      :reportDuplicateImport t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t
+      :analysis
+      (:diagnosticSeverityOverrides
+       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+       :inlayHints
+       (:callArgumentNames
+        :json-false
+        :functionReturnTypes
+        :json-false
+        :variableTypes
+        :json-false
+        :genericTypes
+        :json-false)))))))
 
  ((sh-mode bash-ts-mode) . ((subdirs . nil)))
 
@@ -280,14 +280,14 @@
       :hover t
       :completion t)))
    (eval .
-           (add-hook
+         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
    (eval .
          (add-hook
           'eglot-managed-mode-hook
-            (lambda ()
+          (lambda ()
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  ((toml-mode
@@ -301,14 +301,14 @@
    cmake-ts-mode)
   .
   ((eval .
-           (add-hook
+         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
    (eval .
          (add-hook
           'eglot-managed-mode-hook
-            (lambda ()
+          (lambda ()
             (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
 
  (LaTeX-mode
@@ -337,14 +337,14 @@
       :output-dir "build")
      :jdtls (:workspaceFolder "~/java/")))
    (eval .
-           (add-hook
+         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
    (eval .
          (add-hook
           'eglot-managed-mode-hook
-            (lambda ()
+          (lambda ()
             (add-hook 'before-save-hook #'eglot-format-buffer nil t)))))))
 
 
