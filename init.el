@@ -1005,8 +1005,6 @@ The provider is `nerd-icons'."
    ([remap vc-git-grep] . consult-git-grep)
    ("<f4>" . consult-line)
    ("M-g l" . sb/consult-line-symbol-at-point)
-   ([remap multi-occur] . consult-multi-occur)
-   ("M-s m" . consult-multi-occur)
    ([remap recentf-open-files] . consult-recent-file)
    ("M-g r" . consult-register)
    :map
@@ -3400,7 +3398,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; `cperl-mode' derives from `perl-mode' which derives from `prog-mode' which derives from `fundamental-mode'.
 (use-package cperl-mode
   :ensure nil
-  :mode ("^latexmkrc\\'" . cperl-mode)
+  :mode ("latexmkrc\\'" . cperl-mode)
   :interpreter ("perl" . cperl-mode)
   :init (defalias 'perl-mode 'cperl-mode))
 
@@ -5288,7 +5286,9 @@ or the major mode is not in `sb/skippable-modes'."
      ("r" "Rename" rename-file)
      ("a" "Find alternate" find-alternate-file)
      ("o" "FFAP find other" ff-find-other-file)]
-    ["Buffer" ("g" "Revert quick" revert-buffer-quick)]])
+    ["Buffer"
+     ("g" "Revert quick" revert-buffer-quick)
+     ("b" "Rename" rename-buffer)]])
   (bind-key "C-c x" #'sb/file-buffer-transient)
 
   (transient-define-prefix
@@ -5371,17 +5371,31 @@ or the major mode is not in `sb/skippable-modes'."
      ("b" "Insert block" latex-insert-block)
      ("r" "Insert reference" consult-reftex-insert-reference)]]))
 
-(defun sb/jump-choose-definition ()
-  "Interactive jump menu with iconified options."
-  (interactive)
-  (let* ((options
-          `(("🔍 LSP: go to definition" . lsp-find-definition)
-            ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
-            ("📚 Citre: jump" . citre-jump)
-            ("📎 Xref: find definitions" . xref-find-definitions)
-            ("🗂 Imenu (consult)" . consult-imenu)))
-         (choice (completing-read "Jump using: " (mapcar #'car options))))
-    (call-interactively (cdr (assoc choice options)))))
+(when (eq sb/lsp-provider 'lsp-mode)
+  (defun sb/jump-choose-definition ()
+    "Interactive jump menu with iconified options."
+    (interactive)
+    (let* ((options
+            `(("🔍 LSP: go to definition" . lsp-find-definition)
+              ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
+              ("📚 Citre: jump" . citre-jump)
+              ("📎 Xref: find definitions" . xref-find-definitions)
+              ("🗂 Imenu (consult)" . consult-imenu)))
+           (choice (completing-read "Jump using: " (mapcar #'car options))))
+      (call-interactively (cdr (assoc choice options))))))
+
+(when (eq sb/lsp-provider 'eglot)
+  (defun sb/jump-choose-definition ()
+    "Interactive jump menu with iconified options."
+    (interactive)
+    (let* ((options
+            `(("🔍 Eglot: go to declaration" . eglot-find-declaration)
+              ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
+              ("📚 Citre: jump" . citre-jump)
+              ("📎 Xref: find definitions" . xref-find-definitions)
+              ("🗂 Imenu (consult)" . consult-imenu)))
+           (choice (completing-read "Jump using: " (mapcar #'car options))))
+      (call-interactively (cdr (assoc choice options))))))
 
 (add-hook
  'elpaca-after-init-hook
