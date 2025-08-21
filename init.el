@@ -3760,7 +3760,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; frequent hangs while communicating with Emacs. Furthermore, this package is not required for completions with `company-mode'.
 
 (use-package lsp-latex
-  :when (eq sb/lsp-provider 'lsp-mode)
+  :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
   :hook
   ((LaTeX-mode bibtex-mode)
    .
