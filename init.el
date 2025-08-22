@@ -46,7 +46,8 @@
 ;; Emacs, and has more extensive LaTeX support than Corfu. We can set up
 ;; separate completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend.
-(defcustom sb/in-buffer-completion 'corfu
+;; We use `company' for now because Emacs versions till 30.x does not support child frames on the terminal.
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -71,7 +72,7 @@ The provider is `nerd-icons'."
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I would prefer Eglot if I do not have to use Texlab.
+;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot because it seems Texlab is inefficient.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
@@ -2480,23 +2481,21 @@ DIR can be relative or absolute."
 ;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
 
 (with-eval-after-load 'company
-  ;; Override `company-backends' for unhandled major modes.
+  ;; Override `company-backends' for unhandled major modes. `company-keywords'
+  ;; should not be required with LS support. If we have `company-dabbrev' first,
+  ;; then other matches from later backends `company-ispell' or `company-dict'
+  ;; will be ignored.
   (setopt company-backends
           (if (or (bound-and-true-p lsp-mode)
                   (bound-and-true-p eglot-managed-mode))
-              '((company-capf
-                 company-keywords
-                 company-dabbrev-code
-                 :with company-yasnippet)
+              '((company-capf company-dabbrev-code :with company-yasnippet)
                 company-files
-                ;; If we have `company-dabbrev' first, then other matches from
-                ;; `company-ispell' will be ignored.
-                (company-dict company-ispell) company-dabbrev)
+                (company-dict company-ispell)
+                company-dabbrev)
             '((company-keywords company-dabbrev-code :with company-yasnippet)
               company-files
-              ;; If we have `company-dabbrev' first, then other matches from
-              ;; `company-ispell' will be ignored.
-              (company-dict company-ispell) company-dabbrev)))
+              (company-dict company-ispell)
+              company-dabbrev)))
 
   (setopt
    company-transformers
@@ -2527,8 +2526,8 @@ DIR can be relative or absolute."
       (setq-local company-backends
                   '((:separate
                      company-capf
-                     ;; company-bibtex
-                     ;; company-auctex-bibs
+                     company-bibtex
+                     company-auctex-bibs
                      company-reftex-citations
                      company-reftex-labels
                      ;; LaTeX structure
@@ -2586,11 +2585,11 @@ DIR can be relative or absolute."
 
   (defun sb/company-c-mode ()
     (setq-local company-backends
-                '(company-capf
-                  company-c-headers
-                  company-files
-                  (company-dict company-ispell)
-                  company-dabbrev)))
+                '((company-capf
+                   company-c-headers
+                   company-dabbrev-code
+                   :with company-yasnippet)
+                  company-files (company-dict company-ispell) company-dabbrev)))
 
   (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
     (add-hook
@@ -3253,21 +3252,21 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (mapcar #'car treesit-language-source-alist)))
 
   (setopt major-mode-remap-alist
-          '((sh-mode . #'bash-ts-mode)
-            (c-mode . #'c-ts-mode)
-            (c++-mode . #'c++-ts-mode)
-            (c-or-c++-mode . #'c-or-c++-ts-mode)
-            (cmake-mode . #'cmake-ts-mode)
-            (css-mode . #'css-ts-mode)
-            (dockerfile-mode . #'dockerfile-ts-mode)
-            (html-mode . #'html-ts-mode)
-            (java-mode . #'java-ts-mode)
-            (json-mode . #'json-ts-mode)
-            (kdl-mode . #'kdl-ts-mode)
-            (python-mode . #'python-ts-mode)
-            (toml-mode . #'toml-ts-mode)
-            (conf-toml-mode . #'toml-ts-mode)
-            (yaml-mode . #'yaml-ts-mode))))
+          '((sh-mode . bash-ts-mode)
+            (c-mode . c-ts-mode)
+            (c++-mode . c++-ts-mode)
+            (c-or-c++-mode . c-or-c++-ts-mode)
+            (cmake-mode . cmake-ts-mode)
+            (css-mode . css-ts-mode)
+            (dockerfile-mode . dockerfile-ts-mode)
+            (html-mode . html-ts-mode)
+            (java-mode . java-ts-mode)
+            (json-mode . json-ts-mode)
+            (kdl-mode . kdl-ts-mode)
+            (python-mode . python-ts-mode)
+            (toml-mode . toml-ts-mode)
+            (conf-toml-mode . toml-ts-mode)
+            (yaml-mode . yaml-ts-mode))))
 
 (use-package treesit-auto
   :after treesit
@@ -4464,13 +4463,15 @@ Shows both colors when errors and warnings are present."
 
 (use-package eglot
   :preface
-  ;; It seems there is a race condition between Eglot shutting down the servers and closing the project buffers. 
+  ;; It seems there is a race condition between Eglot shutting down the servers and closing the project buffers.
   (defun sb/project-kill-buffers-disconnect-eglot ()
-    "Shutdown Eglot before killing all project buffers."
+    "Shutdown Eglot for current project before killing buffers."
     (interactive)
-    (when (bound-and-true-p eglot-managed-mode)
-      (ignore-errors
-        (eglot-shutdown-all)))
+    (when-let* ((proj (project-current))
+                (servers (eglot--servers-for (project-root proj))))
+      (dolist (server servers)
+        (ignore-errors
+          (eglot-shutdown server))))
     (project-kill-buffers))
   :ensure (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
@@ -4494,9 +4495,8 @@ Shows both colors when errors and warnings are present."
      :foldingRangeProvider
      :hoverProvider ; Automatic documentation popups can be distracting
      :inlayHintProvider ; Inlay hints are distracting
-     ;; :executeCommandProvider
-     ;; :documentLinkProvider
-     ))
+     :executeCommandProvider
+     :documentLinkProvider))
   (eglot-report-progress nil)
   (eglot-mode-line-format
    '(eglot-mode-line-session
