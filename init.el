@@ -45,8 +45,9 @@
 ;; messes up the completion. Company works better with both Windows and TUI
 ;; Emacs, and has more extensive LaTeX support than Corfu. We can set up
 ;; separate completion files with `company-ispell' and `company-dict'. However,
-;; `company-ispell' does not keep prefix case when used as a grouped backend.
-;; We use `company' for now because Emacs versions till 30.x does not support child frames on the terminal.
+;; `company-ispell' does not keep prefix case when used as a grouped backend. We
+;; use `company' for now because Emacs versions till 30.x does not support child
+;; frames on the terminal.
 (defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
@@ -2264,8 +2265,7 @@ The provider is `nerd-icons'."
   :bind
   (:map
    company-active-map
-   ("C-M-/" . company-other-backend) ; Invoke the next backend
-   ("C-;" . company-other-backend)
+   ("C-;" . company-other-backend) ; Invoke the next backend
    ("C-s" . company-search-candidates)
    ("C-f" . company-filter-candidates)
    ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
@@ -2325,12 +2325,26 @@ The provider is `nerd-icons'."
      company-echo-metadata-frontend))
   (company-require-match nil)
   (company-insertion-triggers '())
+  (company-tooltip-align-annotations (display-graphic-p))
   :config
-  (when (display-graphic-p)
-    (setopt company-tooltip-align-annotations t))
-
   (unless (bound-and-true-p sb/enable-icons)
-    (setopt company-format-margin-function nil)))
+    (setopt company-format-margin-function nil))
+
+  (setopt
+   company-transformers
+   '(delete-dups
+     ;; Ignore matches from `company-dabbrev' that consist solely of numbers
+     ;; https://github.com/company-mode/company-mode/issues/358
+     (lambda (candidates)
+       (cl-remove-if
+        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
+
+  (setopt company-backends
+          '((company-capf
+             company-keywords
+             company-dabbrev-code
+             :with company-yasnippet)
+            company-files (company-dict company-ispell) company-dabbrev)))
 
 (use-package nerd-icons
   :when (bound-and-true-p sb/enable-icons)
@@ -2430,7 +2444,7 @@ DIR can be relative or absolute."
   :commands bibtex-completion-insert-citation)
 
 (use-package company-bibtex
-  :after bibtex-completion
+  :after tex
   :commands company-bibtex)
 
 ;; A few mode-agnostic backends are applicable to all modes:
@@ -2483,26 +2497,6 @@ DIR can be relative or absolute."
   ;; should not be required with LS support. If we have `company-dabbrev' first,
   ;; then other matches from later backends `company-ispell' or `company-dict'
   ;; will be ignored.
-  (setopt company-backends
-          (if (or (bound-and-true-p lsp-mode)
-                  (bound-and-true-p eglot-managed-mode))
-              '((company-capf company-dabbrev-code :with company-yasnippet)
-                company-files
-                (company-dict company-ispell)
-                company-dabbrev)
-            '((company-keywords company-dabbrev-code :with company-yasnippet)
-              company-files
-              (company-dict company-ispell)
-              company-dabbrev)))
-
-  (setopt
-   company-transformers
-   '(delete-dups
-     ;; Ignore matches from `company-dabbrev' that consist solely of numbers
-     ;; https://github.com/company-mode/company-mode/issues/358
-     (lambda (candidates)
-       (cl-remove-if
-        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
 
   (defun sb/company-latex-mode ()
     ;; `company-capf' with Texlab does not pass to later backends if it
@@ -2524,13 +2518,13 @@ DIR can be relative or absolute."
       (setq-local company-backends
                   '((:separate
                      company-capf
-                     company-bibtex
+                     ;; company-bibtex
                      company-auctex-bibs
                      company-reftex-citations
                      company-reftex-labels
                      ;; LaTeX structure
                      company-auctex-labels
-                     ;; company-auctex-macros
+                     company-auctex-macros
                      company-auctex-environments
                      company-latex-commands
                      company-auctex-symbols
@@ -2558,29 +2552,6 @@ DIR can be relative or absolute."
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
        (sb/company-text-mode))))
 
-  ;; (defun sb/company-yaml-mode ()
-  ;;   (setq-local company-backends
-  ;;               '((company-capf
-  ;;                  company-dabbrev-code ; Useful for variable names
-  ;;                  :with company-yasnippet)
-  ;;                 company-files
-  ;;                 (company-dict company-ispell)
-  ;;                 company-dabbrev)))
-
-  ;; (dolist (mode '(yaml-mode-hook yaml-ts-mode-hook))
-  ;;   (add-hook mode #'sb/company-yaml-mode))
-
-  ;; (defun sb/company-html-mode ()
-  ;;   (set
-  ;;    (make-local-variable 'company-backends)
-  ;;    '((company-capf :with company-yasnippet)
-  ;;      company-files
-  ;;      (company-dict company-ispell)
-  ;;      company-dabbrev)))
-
-  ;; (dolist (hook '(html-mode-hook html-ts-mode-hook))
-  ;;   (add-hook hook #'sb/company-html-mode))
-
   (defun sb/company-c-mode ()
     (setq-local company-backends
                 '((company-capf
@@ -2596,44 +2567,27 @@ DIR can be relative or absolute."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-c-mode))))
 
-  ;; (progn
-  ;;   (defun sb/company-prog-mode ()
-  ;;     (setq-local company-backends
-  ;;                 '((company-capf
-  ;;                    company-keywords
-  ;;                    company-dabbrev-code ; Useful for variable names
-  ;;                    :with company-yasnippet)
-  ;;                   company-files
-  ;;                   (company-ispell company-dict)
-  ;;                   company-dabbrev)))
+  (progn
+    (defun sb/company-prog-mode ()
+      (setq-local company-backends
+                  '((company-capf
+                     company-keywords
+                     company-dabbrev-code ; Useful for variable names
+                     :with company-yasnippet)
+                    company-files
+                    (company-ispell company-dict)
+                    company-dabbrev)))
 
-  ;;   (add-hook
-  ;;    'prog-mode-hook
-  ;;    (lambda ()
-  ;;      (unless (or (derived-mode-p 'emacs-lisp-mode)
-  ;;                  (derived-mode-p 'lisp-data-mode)
-  ;;                  (derived-mode-p 'flex-mode)
-  ;;                  (derived-mode-p 'bison-mode)
-  ;;                  (derived-mode-p 'cmake-ts-mode))
-  ;;        (setq-local company-minimum-prefix-length 2)
-  ;;        (sb/company-prog-mode)))))
-
-  ;; (defun sb/company-elisp-mode ()
-  ;;   (setq-local company-backends
-  ;;               '((company-capf :with company-yasnippet)
-  ;;                 company-keywords
-  ;;                 company-dabbrev-code ; Useful for variable names
-  ;;                 company-files
-  ;;                 (company-dict company-ispell)
-  ;;                 company-dabbrev)))
-
-  ;; (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-  ;;   (add-hook
-  ;;    hook
-  ;;    (lambda ()
-  ;;      (setq-local company-minimum-prefix-length 2)
-  ;;      (sb/company-elisp-mode))))
-  )
+    (add-hook
+     'prog-mode-hook
+     (lambda ()
+       (unless (or (derived-mode-p 'emacs-lisp-mode)
+                   (derived-mode-p 'lisp-data-mode)
+                   (derived-mode-p 'flex-mode)
+                   (derived-mode-p 'bison-mode)
+                   (derived-mode-p 'cmake-ts-mode))
+         (setq-local company-minimum-prefix-length 2)
+         (sb/company-prog-mode))))))
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
@@ -3800,7 +3754,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
      ;; Enable rainbow mode after applying styles to the buffer
      ;; (TeX-update-style . rainbow-delimiters-mode)
-     (setq TeX-command-default "LaTeXMk")))
+     ))
   :bind (:map LaTeX-mode-map ("C-c C-j" . consult-outline))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
@@ -4463,13 +4417,19 @@ Shows both colors when errors and warnings are present."
   :preface
   ;; It seems there is a race condition between Eglot shutting down the servers and closing the project buffers.
   (defun sb/project-kill-buffers-disconnect-eglot ()
-    "Shutdown Eglot for current project before killing buffers."
+    "Shutdown Eglot for the current project before killing its buffers."
     (interactive)
     (when-let* ((proj (project-current))
-                (servers (eglot--servers-for (project-root proj))))
-      (dolist (server servers)
-        (ignore-errors
-          (eglot-shutdown server))))
+                (root (project-root proj)))
+      (dolist (buf (project-buffers proj))
+        (with-current-buffer buf
+          (when (and eglot--managed-mode (eglot-current-server))
+            ;; Shut down once per server, not once per buffer
+            (let ((server (eglot-current-server)))
+              (when (and server
+                         (equal (project-root (eglot--project server)) root))
+                (ignore-errors
+                  (eglot-shutdown server))))))))
     (project-kill-buffers))
   :ensure (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
