@@ -266,6 +266,7 @@ The provider is `nerd-icons'."
   :config
   (dolist (exts
            '(".aux"
+             ".bcf"
              ".blg"
              ".directory"
              ".dll"
@@ -2337,14 +2338,7 @@ The provider is `nerd-icons'."
      ;; https://github.com/company-mode/company-mode/issues/358
      (lambda (candidates)
        (cl-remove-if
-        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
-
-  (setopt company-backends
-          '((company-capf
-             company-keywords
-             company-dabbrev-code
-             :with company-yasnippet)
-            company-files (company-dict company-ispell) company-dabbrev)))
+        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates)))))
 
 (use-package nerd-icons
   :when (bound-and-true-p sb/enable-icons)
@@ -2388,11 +2382,11 @@ The provider is `nerd-icons'."
 (use-package company-org-block
   :preface
   (defun sb/org-block-setup ()
-    (when (and (derived-mode-p 'org-mode) (fboundp 'company-org-block))
       (setq-local company-backends
-                  (append
-                   '((company-org-block :with company-dabbrev-code))
-                   company-backends))))
+                '(company-files
+                  (company-org-block :with company-dabbrev-code)
+                  (company-dict company-ispell)
+                  company-dabbrev)))
   :after company
   :hook
   (org-mode
@@ -2443,9 +2437,9 @@ DIR can be relative or absolute."
   :after tex
   :commands bibtex-completion-insert-citation)
 
-(use-package company-bibtex
-  :after tex
-  :commands company-bibtex)
+;; (use-package company-bibtex
+;;   :after tex
+;;   :commands company-bibtex)
 
 ;; A few mode-agnostic backends are applicable to all modes:
 ;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
@@ -2497,6 +2491,12 @@ DIR can be relative or absolute."
   ;; should not be required with LS support. If we have `company-dabbrev' first,
   ;; then other matches from later backends `company-ispell' or `company-dict'
   ;; will be ignored.
+  (setopt company-backends
+          '((company-capf
+             company-keywords
+             company-dabbrev-code
+             :with company-yasnippet)
+            company-files (company-dict company-ispell) company-dabbrev))
 
   (defun sb/company-latex-mode ()
     ;; `company-capf' with Texlab does not pass to later backends if it
@@ -2508,19 +2508,13 @@ DIR can be relative or absolute."
 
     ;; Order citations -> macros -> math -> text/dictionary without duplicates.
     ;; Always query all the following backends
-    (when (eq sb/lsp-provider 'lsp-mode)
-      (setq-local company-backends
-                  '((:separate
-                     company-capf company-dict company-ispell company-dabbrev)
-                    company-files company-yasnippet)))
-
-    (when (eq sb/lsp-provider 'eglot)
-      (setq-local company-backends
+    (setq-local
+     company-backends
                   '((:separate
                      company-capf
-                     ;; company-bibtex
                      company-auctex-bibs
-                     company-reftex-citations
+        company-reftex-citations ; will trigger inside \cite{}
+        ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
                      company-reftex-labels
                      ;; LaTeX structure
                      company-auctex-labels
@@ -2535,7 +2529,7 @@ DIR can be relative or absolute."
                      company-dict
                      company-ispell
                      company-dabbrev)
-                    company-files company-yasnippet))))
+       company-files company-yasnippet)))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
 
@@ -2600,7 +2594,7 @@ DIR can be relative or absolute."
     (corfu-echo-mode 1)
     (corfu-popupinfo-mode 1))
   (defun sb/corfu-prog-setup ()
-    "Use shorter prefix for corfu in prog-mode."
+    "Use shorter prefix for Corfu in `prog-mode'."
     (setq-local corfu-auto-prefix 2))
   :ensure
   (corfu
