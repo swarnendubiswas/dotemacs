@@ -136,8 +136,6 @@
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message user-login-name
  initial-scratch-message nil
- ;; *scratch* is in `lisp-interaction-mode' by default.
- initial-major-mode 'fundamental-mode
  use-file-dialog nil
  use-dialog-box nil)
 

@@ -667,19 +667,71 @@ The provider is `nerd-icons'."
    ((fboundp 'pixel-scroll-mode)
     (pixel-scroll-mode 1))))
 
-;; Show temporary buffers as a popup window, and close them with "C-g"
-(use-package popwin
-  :hook (elpaca-after-init . popwin-mode)
-  :config
-  (push '(helpful-mode :noselect t :position bottom :height 0.5)
-        popwin:special-display-config)
-  ;; (push '(deadgrep-mode :noselect nil :position bottom :height 0.75)
+;; ;; Show temporary buffers as a popup window, and close them with "C-g"
+;; (use-package popwin
+;;   :hook (elpaca-after-init . popwin-mode)
+;;   :config
+;;   (push '(helpful-mode :noselect t :position bottom :height 0.5)
+;;         popwin:special-display-config)
+;;   ;; (push '(deadgrep-mode :noselect nil :position bottom :height 0.75)
+;;   ;;         popwin:special-display-config)
+;;   (push '(compilation-mode :noselect t :position bottom :height 0.5)
   ;;         popwin:special-display-config)
-  (push '("\\*EGLOT workspace configuration\\*"
-          :noselect nil
-          :position bottom
-          :height 0.5)
-        popwin:special-display-config))
+;;   (push '("\\*EGLOT workspace configuration\\*"
+;;           :noselect nil
+;;           :position bottom
+;;           :height 0.5)
+;;         popwin:special-display-config))
+
+;; Define what counts as a popup window
+(defun sb/popup-window-p (window)
+  "Return non-nil if WINDOW is a popup (side-window or marked)."
+  (or
+   (window-parameter window 'window-side) ; side-window (display-buffer-in-side-window)
+   (window-parameter window 'popup))) ; manually marked
+
+;; Close all popup windows
+(defun sb/close-popups ()
+  "Close all popup windows."
+  (interactive)
+  (dolist (win (window-list))
+    (when (sb/popup-window-p win)
+      (delete-window win))))
+
+;; C-g: first close popups, else normal quit
+(defun sb/keyboard-quit-dwim ()
+  "Quit popups if any, otherwise run `keyboard-quit`."
+  (interactive)
+  (if (cl-some #'sb/popup-window-p (window-list))
+      (sb/close-popups)
+    (keyboard-quit)))
+
+;; (defun sb/keyboard-quit-dwim ()
+;;   "Quit active popup/window or just call `keyboard-quit`."
+;;   (interactive)
+;;   (if (window-parameter nil 'window-side)
+;;       (delete-window)
+;;     (keyboard-quit)))
+
+(bind-key "C-g" #'sb/keyboard-quit-dwim)
+
+(setq display-buffer-alist
+      '(("\\*helpful.*\\*" ; Helpful buffers
+         (display-buffer-in-side-window)
+         (side . bottom)
+         (slot . 0)
+         (window-height . 0.5)
+         (window-parameters . ((no-delete-other-windows . t))))
+        ("\\*compilation\\*" ; Compilation
+         (display-buffer-in-side-window)
+         (side . bottom)
+         (slot . 1)
+         (window-height . 0.5))
+        ("\\*EGLOT workspace configuration\\*"
+         (display-buffer-in-side-window)
+         (side . bottom)
+         (slot . 2)
+         (window-height . 0.5))))
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
@@ -2274,16 +2326,16 @@ The provider is `nerd-icons'."
    ;; completions, and the next will switch to the next completion in a cyclic
    ;; fashion, meaning that if you reach the end you continue from the top.
    ;; S-TAB will go in reverse direction.
-   ("<tab>" . company-complete-common-or-cycle)
-   ("TAB" . company-complete-common-or-cycle)
-   ("<backtab>" .
-    (lambda ()
-      (interactive)
-      (company-complete-common-or-cycle -1)))
-   ("S-TAB" .
-    (lambda ()
-      (interactive)
-      (company-complete-common-or-cycle -1)))
+   ;; ("<tab>" . company-complete-common-or-cycle)
+   ;; ("TAB" . company-complete-common-or-cycle)
+   ;; ("<backtab>" .
+   ;;  (lambda ()
+   ;;    (interactive)
+   ;;    (company-complete-common-or-cycle -1)))
+   ;; ("S-TAB" .
+   ;;  (lambda ()
+   ;;    (interactive)
+   ;;    (company-complete-common-or-cycle -1)))
    ([escape] . company-abort)
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
@@ -2510,9 +2562,10 @@ DIR can be relative or absolute."
     ;; Always query all the following backends
     (setq-local
      company-backends
-                  '((:separate
+     '(company-files ; Have files first to allow completing paths 
+       (:separate
                      company-capf
-                     company-auctex-bibs
+        ;; company-auctex-bibs
         company-reftex-citations ; will trigger inside \cite{}
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
                      company-reftex-labels
@@ -2520,7 +2573,7 @@ DIR can be relative or absolute."
                      company-auctex-labels
                      company-auctex-macros
                      company-auctex-environments
-                     company-latex-commands
+        ;; company-latex-commands ; company-auctex-macros seem to be better
                      company-auctex-symbols
                      ;; Math latex tags
                      company-math-symbols-latex
@@ -2529,7 +2582,7 @@ DIR can be relative or absolute."
                      company-dict
                      company-ispell
                      company-dabbrev)
-       company-files company-yasnippet)))
+        company-yasnippet)))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
 
@@ -3833,7 +3886,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package bibtex
   :ensure nil
-  :hook (bibtex-mode . sb/setup-lsp-provider)
+  ;; :hook (bibtex-mode . sb/setup-lsp-provider)
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
@@ -4272,12 +4325,12 @@ Shows both colors when errors and warnings are present."
   :commands consult-xref-stack-forward
   :bind ("C-," . consult-xref-stack-backward))
 
-;; Kill Emacs buffers automatically after a timeout
-(use-package buffer-terminator
-  :ensure (:host github :repo "jamescherti/buffer-terminator.el")
-  :hook (find-file . buffer-terminator-mode)
-  :custom (buffer-terminator-verbose nil)
-  :diminish)
+;; ;; Kill Emacs buffers automatically after a timeout
+;; (use-package buffer-terminator
+;;   :ensure (:host github :repo "jamescherti/buffer-terminator.el")
+;;   :hook (find-file . buffer-terminator-mode)
+;;   :custom (buffer-terminator-verbose nil)
+;;   :diminish)
 
 (use-package hl-line
   :ensure nil
@@ -5321,9 +5374,11 @@ or the major mode is not in `sb/skippable-modes'."
   (transient-define-prefix
    sb/latex-transient () "LaTeX commands"
    [[""
-     ("(" "Insert label" reftex-label)
+     ("l" "Insert label" reftex-label)
      ("b" "Insert block" latex-insert-block)
-     ("r" "Insert reference" consult-reftex-insert-reference)]]))
+     ("r" "Insert reference" consult-reftex-insert-reference)
+     ("g" "Go to label" consult-reftex-goto-label)]])
+  (bind-key "C-c j" #'sb/latex-transient))
 
 (when (eq sb/lsp-provider 'lsp-mode)
   (defun sb/jump-choose-definition ()
