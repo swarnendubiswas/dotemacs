@@ -209,7 +209,12 @@
 ;; will be ignored when we use TUI Emacs, and the terminal font setting will be
 ;; used.
 
-;; (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNF-17"))
+(add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
+(defun sb/init-fonts-daemon (frame)
+  (with-selected-frame frame
+    (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
+
+(add-hook 'after-make-frame-functions #'sb/init-fonts-daemon)
 
 (defun sb/init-fonts-graphic ()
   (cond

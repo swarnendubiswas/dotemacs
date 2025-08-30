@@ -263,6 +263,7 @@ The provider is `nerd-icons'."
   (list-matching-lines-default-context-lines 1)
   (imenu-auto-rescan t)
   (imenu-use-popup-menu nil)
+  (save-silently t)
   :config
   (dolist (exts
            '(".aux"
@@ -451,7 +452,18 @@ The provider is `nerd-icons'."
   ;; Hide the "Cleaning up the recentf list...done" message
   (advice-add 'recentf-cleanup :around #'sb/inhibit-message-call-orig-fun)
   ;; Hide the "Wrote ..." message
-  (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun))
+  (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+  ;; (advice-add 'write-file :around #'sb/inhibit-message-call-orig-fun)
+  ;; (advice-add 'save-buffer :around #'sb/inhibit-message-call-orig-fun)
+  )
+
+(advice-add
+ 'basic-save-buffer
+ :around
+ (lambda (orig-fun &rest args)
+   (let ((inhibit-message t)
+         (message-log-max nil))
+     (apply orig-fun args))))
 
 (progn
   (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -600,9 +612,21 @@ The provider is `nerd-icons'."
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil)
+  ;; (ibuffer-formats
+  ;;  '((mark
+  ;;     modified read-only locked " " (name 30 -1 :left :elide) " " filename)))
   (ibuffer-formats
    '((mark
-      modified read-only locked " " (name 30 -1 :left :elide) " " filename)))
+      modified
+      read-only
+      locked
+      " "
+      (name 30 30 :left :elide)
+      " "
+      (mode 16 16 :left :elide)
+      " "
+      filename-and-process)
+     (mark " " (name 16 -1) " " filename)))
   (ibuffer-never-show-predicates
    '("\\*Help\\*"
      "\\*Quick Help\\*"
@@ -676,7 +700,7 @@ The provider is `nerd-icons'."
 ;;   ;; (push '(deadgrep-mode :noselect nil :position bottom :height 0.75)
 ;;   ;;         popwin:special-display-config)
 ;;   (push '(compilation-mode :noselect t :position bottom :height 0.5)
-  ;;         popwin:special-display-config)
+;;         popwin:special-display-config)
 ;;   (push '("\\*EGLOT workspace configuration\\*"
 ;;           :noselect nil
 ;;           :position bottom
@@ -1814,7 +1838,7 @@ The provider is `nerd-icons'."
 
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
-  :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
+  ;; :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
   :custom
   (elisp-autofmt-python-bin "python3")
   (elisp-autofmt-on-save-p 'always))
@@ -2434,7 +2458,7 @@ The provider is `nerd-icons'."
 (use-package company-org-block
   :preface
   (defun sb/org-block-setup ()
-      (setq-local company-backends
+    (setq-local company-backends
                 '(company-files
                   (company-org-block :with company-dabbrev-code)
                   (company-dict company-ispell)
@@ -2564,25 +2588,23 @@ DIR can be relative or absolute."
      company-backends
      '(company-files ; Have files first to allow completing paths 
        (:separate
-                     company-capf
+        company-capf
         ;; company-auctex-bibs
         company-reftex-citations ; will trigger inside \cite{}
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-                     company-reftex-labels
-                     ;; LaTeX structure
-                     company-auctex-labels
-                     company-auctex-macros
-                     company-auctex-environments
+        company-reftex-labels
+        company-auctex-labels ; LaTeX structure
+        company-auctex-macros
+        company-auctex-environments
         ;; company-latex-commands ; company-auctex-macros seem to be better
-                     company-auctex-symbols
-                     ;; Math latex tags
-                     company-math-symbols-latex
-                     ;; Math Unicode symbols and sub (super) scripts
-                     company-math-symbols-unicode
-                     company-dict
-                     company-ispell
-                     company-dabbrev)
-        company-yasnippet)))
+        company-auctex-symbols
+        company-math-symbols-latex ; Math latex tags
+        ;; Math Unicode symbols and sub (super) scripts
+        company-math-symbols-unicode
+        company-dict
+        company-ispell
+        company-dabbrev)
+       company-yasnippet)))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
 
@@ -3517,7 +3539,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :config
   (with-eval-after-load 'html-mode
     (unbind-key "M-o" html-mode-map)
-    (unbind-key "M-o" html-ts-mode-map)))
+    (when (boundp 'html-ts-mode-map)
+      (unbind-key "M-o" html-ts-mode-map))))
 
 (use-package emmet-mode
   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
