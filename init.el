@@ -1869,7 +1869,7 @@ The provider is `nerd-icons'."
 ;; current buffer and presents suggestions for completion.
 (use-package dabbrev
   :ensure nil
-  :bind ("C-M-;" . dabbrev-completionetion)
+  :bind ("C-M-;" . dabbrev-completion)
   :custom
   (dabbrev-ignored-buffer-regexps
    '("^ " ;; internal or hidden buffers starting with space
@@ -4530,8 +4530,8 @@ Shows both colors when errors and warnings are present."
    '(eglot-mode-line-session
      eglot-mode-line-error eglot-mode-line-action-suggestion))
   :config
-  ;; (setf (plist-get eglot-events-buffer-config :size) 0)
-  ;; (fset #'jsonrpc--log-event #'ignore)
+  (setf (plist-get eglot-events-buffer-config :size) 0)
+  (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
