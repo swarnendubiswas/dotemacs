@@ -2574,22 +2574,40 @@ DIR can be relative or absolute."
              :with company-yasnippet)
             company-files (company-dict company-ispell) company-dabbrev))
 
-  (defun sb/company-latex-mode ()
-    ;; `company-capf' with Texlab does not pass to later backends if it
-    ;; returns any result (even an empty list). So it makes it difficult to
-    ;; complete non-LaTeX commands (e.g., words) which is the majority. By
-    ;; combining it in a single group with :separate, the following code
-    ;; forces all listed backends to be queried regardless of what
-    ;; `company-capf' returns.
+  ;; `company-capf' with Texlab does not pass to later backends if it
+  ;; returns any result (even an empty list). So it makes it difficult to
+  ;; complete non-LaTeX commands (e.g., words) which is the majority. By
+  ;; combining it in a single group with :separate, the following code
+  ;; forces all listed backends to be queried regardless of what
+  ;; `company-capf' returns.
 
-    ;; Order citations -> macros -> math -> text/dictionary without duplicates.
-    ;; Always query all the following backends
+  ;; Order citations -> macros -> math -> text/dictionary without duplicates.
+  ;; Always query all the following backends
+
+  (defun sb/company-latex-mode-no-separate ()
+    (setq-local
+     company-backends
+     '(company-files ; Have files first to allow completing paths
+        (company-capf :with company-yasnippet)
+        company-reftex-citations ; will trigger inside \cite{}
+        (
+         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
+         company-reftex-labels
+         company-auctex-labels ; LaTeX structure
+         company-auctex-macros company-auctex-environments
+         ;; company-latex-commands ; company-auctex-macros seem to be better
+         company-auctex-symbols
+         company-math-symbols-latex ; Math latex tags
+         ;; Math Unicode symbols and sub (super) scripts
+         company-math-symbols-unicode)
+       company-ispell company-dict company-dabbrev)))
+
+  (defun sb/company-latex-mode-separate ()
     (setq-local
      company-backends
      '(company-files ; Have files first to allow completing paths 
        (:separate
         company-capf
-        ;; company-auctex-bibs
         company-reftex-citations ; will trigger inside \cite{}
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
         company-reftex-labels
@@ -2603,10 +2621,10 @@ DIR can be relative or absolute."
         company-math-symbols-unicode
         company-dict
         company-ispell
-        company-dabbrev)
-       company-yasnippet)))
+        company-dabbrev
+        :with company-yasnippet))))
 
-  (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode)
+  (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode-separate)
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
@@ -4538,7 +4556,7 @@ Shows both colors when errors and warnings are present."
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      (text-mode
-      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+      . ,(eglot-alternatives '("ltex-ls-plus" ("harper-ls" "--stdio"))))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
       . ("autotools-language-server"))
      (fish-mode . ("fish-lsp" "start"))
