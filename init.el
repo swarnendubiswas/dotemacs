@@ -1367,6 +1367,16 @@ The provider is `nerd-icons'."
      consult-after-jump-hook
      before-save-hook)))
 
+(use-package gumshoe
+  :ensure (:host github :repo "Overdr0ne/gumshoe")
+  :init
+  ;; Enabing global-gumshoe-mode will initiate tracking
+  (global-gumshoe-mode +1)
+  ;; customize peruse slot display if you like
+  (setf gumshoe-slot-schema '(time buffer position line))
+  ;; disable auto-cancel of backtracking
+  (setf gumshoe-auto-cancel-backtracking-p nil))
+
 (use-package vundo
   :bind
   (([remap undo] . vundo)
@@ -1552,6 +1562,9 @@ The provider is `nerd-icons'."
   :config (transient-bind-q-to-quit))
 
 (use-package with-editor :diminish)
+
+(use-package cond-let
+  :ensure (:host github :repo "tarsius/cond-let"))
 
 (use-package magit
   :hook
@@ -2588,18 +2601,18 @@ DIR can be relative or absolute."
     (setq-local
      company-backends
      '(company-files ; Have files first to allow completing paths
-        (company-capf :with company-yasnippet)
-        company-reftex-citations ; will trigger inside \cite{}
-        (
-         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-         company-reftex-labels
-         company-auctex-labels ; LaTeX structure
-         company-auctex-macros company-auctex-environments
-         ;; company-latex-commands ; company-auctex-macros seem to be better
-         company-auctex-symbols
-         company-math-symbols-latex ; Math latex tags
-         ;; Math Unicode symbols and sub (super) scripts
-         company-math-symbols-unicode)
+       (company-capf :with company-yasnippet)
+       company-reftex-citations ; will trigger inside \cite{}
+       (
+        ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
+        company-reftex-labels
+        company-auctex-labels ; LaTeX structure
+        company-auctex-macros company-auctex-environments
+        ;; company-latex-commands ; company-auctex-macros seem to be better
+        company-auctex-symbols
+        company-math-symbols-latex ; Math latex tags
+        ;; Math Unicode symbols and sub (super) scripts
+        company-math-symbols-unicode)
        company-ispell company-dict company-dabbrev)))
 
   (defun sb/company-latex-mode-separate ()
@@ -2612,16 +2625,12 @@ DIR can be relative or absolute."
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
         company-reftex-labels
         company-auctex-labels ; LaTeX structure
-        company-auctex-macros
-        company-auctex-environments
+        company-auctex-macros company-auctex-environments
         ;; company-latex-commands ; company-auctex-macros seem to be better
         company-auctex-symbols
         company-math-symbols-latex ; Math latex tags
         ;; Math Unicode symbols and sub (super) scripts
-        company-math-symbols-unicode
-        company-dict
-        company-ispell
-        company-dabbrev
+        company-math-symbols-unicode company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
   (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode-separate)
@@ -5182,6 +5191,9 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   (flyover-hide-checker-name nil)
 ;;   (flyover-background-lightness 40)
 ;;   :diminish)
+
+(use-package show-font
+  :ensure (:host github :repo "protesilaos/show-font"))
 
 (with-eval-after-load 'transient
   (transient-define-prefix
