@@ -262,8 +262,20 @@
         :genericTypes
         :json-false)))))))
 
- ((sh-mode bash-ts-mode) . ((subdirs . nil)))
+ ((sh-mode bash-ts-mode)
+  .
+  ((subdirs . nil)
+   (eval .
+           (add-hook
+          'lsp-managed-mode-hook
+          (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
+   (eval .
+         (add-hook
+          'eglot-managed-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+ 
  ((yaml-mode yaml-ts-mode)
   .
   ((eglot-workspace-configuration
