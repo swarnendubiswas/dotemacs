@@ -4623,11 +4623,6 @@ Shows both colors when errors and warnings are present."
      'eglot-server-programs
      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
 
-  ;; Texlab does not work well with Corfu, but works reasonably with `company-mode'.
-  ;; (when (eq sb/in-buffer-completion 'company)
-  ;;   (add-to-list 'eglot-server-programs '((latex-mode LaTeX-mode) . ("texlab")))
-  ;;   (add-to-list 'eglot-server-programs '(bibtex-mode . ("texlab"))))
-
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
@@ -5360,8 +5355,8 @@ or the major mode is not in `sb/skippable-modes'."
      ("f" "Forward sexp" forward-sexp)
      ("k" "Kill sexp" kill-sexp)]
     ["Functions"
-     ("a" "Function beginning" treesit-beginning-of-defun)
-     ("e" "Function end" treesit-end-of-defun)]
+     ("a" "Treesitter beginning" treesit-beginning-of-defun)
+     ("e" "Treesitter end" treesit-end-of-defun)]
     ["Expressions"
      ;; ("u" "Up list" treesit-up-list)
      ;; ("d" "Down list" treesit-down-list)
@@ -5391,22 +5386,23 @@ or the major mode is not in `sb/skippable-modes'."
      ("ww" "Wordwise" ediff-windows-wordwise)]])
   (bind-key "C-c e" #'sb/ediff-transient)
 
-  (transient-define-prefix
-   sb/citre-transient () "Citre commands"
-   [["Jump"
-     ("j" "Jump" sb/jump-citre-xref)
-     ("b" "Jump back" citre-jump-back)
-     ("p" "Peek" citre-peek)
-     ("a" "Ace peek" citre-ace-peek)
-     ("r" "Reference" citre-jump-to-reference)]
-    ["Manage"
-     ("c" "Create tags" citre-create-tags-file)
-     ("u" "Update tags" citre-update-tags-file)
-     ("e" "Edit recipe" citre-edit-tags-file-recipe)
-     ("g" "Update global db" citre-global-update-database)]])
-  (bind-key "C-c c" #'sb/citre-transient)
+  (with-eval-after-load 'citre
+    (transient-define-prefix
+     sb/citre-transient () "Citre commands"
+     [["Jump"
+       ("j" "Jump" sb/jump-citre-xref)
+       ("b" "Jump back" citre-jump-back)
+       ("p" "Peek" citre-peek)
+       ("a" "Ace peek" citre-ace-peek)
+       ("r" "Reference" citre-jump-to-reference)]
+      ["Manage"
+       ("c" "Create tags" citre-create-tags-file)
+       ("u" "Update tags" citre-update-tags-file)
+       ("e" "Edit recipe" citre-edit-tags-file-recipe)
+       ("g" "Update global db" citre-global-update-database)]])
+    (bind-key "C-c c" #'sb/citre-transient))
 
-  (when (eq sb/in-buffer-completion 'corfu)
+  (with-eval-after-load 'corfu
     (transient-define-prefix
      sb/corfu-transient () "Corfu commands"
      [["Capf"
@@ -5426,14 +5422,15 @@ or the major mode is not in `sb/skippable-modes'."
       ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
     (bind-key "C-c p" #'sb/corfu-transient))
 
-  (transient-define-prefix
-   sb/latex-transient () "LaTeX commands"
-   [[""
-     ("l" "Insert label" reftex-label)
-     ("b" "Insert block" latex-insert-block)
-     ("r" "Insert reference" consult-reftex-insert-reference)
-     ("g" "Go to label" consult-reftex-goto-label)]])
-  (bind-key "C-c j" #'sb/latex-transient))
+  (with-eval-after-load 'latex
+    (transient-define-prefix
+     sb/latex-transient () "LaTeX commands"
+     [[""
+       ("l" "Insert label" reftex-label)
+       ("b" "Insert block" latex-insert-block)
+       ("r" "Insert reference" consult-reftex-insert-reference)
+       ("g" "Go to label" consult-reftex-goto-label)]])
+    (bind-key "C-c j" #'sb/latex-transient)))
 
 (when (eq sb/lsp-provider 'lsp-mode)
   (defun sb/jump-choose-definition ()
