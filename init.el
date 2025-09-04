@@ -1340,23 +1340,14 @@ The provider is `nerd-icons'."
   :diminish whole-line-or-region-local-mode)
 
 (use-package dogears
-  :preface
-  (defun sb/dogears-list-sorted ()
-    "Show Dogears list sorted by most recent first."
-    (interactive)
-    (let ((dogears-list
-           (sort (copy-sequence dogears-list)
-                 (lambda (a b)
-                   (time-less-p (alist-get 'time b) (alist-get 'time a))))))
-      (dogears-list)))
   :ensure (:host github :repo "alphapapa/dogears.el")
-  :hook (elpaca-after-init . dogears-mode)
+  :hook ((prog-mode text-mode) . dogears-mode)
   :bind
   (("M-g d" . dogears-go)
    ("M-g r" . dogears-remember)
    ("M-g b" . dogears-back)
    ("M-g f" . dogears-forward)
-   ("M-g t" . sb/dogears-list-sorted))
+   ("M-g t" . dogears-list))
   :custom
   (dogears-message nil)
   (dogears-idle 2)
@@ -1369,13 +1360,9 @@ The provider is `nerd-icons'."
 
 (use-package gumshoe
   :ensure (:host github :repo "Overdr0ne/gumshoe")
-  :init
-  ;; Enabing global-gumshoe-mode will initiate tracking
-  (global-gumshoe-mode +1)
-  ;; customize peruse slot display if you like
-  (setf gumshoe-slot-schema '(time buffer position line))
-  ;; disable auto-cancel of backtracking
-  (setf gumshoe-auto-cancel-backtracking-p nil))
+  :hook (elpaca-after-init . global-gumshoe-mode)
+  :custom (gumshoe-auto-cancel-backtracking-p nil)
+  :diminish global-gumshoe-mode)
 
 (use-package vundo
   :bind
@@ -1812,13 +1799,7 @@ The provider is `nerd-icons'."
 (use-package apheleia
   :hook
   ((markdown-mode
-    markdown-ts-mode
-    python-mode
-    python-ts-mode
-    kdl-mode
-    kdl-ts-mode
-    sh-mode
-    bash-ts-mode)
+    markdown-ts-mode python-mode python-ts-mode kdl-mode kdl-ts-mode)
    . apheleia-mode)
   :custom (apheleia-formatters-respect-fill-column t)
   :config
@@ -3452,9 +3433,18 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :init (defalias 'perl-mode 'cperl-mode))
 
 (use-package sh-script
+  :preface
+  (defun sb/bash-shfmt-opts ()
+    ;; Apply formatting defaults for shfmt used by bash-language-server
+    (setenv "SHFMT_OPTS" "-i 2 -ci -bn"))
   :ensure nil
   :mode ("\\bashrc\\'" . bash-ts-mode)
-  :hook ((sh-mode bash-ts-mode) . sb/setup-lsp-provider)
+  :hook
+  ((sh-mode bash-ts-mode)
+   .
+   (lambda ()
+     (sb/bash-shfmt-opts)
+     (sb/setup-lsp-provider)))
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
@@ -5300,11 +5290,17 @@ or the major mode is not in `sb/skippable-modes'."
     (transient-define-prefix
      sb/imenu-transient () "Imenu commands"
      [["Imenu"
-       ("j" "Imenu" consult-imenu)
-       ("b" "Breadcrumb jump" breadcrumb-jump)]
+       ("i" "Imenu" consult-imenu)
+       ("j" "Breadcrumb jump" breadcrumb-jump)]
       ["Lsp imenu"
        ("g" "File symbols" consult-lsp-file-symbols)
-       ("h" "Workspace symbols" consult-lsp-symbols)]])
+       ("h" "Workspace symbols" consult-lsp-symbols)]
+      ["Dogears"
+       ("d" "Go" dogears-go)
+       ("r" "Remember" dogears-remember)
+       ("b" "Back" dogears-back)
+       ("f" "Forward" dogears-forward)
+       ("t" "List" dogears-list)]])
     (bind-key "C-c i" #'sb/imenu-transient))
 
   (with-eval-after-load 'eglot
@@ -5334,9 +5330,15 @@ or the major mode is not in `sb/skippable-modes'."
     (transient-define-prefix
      sb/imenu-transient () "Imenu commands"
      [["Imenu"
-       ("j" "Imenu" consult-imenu)
-       ("b" "Breadcrumb jump" breadcrumb-jump)]
-      ["Lsp imenu" ("h" "Workspace symbols" consult-eglot-symbols)]])
+       ("i" "Imenu" consult-imenu)
+       ("j" "Breadcrumb jump" breadcrumb-jump)]
+      ["Lsp imenu" ("h" "Workspace symbols" consult-eglot-symbols)]
+      ["Dogears"
+       ("d" "Go" dogears-go)
+       ("r" "Remember" dogears-remember)
+       ("b" "Back" dogears-back)
+       ("f" "Forward" dogears-forward)
+       ("t" "List" dogears-list)]])
     (bind-key "C-c i" #'sb/imenu-transient))
 
   (transient-define-prefix
