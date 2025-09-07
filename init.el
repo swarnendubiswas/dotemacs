@@ -637,6 +637,7 @@ The provider is `nerd-icons'."
      "\\*Calculator\\*"
      "\\*Calendar\\*"
      "\\*Org Help\\*"
+     "\\*Ediff Registry\\*"
      "^magit.*"
      "\\*ltex-ls.*"
      "\\*bash-ls.*"
@@ -804,19 +805,20 @@ The provider is `nerd-icons'."
   :config (ace-window-display-mode 1))
 
 ;; Jump around buffers in few keystrokes
-(use-package frog-jump-buffer
-  :ensure (:host github :repo "waymondo/frog-jump-buffer")
-  :bind ("C-b" . frog-jump-buffer)
-  :config
-  (dolist
-      (regexp
-       '("^TAGS$"
-         "^:" ; temp buffers
-         "errors\\*$" ; errors* buffer
-         "stderr\\*$" ; stderr* buffer
-         "-ls\\*$" ; -ls* buffer
-         "^\\*\\(?:Compile-log\\|Backtrace\\|Flymake\\|vc\\|eldoc\\|Async-native-compile-log\\)\\*?$"))
-    (add-to-list 'frog-jump-buffer-ignore-buffers regexp)))
+
+;; (use-package frog-jump-buffer
+;;   :ensure (:host github :repo "waymondo/frog-jump-buffer")
+;;   :bind ("C-b" . frog-jump-buffer)
+;;   :config
+;;   (dolist
+;;       (regexp
+;;        '("^TAGS$"
+;;          "^:" ; temp buffers
+;;          "errors\\*$" ; errors* buffer
+;;          "stderr\\*$" ; stderr* buffer
+;;          "-ls\\*$" ; -ls* buffer
+;;          "^\\*\\(?:Compile-log\\|Backtrace\\|Flymake\\|vc\\|eldoc\\|Async-native-compile-log\\)\\*?$"))
+;;     (add-to-list 'frog-jump-buffer-ignore-buffers regexp)))
 
 (use-package dired
   :preface
@@ -2575,9 +2577,7 @@ DIR can be relative or absolute."
   ;; forces all listed backends to be queried regardless of what
   ;; `company-capf' returns.
 
-  ;; Order citations -> macros -> math -> text/dictionary without duplicates.
   ;; Always query all the following backends
-
   (defun sb/company-latex-mode-no-separate ()
     (setq-local
      company-backends
@@ -2614,7 +2614,12 @@ DIR can be relative or absolute."
         company-math-symbols-unicode company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
-  (add-hook 'LaTeX-mode-hook #'sb/company-latex-mode-separate)
+  (add-hook
+   'LaTeX-mode-hook
+   (lambda ()
+     ;; Allow showing yasnippets auto-complete
+     (setq-local company-minimum-prefix-length 2)
+     (sb/company-latex-mode-separate)))
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
@@ -3210,7 +3215,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :diminish)
 
 (use-package eldoc-box
-  :ensure t
   :after eldoc
   :demand t)
 
@@ -3221,86 +3225,94 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; in `c-ts-mode'. That means `.dir-locals.el' settings and yasnippets for
 ;; `c-mode' will work for `c-ts-mode' too. However, `c-ts-mode' still does not
 ;; run c-mode's major mode hooks. Also, there's still no major mode fallback.
-(use-package treesit
-  :ensure nil
+
+;; (use-package treesit
+;;   :ensure nil
+;;   :when
+;;   (and (executable-find "tree-sitter")
+;;        (fboundp 'treesit-available-p)
+;;        (treesit-available-p))
+;;   :demand t
+;;   :commands (treesit-install-language-grammar)
+;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+;;   :custom
+;;   ;; Increased default font locking may hurt performance
+;;   (treesit-font-lock-level 4)
+;;   (treesit-language-source-alist
+;;    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+;;      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+;;      (c "https://github.com/tree-sitter/tree-sitter-c")
+;;      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+;;      (cmake "https://github.com/uyha/tree-sitter-cmake")
+;;      (css "https://github.com/tree-sitter/tree-sitter-css")
+;;      (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
+;;      (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+;;      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+;;      (go "https://github.com/tree-sitter/tree-sitter-go")
+;;      (html "https://github.com/tree-sitter/tree-sitter-html")
+;;      (java "https://github.com/tree-sitter/tree-sitter-java")
+;;      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+;;      (json "https://github.com/tree-sitter/tree-sitter-json")
+;;      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
+;;      (latex "https://github.com/latex-lsp/tree-sitter-latex")
+;;      (make "https://github.com/alemuller/tree-sitter-make")
+;;      (markdown
+;;       "https://github.com/ikatyang/tree-sitter-markdown"
+;;       "split_parser"
+;;       "tree-sitter-markdown/src")
+;;      (markdown-inline
+;;       "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+;;       "split_parser"
+;;       "tree-sitter-markdown-inline/src")
+;;      (org "https://github.com/milisims/tree-sitter-org")
+;;      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+;;      (php "https://github.com/tree-sitter/tree-sitter-php")
+;;      (python "https://github.com/tree-sitter/tree-sitter-python")
+;;      (toml "https://github.com/tree-sitter/tree-sitter-toml")
+;;      (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
+;;      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+;;      (rust "https://github.com/tree-sitter/tree-sitter-rust")
+;;      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+;;   :config
+;;   (setopt treesit-language-source-alist
+;;           '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
+
+;;   ;; Install grammars if missing
+;;   (unless (seq-every-p
+;;            #'treesit-language-available-p
+;;            (mapcar #'car treesit-language-source-alist))
+;;     (mapc
+;;      #'treesit-install-language-grammar
+;;      (mapcar #'car treesit-language-source-alist)))
+
+;;   (setopt major-mode-remap-alist
+;;           '((sh-mode . bash-ts-mode)
+;;             (c-mode . c-ts-mode)
+;;             (c++-mode . c++-ts-mode)
+;;             (c-or-c++-mode . c-or-c++-ts-mode)
+;;             (cmake-mode . cmake-ts-mode)
+;;             (css-mode . css-ts-mode)
+;;             (dockerfile-mode . dockerfile-ts-mode)
+;;             (html-mode . html-ts-mode)
+;;             (java-mode . java-ts-mode)
+;;             (json-mode . json-ts-mode)
+;;             (kdl-mode . kdl-ts-mode)
+;;             (python-mode . python-ts-mode)
+;;             (toml-mode . toml-ts-mode)
+;;             (conf-toml-mode . toml-ts-mode)
+;;             (yaml-mode . yaml-ts-mode))))
+
+(use-package treesit-auto
   :when
   (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
        (treesit-available-p))
   :demand t
-  :commands (treesit-install-language-grammar)
   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
   :custom
   ;; Increased default font locking may hurt performance
   (treesit-font-lock-level 4)
-  (treesit-language-source-alist
-   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-     (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-     (c "https://github.com/tree-sitter/tree-sitter-c")
-     (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-     (cmake "https://github.com/uyha/tree-sitter-cmake")
-     (css "https://github.com/tree-sitter/tree-sitter-css")
-     (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
-     (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-     (go "https://github.com/tree-sitter/tree-sitter-go")
-     (html "https://github.com/tree-sitter/tree-sitter-html")
-     (java "https://github.com/tree-sitter/tree-sitter-java")
-     (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-     (json "https://github.com/tree-sitter/tree-sitter-json")
-     (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
-     (latex "https://github.com/latex-lsp/tree-sitter-latex")
-     (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown
-      "https://github.com/ikatyang/tree-sitter-markdown"
-      "split_parser"
-      "tree-sitter-markdown/src")
-     (markdown-inline
-      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-      "split_parser"
-      "tree-sitter-markdown-inline/src")
-     (org "https://github.com/milisims/tree-sitter-org")
-     (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-     (php "https://github.com/tree-sitter/tree-sitter-php")
-     (python "https://github.com/tree-sitter/tree-sitter-python")
-     (toml "https://github.com/tree-sitter/tree-sitter-toml")
-     (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
-     (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
-     (rust "https://github.com/tree-sitter/tree-sitter-rust")
-     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-  :config
-  (setopt treesit-language-source-alist
-          '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
-
-  ;; Install grammars if missing
-  (unless (seq-every-p
-           #'treesit-language-available-p
-           (mapcar #'car treesit-language-source-alist))
-    (mapc
-     #'treesit-install-language-grammar
-     (mapcar #'car treesit-language-source-alist)))
-
-  (setopt major-mode-remap-alist
-          '((sh-mode . bash-ts-mode)
-            (c-mode . c-ts-mode)
-            (c++-mode . c++-ts-mode)
-            (c-or-c++-mode . c-or-c++-ts-mode)
-            (cmake-mode . cmake-ts-mode)
-            (css-mode . css-ts-mode)
-            (dockerfile-mode . dockerfile-ts-mode)
-            (html-mode . html-ts-mode)
-            (java-mode . java-ts-mode)
-            (json-mode . json-ts-mode)
-            (kdl-mode . kdl-ts-mode)
-            (python-mode . python-ts-mode)
-            (toml-mode . toml-ts-mode)
-            (conf-toml-mode . toml-ts-mode)
-            (yaml-mode . yaml-ts-mode))))
-
-(use-package treesit-auto
-  :after treesit
-  :demand t
-  :custom (treesit-auto-install t)
+  (treesit-auto-install t)
   :config
   (global-treesit-auto-mode 1)
   (treesit-auto-add-to-auto-mode-alist 'all))
@@ -4725,7 +4737,7 @@ Shows both colors when errors and warnings are present."
       "en-US"
       :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
       ;; Keep grammar and style checking
-      :additionalRules (:enablePickyRules t))
+      :additionalRules (:enablePickyRules t :motherTongue "en-In"))
      :yaml
      (:format
       (:enable t :singleQuote nil :bracketSpacing t)
