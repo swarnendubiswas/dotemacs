@@ -500,12 +500,13 @@ The provider is `nerd-icons'."
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
 ;; `find-file' unless a prefix argument is given. Then it will find file at
 ;; point.
-(use-package ffap
-  :ensure nil
-  :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
-  :custom
-  ;; Do not ping things that look like domain names
-  (ffap-machine-p-known 'reject))
+
+;; (use-package ffap
+;;   :ensure nil
+;;   :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
+;;   :custom
+;;   ;; Do not ping things that look like domain names
+;;   (ffap-machine-p-known 'reject))
 
 ;; Highlight and open http links in strings and comments in buffers.
 (use-package goto-addr
@@ -1358,13 +1359,24 @@ The provider is `nerd-icons'."
      xref-after-jump-hook
      xref-after-return-hook
      consult-after-jump-hook
-     before-save-hook)))
+     before-save-hook
+     isearch-mode-end-hook
+     bookmark-after-jump-hook))
+  (dogears-functions '(avy-goto-char-timer avy-goto-line))
+  :config
+  (add-to-list 'dogears-ignore-modes 'elpaca-log-mode)
+  (add-to-list 'dogears-ignore-modes 'messages-buffer-mode)
+  (with-eval-after-load 'git-commit
+    (add-to-list 'dogears-ignore-modes 'git-commit-mode))
+  (with-eval-after-load 'magit-status
+    (add-to-list 'dogears-ignore-modes 'magit-status-mode)))
 
-(use-package gumshoe
-  :ensure (:host github :repo "Overdr0ne/gumshoe")
-  :hook (elpaca-after-init . global-gumshoe-mode)
-  :custom (gumshoe-auto-cancel-backtracking-p nil)
-  :diminish global-gumshoe-mode)
+;; (use-package gumshoe
+;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
+;;   :hook (elpaca-after-init . global-gumshoe-mode)
+;;   :custom (gumshoe-auto-cancel-backtracking-p nil)
+;;   :config (diminish 'global-gumshoe-mode)
+;;   :diminish global-gumshoe-mode)
 
 (use-package vundo
   :bind
@@ -3803,26 +3815,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; The LSP setup seems to work very poorly with large LaTeX files, leading to
 ;; frequent hangs while communicating with Emacs. Furthermore, this package is not required for completions with `company-mode'.
 
-(use-package lsp-latex
-  :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
-  :hook
-  ((LaTeX-mode bibtex-mode)
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length fill-column)
-  (lsp-latex-diagnostics-delay 2000)
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click
-  ;; in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-  :config
-  (with-eval-after-load 'latex
-    (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
+;; (use-package lsp-latex
+;;   :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
+;;   :hook
+;;   ((LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   (lsp-latex-bibtex-formatter "latexindent")
+;;   (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load 'latex
+;;     (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
