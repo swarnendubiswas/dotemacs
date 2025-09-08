@@ -184,6 +184,30 @@ The provider is `nerd-icons'."
      ;; "~/Documents/notes/file.txt" and you want to go to "~/.emacs.d/init.el",
      ;; type the latter directly and Emacs will take you there.
      (file-name-shadow-mode 1)))
+  :bind
+  (("<f1>" . execute-extended-command)
+   ("<f2>" . find-file)
+   ("<f7>" . previous-error) ; "M-g p" is the default keybinding
+   ("<f8>" . next-error) ; "M-g n" is the default keybinding
+   ("C-l" . goto-line)
+   ("C-c z" . repeat) ; Repeat the last command
+   ("C-z" . undo)
+
+   ;; In a line with comments, "C-u M-;" removes the comments altogether. That
+   ;; means deleting the comment, NOT UNCOMMENTING but removing all commented text
+   ;; and the comment marker itself.
+   ("C-c n" . comment-region)
+   ("C-c m" . uncomment-region)
+   ("C-c b" . comment-box)
+   ("C-s" . save-buffer)
+   ("C-x k" . kill-current-buffer)
+   ("C-<left>" . backward-word)
+   ("C-<right>" . forward-word)
+   ("M-\\" . delete-horizontal-space)
+   ("M-#" . cycle-spacing)
+   ("C-M-b" . backward-sexp)
+   ("C-M-f" . forward-sexp)
+   ("C-M-k" . kill-sexp))
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (auto-save-no-message t "Do not print frequent autosave messages")
@@ -4184,12 +4208,12 @@ Fallback to `xref-go-back'."
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
   :custom (nerd-icons-ibuffer-icon-size 1.0))
 
-(use-package nerd-icons-grep
-  :ensure (:host github :repo "hron/nerd-icons-grep")
-  :when (bound-and-true-p sb/enable-icons)
-  :after grep
-  :init (nerd-icons-grep-mode)
-  :custom (grep-use-headings t))
+;; (use-package nerd-icons-grep
+;;   :ensure (:host github :repo "hron/nerd-icons-grep")
+;;   :when (bound-and-true-p sb/enable-icons)
+;;   :after grep
+;;   :init (nerd-icons-grep-mode)
+;;   :custom (grep-use-headings t))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline.
 ;; It does not show lsp status, flycheck information, and Python virtualenv
@@ -4553,7 +4577,7 @@ Shows both colors when errors and warnings are present."
               "COMMIT_EDITMSG")
        (eglot-ensure))))
   :custom
-  (eglot-autoshutdown t)
+  ;; (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
@@ -5017,37 +5041,9 @@ or the major mode is not in `sb/skippable-modes'."
 ;; other key sequentially.
 
 (bind-keys
- ("C-l" . goto-line)
- ("C-c z" . repeat) ; Repeat the last command
- ("C-z" . undo)
-
- ("<f1>" . execute-extended-command)
- ("<f7>" . previous-error) ; "M-g p" is the default keybinding
- ("<f8>" . next-error) ; "M-g n" is the default keybinding
-
- ;; In a line with comments, "C-u M-;" removes the comments altogether. That
- ;; means deleting the comment, NOT UNCOMMENTING but removing all commented text
- ;; and the comment marker itself.
- ("C-c n" . comment-region)
- ("C-c m" . uncomment-region)
  ("C-c ;" . sb/comment-line)
- ("C-c b" . comment-box)
-
- ("C-s" . save-buffer)
  ("C-S-s" . sb/save-all-buffers)
- ("C-x k" . kill-current-buffer)
-
- ("C-x |" . sb/toggle-window-split)
-
- ("C-<left>" . backward-word)
- ("C-<right>" . forward-word)
-
- ("M-\\" . delete-horizontal-space)
- ("M-#" . cycle-spacing)
-
- ("C-M-b" . backward-sexp)
- ("C-M-f" . forward-sexp)
- ("C-M-k" . kill-sexp))
+ ("C-x |" . sb/toggle-window-split))
 
 ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
 ;; Zellij.
