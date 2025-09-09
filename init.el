@@ -192,10 +192,9 @@ The provider is `nerd-icons'."
    ("C-l" . goto-line)
    ("C-c z" . repeat) ; Repeat the last command
    ("C-z" . undo)
-
    ;; In a line with comments, "C-u M-;" removes the comments altogether. That
-   ;; means deleting the comment, NOT UNCOMMENTING but removing all commented text
-   ;; and the comment marker itself.
+   ;; means deleting the comment, NOT UNCOMMENTING but removing all commented
+   ;; text and the comment marker itself.
    ("C-c n" . comment-region)
    ("C-c m" . uncomment-region)
    ("C-c b" . comment-box)
@@ -208,6 +207,7 @@ The provider is `nerd-icons'."
    ("C-M-b" . backward-sexp)
    ("C-M-f" . forward-sexp)
    ("C-M-k" . kill-sexp))
+  :bind* ("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
   :custom
   (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (auto-save-no-message t "Do not print frequent autosave messages")
@@ -381,6 +381,13 @@ The provider is `nerd-icons'."
   ;; with "C-c C-c".
   (unless (version<= emacs-version "27")
     (add-hook 'elpaca-after-init-hook #'global-so-long-mode))
+
+  ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
+  ;; Zellij.
+  (unbind-key "C-]")
+  ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
+  (unbind-key "C-x f") ; Bound to `set-fill-column'
+  (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
 
   :diminish visual-line-mode)
 
@@ -765,7 +772,7 @@ The provider is `nerd-icons'."
 
 (bind-key "C-g" #'sb/keyboard-quit-dwim)
 
-(setq display-buffer-alist
+(setopt display-buffer-alist
       '(("\\*helpful.*\\*" ; Helpful buffers
          (display-buffer-in-side-window)
          (side . bottom)
@@ -2432,9 +2439,10 @@ The provider is `nerd-icons'."
      company-pseudo-tooltip-frontend
      ;; Show selected candidate docs in echo area
      company-echo-metadata-frontend))
-  (company-require-match nil)
-  (company-insertion-triggers '())
+  ;; (company-require-match nil)
+  ;; (company-insertion-triggers '())
   (company-tooltip-align-annotations (display-graphic-p))
+  (company-tooltip-width-grow-only t)
   :config
   (unless (bound-and-true-p sb/enable-icons)
     (setopt company-format-margin-function nil))
@@ -5043,18 +5051,7 @@ or the major mode is not in `sb/skippable-modes'."
 (bind-keys
  ("C-c ;" . sb/comment-line)
  ("C-S-s" . sb/save-all-buffers)
- ("C-x |" . sb/toggle-window-split))
-
-;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
-;; Zellij.
-(unbind-key "C-]")
-;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
-(unbind-key "C-x f") ; Bound to `set-fill-column'
-(unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
-
-(bind-key* "C-x s" #'scratch-buffer) ; Bound to `save-some-buffers'
-
-(bind-keys
+ ("C-x |" . sb/toggle-window-split)
  ("M-<left>" . sb/previous-buffer)
  ("M-<right>" . sb/next-buffer)
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
@@ -5463,7 +5460,8 @@ or the major mode is not in `sb/skippable-modes'."
               ("📎 Xref: find definitions" . xref-find-definitions)
               ("🗂 Imenu (consult)" . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
-      (call-interactively (cdr (assoc choice options))))))
+      (call-interactively (cdr (assoc choice options)))))
+  (bind-key "M-'" #'sb/jump-choose-definition))
 
 (when (eq sb/lsp-provider 'eglot)
   (defun sb/jump-choose-definition ()
@@ -5476,7 +5474,8 @@ or the major mode is not in `sb/skippable-modes'."
               ("📎 Xref: find definitions" . xref-find-definitions)
               ("🗂 Imenu (consult)" . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
-      (call-interactively (cdr (assoc choice options))))))
+      (call-interactively (cdr (assoc choice options)))))
+  (bind-key "M-'" #'sb/jump-choose-definition))
 
 (add-hook
  'elpaca-after-init-hook

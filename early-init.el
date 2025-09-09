@@ -35,7 +35,7 @@
    gc-cons-threshold sb/emacs-4MB
    gc-cons-percentage 0.1))
 
-(add-hook 'emacs-startup-hook #'sb/restore-gc)
+(add-hook 'elpaca-after-init-hook #'sb/restore-gc)
 (add-hook 'minibuffer-setup-hook #'sb/defer-gc)
 (add-hook 'minibuffer-exit-hook #'sb/restore-gc)
 
