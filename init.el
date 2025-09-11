@@ -48,7 +48,10 @@
 ;; `company-ispell' does not keep prefix case when used as a grouped backend. We
 ;; use `company' for now because Emacs versions till 30.x does not support child
 ;; frames on the terminal.
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/in-buffer-completion
+  (if (display-graphic-p)
+      'corfu
+    'company)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -773,22 +776,22 @@ The provider is `nerd-icons'."
 (bind-key "C-g" #'sb/keyboard-quit-dwim)
 
 (setopt display-buffer-alist
-      '(("\\*helpful.*\\*" ; Helpful buffers
-         (display-buffer-in-side-window)
-         (side . bottom)
-         (slot . 0)
-         (window-height . 0.5)
-         (window-parameters . ((no-delete-other-windows . t))))
-        ("\\*compilation\\*" ; Compilation
-         (display-buffer-in-side-window)
-         (side . bottom)
-         (slot . 1)
-         (window-height . 0.5))
-        ("\\*EGLOT workspace configuration\\*"
-         (display-buffer-in-side-window)
-         (side . bottom)
-         (slot . 2)
-         (window-height . 0.5))))
+        '(("\\*helpful.*\\*" ; Helpful buffers
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (slot . 0)
+           (window-height . 0.5)
+           (window-parameters . ((no-delete-other-windows . t))))
+          ("\\*compilation\\*" ; Compilation
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (slot . 1)
+           (window-height . 0.5))
+          ("\\*EGLOT workspace configuration\\*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (slot . 2)
+           (window-height . 0.5))))
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
@@ -2608,11 +2611,13 @@ DIR can be relative or absolute."
   ;; then other matches from later backends `company-ispell' or `company-dict'
   ;; will be ignored.
   (setopt company-backends
-          '((company-capf
+          '(company-files
+            (company-capf
              company-keywords
              company-dabbrev-code
              :with company-yasnippet)
-            company-files (company-dict company-ispell) company-dabbrev))
+            (company-dict company-ispell :with company-yasnippet)
+            (company-dabbrev :with company-yasnippet)))
 
   ;; `company-capf' with Texlab does not pass to later backends if it
   ;; returns any result (even an empty list). So it makes it difficult to
@@ -2658,12 +2663,30 @@ DIR can be relative or absolute."
         company-math-symbols-unicode company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
+  (defun sb/company-latex-backends-new ()
+    "Company backends optimized for LaTeX."
+    (setq-local company-backends
+                '(company-files
+                  ;; References & labels
+                  (company-reftex-citations
+                   company-reftex-labels company-auctex-labels)
+                  ;; LaTeX macros/envs/snippets
+                  (company-auctex-macros
+                   company-auctex-environments
+                   company-auctex-symbols
+                   :with company-yasnippet)
+                  ;; Math symbols
+                  (company-math-symbols-latex company-math-symbols-unicode)
+                  ;; Language-level fallback
+                  (company-ispell company-dict :with company-yasnippet)
+                  (company-dabbrev :with company-yasnippet))))
+
   (add-hook
    'LaTeX-mode-hook
    (lambda ()
      ;; Allow showing yasnippets auto-complete
      (setq-local company-minimum-prefix-length 2)
-     (sb/company-latex-mode-separate)))
+     (sb/company-latex-backends-new)))
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
@@ -2680,11 +2703,15 @@ DIR can be relative or absolute."
 
   (defun sb/company-c-mode ()
     (setq-local company-backends
-                '((company-capf
+                '(company-files
+                  (company-capf
                    company-c-headers
                    company-dabbrev-code
                    :with company-yasnippet)
-                  company-files (company-dict company-ispell) company-dabbrev)))
+                  (company-dict
+                   company-ispell
+                   :with company-yasnippet)
+                  (company-dabbrev :with company-yasnippet))))
 
   (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
     (add-hook
@@ -2693,35 +2720,33 @@ DIR can be relative or absolute."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-c-mode))))
 
-  (progn
-    (defun sb/company-prog-mode ()
-      (setq-local company-backends
-                  '((company-capf
-                     company-keywords
-                     company-dabbrev-code ; Useful for variable names
-                     :with company-yasnippet)
-                    company-files
-                    (company-ispell company-dict)
-                    company-dabbrev)))
+  (defun sb/company-prog-mode ()
+    (setq-local company-backends
+                '(company-files
+                  (company-capf
+                   company-keywords
+                   company-dabbrev-code ; Useful for variable names
+                   :with company-yasnippet)
+                  (company-ispell company-dict :with company-yasnippet)
+                  (company-dabbrev :with company-yasnippet))))
 
-    (add-hook
-     'prog-mode-hook
-     (lambda ()
-       (unless (or (derived-mode-p 'emacs-lisp-mode)
-                   (derived-mode-p 'lisp-data-mode)
-                   (derived-mode-p 'flex-mode)
-                   (derived-mode-p 'bison-mode)
-                   (derived-mode-p 'cmake-ts-mode))
-         (setq-local company-minimum-prefix-length 2)
-         (sb/company-prog-mode))))))
+  (add-hook
+   'prog-mode-hook
+   (lambda ()
+     (unless (or (derived-mode-p 'emacs-lisp-mode)
+                 (derived-mode-p 'lisp-data-mode)
+                 (derived-mode-p 'flex-mode)
+                 (derived-mode-p 'bison-mode)
+                 (derived-mode-p 'cmake-ts-mode))
+       (setq-local company-minimum-prefix-length 2)
+       (sb/company-prog-mode)))))
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
 (use-package corfu
   :preface
   (defun sb/corfu-default-setup ()
-    ;; The right edge is getting cut off with `corfu-indexed-mode'
-    (corfu-indexed-mode 1)
+    ;; (corfu-indexed-mode 1) ; I prefer `corfu-quick'
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
     (corfu-popupinfo-mode 1))
@@ -2825,7 +2850,7 @@ DIR can be relative or absolute."
              (list
               (cape-capf-inside-string #'cape-file)
               #'cape-dict
-              #'cape-dabbrev)))))
+              (cape-capf-buster #'cape-dabbrev))))))
 
   (add-hook
    'org-mode-hook
@@ -2835,7 +2860,7 @@ DIR can be relative or absolute."
                   (cape-capf-inside-string #'cape-file)
                   #'cape-elisp-block
                   #'cape-dict
-                  #'cape-dabbrev
+                  (cape-capf-buster #'cape-dabbrev)
                   #'yasnippet-capf))))
 
   (add-hook
@@ -2848,7 +2873,7 @@ DIR can be relative or absolute."
                     #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
                   (cape-capf-inside-string #'cape-file)
-                  #'cape-dabbrev
+                  (cape-capf-buster #'cape-dabbrev)
                   #'yasnippet-capf))))
 
   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
@@ -2872,7 +2897,7 @@ DIR can be relative or absolute."
           (cape-company-to-capf #'company-auctex-symbols)
           ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
           #'cape-tex)
-         #'cape-dict #'cape-dabbrev #'yasnippet-capf)))))
+         #'cape-dict (cape-capf-buster #'cape-dabbrev) #'yasnippet-capf)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2885,7 +2910,7 @@ DIR can be relative or absolute."
                     (cape-capf-inside-code #'cape-elisp-symbol)
                     (cape-capf-inside-string #'cape-file)
                     (cape-capf-inside-comment #'cape-dict)
-                    #'cape-dabbrev
+                    (cape-capf-buster #'cape-dabbrev)
                     #'yasnippet-capf)))))
 
   ;; (dolist (hook
@@ -3194,6 +3219,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package hl-todo
+  :hook (elpaca-after-init . hl-todo-mode)
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setopt
@@ -3259,8 +3285,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :diminish)
 
 (use-package eldoc-box
-  :after eldoc
-  :demand t)
+  :when (display-graphic-p)
+  :hook (eldoc-mode . eldoc-box-hover-mode)
+  :custom
+  (eldoc-box-max-pixel-width 600)
+  (eldoc-box-max-pixel-height 400)
+  :diminish eldoc-box-hover-mode)
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
@@ -4558,7 +4588,8 @@ Shows both colors when errors and warnings are present."
 
 (use-package eglot
   :preface
-  ;; It seems there is a race condition between Eglot shutting down the servers and closing the project buffers.
+  ;; FIXME: It seems there is a race condition between Eglot shutting down the
+  ;; servers and closing the project buffers.
   (defun sb/project-kill-buffers-disconnect-eglot ()
     "Shutdown Eglot for the current project before killing its buffers."
     (interactive)
@@ -4610,8 +4641,9 @@ Shows both colors when errors and warnings are present."
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
+     ;; `harper-ls' is more efficient than `ltex-ls-plus'
      (text-mode
-      . ,(eglot-alternatives '("ltex-ls-plus" ("harper-ls" "--stdio"))))
+      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
       . ("autotools-language-server"))
      (fish-mode . ("fish-lsp" "start"))
@@ -5073,11 +5105,11 @@ or the major mode is not in `sb/skippable-modes'."
 ;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
 ;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
-(use-package default-text-scale
-  :when (display-graphic-p)
-  :bind
-  (("C-M-+" . default-text-scale-increase)
-   ("C-M--" . default-text-scale-decrease)))
+;; (use-package default-text-scale
+;;   :when (display-graphic-p)
+;;   :bind
+;;   (("C-M-+" . default-text-scale-increase)
+;;    ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
 (use-package free-keys
@@ -5256,23 +5288,24 @@ or the major mode is not in `sb/skippable-modes'."
       (lambda ()
         (interactive)
         (dired user-emacs-directory)))
-     ("r" "Restart" restart-emacs)
+     ("m" "Restart" restart-emacs)
      ("k" "Describe personal keybindings" describe-personal-keybindings)
      ("b" "Describe keybindings" embark-bindings)]])
   (bind-key "C-c d" #'sb/dotemacs-transient)
 
-  (with-eval-after-load 'smerge-mode
-    (transient-define-prefix
-     sb/smerge-transient () "Smerge menu"
-     [["Navigation"
-       ("n" "Next conflict" smerge-next)
-       ("p" "Previous conflict" smerge-prev)]
-      ["Merge"
-       ("u" "Keep upper" smerge-keep-upper)
-       ("l" "Keep lower" smerge-keep-lower)
-       ("a" "Keep both" smerge-keep-all)]
-      ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
-    (bind-key "C-c ^" #'sb/smerge-transient))
+  ;; (with-eval-after-load 'smerge-mode
+  (transient-define-prefix
+   sb/smerge-transient () "Smerge menu"
+   [["Navigation"
+     ("n" "Next conflict" smerge-next)
+     ("p" "Previous conflict" smerge-prev)]
+    ["Merge"
+     ("u" "Keep upper" smerge-keep-upper)
+     ("l" "Keep lower" smerge-keep-lower)
+     ("a" "Keep both" smerge-keep-all)]
+    ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
+  (bind-key "C-c ^" #'sb/smerge-transient)
+  ;; )
 
   (with-eval-after-load 'lsp-mode
     (transient-define-prefix
@@ -5287,7 +5320,7 @@ or the major mode is not in `sb/skippable-modes'."
        ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
       ["Browsing functionality"
        ("d" "Find declaration" lsp-find-declaration)
-       ("e" "Find declaration" lsp-find-definition)
+       ("e" "Find definition" lsp-find-definition)
        ("i" "Find implementation" lsp-find-implementation)
        ("r" "Find references" lsp-find-references)
        ("I" "Go to implementation" lsp-goto-implementation)
@@ -5300,7 +5333,7 @@ or the major mode is not in `sb/skippable-modes'."
     (bind-key "C-c l" #'sb/lsp-transient)
 
     (transient-define-prefix
-     sb/imenu-transient () "Imenu commands"
+     sb/lsp-imenu-transient () "Imenu commands"
      [["Imenu"
        ("i" "Imenu" consult-imenu)
        ("j" "Breadcrumb jump" breadcrumb-jump)]
@@ -5313,45 +5346,46 @@ or the major mode is not in `sb/skippable-modes'."
        ("b" "Back" dogears-back)
        ("f" "Forward" dogears-forward)
        ("t" "List" dogears-list)]])
-    (bind-key "C-c i" #'sb/imenu-transient))
+    (bind-key "C-c i" #'sb/lsp-imenu-transient))
 
-  (with-eval-after-load 'eglot
-    (transient-define-prefix
-     sb/eglot-transient () "Eglot menu"
-     [["Lsp functionality"
-       ("l" "Start Eglot" eglot)
-       ("q" "Disconnect Eglot" eglot-shutdown)]
-      ["Browsing functionality"
-       ("d" "Find declaration" eglot-find-declaration)
-       ("i" "Find implementation" eglot-find-implementation)
-       ("t" "Find type definition" eglot-find-typeDefinition)]
-      ["Code actions"
-       ("r" "Rename" eglot-rename)
-       ("f" "Format buffer" eglot-format)
-       ("x" "Execute code action" eglot-code-actions)
-       ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
-       ("e" "Execution code action: extract" eglot-code-action-extract)
-       ("n" "Execution code action: inline" eglot-code-action-inline)
-       ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
-       ("o"
-        "Execution code action: organize imports"
-        eglot-code-action-organize-imports)]
-      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
-    (bind-key "C-c l" #'sb/eglot-transient)
+  ;; (with-eval-after-load 'eglot
+  (transient-define-prefix
+   sb/eglot-transient () "Eglot menu"
+   [["Lsp functionality"
+     ("l" "Start Eglot" eglot)
+     ("q" "Disconnect Eglot" eglot-shutdown)]
+    ["Browsing functionality"
+     ("d" "Find declaration" eglot-find-declaration)
+     ("i" "Find implementation" eglot-find-implementation)
+     ("t" "Find type definition" eglot-find-typeDefinition)]
+    ["Code actions"
+     ("r" "Rename" eglot-rename)
+     ("f" "Format buffer" eglot-format)
+     ("x" "Execute code action" eglot-code-actions)
+     ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
+     ("e" "Execution code action: extract" eglot-code-action-extract)
+     ("n" "Execution code action: inline" eglot-code-action-inline)
+     ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
+     ("o"
+      "Execution code action: organize imports"
+      eglot-code-action-organize-imports)]
+    ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
+  (bind-key "C-c l" #'sb/eglot-transient)
 
-    (transient-define-prefix
-     sb/imenu-transient () "Imenu commands"
-     [["Imenu"
-       ("i" "Imenu" consult-imenu)
-       ("j" "Breadcrumb jump" breadcrumb-jump)]
-      ["Lsp imenu" ("h" "Workspace symbols" consult-eglot-symbols)]
-      ["Dogears"
-       ("d" "Go" dogears-go)
-       ("r" "Remember" dogears-remember)
-       ("b" "Back" dogears-back)
-       ("f" "Forward" dogears-forward)
-       ("t" "List" dogears-list)]])
-    (bind-key "C-c i" #'sb/imenu-transient))
+  (transient-define-prefix
+   sb/eglot-imenu-transient () "Imenu commands"
+   [["Imenu"
+     ("i" "Imenu" consult-imenu)
+     ("j" "Breadcrumb jump" breadcrumb-jump)]
+    ["Lsp imenu" ("h" "Workspace symbols" consult-eglot-symbols)]
+    ["Dogears"
+     ("d" "Go" dogears-go)
+     ("r" "Remember" dogears-remember)
+     ("b" "Back" dogears-back)
+     ("f" "Forward" dogears-forward)
+     ("t" "List" dogears-list)]])
+  (bind-key "C-c i" #'sb/eglot-imenu-transient)
+  ;; )
 
   (transient-define-prefix
    sb/file-buffer-transient () "File and Buffer commands"
@@ -5403,51 +5437,77 @@ or the major mode is not in `sb/skippable-modes'."
      ("ww" "Wordwise" ediff-windows-wordwise)]])
   (bind-key "C-c e" #'sb/ediff-transient)
 
-  (with-eval-after-load 'citre
-    (transient-define-prefix
-     sb/citre-transient () "Citre commands"
-     [["Jump"
-       ("j" "Jump" sb/jump-citre-xref)
-       ("b" "Jump back" citre-jump-back)
-       ("p" "Peek" citre-peek)
-       ("a" "Ace peek" citre-ace-peek)
-       ("r" "Reference" citre-jump-to-reference)]
-      ["Manage"
-       ("c" "Create tags" citre-create-tags-file)
-       ("u" "Update tags" citre-update-tags-file)
-       ("e" "Edit recipe" citre-edit-tags-file-recipe)
-       ("g" "Update global db" citre-global-update-database)]])
-    (bind-key "C-c c" #'sb/citre-transient))
+  ;; (with-eval-after-load 'citre
+  (transient-define-prefix
+   sb/citre-transient () "Citre commands"
+   [["Jump"
+     ("j" "Jump" sb/jump-citre-xref)
+     ("b" "Jump back" citre-jump-back)
+     ("p" "Peek" citre-peek)
+     ("a" "Ace peek" citre-ace-peek)
+     ("r" "Reference" citre-jump-to-reference)]
+    ["Manage"
+     ("c" "Create tags" citre-create-tags-file)
+     ("u" "Update tags" citre-update-tags-file)
+     ("e" "Edit recipe" citre-edit-tags-file-recipe)
+     ("g" "Update global db" citre-global-update-database)]])
+  (bind-key "C-c c" #'sb/citre-transient)
+  ;; )
 
-  (with-eval-after-load 'corfu
-    (transient-define-prefix
-     sb/corfu-transient () "Corfu commands"
-     [["Capf"
-       ("d" "Dict" cape-dict)
-       ("v" "Dabbrev" cape-dabbrev)
-       ("h" "History" cape-history)
-       ("f" "File" cape-file)]
-      [""
-       ("t" "TeX" cape-tex)
-       ("a" "Abbrev" cape-abbrev)
-       ("k" "Keyword" cape-keyword)
-       ("e" "Elisp symbol" cape-elisp-symbol)]
-      [""
-       ("j" "Emoji" cape-emoji)
-       ("l" "Line" cape-line)
-       ("b" "Elisp block" cape-elisp-block)]
-      ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
-    (bind-key "C-c p" #'sb/corfu-transient))
+  ;; (with-eval-after-load 'corfu
+  (transient-define-prefix
+   sb/corfu-transient () "Corfu commands"
+   [["Capf"
+     ("d" "Dict" cape-dict)
+     ("v" "Dabbrev" cape-dabbrev)
+     ("h" "History" cape-history)
+     ("f" "File" cape-file)]
+    [""
+     ("t" "TeX" cape-tex)
+     ("a" "Abbrev" cape-abbrev)
+     ("k" "Keyword" cape-keyword)
+     ("e" "Elisp symbol" cape-elisp-symbol)]
+    [""
+     ("j" "Emoji" cape-emoji)
+     ("l" "Line" cape-line)
+     ("b" "Elisp block" cape-elisp-block)]
+    ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
+  (bind-key "C-c p" #'sb/corfu-transient)
+  ;; )
 
-  (with-eval-after-load 'latex
-    (transient-define-prefix
-     sb/latex-transient () "LaTeX commands"
-     [[""
-       ("l" "Insert label" reftex-label)
-       ("b" "Insert block" latex-insert-block)
-       ("r" "Insert reference" consult-reftex-insert-reference)
-       ("g" "Go to label" consult-reftex-goto-label)]])
-    (bind-key "C-c j" #'sb/latex-transient)))
+  ;; (with-eval-after-load 'latex
+  (transient-define-prefix
+   sb/latex-transient () "LaTeX commands"
+   [[""
+     ("l" "Insert label" reftex-label)
+     ("b" "Insert block" latex-insert-block)
+     ("r" "Insert reference" consult-reftex-insert-reference)
+     ("g" "Go to label" consult-reftex-goto-label)]])
+  (bind-key "C-c j" #'sb/latex-transient)
+  ;; )
+
+  (transient-define-prefix
+   sb/root-transient () "Top-level menu"
+   [["Emacs"
+     ("d" "Dotemacs" sb/dotemacs-transient)
+     ("x" "File/Buffer" sb/file-buffer-transient)
+     ("s" "Search" sb/search-transient)
+     ("^" "Smerge" sb/smerge-transient)]
+    ["Programming" ("l" "LSP/Eglot"
+      (lambda ()
+        (interactive)
+        (cond
+         ((eq sb/lsp-provider 'eglot)
+          (sb/eglot-transient))
+         ((eq sb/lsp-provider 'lsp-mode)
+          (sb/lsp-transient)))))]
+    ["Navigation"
+     ("n" "Navigation" sb/navigation-transient)
+     ("i" "Imenu" sb/eglot-imenu-transient)
+     ("c" "Citre" sb/citre-transient)]
+    ["Completion" ("p" "Corfu" sb/corfu-transient)]
+    ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
+  (bind-key "C-c SPC" #'sb/root-transient))
 
 (when (eq sb/lsp-provider 'lsp-mode)
   (defun sb/jump-choose-definition ()
@@ -5458,7 +5518,7 @@ or the major mode is not in `sb/skippable-modes'."
               ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
               ("📚 Citre: jump" . citre-jump)
               ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂 Imenu (consult)" . consult-imenu)))
+              ("🗂  Imenu (consult)" . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
       (call-interactively (cdr (assoc choice options)))))
   (bind-key "M-'" #'sb/jump-choose-definition))
