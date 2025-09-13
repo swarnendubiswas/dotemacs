@@ -131,7 +131,6 @@ The provider is `nerd-icons'."
   (backup-directory-alist
    `((".*" . ,(no-littering-expand-var-file-name "backup/"))))
   (custom-file (no-littering-expand-var-file-name "custom.el"))
-  (url-history-file (no-littering-expand-var-file-name "url/history"))
   :config (no-littering-theme-backups))
 
 (elpaca-wait)
@@ -144,17 +143,9 @@ The provider is `nerd-icons'."
   :init
   (setopt
    exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables
-   '("PATH"
-     "JAVA_HOME"
-     "TERM"
-     "LANG"
-     "LC_CTYPE"
-     "LSP_USE_PLISTS"
-     "CONDA_PREFIX"
-     "CONDA_DEFAULT_ENV")
-   ;; Reduce the start up time for GUI Emacs. Exporting $PATH should still work
-   ;; if the shell rc files have been correctly setup.
+   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "LANG" "LC_CTYPE" "LSP_USE_PLISTS")
+   ;; Reduce the start up time. Exporting $PATH should still work if the shell
+   ;; rc files have been correctly setup.
    exec-path-from-shell-arguments nil)
   (exec-path-from-shell-initialize))
 
@@ -165,8 +156,7 @@ The provider is `nerd-icons'."
    .
    (lambda ()
      (save-place-mode 1)
-     ;; There is mostly no benefit in seeing the file size on the modeline. 
-     ;; (size-indication-mode 1)
+     ;; (size-indication-mode 1) ; No benefit in seeing the file size.
      (column-number-mode 1)
      ;; `auto-save-mode' saves to a separate auto-save file, while
      ;; `auto-save-visited-mode' saves directly to the visited file and runs all
@@ -212,18 +202,18 @@ The provider is `nerd-icons'."
    ("C-M-k" . kill-sexp))
   :bind* ("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
   :custom
-  (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
-  (auto-save-no-message t "Do not print frequent autosave messages")
-  ;; Disable autosaving based on number of characters typed
+  ;; (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
+  (auto-save-no-message t "Do not print frequent auto-save messages")
+  ;; Disable auto-saving based on number of characters typed
   (auto-save-interval 0)
-  ;; Save buffer to file after idling for 10s. The default of 5s may be too
-  ;; frequent since it runs all the save-related hooks.
-  (auto-save-visited-interval 10)
-  (apropos-do-all t "Make `apropos' search more extensively")
+  ;; ;; Save buffer to file after idling for 10s. The default of 5s may be too
+  ;; ;; frequent since it runs all the save-related hooks.
+  ;; (auto-save-visited-interval 10)
+  ;; (apropos-do-all t "Make `apropos' search more extensively")
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
   ;; Autofill comments in modes that define them
-  (comment-auto-fill-only-comments t)
+  ;; (comment-auto-fill-only-comments t)
   ;; Show the actual symbol name in the *customize* buffer
   (custom-unlispify-menu-entries nil)
   (create-lockfiles nil)
@@ -244,18 +234,18 @@ The provider is `nerd-icons'."
   (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
   (sentence-end-double-space nil)
   (shift-select-mode nil)
-  (sort-fold-case nil "Do not ignore case when sorting")
+  ;; (sort-fold-case nil "Do not ignore case when sorting")
   (standard-indent 2)
   (switch-to-buffer-preserve-window-point t)
-  (view-read-only t "View mode for read-only buffers")
+  (view-read-only t "Use view mode for read-only buffers")
   (window-combination-resize t "Resize windows proportionally")
-  (max-mini-window-height 0.3)
+  ;; (max-mini-window-height 0.3)
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
   (tags-case-fold-search nil "case-sensitive")
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
-  (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
-  (confirm-kill-emacs nil)
+  ;; (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
+  ;; (confirm-kill-emacs nil)
   ;; Prevent 'Active processes exist' when you quit Emacs
   (confirm-kill-processes nil)
   (require-final-newline t "Always end a file with a newline")
@@ -269,25 +259,42 @@ The provider is `nerd-icons'."
    '(
      ;; Allow *Help* buffers to use the full frame
      ("*Help*" (display-buffer-same-window))
+     ("\\*helpful.*\\*" ; Helpful buffers
+      (display-buffer-in-side-window)
+      (side . bottom)
+      (slot . 0)
+      (window-height . 0.5)
+      (window-parameters . ((no-delete-other-windows . t))))
      ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
       (display-buffer-no-window)
-      (allow-no-window . t))))
+      (allow-no-window . t))
+     ("\\*compilation\\*" ; Compilation
+      (display-buffer-in-side-window)
+      (side . bottom)
+      (slot . 1)
+      (window-height . 0.5))
+     ("\\*EGLOT workspace configuration\\*"
+      (display-buffer-in-side-window)
+      (side . bottom)
+      (slot . 2)
+      (window-height . 0.5))))
   (scroll-preserve-screen-position t)
-  (scroll-margin 3)
-  (scroll-step 1)
-  (scroll-conservatively 10)
-  (scroll-error-top-bottom t)
+  ;; Number of lines of margin at the top and bottom of a window when automatic scrolling is triggered
+  (scroll-margin 2)
+  ;; (scroll-step 1)
+  ;; (scroll-conservatively 10)
+  ;; (scroll-error-top-bottom t)
   ;; Accelerate scrolling operations when non-nil. Only those portions of the
   ;; buffer which are actually going to be displayed get fontified.
   (fast-but-imprecise-scrolling t)
   (auto-window-vscroll nil)
   (hscroll-margin 2)
   (hscroll-step 1)
-  (fringes-outside-margins t)
+  ;; (fringes-outside-margins t)
   ;; Improve Emacs' responsiveness by delaying syntax highlighting during input
   (redisplay-skip-fontification-on-input t)
   ;; Show contextual lines around a match
-  (list-matching-lines-default-context-lines 1)
+  ;; (list-matching-lines-default-context-lines 1)
   (imenu-auto-rescan t)
   (imenu-use-popup-menu nil)
   (save-silently t)
@@ -348,9 +355,9 @@ The provider is `nerd-icons'."
    cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
-   ;; TAB first tries to indent the current line, and if the line was already
-   ;; indented, then try to complete the thing at point.
-   tab-always-indent 'complete
+   ;; ;; TAB first tries to indent the current line, and if the line was already
+   ;; ;; indented, then try to complete the thing at point.
+   ;; tab-always-indent 'complete
    bidi-display-reordering 'left-to-right
    bidi-paragraph-direction 'left-to-right)
 
@@ -368,17 +375,18 @@ The provider is `nerd-icons'."
 
   (put 'overwrite-mode 'disabled t)
 
-  ;; Keep the cursor out of the read-only portions of the.minibuffer
-  (setopt minibuffer-prompt-properties
-          '(read-only
-            t intangible t cursor-intangible t face minibuffer-prompt))
-  (add-hook
-   'minibuffer-setup-hook
-   (lambda ()
-     (cursor-intangible-mode 1)
-     ;; Allow Flycheck to show long error messages in the minibuffer
-     (setq truncate-lines nil)
-     (visual-line-mode 1)))
+  ;; ;; Keep the cursor out of the read-only portions of the minibuffer
+  ;; (setopt minibuffer-prompt-properties
+  ;;         '(read-only
+  ;;           t intangible t cursor-intangible t face minibuffer-prompt))
+
+  ;; (add-hook
+  ;;  'minibuffer-setup-hook
+  ;;  (lambda ()
+  ;;    (cursor-intangible-mode 1)
+  ;;    ;; Allow Flycheck to show long error messages in the minibuffer
+  ;;    (setq truncate-lines nil)
+  ;;    (visual-line-mode 1)))
 
   ;; This puts the buffer in read-only mode and disables font locking, revert
   ;; with "C-c C-c".
@@ -458,8 +466,7 @@ The provider is `nerd-icons'."
      "*[/\\]straight/repos/"))
   ;; Keep remote file without testing if they still exist
   (recentf-keep '(file-remote-p file-readable-p))
-  ;; Larger values help in lookup but takes more time to check if the files
-  ;; exist
+  ;; Larger values help in lookup but slows it down
   (recentf-max-saved-items 250)
   :config
   ;; Abbreviate the home directory to make it easy to read the actual file name.
@@ -472,7 +479,7 @@ The provider is `nerd-icons'."
     (add-to-list 'recentf-exclude exclude))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent
-  ;; list periodically after idling for a few seconds.
+  ;; list periodically after idling.
   (run-with-idle-timer 30 t #'recentf-save-list))
 
 (progn
@@ -567,11 +574,6 @@ The provider is `nerd-icons'."
 ;; for larger regions.
 (use-package ediff
   :ensure nil
-  :commands
-  (ediff-buffers
-   ediff-regions-linewise
-   ediff-regions-wordwise
-   ediff-revert-buffers-then-recompute-diffs)
   :hook
   ( ;; Offer to clean up files from ediff sessions.
    (ediff-cleanup . (lambda () (ediff-janitor t nil)))
@@ -647,9 +649,6 @@ The provider is `nerd-icons'."
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil)
-  ;; (ibuffer-formats
-  ;;  '((mark
-  ;;     modified read-only locked " " (name 30 -1 :left :elide) " " filename)))
   (ibuffer-formats
    '((mark
       modified
@@ -661,7 +660,7 @@ The provider is `nerd-icons'."
       (mode 16 16 :left :elide)
       " "
       filename-and-process)
-     (mark " " (name 16 -1) " " filename)))
+     (mark " " (name 30 -1) " " filename-and-process)))
   (ibuffer-never-show-predicates
    '("\\*Help\\*"
      "\\*Quick Help\\*"
@@ -742,56 +741,6 @@ The provider is `nerd-icons'."
 ;;           :position bottom
 ;;           :height 0.5)
 ;;         popwin:special-display-config))
-
-;; Define what counts as a popup window
-(defun sb/popup-window-p (window)
-  "Return non-nil if WINDOW is a popup (side-window or marked)."
-  (or
-   (window-parameter window 'window-side) ; side-window (display-buffer-in-side-window)
-   (window-parameter window 'popup))) ; manually marked
-
-;; Close all popup windows
-(defun sb/close-popups ()
-  "Close all popup windows."
-  (interactive)
-  (dolist (win (window-list))
-    (when (sb/popup-window-p win)
-      (delete-window win))))
-
-;; C-g: first close popups, else normal quit
-(defun sb/keyboard-quit-dwim ()
-  "Quit popups if any, otherwise run `keyboard-quit`."
-  (interactive)
-  (if (cl-some #'sb/popup-window-p (window-list))
-      (sb/close-popups)
-    (keyboard-quit)))
-
-;; (defun sb/keyboard-quit-dwim ()
-;;   "Quit active popup/window or just call `keyboard-quit`."
-;;   (interactive)
-;;   (if (window-parameter nil 'window-side)
-;;       (delete-window)
-;;     (keyboard-quit)))
-
-(bind-key "C-g" #'sb/keyboard-quit-dwim)
-
-(setopt display-buffer-alist
-        '(("\\*helpful.*\\*" ; Helpful buffers
-           (display-buffer-in-side-window)
-           (side . bottom)
-           (slot . 0)
-           (window-height . 0.5)
-           (window-parameters . ((no-delete-other-windows . t))))
-          ("\\*compilation\\*" ; Compilation
-           (display-buffer-in-side-window)
-           (side . bottom)
-           (slot . 1)
-           (window-height . 0.5))
-          ("\\*EGLOT workspace configuration\\*"
-           (display-buffer-in-side-window)
-           (side . bottom)
-           (slot . 2)
-           (window-height . 0.5))))
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
@@ -940,11 +889,12 @@ The provider is `nerd-icons'."
   (unless (> emacs-major-version 27)
     (setopt dired-bind-jump t))
 
-  ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  ;; Remove 'Omit' from the modeline.
-  (advice-add
-   'dired-omit-startup
-   :after (lambda () (diminish 'dired-omit-mode))))
+  ;; ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
+  ;; ;; Remove 'Omit' from the modeline.
+  ;; (advice-add
+  ;;  'dired-omit-startup
+  ;;  :after (lambda () (diminish 'dired-omit-mode)))
+  )
 
 (use-package dired-narrow
   :after dired
@@ -979,7 +929,7 @@ The provider is `nerd-icons'."
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
    :map
-   project-prefix-map
+   project-prefix-map ; "C-x p"
    ("f" . project-or-external-find-file)
    ("b" . project-switch-to-buffer)
    ("c" . project-compile)
@@ -4850,13 +4800,14 @@ Shows both colors when errors and warnings are present."
       :json-false
       :dialect "American")))
 
-  (setq-default completion-category-overrides
-                '((eglot (styles hotfuzz basic substring orderless))
-                  (eglot-capf (styles hotfuzz orderless))))
+  ;; (setq-default completion-category-overrides
+  ;;               '((eglot (styles hotfuzz basic substring orderless))
+  ;;                 (eglot-capf (styles hotfuzz orderless))))
 
-  (with-eval-after-load 'project
-    (bind-key
-     "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map)))
+  ;; (with-eval-after-load 'project
+  ;;   (bind-key
+  ;;    "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map))
+  )
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
@@ -5071,6 +5022,29 @@ or the major mode is not in `sb/skippable-modes'."
           (if this-win-2nd
               (other-window 1))))))
 
+;; Define what counts as a popup window
+(defun sb/popup-window-p (window)
+  "Return non-nil if WINDOW is a popup (side-window or marked)."
+  (or
+   (window-parameter window 'window-side) ; side-window (display-buffer-in-side-window)
+   (window-parameter window 'popup))) ; manually marked
+
+;; Close all popup windows
+(defun sb/close-popups ()
+  "Close all popup windows."
+  (interactive)
+  (dolist (win (window-list))
+    (when (sb/popup-window-p win)
+      (delete-window win))))
+
+;; C-g: first close popups, else normal quit
+(defun sb/keyboard-quit-dwim ()
+  "Quit popups if any, otherwise run `keyboard-quit`."
+  (interactive)
+  (if (cl-some #'sb/popup-window-p (window-list))
+      (sb/close-popups)
+    (keyboard-quit)))
+
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
@@ -5087,7 +5061,8 @@ or the major mode is not in `sb/skippable-modes'."
  ("M-<left>" . sb/previous-buffer)
  ("M-<right>" . sb/next-buffer)
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
- ("C-<tab>" . sb/next-buffer))
+ ("C-<tab>" . sb/next-buffer)
+ ("C-g" . sb/keyboard-quit-dwim))
 
 ;; ;; Make ESC quit everything
 ;; ;; Clear any previous ESC settings
@@ -5265,8 +5240,10 @@ or the major mode is not in `sb/skippable-modes'."
    [["Utilities"
      ("s" "Sudo edit" crux-sudo-edit)
      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
-     ("w" "Whitespace" whitespace-mode)
-     ("m" "Describe major mode" discover-my-mode)
+     ("w" "Toggle Whitespace" whitespace-mode)
+     ("m" "Describe major mode" discover-my-mode)]
+    ["Buffers"
+     ("c" "*scratch*" scratch-buffer)
      ("v" "View echo-area messages" view-echo-area-messages)
      ("l" "View *Messages*"
       (lambda ()
@@ -5411,7 +5388,10 @@ or the major mode is not in `sb/skippable-modes'."
     ["Expressions"
      ;; ("u" "Up list" treesit-up-list)
      ;; ("d" "Down list" treesit-down-list)
-     ("f" "Forward sexp" treesit-forward-sexp)]])
+     ("f" "Forward sexp" treesit-forward-sexp)]
+    ["Flycheck"
+     ("n" "Next error" next-error)
+     ("p" "Previous error" previous-error)]])
   (bind-key "C-c n" #'sb/navigation-transient)
 
   (transient-define-prefix

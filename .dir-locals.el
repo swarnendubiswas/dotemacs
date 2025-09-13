@@ -85,6 +85,8 @@
                  (file-name-nondirectory (buffer-name)) "setup_environment"))
            (sh-mode)))))
 
+ (diff-mode . ((mode . whitespace)))
+ 
  (dired-mode
   .
   ((dired-omit-mode . t)
