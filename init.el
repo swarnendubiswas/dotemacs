@@ -4093,6 +4093,9 @@ Fallback to `xref-go-back'."
       "--extras=*"
       "--recurse")
     " "))
+  ;; Add Elisp to the backend lists.
+  (citre-find-definition-backends '(elisp eglot tags global))
+  (citre-find-reference-backends '(elisp eglot global))
   :config
   (setq-default
    citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
@@ -4107,9 +4110,6 @@ Fallback to `xref-go-back'."
      (lambda () (derived-mode-p 'emacs-lisp-mode))))
   ;; Register the backend, which means to bind it with the symbol `elisp'.
   (citre-register-backend 'elisp citre-elisp-backend)
-  ;; Add Elisp to the backend lists.
-  (setopt citre-find-definition-backends '(elisp eglot tags global))
-  (setopt citre-find-reference-backends '(elisp eglot global))
 
   ;; Integrate with `lsp-mode' and `eglot'
   (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
@@ -4125,20 +4125,16 @@ Fallback to `xref-go-back'."
   (defun sb/push-point-to-xref-marker-stack (&rest r)
     (xref-push-marker-stack (point-marker)))
 
-  (advice-add
-   'xref-find-definitions
-   :before #'sb/push-point-to-xref-marker-stack)
-  (advice-add
-   'xref-find-references
-   :before #'sb/push-point-to-xref-marker-stack)
-
   (dolist (func
-           '(find-function consult-imenu
-                           project-grep
-                           deadgrep
-                           counsel-rg
-                           consult-lsp-file-symbols
-                           citre-jump))
+           '(xref-find-definitions
+             xref-find-references
+             find-function
+             consult-imenu
+             project-grep
+             deadgrep
+             counsel-rg
+             consult-lsp-file-symbols
+             citre-jump))
     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
   :diminish)
 
