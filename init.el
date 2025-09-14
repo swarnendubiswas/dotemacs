@@ -135,7 +135,7 @@ The provider is `nerd-icons'."
 
 (elpaca-wait)
 
-;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient. 
+;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient.
 (use-package exec-path-from-shell
   ;; Emacs launched in the terminal gets to see $PATH.
   :when (and (eq system-type 'gnu/linux) (display-graphic-p))
@@ -1313,7 +1313,7 @@ The provider is `nerd-icons'."
 (use-package change-inner
   :commands (change-inner change-outer))
 
-;; Mark current line. 
+;; Mark current line.
 (use-package expand-line
   :bind ("M-i" . expand-line-mark-line)
   :diminish)
@@ -1429,9 +1429,9 @@ The provider is `nerd-icons'."
    . colorful-mode)
   :diminish)
 
-;; LATER: The parenthesis faces are wrongly highlighted
-;; (use-package rainbow-delimiters
-;;   :hook ((prog-mode LaTeX-mode org-src-mode) . rainbow-delimiters-mode))
+;; Parsing parentheses for `LaTeX-mode' is difficult.
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -1881,10 +1881,10 @@ The provider is `nerd-icons'."
   :custom
   (hippie-expand-try-functions-list
    '(try-expand-dabbrev ; current buffer
-     try-expand-dabbrev-all-buffers ; any buffer 
-     try-complete-file-name-partially ; partial path 
+     try-expand-dabbrev-all-buffers ; any buffer
+     try-complete-file-name-partially ; partial path
      try-expand-dabbrev-from-kill ; recent kills
-     try-complete-file-name ; full path 
+     try-complete-file-name ; full path
      try-complete-lisp-symbol-partially
      try-complete-lisp-symbol
      try-expand-all-abbrevs
@@ -2212,7 +2212,7 @@ The provider is `nerd-icons'."
     ;;              :icon "symbol-text_size"
     ;;              :face font-lock-builtin-face
     ;;              :collection "nerd-fonts-codicons")))
-    ;; 
+    ;;
 
     (setopt kind-icon-mapping
             `((array
@@ -2599,7 +2599,7 @@ DIR can be relative or absolute."
   (defun sb/company-latex-mode-separate ()
     (setq-local
      company-backends
-     '(company-files ; Have files first to allow completing paths 
+     '(company-files ; Have files first to allow completing paths
        (:separate
         company-capf
         company-reftex-citations ; will trigger inside \cite{}
@@ -2645,7 +2645,7 @@ DIR can be relative or absolute."
      (make-local-variable 'company-backends)
      '(company-files (company-dict company-ispell) company-dabbrev)))
 
-  ;; Extends to derived modes like `markdown-mode' 
+  ;; Extends to derived modes like `markdown-mode'
   (add-hook
    'text-mode-hook
    (lambda ()
@@ -2799,7 +2799,9 @@ DIR can be relative or absolute."
      (lambda ()
        (setq completion-at-point-functions
              (list
-              (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'cape-dict
+              (cape-capf-inside-string #'cape-file)
+              #'yasnippet-capf
+              #'cape-dict
               (cape-capf-buster #'cape-dabbrev))))))
 
   (add-hook
@@ -2808,7 +2810,9 @@ DIR can be relative or absolute."
      (setq-local completion-at-point-functions
                  (list
                   (cape-capf-inside-string #'cape-file)
-                  #'yasnippet-capf #'cape-elisp-block #'cape-dict
+                  #'yasnippet-capf
+                  #'cape-elisp-block
+                  #'cape-dict
                   (cape-capf-buster #'cape-dabbrev)))))
 
   (add-hook
@@ -3509,34 +3513,23 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
 
-(defun sb/indent-elisp-buffer ()
-  "Indent the current Emacs Lisp buffer."
-  (interactive)
-  (when (derived-mode-p 'emacs-lisp-mode)
-    (indent-region (point-min) (point-max))))
-
 (use-package lisp-mode
   :ensure nil
-  :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode)
-  :hook
-  (lisp-data-mode
-   .
-   (lambda ()
-     (when buffer-file-name
-       (add-hook 'after-save-hook #'check-parens nil t)))))
+  :mode ("\\.dir-locals\\(?:-2\\)?\\.el\\'" . lisp-data-mode))
 
 (use-package elisp-mode
   :ensure nil
-  :mode ("\\.el\\'" . emacs-lisp-mode)
-  :hook
-  (emacs-lisp-mode
-   .
+  :mode ("\\.el\\'" . emacs-lisp-mode))
+
+(dolist (hook '(lisp-data-mode-hook emacs-lisp-mode-hook))
+  (add-hook
+   hook
    (lambda ()
      (when buffer-file-name
        (add-hook 'after-save-hook #'check-parens nil t)))))
 
 (use-package ini-mode
-  :commands (ini-mode))
+  :commands ini-mode)
 
 (use-package conf-mode
   :ensure nil
@@ -4592,7 +4585,8 @@ Shows both colors when errors and warnings are present."
      ;; `harper-ls' is more efficient than `ltex-ls-plus'
      ((LaTeX-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      ((text-mode org-mode)
-      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+      .
+      ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
       . ("autotools-language-server"))
      (fish-mode . ("fish-lsp" "start"))
@@ -4785,7 +4779,8 @@ Shows both colors when errors and warnings are present."
        :UnclosedQuotes t
        :WrongQuotes
        :json-false
-       :LongSentences :json-false
+       :LongSentences
+       :json-false
        :RepeatedWords t
        :Spaces t
        :Matcher t
@@ -5215,7 +5210,7 @@ or the major mode is not in `sb/skippable-modes'."
      ;; of Isearch, the command allows you to pick a string from the history and
      ;; starts a new Isearch.
      ("h" "Consult isearch history" consult-isearch-history)]
-    ["Occur" ("o" "occur" isearch-occur :transient nil)]
+    ["Occur" ("o" "occur" occur :transient nil)]
     ["Other tools"
      ("d" "Deadgrep" deadgrep)
      ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
@@ -5297,7 +5292,7 @@ or the major mode is not in `sb/skippable-modes'."
        ("d" "Find declaration" lsp-find-declaration)
        ("e" "Find definition" lsp-find-definition)
        ("i" "Find implementation" lsp-find-implementation)
-       ("r" "Find references" lsp-find-references)
+       ("c" "Find references" lsp-find-references)
        ("I" "Go to implementation" lsp-goto-implementation)
        ("t" "Go to type definition" lsp-goto-type-definition)]
       ["Code actions"
@@ -5386,7 +5381,7 @@ or the major mode is not in `sb/skippable-modes'."
     ["Expressions"
      ;; ("u" "Up list" treesit-up-list)
      ;; ("d" "Down list" treesit-down-list)
-     ("f" "Forward sexp" treesit-forward-sexp)]
+     ("F" "Forward sexp" treesit-forward-sexp)]
     ["Flycheck"
      ("n" "Next error" next-error)
      ("p" "Previous error" previous-error)]])
