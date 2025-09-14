@@ -182,7 +182,7 @@ The provider is `nerd-icons'."
    ("<f2>" . find-file)
    ("<f7>" . previous-error) ; "M-g p" is the default keybinding
    ("<f8>" . next-error) ; "M-g n" is the default keybinding
-   ("C-l" . goto-line)
+   ("C-l" . goto-line) ; "M-g l" is the default keybinding
    ("C-c z" . repeat) ; Repeat the last command
    ("C-z" . undo)
    ;; In a line with comments, "C-u M-;" removes the comments altogether. That
@@ -298,6 +298,7 @@ The provider is `nerd-icons'."
   (imenu-auto-rescan t)
   (imenu-use-popup-menu nil)
   (save-silently t)
+  (show-paren-when-point-inside-paren t)
   :config
   (dolist (exts
            '(".aux"
@@ -2798,8 +2799,7 @@ DIR can be relative or absolute."
      (lambda ()
        (setq completion-at-point-functions
              (list
-              (cape-capf-inside-string #'cape-file)
-              #'cape-dict
+              (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'cape-dict
               (cape-capf-buster #'cape-dabbrev))))))
 
   (add-hook
@@ -2808,23 +2808,21 @@ DIR can be relative or absolute."
      (setq-local completion-at-point-functions
                  (list
                   (cape-capf-inside-string #'cape-file)
-                  #'cape-elisp-block
-                  #'cape-dict
-                  (cape-capf-buster #'cape-dabbrev)
-                  #'yasnippet-capf))))
+                  #'yasnippet-capf #'cape-elisp-block #'cape-dict
+                  (cape-capf-buster #'cape-dabbrev)))))
 
   (add-hook
    'prog-mode-hook
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
+                  #'yasnippet-capf
                   (cape-capf-inside-code
                    (cape-capf-super
                     #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
                   (cape-capf-inside-string #'cape-file)
-                  (cape-capf-buster #'cape-dabbrev)
-                  #'yasnippet-capf))))
+                  (cape-capf-buster #'cape-dabbrev)))))
 
   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
     (add-hook
@@ -2833,7 +2831,7 @@ DIR can be relative or absolute."
        (setq-local
         completion-at-point-functions
         (list
-         (cape-capf-inside-string #'cape-file) #'citar-capf
+         (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'citar-capf
          (cape-capf-super
           ;; Math latex tags
           (cape-company-to-capf #'company-math-symbols-latex)
@@ -2847,7 +2845,7 @@ DIR can be relative or absolute."
           (cape-company-to-capf #'company-auctex-symbols)
           ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
           #'cape-tex)
-         #'cape-dict (cape-capf-buster #'cape-dabbrev) #'yasnippet-capf)))))
+         #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2855,13 +2853,13 @@ DIR can be relative or absolute."
      (lambda ()
        (setq-local completion-at-point-functions
                    (list
+                    (cape-capf-inside-string #'cape-file)
+                    #'yasnippet-capf
                     (cape-capf-inside-code
                      (cape-capf-nonexclusive #'elisp-completion-at-point))
                     (cape-capf-inside-code #'cape-elisp-symbol)
-                    (cape-capf-inside-string #'cape-file)
                     (cape-capf-inside-comment #'cape-dict)
-                    (cape-capf-buster #'cape-dabbrev)
-                    #'yasnippet-capf)))))
+                    (cape-capf-buster #'cape-dabbrev))))))
 
   ;; (dolist (hook
   ;;          '(bash-ts-mode-hook
@@ -4046,6 +4044,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   ;; (setq-default TeX-command-default "LaTexMk")
 ;;   (auctex-latexmk-setup))
 
+;; Insert an environment with "C-c {". For a full list of environment abbreviations, use `C-c ?'.
+(use-package cdlatex
+  :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
+  :diminish)
+
 (use-package citre
   :preface
   (defun sb/jump-citre-xref ()
@@ -4586,15 +4589,15 @@ Shows both colors when errors and warnings are present."
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-     ((org-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      ;; `harper-ls' is more efficient than `ltex-ls-plus'
-     (text-mode
+     ((LaTeX-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
+     ((text-mode org-mode)
       . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
       . ("autotools-language-server"))
      (fish-mode . ("fish-lsp" "start"))
      ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
-     ((c++-mode c++-ts-mode c-mode c-ts-mode)
+     ((c-mode c-ts-mode c++-mode c++-ts-mode c-or-c++-ts-mode c-or-c++-mode)
       .
       ("clangd"
        "-j=4"
@@ -4782,13 +4785,12 @@ Shows both colors when errors and warnings are present."
        :UnclosedQuotes t
        :WrongQuotes
        :json-false
-       :LongSentences t
+       :LongSentences :json-false
        :RepeatedWords t
        :Spaces t
        :Matcher t
        :CorrectNumberSuffix t
-       :SentenceCapitalization
-       :json-false)
+       :SentenceCapitalization t)
       :codeActions (:ForceStable :json-false)
       :diagnosticSeverity "hint"
       :markdown (:IgnoreLinkTitle :json-false)
