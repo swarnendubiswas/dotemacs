@@ -77,7 +77,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot because it seems Texlab is inefficient.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -698,6 +698,13 @@ The provider is `nerd-icons'."
   :config
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
+
+;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+(use-package vlf
+  :commands vlf
+  :init
+  (setopt vlf-application 'dont-ask)
+  (require 'vlf-setup))
 
 (use-package immortal-scratch
   :hook (elpaca-after-init . immortal-scratch-mode))
@@ -2327,8 +2334,7 @@ The provider is `nerd-icons'."
       (setopt company-format-margin-function #'sb/company-kind-icon-margin))))
 
 ;; Use "M-x company-diag" or the modeline status (without diminish) to see the
-;; backend used for the last completion. Use "C-M-i" for `complete-symbol' with
-;; regex search.
+;; backend used for the last completion.
 (use-package company
   :when (eq sb/in-buffer-completion 'company)
   :hook (elpaca-after-init . global-company-mode)
@@ -2396,6 +2402,7 @@ The provider is `nerd-icons'."
   ;; (company-require-match nil)
   ;; (company-insertion-triggers '())
   (company-tooltip-align-annotations (display-graphic-p))
+  ;; Avoid shrinking the company popup
   (company-tooltip-width-grow-only t)
   :config
   (unless (bound-and-true-p sb/enable-icons)
@@ -3121,8 +3128,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    (concat
     "file://"
     (file-truename (locate-user-emacs-file "servers/eclipse-formatter.xml"))))
-  (lsp-java-jdt-download-url
-   "https://github.com/eclipse-jdtls/eclipse.jdt.ls/archive/refs/tags/v1.47.0.tar.gz"))
+  ;; Provide my own installation which Eglot can also use
+  (lsp-java-server-install-dir (file-truename (locate-user-emacs-file  "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
   :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
@@ -4312,7 +4319,7 @@ Shows both colors when errors and warnings are present."
   :custom
   (doom-modeline-buffer-encoding nil)
   (doom-modeline-unicode-fallback t)
-  ;; LSP state is wrong for non-LSP-managed files
+  ;; Wrong LSP state is shown for non-LSP-managed files
   (doom-modeline-lsp nil)
   (doom-modeline-minor-modes t)
   :config
@@ -4572,9 +4579,7 @@ Shows both colors when errors and warnings are present."
      :executeCommandProvider
      :documentLinkProvider))
   (eglot-report-progress nil)
-  (eglot-mode-line-format
-   '(eglot-mode-line-session
-     eglot-mode-line-error eglot-mode-line-action-suggestion))
+  (eglot-mode-line-format nil)
   :config
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
@@ -4582,7 +4587,7 @@ Shows both colors when errors and warnings are present."
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-     ;; `harper-ls' is more efficient than `ltex-ls-plus'
+     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' or `markdown-mode' yet
      ((LaTeX-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
      ((text-mode org-mode)
       .
@@ -4627,7 +4632,9 @@ Shows both colors when errors and warnings are present."
      ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
      ;; Download the source from
      ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
-     ;; clean verify -DskipTests=true".
+     ;; clean verify -U -DskipTests=true". Change the url in
+     ;; "org.eclipse.jdt.ls.target/org.eclipse.jdt.ls.tp.target" if there is a
+     ;; "No repository found" error.
      ((java-mode java-ts-mode)
       .
       ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
