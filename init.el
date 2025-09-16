@@ -255,6 +255,7 @@ The provider is `nerd-icons'."
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp
    (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
+  ;; FIXME: Move helpful and eglot entries to their respective packages.
   (display-buffer-alist
    '(
      ;; Allow *Help* buffers to use the full frame
@@ -1345,7 +1346,7 @@ The provider is `nerd-icons'."
    ("M-g t" . dogears-list))
   :custom
   (dogears-message nil)
-  (dogears-idle 2)
+  (dogears-idle 0.5)
   (dogears-hooks
    '(imenu-after-jump-hook
      xref-after-jump-hook
@@ -1356,12 +1357,21 @@ The provider is `nerd-icons'."
      bookmark-after-jump-hook))
   (dogears-functions '(avy-goto-char-timer avy-goto-line))
   :config
-  (add-to-list 'dogears-ignore-modes 'elpaca-log-mode)
-  (add-to-list 'dogears-ignore-modes 'messages-buffer-mode)
+  (dolist (mode '(elpaca-log-mode messages-buffer-mode))
+    (add-to-list 'dogears-ignore-modes mode))
   (with-eval-after-load 'git-commit
     (add-to-list 'dogears-ignore-modes 'git-commit-mode))
   (with-eval-after-load 'magit-status
-    (add-to-list 'dogears-ignore-modes 'magit-status-mode)))
+    (add-to-list 'dogears-ignore-modes 'magit-status-mode))
+
+  (add-to-list 'display-buffer-alist
+             '("\\*Dogears List\\*"
+               (display-buffer-same-window)   ; open in same window
+               (inhibit-same-window . nil)    ; allow reuse
+               (inhibit-switch-frame . nil)   ; allow switching frames
+               (window-parameters . ((no-other-window . t)))
+               ;; Make it full-frame
+               (body-function . delete-other-windows))))
 
 ;; (use-package gumshoe
 ;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
@@ -2971,7 +2981,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-enable-on-type-formatting nil "Reduce unexpected modifications to code")
   (lsp-enable-folding nil "I do not find the feature useful")
   (lsp-headerline-breadcrumb-enable nil)
-  ;; (lsp-enable-file-watchers nil "Avoid watcher warnings")
+  (lsp-enable-file-watchers nil "Avoid watcher warnings and slowdown")
   (lsp-lens-enable nil "Lenses are distracting")
   ;; Disable highlighting references of the symbol at point. I use
   ;; `symbol-overlay' to include languages that do not have a language server.
@@ -3129,7 +3139,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     "file://"
     (file-truename (locate-user-emacs-file "servers/eclipse-formatter.xml"))))
   ;; Provide my own installation which Eglot can also use
-  (lsp-java-server-install-dir (file-truename (locate-user-emacs-file  "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
+  (lsp-java-server-install-dir
+   (file-truename
+    (locate-user-emacs-file
+     "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
   :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
@@ -3178,7 +3191,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pyright-python-executable-cmd "python3"))
 
 (use-package hl-todo
-  :hook (elpaca-after-init . hl-todo-mode)
+  :hook (elpaca-after-init . global-hl-todo-mode)
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :config
   (setopt
@@ -3535,6 +3548,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (when buffer-file-name
        (add-hook 'after-save-hook #'check-parens nil t)))))
 
+(use-package semel
+  :ensure (:host github :repo "eshelyaron/semel")
+  :hook ((emacs-lisp-mode lisp-data-mode) . semel-mode))
+
 (use-package ini-mode
   :commands ini-mode)
 
@@ -3593,11 +3610,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     (when (boundp 'html-ts-mode-map)
       (unbind-key "M-o" html-ts-mode-map))))
 
-(use-package emmet-mode
-  :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-  :custom
-  (emmet-move-cursor-between-quote t)
-  (emmet-self-closing-tag-style " /"))
+;; (use-package emmet-mode
+;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
+;;   :custom
+;;   (emmet-move-cursor-between-quote t)
+;;   (emmet-self-closing-tag-style " /"))
 
 (use-package css-mode
   :ensure nil
@@ -3639,16 +3656,15 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; More shortcuts: https://jblevins.org/projects/markdown-mode/
 (use-package markdown-mode
+  :preface
+  (defun sb/markdown-setup ()
+    ;; Auto-pair backticks
+    (sb/add-pairs '((?` . ?`)))
+    (when (eq sb/lsp-provider 'lsp-mode)
+      (require 'lsp-marksman))
+    (sb/setup-lsp-provider))
   :mode ("README\\.md\\'" . gfm-mode)
-  :hook
-  (markdown-mode
-   .
-   (lambda ()
-     ;; Auto-pair backticks
-     (sb/add-pairs '((?` . ?`)))
-     (when (eq sb/lsp-provider 'lsp-mode)
-       (require 'lsp-marksman))
-     (sb/setup-lsp-provider)))
+  :hook (markdown-mode . sb/markdown-setup)
   :bind
   (:map
    markdown-mode-map
@@ -3675,18 +3691,17 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :diminish)
 
 (use-package nxml-mode
+  :preface
+  (defun sb/nxml-setup ()
+    ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
+    ;; checking.
+    (jinx-mode -1)
+    (when (eq sb/lsp-provider 'lsp-mode)
+      (setq-local lsp-disabled-clients '(ltex-ls-plus)))
+    (sb/setup-lsp-provider))
   :ensure nil
   :mode ("\\.xml\\'" "\\.xsd\\'" "\\.xslt\\'" "\\.pom\\'" "\\.drawio\\'")
-  :hook
-  (nxml-mode
-   .
-   (lambda ()
-     ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
-     ;; checking.
-     (jinx-mode -1)
-     (when (eq sb/lsp-provider 'lsp-mode)
-       (setq-local lsp-disabled-clients '(ltex-ls-plus)))
-     (sb/setup-lsp-provider)))
+  :hook (nxml-mode . sb/nxml-setup)
   :custom
   (nxml-auto-insert-xml-declaration-flag t)
   (nxml-slash-auto-complete-flag t)
@@ -3694,19 +3709,18 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :config (fset 'xml-mode 'nxml-mode))
 
 (use-package json-mode
+  :preface
+  (defun sb/json-setup ()
+    (setq-local js-indent-level 2)
+    (sb/setup-lsp-provider))
   :mode
   (("pyrightconfig\\.json\\'" . jsonc-mode)
-   ("\\.json\\'" . json-ts-mode)
    (".*/vscode/settings.json\\'" . jsonc-mode)
    (".*/\\.vscode/settings.json\\'" . jsonc-mode)
    ("User/settings\\.json\\'" . jsonc-mode)
-   ("\\.htmlhintrc\\'" . json-mode))
-  :hook
-  ((json-mode json-ts-mode jsonc-mode)
-   .
-   (lambda ()
-     (setq-local js-indent-level 2)
-     (sb/setup-lsp-provider))))
+   ("\\.htmlhintrc\\'" . json-mode)
+   ("\\.json\\'" . json-ts-mode))
+  :hook ((json-mode json-ts-mode jsonc-mode) . sb/json-setup))
 
 ;; Links in org-mode by default are displayed as "descriptive" links, meaning
 ;; they hide their target URLs. While this looks great, it makes it a bit tricky
