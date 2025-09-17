@@ -260,12 +260,6 @@ The provider is `nerd-icons'."
    '(
      ;; Allow *Help* buffers to use the full frame
      ("*Help*" (display-buffer-same-window))
-     ("\\*helpful.*\\*" ; Helpful buffers
-      (display-buffer-in-side-window)
-      (side . bottom)
-      (slot . 0)
-      (window-height . 0.5)
-      (window-parameters . ((no-delete-other-windows . t))))
      ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
       (display-buffer-no-window)
       (allow-no-window . t))
@@ -273,11 +267,6 @@ The provider is `nerd-icons'."
       (display-buffer-in-side-window)
       (side . bottom)
       (slot . 1)
-      (window-height . 0.5))
-     ("\\*EGLOT workspace configuration\\*"
-      (display-buffer-in-side-window)
-      (side . bottom)
-      (slot . 2)
       (window-height . 0.5))))
   (scroll-preserve-screen-position t)
   ;; Number of lines of margin at the top and bottom of a window when automatic scrolling is triggered
@@ -1298,7 +1287,16 @@ The provider is `nerd-icons'."
    ([remap describe-symbol] . helpful-symbol) ; "C-h o"
    ([remap describe-key] . helpful-key) ; "C-h k"
    ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
-   :map helpful-mode-map ("q" . helpful-kill-buffers)))
+   :map helpful-mode-map ("q" . helpful-kill-buffers))
+  :config
+  (add-to-list
+   'display-buffer-alist
+   '("\\*helpful.*\\*"
+     (display-buffer-in-side-window)
+     (side . bottom)
+     (slot . 0)
+     (window-height . 0.5)
+     (window-parameters . ((no-delete-other-windows . t))))))
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
@@ -1364,14 +1362,15 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'magit-status
     (add-to-list 'dogears-ignore-modes 'magit-status-mode))
 
-  (add-to-list 'display-buffer-alist
-             '("\\*Dogears List\\*"
-               (display-buffer-same-window)   ; open in same window
-               (inhibit-same-window . nil)    ; allow reuse
-               (inhibit-switch-frame . nil)   ; allow switching frames
-               (window-parameters . ((no-other-window . t)))
-               ;; Make it full-frame
-               (body-function . delete-other-windows))))
+  (add-to-list
+   'display-buffer-alist
+   '("\\*Dogears List\\*"
+     (display-buffer-same-window) ; open in same window
+     (inhibit-same-window . nil) ; allow reuse
+     (inhibit-switch-frame . nil) ; allow switching frames
+     (window-parameters . ((no-other-window . t)))
+     ;; Make it full-frame
+     (body-function . delete-other-windows))))
 
 ;; (use-package gumshoe
 ;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
@@ -3428,6 +3427,50 @@ Uses `eglot` or `lsp-mode` depending on configuration."
        (setq-local lsp-disabled-clients '(ltex-ls-plus)))
      (sb/setup-lsp-provider))))
 
+(use-package doxymacs
+  :ensure (:host github :repo "pniedzielski/doxymacs")
+  :hook (c-mode-common-hook . doxymacs-mode)
+  :bind
+  (:map
+   c-mode-base-map
+   ;; Lookup documentation for the symbol at point.
+   ("C-c d ?" . doxymacs-lookup)
+   ;; Rescan your Doxygen tags file.
+   ("C-c d r" . doxymacs-rescan-tags)
+   ;; Prompt you for a Doxygen command to enter, and its
+   ;; arguments.
+   ("C-c d RET" . doxymacs-insert-command)
+   ;; Insert a Doxygen comment for the next function.
+   ("C-c d f" . doxymacs-insert-function-comment)
+   ;; Insert a Doxygen comment for the current file.
+   ("C-c d i" . doxymacs-insert-file-comment)
+   ;; Insert a Doxygen comment for the current member.
+   ("C-c d ;" . doxymacs-insert-member-comment)
+   ;; Insert a blank multi-line Doxygen comment.
+   ("C-c d m" . doxymacs-insert-blank-multiline-comment)
+   ;; Insert a blank single-line Doxygen comment.
+   ("C-c d s" . doxymacs-insert-blank-singleline-comment)
+   ;; Insert a grouping comments around the current region.
+   ("C-c d @" . doxymacs-insert-grouping-comments))
+  ;; :custom
+  ;;   ;; Configure source code <-> Doxygen tag file <-> Doxygen HTML
+  ;;   ;; documentation mapping:
+  ;;   ;;   - Files in /home/me/project/foo/ have their tag file at
+  ;;   ;;     http://someplace.com/doc/foo/foo.xml, and HTML documentation
+  ;;   ;;     at http://someplace.com/doc/foo/.
+  ;;   ;;   - Files in /home/me/project/bar/ have their tag file at
+  ;;   ;;     ~/project/bar/doc/bar.xml, and HTML documentation at
+  ;;   ;;     file:///home/me/project/bar/doc/.
+  ;;   ;; This must be configured for Doxymacs to function!
+  ;;   (doxymacs-doxygen-dirs
+  ;;    '(("^/home/me/project/foo/"
+  ;;       "http://someplace.com/doc/foo/foo.xml"
+  ;;        "http://someplace.com/doc/foo/")
+  ;;      ("^/home/me/project/bar/"
+  ;;       "~/project/bar/doc/bar.xml"
+  ;;       "file:///home/me/project/bar/doc/")))
+  )
+
 (use-package python
   :ensure nil
   :mode
@@ -4116,7 +4159,7 @@ Fallback to `xref-go-back'."
   :config
   (setq-default
    citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
-   citre-enable-capf-integration nil)
+   citre-enable-capf-integration t)
 
   ;; Use `citre' with Emacs Lisp
   (defvar citre-elisp-backend
@@ -4821,7 +4864,14 @@ Shows both colors when errors and warnings are present."
   ;; (with-eval-after-load 'project
   ;;   (bind-key
   ;;    "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map))
-  )
+
+  (add-to-list
+   'display-buffer-alist
+   '("\\*EGLOT workspace configuration\\*"
+     (display-buffer-in-side-window)
+     (side . bottom)
+     (slot . 2)
+     (window-height . 0.5))))
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
