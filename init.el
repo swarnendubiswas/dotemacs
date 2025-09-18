@@ -255,7 +255,6 @@ The provider is `nerd-icons'."
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp
    (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
-  ;; FIXME: Move helpful and eglot entries to their respective packages.
   (display-buffer-alist
    '(
      ;; Allow *Help* buffers to use the full frame
@@ -2634,6 +2633,7 @@ DIR can be relative or absolute."
     "Company backends optimized for LaTeX."
     (setq-local company-backends
                 '(company-files
+                  (company-capf :with company-yasnippet)
                   ;; References & labels
                   (company-reftex-citations
                    company-reftex-labels company-auctex-labels)
@@ -4159,7 +4159,8 @@ Fallback to `xref-go-back'."
   :config
   (setq-default
    citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
-   citre-enable-capf-integration t)
+   ;; Large tags file slows down completion
+   citre-enable-capf-integration nil)
 
   ;; Use `citre' with Emacs Lisp
   (defvar citre-elisp-backend
@@ -4724,11 +4725,8 @@ Shows both colors when errors and warnings are present."
   ;; FIXME: `eglot-workspace-configuration' should be set as a directory-local
   ;; variable, but it is not working for me.
 
-  ;; https://gist.github.com/doolio/8c1768ebf33c483e6d26e5205896217f
-  ;; https://paste.sr.ht/~meow_king/df83c4dd8541e54befe511ddaf0eeee7cb59eaba
-
-  ;; :json-false is the correct way to send false to LSP servers (instead of nil,
-  ;; which would remove the key).
+  ;; `:json-false' is the correct way to send false to LSP servers instead of
+  ;; nil, which would remove the key.
   (setq-default
    eglot-workspace-configuration
    '(:pylsp
@@ -4775,7 +4773,8 @@ Shows both colors when errors and warnings are present."
        :pycodestyle (:enabled :json-false)
        :pydocstyle (:enabled :json-false)
        :pyflakes (:enabled :json-false)
-       :pylint (:args [] :enabled t)
+       ;; We use "basedpyright" as the primary server which provides type hints.
+       :pylint (:args [] :enabled :json-false)
        :pylsp_black (:enabled :json-false)
        :pylsp_isort (:enabled t)
        :pylsp_mypy
@@ -4820,7 +4819,7 @@ Shows both colors when errors and warnings are present."
       "en-US"
       :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
       ;; Keep grammar and style checking
-      :additionalRules (:enablePickyRules t :motherTongue "en-In"))
+      :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
      :yaml
      (:format
       (:enable t :singleQuote nil :bracketSpacing t)
@@ -4831,7 +4830,7 @@ Shows both colors when errors and warnings are present."
      ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
      :harper-ls
      (:userDictPath
-      "~/.emacs.d/company-dict/text-mode"
+      (expand-file-name "~/.emacs.d/company-dict/text-mode")
       :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
       :fileDictPath ""
       :linters
