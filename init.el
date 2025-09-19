@@ -17,7 +17,7 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'none
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -27,7 +27,7 @@
   :group 'sb/emacs)
 
 ;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative.
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -2591,6 +2591,9 @@ DIR can be relative or absolute."
   ;; combining it in a single group with :separate, the following code
   ;; forces all listed backends to be queried regardless of what
   ;; `company-capf' returns.
+
+  ;; We can also integrate Citre tags with the capf functionality with
+  ;; `company-capf', but the completion becomes slow.
 
   ;; Always query all the following backends
   (defun sb/company-latex-mode-no-separate ()
