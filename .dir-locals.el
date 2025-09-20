@@ -241,7 +241,13 @@
         :json-false)
        :rope_completion (:eager :json-false :enabled :json-false)
        :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
-       :yapf (:enabled :json-false)
+       :yapf (:based_on_style "pep8"
+        :column_limit 80
+        :enabled :json-false
+        :indent_width 4
+        :split_before_logical_operator t
+        :use_tabs
+        :json-false)
        :rope (:extensionModules nil :ropeFolder nil)))
      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
      ;; LSP configuration for basedpyright.

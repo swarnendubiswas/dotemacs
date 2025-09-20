@@ -17,7 +17,7 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'none
+(defcustom sb/theme 'catppuccin
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -27,7 +27,7 @@
   :group 'sb/emacs)
 
 ;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative.
-(defcustom sb/modeline-theme 'none
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -2691,14 +2691,15 @@ DIR can be relative or absolute."
        (sb/company-c-mode))))
 
   (defun sb/company-prog-mode ()
-    (setq-local company-backends
-                '(company-files
-                  (company-capf
-                   company-keywords
-                   company-dabbrev-code ; Useful for variable names
-                   :with company-yasnippet)
-                  (company-ispell company-dict :with company-yasnippet)
-                  (company-dabbrev :with company-yasnippet))))
+    (setq-local
+     company-backends
+     '(company-files
+       (company-capf
+        company-keywords
+        company-dabbrev-code ; Useful for local (e.g., variable) names
+        :with company-yasnippet)
+       (company-ispell company-dict :with company-yasnippet)
+       (company-dabbrev :with company-yasnippet))))
 
   (add-hook
    'prog-mode-hook
@@ -2709,7 +2710,27 @@ DIR can be relative or absolute."
                  (derived-mode-p 'bison-mode)
                  (derived-mode-p 'cmake-ts-mode))
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-prog-mode)))))
+       (sb/company-prog-mode))))
+
+  ;; `company-capf' is not complete for Elisp. For example, it will not suggest `doom-modeline' but suggests `doom-modeline-mode'. So I need to merge `company-capf' with `company-dabbrev-code'.
+  (defun sb/company-elisp-mode ()
+    "Add backends for `emacs-lisp-mode' completion in company mode."
+    (setq-local
+     company-backends
+     '(company-files
+       (:separate
+        company-capf
+        company-dabbrev-code ; Useful for local (e.g., variable) names
+        :with company-yasnippet)
+       (company-ispell company-dict :with company-yasnippet)
+       (company-dabbrev :with company-yasnippet))))
+
+  (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       (setq-local company-minimum-prefix-length 2)
+       (sb/company-elisp-mode)))))
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
@@ -2953,6 +2974,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-auto-register-remote-clients nil)
   (lsp-keep-workspace-alive nil)
   (lsp-progress-via-spinner nil)
+  (lsp-progress-function 'ignore)
   ;; Increase the delay to allow transient changes and avoid getting flooded with LSP errors.
   (lsp-idle-delay 1.5)
   ;; Avoid annoying questions, we expect a server restart to succeed
