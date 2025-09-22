@@ -486,15 +486,9 @@ The provider is `nerd-icons'."
   (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
   ;; (advice-add 'write-file :around #'sb/inhibit-message-call-orig-fun)
   ;; (advice-add 'save-buffer :around #'sb/inhibit-message-call-orig-fun)
+(advice-add 'basic-save-buffer :around #'sb/inhibit-message-call-orig-fun)
   )
 
-(advice-add
- 'basic-save-buffer
- :around
- (lambda (orig-fun &rest args)
-   (let ((inhibit-message t)
-         (message-log-max nil))
-     (apply orig-fun args))))
 
 (progn
   (defun sb/auto-save-wrapper (save-fn &rest args)
@@ -925,19 +919,19 @@ The provider is `nerd-icons'."
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
-   :map
-   project-prefix-map ; "C-x p"
-   ("f" . project-or-external-find-file)
-   ("b" . project-switch-to-buffer)
-   ("c" . project-compile)
-   ("k" . project-kill-buffers)
-   ("s" . project-find-regexp)
-   ("r" . project-query-replace-regexp))
+   ;; :map
+   ;; project-prefix-map ; "C-x p"
+   ;; ("f" . project-or-external-find-file)
+   ;; ("b" . project-switch-to-buffer)
+   ;; ("c" . project-compile)
+   ;; ("k" . project-kill-buffers)
+   ;; ("s" . project-find-regexp)
+   ;; ("r" . project-query-replace-regexp)
+   )
   :custom
   ;; Start `project-find-file' by default
   (project-switch-commands 'project-find-file)
-  (project-vc-extra-root-markers
-   '(".project" "pyproject.toml" "CMakeLists.txt")))
+  (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
 ;; ;; Allows identifying custom projects with a ".project" file (e.g., ~/Dropbox).
 ;; (use-package project-x
@@ -2770,8 +2764,8 @@ DIR can be relative or absolute."
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-on-exact-match 'show)
-  ;; ;; Do not close popup when adjacent to other characters
-  ;; (corfu-quit-at-boundary nil)
+  ;; Do not close popup when adjacent to other characters
+  (corfu-quit-at-boundary nil)
   :config
   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
   (unless (display-graphic-p)
@@ -2863,7 +2857,8 @@ DIR can be relative or absolute."
                   #'yasnippet-capf
                   (cape-capf-inside-code
                    (cape-capf-super
-                    #'citre-completion-at-point #'cape-keyword #'cape-dabbrev))
+                    ;; #'citre-completion-at-point
+                    #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
                   (cape-capf-inside-string #'cape-file)
                   (cape-capf-buster #'cape-dabbrev)))))
@@ -3372,20 +3367,20 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;             (conf-toml-mode . toml-ts-mode)
 ;;             (yaml-mode . yaml-ts-mode))))
 
-(use-package treesit-auto
-  :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
-  :demand t
-  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-  :custom
-  ;; Increased default font locking may hurt performance
-  (treesit-font-lock-level 4)
-  (treesit-auto-install t)
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all))
+;; (use-package treesit-auto
+;;   :when
+;;   (and (executable-find "tree-sitter")
+;;        (fboundp 'treesit-available-p)
+;;        (treesit-available-p))
+;;   :demand t
+;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+;;   :custom
+;;   ;; Increased default font locking may hurt performance
+;;   (treesit-font-lock-level 4)
+;;   (treesit-auto-install t)
+;;   :config
+;;   (global-treesit-auto-mode 1)
+;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -4131,98 +4126,98 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
   :diminish)
 
-(use-package citre
-  :preface
-  (defun sb/jump-citre-xref ()
-    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
-    (interactive)
-    (condition-case _
-        (citre-jump)
-      (error
-       (let* ((xref-prompt-for-identifier nil))
-         (call-interactively #'xref-find-definitions)))))
+;; (use-package citre
+;;   :preface
+;;   (defun sb/jump-citre-xref ()
+;;     "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
+;;     (interactive)
+;;     (condition-case _
+;;         (citre-jump)
+;;       (error
+;;        (let* ((xref-prompt-for-identifier nil))
+;;          (call-interactively #'xref-find-definitions)))))
 
-  (defun sb/jump-xref-citre ()
-    "Jump to the definition of the symbol at point using `xref-find-definitions' first. Falls back to `citre-jump' on failure."
-    (interactive)
-    (let ((ofn
-           (lambda ()
-             (let* ((xref-prompt-for-identifier nil))
-               (call-interactively #'xref-find-definitions)))))
-      (condition-case _
-          (citre-jump)
-        (error
-         (funcall ofn)))))
+;;   (defun sb/jump-xref-citre ()
+;;     "Jump to the definition of the symbol at point using `xref-find-definitions' first. Falls back to `citre-jump' on failure."
+;;     (interactive)
+;;     (let ((ofn
+;;            (lambda ()
+;;              (let* ((xref-prompt-for-identifier nil))
+;;                (call-interactively #'xref-find-definitions)))))
+;;       (condition-case _
+;;           (citre-jump)
+;;         (error
+;;          (funcall ofn)))))
 
-  (defun sb/jump-back-citre-xref ()
-    "Go back to the position before last `citre-jump'.
-Fallback to `xref-go-back'."
-    (interactive)
-    (condition-case _
-        (citre-jump-back)
-      (error
-       (if (fboundp #'xref-go-back)
-           (call-interactively #'xref-go-back)
-         (call-interactively #'xref-pop-marker-stack)))))
-  :hook ((prog-mode LaTeX-mode) . citre-mode)
-  :bind* (("M-." . sb/jump-xref-citre) ("M-," . sb/jump-back-citre-xref))
-  :custom (citre-default-create-tags-file-location 'in-dir)
-  ;; Add exclude by: --exclude=target or by --exclude=@./.ctagsignore
-  ;; Add dirs/files to scan here, one line per dir/file
-  (citre-ctags-default-options
-   (string-join
-    '("-o %TAGSFILE%"
-      "--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX"
-      "--kinds-all=*"
-      "--fields=*"
-      "--extras=*"
-      "--recurse")
-    " "))
-  ;; Add Elisp to the backend lists.
-  (citre-find-definition-backends '(elisp eglot tags global))
-  (citre-find-reference-backends '(elisp eglot global))
-  :config
-  (setq-default
-   citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
-   ;; Large tags file slows down completion
-   citre-enable-capf-integration nil)
+;;   (defun sb/jump-back-citre-xref ()
+;;     "Go back to the position before last `citre-jump'.
+;; Fallback to `xref-go-back'."
+;;     (interactive)
+;;     (condition-case _
+;;         (citre-jump-back)
+;;       (error
+;;        (if (fboundp #'xref-go-back)
+;;            (call-interactively #'xref-go-back)
+;;          (call-interactively #'xref-pop-marker-stack)))))
+;;   :hook ((prog-mode LaTeX-mode) . citre-mode)
+;;   :bind* (("M-." . sb/jump-xref-citre) ("M-," . sb/jump-back-citre-xref))
+;;   :custom (citre-default-create-tags-file-location 'in-dir)
+;;   ;; Add exclude by: --exclude=target or by --exclude=@./.ctagsignore
+;;   ;; Add dirs/files to scan here, one line per dir/file
+;;   (citre-ctags-default-options
+;;    (string-join
+;;     '("-o %TAGSFILE%"
+;;       "--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX"
+;;       "--kinds-all=*"
+;;       "--fields=*"
+;;       "--extras=*"
+;;       "--recurse")
+;;     " "))
+;;   ;; Add Elisp to the backend lists.
+;;   (citre-find-definition-backends '(elisp eglot tags global))
+;;   (citre-find-reference-backends '(elisp eglot global))
+;;   :config
+;;   (setq-default
+;;    citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
+;;    ;; Large tags file slows down completion
+;;    citre-enable-capf-integration nil)
 
-  ;; Use `citre' with Emacs Lisp
-  (defvar citre-elisp-backend
-    (citre-xref-backend-to-citre-backend
-     ;; This is the xref backend name
-     'elisp
-     ;; A function to tell if the backend is usable
-     (lambda () (derived-mode-p 'emacs-lisp-mode))))
-  ;; Register the backend, which means to bind it with the symbol `elisp'.
-  (citre-register-backend 'elisp citre-elisp-backend)
+;;   ;; Use `citre' with Emacs Lisp
+;;   (defvar citre-elisp-backend
+;;     (citre-xref-backend-to-citre-backend
+;;      ;; This is the xref backend name
+;;      'elisp
+;;      ;; A function to tell if the backend is usable
+;;      (lambda () (derived-mode-p 'emacs-lisp-mode))))
+;;   ;; Register the backend, which means to bind it with the symbol `elisp'.
+;;   (citre-register-backend 'elisp citre-elisp-backend)
 
-  ;; Integrate with `lsp-mode' and `eglot'
-  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-    (let ((fetcher (apply -fn -args))
-          (citre-fetcher
-           (let ((xref-backend-functions '(citre-xref-backend t)))
-             (apply -fn -args))))
-      (lambda ()
-        (or (with-demoted-errors "%s, fallback to citre"
-              (funcall fetcher))
-            (funcall citre-fetcher)))))
+;;   ;; Integrate with `lsp-mode' and `eglot'
+;;   (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+;;     (let ((fetcher (apply -fn -args))
+;;           (citre-fetcher
+;;            (let ((xref-backend-functions '(citre-xref-backend t)))
+;;              (apply -fn -args))))
+;;       (lambda ()
+;;         (or (with-demoted-errors "%s, fallback to citre"
+;;               (funcall fetcher))
+;;             (funcall citre-fetcher)))))
 
-  (defun sb/push-point-to-xref-marker-stack (&rest r)
-    (xref-push-marker-stack (point-marker)))
+;;   (defun sb/push-point-to-xref-marker-stack (&rest r)
+;;     (xref-push-marker-stack (point-marker)))
 
-  (dolist (func
-           '(xref-find-definitions
-             xref-find-references
-             find-function
-             consult-imenu
-             project-grep
-             deadgrep
-             counsel-rg
-             consult-lsp-file-symbols
-             citre-jump))
-    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
-  :diminish)
+;;   (dolist (func
+;;            '(xref-find-definitions
+;;              xref-find-references
+;;              find-function
+;;              consult-imenu
+;;              project-grep
+;;              deadgrep
+;;              counsel-rg
+;;              consult-lsp-file-symbols
+;;              citre-jump))
+;;     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
+;;   :diminish)
 
 ;; (use-package doom-themes
 ;;   :init (load-theme 'doom-nord t)

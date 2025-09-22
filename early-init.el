@@ -15,7 +15,8 @@
 
 ;; Defer GC during startup
 (setopt
- gc-cons-percentage 0.6 ; Portion of heap used for allocation
+ ;; Wait until the heap has grown by 60%
+ gc-cons-percentage 0.6
  ;; Temporarily increase GC threshold during startup
  gc-cons-threshold most-positive-fixnum)
 
