@@ -17,12 +17,13 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'rose-pine
   "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "catppuccin" catppuccin)
+    (const :tag "rose-pine" rose-pine)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -289,6 +290,7 @@ The provider is `nerd-icons'."
   (imenu-use-popup-menu nil)
   (save-silently t)
   (show-paren-when-point-inside-paren t)
+  (whitespace-line-column fill-column)
   :config
   (dolist (exts
            '(".aux"
@@ -616,10 +618,10 @@ The provider is `nerd-icons'."
     (remove-hook
      'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
 
-(use-package whitespace
-  :ensure nil
-  :custom (whitespace-line-column fill-column)
-  :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
+;; (use-package whitespace
+;;   :ensure nil
+;;   :custom (whitespace-line-column fill-column)
+;;   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
   :ensure nil
@@ -1901,14 +1903,15 @@ The provider is `nerd-icons'."
      try-expand-line))
   (hippie-expand-verbose nil))
 
-;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
-(use-package hotfuzz
-  :after (:any company corfu)
-  :demand t)
+;; ;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
+;; (use-package hotfuzz
+;;   :after (:any company corfu)
+;;   :demand t)
 
 ;; Use "M-SPC" for space-separated completion lookups.
 (use-package orderless
-  :after hotfuzz
+  ;; :after hotfuzz
+  :after (:any company corfu)
   :demand t
   :config
   (with-eval-after-load 'company
@@ -1945,7 +1948,8 @@ The provider is `nerd-icons'."
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
 
   (setopt
-   completion-styles '(hotfuzz orderless)
+   ;; completion-styles '(hotfuzz orderless)
+   completion-styles '(orderless)
    completion-category-defaults nil
    ;; The "basic" completion style needs to be tried first for TRAMP hostname
    ;; completion to work. I also want substring matching for file names.
@@ -2383,7 +2387,7 @@ The provider is `nerd-icons'."
   (company-dabbrev-other-buffers nil)
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
   (company-dabbrev-code-ignore-case t)
-  (company-dabbrev-code-completion-styles '(basic hotfuzz))
+  (company-dabbrev-code-completion-styles '(basic))
   (company-ispell-dictionary
    (expand-file-name "wordlist.5" sb/extras-directory))
   ;; Speed up selecting a completion, showing the access keys on the left makes them easily discernible.
@@ -3899,12 +3903,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :ensure (:host github :repo "jdtsmith/org-modern-indent")
   :hook (org-mode . org-modern-indent-mode))
 
-;; Use "<" to trigger org block completion at point.
-(use-package org-block-capf
-  :ensure (:host github :repo "xenodium/org-block-capf")
-  :after corfu
-  :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-  :custom (org-block-capf-edit-style 'inline))
+;; ;; Use "<" to trigger org block completion at point.
+;; (use-package org-block-capf
+;;   :ensure (:host github :repo "xenodium/org-block-capf")
+;;   :after corfu
+;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+;;   :custom (org-block-capf-edit-style 'inline))
 
 ;; Without auctex
 (with-eval-after-load 'tex-mode
@@ -4257,6 +4261,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;      ((t
 ;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
+(use-package rose-pine-theme
+  :ensure (:host github :repo "konrad1977/pinerose-emacs")
+  :when (eq sb/theme 'rose-pine)
+  :init (load-theme 'rose-pine-moon t))
+
 ;; (use-package nerd-icons-corfu
 ;;   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
 ;;   :when
@@ -4473,9 +4482,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
 
-(use-package asm-mode
-  :ensure nil
-  :hook (asm-mode . sb/setup-lsp-provider))
+;; (use-package asm-mode
+;;   :ensure nil
+;;   :hook (asm-mode . sb/setup-lsp-provider))
 
 ;; Guess the indentation offset originally used in foreign source code files and
 ;; transparently adjust the corresponding settings in Emacs making it more
@@ -4570,10 +4579,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   (project-headerline-segment-separator " > ")
 ;;   (project-headerline-path-separator " > "))
 
-(use-package breadcrumb
-  :ensure (:host github :repo "joaotavora/breadcrumb")
-  :hook (prog-mode . breadcrumb-mode)
-  :config (breadcrumb-imenu-crumbs))
+;; (use-package breadcrumb
+;;   :ensure (:host github :repo "joaotavora/breadcrumb")
+;;   :hook (prog-mode . breadcrumb-mode)
+;;   :config (breadcrumb-imenu-crumbs))
 
 ;; ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
 ;; ;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
@@ -5183,9 +5192,9 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   (("C-M-+" . default-text-scale-increase)
 ;;    ("C-M--" . default-text-scale-decrease)))
 
-;; Show free bindings in current buffer
-(use-package free-keys
-  :commands free-keys)
+;; ;; Show free bindings in current buffer
+;; (use-package free-keys
+;;   :commands free-keys)
 
 ;; I prefer Embark to show help about keybindings.
 
