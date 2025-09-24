@@ -1560,8 +1560,8 @@ The provider is `nerd-icons'."
 
 ;; (use-package with-editor :diminish)
 
-(use-package cond-let
-  :ensure (:host github :repo "tarsius/cond-let"))
+;; (use-package cond-let
+;;   :ensure (:host github :repo "tarsius/cond-let"))
 
 (use-package magit
   :hook
@@ -2684,7 +2684,9 @@ DIR can be relative or absolute."
      company-backends
      '(company-files
        ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'
-       (:separate company-capf company-dabbrev-code :with company-yasnippet)
+       ;; (:separate company-capf company-dabbrev-code :with company-yasnippet)
+       (company-capf :with company-yasnippet)
+       (company-dabbrev-code :with company-yasnippet)
        company-c-headers
        (company-dict company-ispell :with company-yasnippet)
        (company-dabbrev :with company-yasnippet))))
@@ -3408,11 +3410,17 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package cc-mode
   :ensure nil
   :hook
-  (awk-mode
-   .
-   (lambda ()
-     (setq-local c-basic-offset 4)
-     (sb/setup-lsp-provider))))
+  ((awk-mode
+    .
+    (lambda ()
+      (setq-local c-basic-offset 4)
+      (sb/setup-lsp-provider)))
+   ((c-mode c++-mode)
+    .
+    (lambda ()
+      (setq-local c-basic-offset 2)
+      (c-set-style "linux")
+      (sb/setup-lsp-provider)))))
 
 (use-package c-ts-mode
   :ensure nil
@@ -3433,6 +3441,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       c-electric-flag nil
       c-enable-auto-newline nil
       c-syntactic-indentation nil)
+     (c-ts-mode-set-style "linux")
      (sb/setup-lsp-provider)))
   :bind
   (:map
@@ -5618,7 +5627,7 @@ or the major mode is not in `sb/skippable-modes'."
               ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
               ("📚 Citre: jump" . citre-jump)
               ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂 Imenu (consult)" . consult-imenu)))
+              ("🗂  Imenu (consult)" . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
       (call-interactively (cdr (assoc choice options)))))
   (bind-key "M-'" #'sb/jump-choose-definition))
