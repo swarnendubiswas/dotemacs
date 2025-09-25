@@ -3908,9 +3908,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (org-pandoc-export-to-markdown
    org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
 
-(use-package org-modern-indent
-  :ensure (:host github :repo "jdtsmith/org-modern-indent")
-  :hook (org-mode . org-modern-indent-mode))
+(use-package org-modern
+  :hook (org-mode . global-org-modern-mode))
+
+;; ;; Useful if `org-indent-mode' is enabled
+;; (use-package org-modern-indent
+;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
+;;   :hook (org-mode . org-modern-indent-mode))
 
 ;; ;; Use "<" to trigger org block completion at point.
 ;; (use-package org-block-capf
