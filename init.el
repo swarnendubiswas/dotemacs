@@ -17,7 +17,7 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'rose-pine
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -4274,10 +4274,19 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;      ((t
 ;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
-(use-package rose-pine-theme
-  :ensure (:host github :repo "konrad1977/pinerose-emacs")
-  :when (eq sb/theme 'rose-pine)
-  :init (load-theme 'rose-pine-moon t))
+(use-package autothemer)
+
+;; (use-package rose-pine-theme
+;;   :ensure (:host github :repo "konrad1977/pinerose-emacs")
+;;   :after autothemer
+;;   :when (eq sb/theme 'rose-pine)
+;;   :init (load-theme 'rose-pine t))
+
+;; (use-package rose-pine-emacs
+;;   :ensure (:host github :repo "thongpv87/rose-pine-emacs")
+;;   :after autothemer
+;;   :when (eq sb/theme 'rose-pine)
+;;   :init (load-theme 'rose-pine-moon t))
 
 ;; (use-package nerd-icons-corfu
 ;;   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
@@ -4520,12 +4529,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :custom (buffer-terminator-verbose nil)
 ;;   :diminish)
 
-(use-package hl-line
-  :ensure nil
-  :hook (dired-mode . hl-line-mode)
-  :custom
-  ;; Restrict `hl-line-mode' highlighting to the current window
-  (hl-line-sticky-flag nil))
+;; (use-package hl-line
+;;   :ensure nil
+;;   :hook (dired-mode . hl-line-mode)
+;;   :custom
+;;   ;; Restrict `hl-line-mode' highlighting to the current window
+;;   (hl-line-sticky-flag nil))
 
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
