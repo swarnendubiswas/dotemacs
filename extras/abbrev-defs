@@ -1,4 +1,4 @@
-;; -*- coding: utf-8; lexical-binding: t -*-
+;;-*-coding: utf-8;-*-
 (define-abbrev-table 'LaTeX-mode-abbrev-table
   '(
     ("aentored" "mentored" nil :count 0)
@@ -148,6 +148,7 @@
     ("ahve" "have" nil :count 2)
     ("aknowledge" "acknowledge" nil :count 0)
     ("alegiance" "allegiance" nil :count 0)
+    ("algorithsm" "algorithms" nil :count 0)
     ("allegaince" "allegiance" nil :count 0)
     ("allegience" "allegiance" nil :count 0)
     ("allmost" "almost" nil :count 0)
@@ -456,6 +457,7 @@
     ("danceing" "dancing" nil :count 0)
     ("dcoument" "document" nil :count 0)
     ("dcument" "document" nil :count 0)
+    ("deadling" "dealing" nil :count 0)
     ("deatils" "details" nil :count 0)
     ("debuggign" "debugging" nil :count 0)
     ("decied" "decided" nil :count 1)
@@ -882,6 +884,7 @@
     ("liveing" "living" nil :count 0)
     ("llines" "lines" nil :count 1)
     ("loev" "love" nil :count 0)
+    ("logicla" "logical" nil :count 0)
     ("lonly" "lonely" nil :count 0)
     ("lookign" "looking" nil :count 0)
     ("lookupts" "lookups" nil :count 1)

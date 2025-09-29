@@ -17,13 +17,14 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'rose-pine
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "catppuccin" catppuccin)
     (const :tag "rose-pine" rose-pine)
+    (const :tag "kanagawa" kanagawa)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -49,10 +50,10 @@
 ;; `company-ispell' does not keep prefix case when used as a grouped backend. We
 ;; use `company' for now because Emacs versions till 30.x does not support child
 ;; frames on the terminal.
-(defcustom sb/in-buffer-completion
-  (if (display-graphic-p)
-      'corfu
-    'company)
+(defcustom sb/in-buffer-completion 'company
+  ;; (if (display-graphic-p)
+  ;;     'corfu
+  ;;   'company)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -137,19 +138,19 @@ The provider is `nerd-icons'."
 
 (elpaca-wait)
 
-;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient.
-(use-package exec-path-from-shell
-  ;; Emacs launched in the terminal gets to see $PATH.
-  :when (and (eq system-type 'gnu/linux) (display-graphic-p))
-  :demand t
-  :init
-  (setopt
-   exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "LANG" "LC_CTYPE" "LSP_USE_PLISTS")
-   ;; Reduce the start up time. Exporting $PATH should still work if the shell
-   ;; rc files have been correctly setup.
-   exec-path-from-shell-arguments nil)
-  (exec-path-from-shell-initialize))
+;; ;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient.
+;; (use-package exec-path-from-shell
+;;   ;; Emacs launched in the terminal gets to see $PATH.
+;;   :when (and (eq system-type 'gnu/linux) (display-graphic-p))
+;;   :demand t
+;;   :init
+;;   (setopt
+;;    exec-path-from-shell-check-startup-files nil
+;;    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "LANG" "LC_CTYPE" "LSP_USE_PLISTS")
+;;    ;; Reduce the start up time. Exporting $PATH should still work if the shell
+;;    ;; rc files have been correctly setup.
+;;    exec-path-from-shell-arguments nil)
+;;   (exec-path-from-shell-initialize))
 
 (use-package emacs
   :ensure nil
@@ -1560,8 +1561,8 @@ The provider is `nerd-icons'."
 
 ;; (use-package with-editor :diminish)
 
-;; (use-package cond-let
-;;   :ensure (:host github :repo "tarsius/cond-let"))
+(use-package cond-let
+  :ensure (:host github :repo "tarsius/cond-let"))
 
 (use-package magit
   :hook
@@ -2386,6 +2387,8 @@ The provider is `nerd-icons'."
   ;; Avoid slowdown when there are lot of buffers open
   (company-dabbrev-other-buffers nil)
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
+  ;; Avoid slowdown when there are lot of buffers open
+  (company-dabbrev-code-other-buffers nil)
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic))
   (company-ispell-dictionary
@@ -4274,10 +4277,25 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;      ((t
 ;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
-(use-package rose-pine-theme
-  :ensure (:host github :repo "konrad1977/pinerose-emacs")
-  :when (eq sb/theme 'rose-pine)
-  :init (load-theme 'rose-pine-moon t))
+;; (use-package autothemer)
+
+;; (use-package rose-pine-theme
+;;   :ensure (:host github :repo "konrad1977/pinerose-emacs")
+;;   :after autothemer
+;;   :when (eq sb/theme 'rose-pine)
+;;   :init (load-theme 'rose-pine t))
+
+;; (use-package rose-pine-emacs
+;;   :ensure (:host github :repo "thongpv87/rose-pine-emacs"
+;;                  :files ("*.el")
+;;    :includes (rose-pine-moon-theme))
+;;   :after autothemer
+;;   :when (eq sb/theme 'rose-pine)
+;;   :init (load-theme 'rose-pine-moon-theme t))
+
+;; (use-package kanagawa-themes
+;;   :when (eq sb/theme 'kanagawa)
+;;   :init (load-theme 'kanagawa-wave t))
 
 ;; (use-package nerd-icons-corfu
 ;;   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
@@ -4520,12 +4538,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :custom (buffer-terminator-verbose nil)
 ;;   :diminish)
 
-(use-package hl-line
-  :ensure nil
-  :hook (dired-mode . hl-line-mode)
-  :custom
-  ;; Restrict `hl-line-mode' highlighting to the current window
-  (hl-line-sticky-flag nil))
+;; (use-package hl-line
+;;   :ensure nil
+;;   :hook (dired-mode . hl-line-mode)
+;;   :custom
+;;   ;; Restrict `hl-line-mode' highlighting to the current window
+;;   (hl-line-sticky-flag nil))
 
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
