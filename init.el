@@ -492,7 +492,6 @@ The provider is `nerd-icons'."
   ;; (advice-add 'save-buffer :around #'sb/inhibit-message-call-orig-fun)
   (advice-add 'basic-save-buffer :around #'sb/inhibit-message-call-orig-fun))
 
-
 (progn
   (defun sb/auto-save-wrapper (save-fn &rest args)
     "Hide 'Auto-saving...done' messages by calling the method.
@@ -502,28 +501,29 @@ The provider is `nerd-icons'."
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; (use-package doc-view
-;;   :ensure nil
-;;   :hook
-;;   (doc-view-mode
-;;    .
-;;    (lambda ()
-;;      (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
-;;        (auto-revert-mode 1))))
-;;   :bind
-;;   (:map
-;;    doc-view-mode-map
-;;    ("=" . doc-view-enlarge)
-;;    ("-" . doc-view-shrink)
-;;    ("n" . doc-view-next-page)
-;;    ("p" . doc-view-previous-page)
-;;    ("0" . doc-view-scale-reset)
-;;    ("M-<" . doc-view-first-page)
-;;    ("M->" . doc-view-last-page)
-;;    ("C-l" . doc-view-goto-page))
-;;   :custom
-;;   (doc-view-continuous t)
-;;   (doc-view-resolution 120))
+;; Allows viewing PDFs remotely through Tramp.
+(use-package doc-view
+  :ensure nil
+  :hook
+  (doc-view-mode
+   .
+   (lambda ()
+     (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
+       (auto-revert-mode 1))))
+  :bind
+  (:map
+   doc-view-mode-map
+   ("=" . doc-view-enlarge)
+   ("-" . doc-view-shrink)
+   ("n" . doc-view-next-page)
+   ("p" . doc-view-previous-page)
+   ("0" . doc-view-scale-reset)
+   ("M-<" . doc-view-first-page)
+   ("M->" . doc-view-last-page)
+   ("C-l" . doc-view-goto-page))
+  :custom
+  (doc-view-continuous t)
+  (doc-view-resolution 120))
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
 ;; `find-file' unless a prefix argument is given. Then it will find file at
@@ -1418,7 +1418,8 @@ The provider is `nerd-icons'."
   :bind
   (("C-<f9>" . crux-recentf-find-directory)
    ("C-<f11>" . crux-kill-other-buffers)
-   ([remap keyboard-quit] . crux-keyboard-quit-dwim))
+   ([remap keyboard-quit] . crux-keyboard-quit-dwim)
+   ("C-c d i" . crux-ispell-word-then-abbrev))
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
 ;; (use-package rainbow-mode
@@ -1850,7 +1851,20 @@ The provider is `nerd-icons'."
 
 ;; Provides indentation guide bars with tree-sitter support
 (use-package indent-bars
-  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :hook
+  ((bash-ts-mode
+    c-mode
+    c-ts-mode
+    c++-mode
+    c++-ts-mode
+    java-mode
+    java-ts-mode
+    python-mode
+    python-ts-mode
+    yaml-mode
+    yaml-ts-mode
+    sh-mode)
+   . indent-bars-mode)
   :custom
   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
   :config
@@ -1878,7 +1892,7 @@ The provider is `nerd-icons'."
   :custom
   (dabbrev-ignored-buffer-regexps
    '("^ " ;; internal or hidden buffers starting with space
-     "\\.\\(?:jpe?g\\|png\\|pdf\\)\\'" ;; image/PDF files
+     "\\.\\(?:jpe?g\\|png\\|pdf\\)\\'"
      "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?"))
   (dabbrev-upcase-means-case-search t)
   :config
@@ -3157,7 +3171,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package consult-lsp
   :after (consult lsp-mode)
-  :when (eq sb/lsp-provider 'lsp-mode))
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :commands (consult-lsp-symbols consult-lsp-file-symbols consult-lsp-diagnostics))
 
 (use-package lsp-java
   :when (eq sb/lsp-provider 'lsp-mode)
@@ -3165,9 +3180,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ((java-mode java-ts-mode)
    .
    (lambda ()
-     (setq-local
-      c-basic-offset 4
-      c-set-style "java")
+     (setq-local c-basic-offset 4)
+     (c-set-style "java")
      (lsp-deferred)))
   :custom
   (lsp-java-progress-reports-enabled nil)
@@ -3417,6 +3431,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     .
     (lambda ()
       (setq-local c-basic-offset 4)
+      (c-set-style "awk")
       (sb/setup-lsp-provider)))
    ((c-mode c++-mode)
     .
@@ -3609,18 +3624,19 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (add-hook 'before-save-hook #'fish_indent-before-save)
-     ;; `lsp-mode' does not support fish yet
-     (when (eq sb/lsp-provider 'eglot)
-       (eglot-ensure))
-     (when (eq sb/lsp-provider 'lsp-mode)
-       (with-eval-after-load 'lsp-mode
-         (lsp-register-client
-          (make-lsp-client
-           :new-connection
-           (lsp-stdio-connection '("fish-lsp" "start"))
-           :activation-fn (lsp-activate-on "fish")
-           :server-id 'fish-lsp))
-         (lsp-deferred))))))
+     ;; ;; `lsp-mode' does not support fish yet
+     ;; (when (eq sb/lsp-provider 'eglot)
+     ;;   (eglot-ensure))
+     ;; (when (eq sb/lsp-provider 'lsp-mode)
+     ;;   (with-eval-after-load 'lsp-mode
+     ;;     (lsp-register-client
+     ;;      (make-lsp-client
+     ;;       :new-connection
+     ;;       (lsp-stdio-connection '("fish-lsp" "start"))
+     ;;       :activation-fn (lsp-activate-on "fish")
+     ;;       :server-id 'fish-lsp))
+     ;;     (lsp-deferred)))
+     )))
 
 (use-package lisp-mode
   :ensure nil
@@ -5340,6 +5356,23 @@ or the major mode is not in `sb/skippable-modes'."
 
 ;; (use-package show-font
 ;;   :ensure (:host github :repo "protesilaos/show-font"))
+
+;; (use-package disable-mouse
+;;   :hook (emacs-startup . disable-mouse-global-mode)
+;;   :diminish disable-mouse-global-mode)
+
+;; `inhibit-mouse' is supposed to be more efficient than `disable-mouse'
+(use-package inhibit-mouse
+  :hook (elpaca-after-init . inhibit-mouse-mode)
+  :custom
+  ;; Disable highlighting of clickable text such as URLs and hyperlinks when
+  ;; hovered by the mouse pointer.
+  (inhibit-mouse-adjust-mouse-highlight t)
+  ;; Disables the use of tooltips (show-help-function) during mouse events.
+  (inhibit-mouse-adjust-show-help-function t)
+  :config
+  (when (daemonp)
+    (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode)))
 
 (with-eval-after-load 'transient
   (transient-define-prefix

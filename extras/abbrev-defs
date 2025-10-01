@@ -393,6 +393,7 @@
     ("condolances" "condolences" nil :count 0)
     ("conected" "connected" nil :count 0)
     ("conent" "content" nil :count 0)
+    ("conerns" "concerns" nil :count 0)
     ("conferance" "conference" nil :count 0)
     ("confernece" "Conference" nil :count 1)
     ("conficts" "conflicts" nil :count 1)
