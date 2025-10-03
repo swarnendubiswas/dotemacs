@@ -17,7 +17,7 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'modus-vivendi
+(defcustom sb/theme 'leuven-dark
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -25,11 +25,12 @@
     (const :tag "catppuccin" catppuccin)
     (const :tag "rose-pine" rose-pine)
     (const :tag "kanagawa" kanagawa)
+    (const :tag "leuven-dark" leuven-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative.
-(defcustom sb/modeline-theme 'doom-modeline
+;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative. A plain modeline also suffices and avoids startup overhead.
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -1435,10 +1436,18 @@ The provider is `nerd-icons'."
 ;;    . rainbow-mode)
 ;;   :diminish)
 
+;; Emacs theme files have hex codes.
 (use-package colorful-mode
   :hook
   ((LaTeX-mode
-    css-mode css-ts-mode html-mode html-ts-mode web-mode help-mode helpful-mode)
+    css-mode
+    css-ts-mode
+    html-mode
+    html-ts-mode
+    web-mode
+    help-mode
+    helpful-mode
+    emacs-lisp-mode)
    . colorful-mode)
   :diminish)
 
@@ -1587,8 +1596,10 @@ The provider is `nerd-icons'."
   (magit-save-repository-buffers 'dontask)
   ;; Do not show the diff by default in the commit buffer.
   (magit-commit-show-diff nil)
-  (magit-format-file-function #'magit-format-file-nerd-icons)
   :config
+  (when (bound-and-true-p sb/enable-icons)
+    (setopt magit-format-file-function #'magit-format-file-nerd-icons))
+
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
     (setopt magit-diff-refine-hunk t)))
@@ -2425,13 +2436,9 @@ The provider is `nerd-icons'."
   ;; `company-preview-if-just-one-frontend' shows in-place preview if there is
   ;; only choice, `company-echo-metadata-frontend' shows selected candidate docs
   ;; in echo area, and `company-pseudo-tooltip-frontend' which always shows the
-  ;; candidates in an overlay.
-  (company-frontends
-   '(
-     ;; Always show candidates in overlay tooltip
-     company-pseudo-tooltip-frontend
-     ;; Show selected candidate docs in echo area
-     company-echo-metadata-frontend))
+  ;; candidates in an overlay. We do not want to use `company' for showing
+  ;; selected candidate docs in echo area.
+  (company-frontends '(company-pseudo-tooltip-frontend))
   ;; (company-require-match nil)
   ;; (company-insertion-triggers '())
   (company-tooltip-align-annotations (display-graphic-p))
@@ -2449,6 +2456,36 @@ The provider is `nerd-icons'."
      (lambda (candidates)
        (cl-remove-if
         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates)))))
+
+;; Posframes do not have unaligned rendering issues with variable `:height'
+;; unlike an overlay. However, posframes do not work with TUI, and the width of
+;; the frame popup is often not enough and the right side gets cut off.
+;; https://github.com/company-mode/company-mode/issues/1010
+
+(use-package company-posframe
+  :when (display-graphic-p)
+  :hook (company-mode . company-posframe-mode)
+  :custom
+  ;; Difficult to distinguish the help text from completions
+  (company-posframe-show-metadata nil)
+  ;; The backend display in the posframe modeline gets cut
+  (company-posframe-show-indicator t)
+  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+  :config (diminish 'company-mode)
+  ;; FIXME: Why does this not work with `with-eval-after-load'?
+  (when (eq sb/theme 'leuven-dark)
+    (set-face-attribute 'company-posframe-active-backend-name nil
+                        :height 0.8
+                        :foreground "#4FC3F7" ;; light sky blue
+                        :background "#2E3440" ;; dark gray-blue
+                        :weight 'normal
+                        :box nil)
+    (set-face-attribute 'company-posframe-inactive-backend-name nil
+                        :height 0.7
+                        :foreground "#B0BEC5" ;; soft gray
+                        :background "#1C1C1C" ;; near black
+                        :box nil))
+  :diminish)
 
 ;; (use-package nerd-icons
 ;;   :when (bound-and-true-p sb/enable-icons)
@@ -2476,7 +2513,7 @@ The provider is `nerd-icons'."
 ;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
 ;; active in latex math environments and latex math symbols
 ;; (`company-math-symbols-latex') is not available outside of math latex
-;; environments
+;; environments.
 (use-package company-math
   :after (tex-mode company)
   :demand t)
@@ -2543,9 +2580,9 @@ DIR can be relative or absolute."
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-(use-package bibtex-completion
-  :after tex
-  :commands bibtex-completion-insert-citation)
+;; (use-package bibtex-completion
+;;   :after tex
+;;   :commands bibtex-completion-insert-citation)
 
 ;; (use-package company-bibtex
 ;;   :after tex
@@ -3292,9 +3329,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :init (fancy-compilation-mode 1)
   :custom (fancy-compilation-scroll-output 'first-error))
 
+;; Frequent eldoc popups is irritating.
 (use-package eldoc
   :ensure nil
-  :hook (elpaca-after-init . global-eldoc-mode)
+  ;; :hook ((emacs-lisp-mode lisp-data-mode) . global-eldoc-mode)
   :custom
   (eldoc-area-prefer-doc-buffer t "Disable popups")
   (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
@@ -3310,11 +3348,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package eldoc-box
   :when (display-graphic-p)
-  :hook (eldoc-mode . eldoc-box-hover-mode)
-  :custom
-  (eldoc-box-max-pixel-width 600)
+  ;; :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
+  :custom (eldoc-box-clear-with-C-g t)
+  ;; (eldoc-box-max-pixel-width 600)
   (eldoc-box-max-pixel-height 400)
-  :diminish eldoc-box-hover-mode)
+  :config (eldoc-box-mouse-mode -1)
+  :diminish (eldoc-box-hover-mode eldoc-box-hover-at-point-mode))
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
@@ -4268,6 +4307,24 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
 ;;   :diminish)
 
+(use-package leuven-theme
+  :when (eq sb/theme 'leuven-dark)
+  :init (load-theme 'leuven-dark t)
+  :config
+  (with-eval-after-load 'flycheck
+    (set-face-attribute
+     'flycheck-info nil
+     :underline `(:style wave :color "#4FC3F7") ; light blue wave
+     :foreground "#4FC3F7" ; for echo area msgs
+     :weight 'bold)
+    (set-face-attribute
+     'flycheck-error-list-info nil
+     :underline `(:style wave :color "#4FC3F7") ; light blue wave
+     :foreground "#4FC3F7" ; for echo area msgs
+     :weight 'bold))
+  (with-eval-after-load 'hl-line
+    (set-face-background hl-line-face "midnight blue")))
+
 ;; (use-package doom-themes
 ;;   :init (load-theme 'doom-nord t)
 ;;   :config
@@ -4460,19 +4517,19 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   (powerline-gui-use-vcs-glyph t)
 ;;   (powerline-height 20))
 
-(use-package doom-modeline
-  :when (eq sb/modeline-theme 'doom-modeline)
-  :hook (elpaca-after-init . doom-modeline-mode)
-  :custom
-  (doom-modeline-buffer-encoding nil)
-  (doom-modeline-unicode-fallback t)
-  ;; Wrong LSP state is shown for non-LSP-managed files
-  (doom-modeline-lsp nil)
-  (doom-modeline-minor-modes t)
-  :config
-  (unless (display-graphic-p)
-    ;; All other choices can lead to the modeline text overflowing
-    (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
+;; (use-package doom-modeline
+;;   :when (eq sb/modeline-theme 'doom-modeline)
+;;   :hook (elpaca-after-init . doom-modeline-mode)
+;;   :custom
+;;   (doom-modeline-buffer-encoding nil)
+;;   (doom-modeline-unicode-fallback t)
+;;   ;; Wrong LSP state is shown for non-LSP-managed files
+;;   (doom-modeline-lsp nil)
+;;   (doom-modeline-minor-modes t)
+;;   :config
+;;   (unless (display-graphic-p)
+;;     ;; All other choices can lead to the modeline text overflowing
+;;     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -5372,7 +5429,8 @@ or the major mode is not in `sb/skippable-modes'."
   (inhibit-mouse-adjust-show-help-function t)
   :config
   (when (daemonp)
-    (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode)))
+    (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
+  :diminish)
 
 (with-eval-after-load 'transient
   (transient-define-prefix
