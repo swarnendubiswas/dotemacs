@@ -970,8 +970,7 @@ The provider is `nerd-icons'."
    ("C-c q" . vertico-quick-insert)
    ("C-'" . vertico-quick-jump))
   :custom (vertico-cycle t)
-  :config
-  (vertico-indexed-mode 1)
+  :config (vertico-indexed-mode 1)
   (when (eq sb/theme 'catppuccin)
     (set-face-attribute 'vertico-current nil
                         :background "#676767"
@@ -1123,6 +1122,21 @@ The provider is `nerd-icons'."
   :commands consult-dir-jump-file
   :bind ("C-x C-d" . consult-dir)
   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
+
+;; (use-package consult-project-extra
+;;   :after (project consult)
+;;   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
+;;   :custom (consult-project-function #'consult-project-extra-project-fn)
+;;   :config
+;;   ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
+;;   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
+;;   (setq project-switch-commands 'consult-project-extra-find))
+
+;; (use-package consult-jump-project
+;;   :straight (:host github :repo "jdtsmith/consult-jump-project")
+;;   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
+;;   :custom (consult-jump-direct-jump-modes '(dired-mode))
+;;   :bind ("C-x p j" . consult-jump-project))
 
 ;; Provide context-dependent actions similar to a content menu.
 (use-package embark
@@ -1732,7 +1746,33 @@ The provider is `nerd-icons'."
   (defun sb/flycheck-checker-get (fn checker property)
     (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
         (funcall fn checker property)))
-  (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get))
+  (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
+
+  (when (eq sb/theme 'leuven-dark)
+    ;; (defface sb/flycheck-mode-line
+    ;;   '((t :inherit mode-line :foreground "black" :weight regular))
+    ;;   "Custom face for Flycheck lighter in the mode line.")
+
+    (defface sb/flycheck-mode-line
+      '((((class color) (background light))
+         ;; Active window
+         :inherit mode-line
+         :foreground "#0474B6"
+         :weight normal
+         :height 1)
+        (((class color) (background light))
+         ;; Inactive window
+         :inherit mode-line-inactive
+         :foreground "#555555"
+         :weight normal
+         :height 1))
+      "Custom face for Flycheck lighter in the mode line.")
+
+    (setopt flycheck-mode-line
+            '(:eval
+              (propertize (flycheck-mode-line-status-text)
+                          'face
+                          'sb/flycheck-mode-line)))))
 
 (use-package consult-flycheck
   :after flycheck
@@ -2471,8 +2511,8 @@ The provider is `nerd-icons'."
   ;; The backend display in the posframe modeline gets cut
   (company-posframe-show-indicator t)
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-  :config (diminish 'company-mode)
-  ;; FIXME: Why does this not work with `with-eval-after-load'?
+  :config
+  (diminish 'company-mode)
   (when (eq sb/theme 'leuven-dark)
     (set-face-attribute 'company-posframe-active-backend-name nil
                         :height 0.8
@@ -3078,10 +3118,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-modeline-code-actions-enable nil)
   ;; We already show Flycheck status on the modeline
   (lsp-modeline-diagnostics-enable nil)
-  ;; The workspace status icon on the terminal interface persists across projects and hence is misleading
-  (lsp-modeline-workspace-status-enable nil)
   ;; Simpler to focus on the errors at hand
   (lsp-modeline-diagnostics-scope :file)
+  ;; The workspace status icon on the terminal interface persists across
+  ;; projects and hence is misleading.
+  (lsp-modeline-workspace-status-enable nil)
   (lsp-inlay-hint-enable nil)
   (lsp-enable-snippet nil)
   ;; Enable integration of custom backends other than `capf'
@@ -3089,7 +3130,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; Show/hide completion metadata, e.g., "java.util.ArrayList". This increases
   ;; the width of the completion popup.
   (lsp-completion-show-detail nil)
-  ;; Show/hide completion kind, e.g., interface/class
+  ;; Show/hide completion kind, e.g., interface/class.
   (lsp-completion-show-kind t)
   (lsp-completion-default-behaviour :insert)
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
@@ -4309,21 +4350,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package leuven-theme
   :when (eq sb/theme 'leuven-dark)
-  :init (load-theme 'leuven-dark t)
-  :config
-  (with-eval-after-load 'flycheck
-    (set-face-attribute
-     'flycheck-info nil
-     :underline `(:style wave :color "#4FC3F7") ; light blue wave
-     :foreground "#4FC3F7" ; for echo area msgs
-     :weight 'bold)
-    (set-face-attribute
-     'flycheck-error-list-info nil
-     :underline `(:style wave :color "#4FC3F7") ; light blue wave
-     :foreground "#4FC3F7" ; for echo area msgs
-     :weight 'bold))
-  (with-eval-after-load 'hl-line
-    (set-face-background hl-line-face "midnight blue")))
+  :init (load-theme 'leuven-dark t))
 
 ;; (use-package doom-themes
 ;;   :init (load-theme 'doom-nord t)
@@ -4869,8 +4896,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   ;; Eglot overwrites `company-backends' to only include `company-capf'
 ;;   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
-;;   ;; FIXME: `eglot-workspace-configuration' should be set as a directory-local
-;;   ;; variable, but it is not working for me.
+;;   `eglot-workspace-configuration' should be set as a directory-local
+;;   variable.
 
 ;;   ;; `:json-false' is the correct way to send false to LSP servers instead of
 ;;   ;; nil, which would remove the key.
@@ -5150,11 +5177,6 @@ If region is active, apply to active region instead."
   :type '(repeat string)
   :group 'sb/emacs)
 
-(defun sb/get-buffer-major-mode (buffer-or-string)
-  "Return the major mode associated with BUFFER-OR-STRING."
-  (with-current-buffer buffer-or-string
-    major-mode))
-
 (defcustom sb/skippable-modes
   '(dired-mode
     fundamental-mode
@@ -5177,6 +5199,11 @@ If region is active, apply to active region instead."
   "List of major modes to skip over when calling `change-buffer'."
   :type '(repeat symbol)
   :group 'sb/emacs)
+
+(defun sb/get-buffer-major-mode (buffer-or-string)
+  "Return the major mode associated with BUFFER-OR-STRING."
+  (with-current-buffer buffer-or-string
+    major-mode))
 
 (defun sb/change-buffer (change-buffer)
   "Call CHANGE-BUFFER.
@@ -5239,7 +5266,6 @@ or the major mode is not in `sb/skippable-modes'."
    (window-parameter window 'window-side) ; side-window (display-buffer-in-side-window)
    (window-parameter window 'popup))) ; manually marked
 
-;; Close all popup windows
 (defun sb/close-popups ()
   "Close all popup windows."
   (interactive)
@@ -5247,7 +5273,6 @@ or the major mode is not in `sb/skippable-modes'."
     (when (sb/popup-window-p win)
       (delete-window win))))
 
-;; C-g: first close popups, else normal quit
 (defun sb/keyboard-quit-dwim ()
   "Quit popups if any, otherwise run `keyboard-quit`."
   (interactive)
@@ -5260,9 +5285,9 @@ or the major mode is not in `sb/skippable-modes'."
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
 ;; "<tab>".
 
-;; ESC serves as a substitute for META, but there is no need to hold down ESC -
-;; instead "M-something" keybindings can be triggered by pressing ESC and the
-;; other key sequentially.
+;; ESC serves as a substitute for META, but there is no need to hold down ESC
+;; while pressing the subsequent key. Instead "M-something" keybindings can be
+;; triggered by pressing ESC and the other key sequentially.
 
 (bind-keys
  ("C-c ;" . sb/comment-line)
@@ -5273,22 +5298,6 @@ or the major mode is not in `sb/skippable-modes'."
  ("C-S-<iso-lefttab>" . sb/previous-buffer)
  ("C-<tab>" . sb/next-buffer)
  ("C-g" . sb/keyboard-quit-dwim))
-
-;; ;; Make ESC quit everything
-;; ;; Clear any previous ESC settings
-;; (global-unset-key (kbd "<escape>"))
-;; (define-key key-translation-map [escape] nil)
-;; (define-key input-decode-map [escape] nil)
-
-;; ;; Direct keyboard event interception
-;; (defun sb/keyboard-quit-immediately ()
-;;   "Quit immediately when ESC is pressed, regardless of context."
-;;   (interactive)
-;;   (keyboard-quit))
-
-;; (define-key special-event-map [escape] 'sb/keyboard-quit-immediately)
-;; (define-key function-key-map [escape] 'sb/keyboard-quit-immediately)
-;; (global-set-key [escape] 'sb/keyboard-quit-immediately)
 
 ;; (use-package default-text-scale
 ;;   :when (display-graphic-p)
