@@ -51,10 +51,10 @@
 ;; `company-ispell' does not keep prefix case when used as a grouped backend. We
 ;; use `company' for now because Emacs versions till 30.x does not support child
 ;; frames on the terminal.
-(defcustom sb/in-buffer-completion 'company
-  ;; (if (display-graphic-p)
-  ;;     'corfu
-  ;;   'company)
+(defcustom sb/in-buffer-completion
+  (if (display-graphic-p)
+      'corfu
+    'company)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -81,7 +81,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot because it seems Texlab is inefficient.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'lsp-provider
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -970,7 +970,8 @@ The provider is `nerd-icons'."
    ("C-c q" . vertico-quick-insert)
    ("C-'" . vertico-quick-jump))
   :custom (vertico-cycle t)
-  :config (vertico-indexed-mode 1)
+  :config
+  (vertico-indexed-mode 1)
   (when (eq sb/theme 'catppuccin)
     (set-face-attribute 'vertico-current nil
                         :background "#676767"
@@ -1614,9 +1615,10 @@ The provider is `nerd-icons'."
   (when (bound-and-true-p sb/enable-icons)
     (setopt magit-format-file-function #'magit-format-file-nerd-icons))
 
-  (with-eval-after-load 'magit-diff
-    ;; Show fine differences for the current diff hunk only
-    (setopt magit-diff-refine-hunk t)))
+;;   (with-eval-after-load 'magit-diff
+;;     ;; Show fine differences for the current diff hunk only
+  ;;     (setopt magit-diff-refine-hunk t))
+  )
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -2509,7 +2511,7 @@ The provider is `nerd-icons'."
   ;; Difficult to distinguish the help text from completions
   (company-posframe-show-metadata nil)
   ;; The backend display in the posframe modeline gets cut
-  (company-posframe-show-indicator t)
+  (company-posframe-show-indicator nil)
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
   :config
   (diminish 'company-mode)
@@ -2834,211 +2836,211 @@ DIR can be relative or absolute."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-elisp-mode)))))
 
-;; ;; Corfu is not a completion framework, it is a front-end for
-;; ;; `completion-at-point'.
-;; (use-package corfu
-;;   :preface
-;;   (defun sb/corfu-default-setup ()
-;;     ;; (corfu-indexed-mode 1) ; I prefer `corfu-quick'
-;;     (corfu-history-mode 1)
-;;     (corfu-echo-mode 1)
-;;     (corfu-popupinfo-mode 1))
-;;   (defun sb/corfu-prog-setup ()
-;;     "Use shorter prefix for Corfu in `prog-mode'."
-;;     (setq-local corfu-auto-prefix 2))
-;;   :ensure
-;;   (corfu
-;;    :files (:defaults "extensions/*")
-;;    :includes
-;;    (corfu-info
-;;     corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
-;;   :when (eq sb/in-buffer-completion 'corfu)
-;;   :hook
-;;   ((elpaca-after-init . global-corfu-mode)
-;;    (corfu-mode . sb/corfu-default-setup)
-;;    (prog-mode . sb/corfu-prog-setup))
-;;   :bind
-;;   (:map
-;;    corfu-map
-;;    ("TAB" . corfu-quick-insert)
-;;    ("<tab>" . corfu-quick-insert)
-;;    ("M-d" . corfu-info-documentation)
-;;    ("M-l" . corfu-info-location)
-;;    ("M-n" . corfu-popupinfo-scroll-up)
-;;    ("M-p" . corfu-popupinfo-scroll-down)
-;;    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
-;;    ("[escape]" . corfu-quit))
-;;   :custom
-;;   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
-;;   (corfu-auto t "Enable auto completion")
-;;   (corfu-on-exact-match 'show)
-;;   ;; Do not close popup when adjacent to other characters
-;;   (corfu-quit-at-boundary nil)
-;;   :config
-;;   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
-;;   (unless (display-graphic-p)
-;;     (setopt corfu-right-margin-width 1.5)))
+;; Corfu is not a completion framework, it is a front-end for
+;; `completion-at-point'.
+(use-package corfu
+  :preface
+  (defun sb/corfu-default-setup ()
+    ;; (corfu-indexed-mode 1) ; I prefer `corfu-quick'
+    (corfu-history-mode 1)
+    (corfu-echo-mode 1)
+    (corfu-popupinfo-mode 1))
+  (defun sb/corfu-prog-setup ()
+    "Use shorter prefix for Corfu in `prog-mode'."
+    (setq-local corfu-auto-prefix 2))
+  :ensure
+  (corfu
+   :files (:defaults "extensions/*")
+   :includes
+   (corfu-info
+    corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
+  :when (eq sb/in-buffer-completion 'corfu)
+  :hook
+  ((elpaca-after-init . global-corfu-mode)
+   (corfu-mode . sb/corfu-default-setup)
+   (prog-mode . sb/corfu-prog-setup))
+  :bind
+  (:map
+   corfu-map
+   ("TAB" . corfu-quick-insert)
+   ("<tab>" . corfu-quick-insert)
+   ("M-d" . corfu-info-documentation)
+   ("M-l" . corfu-info-location)
+   ("M-n" . corfu-popupinfo-scroll-up)
+   ("M-p" . corfu-popupinfo-scroll-down)
+   ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
+   ("[escape]" . corfu-quit))
+  :custom
+  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+  (corfu-auto t "Enable auto completion")
+  (corfu-on-exact-match 'show)
+  ;; ;; Do not close popup when adjacent to other characters
+  ;; (corfu-quit-at-boundary nil)
+  :config
+  ;; Add space at the right edge so characters do not get cut off in the terminal interface.
+  (unless (display-graphic-p)
+    (setopt corfu-right-margin-width 1.5)))
 
-;; ;; Emacs 31+ has in-built support for child frames in the terminal
-;; (use-package corfu-terminal
-;;   :ensure (:host codeberg :repo "akib/emacs-corfu-terminal")
-;;   :when
-;;   (and (eq sb/in-buffer-completion 'corfu)
-;;        (not (display-graphic-p))
-;;        (< emacs-major-version 31))
-;;   :hook (corfu-mode . corfu-terminal-mode)
-;;   :custom
-;;   ;; Prevent wraparound at the right edge
-;;   (corfu-terminal-position-right-margin 2))
+;; Emacs 31+ has in-built support for child frames in the terminal
+(use-package corfu-terminal
+  :ensure (:host codeberg :repo "akib/emacs-corfu-terminal")
+  :when
+  (and (eq sb/in-buffer-completion 'corfu)
+       (not (display-graphic-p))
+       (< emacs-major-version 31))
+  :hook (corfu-mode . corfu-terminal-mode)
+  :custom
+  ;; Prevent wraparound at the right edge
+  (corfu-terminal-position-right-margin 2))
 
-;; (use-package yasnippet-capf
-;;   :ensure (:host github :repo "elken/yasnippet-capf")
-;;   :when (eq sb/in-buffer-completion 'corfu)
-;;   :after yasnippet
-;;   :commands yasnippet-capf)
+(use-package yasnippet-capf
+  :ensure (:host github :repo "elken/yasnippet-capf")
+  :when (eq sb/in-buffer-completion 'corfu)
+  :after yasnippet
+  :commands yasnippet-capf)
 
-;; (use-package cape
-;;   :after corfu
-;;   :demand t
-;;   :custom
-;;   (cape-dict-file
-;;    `(,(expand-file-name "wordlist.5" sb/extras-directory)
-;;      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
-;;   :config
-;;   ;; `cape-capf-super' works for static completion functions like
-;;   ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
-;;   ;; completions like `cape-file'. File completion with `cape-file' is available
-;;   ;; in comments and string literals, but not in normal code.
+(use-package cape
+  :after corfu
+  :demand t
+  :custom
+  (cape-dict-file
+   `(,(expand-file-name "wordlist.5" sb/extras-directory)
+     ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+  :config
+  ;; `cape-capf-super' works for static completion functions like
+  ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
+  ;; completions like `cape-file'. File completion with `cape-file' is available
+  ;; in comments and string literals, but not in normal code.
 
-;;   ;; There is no mechanism to force deduplication if candidates from `cape-dict'
-;;   ;; and `cape-dabbrev' are not exactly equal (both equal string and equal text
-;;   ;; properties).
-;;   ;; https://github.com/minad/cape/discussions/130
+  ;; There is no mechanism to force deduplication if candidates from `cape-dict'
+  ;; and `cape-dabbrev' are not exactly equal (both equal string and equal text
+  ;; properties).
+  ;; https://github.com/minad/cape/discussions/130
 
-;;   ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
-;;   ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
-;;   ;; Ensures that completion does not get interrupted by the user pressing keys
-;;   ;; or other operations with `cape-wrap-noninterruptible'.
-;;   (with-eval-after-load 'lsp-mode
-;;     (advice-add
-;;      #'lsp-completion-at-point
-;;      :around
-;;      (lambda (orig-fun &rest args)
-;;        (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
+  ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
+  ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
+  ;; Ensures that completion does not get interrupted by the user pressing keys
+  ;; or other operations with `cape-wrap-noninterruptible'.
+  (with-eval-after-load 'lsp-mode
+    (advice-add
+     #'lsp-completion-at-point
+     :around
+     (lambda (orig-fun &rest args)
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
 
-;;   (with-eval-after-load 'eglot
-;;     (advice-add
-;;      #'eglot-completion-at-point
-;;      :around
-;;      (lambda (orig-fun &rest args)
-;;        (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
+  (with-eval-after-load 'eglot
+    (advice-add
+     #'eglot-completion-at-point
+     :around
+     (lambda (orig-fun &rest args)
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
 
-;;   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
-;;   ;; duplicates and we expect `cape-dict' to mostly suffice.
-;;   (dolist (hook '(text-mode-hook markdown-mode-hook bibtex-mode-hook))
-;;     (add-hook
-;;      hook
-;;      (lambda ()
-;;        (setq completion-at-point-functions
-;;              (list
-;;               (cape-capf-inside-string #'cape-file)
-;;               #'yasnippet-capf
-;;               #'cape-dict
-;;               (cape-capf-buster #'cape-dabbrev))))))
+  ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
+  ;; duplicates and we expect `cape-dict' to mostly suffice.
+  (dolist (hook '(text-mode-hook markdown-mode-hook bibtex-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       (setq completion-at-point-functions
+             (list
+              (cape-capf-inside-string #'cape-file)
+              #'yasnippet-capf
+              #'cape-dict
+              (cape-capf-buster #'cape-dabbrev))))))
 
-;;   (add-hook
-;;    'org-mode-hook
-;;    (lambda ()
-;;      (setq-local completion-at-point-functions
-;;                  (list
-;;                   (cape-capf-inside-string #'cape-file)
-;;                   #'yasnippet-capf
-;;                   #'cape-elisp-block
-;;                   #'cape-dict
-;;                   (cape-capf-buster #'cape-dabbrev)))))
+  (add-hook
+   'org-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  (cape-capf-inside-string #'cape-file)
+                  #'yasnippet-capf
+                  #'cape-elisp-block
+                  #'cape-dict
+                  (cape-capf-buster #'cape-dabbrev)))))
 
-;;   (add-hook
-;;    'prog-mode-hook
-;;    (lambda ()
-;;      (setq-local completion-at-point-functions
-;;                  (list
-;;                   #'yasnippet-capf
-;;                   (cape-capf-inside-code
-;;                    (cape-capf-super
-;;                     ;; #'citre-completion-at-point
-;;                     #'cape-keyword #'cape-dabbrev))
-;;                   (cape-capf-inside-comment #'cape-dict)
-;;                   (cape-capf-inside-string #'cape-file)
-;;                   (cape-capf-buster #'cape-dabbrev)))))
+  (add-hook
+   'prog-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  #'yasnippet-capf
+                  (cape-capf-inside-code
+                   (cape-capf-super
+                    ;; #'citre-completion-at-point
+                    #'cape-keyword #'cape-dabbrev))
+                  (cape-capf-inside-comment #'cape-dict)
+                  (cape-capf-inside-string #'cape-file)
+                  (cape-capf-buster #'cape-dabbrev)))))
 
-;;   (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-;;     (add-hook
-;;      hook
-;;      (lambda ()
-;;        (setq-local
-;;         completion-at-point-functions
-;;         (list
-;;          (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'citar-capf
-;;          (cape-capf-super
-;;           ;; Math latex tags
-;;           (cape-company-to-capf #'company-math-symbols-latex)
-;;           (cape-company-to-capf #'company-latex-commands)
-;;           (cape-company-to-capf #'company-reftex-labels)
-;;           (cape-company-to-capf #'company-auctex-environments)
-;;           (cape-company-to-capf #'company-auctex-macros)
-;;           (cape-company-to-capf #'company-auctex-labels)
-;;           ;; Math Unicode symbols and sub(super)scripts
-;;           (cape-company-to-capf #'company-math-symbols-unicode)
-;;           (cape-company-to-capf #'company-auctex-symbols)
-;;           ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-;;           #'cape-tex)
-;;          #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
+  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
+    (add-hook
+     hook
+     (lambda ()
+       (setq-local
+        completion-at-point-functions
+        (list
+         (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'citar-capf
+         (cape-capf-super
+          ;; Math latex tags
+          (cape-company-to-capf #'company-math-symbols-latex)
+          (cape-company-to-capf #'company-latex-commands)
+          (cape-company-to-capf #'company-reftex-labels)
+          (cape-company-to-capf #'company-auctex-environments)
+          (cape-company-to-capf #'company-auctex-macros)
+          (cape-company-to-capf #'company-auctex-labels)
+          ;; Math Unicode symbols and sub(super)scripts
+          (cape-company-to-capf #'company-math-symbols-unicode)
+          (cape-company-to-capf #'company-auctex-symbols)
+          ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+          #'cape-tex)
+         #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
 
-;;   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
-;;     (add-hook
-;;      mode
-;;      (lambda ()
-;;        (setq-local completion-at-point-functions
-;;                    (list
-;;                     (cape-capf-inside-string #'cape-file)
-;;                     #'yasnippet-capf
-;;                     (cape-capf-inside-code
-;;                      (cape-capf-nonexclusive #'elisp-completion-at-point))
-;;                     (cape-capf-inside-code #'cape-elisp-symbol)
-;;                     (cape-capf-inside-comment #'cape-dict)
-;;                     (cape-capf-buster #'cape-dabbrev))))))
+  (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local completion-at-point-functions
+                   (list
+                    (cape-capf-inside-string #'cape-file)
+                    #'yasnippet-capf
+                    (cape-capf-inside-code
+                     (cape-capf-nonexclusive #'elisp-completion-at-point))
+                    (cape-capf-inside-code #'cape-elisp-symbol)
+                    (cape-capf-inside-comment #'cape-dict)
+                    (cape-capf-buster #'cape-dabbrev))))))
 
-;;   ;; (dolist (hook
-;;   ;;          '(bash-ts-mode-hook
-;;   ;;            c-mode-hook
-;;   ;;            c-ts-mode-hook
-;;   ;;            c++-mode-hook
-;;   ;;            c++-ts-mode-hook
-;;   ;;            cmake-mode-hook
-;;   ;;            cmake-ts-mode-hook
-;;   ;;            css-mode-hook
-;;   ;;            css-ts-mode-hook
-;;   ;;            fish-mode-hook
-;;   ;;            html-mode-hook
-;;   ;;            html-ts-mode-hook
-;;   ;;            java-mode-hook
-;;   ;;            java-ts-mode-hook
-;;   ;;            json-mode-hook
-;;   ;;            json-ts-mode-hook
-;;   ;;            jsonc-mode-hook
-;;   ;;            makefile-mode-hook
-;;   ;;            python-mode-hook
-;;   ;;            python-ts-mode-hook
-;;   ;;            sh-mode-hook
-;;   ;;            web-mode-hook
-;;   ;;            yaml-mode-hook
-;;   ;;            yaml-ts-mode-hook))
-;;   ;;   (add-hook
-;;   ;;    hook
-;;   ;;    (lambda ()
-;;   ;;      (sb/setup-capf
-;;   ;;       #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))
-;;   )
+  ;; (dolist (hook
+  ;;          '(bash-ts-mode-hook
+  ;;            c-mode-hook
+  ;;            c-ts-mode-hook
+  ;;            c++-mode-hook
+  ;;            c++-ts-mode-hook
+  ;;            cmake-mode-hook
+  ;;            cmake-ts-mode-hook
+  ;;            css-mode-hook
+  ;;            css-ts-mode-hook
+  ;;            fish-mode-hook
+  ;;            html-mode-hook
+  ;;            html-ts-mode-hook
+  ;;            java-mode-hook
+  ;;            java-ts-mode-hook
+  ;;            json-mode-hook
+  ;;            json-ts-mode-hook
+  ;;            jsonc-mode-hook
+  ;;            makefile-mode-hook
+  ;;            python-mode-hook
+  ;;            python-ts-mode-hook
+  ;;            sh-mode-hook
+  ;;            web-mode-hook
+  ;;            yaml-mode-hook
+  ;;            yaml-ts-mode-hook))
+  ;;   (add-hook
+  ;;    hook
+  ;;    (lambda ()
+  ;;      (sb/setup-capf
+  ;;       #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))
+  )
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
@@ -4613,9 +4615,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
 
-;; (use-package asm-mode
-;;   :ensure nil
-;;   :hook (asm-mode . sb/setup-lsp-provider))
+(use-package asm-mode
+  :ensure nil
+  :hook (asm-mode . sb/setup-lsp-provider))
 
 ;; Guess the indentation offset originally used in foreign source code files and
 ;; transparently adjust the corresponding settings in Emacs making it more
@@ -4764,365 +4766,371 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;    kill-file-path-dirname
 ;;    kill-file-path))
 
-;; ;; Allow fetching the latest version to satisfy Eglot requirements
-;; (use-package flymake)
+;; Allow fetching the latest version to satisfy Eglot requirements
+(use-package flymake)
 
-;; (use-package eglot
-;;   :preface
-;;   ;; FIXME: It seems there is a race condition between Eglot shutting down the
-;;   ;; servers and closing the project buffers.
-;;   (defun sb/project-kill-buffers-disconnect-eglot ()
-;;     "Shutdown Eglot for the current project before killing its buffers."
-;;     (interactive)
-;;     (when-let* ((proj (project-current))
-;;                 (root (project-root proj)))
-;;       (dolist (buf (project-buffers proj))
-;;         (with-current-buffer buf
-;;           (when (and eglot--managed-mode (eglot-current-server))
-;;             ;; Shut down once per server, not once per buffer
-;;             (let ((server (eglot-current-server)))
-;;               (when (and server
-;;                          (equal (project-root (eglot--project server)) root))
-;;                 (ignore-errors
-;;                   (eglot-shutdown server))))))))
-;;     (project-kill-buffers))
-;;   :ensure (:source (gnu-elpa-mirror))
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
-;;    .
-;;    (lambda ()
-;;      (unless (string-equal
-;;               (file-name-nondirectory (or buffer-file-name ""))
-;;               "COMMIT_EDITMSG")
-;;        (eglot-ensure))))
-;;   :custom
-;;   ;; (eglot-autoshutdown t)
-;;   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
-;;   (eglot-send-changes-idle-time 3)
-;;   (eglot-extend-to-xref t)
-;;   (eglot-ignored-server-capabilities
-;;    '(:codeLensProvider
-;;      :documentHighlightProvider
-;;      :documentOnTypeFormattingProvider
-;;      :foldingRangeProvider
-;;      :hoverProvider ; Automatic documentation popups can be distracting
-;;      :inlayHintProvider ; Inlay hints are distracting
-;;      :executeCommandProvider
-;;      :documentLinkProvider))
-;;   (eglot-report-progress nil)
-;;   (eglot-mode-line-format nil)
-;;   :config
-;;   (setf (plist-get eglot-events-buffer-config :size) 0)
-;;   (fset #'jsonrpc--log-event #'ignore)
+(use-package eglot
+  :preface
+  ;; FIXME: It seems there is a race condition between Eglot shutting down the
+  ;; servers and closing the project buffers.
+  (defun sb/project-kill-buffers-disconnect-eglot ()
+    "Shutdown Eglot for the current project before killing its buffers."
+    (interactive)
+    (when-let* ((proj (project-current))
+                (root (project-root proj)))
+      (dolist (buf (project-buffers proj))
+        (with-current-buffer buf
+          (when (and eglot--managed-mode (eglot-current-server))
+            ;; Shut down once per server, not once per buffer
+            (let ((server (eglot-current-server)))
+              (when (and server
+                         (equal (project-root (eglot--project server)) root))
+                (ignore-errors
+                  (eglot-shutdown server))))))))
+    (project-kill-buffers))
+  :ensure (:source (gnu-elpa-mirror))
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
+   .
+   (lambda ()
+     (unless (string-equal
+              (file-name-nondirectory (or buffer-file-name ""))
+              "COMMIT_EDITMSG")
+       (eglot-ensure))))
+  :custom
+  ;; (eglot-autoshutdown t)
+  (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
+  (eglot-send-changes-idle-time 3)
+  (eglot-extend-to-xref t)
+  (eglot-ignored-server-capabilities
+   '(:codeLensProvider
+     :documentHighlightProvider
+     :documentOnTypeFormattingProvider
+     :foldingRangeProvider
+     :hoverProvider ; Automatic documentation popups can be distracting
+     :inlayHintProvider ; Inlay hints are distracting
+     :executeCommandProvider
+     :documentLinkProvider))
+  (eglot-report-progress nil)
+  (eglot-mode-line-format nil)
+  :config
+  (setf (plist-get eglot-events-buffer-config :size) 0)
+  (fset #'jsonrpc--log-event #'ignore)
 
-;;   (setopt
-;;    eglot-server-programs
-;;    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-;;      ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' or `markdown-mode' yet
-;;      ((LaTeX-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
-;;      ((text-mode org-mode)
-;;       .
-;;       ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
-;;      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
-;;       . ("autotools-language-server"))
-;;      (fish-mode . ("fish-lsp" "start"))
-;;      ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
-;;      ((c-mode c-ts-mode c++-mode c++-ts-mode c-or-c++-ts-mode c-or-c++-mode)
-;;       .
-;;       ("clangd"
-;;        "-j=4"
-;;        "--compile-commands-dir=./."
-;;        "--all-scopes-completion"
-;;        "--background-index"
-;;        ;; Unsupported option with Clangd 14
-;;        "--background-index-priority=low"
-;;        "--clang-tidy"
-;;        "--completion-style=detailed"
-;;        "--fallback-style=LLVM"
-;;        "--header-insertion=never"
-;;        "--header-insertion-decorators"
-;;        "--log=error"
-;;        ;; Unsupported option with Clangd 10: malloc-trim and enable-config
-;;        "--malloc-trim" ; Release memory periodically
-;;        ;; Project config is from a .clangd file in the project directory
-;;        "--enable-config"
-;;        "--pch-storage=memory" ; Increases memory usage but can improve performance
-;;        "--pretty"))
-;;      (awk-mode . ("awk-language-server"))
-;;      ((scss-mode css-mode css-ts-mode)
-;;       .
-;;       ("vscode-css-language-server" "--stdio"))
-;;      ((web-mode html-mode html-ts-mode)
-;;       .
-;;       ("vscode-html-language-server" "--stdio"))
-;;      ((json-mode json-ts-mode jsonc-mode)
-;;       .
-;;       ("vscode-json-language-server" "--stdio"))
-;;      ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
-;;      ((cmake-mode cmake-ts-mode) . ("cmake-language-server"))
-;;      ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
-;;      ;; Download the source from
-;;      ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
-;;      ;; clean verify -U -DskipTests=true". Change the url in
-;;      ;; "org.eclipse.jdt.ls.target/org.eclipse.jdt.ls.tp.target" if there is a
-;;      ;; "No repository found" error.
-;;      ((java-mode java-ts-mode)
-;;       .
-;;       ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
-;;      ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
-;;      ((perl-mode cperl-mode)
-;;       .
-;;       ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
-;;      ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
-;;      ;; Download the latest milestone from
-;;      ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
-;;      ;; verify -DskipTests=true". After successful compilation, the resulting
-;;      ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
-;;      ;; "org.eclipse.lemminx/target".
-;;      ((nxml-mode xml-mode)
-;;       .
-;;       ("java" "-jar"
-;;        ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
-;;                           user-emacs-directory)))))
+  (setopt
+   eglot-server-programs
+   `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
+     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' or `markdown-mode' yet
+     ((LaTeX-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
+     ((text-mode org-mode)
+      .
+      ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+     ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
+      . ("autotools-language-server"))
+     (fish-mode . ("fish-lsp" "start"))
+     ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
+     ((c-mode c-ts-mode c++-mode c++-ts-mode c-or-c++-ts-mode c-or-c++-mode)
+      .
+      ("clangd"
+       "-j=4"
+       "--compile-commands-dir=./."
+       "--all-scopes-completion"
+       "--background-index"
+       ;; Unsupported option with Clangd 14
+       "--background-index-priority=low"
+       "--clang-tidy"
+       "--completion-style=detailed"
+       "--fallback-style=LLVM"
+       "--header-insertion=never"
+       "--header-insertion-decorators"
+       "--log=error"
+       ;; Unsupported option with Clangd 10: malloc-trim and enable-config
+       "--malloc-trim" ; Release memory periodically
+       ;; Project config is from a .clangd file in the project directory
+       "--enable-config"
+       "--pch-storage=memory" ; Increases memory usage but can improve performance
+       "--pretty"))
+     (awk-mode . ("awk-language-server"))
+     ((scss-mode css-mode css-ts-mode)
+      .
+      ("vscode-css-language-server" "--stdio"))
+     ((web-mode html-mode html-ts-mode)
+      .
+      ("vscode-html-language-server" "--stdio"))
+     ((json-mode json-ts-mode jsonc-mode)
+      .
+      ("vscode-json-language-server" "--stdio"))
+     ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
+     ((cmake-mode cmake-ts-mode) . ("cmake-language-server"))
+     ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
+     ;; Download the source from
+     ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
+     ;; clean verify -U -DskipTests=true". Change the url in
+     ;; "org.eclipse.jdt.ls.target/org.eclipse.jdt.ls.tp.target" if there is a
+     ;; "No repository found" error.
+     ((java-mode java-ts-mode)
+      .
+      ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx8G"))
+     ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
+     ((perl-mode cperl-mode)
+      .
+      ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
+     ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
+     ;; Download the latest milestone from
+     ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
+     ;; verify -DskipTests=true". After successful compilation, the resulting
+     ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
+     ;; "org.eclipse.lemminx/target".
+     ((nxml-mode xml-mode)
+      .
+      ("java" "-jar"
+       ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
+                          user-emacs-directory)))))
 
-;;   (if (equal sb/python-langserver 'pylsp)
-;;       (add-to-list
-;;        'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
-;;     (add-to-list
-;;      'eglot-server-programs
-;;      '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
+  (if (equal sb/python-langserver 'pylsp)
+      (add-to-list
+       'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
+    (add-to-list
+     'eglot-server-programs
+     '((python-mode python-ts-mode) . ("basedpyright-langserver" "--stdio"))))
 
-;;   ;; Eglot overwrites `company-backends' to only include `company-capf'
-;;   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
+  ;; Eglot overwrites `company-backends' to only include `company-capf'
+  (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
-;;   `eglot-workspace-configuration' should be set as a directory-local
-;;   variable.
+  `eglot-workspace-configuration'
+  should
+  be
+  set
+  as
+  a
+  directory-local
+  variable.
 
-;;   ;; `:json-false' is the correct way to send false to LSP servers instead of
-;;   ;; nil, which would remove the key.
-;;   (setq-default
-;;    eglot-workspace-configuration
-;;    '(:pylsp
-;;      (:configurationSources
-;;       ["pyproject.toml" "setup.cfg"]
-;;       :plugins
-;;       (:autopep8
-;;        (:enabled :json-false)
-;;        :black (:enabled :json-false)
-;;        :flake8 (:enabled :json-false)
-;;        :jedi
-;;        (:auto_import_modules
-;;         []
-;;         :env_vars nil ; (:SOME_ENV_VAR "/some/path")
-;;         :environment nil ; "./.venv/"
-;;         :extra_paths [])
-;;        :jedi_completion
-;;        (:cache_for
-;;         []
-;;         :eager
-;;         :json-false
-;;         :enabled t
-;;         :fuzzy t
-;;         :include_class_objects
-;;         :json-false
-;;         :include_function_objects
-;;         :json-false
-;;         :include_params t
-;;         :resolve_at_most 25)
-;;        :jedi_definition
-;;        (:enabled
-;;         t
-;;         :follow_builtin_definitions t
-;;         :follow_builtin_imports t
-;;         :follow_imports t)
-;;        :jedi_hover (:enabled t)
-;;        :jedi_references (:enabled t)
-;;        :jedi_signature_help (:enabled t)
-;;        :jedi_symbols
-;;        (:all_scopes t :enabled t :include_import_symbols :json-false)
-;;        :mccabe (:enabled t :threshold 15)
-;;        :mypy (:enabled :json-false)
-;;        :preload (:enabled :json-false :modules [])
-;;        :pycodestyle (:enabled :json-false)
-;;        :pydocstyle (:enabled :json-false)
-;;        :pyflakes (:enabled :json-false)
-;;        ;; We use "basedpyright" as the primary server which provides type hints.
-;;        :pylint (:args [] :enabled :json-false)
-;;        :pylsp_black (:enabled :json-false)
-;;        :pylsp_isort (:enabled t)
-;;        :pylsp_mypy
-;;        (:enabled t :live_mode :json-false :report_progress :json-false)
-;;        ;; We use ruff from `apheleia-mode' because `basedpyright' does not support formatting.
-;;        :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
-;;        :rope_autoimport
-;;        (:code_actions
-;;         (:enabled :json-false)
-;;         :completions (:enabled :json-false)
-;;         :enabled
-;;         :json-false
-;;         :memory
-;;         :json-false)
-;;        :rope_completion (:eager :json-false :enabled :json-false)
-;;        :ruff
-;;        (:enabled :json-false :formatEnabled :json-false :lineLength 80)
-;;        :yapf (:enabled :json-false)
-;;        :rope (:extensionModules nil :ropeFolder nil)))
-;;      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
-;;      ;; LSP configuration for basedpyright.
-;;      :basedpyright
-;;      (:checkOnlyOpenFiles
-;;       t
-;;       :reportDuplicateImport t
-;;       :typeCheckingMode "recommended"
-;;       :useLibraryCodeForTypes t
-;;       :analysis
-;;       (:diagnosticSeverityOverrides
-;;        (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
-;;        :inlayHints
-;;        (:callArgumentNames
-;;         :json-false
-;;         :functionReturnTypes
-;;         :json-false
-;;         :variableTypes
-;;         :json-false
-;;         :genericTypes
-;;         :json-false)))
-;;      :ltex-ls-plus
-;;      (:language
-;;       "en-US"
-;;       :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
-;;       ;; Keep grammar and style checking
-;;       :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
-;;      :yaml
-;;      (:format
-;;       (:enable t :singleQuote nil :bracketSpacing t)
-;;       :validate t
-;;       :hover t
-;;       :completion t)
-;;      :vscode-json-language-server (:provideFormatter t)
-;;      ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
-;;      :harper-ls
-;;      (:userDictPath
-;;       (expand-file-name "~/.emacs.d/company-dict/text-mode")
-;;       :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
-;;       :fileDictPath ""
-;;       :linters
-;;       (:SpellCheck
-;;        :json-false
-;;        :SpelledNumbers
-;;        :json-false
-;;        :AnA t
-;;        :UnclosedQuotes t
-;;        :WrongQuotes
-;;        :json-false
-;;        :LongSentences
-;;        :json-false
-;;        :RepeatedWords t
-;;        :Spaces t
-;;        :Matcher t
-;;        :CorrectNumberSuffix t
-;;        :SentenceCapitalization t)
-;;       :codeActions (:ForceStable :json-false)
-;;       :diagnosticSeverity "hint"
-;;       :markdown (:IgnoreLinkTitle :json-false)
-;;       :isolateEnglish
-;;       :json-false
-;;       :dialect "American")))
+  ;; `:json-false' is the correct way to send false to LSP servers instead of
+  ;; nil, which would remove the key.
+  (setq-default
+   eglot-workspace-configuration
+   '(:pylsp
+     (:configurationSources
+      ["pyproject.toml" "setup.cfg"]
+      :plugins
+      (:autopep8
+       (:enabled :json-false)
+       :black (:enabled :json-false)
+       :flake8 (:enabled :json-false)
+       :jedi
+       (:auto_import_modules
+        []
+        :env_vars nil ; (:SOME_ENV_VAR "/some/path")
+        :environment nil ; "./.venv/"
+        :extra_paths [])
+       :jedi_completion
+       (:cache_for
+        []
+        :eager
+        :json-false
+        :enabled t
+        :fuzzy t
+        :include_class_objects
+        :json-false
+        :include_function_objects
+        :json-false
+        :include_params t
+        :resolve_at_most 25)
+       :jedi_definition
+       (:enabled
+        t
+        :follow_builtin_definitions t
+        :follow_builtin_imports t
+        :follow_imports t)
+       :jedi_hover (:enabled t)
+       :jedi_references (:enabled t)
+       :jedi_signature_help (:enabled t)
+       :jedi_symbols
+       (:all_scopes t :enabled t :include_import_symbols :json-false)
+       :mccabe (:enabled t :threshold 15)
+       :mypy (:enabled :json-false)
+       :preload (:enabled :json-false :modules [])
+       :pycodestyle (:enabled :json-false)
+       :pydocstyle (:enabled :json-false)
+       :pyflakes (:enabled :json-false)
+       ;; We use "basedpyright" as the primary server which provides type hints.
+       :pylint (:args [] :enabled :json-false)
+       :pylsp_black (:enabled :json-false)
+       :pylsp_isort (:enabled t)
+       :pylsp_mypy
+       (:enabled t :live_mode :json-false :report_progress :json-false)
+       ;; We use ruff from `apheleia-mode' because `basedpyright' does not support formatting.
+       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
+       :rope_autoimport
+       (:code_actions
+        (:enabled :json-false)
+        :completions (:enabled :json-false)
+        :enabled
+        :json-false
+        :memory
+        :json-false)
+       :rope_completion (:eager :json-false :enabled :json-false)
+       :ruff
+       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+       :yapf (:enabled :json-false)
+       :rope (:extensionModules nil :ropeFolder nil)))
+     ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
+     ;; LSP configuration for basedpyright.
+     :basedpyright
+     (:checkOnlyOpenFiles
+      t
+      :reportDuplicateImport t
+      :typeCheckingMode "recommended"
+      :useLibraryCodeForTypes t
+      :analysis
+      (:diagnosticSeverityOverrides
+       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+       :inlayHints
+       (:callArgumentNames
+        :json-false
+        :functionReturnTypes
+        :json-false
+        :variableTypes
+        :json-false
+        :genericTypes
+        :json-false)))
+     :ltex-ls-plus
+     (:language
+      "en-US"
+      :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
+      ;; Keep grammar and style checking
+      :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
+     :yaml
+     (:format
+      (:enable t :singleQuote nil :bracketSpacing t)
+      :validate t
+      :hover t
+      :completion t)
+     :vscode-json-language-server (:provideFormatter t)
+     ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
+     :harper-ls
+     (:userDictPath
+      (expand-file-name "~/.emacs.d/company-dict/text-mode")
+      :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
+      :fileDictPath ""
+      :linters
+      (:SpellCheck
+       :json-false
+       :SpelledNumbers
+       :json-false
+       :AnA t
+       :UnclosedQuotes t
+       :WrongQuotes
+       :json-false
+       :LongSentences
+       :json-false
+       :RepeatedWords t
+       :Spaces t
+       :Matcher t
+       :CorrectNumberSuffix t
+       :SentenceCapitalization t)
+      :codeActions (:ForceStable :json-false)
+      :diagnosticSeverity "hint"
+      :markdown (:IgnoreLinkTitle :json-false)
+      :isolateEnglish
+      :json-false
+      :dialect "American")))
 
-;;   ;; (setq-default completion-category-overrides
-;;   ;;               '((eglot (styles hotfuzz basic substring orderless))
-;;   ;;                 (eglot-capf (styles hotfuzz orderless))))
+  ;; (setq-default completion-category-overrides
+  ;;               '((eglot (styles hotfuzz basic substring orderless))
+  ;;                 (eglot-capf (styles hotfuzz orderless))))
 
-;;   ;; (with-eval-after-load 'project
-;;   ;;   (bind-key
-;;   ;;    "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map))
+  ;; (with-eval-after-load 'project
+  ;;   (bind-key
+  ;;    "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map))
 
-;;   (add-to-list
-;;    'display-buffer-alist
-;;    '("\\*EGLOT workspace configuration\\*"
-;;      (display-buffer-in-side-window)
-;;      (side . bottom)
-;;      (slot . 2)
-;;      (window-height . 0.5))))
+  (add-to-list
+   'display-buffer-alist
+   '("\\*EGLOT workspace configuration\\*"
+     (display-buffer-in-side-window)
+     (side . bottom)
+     (slot . 2)
+     (window-height . 0.5))))
 
-;; (use-package eglot-booster
-;;   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
-;;   :when (executable-find "emacs-lsp-booster")
-;;   :after eglot
-;;   :demand t
-;;   :config (eglot-booster-mode))
+(use-package eglot-booster
+  :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
+  :when (executable-find "emacs-lsp-booster")
+  :after eglot
+  :demand t
+  :config (eglot-booster-mode))
 
-;; (use-package eglot-java
-;;   :preface
-;;   (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
-;;     "Custom options that will be merged with any default settings."
-;;     `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
-;;       :settings
-;;       (:java
-;;        (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
-;;        :configuration
-;;        (:runtimes
-;;         [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
-;;          (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
-;;        :completion (:guessMethodArguments t)
-;;        :format
-;;        (:enabled
-;;         t
-;;         :comments (:enabled t)
-;;         :onType (:enabled :json-false)
-;;         :tabSize 4
-;;         :insertSpaces t
-;;         :settings
-;;         (:url
-;;          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
-;;        :extendedClientCapabilities (:classFileContentsSupport t))))
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :hook
-;;   ((java-mode . eglot-ensure)
-;;    (eglot-managed-mode
-;;     .
-;;     (lambda ()
-;;       (when (derived-mode-p 'java-mode)
-;;         (eglot-java-mode)))))
-;;   :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
+(use-package eglot-java
+  :preface
+  (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
+    "Custom options that will be merged with any default settings."
+    `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
+      :settings
+      (:java
+       (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
+       :configuration
+       (:runtimes
+        [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
+         (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
+       :completion (:guessMethodArguments t)
+       :format
+       (:enabled
+        t
+        :comments (:enabled t)
+        :onType (:enabled :json-false)
+        :tabSize 4
+        :insertSpaces t
+        :settings
+        (:url
+         "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
+       :extendedClientCapabilities (:classFileContentsSupport t))))
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  ((java-mode . eglot-ensure)
+   (eglot-managed-mode
+    .
+    (lambda ()
+      (when (derived-mode-p 'java-mode)
+        (eglot-java-mode)))))
+  :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
-;; (use-package eglot-hierarchy
-;;   :ensure (:host github :repo "dolmens/eglot-hierarchy")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after eglot
-;;   :commands
-;;   (eglot-hierarchy-call-hierarchy
-;;    eglot-hierarchy-incoming-calls
-;;    eglot-hierarchy-outgoing-calls
-;;    eglot-hierarchy-type-hierarchy))
+(use-package eglot-hierarchy
+  :ensure (:host github :repo "dolmens/eglot-hierarchy")
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
+  :commands
+  (eglot-hierarchy-call-hierarchy
+   eglot-hierarchy-incoming-calls
+   eglot-hierarchy-outgoing-calls
+   eglot-hierarchy-type-hierarchy))
 
-;; (use-package consult-eglot
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after (consult eglot)
-;;   :commands consult-eglot-symbols)
+(use-package consult-eglot
+  :when (eq sb/lsp-provider 'eglot)
+  :after (consult eglot)
+  :commands consult-eglot-symbols)
 
-;; (use-package flycheck-eglot
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after (flycheck eglot)
-;;   :init (global-flycheck-eglot-mode 1)
-;;   :custom (flycheck-eglot-exclusive nil))
+(use-package flycheck-eglot
+  :when (eq sb/lsp-provider 'eglot)
+  :after (flycheck eglot)
+  :init (global-flycheck-eglot-mode 1)
+  :custom (flycheck-eglot-exclusive nil))
 
-;; (use-package eglot-semantic-tokens
-;;   :ensure (:host github :repo "eownerdead/eglot-semantic-tokens")
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after eglot
-;;   :demand t
-;;   :custom (eglot-enable-semantic-tokens t))
+(use-package eglot-semantic-tokens
+  :ensure (:host github :repo "eownerdead/eglot-semantic-tokens")
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
+  :demand t
+  :custom (eglot-enable-semantic-tokens t))
 
-;; (use-package eglot-inactive-regions
-;;   :when (eq sb/lsp-provider 'eglot)
-;;   :after eglot
-;;   :demand t
-;;   :hook (eglot-managed-mode . eglot-inactive-regions-mode)
-;;   :custom
-;;   (eglot-inactive-regions-style 'darken-foreground)
-;;   (eglot-inactive-regions-opacity 0.4))
+(use-package eglot-inactive-regions
+  :when (eq sb/lsp-provider 'eglot)
+  :after eglot
+  :demand t
+  :hook (eglot-managed-mode . eglot-inactive-regions-mode)
+  :custom
+  (eglot-inactive-regions-style 'darken-foreground)
+  (eglot-inactive-regions-opacity 0.4))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
