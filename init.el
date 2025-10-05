@@ -81,7 +81,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot because it seems Texlab is inefficient.
-(defcustom sb/lsp-provider 'lsp-provider
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -906,7 +906,6 @@ The provider is `nerd-icons'."
 ;; functions and variables from Lisp packages which are loaded into the current
 ;; Emacs session or are auto-loaded.
 (use-package xref
-  :ensure nil
   :after consult
   :bind
   (("M-." . xref-find-definitions)
