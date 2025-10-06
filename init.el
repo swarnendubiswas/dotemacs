@@ -530,18 +530,18 @@ The provider is `nerd-icons'."
 ;; `find-file' unless a prefix argument is given. Then it will find file at
 ;; point.
 
-;; (use-package ffap
-;;   :ensure nil
-;;   :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
-;;   :custom
-;;   ;; Do not ping things that look like domain names
-;;   (ffap-machine-p-known 'reject))
+(use-package ffap
+  :ensure nil
+  :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
+  :custom
+  ;; Do not ping things that look like domain names
+  (ffap-machine-p-known 'reject))
 
-;; ;; Highlight and open http links in strings and comments in buffers.
-;; (use-package goto-addr
-;;   :ensure nil
-;;   :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
-;;   :bind ("C-c C-o" . goto-address-at-point))
+;; Highlight and open http links in strings and comments in buffers.
+(use-package goto-addr
+  :ensure nil
+  :hook ((prog-mode . goto-address-prog-mode) (text-mode . goto-address-mode))
+  :bind ("C-c C-o" . goto-address-at-point))
 
 (use-package subword
   :ensure nil
@@ -1526,17 +1526,17 @@ The provider is `nerd-icons'."
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
-;; ;; `consult-rg' provides live search, while `deadgrep' provides a resulting
-;; ;; search buffer. Visit the result in another buffer with "o", move between
-;; ;; search hits with "n" and "p", and move between files with "M-n" and "M-p".
-;; ;; Change the search term with "S" and enable incremental search with "I".
-;; (use-package deadgrep
-;;   :when (executable-find "rg")
-;;   :commands deadgrep-edit-mode
-;;   :custom
-;;   (deadgrep-max-buffers 1)
-;;   (deadgrep-display-buffer-function 'switch-to-buffer-other-frame)
-;;   (deadgrep-extra-arguments '()))
+;; `consult-rg' provides live search, while `deadgrep' provides a resulting
+;; search buffer. Visit the result in another buffer with "o", move between
+;; search hits with "n" and "p", and move between files with "M-n" and "M-p".
+;; Change the search term with "S" and enable incremental search with "I".
+(use-package deadgrep
+  :when (executable-find "rg")
+  :commands deadgrep-edit-mode
+  :custom
+  (deadgrep-max-buffers 1)
+  (deadgrep-display-buffer-function 'switch-to-buffer-other-frame)
+  (deadgrep-extra-arguments '()))
 
 (use-package wgrep
   :bind
@@ -1551,10 +1551,10 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'deadgrep
     (bind-key "e" #'wgrep-change-to-wgrep-mode deadgrep-mode-map)))
 
-;; ;; Allows you to edit a deadgrep buffer and apply those changes to the file
-;; ;; buffer.
-;; (use-package wgrep-deadgrep
-;;   :hook (deadgrep-finished . wgrep-deadgrep-setup))
+;; Allows you to edit a deadgrep buffer and apply those changes to the file
+;; buffer.
+(use-package wgrep-deadgrep
+  :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
 (use-package re-builder
   :ensure nil
@@ -2839,7 +2839,8 @@ DIR can be relative or absolute."
 (use-package corfu
   :preface
   (defun sb/corfu-default-setup ()
-    ;; (corfu-indexed-mode 1) ; I prefer `corfu-quick'
+    ;; I prefer `corfu-quick' because pressing TAB is easier
+    ;; (corfu-indexed-mode 1)
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
     (corfu-popupinfo-mode 1))
@@ -3228,24 +3229,24 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :diminish)
 
-;; (use-package lsp-ui
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-;;   :hook (lsp-mode . lsp-ui-mode)
-;;   :custom
-;;   ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
-;;   (lsp-ui-doc-enable nil)
-;;   (lsp-ui-doc-include-signature t)
-;;   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-;;   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-;;   (lsp-ui-imenu-auto-refresh 'after-save)
-;;   (lsp-ui-sideline-enable nil)
-;;   ;; Enables understanding when to invoke code actions
-;;   (lsp-ui-sideline-show-code-actions t)
-;;   (lsp-ui-sideline-show-hover nil)
-;;   ;; Hide diagnostics when typing because they can be intrusive, Flycheck and
-;;   ;; Flymake already highlight errors
-;;   (lsp-ui-sideline-show-diagnostics nil)
-;;   (lsp-ui-peek-enable nil))
+(use-package lsp-ui
+  :when (eq sb/lsp-provider 'lsp-mode)
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
+  (lsp-ui-imenu-auto-refresh 'after-save)
+  (lsp-ui-sideline-enable nil)
+  ;; Enables understanding when to invoke code actions
+  (lsp-ui-sideline-show-code-actions t)
+  (lsp-ui-sideline-show-hover nil)
+  ;; Hide diagnostics when typing because they can be intrusive, Flycheck and
+  ;; Flymake already highlight errors
+  (lsp-ui-sideline-show-diagnostics nil)
+  (lsp-ui-peek-enable nil))
 
 (use-package consult-lsp
   :after (consult lsp-mode)
@@ -3480,20 +3481,20 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;             (conf-toml-mode . toml-ts-mode)
 ;;             (yaml-mode . yaml-ts-mode))))
 
-;; (use-package treesit-auto
-;;   :when
-;;   (and (executable-find "tree-sitter")
-;;        (fboundp 'treesit-available-p)
-;;        (treesit-available-p))
-;;   :demand t
-;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-;;   :custom
-;;   ;; Increased default font locking may hurt performance
-;;   (treesit-font-lock-level 4)
-;;   (treesit-auto-install t)
-;;   :config
-;;   (global-treesit-auto-mode 1)
-;;   (treesit-auto-add-to-auto-mode-alist 'all))
+(use-package treesit-auto
+  :when
+  (and (executable-find "tree-sitter")
+       (fboundp 'treesit-available-p)
+       (treesit-available-p))
+  :demand t
+  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+  :custom
+  ;; Increased default font locking may hurt performance
+  (treesit-font-lock-level 4)
+  (treesit-auto-install t)
+  :config
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -4362,20 +4363,20 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t))
 
-;; (use-package catppuccin-theme
-;;   :when (eq sb/theme 'catppuccin)
-;;   :init (load-theme 'catppuccin t)
-;;   :config
-;;   (custom-set-faces
-;;    `(diff-hl-change
-;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
-;;   (custom-set-faces
-;;    `(diff-hl-delete
-;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
-;;   (custom-set-faces
-;;    `(diff-hl-insert
-;;      ((t
-;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
+(use-package catppuccin-theme
+  :when (eq sb/theme 'catppuccin)
+  :init (load-theme 'catppuccin t)
+  :config
+  (custom-set-faces
+   `(diff-hl-change
+     ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
+  (custom-set-faces
+   `(diff-hl-delete
+     ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
+  (custom-set-faces
+   `(diff-hl-insert
+     ((t
+       (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
 ;; (use-package autothemer)
 
@@ -4433,130 +4434,130 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :init (nerd-icons-grep-mode)
 ;;   :custom (grep-use-headings t))
 
-;; ;; Powerline theme for Nano looks great, and takes less space on the modeline.
-;; ;; It does not show lsp status, flycheck information, and Python virtualenv
-;; ;; information on the modeline. The package is not being actively maintained.
-;; ;; Inspired by
-;; ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-;; (use-package powerline
-;;   :preface
-;;   (defun sb/powerline-raw (str &optional face pad)
-;;     "Render STR as mode-line data using FACE and optionally PAD import.
-;; PAD can be left (`l') or right (`r')."
-;;     (when str
-;;       (let* ((rendered-str (format-mode-line str))
-;;              (padded-str
-;;               (concat
-;;                (when (and (> (length rendered-str) 0) (eq pad 'l))
-;;                  "")
-;;                (if (listp str)
-;;                    rendered-str
-;;                  str)
-;;                (when (and (> (length rendered-str) 0) (eq pad 'r))
-;;                  ""))))
-;;         (if face
-;;             (pl/add-text-property padded-str 'face face)
-;;           padded-str))))
+;; Powerline theme for Nano looks great, and takes less space on the modeline.
+;; It does not show lsp status, flycheck information, and Python virtualenv
+;; information on the modeline. The package is not being actively maintained.
+;; Inspired by
+;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+(use-package powerline
+  :preface
+  (defun sb/powerline-raw (str &optional face pad)
+    "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
+    (when str
+      (let* ((rendered-str (format-mode-line str))
+             (padded-str
+              (concat
+               (when (and (> (length rendered-str) 0) (eq pad 'l))
+                 "")
+               (if (listp str)
+                   rendered-str
+                 str)
+               (when (and (> (length rendered-str) 0) (eq pad 'r))
+                 ""))))
+        (if face
+            (pl/add-text-property padded-str 'face face)
+          padded-str))))
 
-;;   ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
-;;   (defun sb/flycheck-status ()
-;;     "Return Flycheck status with red for errors and yellow for warnings.
-;; Shows both colors when errors and warnings are present."
-;;     (when (bound-and-true-p flycheck-mode)
-;;       (let-alist
-;;        (flycheck-count-errors flycheck-current-errors)
-;;        (cond
-;;         ;; Both errors and warnings
-;;         ((and .error .warning)
-;;          (concat
-;;           (propertize (format "E:%s" .error) 'face '(:foreground "red"))
-;;           " "
-;;           (propertize (format "W:%s" .warning) 'face '(:foreground "gold"))))
-;;         ;; Only errors
-;;         (.error
-;;          (propertize (format "E:%s" .error) 'face '(:foreground "red")))
-;;         ;; Only warnings
-;;         (.warning
-;;          (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
-;;         ;; Clean: show nothing
-;;         (t
-;;          (propertize "✔ " 'face '(:foreground "green")))))))
+  ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
+  (defun sb/flycheck-status ()
+    "Return Flycheck status with red for errors and yellow for warnings.
+Shows both colors when errors and warnings are present."
+    (when (bound-and-true-p flycheck-mode)
+      (let-alist
+       (flycheck-count-errors flycheck-current-errors)
+       (cond
+        ;; Both errors and warnings
+        ((and .error .warning)
+         (concat
+          (propertize (format "E:%s" .error) 'face '(:foreground "red"))
+          " "
+          (propertize (format "W:%s" .warning) 'face '(:foreground "gold"))))
+        ;; Only errors
+        (.error
+         (propertize (format "E:%s" .error) 'face '(:foreground "red")))
+        ;; Only warnings
+        (.warning
+         (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
+        ;; Clean: show nothing
+        (t
+         (propertize "✔ " 'face '(:foreground "green")))))))
 
-;;   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-;;   (defun sb/powerline-nano-theme ()
-;;     "Setup a nano-like modeline"
-;;     (interactive)
-;;     (setq-default
-;;      mode-line-format
-;;      '("%e" (:eval
-;;         (let*
-;;             ((active (powerline-selected-window-active))
-;;              (face0
-;;               (if active
-;;                   'powerline-active0
-;;                 'powerline-inactive0))
-;;              ;; Left-hand side (GNU Emacs version)
-;;              (lhs
-;;               (list
-;;                (powerline-raw
-;;                 (concat
-;;                  "GNU Emacs "
-;;                  (number-to-string emacs-major-version)
-;;                  "."
-;;                  (number-to-string emacs-minor-version))
-;;                 nil 'l)))
-;;              ;; Center (buffer name)
-;;              (center (list (powerline-raw "%b" nil 'r)))
-;;              ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
-;;              (rhs
-;;               (list
-;;                (when which-function-mode
-;;                  (powerline-raw which-func-format nil 'l))
-;;                (when-let ((proj (project-current)))
-;;                  (powerline-raw (format "[%s]" (project-name proj)) nil 'l))
-;;                (powerline-vc nil 'l)
-;;                (powerline-raw "")
-;;                (powerline-raw "%4l" nil 'l)
-;;                (powerline-raw ",")
-;;                (powerline-raw "%3c" nil 'r)
-;;                (if (buffer-modified-p)
-;;                    (powerline-raw " ⠾" nil 'r)
-;;                  (powerline-raw "  " nil 'r))
-;;                (let ((status (sb/flycheck-status)))
-;;                  (when status
-;;                    (powerline-raw (format "  %s" status) nil 'r)))
-;;                (powerline-raw " "))))
-;;           (concat
-;;            (powerline-render lhs)
-;;            (powerline-fill-center nil (/ (powerline-width center) 2.0))
-;;            (powerline-render center)
-;;            (powerline-fill nil (powerline-width rhs))
-;;            (powerline-render rhs)))))))
-;;   :when (eq sb/modeline-theme 'powerline)
-;;   :hook
-;;   ((elpaca-after-init . sb/powerline-nano-theme)
-;;    ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
-;;   :custom
-;;   ;; Visualization of the buffer position is not useful
-;;   (powerline-display-hud nil)
-;;   (powerline-display-buffer-size nil)
-;;   (powerline-display-mule-info nil "File encoding information is not useful")
-;;   (powerline-gui-use-vcs-glyph t)
-;;   (powerline-height 20))
+  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+  (defun sb/powerline-nano-theme ()
+    "Setup a nano-like modeline"
+    (interactive)
+    (setq-default
+     mode-line-format
+     '("%e" (:eval
+        (let*
+            ((active (powerline-selected-window-active))
+             (face0
+              (if active
+                  'powerline-active0
+                'powerline-inactive0))
+             ;; Left-hand side (GNU Emacs version)
+             (lhs
+              (list
+               (powerline-raw
+                (concat
+                 "GNU Emacs "
+                 (number-to-string emacs-major-version)
+                 "."
+                 (number-to-string emacs-minor-version))
+                nil 'l)))
+             ;; Center (buffer name)
+             (center (list (powerline-raw "%b" nil 'r)))
+             ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
+             (rhs
+              (list
+               (when which-function-mode
+                 (powerline-raw which-func-format nil 'l))
+               (when-let ((proj (project-current)))
+                 (powerline-raw (format "[%s]" (project-name proj)) nil 'l))
+               (powerline-vc nil 'l)
+               (powerline-raw "")
+               (powerline-raw "%4l" nil 'l)
+               (powerline-raw ",")
+               (powerline-raw "%3c" nil 'r)
+               (if (buffer-modified-p)
+                   (powerline-raw " ⠾" nil 'r)
+                 (powerline-raw "  " nil 'r))
+               (let ((status (sb/flycheck-status)))
+                 (when status
+                   (powerline-raw (format "  %s" status) nil 'r)))
+               (powerline-raw " "))))
+          (concat
+           (powerline-render lhs)
+           (powerline-fill-center nil (/ (powerline-width center) 2.0))
+           (powerline-render center)
+           (powerline-fill nil (powerline-width rhs))
+           (powerline-render rhs)))))))
+  :when (eq sb/modeline-theme 'powerline)
+  :hook
+  ((elpaca-after-init . sb/powerline-nano-theme)
+   ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
+  :custom
+  ;; Visualization of the buffer position is not useful
+  (powerline-display-hud nil)
+  (powerline-display-buffer-size nil)
+  (powerline-display-mule-info nil "File encoding information is not useful")
+  (powerline-gui-use-vcs-glyph t)
+  (powerline-height 20))
 
-;; (use-package doom-modeline
-;;   :when (eq sb/modeline-theme 'doom-modeline)
-;;   :hook (elpaca-after-init . doom-modeline-mode)
-;;   :custom
-;;   (doom-modeline-buffer-encoding nil)
-;;   (doom-modeline-unicode-fallback t)
-;;   ;; Wrong LSP state is shown for non-LSP-managed files
-;;   (doom-modeline-lsp nil)
-;;   (doom-modeline-minor-modes t)
-;;   :config
-;;   (unless (display-graphic-p)
-;;     ;; All other choices can lead to the modeline text overflowing
-;;     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
+(use-package doom-modeline
+  :when (eq sb/modeline-theme 'doom-modeline)
+  :hook (elpaca-after-init . doom-modeline-mode)
+  :custom
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-unicode-fallback t)
+  ;; Wrong LSP state is shown for non-LSP-managed files
+  (doom-modeline-lsp nil)
+  (doom-modeline-minor-modes t)
+  :config
+  (unless (display-graphic-p)
+    ;; All other choices can lead to the modeline text overflowing
+    (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -4756,13 +4757,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
 
-;; (use-package kill-file-path
-;;   :ensure (:host github :repo "chyla/kill-file-path")
-;;   :commands
-;;   (kill-file-path-basename
-;;    kill-file-path-basename-without-extension
-;;    kill-file-path-dirname
-;;    kill-file-path))
+(use-package kill-file-path
+  :ensure (:host github :repo "chyla/kill-file-path")
+  :commands
+  (kill-file-path-basename
+   kill-file-path-basename-without-extension
+   kill-file-path-dirname
+   kill-file-path))
 
 ;; Allow fetching the latest version to satisfy Eglot requirements
 (use-package flymake)
@@ -5311,9 +5312,9 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   (("C-M-+" . default-text-scale-increase)
 ;;    ("C-M--" . default-text-scale-decrease)))
 
-;; ;; Show free bindings in current buffer
-;; (use-package free-keys
-;;   :commands free-keys)
+;; Show free bindings in current buffer
+(use-package free-keys
+  :commands free-keys)
 
 ;; I prefer Embark to show help about keybindings.
 
@@ -5426,8 +5427,8 @@ or the major mode is not in `sb/skippable-modes'."
 ;;   (flyover-background-lightness 40)
 ;;   :diminish)
 
-;; (use-package show-font
-;;   :ensure (:host github :repo "protesilaos/show-font"))
+(use-package show-font
+  :ensure (:host github :repo "protesilaos/show-font"))
 
 ;; (use-package disable-mouse
 ;;   :hook (emacs-startup . disable-mouse-global-mode)
