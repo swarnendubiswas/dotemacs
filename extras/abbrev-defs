@@ -1305,6 +1305,7 @@
     ("superflous" "superfluous" nil :count 1)
     ("suposed" "supposed" nil :count 0)
     ("suppossed" "supposed" nil :count 0)
+    ("suppsoe" "suppose" nil :count 0)
     ("suprise" "surprise" nil :count 0)
     ("suprised" "surprised" nil :count 0)
     ("suprisingly" "surprisingly" nil :count 0)

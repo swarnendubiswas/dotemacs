@@ -17,7 +17,7 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while Catppuccin is more colorful.
-(defcustom sb/theme 'leuven-dark
+(defcustom sb/theme 'modus-vivendi
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -1583,7 +1583,7 @@ The provider is `nerd-icons'."
   :custom (transient-semantic-coloring t)
   :config (transient-bind-q-to-quit))
 
-;; (use-package with-editor :diminish)
+(use-package with-editor :diminish)
 
 (use-package cond-let
   :ensure (:host github :repo "tarsius/cond-let"))
@@ -1614,10 +1614,9 @@ The provider is `nerd-icons'."
   (when (bound-and-true-p sb/enable-icons)
     (setopt magit-format-file-function #'magit-format-file-nerd-icons))
 
-;;   (with-eval-after-load 'magit-diff
-;;     ;; Show fine differences for the current diff hunk only
-  ;;     (setopt magit-diff-refine-hunk t))
-  )
+  (with-eval-after-load 'magit-diff
+    ;; Show fine differences for the current diff hunk only
+      (setopt magit-diff-refine-hunk t)))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -4194,51 +4193,51 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :after latex
 ;;   :commands bibtex-capf)
 
-;; (use-package citar
-;;   :preface
-;;   (defun sb/citar-format-key-title (key entry)
-;;     "Format Citar completion candidate showing only citation KEY and title."
-;;     (let ((title (citar-get-value "title" entry)))
-;;       (concat key " — " (truncate-string-to-width title 80))))
-;;   (defun sb/citar-annotate-key-title (key entry)
-;;     "Custom annotation for Citar: only show title, no authors."
-;;     (let ((title (citar-get-value "title" entry)))
-;;       ;; Corfu displays: COMPLETION  ANNOTATION
-;;       ;; key comes from the completion itself, so we just return title here
-;;       (concat " " (truncate-string-to-width (or title "") 80))))
-;;   (defun sb/citar-affixation-key-title (keys)
-;;     "Only show KEY and TITLE in completion (no authors)."
-;;     (mapcar
-;;      (lambda (key)
-;;        (let* ((entry (citar-get-entry key))
-;;               (title (citar-get-value "title" entry)))
-;;          ;; Return a (completion annotation summary) triple
-;;          (list
-;;           key
-;;           "" ; no annotation
-;;           (truncate-string-to-width (or title "") 80))))
-;;      keys))
-;;   :when (eq sb/in-buffer-completion 'corfu)
-;;   :after (tex cape)
-;;   :custom
-;;   ;; Remove support for `org-mode' and `markdown-mode'
-;;   (citar-major-mode-functions
-;;    '(((latex-mode LaTeX-mode)
-;;       .
-;;       ((local-bib-files . citar-latex-local-bib-files)
-;;        (insert-citation . citar-latex-insert-citation)
-;;        (insert-edit . citar-latex-insert-edit)
-;;        (key-at-point . citar-latex-key-at-point)
-;;        (citation-at-point . citar-latex-citation-at-point)
-;;        (list-keys . citar-latex-list-keys)))
-;;      (t . ((insert-keys . citar--insert-keys-comma-space-separated)))))
-;;   ;; Only show key and title in Corfu popup
-;;   (citar-format-reference-function 'citar-citeproc-format-reference))
+(use-package citar
+  :preface
+  (defun sb/citar-format-key-title (key entry)
+    "Format Citar completion candidate showing only citation KEY and title."
+    (let ((title (citar-get-value "title" entry)))
+      (concat key " — " (truncate-string-to-width title 80))))
+  (defun sb/citar-annotate-key-title (key entry)
+    "Custom annotation for Citar: only show title, no authors."
+    (let ((title (citar-get-value "title" entry)))
+      ;; Corfu displays: COMPLETION  ANNOTATION
+      ;; key comes from the completion itself, so we just return title here
+      (concat " " (truncate-string-to-width (or title "") 80))))
+  (defun sb/citar-affixation-key-title (keys)
+    "Only show KEY and TITLE in completion (no authors)."
+    (mapcar
+     (lambda (key)
+       (let* ((entry (citar-get-entry key))
+              (title (citar-get-value "title" entry)))
+         ;; Return a (completion annotation summary) triple
+         (list
+          key
+          "" ; no annotation
+          (truncate-string-to-width (or title "") 80))))
+     keys))
+  :when (eq sb/in-buffer-completion 'corfu)
+  :after (tex cape)
+  :custom
+  ;; Remove support for `org-mode' and `markdown-mode'
+  (citar-major-mode-functions
+   '(((latex-mode LaTeX-mode)
+      .
+      ((local-bib-files . citar-latex-local-bib-files)
+       (insert-citation . citar-latex-insert-citation)
+       (insert-edit . citar-latex-insert-edit)
+       (key-at-point . citar-latex-key-at-point)
+       (citation-at-point . citar-latex-citation-at-point)
+       (list-keys . citar-latex-list-keys)))
+     (t . ((insert-keys . citar--insert-keys-comma-space-separated)))))
+  ;; Only show key and title in Corfu popup
+  (citar-format-reference-function 'citar-citeproc-format-reference))
 
-;; (use-package citar-embark
-;;   :after (citar embark)
-;;   :config (citar-embark-mode)
-;;   :diminish)
+(use-package citar-embark
+  :after (citar embark)
+  :config (citar-embark-mode)
+  :diminish)
 
 ;; (use-package auctex-latexmk
 ;;   :after tex
