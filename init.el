@@ -174,7 +174,8 @@ The provider is `nerd-icons'."
      (global-visual-line-mode 1)
      ;; Add a prefix to continuation lines to prevent them from being indented
      ;; too far or wrapping awkwardly
-     (global-visual-wrap-prefix-mode 1)
+     (when (fboundp 'global-visual-wrap-prefix-mode)
+     (global-visual-wrap-prefix-mode 1))
      ;; When you call `find-file', you do not need to clear the existing file
      ;; path before adding the new one. Just start typing the whole path and
      ;; Emacs will "shadow" the current one. For example, you are at
@@ -253,7 +254,8 @@ The provider is `nerd-icons'."
   ;; Prevent 'Active processes exist' when you quit Emacs
   (confirm-kill-processes nil)
   (require-final-newline t "Always end a file with a newline")
-  (revert-without-query '("\\.*") "Revert all files without asking")
+  ;; This is problematic, and hence it is better to be explicit
+  ;; (revert-without-query '("\\.*") "Revert all files without asking")
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
   (vc-handled-backends '(Git))
   ;; Disable version control for remote files to improve performance
@@ -357,7 +359,11 @@ The provider is `nerd-icons'."
    bidi-paragraph-direction 'left-to-right)
 
   ;; Not a library/file, so `eval-after-load' does not work
-  (diminish 'auto-fill-function)
+  ;; (diminish 'auto-fill-function)
+  (diminish 'auto-fill-mode)
+
+  ;; (when (file-in-directory-p buffer-file-name user-emacs-directory)
+  ;; (advice-add 'risky-local-variable-p :override #'ignore))
 
   (advice-add 'risky-local-variable-p :override #'ignore)
 
@@ -405,6 +411,7 @@ The provider is `nerd-icons'."
   (auto-revert-remote-files nil)
   ;; Revert `dired' buffers if the directory contents change
   (global-auto-revert-non-file-buffers t)
+  (auto-revert-check-vc-info t)
   :diminish auto-revert-mode)
 
 (use-package savehist
@@ -629,7 +636,7 @@ The provider is `nerd-icons'."
   :ensure nil
   :hook (ibuffer . ibuffer-auto-mode)
   :bind
-  (("C-x C-b" . ibuffer-jump)
+  (("C-x C-b" . ibuffer)
    :map
    ibuffer-mode-map
    ("`" . ibuffer-switch-format))
@@ -1217,7 +1224,7 @@ The provider is `nerd-icons'."
   (cond
    ((executable-find "hunspell")
     (progn
-      (setenv "LANG" "en_US")
+      ;; (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
       (setopt
@@ -1367,7 +1374,7 @@ The provider is `nerd-icons'."
      bookmark-after-jump-hook))
   (dogears-functions '(avy-goto-char-timer avy-goto-line))
   :config
-  (dolist (mode '(elpaca-log-mode messages-buffer-mode))
+  (dolist (mode '(elpaca-log-mode messages-buffer-mode helpful-mode completion-list-mode))
     (add-to-list 'dogears-ignore-modes mode))
   (with-eval-after-load 'git-commit
     (add-to-list 'dogears-ignore-modes 'git-commit-mode))
@@ -1401,6 +1408,7 @@ The provider is `nerd-icons'."
    ;; These are for vertical movements.
    ("C-n" . vundo-next) ("C-p" . vundo-previous))
   :custom
+  (vundo-compact-display t)
   ;; Use pretty Unicode glyphs to draw the tree
   (vundo-glyph-alist vundo-unicode-symbols))
 
@@ -1536,7 +1544,7 @@ The provider is `nerd-icons'."
   :commands deadgrep-edit-mode
   :custom
   (deadgrep-max-buffers 1)
-  (deadgrep-display-buffer-function 'switch-to-buffer-other-frame)
+  (deadgrep-display-buffer-function 'switch-to-buffer)
   (deadgrep-extra-arguments '()))
 
 (use-package wgrep
@@ -1635,7 +1643,8 @@ The provider is `nerd-icons'."
   :hook
   ((elpaca-after-init . global-diff-hl-mode)
    (dired-mode . diff-hl-dired-mode-unless-remote)
-   (diff-hl-mode . sb/diff-hl-maybe-margin))
+   (diff-hl-mode . sb/diff-hl-maybe-margin)
+   (after-save-hook . diff-hl-update))
   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
   :custom
   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
