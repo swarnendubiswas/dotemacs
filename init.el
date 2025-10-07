@@ -402,7 +402,7 @@ The provider is `nerd-icons'."
   :hook (elpaca-after-init . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
-  (auto-revert-remote-files t)
+  (auto-revert-remote-files nil)
   ;; Revert `dired' buffers if the directory contents change
   (global-auto-revert-non-file-buffers t)
   :diminish auto-revert-mode)
@@ -2629,6 +2629,21 @@ DIR can be relative or absolute."
 ;;   :after tex
 ;;   :commands company-bibtex)
 
+;; We should enable `company-fuzzy-mode' at the very end of configuring
+;; `company'. Nice feature but slows completions.
+
+;; (use-package company-fuzzy
+;;   :after company
+;;   :demand t
+;;   :custom
+;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
+;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
+;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
+;;   ;; Disabling the requirement may help with performance.
+;;   (company-fuzzy-prefix-on-top t)
+;;   :diminish)
+
 ;; A few mode-agnostic backends are applicable to all modes:
 ;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
 ;; `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev' returns
@@ -4757,6 +4772,9 @@ Shows both colors when errors and warnings are present."
 ;;    . hs-minor-mode)
 ;;   :custom (hs-isearch-open t "Open all folds while searching")
 ;;   :diminish hs-minor-mode)
+
+(use-package string-inflection
+  :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
 (use-package kill-file-path
   :ensure (:host github :repo "chyla/kill-file-path")
