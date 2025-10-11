@@ -22,7 +22,7 @@
    ;; Files
    (eval .
          (dolist (ext
-                  '("\\.tags" ".pptx" ".xml" ".drawio" ".out" ".vect" "GPATH"))
+                  '("\\.tags/" ".pptx" ".xml" ".drawio" ".out" ".vect" "GPATH" ".rel"))
            (add-to-list 'completion-ignored-extensions ext)))
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")

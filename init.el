@@ -81,7 +81,7 @@ The provider is `nerd-icons'."
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
 ;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot because it seems Texlab is inefficient.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -1632,29 +1632,29 @@ The provider is `nerd-icons'."
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-;; Diff-hl looks nicer than git-gutter, and is based on `vc'. Fringe is
-;; unavailable in TTY.
-(use-package diff-hl
-  :preface
-  (defun sb/diff-hl-maybe-margin ()
-    "Enable margin mode for diff-hl when in TTY."
-    (unless (display-graphic-p)
-      (diff-hl-margin-local-mode)))
-  :hook
-  ((elpaca-after-init . global-diff-hl-mode)
-   (dired-mode . diff-hl-dired-mode-unless-remote)
-   (diff-hl-mode . sb/diff-hl-maybe-margin)
-   (after-save-hook . diff-hl-update))
-  :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
-  :custom
-  (diff-hl-draw-borders nil "Highlight without a border looks nicer")
-  (diff-hl-update-async t)
-  :config
-  (diff-hl-flydiff-mode 1) ; For unsaved buffers
+;; ;; Diff-hl looks nicer than git-gutter, and is based on `vc'. Fringe is
+;; ;; unavailable in TTY.
+;; (use-package diff-hl
+;;   :preface
+;;   (defun sb/diff-hl-maybe-margin ()
+;;     "Enable margin mode for diff-hl when in TTY."
+;;     (unless (display-graphic-p)
+;;       (diff-hl-margin-local-mode)))
+;;   :hook
+;;   ((elpaca-after-init . global-diff-hl-mode)
+;;    (dired-mode . diff-hl-dired-mode-unless-remote)
+;;    (diff-hl-mode . sb/diff-hl-maybe-margin)
+;;    (after-save-hook . diff-hl-update))
+;;   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
+;;   :custom
+;;   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
+;;   (diff-hl-update-async t)
+;;   :config
+;;   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 
-  (with-eval-after-load 'magit
-    ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
+;;   (with-eval-after-load 'magit
+;;     ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+;;     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 ;; (use-package smerge-mode
 ;;   :ensure nil)
@@ -3006,13 +3006,14 @@ DIR can be relative or absolute."
         (list
          (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'citar-capf
          (cape-capf-super
+          (cape-company-to-capf #'company-reftex-labels)
+          (cape-company-to-capf #'company-auctex-labels))
+         (cape-capf-super
           ;; Math latex tags
           (cape-company-to-capf #'company-math-symbols-latex)
           (cape-company-to-capf #'company-latex-commands)
-          (cape-company-to-capf #'company-reftex-labels)
           (cape-company-to-capf #'company-auctex-environments)
           (cape-company-to-capf #'company-auctex-macros)
-          (cape-company-to-capf #'company-auctex-labels)
           ;; Math Unicode symbols and sub(super)scripts
           (cape-company-to-capf #'company-math-symbols-unicode)
           (cape-company-to-capf #'company-auctex-symbols)
@@ -4192,7 +4193,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package bibtex
   :ensure nil
-  ;; :hook (bibtex-mode . sb/setup-lsp-provider)
+  :hook (bibtex-mode . (lambda()
+                         (when (eq sb/lsp-provider 'lsp-mode)
+                           (setq-local lsp-disabled-clients '(ltex-ls-plus)))))
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
@@ -4386,7 +4389,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
-  :init (load-theme 'modus-vivendi t))
+  :init (load-theme 'modus-vivendi t)
+  :custom
+  (modus-themes-mixed-fonts nil))
 
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
@@ -4848,9 +4853,9 @@ Shows both colors when errors and warnings are present."
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' or `markdown-mode' yet
-     ((LaTeX-mode markdown-mode markdown-ts-mode) . ("ltex-ls-plus"))
-     ((text-mode org-mode)
+     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode'
+     (LaTeX-mode . ("ltex-ls-plus"))
+     ((text-mode org-mode markdown-mode markdown-ts-mode)
       .
       ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -4925,14 +4930,8 @@ Shows both colors when errors and warnings are present."
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
-  `eglot-workspace-configuration'
-  should
-  be
-  set
-  as
-  a
-  directory-local
-  variable.
+  ;; `eglot-workspace-configuration' should be set as a directory-local
+  ;; variable, but it is not working for me.
 
   ;; `:json-false' is the correct way to send false to LSP servers instead of
   ;; nil, which would remove the key.

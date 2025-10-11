@@ -1130,6 +1130,7 @@
     ("reconize" "recognize" nil :count 0)
     ("recrod" "record" nil :count 0)
     ("redirector" "re-director" nil :count 0)
+    ("refelcted" "reflected" nil :count 0)
     ("referrred" "referred" nil :count 1)
     ("refferences" "references" nil :count 0)
     ("refinign" "refining" nil :count 1)
