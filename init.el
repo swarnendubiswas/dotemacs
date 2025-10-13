@@ -865,9 +865,9 @@ The provider is `nerd-icons'."
 
 (use-package dired-x
   :ensure nil
-  ;; :hook (dired-mode . (lambda ()
-  ;;                       (require 'dired-x)
-  ;;                       (dired-omit-mode -1)))
+  :hook (dired-mode . (lambda ()
+                        (require 'dired-x)
+                        (dired-omit-mode -1)))
   :bind ("C-x C-j" . dired-jump)
   :custom
   (dired-omit-verbose nil "Do not show messages when omitting files")
@@ -1633,7 +1633,7 @@ The provider is `nerd-icons'."
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
 ;; ;; Diff-hl looks nicer than git-gutter, and is based on `vc'. Fringe is
-;; ;; unavailable in TTY.
+;; ;; unavailable in TTY. But it can be expensive.
 ;; (use-package diff-hl
 ;;   :preface
 ;;   (defun sb/diff-hl-maybe-margin ()
@@ -2479,7 +2479,6 @@ The provider is `nerd-icons'."
          minibuffer-inactive-mode))
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
-  (company-minimum-prefix-length 3)
   ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup
   ;; unless there is only one candidate, `company-preview-frontend' shows the
   ;; preview in-place which is too intrusive,
@@ -2765,8 +2764,8 @@ DIR can be relative or absolute."
                 '(company-files
                   ;; (company-capf :with company-yasnippet)
                   ;; References & labels
-                  (company-reftex-citations
-                   company-reftex-labels company-auctex-labels)
+                   company-reftex-citations
+                  (company-reftex-labels company-auctex-labels)
                   ;; LaTeX macros/envs/snippets
                   (company-auctex-macros
                    company-auctex-environments
@@ -2882,7 +2881,8 @@ DIR can be relative or absolute."
   :hook
   ((elpaca-after-init . global-corfu-mode)
    (corfu-mode . sb/corfu-default-setup)
-   (prog-mode . sb/corfu-prog-setup))
+   ;; We want 2-character prefixes in LaTeX-mode for yasnippets
+   ((prog-mode LaTeX-mode) . sb/corfu-prog-setup))
   :bind
   (:map
    corfu-map
@@ -3067,10 +3067,10 @@ DIR can be relative or absolute."
   ;;       #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))
   )
 
-;; Prescient uses frecency (frequency + recency) for sorting. Recently used
-;; commands should be sorted first. Only commands that have never been used
-;; before will be sorted by length. Vertico does its own sorting based on
-;; recency, Corfu has `corfu-history', and Company has `company-statistics'.
+;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
+;; Company has `company-statistics'. ;; Prescient uses frecency (frequency +
+;; recency) for sorting. Recently used commands should be sorted first. Only
+;; commands that have never been used before will be sorted by length.
 (use-package prescient
   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
   :hook (elpaca-after-init . prescient-persist-mode)
@@ -3349,10 +3349,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package hl-todo
   :hook (elpaca-after-init . global-hl-todo-mode)
+  ;; I use Flycheck integration to navigate among the highlighted lines.
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
+  :custom (hl-todo-highlight-punctuation ":")
   :config
   (setopt
-   hl-todo-highlight-punctuation ":"
    hl-todo-keyword-faces
    (append
     '(("LATER" . "#d0bf8f")
@@ -3397,9 +3398,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :init (fancy-compilation-mode 1)
   :custom (fancy-compilation-scroll-output 'first-error))
 
-;; Frequent eldoc popups is irritating.
 (use-package eldoc
   :ensure nil
+  ;; Frequent eldoc messages are irritating.
   ;; :hook ((emacs-lisp-mode lisp-data-mode) . global-eldoc-mode)
   :custom
   (eldoc-area-prefer-doc-buffer t "Disable popups")
@@ -3416,9 +3417,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package eldoc-box
   :when (display-graphic-p)
-  ;; :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
+  :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
   :custom (eldoc-box-clear-with-C-g t)
-  ;; (eldoc-box-max-pixel-width 600)
+  ;; Reduce the width to cover a lesser portion of the screen
   (eldoc-box-max-pixel-height 400)
   :config (eldoc-box-mouse-mode -1)
   :diminish (eldoc-box-hover-mode eldoc-box-hover-at-point-mode))
@@ -4390,8 +4391,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t)
-  :custom
-  (modus-themes-mixed-fonts nil))
+  :custom (modus-themes-mixed-fonts nil))
 
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
@@ -4854,7 +4854,7 @@ Shows both colors when errors and warnings are present."
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode'
-     (LaTeX-mode . ("ltex-ls-plus"))
+     ;; (LaTeX-mode . ("ltex-ls-plus"))
      ((text-mode org-mode markdown-mode markdown-ts-mode)
       .
       ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
@@ -5038,7 +5038,7 @@ Shows both colors when errors and warnings are present."
      ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
      :harper-ls
      (:userDictPath
-      (expand-file-name "~/.emacs.d/company-dict/text-mode")
+      (expand-file-name ())
       :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
       :fileDictPath ""
       :linters
