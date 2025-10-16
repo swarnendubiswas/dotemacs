@@ -1391,12 +1391,15 @@ The provider is `nerd-icons'."
      ;; Make it full-frame
      (body-function . delete-other-windows))))
 
-;; (use-package gumshoe
-;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
-;;   :hook (elpaca-after-init . global-gumshoe-mode)
-;;   :custom (gumshoe-auto-cancel-backtracking-p nil)
-;;   :config (diminish 'global-gumshoe-mode)
-;;   :diminish global-gumshoe-mode)
+(use-package gumshoe
+  :ensure (:host github :repo "Overdr0ne/gumshoe")
+  :hook (elpaca-after-init . global-gumshoe-mode)
+  :custom (gumshoe-auto-cancel-backtracking-p nil)
+  :config (diminish 'global-gumshoe-mode)
+  :diminish global-gumshoe-mode)
+
+(use-package better-jumper
+  :hook (elpaca-after-init . better-jumper-mode))
 
 (use-package vundo
   :bind
