@@ -125,6 +125,14 @@ The provider is `nerd-icons'."
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
 
+;; The following webpage provides a few recommendations on how to use
+;; `use-package'.
+;; https://batsov.com/articles/2025/04/17/using-use-package-the-right-way/
+
+;; Where possible, it is better to avoid :preface, :config and :init. Instead,
+;; prefer autoloading keywords such as :bind, :hook, and :mode, as they will
+;; take care of setting up autoloads.
+
 (use-package diminish
   :ensure (:wait t))
 
@@ -828,9 +836,10 @@ The provider is `nerd-icons'."
   :ensure nil
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh `dired' when files change
-   (dired-mode . dired-hide-details-mode))
-  :bind
-  (:map
+   (dired-mode . dired-hide-details-mode)
+   (dired-mode . dired-omit-mode))
+  :bind (("C-x C-j" . dired-jump)
+         :map
    dired-mode-map
    ("M-<home>" . sb/dired-go-home)
    ("M-<up>" . sb/dired-jump-to-top)
@@ -859,18 +868,7 @@ The provider is `nerd-icons'."
   (dired-clean-confirm-killing-deleted-buffers nil)
   (dired-hide-details-hide-symlink-targets nil)
   (dired-free-space nil)
-  :config
-  (when (boundp 'dired-kill-when-opening-new-dired-buffer)
-    (setopt dired-kill-when-opening-new-dired-buffer t)))
-
-(use-package dired-x
-  :ensure nil
-  :hook (dired-mode . (lambda ()
-                        (require 'dired-x)
-                        (dired-omit-mode -1)))
-  :bind ("C-x C-j" . dired-jump)
-  :custom
-  (dired-omit-verbose nil "Do not show messages when omitting files")
+    (dired-omit-verbose nil "Do not show messages when omitting files")
   (dired-omit-files
    (rx
     (or (seq bol "." (not (any "."))) ; dotfiles
@@ -888,6 +886,8 @@ The provider is `nerd-icons'."
         (seq (optional ".js") ".meta")
         (seq "." (or "elc" "o" "pyo" "swp" "class")))))
   :config
+  (when (boundp 'dired-kill-when-opening-new-dired-buffer)
+    (setopt dired-kill-when-opening-new-dired-buffer t))
   ;; Obsolete from Emacs 28+
   (unless (> emacs-major-version 27)
     (setopt dired-bind-jump t))
@@ -2507,7 +2507,10 @@ The provider is `nerd-icons'."
      ;; https://github.com/company-mode/company-mode/issues/358
      (lambda (candidates)
        (cl-remove-if
-        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates)))))
+        (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
+
+  (use-package company-capf
+    :bind ("C-c p" . company-capf)))
 
 ;; Posframes do not have unaligned rendering issues with variable `:height'
 ;; unlike an overlay. However, posframes do not work with TUI, and the width of
@@ -2991,7 +2994,7 @@ DIR can be relative or absolute."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'yasnippet-capf
+                  (ignore-errors #'yasnippet-capf)
                   (cape-capf-inside-code
                    (cape-capf-super
                     ;; #'citre-completion-at-point
@@ -3511,20 +3514,22 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;             (conf-toml-mode . toml-ts-mode)
 ;;             (yaml-mode . yaml-ts-mode))))
 
-(use-package treesit-auto
-  :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
-  :demand t
-  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-  :custom
-  ;; Increased default font locking may hurt performance
-  (treesit-font-lock-level 4)
-  (treesit-auto-install t)
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all))
+;; I have disabled treesitter support because several major modes are still unstable. For example, I get "treesit-font-lock-fontify-region: Query pattern is malformed" with CMake.
+
+;; (use-package treesit-auto
+;;   :when
+;;   (and (executable-find "tree-sitter")
+;;        (fboundp 'treesit-available-p)
+;;        (treesit-available-p))
+;;   :demand t
+;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+;;   :custom
+;;   ;; Increased default font locking may hurt performance
+;;   (treesit-font-lock-level 4)
+;;   (treesit-auto-install t)
+;;   :config
+;;   (global-treesit-auto-mode 1)
+;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -4628,6 +4633,7 @@ Shows both colors when errors and warnings are present."
   :ensure (:host github :repo "dataphract/kdl-ts-mode")
   :mode ("\\.kdl\\'" . kdl-ts-mode))
 
+;; I use `apheleia-mode' to sort kdl files.
 ;; (use-package reformatter
 ;;   :after (:any kdl-ts-mode kdl-mode)
 ;;   :demand t
@@ -4647,6 +4653,7 @@ Shows both colors when errors and warnings are present."
   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
 
+;; The LSP is too slow to start.
 (use-package asm-mode
   :ensure nil
   :hook (asm-mode . sb/setup-lsp-provider))
@@ -5708,7 +5715,8 @@ or the major mode is not in `sb/skippable-modes'."
   (bind-key "C-c c" #'sb/citre-transient)
   ;; )
 
-  ;; (with-eval-after-load 'corfu
+  ;; We want Cape functions to be autoloaded if not already.
+  (when (eq sb/in-buffer-completion 'corfu)
   (transient-define-prefix
    sb/corfu-transient () "Corfu commands"
    [["Capf"
@@ -5726,8 +5734,7 @@ or the major mode is not in `sb/skippable-modes'."
      ("l" "Line" cape-line)
      ("b" "Elisp block" cape-elisp-block)]
     ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
-  (bind-key "C-c p" #'sb/corfu-transient)
-  ;; )
+  (bind-key "C-c p" #'sb/corfu-transient))
 
   ;; (with-eval-after-load 'latex
   (transient-define-prefix

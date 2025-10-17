@@ -217,6 +217,8 @@
 
 (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon)
 
+;; The following page suggests avoiding set-face-attribute for performance
+;; reasons. https://github.com/D4lj337/Emacs-performance
 (defun sb/init-fonts-graphic ()
   (cond
    ((string= (system-name) "inspiron-7572")
@@ -243,7 +245,7 @@
       (set-face-attribute 'mode-line nil :height 140)
       (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
-(add-hook 'emacs-startup-hook #'sb/init-fonts-graphic)
+(add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic)
 
 (provide 'early-init)
 
