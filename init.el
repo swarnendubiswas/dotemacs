@@ -3511,20 +3511,20 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;             (conf-toml-mode . toml-ts-mode)
 ;;             (yaml-mode . yaml-ts-mode))))
 
-(use-package treesit-auto
-  :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
-  :demand t
-  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-  :custom
-  ;; Increased default font locking may hurt performance
-  (treesit-font-lock-level 4)
-  (treesit-auto-install t)
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all))
+;; (use-package treesit-auto
+;;   :when
+;;   (and (executable-find "tree-sitter")
+;;        (fboundp 'treesit-available-p)
+;;        (treesit-available-p))
+;;   :demand t
+;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+;;   :custom
+;;   ;; Increased default font locking may hurt performance
+;;   (treesit-font-lock-level 4)
+;;   (treesit-auto-install t)
+;;   :config
+;;   (global-treesit-auto-mode 1)
+;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
