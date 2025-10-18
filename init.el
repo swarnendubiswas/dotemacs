@@ -1395,11 +1395,13 @@ The provider is `nerd-icons'."
   :ensure (:host github :repo "Overdr0ne/gumshoe")
   :hook (elpaca-after-init . global-gumshoe-mode)
   :custom (gumshoe-auto-cancel-backtracking-p nil)
-  :config (diminish 'global-gumshoe-mode)
-  :diminish global-gumshoe-mode)
+  :config
+  (use-package gumshoe-core
+  :diminish global-gumshoe-mode))
 
 (use-package better-jumper
-  :hook (elpaca-after-init . better-jumper-mode))
+  :hook (elpaca-after-init . better-jumper-mode)
+  :diminish better-jumper-local-mode)
 
 (use-package vundo
   :bind
@@ -2482,14 +2484,14 @@ The provider is `nerd-icons'."
          minibuffer-inactive-mode))
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
-  ;; Choices are: `company-pseudo-tooltip-unless-just-one-frontend' shows popup
-  ;; unless there is only one candidate, `company-preview-frontend' shows the
-  ;; preview in-place which is too intrusive,
-  ;; `company-preview-if-just-one-frontend' shows in-place preview if there is
-  ;; only choice, `company-echo-metadata-frontend' shows selected candidate docs
-  ;; in echo area, and `company-pseudo-tooltip-frontend' which always shows the
+  ;; `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there
+  ;; is only one candidate, `company-preview-frontend' shows the preview
+  ;; in-place which is too intrusive, `company-preview-if-just-one-frontend'
+  ;; shows in-place preview if there is only choice,
+  ;; `company-echo-metadata-frontend' shows selected candidate docs in echo
+  ;; area, and `company-pseudo-tooltip-frontend' which always shows the
   ;; candidates in an overlay. We do not want to use `company' for showing
-  ;; selected candidate docs in echo area.
+  ;; selected candidate docs in echo area and hence remove `company-echo-metadata-frontend'.
   (company-frontends '(company-pseudo-tooltip-frontend))
   ;; (company-require-match nil)
   ;; (company-insertion-triggers '())
@@ -2508,6 +2510,17 @@ The provider is `nerd-icons'."
      (lambda (candidates)
        (cl-remove-if
         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
+
+  ;; Disable code candidates in comments
+  ;; https://github.com/company-mode/company-mode/discussions/1498
+  (when (eq sb/lsp-provider 'eglot)
+  (defun sb/company-capf-around (orig-fun &rest args)
+  "Custom advice for `company-capf--prefix` to restrict completions in comments."
+  (let ((syntax-info (syntax-ppss)))
+    (if (nth 4 syntax-info)
+        nil
+      (apply orig-fun args))))
+  (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
 
   (use-package company-capf
     :bind ("C-c p" . company-capf)))
@@ -2803,6 +2816,7 @@ DIR can be relative or absolute."
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
        (sb/company-text-mode))))
 
+  ;; FIXME: This does not complete inside comments with Eglot but works with `lsp-mode'.
   (defun sb/company-c-mode ()
     (setq-local
      company-backends
