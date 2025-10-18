@@ -1391,13 +1391,16 @@ The provider is `nerd-icons'."
      ;; Make it full-frame
      (body-function . delete-other-windows))))
 
+;; Keeps track of the point position over time and allows us to navigate back
+;; and forward in history.
 (use-package gumshoe
   :ensure (:host github :repo "Overdr0ne/gumshoe")
-  :hook (elpaca-after-init . global-gumshoe-mode)
-  :custom (gumshoe-auto-cancel-backtracking-p nil)
-  :config
-  (use-package gumshoe-core
-  :diminish global-gumshoe-mode))
+  :hook (elpaca-after-init . (lambda ()
+                               (global-gumshoe-mode 1)
+                               (diminish 'global-gumshoe-mode)))
+  :custom (gumshoe-show-footprints-p nil)
+  (gumshoe-prefer-same-window t)
+  (gumshoe-idle-time 2))
 
 (use-package better-jumper
   :hook (elpaca-after-init . better-jumper-mode)
