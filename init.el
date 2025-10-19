@@ -2525,8 +2525,9 @@ The provider is `nerd-icons'."
       (apply orig-fun args))))
   (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
 
-  (use-package company-capf
-    :bind ("C-c p" . company-capf)))
+  (with-eval-after-load 'company-capf
+    (bind-key "C-c p" #'company-capf))
+  :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height'
 ;; unlike an overlay. However, posframes do not work with TUI, and the width of
@@ -2543,7 +2544,6 @@ The provider is `nerd-icons'."
   (company-posframe-show-indicator nil)
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
   :config
-  (diminish 'company-mode)
   (when (eq sb/theme 'leuven-dark)
     (set-face-attribute 'company-posframe-active-backend-name nil
                         :height 0.8
@@ -2944,7 +2944,7 @@ DIR can be relative or absolute."
   :ensure (:host github :repo "elken/yasnippet-capf")
   :when (eq sb/in-buffer-completion 'corfu)
   :after yasnippet
-  :commands yasnippet-capf)
+  :demand t)
 
 (use-package cape
   :after corfu
@@ -4709,13 +4709,13 @@ Shows both colors when errors and warnings are present."
 ;;   :hook (elpaca-after-init . global-clipetty-mode)
 ;;   :diminish)
 
-;; ;; Only enable xclip in TTY under X11
-;; (use-package xclip
-;;   :when (and (not (display-graphic-p))          ; only in TTY
-;;            (not (getenv "WAYLAND_DISPLAY"))   ; avoid Wayland
-;;            (or (executable-find "xclip")
-;;                (executable-find "xsel")))
-;;   :hook (elpaca-after-init . xclip-mode))
+;; Only enable xclip in TTY under X11
+(use-package xclip
+  :when (and (not (display-graphic-p))          ; only in TTY
+           (not (getenv "WAYLAND_DISPLAY"))   ; avoid Wayland
+           (or (executable-find "xclip")
+               (executable-find "xsel")))
+  :hook (elpaca-after-init . xclip-mode))
 
 ;; (use-package ztree
 ;;   :commands (ztree-diff))

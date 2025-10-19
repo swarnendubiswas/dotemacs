@@ -11,7 +11,6 @@
 
 (defconst sb/emacs-4MB (* 4 1024 1024))
 (defconst sb/emacs-64MB (* 64 1024 1024))
-(defconst sb/emacs-1GB (* 1 1024 1024 1024))
 
 ;; Defer GC during startup
 (setopt
@@ -137,6 +136,8 @@
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message user-login-name
  initial-scratch-message nil
+ ;; Avoid overhead of loading more expensive major modes
+ initial-major-mode 'fundamental-mode
  use-file-dialog nil
  use-dialog-box nil)
 
