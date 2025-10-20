@@ -229,7 +229,7 @@
       (progn
         (set-face-attribute 'default nil
                             :font "JetBrainsMonoNerdFontMono"
-                            :height 200)
+                            :height 210)
         (set-face-attribute 'mode-line nil :height 160)
         (set-face-attribute 'mode-line-inactive nil :height 160)))
 
