@@ -16,8 +16,8 @@
   :group 'sb/emacs)
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
-;; while Catppuccin is more colorful.
-(defcustom sb/theme 'modus-vivendi
+;; while `Catppuccin' is more colorful.
+(defcustom sb/theme 'none
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -39,8 +39,6 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; So far, `lsp-mode' with `company' works best for me. The other alternatives are `eglot' and `corfu'.
-
 ;; Corfu integrates nicely with `orderless' and provides better completion for
 ;; Elisp symbols with `cape-elisp-symbol'. But `corfu-terminal-mode' with Emacs
 ;; < 31 has a rendering problem for completion popups appearing near the right
@@ -49,8 +47,8 @@
 ;; Emacs, and has more extensive LaTeX support than Corfu. We can set up
 ;; separate completion files with `company-ispell' and `company-dict'. However,
 ;; `company-ispell' does not keep prefix case when used as a grouped backend. We
-;; use `company' for now because Emacs versions till 30.x does not support child
-;; frames on the terminal.
+;; use `company' with TUI for now because Emacs versions till 30.x does not
+;; support child frames on the terminal.
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
       'corfu
@@ -63,13 +61,15 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Keeping icons disabled should help with the alignment issue with Company and Corfu popups in the terminal.
+;; Keeping icons disabled should lower overhead and help with the alignment
+;; issue with Company and Corfu popups in the terminal.
 (defcustom sb/enable-icons nil
   "Should icons be enabled?
 The provider is `nerd-icons'."
   :type 'boolean
   :group 'sb/emacs)
 
+;; Nerd-icons are more compact and look nicer.
 (defcustom sb/corfu-icons 'nerd-icons
   "Choose the provider for Corfu icons."
   :type
@@ -80,7 +80,7 @@ The provider is `nerd-icons'."
   :group 'sb/emacs)
 
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I prefer Eglot because it seems Texlab is inefficient.
+;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I use Eglot because Texlab is inefficient.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
@@ -110,28 +110,25 @@ The provider is `nerd-icons'."
 
 (eval-and-compile
   (setopt
+   use-package-always-ensure t
    use-package-enable-imenu-support t
+   ;; Delay loading packages
    use-package-expand-minimally t
-   use-package-always-defer t
-   use-package-always-ensure t))
+   use-package-always-defer t))
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
 
-;; Package `bind-key' provides macros `bind-key', `bind-key*', and `unbind-key'
-;; which provides a much prettier API for manipulating keymaps than `define-key'
-;; and `global-set-key'. "C-h b" lists all the bindings available in a buffer,
-;; "C-h m" shows the keybindings for the major and the minor modes.
+;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the
+;; keybindings for the major and the minor modes.
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
 ;; keywords.
 
 ;; The following webpage provides a few recommendations on how to use
-;; `use-package'.
+;; `use-package'. Where possible, it is better to avoid :preface, :config and
+;; :init. Instead, prefer autoloading keywords such as :bind, :hook, and :mode,
+;; as they will take care of setting up autoloads.
 ;; https://batsov.com/articles/2025/04/17/using-use-package-the-right-way/
-
-;; Where possible, it is better to avoid :preface, :config and :init. Instead,
-;; prefer autoloading keywords such as :bind, :hook, and :mode, as they will
-;; take care of setting up autoloads.
 
 (use-package diminish
   :ensure (:wait t))
@@ -147,19 +144,19 @@ The provider is `nerd-icons'."
 
 (elpaca-wait)
 
-;; ;; Use "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc" for defining aliases. Then, we can avoid passing shell arguments to be more efficient.
-;; (use-package exec-path-from-shell
-;;   ;; Emacs launched in the terminal gets to see $PATH.
-;;   :when (and (eq system-type 'gnu/linux) (display-graphic-p))
-;;   :demand t
-;;   :init
-;;   (setopt
-;;    exec-path-from-shell-check-startup-files nil
-;;    exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "LANG" "LC_CTYPE" "LSP_USE_PLISTS")
-;;    ;; Reduce the start up time. Exporting $PATH should still work if the shell
-;;    ;; rc files have been correctly setup.
-;;    exec-path-from-shell-arguments nil)
-;;   (exec-path-from-shell-initialize))
+;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
+;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
+;; for defining aliases. Then, we can avoid passing shell arguments to be more
+;; efficient.
+(use-package exec-path-from-shell
+  :when (and (eq system-type 'gnu/linux) (display-graphic-p))
+  :demand t
+  :init
+  (setopt
+   exec-path-from-shell-check-startup-files nil
+   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "LANG" "LC_CTYPE" "LSP_USE_PLISTS")
+   exec-path-from-shell-arguments nil) ; Reduce the start up time
+  (exec-path-from-shell-initialize))
 
 (use-package emacs
   :ensure nil
@@ -168,13 +165,13 @@ The provider is `nerd-icons'."
    .
    (lambda ()
      (save-place-mode 1)
-     ;; (size-indication-mode 1) ; No benefit in seeing the file size.
+     ;; (size-indication-mode 1) ; No benefit in seeing the file size
      (column-number-mode 1)
      ;; `auto-save-mode' saves to a separate auto-save file, while
      ;; `auto-save-visited-mode' saves directly to the visited file and runs all
      ;; save-related hooks. We disable `auto-save-mode' and prefer
-     ;; `auto-save-visited-mode' instead. Autosave file-visiting buffers at idle
-     ;; time intervals instead of based on the number of characters typed.
+     ;; `auto-save-visited-mode' instead. Auto-save file-visiting buffers at
+     ;; idle time intervals instead of based on the number of characters typed.
      (auto-save-visited-mode 1)
      ;; Typing with the mark active will overwrite the marked region
      (delete-selection-mode 1)
@@ -189,7 +186,11 @@ The provider is `nerd-icons'."
      ;; Emacs will "shadow" the current one. For example, you are at
      ;; "~/Documents/notes/file.txt" and you want to go to "~/.emacs.d/init.el",
      ;; type the latter directly and Emacs will take you there.
-     (file-name-shadow-mode 1)))
+     (file-name-shadow-mode 1)
+     ;; This puts the buffer in read-only mode and disables font locking, revert
+     ;; with "C-c C-c".
+     (when (fboundp 'global-so-long-mode)
+       (global-so-long-mode 1))))
   :bind
   (("<f1>" . execute-extended-command)
    ("<f2>" . find-file)
@@ -219,14 +220,18 @@ The provider is `nerd-icons'."
   (auto-save-no-message t "Do not print frequent auto-save messages")
   ;; Disable auto-saving based on number of characters typed
   (auto-save-interval 0)
+
   ;; ;; Save buffer to file after idling for 10s. The default of 5s may be too
   ;; ;; frequent since it runs all the save-related hooks.
   ;; (auto-save-visited-interval 10)
   ;; (apropos-do-all t "Make `apropos' search more extensively")
+
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
+
   ;; Autofill comments in modes that define them
   ;; (comment-auto-fill-only-comments t)
+
   ;; Show the actual symbol name in the *customize* buffer
   (custom-unlispify-menu-entries nil)
   (create-lockfiles nil)
@@ -257,47 +262,46 @@ The provider is `nerd-icons'."
   (tags-case-fold-search nil "case-sensitive")
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
+
   ;; (auto-mode-case-fold nil "Avoid a second pass through `auto-mode-alist'")
   ;; (confirm-kill-emacs nil)
+
   ;; Prevent 'Active processes exist' when you quit Emacs
   (confirm-kill-processes nil)
   (require-final-newline t "Always end a file with a newline")
-  ;; This is problematic, and hence it is better to be explicit
+
+  ;; Reverting without confirmation is confusing, and hence it is better to be
+  ;; explicit
   ;; (revert-without-query '("\\.*") "Revert all files without asking")
+
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
   (vc-handled-backends '(Git))
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp
    (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
-  (display-buffer-alist
-   '(
-     ;; Allow *Help* buffers to use the full frame
-     ("*Help*" (display-buffer-same-window))
-     ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
-      (display-buffer-no-window)
-      (allow-no-window . t))
-     ("\\*compilation\\*" ; Compilation
-      (display-buffer-in-side-window)
-      (side . bottom)
-      (slot . 1)
-      (window-height . 0.5))))
   (scroll-preserve-screen-position t)
   ;; Number of lines of margin at the top and bottom of a window when automatic scrolling is triggered
   (scroll-margin 2)
+
   ;; (scroll-step 1)
   ;; (scroll-conservatively 10)
   ;; (scroll-error-top-bottom t)
+
   ;; Accelerate scrolling operations when non-nil. Only those portions of the
   ;; buffer which are actually going to be displayed get fontified.
   (fast-but-imprecise-scrolling t)
   (auto-window-vscroll nil)
   (hscroll-margin 2)
   (hscroll-step 1)
+
   ;; (fringes-outside-margins t)
+
   ;; Improve Emacs' responsiveness by delaying syntax highlighting during input
   (redisplay-skip-fontification-on-input t)
+
   ;; Show contextual lines around a match
   ;; (list-matching-lines-default-context-lines 1)
+
   (imenu-auto-rescan t)
   (imenu-use-popup-menu nil)
   (save-silently t)
@@ -306,6 +310,7 @@ The provider is `nerd-icons'."
   :config
   (dolist (exts
            '(".aux"
+             ".bbl"
              ".bcf"
              ".blg"
              ".directory"
@@ -397,17 +402,26 @@ The provider is `nerd-icons'."
   ;;    (setq truncate-lines nil)
   ;;    (visual-line-mode 1)))
 
-  ;; This puts the buffer in read-only mode and disables font locking, revert
-  ;; with "C-c C-c".
-  (unless (version<= emacs-version "27")
-    (add-hook 'elpaca-after-init-hook #'global-so-long-mode))
-
   ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
   ;; Zellij.
   (unbind-key "C-]")
-  ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
   (unbind-key "C-x f") ; Bound to `set-fill-column'
   (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
+
+  ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
+
+  (setopt display-buffer-alist
+          '(
+            ;; Allow *Help* buffers to use the full frame
+            ("*Help*" (display-buffer-same-window))
+            ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
+             (display-buffer-no-window)
+             (allow-no-window . t))
+            ("\\*compilation\\*" ; Compilation
+             (display-buffer-in-side-window)
+             (side . bottom)
+             (slot . 1)
+             (window-height . 0.5))))
 
   :diminish visual-line-mode)
 
@@ -416,8 +430,10 @@ The provider is `nerd-icons'."
   :hook (elpaca-after-init . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
-  (auto-revert-remote-files nil)
-  ;; Revert `dired' buffers if the directory contents change
+  (auto-revert-remote-files nil) ; Avoid overhead
+  ;; Revert `dired' buffers if the current directory contents change. Dired
+  ;; buffers do not auto-revert as a result of changes in subdirectories, or in
+  ;; the contents, size, modes, etc., of files.
   (global-auto-revert-non-file-buffers t)
   (auto-revert-check-vc-info t)
   :diminish auto-revert-mode)
@@ -504,8 +520,10 @@ The provider is `nerd-icons'."
   (advice-add 'recentf-cleanup :around #'sb/inhibit-message-call-orig-fun)
   ;; Hide the "Wrote ..." message
   (advice-add 'write-region :around #'sb/inhibit-message-call-orig-fun)
+
   ;; (advice-add 'write-file :around #'sb/inhibit-message-call-orig-fun)
   ;; (advice-add 'save-buffer :around #'sb/inhibit-message-call-orig-fun)
+
   (advice-add 'basic-save-buffer :around #'sb/inhibit-message-call-orig-fun))
 
 (progn
@@ -544,7 +562,6 @@ The provider is `nerd-icons'."
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
 ;; `find-file' unless a prefix argument is given. Then it will find file at
 ;; point.
-
 (use-package ffap
   :ensure nil
   :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
@@ -563,7 +580,7 @@ The provider is `nerd-icons'."
   :hook ((LaTeX-mode prog-mode conf-unix-mode) . subword-mode)
   :diminish)
 
-;; Use "Shift + direction" arrows for moving around windows.
+;; ;; Use "Shift + direction" arrows for moving around windows.
 ;; (use-package windmove
 ;;   :ensure nil
 ;;   :when (display-graphic-p)
@@ -586,8 +603,8 @@ The provider is `nerd-icons'."
   (ediff-window-setup-function #'ediff-setup-windows-plain)
   ;; Split diffs side by side
   (ediff-split-window-function #'split-window-horizontally)
-  ;; ;; Prompt and kill file variants on quitting an Ediff session
-  ;; (ediff-keep-variants nil)
+  ;; Prompt and kill file variants on quitting an Ediff session
+  (ediff-keep-variants nil)
   :config
   (ediff-set-diff-options 'ediff-diff-options "-w")
   (with-eval-after-load 'winner
@@ -623,8 +640,9 @@ The provider is `nerd-icons'."
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path t)
-  ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
   (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
+
+  ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
 
   ;; https://coredumped.dev/2025/06/18/making-tramp-go-brrrr./
   ;; Newer versions of TRAMP will use SSH connection sharing for much faster
@@ -749,37 +767,10 @@ The provider is `nerd-icons'."
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
-  :preface
-  (defun sb/avy-goto-visual-line-column-0 ()
-    "Jump to column 0 of each visible visual line in the current window."
-    (interactive)
-    (avy-with
-     avy-goto-line
-     (avy-process
-      (save-excursion
-        (let ((start (window-start))
-              (end (window-end nil t))
-              positions)
-          ;; Restrict search to visible region for speed
-          (save-restriction
-            (narrow-to-region start end)
-            (goto-char (point-min))
-            (while (not (eobp))
-              (let ((bol
-                     (save-excursion
-                       (vertical-motion 0) ; stay on current visual line
-                       (line-beginning-position))))
-                ;; Avoid duplicates (folds/overlays can cause repeats)
-                (unless (and positions (= bol (caar positions)))
-                  (push (cons bol bol) positions)))
-              (vertical-motion 1))) ; move to next visual line
-          (nreverse positions)))
-      (avy--style-fn avy-style))))
   :bind
   (("C-\\" . avy-goto-word-1)
    ("C-'" . avy-goto-char-timer)
    ("C-/" . avy-goto-line)
-   ("M-/" . sb/avy-goto-visual-line-column-0)
    ("C-M-c" . avy-copy-line)
    ("C-M-m" . avy-move-line)
    :map isearch-mode-map
@@ -793,8 +784,7 @@ The provider is `nerd-icons'."
   :custom (aw-minibuffer-flag t)
   :config (ace-window-display-mode 1))
 
-;; Jump around buffers in few keystrokes
-
+;; ;; Jump around buffers in few keystrokes
 ;; (use-package frog-jump-buffer
 ;;   :ensure (:host github :repo "waymondo/frog-jump-buffer")
 ;;   :bind ("C-b" . frog-jump-buffer)
@@ -842,8 +832,7 @@ The provider is `nerd-icons'."
    ("_" . dired-create-empty-file))
   :custom
   ;; When there are two `dired' buffer windows in the same frame, Emacs will
-  ;; select the other buffer as the target directory (e.g., for copying or
-  ;; renaming files).
+  ;; select the other buffer as the target for copying or renaming files.
   (dired-dwim-target t)
   (dired-auto-revert-buffer t)
   ;; "A" is to avoid listing "." and "..", "B" is to avoid listing backup
@@ -863,22 +852,22 @@ The provider is `nerd-icons'."
   (dired-hide-details-hide-symlink-targets nil)
   (dired-free-space nil)
   (dired-omit-verbose nil "Do not show messages when omitting files")
-  (dired-omit-files
-   (rx
-    (or (seq bol "." (not (any "."))) ; dotfiles
-        ".DS_Store"
-        ".project"
-        (optional "ile")
-        ".svn"
-        ".git"
-        ".cache"
-        ".ccls-cache"
-        "__pycache__"
-        "eln-cache"
-        ".ctags.d"
-        ".git"
-        (seq (optional ".js") ".meta")
-        (seq "." (or "elc" "o" "pyo" "swp" "class")))))
+  ;; (dired-omit-files
+  ;;  (rx
+  ;;   (or (seq bol "." (not (any "."))) ; dotfiles
+  ;;       ".DS_Store"
+  ;;       ".project"
+  ;;       (optional "ile")
+  ;;       ".svn"
+  ;;       ".git"
+  ;;       ".cache"
+  ;;       ".ccls-cache"
+  ;;       "__pycache__"
+  ;;       "eln-cache"
+  ;;       ".ctags.d"
+  ;;       ".git"
+  ;;       (seq (optional ".js") ".meta")
+  ;;       (seq "." (or "elc" "o" "pyo" "swp" "class")))))
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setopt dired-kill-when-opening-new-dired-buffer t))
@@ -980,7 +969,6 @@ The provider is `nerd-icons'."
 
   ;; Customize the display of the current candidate in the completion list. This
   ;; will prefix the current candidate with "» " to make it stand out.
-  ;; Reference:
   ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
   (advice-add
    #'vertico--format-candidate
@@ -1076,9 +1064,12 @@ The provider is `nerd-icons'."
   ;; Disable preview by default, enable for selected commands
   (consult-preview-key nil)
   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
-  ;; Having multiple other sources like `recentf' makes it difficult to identify
-  ;; and switch quickly between only buffers, especially while wrapping around.
+
+  ;; Having multiple other sources like `recentf' may make it difficult to
+  ;; identify and switch quickly between only buffers, especially while wrapping
+  ;; around.
   ;; (consult-buffer-sources '(consult--source-buffer))
+
   (consult-narrow-key "<")
   (consult-widen-key ">")
   (consult-buffer-filter sb/consult-buffer-filter)
@@ -1140,6 +1131,12 @@ The provider is `nerd-icons'."
 ;;   :custom (consult-jump-direct-jump-modes '(dired-mode))
 ;;   :bind ("C-x p j" . consult-jump-project))
 
+;; Use `consult' to select Tramp targets. Supported completion sources are ssh
+;; config, known hosts, and docker containers.
+(use-package consult-tramp
+  :ensure (:host github :repo "Ladicle/consult-tramp")
+  :commands consult-tramp)
+
 ;; Provide context-dependent actions similar to a content menu.
 (use-package embark
   :bind
@@ -1189,18 +1186,7 @@ The provider is `nerd-icons'."
   ;; Override the annotators for the variable category.
   (add-to-list
    'marginalia-annotators
-   '(variable sb/marginalia-annotate-variable builtin none))
-
-  ;; (add-to-list
-  ;;  'marginalia-annotators
-  ;;  '(symbol marginalia-annotate-variable marginalia-align))
-  )
-
-;; Use `consult' to select Tramp targets. Supported completion sources are ssh
-;; config, known hosts, and docker containers.
-(use-package consult-tramp
-  :ensure (:host github :repo "Ladicle/consult-tramp")
-  :commands consult-tramp)
+   '(variable sb/marginalia-annotate-variable builtin none)))
 
 (use-package ispell
   :ensure nil
@@ -1241,7 +1227,6 @@ The provider is `nerd-icons'."
        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
 
   ;; Skip regions in `org-mode'
-
   (dolist
       (skip-pair
        '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
@@ -1555,9 +1540,10 @@ The provider is `nerd-icons'."
   (deadgrep-extra-arguments '()))
 
 (use-package wgrep
+  ;; These keybindings are also defined in `wgrep-mode-map'
   :bind
   (:map
-   grep-mode-map ; These keybindings are also defined in `wgrep-mode-map'
+   grep-mode-map
    ("C-x C-p" . wgrep-change-to-wgrep-mode)
    ("C-x C-s" . wgrep-finish-edit)
    ("C-x C-k" . wgrep-abort-changes)
@@ -1567,7 +1553,7 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'deadgrep
     (bind-key "e" #'wgrep-change-to-wgrep-mode deadgrep-mode-map)))
 
-;; Allows you to edit a deadgrep buffer and apply those changes to the file
+;; Allows you to edit a `deadgrep' buffer and apply those changes to the file
 ;; buffer.
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
@@ -1577,9 +1563,8 @@ The provider is `nerd-icons'."
   :commands re-builder
   :custom (reb-re-syntax 'string))
 
-;; Package `visual-regexp' provides an alternate version of `query-replace'
-;; which highlights matches and replacements as you type.
-
+;; ;; Package `visual-regexp' provides an alternate version of `query-replace'
+;; ;; which highlights matches and replacements as you type.
 ;; (use-package visual-regexp
 ;;   :bind
 ;;   (([remap query-replace] . vr/query-replace)
@@ -1604,9 +1589,9 @@ The provider is `nerd-icons'."
 (use-package cond-let
   :ensure (:host github :repo "tarsius/cond-let"))
 
+;; Use "M-p/n" to cycle between older commit messages.
 (use-package magit
   :hook
-  ;; Use "M-p/n" to cycle between older commit messages.
   (git-commit-setup
    .
    (lambda ()
@@ -1639,12 +1624,12 @@ The provider is `nerd-icons'."
   :mode ("/\\.gitignore\\'" . gitignore-mode)
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-;; ;; Diff-hl looks nicer than git-gutter, and is based on `vc'. Fringe is
-;; ;; unavailable in TTY. But it can be expensive.
+;; ;; Diff-hl looks nicer than git-gutter, but is based on `vc' and can be
+;; ;; expensive.
 ;; (use-package diff-hl
 ;;   :preface
 ;;   (defun sb/diff-hl-maybe-margin ()
-;;     "Enable margin mode for diff-hl when in TTY."
+;;     "Fringe is unavailable in TTY. Enable margin mode for when in TTY."
 ;;     (unless (display-graphic-p)
 ;;       (diff-hl-margin-local-mode)))
 ;;   :hook
@@ -1658,7 +1643,6 @@ The provider is `nerd-icons'."
 ;;   (diff-hl-update-async t)
 ;;   :config
 ;;   (diff-hl-flydiff-mode 1) ; For unsaved buffers
-
 ;;   (with-eval-after-load 'magit
 ;;     ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
 ;;     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
@@ -1719,37 +1703,34 @@ The provider is `nerd-icons'."
   (flycheck-indication-mode nil)
   :config
   ;; Shellcheck is invoked by bash lsp
-  (setq flycheck-checkers
-        (seq-difference
-         flycheck-checkers
-         '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck)))
+  (setopt flycheck-checkers
+          (seq-difference
+           flycheck-checkers
+           '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck)))
   ;; Prefer linters packaged with pylsp
   (pcase sb/python-langserver
     ('pylsp
-     (setq flycheck-checkers
-           (seq-difference
-            flycheck-checkers
-            '(python-flake8
-              python-pylint
-              python-mypy
-              python-ruff
-              python-pycompile
-              python-pyright))))
+     (setopt flycheck-checkers
+             (seq-difference
+              flycheck-checkers
+              '(python-flake8
+                python-pylint
+                python-mypy
+                python-ruff
+                python-pycompile
+                python-pyright))))
     ('basedpyright
-     (setq flycheck-checkers
-           (seq-difference
-            flycheck-checkers
-            '(python-flake8
-              python-pylint python-mypy python-pycompile python-pyright)))))
+     (setopt flycheck-checkers
+             (seq-difference
+              flycheck-checkers
+              '(python-flake8
+                python-pylint python-mypy python-pycompile python-pyright)))))
 
   ;; These themes have their own styles for displaying flycheck info.
   (when (eq sb/modeline-theme 'doom-modeline)
     (setopt flycheck-mode-line nil))
 
   (setq-default
-   flycheck-markdown-markdownlint-cli-config
-   (expand-file-name ".markdownlint.json" sb/user-home-directory)
-   flycheck-pylintrc '("setup.cfg" "pylintrc")
    flycheck-python-pylint-executable "python3"
    flycheck-shellcheck-follow-sources nil
    flycheck-shellcheck-excluded-warnings '("SC1091"))
@@ -1757,7 +1738,8 @@ The provider is `nerd-icons'."
   ;; https://github.com/flycheck/flycheck/issues/1833
   (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
 
-  ;; Chain checkers with lsp, using per-project directory local variables.
+  ;; Chain checkers with `Lsp-mode', using per-project directory local
+  ;; variables.
   ;; https://github.com/flycheck/flycheck/issues/1762
   (defvar-local sb/flycheck-local-checkers nil)
   (defun sb/flycheck-checker-get (fn checker property)
@@ -1765,11 +1747,8 @@ The provider is `nerd-icons'."
         (funcall fn checker property)))
   (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
 
-  (when (eq sb/theme 'leuven-dark)
-    ;; (defface sb/flycheck-mode-line
-    ;;   '((t :inherit mode-line :foreground "black" :weight regular))
-    ;;   "Custom face for Flycheck lighter in the mode line.")
-
+  ;; Customize face for Flycheck lighter in the mode line.
+  (when (or (eq sb/theme 'none) (eq sb/theme 'leuven-dark))
     (defface sb/flycheck-mode-line
       '((((class color) (background light))
          ;; Active window
@@ -1794,6 +1773,23 @@ The provider is `nerd-icons'."
 (use-package consult-flycheck
   :after flycheck
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
+
+(use-package hl-todo
+  :hook (elpaca-after-init . global-hl-todo-mode)
+
+  ;; I use Flycheck integration (`previous-error' and `next-error') to navigate
+  ;; among the highlighted lines.
+  ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
+
+  :custom (hl-todo-highlight-punctuation ":")
+  :config
+  (setopt hl-todo-keyword-faces
+          (append
+           '(("LATER" . "#d0bf8f")
+             ("IMP" . "#7cb8bb")
+             ("TEST" . "tomato")
+             ("WARNING" . "#cc0000"))
+           hl-todo-keyword-faces)))
 
 ;; Include `hl-todo' keywords in Flycheck messages.
 (use-package flycheck-hl-todo
@@ -1874,6 +1870,24 @@ The provider is `nerd-icons'."
 ;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
 ;;   :diminish)
 
+;; ;; We now use Bash LSP for formatting with `shfmt'.
+;; (use-package shfmt
+;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
+;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
+;;   :diminish shfmt-on-save-mode)
+
+;; ;; Yapfify works on the original file, so that any project settings supported
+;; ;; by YAPF itself are used. We now use `apheleia-mode' for Python.
+;; (use-package yapfify
+;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
+;;   :hook ((python-mode python-ts-mode) . yapf-mode)
+;;   :diminish yapf-mode)
+
+;; ;; We use `apheleia-mode' for Python.
+;; (use-package ruff-format
+;;   :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
+;;   :diminish ruff-format-on-save-mode)
+
 ;; Basedpyright does not provide formatting feature. So, we cannot use
 ;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
 (use-package apheleia
@@ -1894,22 +1908,6 @@ The provider is `nerd-icons'."
     (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
   :diminish apheleia-mode)
 
-;; (use-package shfmt
-;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
-;;   :diminish shfmt-on-save-mode)
-
-;; Yapfify works on the original file, so that any project settings supported by
-;; YAPF itself are used.
-;; (use-package yapfify
-;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
-;;   :hook ((python-mode python-ts-mode) . yapf-mode)
-;;   :diminish yapf-mode)
-
-;; (use-package ruff-format
-;;   :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
-;;   :diminish ruff-format-on-save-mode)
-
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
   :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
@@ -1917,7 +1915,7 @@ The provider is `nerd-icons'."
   (elisp-autofmt-python-bin "python3")
   (elisp-autofmt-on-save-p 'always))
 
-;; Provides indentation guide bars with tree-sitter support
+;; Provides indentation guide bars with optional `tree-sitter' support
 (use-package indent-bars
   :hook
   ((bash-ts-mode
@@ -1952,8 +1950,8 @@ The provider is `nerd-icons'."
         while_statement)
        (yaml block_mapping_pair comment)))))
 
-;; Use "C-M-;" for `dabbrev-completion' which finds all expansions in the
-;; current buffer and presents suggestions for completion.
+;; `dabbrev-completion' finds all expansions in the current buffer and presents
+;; suggestions for completion.
 (use-package dabbrev
   :ensure nil
   :bind ("C-M-;" . dabbrev-completion)
@@ -1986,15 +1984,8 @@ The provider is `nerd-icons'."
      try-expand-line))
   (hippie-expand-verbose nil))
 
-;; ;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
-;; (use-package hotfuzz
-;;   :after (:any company corfu)
-;;   :demand t)
-
 ;; Use "M-SPC" for space-separated completion lookups.
 (use-package orderless
-  ;; :after hotfuzz
-  :after (:any company corfu)
   :demand t
   :config
   (with-eval-after-load 'company
@@ -2011,17 +2002,21 @@ The provider is `nerd-icons'."
 ;; "orderless" can match search terms in any order.
 (use-package minibuffer
   :ensure nil
-  :after orderless
   :bind
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
   :custom
-  (enable-recursive-minibuffers nil)
+  (enable-recursive-minibuffers nil "Confusing to track the depth")
   (completion-ignore-case t)
   ;; Ignore case when reading a file name
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
   (read-buffer-completion-ignore-case t)
+  (completion-styles '(orderless))
+  (completion-category-defaults nil)
+  ;; The "basic" completion style needs to be tried first for TRAMP hostname
+  ;; completion to work. I also want substring matching for file names.
+  (completion-category-overrides '((file (styles basic partial-completion))))
   :config
   ;; Show docstring description for completion candidates in commands like
   ;; `describe-function'.
@@ -2030,14 +2025,6 @@ The provider is `nerd-icons'."
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
 
-  (setopt
-   ;; completion-styles '(hotfuzz orderless)
-   completion-styles '(orderless)
-   completion-category-defaults nil
-   ;; The "basic" completion style needs to be tried first for TRAMP hostname
-   ;; completion to work. I also want substring matching for file names.
-   completion-category-overrides '((file (styles basic partial-completion))))
-
   (defun sb/decrease-minibuffer-font ()
     "Decrease minibuffer font size."
     (setq-local face-remapping-alist '((default :height 0.95))))
@@ -2045,6 +2032,11 @@ The provider is `nerd-icons'."
 
   ;; Do not open the *Messages* buffer when clicking in the Echo area.
   (unbind-key [mouse-1] minibuffer-inactive-mode-map))
+
+;; ;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
+;; (use-package hotfuzz
+;;   :demand t
+;;   :custom completion-styles '(hotfuzz orderless))
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
@@ -2069,9 +2061,14 @@ The provider is `nerd-icons'."
 (use-package consult-yasnippet
   :bind ("C-M-y" . consult-yasnippet))
 
-;; `kind-icon' can be used for both Corfu and Company. I set up nerd icons for
-;; Corfu with `nerd-icons-corfu'. I use `kind-icon' to provide nerd icons for
-;; Company.
+(use-package nerd-icons
+  :when (bound-and-true-p sb/enable-icons)
+  :demand t
+  :custom (nerd-icons-scale-factor 0.8))
+
+;; `kind-icon' can be used for both Corfu and Company. I use `kind-icon' to
+;; provide Nerd icons for Company while I use `nerd-icons-corfu' to set up nerd
+;; icons for Corfu.
 (use-package kind-icon
   :when
   (and (bound-and-true-p sb/enable-icons)
@@ -2079,17 +2076,6 @@ The provider is `nerd-icons'."
            (eq sb/corfu-icons 'kind-icon)))
   :after nerd-icons
   :demand t ; Required to load the library because there are no other triggers
-  :custom
-  ;; Corfu icons are too big, prefer smaller icons and a more compact popup
-  (kind-icon-default-style
-   '(:padding
-     0
-     :stroke 0
-     :margin 0
-     :radius 0
-     :height 0.5
-     :scale 0.8
-     :background nil))
   :config
   (add-to-list
    'svg-lib-icon-collections
@@ -2103,317 +2089,130 @@ The provider is `nerd-icons'."
      "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
 
   (with-eval-after-load 'corfu
-    (setopt kind-icon-default-face 'corfu-default)
+    (setopt
+     kind-icon-default-face 'corfu-default
+     ;; Corfu icons are too big, prefer smaller icons and a more compact popup
+     kind-icon-default-style
+     '(:padding
+       0
+       :stroke 0
+       :margin 0
+       :radius 0
+       :height 0.5
+       :scale 0.8
+       :background nil))
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
+  ;; Company may be loaded even with Corfu for use with LaTeX. That is why we do
+  ;; not use `with-eval-after-load'.
   (when (eq sb/in-buffer-completion 'company)
     ;; Prefer smaller icons and a more compact popup
-    (setopt kind-icon-default-style
-            '(:padding
-              0
-              :stroke 0
-              :margin 0
-              :radius 0
-              :height 0.8
-              :scale 0.6
-              :background nil))
-
-    ;;   (setopt kind-icon-mapping
-    ;;           '((array
-    ;;              "a"
-    ;;              :icon "symbol-array"
-    ;;              :face font-lock-type-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (boolean
-    ;;              "b"
-    ;;              :icon "symbol-boolean"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (class
-    ;;              "c"
-    ;;              :icon "symbol-class"
-    ;;              :face font-lock-type-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (color
-    ;;              "#"
-    ;;              :icon "symbol-color"
-    ;;              :face success
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (command
-    ;;              "cm"
-    ;;              :icon "chevron-right"
-    ;;              :face default
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (constant
-    ;;              "co"
-    ;;              :icon "symbol-constant"
-    ;;              :face font-lock-constant-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (constructor
-    ;;              "cn"
-    ;;              :icon "symbol-method"
-    ;;              :face font-lock-function-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (enum
-    ;;              "e"
-    ;;              :icon "symbol-enum"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (enummember
-    ;;              "em"
-    ;;              :icon "symbol-enum-member"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (enum-member
-    ;;              "em"
-    ;;              :icon "symbol-enum-member"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (event
-    ;;              "ev"
-    ;;              :icon "symbol-event"
-    ;;              :face font-lock-warning-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (field
-    ;;              "fd"
-    ;;              :icon "symbol-field"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (file
-    ;;              "f"
-    ;;              :icon "symbol-file"
-    ;;              :face font-lock-string-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (folder
-    ;;              "d"
-    ;;              :icon "folder"
-    ;;              :face font-lock-doc-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (function "f"
-    ;;                       :icon "symbol-method"
-    ;;                       :face font-lock-function-name-face
-    ;;                       :collection "nerd-fonts-codicons")
-    ;;             ;; For Python
-    ;;             (instance
-    ;;              "in"
-    ;;              :icon "symbol-variable"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "vscode")
-    ;;             (interface
-    ;;              "if"
-    ;;              :icon "symbol-interface"
-    ;;              :face font-lock-type-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (keyword
-    ;;              "kw"
-    ;;              :icon "symbol-keyword"
-    ;;              :face font-lock-keyword-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (macro "mc" :icon "lambda" :face font-lock-keyword-face)
-    ;;             (magic
-    ;;              "ma"
-    ;;              :icon "lightbulb-autofix"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (method
-    ;;              "m"
-    ;;              :icon "symbol-method"
-    ;;              :face font-lock-function-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (module
-    ;;              "{"
-    ;;              :icon "file-code-outline"
-    ;;              :face font-lock-preprocessor-face)
-    ;;             (namespace
-    ;;              "ns"
-    ;;              :icon "file-code-outline"
-    ;;              :face font-lock-preprocessor-face)
-    ;;             (numeric
-    ;;              "nu"
-    ;;              :icon "symbol-numeric"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (operator
-    ;;              "op"
-    ;;              :icon "symbol-operator"
-    ;;              :face font-lock-comment-delimiter-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (param
-    ;;              "pa"
-    ;;              :icon "gear"
-    ;;              :face default
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (property
-    ;;              "pr"
-    ;;              :icon "symbol-property"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (reference
-    ;;              "rf"
-    ;;              :icon "library"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (snippet
-    ;;              "S"
-    ;;              :icon "symbol-snippet"
-    ;;              :face font-lock-string-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (statement
-    ;;              "st"
-    ;;              :icon "symbol-field"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "vscode")
-    ;;             (string
-    ;;              "s"
-    ;;              :icon "symbol-string"
-    ;;              :face font-lock-string-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (struct
-    ;;              "%"
-    ;;              :icon "symbol-structure"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (text
-    ;;              "tx"
-    ;;              :icon "symbol-key"
-    ;;              :face font-lock-doc-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (typeparameter
-    ;;              "tp"
-    ;;              :icon "symbol-parameter"
-    ;;              :face font-lock-type-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (type-parameter
-    ;;              "tp"
-    ;;              :icon "symbol-parameter"
-    ;;              :face font-lock-type-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (unit
-    ;;              "u"
-    ;;              :icon "symbol-ruler"
-    ;;              :face font-lock-constant-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (value
-    ;;              "v"
-    ;;              :icon "symbol-enum"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (variable
-    ;;              "va"
-    ;;              :icon "symbol-variable"
-    ;;              :face font-lock-variable-name-face
-    ;;              :collection "nerd-fonts-codicons")
-    ;;             (t
-    ;;              "."
-    ;;              :icon "symbol-text_size"
-    ;;              :face font-lock-builtin-face
-    ;;              :collection "nerd-fonts-codicons")))
-    ;;
-
-    (setopt kind-icon-mapping
-            `((array
-               ,(nerd-icons-codicon "nf-cod-symbol_array")
-               :face font-lock-type-face)
-              (boolean
-               ,(nerd-icons-codicon "nf-cod-symbol_boolean")
-               :face font-lock-builtin-face)
-              (class
-               ,(nerd-icons-codicon "nf-cod-symbol_class")
-               :face font-lock-type-face)
-              (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
-              (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-              (constant
-               ,(nerd-icons-codicon "nf-cod-symbol_constant")
-               :face font-lock-constant-face)
-              (constructor
-               ,(nerd-icons-codicon "nf-cod-triangle_right")
-               :face font-lock-function-name-face)
-              (enummember
-               ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-               :face font-lock-builtin-face)
-              (enum-member
-               ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-               :face font-lock-builtin-face)
-              (enum
-               ,(nerd-icons-codicon "nf-cod-symbol_enum")
-               :face font-lock-builtin-face)
-              (event
-               ,(nerd-icons-codicon "nf-cod-symbol_event")
-               :face font-lock-warning-face)
-              (field
-               ,(nerd-icons-codicon "nf-cod-symbol_field")
-               :face font-lock-variable-name-face)
-              (file
-               ,(nerd-icons-codicon "nf-cod-symbol_file")
-               :face font-lock-string-face)
-              (folder
-               ,(nerd-icons-codicon "nf-cod-folder")
-               :face font-lock-doc-face)
-              (interface
-               ,(nerd-icons-codicon "nf-cod-symbol_interface")
-               :face font-lock-type-face)
-              (keyword
-               ,(nerd-icons-codicon "nf-cod-symbol_keyword")
-               :face font-lock-keyword-face)
-              (macro
-               ,(nerd-icons-codicon "nf-cod-symbol_misc")
-               :face font-lock-keyword-face)
-              (magic
-               ,(nerd-icons-codicon "nf-cod-wand")
-               :face font-lock-builtin-face)
-              (method
-               ,(nerd-icons-codicon "nf-cod-symbol_method")
-               :face font-lock-function-name-face)
-              (function ,(nerd-icons-codicon "nf-cod-symbol_method")
-                        :face font-lock-function-name-face)
-              (module
-               ,(nerd-icons-codicon "nf-cod-file_submodule")
-               :face font-lock-preprocessor-face)
-              (numeric
-               ,(nerd-icons-codicon "nf-cod-symbol_numeric")
-               :face font-lock-builtin-face)
-              (operator
-               ,(nerd-icons-codicon "nf-cod-symbol_operator")
-               :face font-lock-comment-delimiter-face)
-              (param
-               ,(nerd-icons-codicon "nf-cod-symbol_parameter")
-               :face default)
-              (property
-               ,(nerd-icons-codicon "nf-cod-symbol_property")
-               :face font-lock-variable-name-face)
-              (reference
-               ,(nerd-icons-codicon "nf-cod-references")
-               :face font-lock-variable-name-face)
-              (snippet
-               ,(nerd-icons-codicon "nf-cod-symbol_snippet")
-               :face font-lock-string-face)
-              (string
-               ,(nerd-icons-codicon "nf-cod-symbol_string")
-               :face font-lock-string-face)
-              (struct
-               ,(nerd-icons-codicon "nf-cod-symbol_structure")
-               :face font-lock-variable-name-face)
-              (text
-               ,(nerd-icons-codicon "nf-cod-text_size")
-               :face font-lock-doc-face)
-              (typeparameter
-               ,(nerd-icons-codicon "nf-cod-list_unordered")
-               :face font-lock-type-face)
-              (type-parameter
-               ,(nerd-icons-codicon "nf-cod-list_unordered")
-               :face font-lock-type-face)
-              (unit
-               ,(nerd-icons-codicon "nf-cod-symbol_ruler")
-               :face font-lock-constant-face)
-              (value
-               ,(nerd-icons-codicon "nf-cod-symbol_field")
-               :face font-lock-builtin-face)
-              (variable
-               ,(nerd-icons-codicon "nf-cod-symbol_variable")
-               :face font-lock-variable-name-face)
-              (t
-               ,(nerd-icons-codicon "nf-cod-text_size")
-               :face font-lock-builtin-face)))
+    (setopt
+     kind-icon-default-style
+     '(:padding
+       0
+       :stroke 0
+       :margin 0
+       :radius 0
+       :height 0.8
+       :scale 0.6
+       :background nil)
+     kind-icon-mapping
+     `((array
+        ,(nerd-icons-codicon "nf-cod-symbol_array")
+        :face font-lock-type-face)
+       (boolean
+        ,(nerd-icons-codicon "nf-cod-symbol_boolean")
+        :face font-lock-builtin-face)
+       (class
+        ,(nerd-icons-codicon "nf-cod-symbol_class")
+        :face font-lock-type-face)
+       (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+       (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+       (constant
+        ,(nerd-icons-codicon "nf-cod-symbol_constant")
+        :face font-lock-constant-face)
+       (constructor
+        ,(nerd-icons-codicon "nf-cod-triangle_right")
+        :face font-lock-function-name-face)
+       (enummember
+        ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+        :face font-lock-builtin-face)
+       (enum-member
+        ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+        :face font-lock-builtin-face)
+       (enum
+        ,(nerd-icons-codicon "nf-cod-symbol_enum")
+        :face font-lock-builtin-face)
+       (event
+        ,(nerd-icons-codicon "nf-cod-symbol_event")
+        :face font-lock-warning-face)
+       (field
+        ,(nerd-icons-codicon "nf-cod-symbol_field")
+        :face font-lock-variable-name-face)
+       (file
+        ,(nerd-icons-codicon "nf-cod-symbol_file")
+        :face font-lock-string-face)
+       (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
+       (interface
+        ,(nerd-icons-codicon "nf-cod-symbol_interface")
+        :face font-lock-type-face)
+       (keyword
+        ,(nerd-icons-codicon "nf-cod-symbol_keyword")
+        :face font-lock-keyword-face)
+       (macro
+        ,(nerd-icons-codicon "nf-cod-symbol_misc")
+        :face font-lock-keyword-face)
+       (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
+       (method
+        ,(nerd-icons-codicon "nf-cod-symbol_method")
+        :face font-lock-function-name-face)
+       (function ,(nerd-icons-codicon "nf-cod-symbol_method")
+                 :face font-lock-function-name-face)
+       (module
+        ,(nerd-icons-codicon "nf-cod-file_submodule")
+        :face font-lock-preprocessor-face)
+       (numeric
+        ,(nerd-icons-codicon "nf-cod-symbol_numeric")
+        :face font-lock-builtin-face)
+       (operator
+        ,(nerd-icons-codicon "nf-cod-symbol_operator")
+        :face font-lock-comment-delimiter-face)
+       (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
+       (property
+        ,(nerd-icons-codicon "nf-cod-symbol_property")
+        :face font-lock-variable-name-face)
+       (reference
+        ,(nerd-icons-codicon "nf-cod-references")
+        :face font-lock-variable-name-face)
+       (snippet
+        ,(nerd-icons-codicon "nf-cod-symbol_snippet")
+        :face font-lock-string-face)
+       (string
+        ,(nerd-icons-codicon "nf-cod-symbol_string")
+        :face font-lock-string-face)
+       (struct
+        ,(nerd-icons-codicon "nf-cod-symbol_structure")
+        :face font-lock-variable-name-face)
+       (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
+       (typeparameter
+        ,(nerd-icons-codicon "nf-cod-list_unordered")
+        :face font-lock-type-face)
+       (type-parameter
+        ,(nerd-icons-codicon "nf-cod-list_unordered")
+        :face font-lock-type-face)
+       (unit
+        ,(nerd-icons-codicon "nf-cod-symbol_ruler")
+        :face font-lock-constant-face)
+       (value
+        ,(nerd-icons-codicon "nf-cod-symbol_field")
+        :face font-lock-builtin-face)
+       (variable
+        ,(nerd-icons-codicon "nf-cod-symbol_variable")
+        :face font-lock-variable-name-face)
+       (t
+        ,(nerd-icons-codicon "nf-cod-text_size")
+        :face font-lock-builtin-face)))
 
     (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
            (formatter
@@ -2440,6 +2239,7 @@ The provider is `nerd-icons'."
    ("C-;" . company-other-backend) ; Invoke the next backend
    ("C-s" . company-search-candidates)
    ("C-f" . company-filter-candidates)
+
    ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
    ;; "TAB"). First TAB key press will complete the common part of all
    ;; completions, and the next will switch to the next completion in a cyclic
@@ -2455,10 +2255,11 @@ The provider is `nerd-icons'."
    ;;  (lambda ()
    ;;    (interactive)
    ;;    (company-complete-common-or-cycle -1)))
+
    ([escape] . company-abort)
+   ("M-d" . sb/company-abort-then-kill-word)
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
-   ("M-d" . sb/company-abort-then-kill-word)
    :map
    company-search-map
    ("C-s" . company-search-repeat-forward)
@@ -2466,16 +2267,17 @@ The provider is `nerd-icons'."
    ("C-g" . company-search-abort)
    ("DEL" . company-search-delete-char))
   :custom
-  ;; Avoid slowdown when there are lot of buffers open
+  ;; Avoid slowdown in case there are lot of buffers open
   (company-dabbrev-other-buffers nil)
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  ;; Avoid slowdown when there are lot of buffers open
+  ;; Avoid slowdown in case there are lot of buffers open
   (company-dabbrev-code-other-buffers nil)
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic))
   (company-ispell-dictionary
    (expand-file-name "wordlist.5" sb/extras-directory))
-  ;; Speed up selecting a completion, showing the access keys on the left makes them easily discernible.
+  ;; Speed up selecting a completion with quick access keys. Showing the access
+  ;; keys on the left makes them easily discernible.
   (company-show-quick-access 'left)
   (company-global-modes
    '(not dired-mode
@@ -2493,10 +2295,13 @@ The provider is `nerd-icons'."
   ;; `company-echo-metadata-frontend' shows selected candidate docs in echo
   ;; area, and `company-pseudo-tooltip-frontend' which always shows the
   ;; candidates in an overlay. We do not want to use `company' for showing
-  ;; selected candidate docs in echo area and hence remove `company-echo-metadata-frontend'.
+  ;; selected candidate docs in echo area and hence remove
+  ;; `company-echo-metadata-frontend'.
   (company-frontends '(company-pseudo-tooltip-frontend))
+
   ;; (company-require-match nil)
   ;; (company-insertion-triggers '())
+
   (company-tooltip-align-annotations (display-graphic-p))
   ;; Avoid shrinking the company popup
   (company-tooltip-width-grow-only t)
@@ -2513,33 +2318,34 @@ The provider is `nerd-icons'."
        (cl-remove-if
         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
 
-  ;; Disable code candidates in comments
+  ;; Disable code candidates in comments, otherwise text completions are not offered with Eglot.
   ;; https://github.com/company-mode/company-mode/discussions/1498
   (when (eq sb/lsp-provider 'eglot)
     (defun sb/company-capf-around (orig-fun &rest args)
-      "Custom advice for `company-capf--prefix` to restrict completions in comments."
+      "Custom advice for `company-capf--prefix' to restrict completions in comments."
       (let ((syntax-info (syntax-ppss)))
         (if (nth 4 syntax-info)
             nil
           (apply orig-fun args))))
     (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
 
+  ;; This is useful for LaTeX completions with Texlab.
   (with-eval-after-load 'company-capf
     (bind-key "C-c p" #'company-capf))
   :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height'
-;; unlike an overlay. However, posframes do not work with TUI, and the width of
-;; the frame popup is often not enough and the right side gets cut off.
+;; unlike an overlay. However, posframes do not work with TUI. The width of the
+;; popup frame is may not be sufficient sometimes, and the right side may get
+;; cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
-
 (use-package company-posframe
   :when (display-graphic-p)
   :hook (company-mode . company-posframe-mode)
   :custom
   ;; Difficult to distinguish the help text from completions
   (company-posframe-show-metadata nil)
-  ;; The backend display in the posframe modeline gets cut
+  ;; The backend display in the posframe modeline gets cut for complicated backend setups and looks ugly.
   (company-posframe-show-indicator nil)
   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
   :config
@@ -2557,11 +2363,6 @@ The provider is `nerd-icons'."
                         :box nil))
   :diminish)
 
-;; (use-package nerd-icons
-;;   :when (bound-and-true-p sb/enable-icons)
-;;   :demand t
-;;   :custom (nerd-icons-scale-factor 0.8))
-
 ;; Show documentation popups
 (use-package company-quickhelp
   :when (eq sb/in-buffer-completion 'company)
@@ -2575,17 +2376,18 @@ The provider is `nerd-icons'."
   :unless (display-graphic-p)
   :hook (prog-mode . company-quickhelp-terminal-mode))
 
+;; ;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
 ;; (use-package company-statistics
 ;;   :when (eq sb/in-buffer-completion 'company)
 ;;   :after company
 ;;   :init (company-statistics-mode 1))
 
-;; By default, Unicode symbols backend (`company-math-symbols-unicode') is not
+;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
-;; (`company-math-symbols-latex') is not available outside of math latex
+;; `company-math-symbols-latex' is not available outside of math latex
 ;; environments.
 (use-package company-math
-  :after (tex-mode company)
+  :after company
   :demand t)
 
 (use-package company-dict
@@ -2597,40 +2399,32 @@ The provider is `nerd-icons'."
 
 ;; Use "<" to trigger company completion of org blocks.
 (use-package company-org-block
-  :preface
-  (defun sb/org-block-setup ()
-    (setq-local company-backends
-                '(company-files
-                  (company-org-block :with company-dabbrev-code)
-                  (company-dict company-ispell)
-                  company-dabbrev)))
   :after company
   :hook
   (org-mode
    .
    (lambda ()
      (require 'company-org-block)
-     (sb/org-block-setup))))
+     (setq-local company-backends
+                 '(company-files
+                   (company-org-block :with company-dabbrev-code)
+                   (company-dict company-ispell)
+                   company-dabbrev)))))
 
 ;; Enables completion of C/C++ header file names
 (use-package company-c-headers
-  :preface
-  (defun sb/directory-exists-p (dir)
-    "Return non-nil if DIR exists and is a directory.
-DIR can be relative or absolute."
-    (and (stringp dir) (file-directory-p (expand-file-name dir))))
   :after (company cc-mode)
   :config
+  ;; Prefer GCC 13 if it is present
   (cond
    ((sb/directory-exists-p "/usr/include/c++/13")
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/13"))
    ((sb/directory-exists-p "/usr/include/c++/11")
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/11"))))
 
-;; Incompatible with the tags file generated by Citre, works if the tags file is
-;; generated independently with "ctags -R .".
+;; ;; Incompatible with the tags file generated by Citre, works if the tags file is generated independently with "ctags -R .".
 ;; (use-package company-ctags
-;;   :after (company prog-mode))
+;;   :after company)
 
 (use-package company-auctex
   :after tex
@@ -2654,6 +2448,7 @@ DIR can be relative or absolute."
 ;;   :after tex
 ;;   :commands bibtex-completion-insert-citation)
 
+;; ;; I cannot get this to work correctly.
 ;; (use-package company-bibtex
 ;;   :after tex
 ;;   :commands company-bibtex)
@@ -2661,26 +2456,33 @@ DIR can be relative or absolute."
 ;; We should enable `company-fuzzy-mode' at the very end of configuring
 ;; `company'. Nice feature but slows completions.
 
-;; (use-package company-fuzzy
-;;   :after company
-;;   :demand t
-;;   :custom
-;;   (company-fuzzy-sorting-backend 'alphabetic) ; Using "flx" slows down completion significantly
-;;   ;; (company-fuzzy-passthrough-backends '(company-capf))
-;;   (company-fuzzy-show-annotation t "The right-hand side may get cut off")
-;;   ;; We should not need this with "flx" sorting because the "flx" sorting accounts for the prefix.
-;;   ;; Disabling the requirement may help with performance.
-;;   (company-fuzzy-prefix-on-top t)
-;;   :diminish)
+(use-package company-fuzzy
+  :after company
+  :demand t
+  :custom
+  ;; Using "flx" slows down completion significantly
+  (company-fuzzy-sorting-backend 'alphabetic)
+  ;; (company-fuzzy-passthrough-backends '(company-capf))
+  (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+  ;; We should not need this with "flx" sorting because the "flx" sorting
+  ;; accounts for the prefix. Disabling the requirement may help with
+  ;; performance.
+  (company-fuzzy-prefix-on-top t)
+  :diminish)
+
+;; Notes on configuring `company-backends'.
 
 ;; A few mode-agnostic backends are applicable to all modes:
 ;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
-;; `company-dabbrev'. `company-yasnippet' is blocking. `company-dabbrev' returns
-;; a non-nil prefix in almost any context (major mode, inside strings, or
-;; comments). That is why it is better to put `company-dabbrev' at the end. The
-;; ‘prefix’ bool command always returns non-nil for following backends even when
-;; their candidates list command is empty: `company-abbrev', `company-dabbrev',
-;; `company-dabbrev-code'.
+;; `company-dabbrev'. `company-yasnippet' is blocking.
+
+;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode,
+;; inside strings, or comments). That is why it is better to put
+;; `company-dabbrev' at the end.
+
+;; The ‘prefix’ bool command always returns non-nil for following backends even
+;; when their candidates list command is empty: `company-abbrev',
+;; `company-dabbrev', `company-dabbrev-code'.
 
 ;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
 ;; backends. Only a few backends are specialized on certain major modes or
@@ -3363,20 +3165,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pyright-langserver-command "basedpyright")
   (lsp-pyright-python-executable-cmd "python3"))
 
-(use-package hl-todo
-  :hook (elpaca-after-init . global-hl-todo-mode)
-  ;; I use Flycheck integration to navigate among the highlighted lines.
-  ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
-  :custom (hl-todo-highlight-punctuation ":")
-  :config
-  (setopt hl-todo-keyword-faces
-          (append
-           '(("LATER" . "#d0bf8f")
-             ("IMP" . "#7cb8bb")
-             ("TEST" . "tomato")
-             ("WARNING" . "#cc0000"))
-           hl-todo-keyword-faces)))
-
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind
@@ -3723,17 +3511,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :init (defalias 'perl-mode 'cperl-mode))
 
 (use-package sh-script
-  :preface
-  (defun sb/bash-shfmt-opts ()
-    ;; Apply formatting defaults for shfmt used by bash-language-server
-    (setenv "SHFMT_OPTS" "-i 2 -ci -bn"))
   :ensure nil
   :mode ("\\bashrc\\'" . bash-ts-mode)
   :hook
   ((sh-mode bash-ts-mode)
    .
    (lambda ()
-     (sb/bash-shfmt-opts)
+     ;; Apply formatting defaults for shfmt used by bash-language-server
+     (setenv "SHFMT_OPTS" "-i 2 -ci -bn")
      (sb/setup-lsp-provider)))
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
@@ -5363,6 +5148,11 @@ or the major mode is not in `sb/skippable-modes'."
   (if (cl-some #'sb/popup-window-p (window-list))
       (sb/close-popups)
     (keyboard-quit)))
+
+(defun sb/directory-exists-p (dir)
+  "Return non-nil if DIR exists and is a directory.
+DIR can be relative or absolute."
+  (and (stringp dir) (file-directory-p (expand-file-name dir))))
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
