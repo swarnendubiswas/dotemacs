@@ -12,11 +12,11 @@
 (defconst sb/emacs-4MB (* 4 1024 1024))
 (defconst sb/emacs-64MB (* 64 1024 1024))
 
-;; Defer GC during startup
+;; Defer GC during startup by introducing the hacks early to maximize its
+;; influence.
 (setopt
- ;; Wait until the heap has grown by 60%
- gc-cons-percentage 0.6
- ;; Temporarily increase GC threshold during startup
+ gc-cons-percentage 0.6 ; Wait until the heap has grown by 60%
+ ;; Temporarily increase GC threshold during startup to reduce the chances of GC getting triggered
  gc-cons-threshold most-positive-fixnum)
 
 ;; GC may happen after this many bytes are allocated since last GC. If you
@@ -98,9 +98,10 @@
           (progn
             (message "%s" (buffer-string))
             (kill-buffer buffer))
-          (error "%s"
-                 (with-current-buffer buffer
-                   (buffer-string))))
+          (error
+           "%s"
+           (with-current-buffer buffer
+             (buffer-string))))
       ((error)
        (warn "%s" err)
        (delete-directory repo 'recursive))))
@@ -115,10 +116,11 @@
 ;; The run-time load order is: (1) file described by `site-run-file' if non-nil,
 ;; (2) `user-init-file', and (3) `default.el'.
 
-;; Disable site-wide run-time initialization. Customizing size-run-file with
-;; `setopt' does not work.
-(setq
- site-run-file nil
+;; Disable site-wide run-time initialization. We cannot customize
+;; `size-run-file', hence `setopt' does not work.
+(setq site-run-file nil)
+
+(setopt
  ;; Disable loading of `default.el' at startup
  inhibit-default-init t
  ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
@@ -131,45 +133,45 @@
  ;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
  ;; fringes, or scroll bars.
  frame-inhibit-implied-resize t
- frame-resize-pixelwise t
- window-resize-pixelwise t
+ ;; frame-resize-pixelwise t
+ ;; window-resize-pixelwise t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message user-login-name
  initial-scratch-message nil
- ;; Avoid overhead of loading more expensive major modes
+ ;; Avoid overhead of loading more expensive major modes. Plus, I use *scratch*
+ ;; as a general-purpose buffer.
  initial-major-mode 'fundamental-mode
- use-file-dialog nil
+ ;; Also disables `use-file-dialog'
  use-dialog-box nil)
 
-;; Suppress the vanilla startup screen completely. We've disabled it with
+;; Suppress the vanilla startup screen completely. We have disabled it with
 ;; `inhibit-startup-screen', but it would still initialize anyway.
 (advice-add #'display-startup-screen :override #'ignore)
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
 
-;; This is faster than running "(tool-bar-mode -1)"
+;; The following is faster than running "(tool-bar-mode -1)"
 (push '(tool-bar-lines . 0) default-frame-alist)
+
 ;; The menu bar can be useful to identify different capabilities available and
-;; their shortcuts.
+;; their shortcuts but we still turn it off.
 (push '(menu-bar-lines . 0) default-frame-alist)
+
 ;; (when (fboundp 'scroll-bar-mode)
 ;;   (scroll-bar-mode -1))
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
+
 (when (fboundp 'tooltip-mode)
   (tooltip-mode -1))
 
-;; Set a hint of transparency, works with GUI frames.
 
-;; Sets the active and inactive frame transparency to 97% for the currently selected frame.
+;; Sets the active and inactive frame transparency to 97% for the currently
+;; selected frame. Transparency works with GUI frames.
 (set-frame-parameter (selected-frame) 'alpha '(97 . 97))
 ;; Ensures new frames are created with 97% opacity.
 (add-to-list 'default-frame-alist '(alpha . (97 . 97)))
-
-;; Only for Emacs 29+, and applies when using pgtk or Wayland
-;; (set-frame-parameter nil 'alpha-background 50)
-;; (add-to-list 'default-frame-alist '(alpha-background . 50))
 
 ;; Maximize Emacs on startup.
 
@@ -198,55 +200,56 @@
    native-comp-always-compile t
    ;; Silence compiler warnings as they can be pretty disruptive
    native-comp-async-report-warnings-errors nil
-   ;; Enable ahead-of-time compilation when installing a package
-   package-native-compile t
    ;; Compile loaded packages asynchronously
    native-comp-jit-compilation t
    native-comp-async-query-on-exit t
    native-comp-warning-on-missing-source nil))
 
+;; Recommended by `lsp-mode' for better performance
 (setenv "LSP_USE_PLISTS" "true")
 
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences
 ;; will be ignored when we use TUI Emacs, and the terminal font setting will be
 ;; used.
 
-(add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
-(defun sb/init-fonts-daemon (frame)
-  (with-selected-frame frame
-    (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
+(when (daemonp)
+  (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
+  (defun sb/init-fonts-daemon (frame)
+    (with-selected-frame frame
+      (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
 
-(add-hook 'after-make-frame-functions #'sb/init-fonts-daemon)
+  (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))
 
 ;; The following page suggests avoiding set-face-attribute for performance
 ;; reasons. https://github.com/D4lj337/Emacs-performance
-(defun sb/init-fonts-graphic ()
-  (cond
-   ((string= (system-name) "inspiron-7572")
-    (progn
-      (set-face-attribute 'default nil
-                          :font "JetBrainsMonoNerdFont"
-                          :height 200)
-      (set-face-attribute 'mode-line nil :height 160)
-      (set-face-attribute 'mode-line-inactive nil :height 160)))
+(unless (daemonp)
+  (defun sb/init-fonts-graphic ()
+    (cond
+     ((string= (system-name) "inspiron-7572")
+      (progn
+        (set-face-attribute 'default nil
+                            :font "JetBrainsMonoNerdFontMono"
+                            :height 200)
+        (set-face-attribute 'mode-line nil :height 160)
+        (set-face-attribute 'mode-line-inactive nil :height 160)))
 
-   ((string= (system-name) "dell-7506")
-    (progn
-      (set-face-attribute 'default nil
-                          :font "JetBrainsMonoNerdFont"
-                          :height 150)
-      (set-face-attribute 'mode-line nil :height 120)
-      (set-face-attribute 'mode-line-inactive nil :height 120)))
+     ((string= (system-name) "dell-7506")
+      (progn
+        (set-face-attribute 'default nil
+                            :font "JetBrainsMonoNerdFontMono"
+                            :height 150)
+        (set-face-attribute 'mode-line nil :height 120)
+        (set-face-attribute 'mode-line-inactive nil :height 120)))
 
-   ((string= (system-name) "office")
-    (progn
-      (set-face-attribute 'default nil
-                          :font "JetBrainsMonoNerdFont"
-                          :height 210)
-      (set-face-attribute 'mode-line nil :height 140)
-      (set-face-attribute 'mode-line-inactive nil :height 140)))))
+     ((string= (system-name) "office")
+      (progn
+        (set-face-attribute 'default nil
+                            :font "JetBrainsMonoNerdFontMono"
+                            :height 210)
+        (set-face-attribute 'mode-line nil :height 140)
+        (set-face-attribute 'mode-line-inactive nil :height 140)))))
 
-(add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic)
+  (add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic))
 
 (provide 'early-init)
 

@@ -183,7 +183,7 @@ The provider is `nerd-icons'."
      ;; Add a prefix to continuation lines to prevent them from being indented
      ;; too far or wrapping awkwardly
      (when (fboundp 'global-visual-wrap-prefix-mode)
-     (global-visual-wrap-prefix-mode 1))
+       (global-visual-wrap-prefix-mode 1))
      ;; When you call `find-file', you do not need to clear the existing file
      ;; path before adding the new one. Just start typing the whole path and
      ;; Emacs will "shadow" the current one. For example, you are at
@@ -643,11 +643,7 @@ The provider is `nerd-icons'."
 (use-package ibuffer
   :ensure nil
   :hook (ibuffer . ibuffer-auto-mode)
-  :bind
-  (("C-x C-b" . ibuffer)
-   :map
-   ibuffer-mode-map
-   ("`" . ibuffer-switch-format))
+  :bind (("C-x C-b" . ibuffer) :map ibuffer-mode-map ("`" . ibuffer-switch-format))
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
@@ -704,10 +700,8 @@ The provider is `nerd-icons'."
 ;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
 (use-package vlf
   :commands vlf
-  :init
-  (setopt vlf-application 'dont-ask)
-  :config
-  (require 'vlf-setup))
+  :init (setopt vlf-application 'dont-ask)
+  :config (require 'vlf-setup))
 
 (use-package immortal-scratch
   :hook (elpaca-after-init . immortal-scratch-mode))
@@ -836,10 +830,10 @@ The provider is `nerd-icons'."
   :ensure nil
   :hook
   ((dired-mode . auto-revert-mode) ; Auto refresh `dired' when files change
-   (dired-mode . dired-hide-details-mode)
-   (dired-mode . dired-omit-mode))
-  :bind (("C-x C-j" . dired-jump)
-         :map
+   (dired-mode . dired-hide-details-mode) (dired-mode . dired-omit-mode))
+  :bind
+  (("C-x C-j" . dired-jump)
+   :map
    dired-mode-map
    ("M-<home>" . sb/dired-go-home)
    ("M-<up>" . sb/dired-jump-to-top)
@@ -868,7 +862,7 @@ The provider is `nerd-icons'."
   (dired-clean-confirm-killing-deleted-buffers nil)
   (dired-hide-details-hide-symlink-targets nil)
   (dired-free-space nil)
-    (dired-omit-verbose nil "Do not show messages when omitting files")
+  (dired-omit-verbose nil "Do not show messages when omitting files")
   (dired-omit-files
    (rx
     (or (seq bol "." (not (any "."))) ; dotfiles
@@ -1374,7 +1368,9 @@ The provider is `nerd-icons'."
      bookmark-after-jump-hook))
   (dogears-functions '(avy-goto-char-timer avy-goto-line))
   :config
-  (dolist (mode '(elpaca-log-mode messages-buffer-mode helpful-mode completion-list-mode))
+  (dolist (mode
+           '(elpaca-log-mode
+             messages-buffer-mode helpful-mode completion-list-mode))
     (add-to-list 'dogears-ignore-modes mode))
   (with-eval-after-load 'git-commit
     (add-to-list 'dogears-ignore-modes 'git-commit-mode))
@@ -1395,10 +1391,14 @@ The provider is `nerd-icons'."
 ;; and forward in history.
 (use-package gumshoe
   :ensure (:host github :repo "Overdr0ne/gumshoe")
-  :hook (elpaca-after-init . (lambda ()
-                               (global-gumshoe-mode 1)
-                               (diminish 'global-gumshoe-mode)))
-  :custom (gumshoe-show-footprints-p nil)
+  :hook
+  (elpaca-after-init
+   .
+   (lambda ()
+     (global-gumshoe-mode 1)
+     (diminish 'global-gumshoe-mode)))
+  :custom
+  (gumshoe-show-footprints-p nil)
   (gumshoe-prefer-same-window t)
   (gumshoe-idle-time 2))
 
@@ -1415,8 +1415,7 @@ The provider is `nerd-icons'."
    ("C-f" . vundo-forward) ("C-b" . vundo-backward)
    ;; These are for vertical movements.
    ("C-n" . vundo-next) ("C-p" . vundo-previous))
-  :custom
-  (vundo-compact-display t)
+  :custom (vundo-compact-display t)
   ;; Use pretty Unicode glyphs to draw the tree
   (vundo-glyph-alist vundo-unicode-symbols))
 
@@ -1633,7 +1632,7 @@ The provider is `nerd-icons'."
 
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
-      (setopt magit-diff-refine-hunk t)))
+    (setopt magit-diff-refine-hunk t)))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -1913,7 +1912,7 @@ The provider is `nerd-icons'."
 
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
-  ;; :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
+  :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
   :custom
   (elisp-autofmt-python-bin "python3")
   (elisp-autofmt-on-save-p 'always))
@@ -2517,13 +2516,13 @@ The provider is `nerd-icons'."
   ;; Disable code candidates in comments
   ;; https://github.com/company-mode/company-mode/discussions/1498
   (when (eq sb/lsp-provider 'eglot)
-  (defun sb/company-capf-around (orig-fun &rest args)
-  "Custom advice for `company-capf--prefix` to restrict completions in comments."
-  (let ((syntax-info (syntax-ppss)))
-    (if (nth 4 syntax-info)
-        nil
-      (apply orig-fun args))))
-  (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
+    (defun sb/company-capf-around (orig-fun &rest args)
+      "Custom advice for `company-capf--prefix` to restrict completions in comments."
+      (let ((syntax-info (syntax-ppss)))
+        (if (nth 4 syntax-info)
+            nil
+          (apply orig-fun args))))
+    (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
 
   (with-eval-after-load 'company-capf
     (bind-key "C-c p" #'company-capf))
@@ -2786,7 +2785,7 @@ DIR can be relative or absolute."
                 '(company-files
                   ;; (company-capf :with company-yasnippet)
                   ;; References & labels
-                   company-reftex-citations
+                  company-reftex-citations
                   (company-reftex-labels company-auctex-labels)
                   ;; LaTeX macros/envs/snippets
                   (company-auctex-macros
@@ -2964,24 +2963,6 @@ DIR can be relative or absolute."
   ;; properties).
   ;; https://github.com/minad/cape/discussions/130
 
-  ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
-  ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
-  ;; Ensures that completion does not get interrupted by the user pressing keys
-  ;; or other operations with `cape-wrap-noninterruptible'.
-  (with-eval-after-load 'lsp-mode
-    (advice-add
-     #'lsp-completion-at-point
-     :around
-     (lambda (orig-fun &rest args)
-       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
-
-  (with-eval-after-load 'eglot
-    (advice-add
-     #'eglot-completion-at-point
-     :around
-     (lambda (orig-fun &rest args)
-       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
-
   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
   ;; duplicates and we expect `cape-dict' to mostly suffice.
   (dolist (hook '(text-mode-hook markdown-mode-hook bibtex-mode-hook))
@@ -3006,12 +2987,13 @@ DIR can be relative or absolute."
                   #'cape-dict
                   (cape-capf-buster #'cape-dabbrev)))))
 
+  ;; For generic non-LSP-managed programming modes
   (add-hook
    'prog-mode-hook
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  (ignore-errors #'yasnippet-capf)
+                  #'yasnippet-capf
                   (cape-capf-inside-code
                    (cape-capf-super
                     ;; #'citre-completion-at-point
@@ -3276,6 +3258,17 @@ Uses `eglot` or `lsp-mode` depending on configuration."
           '(substring)))
   (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-disable-orderless)
 
+  ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
+  ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
+  ;; Ensure that completion does not get interrupted by the user pressing keys
+  ;; or other operations with `cape-wrap-noninterruptible'.
+  (with-eval-after-load 'lsp-mode
+    (advice-add
+     #'lsp-completion-at-point
+     :around
+     (lambda (orig-fun &rest args)
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
+
   :diminish)
 
 (use-package lsp-ui
@@ -3376,14 +3369,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
   :custom (hl-todo-highlight-punctuation ":")
   :config
-  (setopt
-   hl-todo-keyword-faces
-   (append
-    '(("LATER" . "#d0bf8f")
-      ("IMP" . "#7cb8bb")
-      ("TEST" . "tomato")
-      ("WARNING" . "#cc0000"))
-    hl-todo-keyword-faces)))
+  (setopt hl-todo-keyword-faces
+          (append
+           '(("LATER" . "#d0bf8f")
+             ("IMP" . "#7cb8bb")
+             ("TEST" . "tomato")
+             ("WARNING" . "#cc0000"))
+           hl-todo-keyword-faces)))
 
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
@@ -4219,9 +4211,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package bibtex
   :ensure nil
-  :hook (bibtex-mode . (lambda()
-                         (when (eq sb/lsp-provider 'lsp-mode)
-                           (setq-local lsp-disabled-clients '(ltex-ls-plus)))))
+  :hook
+  (bibtex-mode
+   .
+   (lambda ()
+     (when (eq sb/lsp-provider 'lsp-mode)
+       (setq-local lsp-disabled-clients '(ltex-ls-plus)))))
   :custom
   (bibtex-align-at-equal-sign t)
   (bibtex-maintain-sorted-entries t)
@@ -4711,10 +4706,10 @@ Shows both colors when errors and warnings are present."
 
 ;; Only enable xclip in TTY under X11
 (use-package xclip
-  :when (and (not (display-graphic-p))          ; only in TTY
-           (not (getenv "WAYLAND_DISPLAY"))   ; avoid Wayland
-           (or (executable-find "xclip")
-               (executable-find "xsel")))
+  :when
+  (and (not (display-graphic-p)) ; only in TTY
+       (not (getenv "WAYLAND_DISPLAY")) ; avoid Wayland
+       (or (executable-find "xclip") (executable-find "xsel")))
   :hook (elpaca-after-init . xclip-mode))
 
 ;; (use-package ztree
@@ -5105,7 +5100,35 @@ Shows both colors when errors and warnings are present."
      (display-buffer-in-side-window)
      (side . bottom)
      (slot . 2)
-     (window-height . 0.5))))
+     (window-height . 0.5)))
+
+  ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
+  ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
+  ;; Ensure that completion does not get interrupted by the user pressing keys
+  ;; or other operations with `cape-wrap-noninterruptible'.
+  (with-eval-after-load 'cape
+    (advice-add
+     #'eglot-completion-at-point
+     :around
+     (lambda (orig-fun &rest args)
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
+
+  (defun sb/setup-capfs-for-eglot ()
+    "Setup custom CAPFs for programming buffers."
+    (when (derived-mode-p 'prog-mode)
+      (setq-local completion-at-point-functions
+                  (list
+                   (cape-capf-super
+                    #'eglot-completion-at-point #'yasnippet-capf)
+                   (cape-capf-inside-code
+                    (cape-capf-super
+                     ;; #'citre-completion-at-point
+                     #'cape-keyword #'cape-dabbrev))
+                   (cape-capf-inside-comment #'cape-dict)
+                   (cape-capf-inside-string #'cape-file)
+                   (cape-capf-buster #'cape-dabbrev)))))
+
+  (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot))
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
@@ -5734,24 +5757,24 @@ or the major mode is not in `sb/skippable-modes'."
 
   ;; We want Cape functions to be autoloaded if not already.
   (when (eq sb/in-buffer-completion 'corfu)
-  (transient-define-prefix
-   sb/corfu-transient () "Corfu commands"
-   [["Capf"
-     ("d" "Dict" cape-dict)
-     ("v" "Dabbrev" cape-dabbrev)
-     ("h" "History" cape-history)
-     ("f" "File" cape-file)]
-    [""
-     ("t" "TeX" cape-tex)
-     ("a" "Abbrev" cape-abbrev)
-     ("k" "Keyword" cape-keyword)
-     ("e" "Elisp symbol" cape-elisp-symbol)]
-    [""
-     ("j" "Emoji" cape-emoji)
-     ("l" "Line" cape-line)
-     ("b" "Elisp block" cape-elisp-block)]
-    ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
-  (bind-key "C-c p" #'sb/corfu-transient))
+    (transient-define-prefix
+     sb/corfu-transient () "Corfu commands"
+     [["Capf"
+       ("d" "Dict" cape-dict)
+       ("v" "Dabbrev" cape-dabbrev)
+       ("h" "History" cape-history)
+       ("f" "File" cape-file)]
+      [""
+       ("t" "TeX" cape-tex)
+       ("a" "Abbrev" cape-abbrev)
+       ("k" "Keyword" cape-keyword)
+       ("e" "Elisp symbol" cape-elisp-symbol)]
+      [""
+       ("j" "Emoji" cape-emoji)
+       ("l" "Line" cape-line)
+       ("b" "Elisp block" cape-elisp-block)]
+      ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
+    (bind-key "C-c p" #'sb/corfu-transient))
 
   ;; (with-eval-after-load 'latex
   (transient-define-prefix
