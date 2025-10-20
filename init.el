@@ -2041,7 +2041,7 @@ The provider is `nerd-icons'."
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
   :mode ("/\\.emacs\\.d/snippets/" . snippet-mode)
-  :hook ((prog-mode LaTeX-mode) . yas-minor-mode)
+  :hook ((prog-mode LaTeX-mode bibtex-mode org-mode markdown-mode) . yas-minor-mode)
   :custom
   (yas-verbosity 0)
   (yas-snippet-dirs (list (expand-file-name "snippets" user-emacs-directory)))
@@ -2472,22 +2472,23 @@ The provider is `nerd-icons'."
 
 ;; Notes on configuring `company-backends'.
 
+;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
+;; backends. `company-yasnippet' is blocking. Only a few backends are
+;; specialized on certain major modes or certain contexts (e.g., outside of
+;; strings and comments), and pass control to later backends when outside of
+;; that major mode or context.
+
 ;; A few mode-agnostic backends are applicable to all modes:
 ;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
-;; `company-dabbrev'. `company-yasnippet' is blocking.
-
-;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode,
-;; inside strings, or comments). That is why it is better to put
-;; `company-dabbrev' at the end.
+;; `company-dabbrev'.
 
 ;; The ‘prefix’ bool command always returns non-nil for following backends even
 ;; when their candidates list command is empty: `company-abbrev',
 ;; `company-dabbrev', `company-dabbrev-code'.
 
-;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
-;; backends. Only a few backends are specialized on certain major modes or
-;; certain contexts (e.g., outside of strings and comments), and pass on control
-;; to later backends when outside of that major mode or context.
+;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode,
+;; inside strings, or comments). That is why it is better to put
+;; `company-dabbrev' at the end.
 
 ;; The keyword ":with" helps to make sure the results from major/minor mode
 ;; agnostic backends (such as `company-yasnippet', `company-dabbrev-code') are
@@ -2506,63 +2507,66 @@ The provider is `nerd-icons'."
 ;; them.
 
 ;; Try completion backends in order until there is a non-empty completion list:
-;; (setq company-backends '(company-xxx company-yyy company-zzz))
+
+;; (setopt company-backends '(company-xxx company-yyy company-zzz))
 
 ;; Merge completions of all the backends:
-;; (setq company-backends '((company-xxx company-yyy company-zzz)))
+
+;; (setopt company-backends '((company-xxx company-yyy company-zzz)))
 
 ;; Both the backends will generate completions at the same time, and their
-;; results will be merged. Company treats the result as coming from a single
+;; results will be merged. `company-yasnippet' will be queried even if
+;; `company-capf' returns nil. Company treats the result as coming from a single
 ;; backend.
-;; (setq company-backends '((company-capf :with company-yasnippet)))
+
+;; (setopt company-backends '((company-capf :with company-yasnippet)))
 
 ;; Merge completions of all the backends but keep the candidates organized in
 ;; accordance with the grouped backends order.
-;; (setq company-backends '((company-xxx company-yyy company-zzz :separate)))
+
+;; (setopt company-backends '((company-xxx company-yyy company-zzz :separate)))
 
 (with-eval-after-load 'company
-  ;; Override `company-backends' for unhandled major modes. `company-keywords'
-  ;; should not be required with LS support. If we have `company-dabbrev' first,
-  ;; then other matches from later backends `company-ispell' or `company-dict'
-  ;; will be ignored.
+  ;; Override `company-backends' for unhandled major modes.
   (setopt company-backends
           '(company-files
             (company-capf
-             company-keywords
-             company-dabbrev-code
+             ;; `company-keywords' should not be required with LS support.
+             company-keywords company-dabbrev-code
              :with company-yasnippet)
             (company-dict company-ispell :with company-yasnippet)
+            ;; If we have `company-dabbrev' first, then other matches from later
+            ;; backends `company-ispell' or `company-dict' will be ignored.
             (company-dabbrev :with company-yasnippet)))
 
-  ;; `company-capf' with Texlab does not pass to later backends if it
-  ;; returns any result (even an empty list). So it makes it difficult to
-  ;; complete non-LaTeX commands (e.g., words) which is the majority. By
-  ;; combining it in a single group with :separate, the following code
-  ;; forces all listed backends to be queried regardless of what
-  ;; `company-capf' returns.
+  ;; `company-capf' with Texlab does not pass to later backends even if it does
+  ;; not return any result. So it makes it difficult to complete non-LaTeX
+  ;; commands (e.g., words) which is the majority. By combining it in a single
+  ;; group with ":separate", the following code forces all listed backends to be
+  ;; queried regardless of what `company-capf' returns.
 
-  ;; We can also integrate Citre tags with the capf functionality with
-  ;; `company-capf', but the completion becomes slow.
-
-  ;; Always query all the following backends
   (defun sb/company-latex-mode-no-separate ()
     (setq-local
      company-backends
      '(company-files ; Have files first to allow completing paths
        (company-capf :with company-yasnippet)
        company-reftex-citations ; will trigger inside \cite{}
-       (
-        ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-        company-reftex-labels
-        company-auctex-labels ; LaTeX structure
-        company-auctex-macros company-auctex-environments
-        ;; company-latex-commands ; company-auctex-macros seem to be better
-        company-auctex-symbols
-        company-math-symbols-latex ; Math latex tags
-        ;; Math Unicode symbols and sub (super) scripts
-        company-math-symbols-unicode)
-       company-ispell company-dict company-dabbrev)))
+       ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
+       (company-reftex-labels
+        ;; LaTeX structure
+        company-auctex-labels)
+       company-auctex-macros
+       company-auctex-environments
+       ;; company-latex-commands ; company-auctex-macros seem to be better
+       company-auctex-symbols
+       company-math-symbols-latex ; Math latex tags
+       ;; Math Unicode symbols and sub (super) scripts
+       company-math-symbols-unicode
+       company-ispell
+       company-dict
+       company-dabbrev)))
 
+  ;; Always query all the following backends
   (defun sb/company-latex-mode-separate ()
     (setq-local
      company-backends
@@ -2572,8 +2576,8 @@ The provider is `nerd-icons'."
         company-reftex-citations ; will trigger inside \cite{}
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
         company-reftex-labels
-        company-auctex-labels ; LaTeX structure
-        company-auctex-macros company-auctex-environments
+        ;; LaTeX structure
+        company-auctex-labels company-auctex-macros company-auctex-environments
         ;; company-latex-commands ; company-auctex-macros seem to be better
         company-auctex-symbols
         company-math-symbols-latex ; Math latex tags
@@ -2596,7 +2600,6 @@ The provider is `nerd-icons'."
                    :with company-yasnippet)
                   ;; Math symbols
                   (company-math-symbols-latex company-math-symbols-unicode)
-                  ;; Language-level fallback
                   (company-ispell company-dict :with company-yasnippet)
                   (company-dabbrev :with company-yasnippet))))
 
@@ -2609,24 +2612,26 @@ The provider is `nerd-icons'."
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
+    ;; Another way to make `company-backends' local.
     (set
      (make-local-variable 'company-backends)
      '(company-files (company-dict company-ispell) company-dabbrev)))
 
-  ;; Extends to derived modes like `markdown-mode'
+  ;; Extends to derived modes like `markdown-mode'. We use separate hooks for `org-mode' and `LaTeX-mode'.
   (add-hook
    'text-mode-hook
    (lambda ()
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
        (sb/company-text-mode))))
 
-  ;; FIXME: This does not complete inside comments with Eglot but works with `lsp-mode'.
   (defun sb/company-c-mode ()
     (setq-local
      company-backends
      '(company-files
-       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'
+
+       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'.
        ;; (:separate company-capf company-dabbrev-code :with company-yasnippet)
+
        (company-capf :with company-yasnippet)
        (company-dabbrev-code :with company-yasnippet)
        company-c-headers
@@ -2640,7 +2645,10 @@ The provider is `nerd-icons'."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-c-mode))))
 
-  (defun sb/company-prog-mode ()
+  ;; TODO: It may be possible to merge `sb/company-non-lsp-prog-mode' and `sb/company-elisp-mode'.
+
+  ;; We override `company-backends' for LSP-managed major modes.
+  (defun sb/company-non-lsp-prog-mode ()
     (setq-local
      company-backends
      '(company-files
@@ -2660,7 +2668,7 @@ The provider is `nerd-icons'."
                  (derived-mode-p 'bison-mode)
                  (derived-mode-p 'cmake-ts-mode))
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-prog-mode))))
+       (sb/company-non-lsp-prog-mode))))
 
   ;; `company-capf' is not complete for Elisp. For example, it will not suggest `doom-modeline' but suggests `doom-modeline-mode'. So I need to merge `company-capf' with `company-dabbrev-code'.
   (defun sb/company-elisp-mode ()
@@ -2687,8 +2695,7 @@ The provider is `nerd-icons'."
 (use-package corfu
   :preface
   (defun sb/corfu-default-setup ()
-    ;; I prefer `corfu-quick' because pressing TAB is easier
-    ;; (corfu-indexed-mode 1)
+    ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
     (corfu-history-mode 1)
     (corfu-echo-mode 1)
     (corfu-popupinfo-mode 1))
@@ -2722,8 +2729,10 @@ The provider is `nerd-icons'."
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
   (corfu-on-exact-match 'show)
+
   ;; ;; Do not close popup when adjacent to other characters
   ;; (corfu-quit-at-boundary nil)
+
   :config
   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
   (unless (display-graphic-p)
@@ -2738,7 +2747,7 @@ The provider is `nerd-icons'."
        (< emacs-major-version 31))
   :hook (corfu-mode . corfu-terminal-mode)
   :custom
-  ;; Prevent wraparound at the right edge
+  ;; Prevent wraparound at the right edge, although this breaks sometimes.
   (corfu-terminal-position-right-margin 2))
 
 (use-package yasnippet-capf
@@ -2761,22 +2770,31 @@ The provider is `nerd-icons'."
   ;; in comments and string literals, but not in normal code.
 
   ;; There is no mechanism to force deduplication if candidates from `cape-dict'
-  ;; and `cape-dabbrev' are not exactly equal (both equal string and equal text
-  ;; properties).
+  ;; and `cape-dabbrev' are the same (equal string and equal text
+  ;; properties) because of different metadata.
   ;; https://github.com/minad/cape/discussions/130
 
   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
   ;; duplicates and we expect `cape-dict' to mostly suffice.
-  (dolist (hook '(text-mode-hook markdown-mode-hook bibtex-mode-hook))
+  (add-hook
+   'text-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  (cape-capf-inside-string #'cape-file)
+                  #'cape-dict
+                  (cape-capf-buster #'cape-dabbrev)))))
+
+  (dolist (hook '(markdown-mode-hook bibtex-mode-hook))
     (add-hook
      hook
      (lambda ()
-       (setq completion-at-point-functions
-             (list
-              (cape-capf-inside-string #'cape-file)
-              #'yasnippet-capf
-              #'cape-dict
-              (cape-capf-buster #'cape-dabbrev))))))
+       (setq-local completion-at-point-functions
+                   (list
+                    (cape-capf-inside-string #'cape-file)
+                    #'yasnippet-capf
+                    #'cape-dict
+                    (cape-capf-buster #'cape-dabbrev))))))
 
   (add-hook
    'org-mode-hook
@@ -2797,36 +2815,36 @@ The provider is `nerd-icons'."
                  (list
                   #'yasnippet-capf
                   (cape-capf-inside-code
-                   (cape-capf-super
-                    ;; #'citre-completion-at-point
-                    #'cape-keyword #'cape-dabbrev))
+                   (cape-capf-super #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
                   (cape-capf-inside-string #'cape-file)
                   (cape-capf-buster #'cape-dabbrev)))))
 
-  (dolist (hook '(LaTeX-mode-hook latex-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (setq-local
-        completion-at-point-functions
-        (list
-         (cape-capf-inside-string #'cape-file) #'yasnippet-capf #'citar-capf
-         (cape-capf-super
-          (cape-company-to-capf #'company-reftex-labels)
-          (cape-company-to-capf #'company-auctex-labels))
-         (cape-capf-super
-          ;; Math latex tags
-          (cape-company-to-capf #'company-math-symbols-latex)
-          (cape-company-to-capf #'company-latex-commands)
-          (cape-company-to-capf #'company-auctex-environments)
-          (cape-company-to-capf #'company-auctex-macros)
-          ;; Math Unicode symbols and sub(super)scripts
-          (cape-company-to-capf #'company-math-symbols-unicode)
-          (cape-company-to-capf #'company-auctex-symbols)
-          ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-          #'cape-tex)
-         #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
+  (add-hook
+   'LaTeX-mode-hook
+   (lambda ()
+     (setq-local
+      completion-at-point-functions
+      (list
+       (cape-capf-inside-string #'cape-file)
+       #'yasnippet-capf
+       #'citar-capf
+       (cape-capf-super
+        (cape-company-to-capf #'company-reftex-labels)
+        (cape-company-to-capf #'company-auctex-labels))
+       (cape-capf-super
+        (cape-company-to-capf #'company-latex-commands)
+        (cape-company-to-capf #'company-auctex-environments)
+        (cape-company-to-capf #'company-auctex-macros)
+        ;; Math Unicode symbols and sub(super)scripts
+        (cape-company-to-capf #'company-auctex-symbols)
+        ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+        #'cape-tex)
+       ;; Math latex tags
+       (cape-company-to-capf #'company-math-symbols-latex)
+       (cape-company-to-capf #'company-math-symbols-unicode)
+       #'cape-dict
+       (cape-capf-buster #'cape-dabbrev)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -2840,39 +2858,7 @@ The provider is `nerd-icons'."
                      (cape-capf-nonexclusive #'elisp-completion-at-point))
                     (cape-capf-inside-code #'cape-elisp-symbol)
                     (cape-capf-inside-comment #'cape-dict)
-                    (cape-capf-buster #'cape-dabbrev))))))
-
-  ;; (dolist (hook
-  ;;          '(bash-ts-mode-hook
-  ;;            c-mode-hook
-  ;;            c-ts-mode-hook
-  ;;            c++-mode-hook
-  ;;            c++-ts-mode-hook
-  ;;            cmake-mode-hook
-  ;;            cmake-ts-mode-hook
-  ;;            css-mode-hook
-  ;;            css-ts-mode-hook
-  ;;            fish-mode-hook
-  ;;            html-mode-hook
-  ;;            html-ts-mode-hook
-  ;;            java-mode-hook
-  ;;            java-ts-mode-hook
-  ;;            json-mode-hook
-  ;;            json-ts-mode-hook
-  ;;            jsonc-mode-hook
-  ;;            makefile-mode-hook
-  ;;            python-mode-hook
-  ;;            python-ts-mode-hook
-  ;;            sh-mode-hook
-  ;;            web-mode-hook
-  ;;            yaml-mode-hook
-  ;;            yaml-ts-mode-hook))
-  ;;   (add-hook
-  ;;    hook
-  ;;    (lambda ()
-  ;;      (sb/setup-capf
-  ;;       #'cape-file (cape-capf-inside-comment #'cape-dict) #'cape-dabbrev))))
-  )
+                    (cape-capf-buster #'cape-dabbrev)))))))
 
 ;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
 ;; Company has `company-statistics'. ;; Prescient uses frecency (frequency +
