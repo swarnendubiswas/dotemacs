@@ -17,10 +17,14 @@
 
 ;; `Modus-vivendi' is the most complete and integrates well with all terminals,
 ;; while `Catppuccin' is more colorful.
-(defcustom sb/theme 'none
+(defcustom sb/theme
+  (if (display-graphic-p)
+      'leuven-dark
+    'none)
   "Specify which Emacs theme to use."
   :type
   '(radio
+    (const :tag "doom-nord" doom-nord)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "catppuccin" catppuccin)
     (const :tag "rose-pine" rose-pine)
@@ -79,8 +83,14 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
+;; It is tempting to use `eglot' because it is built in to Emacs. However,
+;; `lsp-mode' offers several advantages. It allows connecting to multiple
+;; servers simultaneously and provides helpers to install and uninstall servers.
 ;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight. Using a single server suffices for most programming language major modes, but it is beneficial to use more than one LS for languages like plain text, markdown, and LaTeX. I use Eglot because Texlab is inefficient.
+;; support semantic tokens, but is possibly more lightweight. Using a single
+;; server suffices for most programming language major modes, but it is
+;; beneficial to use more than one LS for languages like plain text, markdown,
+;; and LaTeX. I use Eglot because Texlab is inefficient.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
@@ -1861,7 +1871,7 @@ The provider is `nerd-icons'."
 ;;                     "--perl-best-practices"
 ;;                     "-l=80"))
 ;;                   ("Python" (yapf "--style" "file") isort)
-;;                   ("Shell" (shfmt "-i" "4" "-ci"))
+;;                   ("Shell" (shfmt "-i" "2" "-ci"))
 ;;                   ("XML" tidy)
 ;;                   ("YAML" prettier "--print-width" "80")))
 ;;   (with-eval-after-load 'markdown-mode
@@ -2861,7 +2871,7 @@ The provider is `nerd-icons'."
                     (cape-capf-buster #'cape-dabbrev)))))))
 
 ;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
-;; Company has `company-statistics'. ;; Prescient uses frecency (frequency +
+;; Company has `company-statistics'. Prescient uses frecency (frequency +
 ;; recency) for sorting. Recently used commands should be sorted first. Only
 ;; commands that have never been used before will be sorted by length.
 (use-package prescient
@@ -2885,15 +2895,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ((eq sb/lsp-provider 'lsp-mode)
     (lsp-deferred))))
 
-;; It is tempting to use `eglot' because it is built in to Emacs. However,
-;; `lsp-mode' offers several advantages. It allows connecting to multiple
-;; servers simultaneously and provides helpers to install and uninstall servers.
 (use-package lsp-mode
   :when (eq sb/lsp-provider 'lsp-mode)
   :bind (:map lsp-command-map ("g"))
   :custom (lsp-use-plists t)
   ;; I mostly SSH into the remote machine and launch Emacs, rather than using
-  ;; Tramp which is slower.
+  ;; Tramp which is slower and more error-prone.
   (lsp-auto-register-remote-clients nil)
   (lsp-keep-workspace-alive nil)
   (lsp-progress-via-spinner nil)
@@ -3010,41 +3017,43 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
 
-  ;; (defun lsp-booster--advice-json-parse (old-fn &rest args)
-  ;;   "Try to parse bytecode instead of json."
-  ;;   (or (when (equal (following-char) ?#)
-  ;;         (let ((bytecode (read (current-buffer))))
-  ;;           (when (byte-code-function-p bytecode)
-  ;;             (funcall bytecode))))
-  ;;       (apply old-fn args)))
-  ;; (advice-add
-  ;;  (if (progn
-  ;;        (require 'json)
-  ;;        (fboundp 'json-parse-buffer))
-  ;;      'json-parse-buffer
-  ;;    'json-read)
-  ;;  :around #'lsp-booster--advice-json-parse)
-  ;; (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-  ;;   "Prepend emacs-lsp-booster command to lsp CMD."
-  ;;   (let ((orig-result (funcall old-fn cmd test?)))
-  ;;     (if (and
-  ;;          (not test?) ;; for check lsp-server-present?
-  ;;          ;; see lsp-resolve-final-command, it would add extra shell wrapper
-  ;;          (not (file-remote-p default-directory)) lsp-use-plists
-  ;;          (not (functionp 'json-rpc-connection)) ;; native json-rpc
-  ;;          (executable-find "emacs-lsp-booster"))
-  ;;         (progn
-  ;;           (message "Using emacs-lsp-booster for %s!" orig-result)
-  ;;           (cons "emacs-lsp-booster" orig-result))
-  ;;       orig-result)))
-  ;; (advice-add
-  ;;  'lsp-resolve-final-command
-  ;;  :around #'lsp-booster--advice-final-command)
+  ;; Enable `lsp-booster'
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or (when (equal (following-char) ?#)
+          (let ((bytecode (read (current-buffer))))
+            (when (byte-code-function-p bytecode)
+              (funcall bytecode))))
+        (apply old-fn args)))
+  (advice-add
+   (if (progn
+         (require 'json)
+         (fboundp 'json-parse-buffer))
+       'json-parse-buffer
+     'json-read)
+   :around #'lsp-booster--advice-json-parse)
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and
+           (not test?) ;; for check lsp-server-present?
+           ;; see lsp-resolve-final-command, it would add extra shell wrapper
+           (not (file-remote-p default-directory)) lsp-use-plists
+           (not (functionp 'json-rpc-connection)) ;; native json-rpc
+           (executable-find "emacs-lsp-booster"))
+          (progn
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  (advice-add
+   'lsp-resolve-final-command
+   :around #'lsp-booster--advice-final-command)
 
-  (defun sb/lsp-mode-disable-orderless ()
+  (defun sb/lsp-mode-capf ()
+    ;; Prescient does not work well with certain dynamic completion tables that use a prefix string to produce candidates before filtering.
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(substring)))
-  (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-disable-orderless)
+          '(prescient basic)))
+  (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-capf)
 
   ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
   ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
@@ -3113,6 +3122,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ((text-mode markdown-mode org-mode LaTeX-mode)
    .
    (lambda ()
+     ;; Disable LSP for git commit message buffers which are usually ephemeral
      (unless (string-equal
               (file-name-nondirectory (or buffer-file-name ""))
               "COMMIT_EDITMSG")
@@ -3122,8 +3132,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; Recommended to set a generic language to disable spell check
   (lsp-ltex-plus-plus-language "en")
   (lsp-ltex-plus-check-frequency "save")
+
   ;; (lsp-ltex-plus-dictionary
   ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
+
   (lsp-ltex-plus-log-level "warning")
   (lsp-ltex-plus-disabled-rules
    '(:en-US
@@ -3151,6 +3163,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pyright-langserver-command "basedpyright")
   (lsp-pyright-python-executable-cmd "python3"))
 
+;; Highlight symbols on hover
 (use-package symbol-overlay
   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
   :bind
@@ -3204,14 +3217,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      'company-abort))
   :diminish)
 
-(use-package eldoc-box
-  :when (display-graphic-p)
-  :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
-  :custom (eldoc-box-clear-with-C-g t)
-  ;; Reduce the width to cover a lesser portion of the screen
-  (eldoc-box-max-pixel-height 400)
-  :config (eldoc-box-mouse-mode -1)
-  :diminish (eldoc-box-hover-mode eldoc-box-hover-at-point-mode))
+;; (use-package eldoc-box
+;;   :when (display-graphic-p)
+;;   ;; :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
+;;   :custom (eldoc-box-clear-with-C-g t)
+;;   ;; Reduce the width to cover a lesser portion of the screen
+;;   (eldoc-box-max-pixel-height 400)
+;;   :config (eldoc-box-mouse-mode -1)
+;;   :diminish (eldoc-box-hover-mode eldoc-box-hover-at-point-mode))
 
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
@@ -3297,22 +3310,20 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;             (conf-toml-mode . toml-ts-mode)
 ;;             (yaml-mode . yaml-ts-mode))))
 
-;; I have disabled treesitter support because several major modes are still unstable. For example, I get "treesit-font-lock-fontify-region: Query pattern is malformed" with CMake.
-
-;; (use-package treesit-auto
-;;   :when
-;;   (and (executable-find "tree-sitter")
-;;        (fboundp 'treesit-available-p)
-;;        (treesit-available-p))
-;;   :demand t
-;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-;;   :custom
-;;   ;; Increased default font locking may hurt performance
-;;   (treesit-font-lock-level 4)
-;;   (treesit-auto-install t)
-;;   :config
-;;   (global-treesit-auto-mode 1)
-;;   (treesit-auto-add-to-auto-mode-alist 'all))
+(use-package treesit-auto
+  :when
+  (and (executable-find "tree-sitter")
+       (fboundp 'treesit-available-p)
+       (treesit-available-p))
+  :demand t
+  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+  :custom
+  ;; Increased default font locking may hurt performance
+  (treesit-font-lock-level 4)
+  (treesit-auto-install t)
+  :config
+  (global-treesit-auto-mode 1)
+  (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -3373,9 +3384,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package opencl-c-mode
   :mode "\\.cl\\'")
 
+;; I have disabled treesitter support for CMake because it seems unstable. For
+;; example, I get "treesit-font-lock-fontify-region: Query pattern is malformed"
+;; on search with `consult-line'.
 (use-package cmake-mode
   :when (executable-find "cmake")
-  :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode) ("\\.cmake\\'" . cmake-ts-mode))
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
   :hook
   ((cmake-mode cmake-ts-mode)
    .
@@ -3504,7 +3518,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      ;; Apply formatting defaults for shfmt used by bash-language-server
-     (setenv "SHFMT_OPTS" "-i 2 -ci -bn")
+     (setenv "SHFMT_OPTS" "-i 2 -ci")
      (sb/setup-lsp-provider)))
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
@@ -3520,9 +3534,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (add-hook 'before-save-hook #'fish_indent-before-save)
-     ;; ;; `lsp-mode' does not support fish yet
      ;; (when (eq sb/lsp-provider 'eglot)
      ;;   (eglot-ensure))
+     ;; ;; `lsp-mode' does not support fish yet
      ;; (when (eq sb/lsp-provider 'lsp-mode)
      ;;   (with-eval-after-load 'lsp-mode
      ;;     (lsp-register-client
@@ -3662,6 +3676,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     ;; Auto-pair backticks
     (with-eval-after-load 'elec-pair
       (sb/add-pairs '((?` . ?`))))
+    ;; We prefer to use "harper-ls" or "ltex-ls-plus" for checking grammar with Eglot.
     (when (eq sb/lsp-provider 'lsp-mode)
       (require 'lsp-marksman))
     (sb/setup-lsp-provider))
@@ -3842,8 +3857,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
 
-;; The LSP setup seems to work very poorly with large LaTeX files, leading to
-;; frequent hangs while communicating with Emacs. Furthermore, this package is not required for completions with `company-mode'.
+;; ;; The LSP setup seems to work very poorly with large LaTeX files, leading to
+;; ;; frequent hangs while communicating with Emacs. Furthermore, this package
+;; ;; is not required for completions with `company-mode'.
 
 ;; (use-package lsp-latex
 ;;   :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
@@ -3890,12 +3906,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (LaTeX-math-mode 1)
      (TeX-PDF-mode) ; Use `pdflatex'
      (turn-on-reftex)
-     (TeX-source-correlate-mode)
+
      ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
      ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
+
      ;; Enable rainbow mode after applying styles to the buffer
      ;; (TeX-update-style . rainbow-delimiters-mode)
-     ))
+
+     (TeX-source-correlate-mode)))
   :bind (:map LaTeX-mode-map ("C-c C-j" . consult-outline))
   :custom
   ;; Enable parse on save, stores parsed information in an `auto' directory
@@ -3904,8 +3922,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (TeX-clean-confirm nil)
   ;; Automatically insert braces after typing ^ and _ in math mode
   (TeX-electric-sub-and-superscript t)
+
   ;; Inserting $ completes the math mode and positions the cursor
   ;; (TeX-electric-math t)
+
   (TeX-parse-self t "Parse documents")
   (TeX-save-query nil "Save buffers automatically when compiling")
   (LaTeX-item-indent 0 "Indent lists by two spaces")
@@ -3980,6 +4000,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (reftex-use-multiple-selection-buffers t)
   :diminish)
 
+;; Enabling LSP for large bibtex files incurs large overhead
 (use-package bibtex
   :ensure nil
   :hook
@@ -4015,35 +4036,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :commands bibtex-capf)
 
 (use-package citar
-  :preface
-  (defun sb/citar-format-key-title (key entry)
-    "Format Citar completion candidate showing only citation KEY and title."
-    (let ((title (citar-get-value "title" entry)))
-      (concat key " — " (truncate-string-to-width title 80))))
-  (defun sb/citar-annotate-key-title (key entry)
-    "Custom annotation for Citar: only show title, no authors."
-    (let ((title (citar-get-value "title" entry)))
-      ;; Corfu displays: COMPLETION  ANNOTATION
-      ;; key comes from the completion itself, so we just return title here
-      (concat " " (truncate-string-to-width (or title "") 80))))
-  (defun sb/citar-affixation-key-title (keys)
-    "Only show KEY and TITLE in completion (no authors)."
-    (mapcar
-     (lambda (key)
-       (let* ((entry (citar-get-entry key))
-              (title (citar-get-value "title" entry)))
-         ;; Return a (completion annotation summary) triple
-         (list
-          key
-          "" ; no annotation
-          (truncate-string-to-width (or title "") 80))))
-     keys))
   :when (eq sb/in-buffer-completion 'corfu)
   :after (tex cape)
   :custom
   ;; Remove support for `org-mode' and `markdown-mode'
   (citar-major-mode-functions
-   '(((latex-mode LaTeX-mode)
+   '((LaTeX-mode
       .
       ((local-bib-files . citar-latex-local-bib-files)
        (insert-citation . citar-latex-insert-citation)
@@ -4173,11 +4171,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :when (eq sb/theme 'leuven-dark)
   :init (load-theme 'leuven-dark t))
 
-;; (use-package doom-themes
-;;   :init (load-theme 'doom-nord t)
-;;   :config
-;;   ;; Corrects (and improves) org-mode's native fontification.
-;;   (doom-themes-org-config))
+(use-package doom-themes
+  :when (eq sb/theme 'doom-nord)
+  :init (load-theme 'doom-nord t)
+  :config
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
@@ -4215,9 +4214,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :when (eq sb/theme 'rose-pine)
 ;;   :init (load-theme 'rose-pine-moon-theme t))
 
-;; (use-package kanagawa-themes
-;;   :when (eq sb/theme 'kanagawa)
-;;   :init (load-theme 'kanagawa-wave t))
+(use-package kanagawa-themes
+  :when (eq sb/theme 'kanagawa)
+  :init (load-theme 'kanagawa-wave t))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
@@ -4408,15 +4407,15 @@ Shows both colors when errors and warnings are present."
   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
   :diminish)
 
-;; (use-package kdl-mode
-;;   :ensure (:host github :repo "taquangtrung/emacs-kdl-mode")
-;;   :mode ("\\.kdl\\'" . kdl-mode))
+(use-package kdl-mode
+  :ensure (:host github :repo "taquangtrung/emacs-kdl-mode")
+  :mode ("\\.kdl\\'" . kdl-mode))
 
-(use-package kdl-ts-mode
-  :ensure (:host github :repo "dataphract/kdl-ts-mode")
-  :mode ("\\.kdl\\'" . kdl-ts-mode))
+;; (use-package kdl-ts-mode
+;;   :ensure (:host github :repo "dataphract/kdl-ts-mode")
+;;   :mode ("\\.kdl\\'" . kdl-ts-mode))
 
-;; I use `apheleia-mode' to sort kdl files.
+;; ;; I use `apheleia-mode' to sort kdl files.
 ;; (use-package reformatter
 ;;   :after (:any kdl-ts-mode kdl-mode)
 ;;   :demand t
@@ -4439,7 +4438,8 @@ Shows both colors when errors and warnings are present."
 ;; The LSP is too slow to start.
 (use-package asm-mode
   :ensure nil
-  :hook (asm-mode . sb/setup-lsp-provider))
+  ;; :hook (asm-mode . sb/setup-lsp-provider)
+  )
 
 ;; Guess the indentation offset originally used in foreign source code files and
 ;; transparently adjust the corresponding settings in Emacs making it more
@@ -4483,11 +4483,11 @@ Shows both colors when errors and warnings are present."
        (or (executable-find "xclip") (executable-find "xsel")))
   :hook (elpaca-after-init . xclip-mode))
 
-;; (use-package ztree
-;;   :commands (ztree-diff))
+(use-package ztree
+  :commands (ztree-diff))
 
-;; Provides pixel-precise smooth scrolling which can keep up with the very high
-;; event rates of modern trackpads and high-precision wheel mice.
+;; ;; Provides pixel-precise smooth scrolling which can keep up with the very high
+;; ;; event rates of modern trackpads and high-precision wheel mice.
 ;; (use-package ultra-scroll
 ;;   :ensure (:host github :repo "jdtsmith/ultra-scroll")
 ;;   :custom
@@ -4495,7 +4495,7 @@ Shows both colors when errors and warnings are present."
 ;;   (scroll-margin 0)
 ;;   :hook (find-file . ultra-scroll-mode))
 
-;; Fold text using indentation levels
+;; ;; Fold text using indentation levels
 ;; (use-package outline-indent
 ;;   :hook
 ;;   ((python-mode python-ts-mode yaml-mode yaml-ts-mode)
@@ -4525,8 +4525,8 @@ Shows both colors when errors and warnings are present."
 ;;   :hook (elpaca-after-init . beacon-mode)
 ;;   :diminish)
 
-;; Allows to easily identify the file path in a project. But does not support
-;; imenu.
+;; ;; Allows to easily identify the file path in a project. But does not support
+;; ;; imenu.
 ;; (use-package project-headerline
 ;;   :ensure (:host github :repo "gavv/project-headerline")
 ;;   :hook (elpaca-after-init . global-project-headerline-mode)
@@ -4591,7 +4591,7 @@ Shows both colors when errors and warnings are present."
    kill-file-path-dirname
    kill-file-path))
 
-;; Allow fetching the latest version to satisfy Eglot requirements
+;; Allow fetching the latest version via Elapaca to satisfy Eglot requirements
 (use-package flymake)
 
 (use-package eglot
@@ -4619,12 +4619,15 @@ Shows both colors when errors and warnings are present."
   ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
    .
    (lambda ()
+     ;; Disable LSP for git commit message buffers which are usually ephemeral
      (unless (string-equal
               (file-name-nondirectory (or buffer-file-name ""))
               "COMMIT_EDITMSG")
        (eglot-ensure))))
   :custom
+  ;; Disabling this helps avoid the race condition between closing a project and shutting down LSP servers.
   ;; (eglot-autoshutdown t)
+
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 3)
   (eglot-extend-to-xref t)
@@ -4638,17 +4641,18 @@ Shows both colors when errors and warnings are present."
      :executeCommandProvider
      :documentLinkProvider))
   (eglot-report-progress nil)
+  ;; Do not clutter the modeline
   (eglot-mode-line-format nil)
   :config
+  ;; Avoid overhead from logging
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode'
-     ;; (LaTeX-mode . ("ltex-ls-plus"))
-     ((text-mode org-mode markdown-mode markdown-ts-mode)
+     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' completely
+     ((text-mode org-mode markdown-mode markdown-ts-mode LaTeX-mode)
       .
       ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -4713,7 +4717,7 @@ Shows both colors when errors and warnings are present."
        ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
                           user-emacs-directory)))))
 
-  (if (equal sb/python-langserver 'pylsp)
+  (if (eq sb/python-langserver 'pylsp)
       (add-to-list
        'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
     (add-to-list
@@ -4724,10 +4728,8 @@ Shows both colors when errors and warnings are present."
   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
   ;; `eglot-workspace-configuration' should be set as a directory-local
-  ;; variable, but it is not working for me.
-
-  ;; `:json-false' is the correct way to send false to LSP servers instead of
-  ;; nil, which would remove the key.
+  ;; variable. `:json-false' is the correct way to send false to LSP servers
+  ;; instead of nil, which would remove the key.
   (setq-default
    eglot-workspace-configuration
    '(:pylsp
@@ -4861,6 +4863,7 @@ Shows both colors when errors and warnings are present."
   ;;               '((eglot (styles hotfuzz basic substring orderless))
   ;;                 (eglot-capf (styles hotfuzz orderless))))
 
+  ;; ;; Try to avoid the race condition when closing a project and shutting down the LSP server.
   ;; (with-eval-after-load 'project
   ;;   (bind-key
   ;;    "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map))
@@ -4889,16 +4892,15 @@ Shows both colors when errors and warnings are present."
     (when (derived-mode-p 'prog-mode)
       (setq-local completion-at-point-functions
                   (list
-                   (cape-capf-super
-                    #'eglot-completion-at-point #'yasnippet-capf)
                    (cape-capf-inside-code
                     (cape-capf-super
-                     ;; #'citre-completion-at-point
-                     #'cape-keyword #'cape-dabbrev))
+                     #'eglot-completion-at-point
+                     #'cape-keyword
+                     #'cape-dabbrev
+                     #'yasnippet-capf))
                    (cape-capf-inside-comment #'cape-dict)
                    (cape-capf-inside-string #'cape-file)
                    (cape-capf-buster #'cape-dabbrev)))))
-
   (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot))
 
 (use-package eglot-booster
@@ -5169,7 +5171,7 @@ DIR can be relative or absolute."
 (use-package free-keys
   :commands free-keys)
 
-;; I prefer Embark to show help about keybindings.
+;; I prefer `embark' to show help about keybindings compared to `which-key'.
 
 ;; ;; Displays available keybindings following the currently entered incomplete
 ;; ;; command/prefix in a popup.
@@ -5256,9 +5258,10 @@ DIR can be relative or absolute."
 (use-package kkp
   :hook (elpaca-after-init . global-kkp-mode)
   ;; :bind
-  ;; ;; Should be remapped to "M-DEL"
-  ;; ("M-<backspace>" . backward-kill-word)
+  ;; ("M-<backspace>" . backward-kill-word) ; Should be remapped to "M-DEL"
   :config
+  ;; These workarounds are to help with Zellij.
+  (define-key key-translation-map (kbd "M-S-;") (kbd "M-:"))
   (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
   (define-key key-translation-map (kbd "M-S-/") (kbd "M-?")))
 
