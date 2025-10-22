@@ -19,8 +19,8 @@
 ;; while `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'leuven-dark
-    'none)
+      'kanagawa
+    'kanagawa)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -3334,6 +3334,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   ;; highlight quality
 ;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
+;; Some systems may not have treesitter mode enabled.
 (use-package cc-mode
   :ensure nil
   :hook
@@ -3377,9 +3378,16 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ("C-M-a" . treesit-beginning-of-defun)
    ("C-M-e" . treesit-end-of-defun)))
 
-(use-package cuda-mode
-  :mode ("\\.cu\\'" . c++-ts-mode)
-  :mode ("\\.cuh\\'" . c++-ts-mode))
+;; Some systems may not have treesitter mode enabled.
+(if (and (executable-find "tree-sitter")
+         (fboundp 'treesit-available-p)
+         (treesit-available-p))
+    (use-package cuda-mode
+      :mode ("\\.cu\\'" . c++-ts-mode)
+      :mode ("\\.cuh\\'" . c++-ts-mode))
+  (use-package cuda-mode
+    :mode ("\\.cu\\'" . c++-mode)
+    :mode ("\\.cuh\\'" . c++-mode)))
 
 (use-package opencl-c-mode
   :mode "\\.cl\\'")
@@ -3574,7 +3582,16 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :ensure nil
   :mode
   "\\.cfg\\'"
-  "\\.conf\\'")
+  "\\.conf\\'"
+  :hook
+  (conf-unix-mode
+   .
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  (cape-capf-inside-string #'cape-file)
+                  #'cape-dict
+                  (cape-capf-buster #'cape-dabbrev))))))
 
 (use-package toml-ts-mode
   :ensure nil
@@ -4198,13 +4215,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ((t
        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
-;; (use-package autothemer)
+(use-package autothemer)
 
-;; (use-package rose-pine-theme
-;;   :ensure (:host github :repo "konrad1977/pinerose-emacs")
-;;   :after autothemer
-;;   :when (eq sb/theme 'rose-pine)
-;;   :init (load-theme 'rose-pine t))
+(use-package rose-pine-theme
+  :ensure (:host github :repo "konrad1977/pinerose-emacs")
+  :after autothemer
+  :when (eq sb/theme 'rose-pine)
+  :init (load-theme 'rose-pine t))
 
 ;; (use-package rose-pine-emacs
 ;;   :ensure (:host github :repo "thongpv87/rose-pine-emacs"
@@ -4885,23 +4902,23 @@ Shows both colors when errors and warnings are present."
      #'eglot-completion-at-point
      :around
      (lambda (orig-fun &rest args)
-       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
+       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args)))
 
-  (defun sb/setup-capfs-for-eglot ()
-    "Setup custom CAPFs for programming buffers."
-    (when (derived-mode-p 'prog-mode)
-      (setq-local completion-at-point-functions
-                  (list
-                   (cape-capf-inside-code
-                    (cape-capf-super
-                     #'eglot-completion-at-point
-                     #'cape-keyword
-                     #'cape-dabbrev
-                     #'yasnippet-capf))
-                   (cape-capf-inside-comment #'cape-dict)
-                   (cape-capf-inside-string #'cape-file)
-                   (cape-capf-buster #'cape-dabbrev)))))
-  (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot))
+    (defun sb/setup-capfs-for-eglot ()
+      "Setup custom CAPFs for programming buffers."
+      (when (derived-mode-p 'prog-mode)
+        (setq-local completion-at-point-functions
+                    (list
+                     (cape-capf-inside-code
+                      (cape-capf-super
+                       #'eglot-completion-at-point
+                       #'cape-keyword
+                       #'cape-dabbrev
+                       #'yasnippet-capf))
+                     (cape-capf-inside-comment #'cape-dict)
+                     (cape-capf-inside-string #'cape-file)
+                     (cape-capf-buster #'cape-dabbrev)))))
+    (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot)))
 
 (use-package eglot-booster
   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
