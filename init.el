@@ -5333,23 +5333,24 @@ DIR can be relative or absolute."
      ;; history and continues the search with the newly selected string. Outside
      ;; of Isearch, the command allows you to pick a string from the history and
      ;; starts a new Isearch.
-     ("h" "Consult isearch history" consult-isearch-history)]
-    ["Occur" ("o" "occur" occur :transient nil)]
-    ["Other tools"
-     ("d" "Deadgrep" deadgrep)
+     ("h" "History" consult-isearch-history)]
+    ["Ripgrep" ("d" "Deadgrep" deadgrep)
      ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
-     ("r" "Consult ripgrep" consult-ripgrep)
-     ("g" "Consult grep" consult-grep)
-     ("t" "Consult git grep" consult-git-grep)]
+     ("r" "Ripgrep" consult-ripgrep)]
     ["Wgrep"
-     ("C-p" "Enable wgrep mode" wgrep-change-to-wgrep-mode)
+     ("C-p" "Enable" wgrep-change-to-wgrep-mode)
      ("C-s" "Finish edit" wgrep-finish-edit)
      ("C-k" "Abort changes" wgrep-abort-changes)
      ("C-q" "Exit" wgrep-exit)]
     ["Search locations"
-     ("n" "Consult find" consult-find)
-     ("f" "Consult fd" consult-fd)
-     ("l" "Consult locate" consult-locate)]])
+     ("n" "Find" consult-find)
+     ("f" "Fd" consult-fd)
+     ("l" "Locate" consult-locate)]
+    ["Other tools"
+     ("o" "Occur" occur)
+     ("h" "Isearch occur" isearch-occur)
+     ("g" "Grep" consult-grep)
+     ("t" "Git grep" consult-git-grep)]])
   (bind-key "C-c s" #'sb/search-transient)
 
   (transient-define-prefix
@@ -5357,12 +5358,12 @@ DIR can be relative or absolute."
    [["Utilities"
      ("s" "Sudo edit" crux-sudo-edit)
      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
-     ("w" "Toggle Whitespace" whitespace-mode)
+     ("w" "Toggle whitespace" whitespace-mode)
      ("m" "Describe major mode" discover-my-mode)]
     ["Buffers"
      ("c" "*scratch*" scratch-buffer)
-     ("v" "View echo-area messages" view-echo-area-messages)
-     ("l" "View *Messages*"
+     ("v" "Echo-area messages" view-echo-area-messages)
+     ("l" "*Messages*"
       (lambda ()
         (interactive)
         (switch-to-buffer "*Messages*")))]
@@ -5383,11 +5384,10 @@ DIR can be relative or absolute."
         (interactive)
         (dired user-emacs-directory)))
      ("m" "Restart" restart-emacs)
-     ("k" "Describe personal keybindings" describe-personal-keybindings)
-     ("b" "Describe keybindings" embark-bindings)]])
+     ("b" "keybindings" embark-bindings)
+     ("k" "Personal keybindings" describe-personal-keybindings)]])
   (bind-key "C-c d" #'sb/dotemacs-transient)
 
-  ;; (with-eval-after-load 'smerge-mode
   (transient-define-prefix
    sb/smerge-transient () "Smerge menu"
    [["Navigation"
@@ -5399,7 +5399,6 @@ DIR can be relative or absolute."
      ("a" "Keep both" smerge-keep-all)]
     ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
   (bind-key "C-c ^" #'sb/smerge-transient)
-  ;; )
 
   (with-eval-after-load 'lsp-mode
     (transient-define-prefix
@@ -5442,44 +5441,27 @@ DIR can be relative or absolute."
        ("t" "List" dogears-list)]])
     (bind-key "C-c i" #'sb/lsp-imenu-transient))
 
-  ;; (with-eval-after-load 'eglot
-  (transient-define-prefix
-   sb/eglot-transient () "Eglot menu"
-   [["Lsp functionality"
-     ("l" "Start Eglot" eglot)
-     ("q" "Disconnect Eglot" eglot-shutdown)]
-    ["Browsing functionality"
-     ("d" "Find declaration" eglot-find-declaration)
-     ("i" "Find implementation" eglot-find-implementation)
-     ("t" "Find type definition" eglot-find-typeDefinition)]
-    ["Code actions"
-     ("r" "Rename" eglot-rename)
-     ("f" "Format buffer" eglot-format)
-     ("x" "Execute code action" eglot-code-actions)
-     ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
-     ("e" "Execution code action: extract" eglot-code-action-extract)
-     ("n" "Execution code action: inline" eglot-code-action-inline)
-     ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
-     ("o"
-      "Execution code action: organize imports"
-      eglot-code-action-organize-imports)]
-    ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
+  (with-eval-after-load 'eglot
+    (transient-define-prefix
+     sb/eglot-transient () "Eglot menu"
+     [["Eglot" ("l" "Start" eglot) ("q" "Shutdown" eglot-shutdown)]
+      ["Browsing functionality"
+       ("d" "Find declaration" eglot-find-declaration)
+       ("i" "Find implementation" eglot-find-implementation)
+       ("t" "Find type definition" eglot-find-typeDefinition)]
+      ["Code actions"
+       ("r" "Rename" eglot-rename)
+       ("f" "Format buffer" eglot-format)
+       ("x" "Execute code action" eglot-code-actions)
+       ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
+       ("e" "Execution code action: extract" eglot-code-action-extract)
+       ("n" "Execution code action: inline" eglot-code-action-inline)
+       ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
+       ("o"
+        "Execution code action: organize imports"
+        eglot-code-action-organize-imports)]
+      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
   (bind-key "C-c l" #'sb/eglot-transient)
-
-  (transient-define-prefix
-   sb/eglot-imenu-transient () "Imenu commands"
-   [["Imenu"
-     ("i" "Imenu" consult-imenu)
-     ("j" "Breadcrumb jump" breadcrumb-jump)]
-    ["Lsp imenu" ("h" "Workspace symbols" consult-eglot-symbols)]
-    ["Dogears"
-     ("d" "Go" dogears-go)
-     ("r" "Remember" dogears-remember)
-     ("b" "Back" dogears-back)
-     ("f" "Forward" dogears-forward)
-     ("t" "List" dogears-list)]])
-  (bind-key "C-c i" #'sb/eglot-imenu-transient)
-  ;; )
 
   (transient-define-prefix
    sb/file-buffer-transient () "File and Buffer commands"
@@ -5500,15 +5482,24 @@ DIR can be relative or absolute."
      ("f" "Forward sexp" forward-sexp)
      ("k" "Kill sexp" kill-sexp)]
     ["Functions"
-     ("a" "Treesitter beginning" treesit-beginning-of-defun)
-     ("e" "Treesitter end" treesit-end-of-defun)]
-    ["Expressions"
-     ;; ("u" "Up list" treesit-up-list)
-     ;; ("d" "Down list" treesit-down-list)
-     ("F" "Forward sexp" treesit-forward-sexp)]
+     ("a" "Begin" treesit-beginning-of-defun)
+     ("e" "End" treesit-end-of-defun)]
+    ;; ["Expressions"
+    ;;  ;; ("u" "Up list" treesit-up-list)
+    ;;  ;; ("d" "Down list" treesit-down-list)
+    ;;  ("F" "Forward sexp" treesit-forward-sexp)]
     ["Flycheck"
      ("n" "Next error" next-error)
-     ("p" "Previous error" previous-error)]])
+     ("p" "Previous error" previous-error)]
+    ["Imenu" ("i" "Imenu" consult-imenu)]
+    ["Eglot" ("h" "Workspace symbols" consult-eglot-symbols)]
+    ;; ["Dogears"
+    ;;  ("d" "Go" dogears-go)
+    ;;  ("r" "Remember" dogears-remember)
+    ;;  ("b" "Back" dogears-back)
+    ;;  ("f" "Forward" dogears-forward)
+    ;;  ("t" "List" dogears-list)]
+    ])
   (bind-key "C-c n" #'sb/navigation-transient)
 
   (transient-define-prefix
@@ -5534,22 +5525,21 @@ DIR can be relative or absolute."
      ("ww" "Wordwise" ediff-windows-wordwise)]])
   (bind-key "C-c e" #'sb/ediff-transient)
 
-  ;; (with-eval-after-load 'citre
-  (transient-define-prefix
-   sb/citre-transient () "Citre commands"
-   [["Jump"
-     ("j" "Jump" sb/jump-citre-xref)
-     ("b" "Jump back" citre-jump-back)
-     ("p" "Peek" citre-peek)
-     ("a" "Ace peek" citre-ace-peek)
-     ("r" "Reference" citre-jump-to-reference)]
-    ["Manage"
-     ("c" "Create tags" citre-create-tags-file)
-     ("u" "Update tags" citre-update-tags-file)
-     ("e" "Edit recipe" citre-edit-tags-file-recipe)
-     ("g" "Update global db" citre-global-update-database)]])
-  (bind-key "C-c c" #'sb/citre-transient)
-  ;; )
+  (with-eval-after-load 'citre
+    (transient-define-prefix
+     sb/citre-transient () "Citre commands"
+     [["Jump"
+       ("j" "Jump" sb/jump-citre-xref)
+       ("b" "Jump back" citre-jump-back)
+       ("p" "Peek" citre-peek)
+       ("a" "Ace peek" citre-ace-peek)
+       ("r" "Reference" citre-jump-to-reference)]
+      ["Manage"
+       ("c" "Create tags" citre-create-tags-file)
+       ("u" "Update tags" citre-update-tags-file)
+       ("e" "Edit recipe" citre-edit-tags-file-recipe)
+       ("g" "Update global db" citre-global-update-database)]])
+    (bind-key "C-c c" #'sb/citre-transient))
 
   ;; We want Cape functions to be autoloaded if not already.
   (when (eq sb/in-buffer-completion 'corfu)
@@ -5600,7 +5590,6 @@ DIR can be relative or absolute."
           (sb/lsp-transient)))))]
     ["Navigation"
      ("n" "Navigation" sb/navigation-transient)
-     ("i" "Imenu" sb/eglot-imenu-transient)
      ("c" "Citre" sb/citre-transient)]
     ["Completion" ("p" "Corfu" sb/corfu-transient)]
     ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
