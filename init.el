@@ -741,6 +741,7 @@ The provider is `nerd-icons'."
    (lambda ()
      (ignore-errors
        (persistent-scratch-setup-default))))
+  :custom (persistent-scratch-what-to-save '(point narrowing))
   :config
   (advice-add
    'persistent-scratch-setup-default
@@ -1905,6 +1906,7 @@ The provider is `nerd-icons'."
   ((markdown-mode
     markdown-ts-mode python-mode python-ts-mode kdl-mode kdl-ts-mode)
    . apheleia-mode)
+  :bind ("C-x f" . apheleia-format-buffer)
   :custom (apheleia-formatters-respect-fill-column t)
   :config
   (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
@@ -2466,6 +2468,7 @@ The provider is `nerd-icons'."
 ;; We should enable `company-fuzzy-mode' at the very end of configuring
 ;; `company'. Nice feature but slows completions.
 
+;; Test the usefulness of this mode before enabling.
 (use-package company-fuzzy
   :after company
   :demand t
@@ -2555,7 +2558,7 @@ The provider is `nerd-icons'."
   ;; group with ":separate", the following code forces all listed backends to be
   ;; queried regardless of what `company-capf' returns.
 
-  (defun sb/company-latex-mode-no-separate ()
+  (defun sb/company-latex-backends-no-separate ()
     (setq-local
      company-backends
      '(company-files ; Have files first to allow completing paths
@@ -2577,7 +2580,7 @@ The provider is `nerd-icons'."
        company-dabbrev)))
 
   ;; Always query all the following backends
-  (defun sb/company-latex-mode-separate ()
+  (defun sb/company-latex-backends-separate ()
     (setq-local
      company-backends
      '(company-files ; Have files first to allow completing paths
@@ -2616,9 +2619,9 @@ The provider is `nerd-icons'."
   (add-hook
    'LaTeX-mode-hook
    (lambda ()
-     ;; Allow showing yasnippets auto-complete
+     ;; Allow showing yasnippets auto-complete which often use two letters
      (setq-local company-minimum-prefix-length 2)
-     (sb/company-latex-backends-new)))
+     (sb/company-latex-backends-separate)))
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
@@ -4086,10 +4089,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   ;; (setq-default TeX-command-default "LaTexMk")
 ;;   (auctex-latexmk-setup))
 
-;; Insert an environment with "C-c {". For a full list of environment abbreviations, use `C-c ?'.
-(use-package cdlatex
-  :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
-  :diminish)
+;; ;; Insert an environment with "C-c {". For a full list of environment abbreviations, use `C-c ?'.
+;; (use-package cdlatex
+;;   :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
+;;   :diminish)
 
 ;; (use-package citre
 ;;   :preface
