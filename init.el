@@ -4907,17 +4907,17 @@ Shows both colors when errors and warnings are present."
     (defun sb/setup-capfs-for-eglot ()
       "Setup custom CAPFs for programming buffers."
       (when (derived-mode-p 'prog-mode)
-        (setq-local completion-at-point-functions
-                    (list
-                     (cape-capf-inside-code
-                      (cape-capf-super
-                       #'eglot-completion-at-point
-                       #'cape-keyword
-                       #'cape-dabbrev
-                       #'yasnippet-capf))
-                     (cape-capf-inside-comment #'cape-dict)
-                     (cape-capf-inside-string #'cape-file)
-                     (cape-capf-buster #'cape-dabbrev)))))
+        (setq-local
+         completion-at-point-functions
+         (list
+          (cape-capf-inside-code
+           (cape-capf-super
+            #'eglot-completion-at-point
+            ;; We do not need to merge `cape-keyword' and `cape-dabbrev' if for Eglot-managed major modes
+            #'yasnippet-capf))
+          (cape-capf-inside-comment #'cape-dict)
+          (cape-capf-inside-string #'cape-file)
+          (cape-capf-buster #'cape-dabbrev)))))
     (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot)))
 
 (use-package eglot-booster
