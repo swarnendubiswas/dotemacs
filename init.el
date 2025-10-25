@@ -1342,6 +1342,8 @@ The provider is `nerd-icons'."
   :hook (elpaca-after-init . whole-line-or-region-global-mode)
   :diminish whole-line-or-region-local-mode)
 
+;; TODO: Choose one among dogears, better-jumper, and gumshoe.
+
 (use-package dogears
   :ensure (:host github :repo "alphapapa/dogears.el")
   :hook ((prog-mode text-mode) . dogears-mode)
@@ -1426,17 +1428,14 @@ The provider is `nerd-icons'."
 (use-package bm
   :init (setq bm-restore-repository-on-load t)
   :hook
-  ((kill-emacs
+  ((elpaca-after-init . bm-repository-load)
+   ((find-file after-revert) . bm-buffer-restore)
+   ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
+   (kill-emacs
     .
     (lambda ()
       (bm-buffer-save-all)
-      (bm-repository-save)))
-   (after-save . bm-buffer-save)
-   (kill-buffer . bm-buffer-save)
-   (vc-before-checkin . bm-buffer-save)
-   (after-revert . bm-buffer-restore)
-   (find-file . bm-buffer-restore)
-   (elpaca-after-init . bm-repository-load))
+      (bm-repository-save))))
   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
   :custom (bm-verbosity-level 0)
   :config (setq-default bm-buffer-persistence t))
@@ -1462,7 +1461,7 @@ The provider is `nerd-icons'."
 ;;    . rainbow-mode)
 ;;   :diminish)
 
-;; Emacs theme files have hex codes.
+;; Emacs theme files also have hex codes.
 (use-package colorful-mode
   :hook
   ((LaTeX-mode
@@ -1538,8 +1537,8 @@ The provider is `nerd-icons'."
   (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
-;; `consult-rg' provides live search, while `deadgrep' provides a resulting
-;; search buffer. Visit the result in another buffer with "o", move between
+;; `consult-rg' provides live search, while `deadgrep' provides a buffer with
+;; the search results. Visit the result in another buffer with "o", move between
 ;; search hits with "n" and "p", and move between files with "M-n" and "M-p".
 ;; Change the search term with "S" and enable incremental search with "I".
 (use-package deadgrep
@@ -1564,7 +1563,7 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'deadgrep
     (bind-key "e" #'wgrep-change-to-wgrep-mode deadgrep-mode-map)))
 
-;; Allows you to edit a `deadgrep' buffer and apply those changes to the file
+;; Allows to edit a `deadgrep' buffer and apply those changes to the file
 ;; buffer.
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
@@ -1696,7 +1695,8 @@ The provider is `nerd-icons'."
 ;;   :commands mode-minder)
 
 (use-package flycheck
-  :hook (elpaca-after-init . global-flycheck-mode)
+  ;; Flycheck is disabled with `emacs-lisp-mode'
+  :hook ((prog-mode text-mode) . flycheck-mode)
   :custom
   ;; Remove newline checks, since they would trigger an immediate check when we
   ;; want the `flycheck-idle-change-delay' to be in effect while editing.
@@ -3836,7 +3836,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :config
   (require 'ox-latex)
   (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted")))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  :diminish org-indent-mode)
 
 ;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
 (use-package org-appear
@@ -5621,7 +5622,7 @@ DIR can be relative or absolute."
               ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
               ("📚 Citre: jump" . citre-jump)
               ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂  Imenu (consult)" . consult-imenu)))
+              ("🗂  Imenu: " . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
       (call-interactively (cdr (assoc choice options)))))
   (bind-key "M-'" #'sb/jump-choose-definition))
