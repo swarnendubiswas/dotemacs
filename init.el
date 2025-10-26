@@ -3956,7 +3956,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; Avoid superscripts and subscripts from being displayed in a different font
   ;; size
   (font-latex-fontify-script nil)
-  (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
+  (font-latex-script-display '()) ; super-/sub-script on baseline
+  ;; Avoid different font styles and instead only use syntax color
+  ;; (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
+  (font-latex-fontify-sectioning 'color)
+  ;; Exclude bold/italic from keywords
+  (font-latex-deactivated-keyword-classes
+   '("italic-command" "bold-command" "italic-declaration" "bold-declaration"))
   :config
   ;; Make AUCTeX aware of the multifile document structure, always query for the
   ;; master file
@@ -4268,17 +4274,15 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
   :custom (nerd-icons-ibuffer-icon-size 1.0))
 
-(use-package nerd-icons-grep
-  :ensure (:host github :repo "hron/nerd-icons-grep")
-  :when (bound-and-true-p sb/enable-icons)
-  :after grep
-  :init (nerd-icons-grep-mode)
-  :custom (grep-use-headings t))
+;; (use-package nerd-icons-grep
+;;   :ensure (:host github :repo "hron/nerd-icons-grep")
+;;   :when (bound-and-true-p sb/enable-icons)
+;;   :after grep
+;;   :init (nerd-icons-grep-mode)
+;;   :custom (grep-use-headings t))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline.
-;; It does not show lsp status, flycheck information, and Python virtualenv
-;; information on the modeline. The package is not being actively maintained.
-;; Inspired by
+;; But the package is not being actively maintained. Inspired by
 ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
 (use-package powerline
   :preface
