@@ -34,7 +34,7 @@
   :group 'sb/emacs)
 
 ;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative. A plain modeline also suffices and avoids startup overhead.
-(defcustom sb/modeline-theme 'none
+(defcustom sb/modeline-theme 'powerline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -4284,6 +4284,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; Powerline theme for Nano looks great, and takes less space on the modeline.
 ;; But the package is not being actively maintained. Inspired by
 ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+
 (use-package powerline
   :preface
   (defun sb/powerline-raw (str &optional face pad)
@@ -4341,18 +4342,36 @@ Shows both colors when errors and warnings are present."
               (if active
                   'powerline-active0
                 'powerline-inactive0))
+             (emacs-icon
+              (if (fboundp 'nerd-icons-devicon)
+                  (nerd-icons-devicon
+                   "nf-dev-emacs"
+                   :height 1.1
+                   :v-adjust -0.05)
+                "λ"))
+
              ;; Left-hand side (GNU Emacs version)
+
+             ;; (lhs
+             ;;  (list
+             ;;   (powerline-raw
+             ;;    (concat
+             ;;     "GNU Emacs "
+             ;;     (number-to-string emacs-major-version)
+             ;;     "."
+             ;;     (number-to-string emacs-minor-version))
+             ;;    nil 'l)))
+
              (lhs
               (list
                (powerline-raw
-                (concat
-                 "GNU Emacs "
-                 (number-to-string emacs-major-version)
-                 "."
-                 (number-to-string emacs-minor-version))
+                (format "%s GNU Emacs %d.%d"
+                        emacs-icon emacs-major-version emacs-minor-version)
                 nil 'l)))
+
              ;; Center (buffer name)
              (center (list (powerline-raw "%b" nil 'r)))
+
              ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
              (rhs
               (list
@@ -4360,8 +4379,19 @@ Shows both colors when errors and warnings are present."
                  (powerline-raw which-func-format nil 'l))
                (when-let ((proj (project-current)))
                  (powerline-raw (format "[%s]" (project-name proj)) nil 'l))
-               (powerline-vc nil 'l)
-               (powerline-raw "")
+
+               ;; Remove the "Git:" prefix to save space.
+               ;; (powerline-vc nil 'l)
+
+               (when vc-mode
+                 (let* ((backend
+                         (substring-no-properties vc-mode))
+                        (branch
+                         (replace-regexp-in-string "^ *[Gg]it[:-]" "" backend)))
+                   (powerline-raw
+                    (format "  %s" branch) '(:foreground "#A3BE8C") 'l)))
+
+               (powerline-raw " ")
                (powerline-raw "%4l" nil 'l)
                (powerline-raw ",")
                (powerline-raw "%3c" nil 'r)
