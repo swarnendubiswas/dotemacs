@@ -19,8 +19,8 @@
 ;; while `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'kanagawa
-    'kanagawa)
+      'modus-vivendi
+    'modus-vivendi)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -67,7 +67,7 @@
 
 ;; Keeping icons disabled should lower overhead and help with the alignment
 ;; issue with Company and Corfu popups in the terminal.
-(defcustom sb/enable-icons nil
+(defcustom sb/enable-icons t
   "Should icons be enabled?
 The provider is `nerd-icons'."
   :type 'boolean
@@ -2314,7 +2314,7 @@ The provider is `nerd-icons'."
   ;; (company-require-match nil)
   ;; (company-insertion-triggers '())
 
-  (company-tooltip-align-annotations (display-graphic-p))
+  (company-tooltip-align-annotations t)
   ;; Avoid shrinking the company popup
   (company-tooltip-width-grow-only t)
   :config
@@ -2467,20 +2467,19 @@ The provider is `nerd-icons'."
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring
 ;; `company'. Nice feature but slows completions.
-
-;; Test the usefulness of this mode before enabling.
 (use-package company-fuzzy
   :after company
-  :demand t
   :custom
   ;; Using "flx" slows down completion significantly
   (company-fuzzy-sorting-backend 'alphabetic)
-  ;; (company-fuzzy-passthrough-backends '(company-capf))
-  (company-fuzzy-show-annotation t "The right-hand side may get cut off")
+  ;; The right-hand side may get cut off if the annotations are right-aligned
+  (company-fuzzy-show-annotation t)
   ;; We should not need this with "flx" sorting because the "flx" sorting
   ;; accounts for the prefix. Disabling the requirement may help with
   ;; performance.
   (company-fuzzy-prefix-on-top t)
+  ;; Ignore LSP completions
+  (company-fuzzy-passthrough-backends '(company-capf))
   :diminish)
 
 ;; Notes on configuring `company-backends'.
@@ -2621,7 +2620,8 @@ The provider is `nerd-icons'."
    (lambda ()
      ;; Allow showing yasnippets auto-complete which often use two letters
      (setq-local company-minimum-prefix-length 2)
-     (sb/company-latex-backends-separate)))
+     (sb/company-latex-backends-separate)
+     (company-fuzzy-mode 1)))
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
@@ -2635,7 +2635,8 @@ The provider is `nerd-icons'."
    'text-mode-hook
    (lambda ()
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
-       (sb/company-text-mode))))
+       (sb/company-text-mode)
+       (company-fuzzy-mode 1))))
 
   (defun sb/company-c-mode ()
     (setq-local

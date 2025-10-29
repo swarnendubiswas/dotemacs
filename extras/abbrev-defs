@@ -593,6 +593,7 @@
     ("euclidan" "euclidean" nil :count 0)
     ("evalauated" "evaluated" nil :count 0)
     ("evalautes" "evaluates" nil :count 0)
+    ("evalute" "evaluate" nil :count 0)
     ("evalution" "evaluation" nil :count 0)
     ("evluate" "evaluate" nil :count 1)
     ("exaclty" "exactly" nil :count 1)
