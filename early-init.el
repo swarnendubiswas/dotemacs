@@ -246,8 +246,8 @@
         (set-face-attribute 'default nil
                             :font "JetBrainsMonoNerdFontMono"
                             :height 210)
-        (set-face-attribute 'mode-line nil :height 140)
-        (set-face-attribute 'mode-line-inactive nil :height 140)))))
+        (set-face-attribute 'mode-line nil :height 160)
+        (set-face-attribute 'mode-line-inactive nil :height 160)))))
 
   (add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic))
 

@@ -1108,6 +1108,7 @@
     ("questoin" "question" nil :count 0)
     ("quetion" "question" nil :count 0)
     ("quetions" "questions" nil :count 0)
+    ("racquet" "racket" nil :count 0)
     ("raidus" "RADIUS" nil :count 0)
     ("readign" "reading" nil :count 0)
     ("readyness" "readiness" nil :count 0)

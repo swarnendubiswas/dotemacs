@@ -4378,19 +4378,42 @@ Shows both colors when errors and warnings are present."
               (list
                (when which-function-mode
                  (powerline-raw which-func-format nil 'l))
-               (when-let ((proj (project-current)))
-                 (powerline-raw (format "[%s]" (project-name proj)) nil 'l))
+
+               (when-let*
+                   ((proj (project-current))
+                    (proj-name (project-name proj))
+                    (branch
+                     (when vc-mode
+                       (let* ((backend
+                               (substring-no-properties vc-mode)))
+                         (replace-regexp-in-string
+                          "^ *[Gg]it[:-]" "" backend))))
+                    ;; Git branch icon (fallback if Nerd Icons not available)
+                    (git-icon
+                     (if (fboundp 'nerd-icons-octicon)
+                         (nerd-icons-octicon
+                          "nf-oct-git_branch"
+                          :v-adjust -0.05)
+                       "")))
+                 (powerline-raw
+                  (format " [%s  %s %s]"
+                          proj-name
+                          git-icon
+                          (or branch "—"))
+                  nil 'l))
+
+               ;; (when-let ((proj (project-current)))
+               ;;   (powerline-raw (format "[%s" (project-name proj)) nil 'l))
 
                ;; Remove the "Git:" prefix to save space.
                ;; (powerline-vc nil 'l)
 
-               (when vc-mode
-                 (let* ((backend
-                         (substring-no-properties vc-mode))
-                        (branch
-                         (replace-regexp-in-string "^ *[Gg]it[:-]" "" backend)))
-                   (powerline-raw
-                    (format "  %s" branch) '(:foreground "#A3BE8C") 'l)))
+               ;; (when vc-mode
+               ;;   (let* ((backend
+               ;;           (substring-no-properties vc-mode))
+               ;;          (branch
+               ;;           (replace-regexp-in-string "^ *[Gg]it[:-]" "" backend)))
+               ;;     (powerline-raw (format "  %s]" branch) nil 'l)))
 
                (powerline-raw " ")
                (powerline-raw "%4l" nil 'l)
@@ -5346,19 +5369,19 @@ DIR can be relative or absolute."
 ;;   :hook (emacs-startup . disable-mouse-global-mode)
 ;;   :diminish disable-mouse-global-mode)
 
-;; `inhibit-mouse' is supposed to be more efficient than `disable-mouse'
-(use-package inhibit-mouse
-  :hook (elpaca-after-init . inhibit-mouse-mode)
-  :custom
-  ;; Disable highlighting of clickable text such as URLs and hyperlinks when
-  ;; hovered by the mouse pointer.
-  (inhibit-mouse-adjust-mouse-highlight t)
-  ;; Disables the use of tooltips (show-help-function) during mouse events.
-  (inhibit-mouse-adjust-show-help-function t)
-  :config
-  (when (daemonp)
-    (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
-  :diminish)
+;; ;; `inhibit-mouse' is supposed to be more efficient than `disable-mouse'
+;; (use-package inhibit-mouse
+;;   :hook (elpaca-after-init . inhibit-mouse-mode)
+;;   :custom
+;;   ;; Disable highlighting of clickable text such as URLs and hyperlinks when
+;;   ;; hovered by the mouse pointer.
+;;   (inhibit-mouse-adjust-mouse-highlight t)
+;;   ;; Disables the use of tooltips (show-help-function) during mouse events.
+;;   (inhibit-mouse-adjust-show-help-function t)
+;;   :config
+;;   (when (daemonp)
+;;     (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
+;;   :diminish)
 
 (with-eval-after-load 'transient
   (transient-define-prefix
