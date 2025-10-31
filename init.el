@@ -19,8 +19,8 @@
 ;; while `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'modus-vivendi
-    'modus-vivendi)
+      'kanagawa
+    'kanagawa)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -55,7 +55,7 @@
 ;; support child frames on the terminal.
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
-      'corfu
+      'company
     'company)
   "Choose the framework to use for completion at point."
   :type
@@ -2465,6 +2465,13 @@ The provider is `nerd-icons'."
 ;;   :after tex
 ;;   :commands company-bibtex)
 
+(use-package company-try-hard
+  :bind
+  (("C-j" . company-try-hard)
+   :map
+   company-active-map
+   ("C-j" . company-try-hard)))
+
 ;; We should enable `company-fuzzy-mode' at the very end of configuring
 ;; `company'. Nice feature but slows completions.
 (use-package company-fuzzy
@@ -2472,14 +2479,18 @@ The provider is `nerd-icons'."
   :custom
   ;; Using "flx" slows down completion significantly
   (company-fuzzy-sorting-backend 'alphabetic)
-  ;; The right-hand side may get cut off if the annotations are right-aligned
+  ;; LATER: The right-hand side may get cut off if the annotations are
+  ;; right-aligned. Disable this after the mode is set up properly.
   (company-fuzzy-show-annotation t)
   ;; We should not need this with "flx" sorting because the "flx" sorting
   ;; accounts for the prefix. Disabling the requirement may help with
   ;; performance.
   (company-fuzzy-prefix-on-top t)
+  (company-fuzzy-trigger-symbols '("." "->" "<" "\"" "'" "@" "::" ":"))
+  (company-fuzzy-reset-selection t)
   ;; Ignore LSP completions
-  (company-fuzzy-passthrough-backends '(company-capf))
+  (company-fuzzy-passthrough-backends
+   '(company-capf company-files company-yasnippet))
   :diminish)
 
 ;; Notes on configuring `company-backends'.
@@ -4244,7 +4255,22 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package kanagawa-themes
   :when (eq sb/theme 'kanagawa)
-  :init (load-theme 'kanagawa-wave t))
+  :init (load-theme 'kanagawa-wave t)
+  :config
+  ;; The default colors are difficult to distinguish
+  (with-eval-after-load 'company
+    (custom-set-faces
+     ;; Normal tooltip
+     '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
+     ;; Selected item
+     '(company-tooltip-selection
+       ((t (:background "#264f78" :foreground "#ffffff"))))
+     ;; Match highlight
+     '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
+     ;; Scrollbar background
+     '(company-scrollbar-bg ((t (:background "#333333"))))
+     ;; Scrollbar foreground
+     '(company-scrollbar-fg ((t (:background "#555555")))))))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
