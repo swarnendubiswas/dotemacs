@@ -15,8 +15,8 @@
   :type 'string
   :group 'sb/emacs)
 
-;; `Modus-vivendi' is the most complete and integrates well with all terminals,
-;; while `Catppuccin' is more colorful.
+;; `Modus-vivendi' is the most complete, has good contrast, and integrates well
+;; with all terminals. `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
       'kanagawa
@@ -1999,12 +1999,14 @@ The provider is `nerd-icons'."
 ;; Use "M-SPC" for space-separated completion lookups.
 (use-package orderless
   :demand t
-  :config
-  (with-eval-after-load 'company
-    (defun sb/just-one-face (fn &rest args)
-      (let ((orderless-match-faces [completions-common-part]))
-        (apply fn args)))
-    (advice-add 'company-capf--candidates :around #'sb/just-one-face)))
+  ;; TODO: What is the utility of this? Is this to highlight the different parts with orderless?
+  ;; :config
+  ;; (with-eval-after-load 'company
+  ;;   (defun sb/just-one-face (fn &rest args)
+  ;;     (let ((orderless-match-faces [completions-common-part]))
+  ;;       (apply fn args)))
+  ;;   (advice-add 'company-capf--candidates :around #'sb/just-one-face))
+  )
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -2344,6 +2346,15 @@ The provider is `nerd-icons'."
   ;; This is useful for LaTeX completions with Texlab.
   (with-eval-after-load 'company-capf
     (bind-key "C-c p" #'company-capf))
+
+  ;; (custom-set-faces
+  ;;  ;; '(company-tooltip ((t (:inherit default))))
+  ;;  ;; '(company-tooltip-selection ((t (:inherit default))))
+  ;;  ;; '(company-tooltip-common ((t (:inherit default))))
+  ;;  ;; '(company-tooltip-common-selection ((t (:inherit default))))
+  ;;  ;; '(company-preview ((t (:inherit default))))
+  ;;  '(company-preview-common ((t (:inherit default)))))
+
   :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height'
@@ -2488,9 +2499,14 @@ The provider is `nerd-icons'."
   (company-fuzzy-prefix-on-top t)
   (company-fuzzy-trigger-symbols '("." "->" "<" "\"" "'" "@" "::" ":"))
   (company-fuzzy-reset-selection t)
-  ;; Ignore LSP completions
+  ;; Ignore backends that are already fuzzy
   (company-fuzzy-passthrough-backends
-   '(company-capf company-files company-yasnippet))
+   '(company-capf
+     company-yasnippet
+     company-dabbrev
+     company-dabbrev-code
+     company-files
+     company-ispell))
   :diminish)
 
 ;; Notes on configuring `company-backends'.
@@ -2608,30 +2624,32 @@ The provider is `nerd-icons'."
         company-math-symbols-unicode company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
-  (defun sb/company-latex-backends-new ()
+  (defun sb/company-latex-backends-fuzzy ()
     "Company backends optimized for LaTeX."
     (setq-local company-backends
                 '(company-files
-                  ;; (company-capf :with company-yasnippet)
                   ;; References & labels
                   company-reftex-citations
-                  (company-reftex-labels company-auctex-labels)
+                  company-reftex-labels
+                  company-auctex-labels
                   ;; LaTeX macros/envs/snippets
-                  (company-auctex-macros
-                   company-auctex-environments
-                   company-auctex-symbols
-                   :with company-yasnippet)
+                  company-auctex-macros
+                  company-auctex-environments
+                  company-auctex-symbols
                   ;; Math symbols
-                  (company-math-symbols-latex company-math-symbols-unicode)
-                  (company-ispell company-dict :with company-yasnippet)
-                  (company-dabbrev :with company-yasnippet))))
+                  company-math-symbols-latex
+                  company-math-symbols-unicode
+                  company-ispell
+                  company-dict
+                  company-dabbrev
+                  company-yasnippet)))
 
   (add-hook
    'LaTeX-mode-hook
    (lambda ()
      ;; Allow showing yasnippets auto-complete which often use two letters
      (setq-local company-minimum-prefix-length 2)
-     (sb/company-latex-backends-separate)
+     (sb/company-latex-backends-fuzzy)
      (company-fuzzy-mode 1)))
 
   (defun sb/company-text-mode ()
@@ -3410,6 +3428,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; I have disabled treesitter support for CMake because it seems unstable. For
 ;; example, I get "treesit-font-lock-fontify-region: Query pattern is malformed"
 ;; on search with `consult-line'.
+;; https://github.com/regen100/cmake-language-server/pull/103/files
 (use-package cmake-mode
   :when (executable-find "cmake")
   :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
@@ -4220,7 +4239,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
   :init (load-theme 'modus-vivendi t)
-  :custom (modus-themes-mixed-fonts nil))
+  :custom
+  (modus-themes-mixed-fonts nil)
+  (modus-themes-completions
+   '((matches . (extrabold underline))
+     (selection . (semibold accented text-also))
+     (popup . (accented intense)))))
 
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
