@@ -2235,16 +2235,9 @@ The provider is `nerd-icons'."
         (funcall formatter cand))
       (setopt company-format-margin-function #'sb/company-kind-icon-margin))))
 
-;; Use "M-x company-diag" or the modeline status (without diminish) to see the
+;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
 (use-package company
-  :preface
-  (defun sb/company-abort-then-kill-word ()
-    "If company popup is active, close it, then delete the next word."
-    (interactive)
-    (when (and (boundp 'company-mode) (company--active-p))
-      (company-abort))
-    (kill-word 1))
   :when (eq sb/in-buffer-completion 'company)
   :hook (elpaca-after-init . global-company-mode)
   :bind
@@ -2271,7 +2264,6 @@ The provider is `nerd-icons'."
    ;;    (company-complete-common-or-cycle -1)))
 
    ([escape] . company-abort)
-   ("M-d" . sb/company-abort-then-kill-word)
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
    :map
@@ -2302,6 +2294,7 @@ The provider is `nerd-icons'."
          minibuffer-inactive-mode))
   ;; Convenient to wrap around completion items at boundaries
   (company-selection-wrap-around t)
+
   ;; `company-pseudo-tooltip-unless-just-one-frontend' shows popup unless there
   ;; is only one candidate, `company-preview-frontend' shows the preview
   ;; in-place which is too intrusive, `company-preview-if-just-one-frontend'
@@ -2317,8 +2310,7 @@ The provider is `nerd-icons'."
   ;; (company-insertion-triggers '())
 
   (company-tooltip-align-annotations t)
-  ;; Avoid shrinking the company popup
-  (company-tooltip-width-grow-only t)
+  (company-tooltip-width-grow-only t) ; Avoid shrinking the company popup
   :config
   (unless (bound-and-true-p sb/enable-icons)
     (setopt company-format-margin-function nil))
@@ -2342,6 +2334,14 @@ The provider is `nerd-icons'."
             nil
           (apply orig-fun args))))
     (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
+
+  (defun sb/company-abort-then-kill-word ()
+    "If company popup is active, close it, then delete the next word."
+    (interactive)
+    (when (and (boundp 'company-mode) (company--active-p))
+      (company-abort))
+    (kill-word 1))
+  (bind-key "M-d" #'sb/company-abort-then-kill-word)
 
   ;; This is useful for LaTeX completions with Texlab.
   (with-eval-after-load 'company-capf
@@ -2649,8 +2649,9 @@ The provider is `nerd-icons'."
    (lambda ()
      ;; Allow showing yasnippets auto-complete which often use two letters
      (setq-local company-minimum-prefix-length 2)
-     (sb/company-latex-backends-fuzzy)
-     (company-fuzzy-mode 1)))
+     (sb/company-latex-backends-separate)
+     ;; (company-fuzzy-mode 1)
+     ))
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
