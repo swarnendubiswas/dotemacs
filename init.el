@@ -2567,16 +2567,23 @@ The provider is `nerd-icons'."
 
 (with-eval-after-load 'company
   ;; Override `company-backends' for unhandled major modes.
+  ;; (setopt company-backends
+  ;;         '(company-files
+  ;;           (company-capf
+  ;;            ;; `company-keywords' should not be required with LS support.
+  ;;            company-keywords company-dabbrev-code
+  ;;            :with company-yasnippet)
+  ;;           (company-dict company-ispell :with company-yasnippet)
+  ;;           ;; If we have `company-dabbrev' first, then other matches from later
+  ;;           ;; backends `company-ispell' or `company-dict' will be ignored.
+  ;;           (company-dabbrev :with company-yasnippet)))
+
   (setopt company-backends
-          '(company-files
+          '(company-yasnippet
+            company-files
             (company-capf
-             ;; `company-keywords' should not be required with LS support.
-             company-keywords company-dabbrev-code
-             :with company-yasnippet)
-            (company-dict company-ispell :with company-yasnippet)
-            ;; If we have `company-dabbrev' first, then other matches from later
-            ;; backends `company-ispell' or `company-dict' will be ignored.
-            (company-dabbrev :with company-yasnippet)))
+             :separate company-keywords company-dabbrev-code)
+            (company-dict company-ispell) company-dabbrev))
 
   ;; `company-capf' with Texlab does not pass to later backends even if it does
   ;; not return any result. So it makes it difficult to complete non-LaTeX
@@ -2605,7 +2612,7 @@ The provider is `nerd-icons'."
        company-dict
        company-dabbrev)))
 
-  ;; Always query all the following backends
+  ;; Always query all the following backends by using ":separate".
   (defun sb/company-latex-backends-separate ()
     (setq-local
      company-backends
@@ -2617,7 +2624,7 @@ The provider is `nerd-icons'."
         company-reftex-labels
         ;; LaTeX structure
         company-auctex-labels company-auctex-macros company-auctex-environments
-        ;; company-latex-commands ; company-auctex-macros seem to be better
+        company-latex-commands ; `company-auctex-macros' seem to be better
         company-auctex-symbols
         company-math-symbols-latex ; Math latex tags
         ;; Math Unicode symbols and sub (super) scripts
@@ -2625,7 +2632,7 @@ The provider is `nerd-icons'."
         :with company-yasnippet))))
 
   (defun sb/company-latex-backends-fuzzy ()
-    "Company backends optimized for LaTeX."
+    "Company backends for use with `company-fuzzy-mode'."
     (setq-local company-backends
                 '(company-files
                   ;; References & labels
@@ -2666,7 +2673,8 @@ The provider is `nerd-icons'."
    (lambda ()
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
        (sb/company-text-mode)
-       (company-fuzzy-mode 1))))
+       ;; (company-fuzzy-mode 1)
+       )))
 
   (defun sb/company-c-mode ()
     (setq-local
@@ -2682,12 +2690,23 @@ The provider is `nerd-icons'."
        (company-dict company-ispell :with company-yasnippet)
        (company-dabbrev :with company-yasnippet))))
 
+  (defun sb/company-c-mode-new ()
+    (setq-local
+     company-backends
+     '(company-yasnippet
+       company-files
+       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'.
+       ;; (:separate company-capf company-dabbrev-code :with company-yasnippet)
+       (company-capf
+        :separate company-dabbrev-code company-c-headers company-keywords)
+       (company-dict company-ispell) (company-dabbrev))))
+
   (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
     (add-hook
      hook
      (lambda ()
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-c-mode))))
+       (sb/company-c-mode-new))))
 
   ;; TODO: It may be possible to merge `sb/company-non-lsp-prog-mode' and `sb/company-elisp-mode'.
 
@@ -2703,6 +2722,17 @@ The provider is `nerd-icons'."
        (company-ispell company-dict :with company-yasnippet)
        (company-dabbrev :with company-yasnippet))))
 
+  (defun sb/company-non-lsp-prog-mode-new ()
+    (setq-local
+     company-backends
+     '(company-yasnippet
+       company-files
+       (company-capf
+        :separate
+        company-dabbrev-code ; Useful for local (e.g., variable) names
+        company-keywords)
+       (company-ispell company-dict) company-dabbrev)))
+
   (add-hook
    'prog-mode-hook
    (lambda ()
@@ -2712,7 +2742,7 @@ The provider is `nerd-icons'."
                  (derived-mode-p 'bison-mode)
                  (derived-mode-p 'cmake-ts-mode))
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-non-lsp-prog-mode))))
+       (sb/company-non-lsp-prog-mode-new))))
 
   ;; `company-capf' is not complete for Elisp. For example, it will not suggest `doom-modeline' but suggests `doom-modeline-mode'. So I need to merge `company-capf' with `company-dabbrev-code'.
   (defun sb/company-elisp-mode ()
@@ -2726,6 +2756,17 @@ The provider is `nerd-icons'."
         :with company-yasnippet)
        (company-ispell company-dict :with company-yasnippet)
        (company-dabbrev :with company-yasnippet))))
+
+  (defun sb/company-elisp-mode-new ()
+    "Add backends for `emacs-lisp-mode' completion in company mode."
+    (setq-local company-backends
+                '(company-yasnippet
+                  company-files
+                  (company-capf
+                   :separate
+                   ;; Useful for local (e.g., variable) names
+                   company-dabbrev-code)
+                  (company-ispell company-dict) company-dabbrev)))
 
   (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
