@@ -2578,12 +2578,16 @@ The provider is `nerd-icons'."
   ;;           ;; backends `company-ispell' or `company-dict' will be ignored.
   ;;           (company-dabbrev :with company-yasnippet)))
 
-  (setopt company-backends
-          '(company-yasnippet
-            company-files
-            (company-capf
-             :separate company-keywords company-dabbrev-code)
-            (company-dict company-ispell) company-dabbrev))
+  (setopt
+   company-backends
+   '(company-files
+     ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'. `company-yasnippet' is blocking.
+     (company-capf
+      :separate
+      company-dabbrev-code
+      company-keywords
+      :with company-yasnippet)
+     (company-dict company-ispell) company-dabbrev))
 
   ;; `company-capf' with Texlab does not pass to later backends even if it does
   ;; not return any result. So it makes it difficult to complete non-LaTeX
@@ -2693,13 +2697,15 @@ The provider is `nerd-icons'."
   (defun sb/company-c-mode-new ()
     (setq-local
      company-backends
-     '(company-yasnippet
-       company-files
-       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'.
-       ;; (:separate company-capf company-dabbrev-code :with company-yasnippet)
+     '(company-files
+       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'. `company-yasnippet' is blocking.
        (company-capf
-        :separate company-dabbrev-code company-c-headers company-keywords)
-       (company-dict company-ispell) (company-dabbrev))))
+        :separate
+        company-dabbrev-code
+        company-c-headers
+        company-keywords
+        :with company-yasnippet)
+       (company-dict company-ispell) company-dabbrev)))
 
   (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
     (add-hook
@@ -2715,9 +2721,11 @@ The provider is `nerd-icons'."
     (setq-local
      company-backends
      '(company-files
+       ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'.
        (company-capf
+        :separate
+        company-dabbrev-code
         company-keywords
-        company-dabbrev-code ; Useful for local (e.g., variable) names
         :with company-yasnippet)
        (company-ispell company-dict :with company-yasnippet)
        (company-dabbrev :with company-yasnippet))))
@@ -2725,12 +2733,13 @@ The provider is `nerd-icons'."
   (defun sb/company-non-lsp-prog-mode-new ()
     (setq-local
      company-backends
-     '(company-yasnippet
-       company-files
+     '(company-files
+       ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'. `company-yasnippet' is blocking.
        (company-capf
         :separate
-        company-dabbrev-code ; Useful for local (e.g., variable) names
-        company-keywords)
+        company-dabbrev-code
+        company-keywords
+        :with company-yasnippet)
        (company-ispell company-dict) company-dabbrev)))
 
   (add-hook
@@ -2759,14 +2768,16 @@ The provider is `nerd-icons'."
 
   (defun sb/company-elisp-mode-new ()
     "Add backends for `emacs-lisp-mode' completion in company mode."
-    (setq-local company-backends
-                '(company-yasnippet
-                  company-files
-                  (company-capf
-                   :separate
-                   ;; Useful for local (e.g., variable) names
-                   company-dabbrev-code)
-                  (company-ispell company-dict) company-dabbrev)))
+    (setq-local
+     company-backends
+     '(company-files
+       ;; `company-capf' may not return all variable or type definitions, so we also use `company-dabbrev-code'. `company-yasnippet' is blocking.
+       (company-capf
+        :separate
+        company-dabbrev-code
+        company-keywords
+        :with company-yasnippet)
+       (company-ispell company-dict) company-dabbrev)))
 
   (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -5453,9 +5464,6 @@ DIR can be relative or absolute."
 ;;   (flyover-hide-checker-name nil)
 ;;   (flyover-background-lightness 40)
 ;;   :diminish)
-
-(use-package show-font
-  :ensure (:host github :repo "protesilaos/show-font"))
 
 ;; (use-package disable-mouse
 ;;   :hook (emacs-startup . disable-mouse-global-mode)
