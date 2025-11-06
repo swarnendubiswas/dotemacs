@@ -43,16 +43,19 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
+;; Company works better with both Windows and TUI Emacs, and has more extensive
+;; LaTeX support than Corfu. We can set up separate completion files with
+;; `company-ispell' and `company-dict'. However, `company-ispell' does not keep
+;; prefix case when used as a grouped backend. We use `company' with TUI for now
+;; because Emacs versions till 30.x does not support child frames on the
+;; terminal.
+
 ;; Corfu integrates nicely with `orderless' and provides better completion for
 ;; Elisp symbols with `cape-elisp-symbol'. But `corfu-terminal-mode' with Emacs
 ;; < 31 has a rendering problem for completion popups appearing near the right
 ;; edges with terminal Emacs. The completion entries wrap around sometimes, and
-;; messes up the completion. Company works better with both Windows and TUI
-;; Emacs, and has more extensive LaTeX support than Corfu. We can set up
-;; separate completion files with `company-ispell' and `company-dict'. However,
-;; `company-ispell' does not keep prefix case when used as a grouped backend. We
-;; use `company' with TUI for now because Emacs versions till 30.x does not
-;; support child frames on the terminal.
+;; messes up the completion.
+
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
       'company
