@@ -213,12 +213,19 @@
 ;; used.
 
 (when (daemonp)
-  (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
-  (defun sb/init-fonts-daemon (frame)
-    (with-selected-frame frame
-      (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
-
-  (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))
+  (cond
+   ((string= (system-name) "inspiron-7572")
+    ((add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-21"))
+     (defun sb/init-fonts-daemon (frame)
+       (with-selected-frame frame
+         (set-frame-font "JetBrainsMonoNerdFontMono-21" t t)))
+     (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon)))
+   ((string= (system-name) "office")
+    ((add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
+     (defun sb/init-fonts-daemon (frame)
+       (with-selected-frame frame
+         (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
+     (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon)))))
 
 ;; The following page suggests avoiding set-face-attribute for performance
 ;; reasons. https://github.com/D4lj337/Emacs-performance

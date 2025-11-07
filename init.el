@@ -2023,13 +2023,13 @@ The provider is `nerd-icons'."
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
   :custom
-  (enable-recursive-minibuffers nil "Confusing to track the depth")
+  (enable-recursive-minibuffers t "Tracking the depth can be confusing")
   (completion-ignore-case t)
   ;; Ignore case when reading a file name
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
   (read-buffer-completion-ignore-case t)
-  (completion-styles '(orderless))
+  (completion-styles '(basic orderless))
   (completion-category-defaults nil)
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
@@ -2276,11 +2276,14 @@ The provider is `nerd-icons'."
    ("C-g" . company-search-abort)
    ("DEL" . company-search-delete-char))
   :custom
-  ;; Avoid slowdown in case there are lot of buffers open
-  (company-dabbrev-other-buffers nil)
+  ;; ;; Avoid slowdown in case there are lot of buffers open
+  ;; (company-dabbrev-other-buffers nil)
+
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
-  ;; Avoid slowdown in case there are lot of buffers open
-  (company-dabbrev-code-other-buffers nil)
+
+  ;; ;; Avoid slowdown in case there are lot of buffers open
+  ;; (company-dabbrev-code-other-buffers nil)
+
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic))
   (company-ispell-dictionary
@@ -2314,6 +2317,10 @@ The provider is `nerd-icons'."
 
   (company-tooltip-align-annotations t)
   (company-tooltip-width-grow-only t) ; Avoid shrinking the company popup
+
+  ;; Allow orderless-like behavior with Company, i.e., search candidates with space-separated regexp
+  ;; https://github.com/company-mode/company-mode/discussions/1211
+  (company-search-regexp-function 'company-search-words-in-any-order-regexp)
   :config
   (unless (bound-and-true-p sb/enable-icons)
     (setopt company-format-margin-function nil))
