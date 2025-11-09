@@ -112,6 +112,15 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
+(defcustom sb/op-mode 'daemon
+  "Specify the way you expect Emacs to be used."
+  :type
+  '(radio
+    (const :tag "server" server)
+    (const :tag "daemon" daemon)
+    (const :tag "standalone" standalone))
+  :group 'sb/emacs)
+
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -124,10 +133,22 @@ The provider is `nerd-icons'."
 (eval-and-compile
   (setopt
    use-package-always-ensure t
-   use-package-enable-imenu-support t
-   ;; Delay loading packages
-   use-package-expand-minimally t
-   use-package-always-defer t))
+   use-package-enable-imenu-support t))
+
+;; Delay loading packages only in standalone mode.
+(when (eq sb/op-mode 'standalone)
+  (eval-and-compile
+    (setopt
+     use-package-expand-minimally t
+     use-package-always-defer t)))
+
+(when (eq sb/op-mode 'daemon)
+  (eval-and-compile
+    (setopt
+     use-package-verbose t
+     use-package-minimum-reported-time 0 ; Show everything
+     ;; Use "M-x use-package-report" to see results
+     use-package-compute-statistics t)))
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
 
@@ -2440,7 +2461,7 @@ The provider is `nerd-icons'."
      (require 'company-org-block)
      (setq-local company-backends
                  '(company-files
-                   (company-org-block :with company-dabbrev-code)
+                   (company-org-block :separate company-dabbrev-code)
                    (company-dict company-ispell)
                    company-dabbrev)))))
 
