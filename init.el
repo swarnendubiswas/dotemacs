@@ -183,7 +183,7 @@ The provider is `nerd-icons'."
 ;; for defining aliases. Then, we can avoid passing shell arguments to be more
 ;; efficient.
 (use-package exec-path-from-shell
-  :when (and (eq system-type 'gnu/linux) (display-graphic-p))
+  :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
   :demand t
   :init
   (setopt

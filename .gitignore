@@ -58,3 +58,4 @@ tramp
 /.ctags.d/
 /elpaca/
 /init.el~
+/lsp-ltex-plus/
