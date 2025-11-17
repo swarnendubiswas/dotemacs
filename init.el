@@ -60,8 +60,8 @@
 
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
-      'company
-    'company)
+      'corfu
+    'corfu)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -2529,29 +2529,30 @@ The provider is `nerd-icons'."
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring
 ;; `company'. Nice feature but slows completions.
-(use-package company-fuzzy
-  :after company
-  :custom
-  ;; Using "flx" slows down completion significantly
-  (company-fuzzy-sorting-backend 'alphabetic)
-  ;; LATER: The right-hand side may get cut off if the annotations are
-  ;; right-aligned. Disable this after the mode is set up properly.
-  (company-fuzzy-show-annotation t)
-  ;; We should not need this with "flx" sorting because the "flx" sorting
-  ;; accounts for the prefix. Disabling the requirement may help with
-  ;; performance.
-  (company-fuzzy-prefix-on-top t)
-  (company-fuzzy-trigger-symbols '("." "->" "<" "\"" "'" "@" "::" ":"))
-  (company-fuzzy-reset-selection t)
-  ;; Ignore backends that are already fuzzy
-  (company-fuzzy-passthrough-backends
-   '(company-capf
-     company-yasnippet
-     company-dabbrev
-     company-dabbrev-code
-     company-files
-     company-ispell))
-  :diminish)
+
+;; (use-package company-fuzzy
+;;   :after company
+;;   :custom
+;;   ;; Using "flx" slows down completion significantly
+;;   (company-fuzzy-sorting-backend 'alphabetic)
+;;   ;; LATER: The right-hand side may get cut off if the annotations are
+;;   ;; right-aligned. Disable this after the mode is set up properly.
+;;   (company-fuzzy-show-annotation t)
+;;   ;; We should not need this with "flx" sorting because the "flx" sorting
+;;   ;; accounts for the prefix. Disabling the requirement may help with
+;;   ;; performance.
+;;   (company-fuzzy-prefix-on-top t)
+;;   (company-fuzzy-trigger-symbols '("." "->" "<" "\"" "'" "@" "::" ":"))
+;;   (company-fuzzy-reset-selection t)
+;;   ;; Ignore backends that are already fuzzy
+;;   (company-fuzzy-passthrough-backends
+;;    '(company-capf
+;;      company-yasnippet
+;;      company-dabbrev
+;;      company-dabbrev-code
+;;      company-files
+;;      company-ispell))
+;;   :diminish)
 
 ;; Notes on configuring `company-backends'.
 
@@ -2834,11 +2835,6 @@ The provider is `nerd-icons'."
 ;; `completion-at-point'.
 (use-package corfu
   :preface
-  (defun sb/corfu-default-setup ()
-    ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
-    (corfu-history-mode 1)
-    (corfu-echo-mode 1)
-    (corfu-popupinfo-mode 1))
   (defun sb/corfu-prog-setup ()
     "Use shorter prefix for Corfu in `prog-mode'."
     (setq-local corfu-auto-prefix 2))
@@ -2868,12 +2864,17 @@ The provider is `nerd-icons'."
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
   (corfu-auto t "Enable auto completion")
-  (corfu-on-exact-match 'show)
+  ;; (corfu-on-exact-match 'show)
 
   ;; ;; Do not close popup when adjacent to other characters
   ;; (corfu-quit-at-boundary nil)
 
   :config
+  ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
+  (corfu-history-mode 1)
+  (corfu-echo-mode 1)
+  (corfu-popupinfo-mode 1)
+
   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
   (unless (display-graphic-p)
     (setopt corfu-right-margin-width 1.5)))
