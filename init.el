@@ -2,7 +2,9 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary: My configuration is mostly targeted toward GNU Linux.
+;;; Commentary: My configuration is mostly targeted toward GNU Linux. I
+;;; primarily use `Company' compared to Corfu for completion because it provides
+;;; for fine-grained control. I use Eglot compared to `lsp-mode' because
 
 ;;; Code:
 
@@ -34,7 +36,7 @@
   :group 'sb/emacs)
 
 ;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative. A plain modeline also suffices and avoids startup overhead.
-(defcustom sb/modeline-theme 'powerline
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -48,7 +50,7 @@
 ;; `company-ispell' and `company-dict'. However, `company-ispell' does not keep
 ;; prefix case when used as a grouped backend. We use `company' with TUI for now
 ;; because Emacs versions till 30.x does not support child frames on the
-;; terminal.
+;; terminal which is required by Corfu.
 
 ;; Corfu integrates nicely with `orderless' and provides better completion for
 ;; Elisp symbols with `cape-elisp-symbol'. But `corfu-terminal-mode' with Emacs
@@ -86,14 +88,16 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; It is tempting to use `eglot' because it is built in to Emacs. However,
+;; It is tempting to use `eglot' because it is built in to Emacs and is
+;; lightweight. Eglot does not allow multiple servers to connect to a major
+;; mode, does not support semantic tokens
+
 ;; `lsp-mode' offers several advantages. It allows connecting to multiple
 ;; servers simultaneously and provides helpers to install and uninstall servers.
-;; Eglot does not allow multiple servers to connect to a major mode, does not
-;; support semantic tokens, but is possibly more lightweight. Using a single
-;; server suffices for most programming language major modes, but it is
-;; beneficial to use more than one LS for languages like plain text, markdown,
-;; and LaTeX. I use Eglot because Texlab is inefficient.
+
+;; Using a single server suffices for most programming language major modes, but
+;; it is beneficial to use more than one LS for languages like plain text,
+;; markdown, and LaTeX. I use Eglot because Texlab is inefficient.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
@@ -188,7 +192,7 @@ The provider is `nerd-icons'."
   :init
   (setopt
    exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "TERM" "LANG" "LC_CTYPE" "LSP_USE_PLISTS")
+   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LSP_USE_PLISTS")
    exec-path-from-shell-arguments nil) ; Reduce the start up time
   (exec-path-from-shell-initialize))
 
@@ -279,21 +283,27 @@ The provider is `nerd-icons'."
   ;; Do not auto-save remote files using `auto-save-visited-mode'
   (remote-file-name-inhibit-auto-save-visited t)
   (ring-bell-function 'ignore "Disable beeping sound")
-  (visible-bell nil)
+  ;; (visible-bell nil)
   (save-interprogram-paste-before-kill t)
   (select-enable-clipboard t)
-  (history-delete-duplicates t)
-  (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
+
+  ;; (history-delete-duplicates t)
+  ;; (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
+
   (sentence-end-double-space nil)
   (shift-select-mode nil)
+
   ;; (sort-fold-case nil "Do not ignore case when sorting")
+  ;; (tags-case-fold-search nil "case-sensitive")
+
   (standard-indent 2)
   (switch-to-buffer-preserve-window-point t)
   (view-read-only t "Use view mode for read-only buffers")
-  (window-combination-resize t "Resize windows proportionally")
+
+  ;; (window-combination-resize t "Resize windows proportionally")
   ;; (max-mini-window-height 0.3)
+
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
-  (tags-case-fold-search nil "case-sensitive")
   ;; Disable the warning "X and Y are the same file" in case of symlinks
   (find-file-suppress-same-file-warnings t)
 
@@ -308,11 +318,11 @@ The provider is `nerd-icons'."
   ;; explicit
   ;; (revert-without-query '("\\.*") "Revert all files without asking")
 
-  (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
   (vc-handled-backends '(Git))
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp
    (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
+
   (scroll-preserve-screen-position t)
   ;; Number of lines of margin at the top and bottom of a window when automatic scrolling is triggered
   (scroll-margin 2)
@@ -332,6 +342,7 @@ The provider is `nerd-icons'."
 
   ;; Improve Emacs' responsiveness by delaying syntax highlighting during input
   (redisplay-skip-fontification-on-input t)
+  (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
 
   ;; Show contextual lines around a match
   ;; (list-matching-lines-default-context-lines 1)
@@ -399,9 +410,11 @@ The provider is `nerd-icons'."
    cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
    indent-tabs-mode nil ; Spaces instead of tabs
    tab-width 4
+
    ;; ;; TAB first tries to indent the current line, and if the line was already
    ;; ;; indented, then try to complete the thing at point.
    ;; tab-always-indent 'complete
+
    bidi-display-reordering 'left-to-right
    bidi-paragraph-direction 'left-to-right)
 
@@ -2493,7 +2506,7 @@ The provider is `nerd-icons'."
 ;; multi-file documents, ensure that the variable `TeX-master' is appropriately
 ;; set in all files, so that RefTeX can find citations across documents.
 (use-package company-reftex
-  :after tex
+  :after reftex
   :custom
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
@@ -3454,6 +3467,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; Some systems may not have treesitter mode enabled.
 (use-package cc-mode
   :ensure nil
+  :mode ("\\.h\\'" . c-or-c++-mode)
   :hook
   ((awk-mode
     .
@@ -3474,7 +3488,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
        (treesit-available-p))
-  :mode (("\\.h\\'" . c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
+  :mode (("\\.h\\'" . c-or-c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
   :hook
   ((c-ts-mode c++-ts-mode)
    .
@@ -4072,9 +4086,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; size
   (font-latex-fontify-script nil)
   (font-latex-script-display '()) ; super-/sub-script on baseline
+
   ;; Avoid different font styles and instead only use syntax color
   ;; (font-latex-fontify-sectioning 1.0 "Avoid emphasizing section headers")
   (font-latex-fontify-sectioning 'color)
+
   ;; Exclude bold/italic from keywords
   (font-latex-deactivated-keyword-classes
    '("italic-command" "bold-command" "italic-declaration" "bold-declaration"))
@@ -4125,7 +4141,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :bind
   (("C-c [" . reftex-citation)
    ("C-c )" . reftex-reference)
-   ("C-c (" . reftex-label)
+   ("C-c (" . reftex-label) ; Add a label
    ("C-c &" . reftex-view-crossref))
   :custom
   (reftex-plug-into-AUCTeX t)
@@ -4158,7 +4174,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package consult-reftex
   :ensure (:host github :repo "karthink/consult-reftex")
-  :after (consult LaTeX-mode)
+  :after (consult reftex)
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
 ;; (use-package math-delimiters
@@ -4578,6 +4594,131 @@ Shows both colors when errors and warnings are present."
   (powerline-gui-use-vcs-glyph t)
   (powerline-height 20))
 
+;; TODO: Merge this with `powerline' modeline theme.
+
+(use-package sb-modeline
+  :preface
+  (defvar sb/modeline-max-project-length 20
+    "Maximum length of displayed project name before truncation.")
+
+  (defvar sb/modeline-show-percentage t
+    "If non-nil, show percentage-of-file instead of total-lines.")
+
+  (defvar sb/modeline-min-width-for-vcs 90
+    "Minimum window width to show Git/VCS segment.")
+
+  ;; ---------------------------------------------
+  ;; Internal caches
+  ;; ---------------------------------------------
+  (defvar sb/modeline--project-cache (make-hash-table :test 'equal)
+    "Caches project root → displayed project name.")
+
+  (defun sb/modeline--project-name ()
+    "Return truncated project name, cached."
+    (let* ((proj
+            (ignore-errors
+              (project-current)))
+           (root
+            (when proj
+              (project-root proj))))
+      (if (not root)
+          ""
+        (or (gethash root sb/modeline--project-cache)
+            (let* ((name (file-name-nondirectory (directory-file-name root)))
+                   (trunc
+                    (if (> (length name) sb/modeline-max-project-length)
+                        (concat
+                         (substring name 0 sb/modeline-max-project-length) "…")
+                      name)))
+              (puthash root trunc sb/modeline--project-cache)
+              trunc)))))
+
+  (defun sb/modeline--vcs-info-visible-p ()
+    "Return non-nil if VCS information should be shown."
+    (>= (window-total-width) sb/modeline-min-width-for-vcs))
+
+  (defun sb/modeline--vcs-segment ()
+    "Return VCS segment (branch name) or empty string if hidden."
+    (if (sb/modeline--vcs-info-visible-p)
+        (let ((branch (vc-working-revision buffer-file-name)))
+          (if branch
+              (format "  %s " branch)
+            ""))
+      ""))
+
+  (defun sb/modeline--position ()
+    "Return position segment: percentage or line/total-lines."
+    (if sb/modeline-show-percentage
+        (let* ((cur (line-number-at-pos))
+               (max (max 1 (line-number-at-pos (point-max)))))
+          (format " %d%%%% " (/ (* 100 cur) max)))
+      (format " %d/%d " (line-number-at-pos) (line-number-at-pos (point-max)))))
+
+
+  ;; GUI icon wrapper (fallback to plain text in TTY)
+  (defun sb/modeline--icon (text)
+    (if (display-graphic-p)
+        (propertize text 'face 'shadow)
+      text))
+
+  (defun sb/modeline-format ()
+    `(" "
+      ;; Project
+      ,(sb/modeline--icon "📁 ") ,(sb/modeline--project-name)
+
+      " | "
+
+      ;; Buffer
+      ,(sb/modeline--icon "📄 ") ,mode-line-buffer-identification
+
+      ;; Modified indicator
+      ,(when (buffer-modified-p)
+         (propertize " ●" 'face 'error))
+
+      " | "
+
+      ;; Position
+      ,(sb/modeline--position)
+
+      ;; Major mode
+      " | " "(" ,mode-name ")"
+
+      ;; VCS (hidden on narrow windows)
+      ,(sb/modeline--vcs-segment)
+
+      " "))
+
+  (defun sb/modeline-tty-setup ()
+    "Compact modeline for terminal use."
+    (unless (display-graphic-p)
+      ;; Reduce modeline visuals
+      (set-face-attribute 'mode-line nil :height 0.8 :weight 'normal :box nil)
+      (set-face-attribute 'mode-line-inactive nil
+                          :height 0.8
+                          :weight 'normal
+                          :box nil)
+      ;; Very minimal TTY format
+      (setq-default mode-line-format
+                    '(" "
+                      mode-line-buffer-identification
+                      " "
+                      (:eval (sb/modeline--position))
+                      " ("
+                      mode-name
+                      ") "))))
+
+  ;; ---------------------------------------------
+  ;; Enable
+  ;; ---------------------------------------------
+  (defun sb/enable-smart-modeline ()
+    "Activate the smart, width-adaptive modeline."
+    (interactive)
+    (setq-default mode-line-format '((:eval (sb/modeline-format))))
+    (sb/modeline-tty-setup))
+
+  :ensure nil
+  :hook (elpaca-after-init . sb/enable-smart-modeline))
+
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
   :hook (elpaca-after-init . doom-modeline-mode)
@@ -4804,8 +4945,10 @@ Shows both colors when errors and warnings are present."
    kill-file-path-dirname
    kill-file-path))
 
-;; Allow fetching the latest version via Elapaca to satisfy Eglot requirements
+;; Allow fetching the latest versions via Elapaca to satisfy Eglot requirements
 (use-package flymake)
+
+(use-package jsonrpc)
 
 (use-package eglot
   :preface
@@ -5616,7 +5759,6 @@ DIR can be relative or absolute."
        ("f" "Format buffer" lsp-format-buffer)
        ("x" "Execute code action" lsp-execute-code-action)]
       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
-    (bind-key "C-c l" #'sb/lsp-transient)
 
     (transient-define-prefix
      sb/lsp-imenu-transient () "Imenu commands"
@@ -5631,7 +5773,10 @@ DIR can be relative or absolute."
        ("r" "Remember" dogears-remember)
        ("b" "Back" dogears-back)
        ("f" "Forward" dogears-forward)
-       ("t" "List" dogears-list)]])
+       ("t" "List" dogears-list)]]))
+
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (bind-key "C-c l" #'sb/lsp-transient)
     (bind-key "C-c i" #'sb/lsp-imenu-transient))
 
   (with-eval-after-load 'eglot
@@ -5654,7 +5799,9 @@ DIR can be relative or absolute."
         "Execution code action: organize imports"
         eglot-code-action-organize-imports)]
       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
-  (bind-key "C-c l" #'sb/eglot-transient)
+
+  (when (eq sb/lsp-provider 'eglot)
+    (bind-key "C-c l" #'sb/eglot-transient))
 
   (transient-define-prefix
    sb/file-buffer-transient () "File and Buffer commands"
@@ -5755,7 +5902,6 @@ DIR can be relative or absolute."
       ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
     (bind-key "C-c p" #'sb/corfu-transient))
 
-  ;; (with-eval-after-load 'latex
   (transient-define-prefix
    sb/latex-transient () "LaTeX commands"
    [[""
@@ -5764,7 +5910,6 @@ DIR can be relative or absolute."
      ("r" "Insert reference" consult-reftex-insert-reference)
      ("g" "Go to label" consult-reftex-goto-label)]])
   (bind-key "C-c j" #'sb/latex-transient)
-  ;; )
 
   (transient-define-prefix
    sb/root-transient () "Top-level menu"
