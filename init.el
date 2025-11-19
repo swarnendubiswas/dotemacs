@@ -3,8 +3,9 @@
 ;; Swarnendu Biswas
 
 ;;; Commentary: My configuration is mostly targeted toward GNU Linux. I
-;;; primarily use `Company' compared to Corfu for completion because it provides
-;;; for fine-grained control. I use Eglot compared to `lsp-mode' because
+;;; primarily use Company compared to Corfu for completion because it provides
+;;; for fine-grained control. I use Eglot compared to lsp-mode because it feels
+;;; lightweight and I rarely use multiple servers simultaneously.
 
 ;;; Code:
 
@@ -35,8 +36,10 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; `Powerline' looks clean and nerdy, but `doom-modeline' is more informative. A plain modeline also suffices and avoids startup overhead.
-(defcustom sb/modeline-theme 'none
+;; Powerline looks clean and nerdy, but doom-modeline is more informative and
+;; maintained. A plain modeline also suffices and avoids startup overhead in
+;; `standalone' mode.
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -46,9 +49,10 @@
   :group 'sb/emacs)
 
 ;; Company works better with both Windows and TUI Emacs, and has more extensive
-;; LaTeX support than Corfu. We can set up separate completion files with
+;; LaTeX support than Corfu. It allows finer-grained control by allowing
+;; grouping of backends. We can set up separate completion files with
 ;; `company-ispell' and `company-dict'. However, `company-ispell' does not keep
-;; prefix case when used as a grouped backend. We use `company' with TUI for now
+;; prefix case when used as a grouped backend. Company works well with TUI
 ;; because Emacs versions till 30.x does not support child frames on the
 ;; terminal which is required by Corfu.
 
@@ -78,8 +82,8 @@ The provider is `nerd-icons'."
   :type 'boolean
   :group 'sb/emacs)
 
-;; Nerd-icons are more compact and look nicer.
-(defcustom sb/corfu-icons 'nerd-icons
+;; Nerd-icons are more compact and look nicer than kind-icons.
+(defcustom sb/corfu-icons 'kind-icons
   "Choose the provider for Corfu icons."
   :type
   '(radio
@@ -88,16 +92,16 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; It is tempting to use `eglot' because it is built in to Emacs and is
+;; It is tempting to use Eglot because it is built in to Emacs and is
 ;; lightweight. Eglot does not allow multiple servers to connect to a major
-;; mode, does not support semantic tokens
+;; mode, does not support semantic tokens.
 
-;; `lsp-mode' offers several advantages. It allows connecting to multiple
-;; servers simultaneously and provides helpers to install and uninstall servers.
+;; Lsp-mode offers several advantages. It allows connecting to multiple servers
+;; simultaneously and provides helpers to install and uninstall servers.
 
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
-;; markdown, and LaTeX. I use Eglot because Texlab is inefficient.
+;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
@@ -1028,6 +1032,12 @@ The provider is `nerd-icons'."
           (propertize "» " 'face '(:foreground "#80adf0" :weight bold))
         "  ")
       cand))))
+
+(use-package vertico-timer
+  :ensure (:host github :repo "ventruvian/vertico-timer")
+  :after vertico
+  :hook (vertico-mode . vertico-timer-mode)
+  :diminish vertico-timer-mode)
 
 (defconst sb/consult-buffer-filter
   '("^ "
@@ -2847,7 +2857,6 @@ The provider is `nerd-icons'."
   :when (eq sb/in-buffer-completion 'corfu)
   :hook
   ((elpaca-after-init . global-corfu-mode)
-   (corfu-mode . sb/corfu-default-setup)
    ;; We want 2-character prefixes in LaTeX-mode for yasnippets
    ((prog-mode LaTeX-mode) . sb/corfu-prog-setup))
   :bind
@@ -4597,128 +4606,128 @@ Shows both colors when errors and warnings are present."
 
 ;; TODO: Merge this with `powerline' modeline theme.
 
-(use-package sb-modeline
-  :preface
-  (defvar sb/modeline-max-project-length 20
-    "Maximum length of displayed project name before truncation.")
+;; (use-package sb-modeline
+;;   :preface
+;;   (defvar sb/modeline-max-project-length 20
+;;     "Maximum length of displayed project name before truncation.")
 
-  (defvar sb/modeline-show-percentage t
-    "If non-nil, show percentage-of-file instead of total-lines.")
+;;   (defvar sb/modeline-show-percentage t
+;;     "If non-nil, show percentage-of-file instead of total-lines.")
 
-  (defvar sb/modeline-min-width-for-vcs 90
-    "Minimum window width to show Git/VCS segment.")
+;;   (defvar sb/modeline-min-width-for-vcs 90
+;;     "Minimum window width to show Git/VCS segment.")
 
-  ;; ---------------------------------------------
-  ;; Internal caches
-  ;; ---------------------------------------------
-  (defvar sb/modeline--project-cache (make-hash-table :test 'equal)
-    "Caches project root → displayed project name.")
+;;   ;; ---------------------------------------------
+;;   ;; Internal caches
+;;   ;; ---------------------------------------------
+;;   (defvar sb/modeline--project-cache (make-hash-table :test 'equal)
+;;     "Caches project root → displayed project name.")
 
-  (defun sb/modeline--project-name ()
-    "Return truncated project name, cached."
-    (let* ((proj
-            (ignore-errors
-              (project-current)))
-           (root
-            (when proj
-              (project-root proj))))
-      (if (not root)
-          ""
-        (or (gethash root sb/modeline--project-cache)
-            (let* ((name (file-name-nondirectory (directory-file-name root)))
-                   (trunc
-                    (if (> (length name) sb/modeline-max-project-length)
-                        (concat
-                         (substring name 0 sb/modeline-max-project-length) "…")
-                      name)))
-              (puthash root trunc sb/modeline--project-cache)
-              trunc)))))
+;;   (defun sb/modeline--project-name ()
+;;     "Return truncated project name, cached."
+;;     (let* ((proj
+;;             (ignore-errors
+;;               (project-current)))
+;;            (root
+;;             (when proj
+;;               (project-root proj))))
+;;       (if (not root)
+;;           ""
+;;         (or (gethash root sb/modeline--project-cache)
+;;             (let* ((name (file-name-nondirectory (directory-file-name root)))
+;;                    (trunc
+;;                     (if (> (length name) sb/modeline-max-project-length)
+;;                         (concat
+;;                          (substring name 0 sb/modeline-max-project-length) "…")
+;;                       name)))
+;;               (puthash root trunc sb/modeline--project-cache)
+;;               trunc)))))
 
-  (defun sb/modeline--vcs-info-visible-p ()
-    "Return non-nil if VCS information should be shown."
-    (>= (window-total-width) sb/modeline-min-width-for-vcs))
+;;   (defun sb/modeline--vcs-info-visible-p ()
+;;     "Return non-nil if VCS information should be shown."
+;;     (>= (window-total-width) sb/modeline-min-width-for-vcs))
 
-  (defun sb/modeline--vcs-segment ()
-    "Return VCS segment (branch name) or empty string if hidden."
-    (if (sb/modeline--vcs-info-visible-p)
-        (let ((branch (vc-working-revision buffer-file-name)))
-          (if branch
-              (format "  %s " branch)
-            ""))
-      ""))
+;;   (defun sb/modeline--vcs-segment ()
+;;     "Return VCS segment (branch name) or empty string if hidden."
+;;     (if (sb/modeline--vcs-info-visible-p)
+;;         (let ((branch (vc-working-revision buffer-file-name)))
+;;           (if branch
+;;               (format "  %s " branch)
+;;             ""))
+;;       ""))
 
-  (defun sb/modeline--position ()
-    "Return position segment: percentage or line/total-lines."
-    (if sb/modeline-show-percentage
-        (let* ((cur (line-number-at-pos))
-               (max (max 1 (line-number-at-pos (point-max)))))
-          (format " %d%%%% " (/ (* 100 cur) max)))
-      (format " %d/%d " (line-number-at-pos) (line-number-at-pos (point-max)))))
+;;   (defun sb/modeline--position ()
+;;     "Return position segment: percentage or line/total-lines."
+;;     (if sb/modeline-show-percentage
+;;         (let* ((cur (line-number-at-pos))
+;;                (max (max 1 (line-number-at-pos (point-max)))))
+;;           (format " %d%%%% " (/ (* 100 cur) max)))
+;;       (format " %d/%d " (line-number-at-pos) (line-number-at-pos (point-max)))))
 
 
-  ;; GUI icon wrapper (fallback to plain text in TTY)
-  (defun sb/modeline--icon (text)
-    (if (display-graphic-p)
-        (propertize text 'face 'shadow)
-      text))
+;;   ;; GUI icon wrapper (fallback to plain text in TTY)
+;;   (defun sb/modeline--icon (text)
+;;     (if (display-graphic-p)
+;;         (propertize text 'face 'shadow)
+;;       text))
 
-  (defun sb/modeline-format ()
-    `(" "
-      ;; Project
-      ,(sb/modeline--icon "📁 ") ,(sb/modeline--project-name)
+;;   (defun sb/modeline-format ()
+;;     `(" "
+;;       ;; Project
+;;       ,(sb/modeline--icon "📁 ") ,(sb/modeline--project-name)
 
-      " | "
+;;       " | "
 
-      ;; Buffer
-      ,(sb/modeline--icon "📄 ") ,mode-line-buffer-identification
+;;       ;; Buffer
+;;       ,(sb/modeline--icon "📄 ") ,mode-line-buffer-identification
 
-      ;; Modified indicator
-      ,(when (buffer-modified-p)
-         (propertize " ●" 'face 'error))
+;;       ;; Modified indicator
+;;       ,(when (buffer-modified-p)
+;;          (propertize " ●" 'face 'error))
 
-      " | "
+;;       " | "
 
-      ;; Position
-      ,(sb/modeline--position)
+;;       ;; Position
+;;       ,(sb/modeline--position)
 
-      ;; Major mode
-      " | " "(" ,mode-name ")"
+;;       ;; Major mode
+;;       " | " "(" ,mode-name ")"
 
-      ;; VCS (hidden on narrow windows)
-      ,(sb/modeline--vcs-segment)
+;;       ;; VCS (hidden on narrow windows)
+;;       ,(sb/modeline--vcs-segment)
 
-      " "))
+;;       " "))
 
-  (defun sb/modeline-tty-setup ()
-    "Compact modeline for terminal use."
-    (unless (display-graphic-p)
-      ;; Reduce modeline visuals
-      (set-face-attribute 'mode-line nil :height 0.8 :weight 'normal :box nil)
-      (set-face-attribute 'mode-line-inactive nil
-                          :height 0.8
-                          :weight 'normal
-                          :box nil)
-      ;; Very minimal TTY format
-      (setq-default mode-line-format
-                    '(" "
-                      mode-line-buffer-identification
-                      " "
-                      (:eval (sb/modeline--position))
-                      " ("
-                      mode-name
-                      ") "))))
+;;   (defun sb/modeline-tty-setup ()
+;;     "Compact modeline for terminal use."
+;;     (unless (display-graphic-p)
+;;       ;; Reduce modeline visuals
+;;       (set-face-attribute 'mode-line nil :height 0.8 :weight 'normal :box nil)
+;;       (set-face-attribute 'mode-line-inactive nil
+;;                           :height 0.8
+;;                           :weight 'normal
+;;                           :box nil)
+;;       ;; Very minimal TTY format
+;;       (setq-default mode-line-format
+;;                     '(" "
+;;                       mode-line-buffer-identification
+;;                       " "
+;;                       (:eval (sb/modeline--position))
+;;                       " ("
+;;                       mode-name
+;;                       ") "))))
 
-  ;; ---------------------------------------------
-  ;; Enable
-  ;; ---------------------------------------------
-  (defun sb/enable-smart-modeline ()
-    "Activate the smart, width-adaptive modeline."
-    (interactive)
-    (setq-default mode-line-format '((:eval (sb/modeline-format))))
-    (sb/modeline-tty-setup))
+;;   ;; ---------------------------------------------
+;;   ;; Enable
+;;   ;; ---------------------------------------------
+;;   (defun sb/enable-smart-modeline ()
+;;     "Activate the smart, width-adaptive modeline."
+;;     (interactive)
+;;     (setq-default mode-line-format '((:eval (sb/modeline-format))))
+;;     (sb/modeline-tty-setup))
 
-  :ensure nil
-  :hook (elpaca-after-init . sb/enable-smart-modeline))
+;;   :ensure nil
+;;   :hook (elpaca-after-init . sb/enable-smart-modeline))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
@@ -4729,6 +4738,7 @@ Shows both colors when errors and warnings are present."
   ;; Wrong LSP state is shown for non-LSP-managed files
   (doom-modeline-lsp nil)
   (doom-modeline-minor-modes t)
+  (doom-modeline-icon sb/enable-icons)
   :config
   (unless (display-graphic-p)
     ;; All other choices can lead to the modeline text overflowing
@@ -4952,24 +4962,24 @@ Shows both colors when errors and warnings are present."
 (use-package jsonrpc)
 
 (use-package eglot
-  :preface
-  ;; FIXME: It seems there is a race condition between Eglot shutting down the
-  ;; servers and closing the project buffers.
-  (defun sb/project-kill-buffers-disconnect-eglot ()
-    "Shutdown Eglot for the current project before killing its buffers."
-    (interactive)
-    (when-let* ((proj (project-current))
-                (root (project-root proj)))
-      (dolist (buf (project-buffers proj))
-        (with-current-buffer buf
-          (when (and eglot--managed-mode (eglot-current-server))
-            ;; Shut down once per server, not once per buffer
-            (let ((server (eglot-current-server)))
-              (when (and server
-                         (equal (project-root (eglot--project server)) root))
-                (ignore-errors
-                  (eglot-shutdown server))))))))
-    (project-kill-buffers))
+  ;; :preface
+  ;; ;; FIXME: It seems there is a race condition between Eglot shutting down the
+  ;; ;; servers and closing the project buffers.
+  ;; (defun sb/project-kill-buffers-disconnect-eglot ()
+  ;;   "Shutdown Eglot for the current project before killing its buffers."
+  ;;   (interactive)
+  ;;   (when-let* ((proj (project-current))
+  ;;               (root (project-root proj)))
+  ;;     (dolist (buf (project-buffers proj))
+  ;;       (with-current-buffer buf
+  ;;         (when (and eglot--managed-mode (eglot-current-server))
+  ;;           ;; Shut down once per server, not once per buffer
+  ;;           (let ((server (eglot-current-server)))
+  ;;             (when (and server
+  ;;                        (equal (project-root (eglot--project server)) root))
+  ;;               (ignore-errors
+  ;;                 (eglot-shutdown server))))))))
+  ;;   (project-kill-buffers))
   :ensure (:source (gnu-elpa-mirror))
   :when (eq sb/lsp-provider 'eglot)
   :hook
@@ -5268,7 +5278,15 @@ Shows both colors when errors and warnings are present."
   :config (eglot-booster-mode))
 
 (use-package eglot-java
-  :preface
+  :when (eq sb/lsp-provider 'eglot)
+  :hook
+  ((java-mode . eglot-ensure)
+   (eglot-managed-mode
+    .
+    (lambda ()
+      (when (derived-mode-p 'java-mode)
+        (eglot-java-mode)))))
+  :config
   (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
     "Custom options that will be merged with any default settings."
     `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
@@ -5291,15 +5309,8 @@ Shows both colors when errors and warnings are present."
         (:url
          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
        :extendedClientCapabilities (:classFileContentsSupport t))))
-  :when (eq sb/lsp-provider 'eglot)
-  :hook
-  ((java-mode . eglot-ensure)
-   (eglot-managed-mode
-    .
-    (lambda ()
-      (when (derived-mode-p 'java-mode)
-        (eglot-java-mode)))))
-  :custom (eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
+
+  (setopt eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 (use-package eglot-hierarchy
   :ensure (:host github :repo "dolmens/eglot-hierarchy")
