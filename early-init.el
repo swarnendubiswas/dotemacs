@@ -98,10 +98,9 @@
           (progn
             (message "%s" (buffer-string))
             (kill-buffer buffer))
-          (error
-           "%s"
-           (with-current-buffer buffer
-             (buffer-string))))
+          (error "%s"
+                 (with-current-buffer buffer
+                   (buffer-string))))
       ((error)
        (warn "%s" err)
        (delete-directory repo 'recursive))))
@@ -113,8 +112,11 @@
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-;; The run-time load order is: (1) file described by `site-run-file' if non-nil,
-;; (2) `user-init-file', and (3) `default.el'.
+;; The run-time load order till Emacs 30 is: (1) early-init.el, (2) file
+;; described by `site-run-file' if non-nil, (3) `user-init-file', and (4)
+;; `default.el'. The run-time load order on Emacs 31+ is: (1) file described by
+;; `site-run-file' if non-nil, (2) early-init.el, (3) `user-init-file', and (4)
+;; `default.el'.
 
 ;; Disable site-wide run-time initialization. We cannot customize
 ;; `size-run-file', hence `setopt' does not work.
