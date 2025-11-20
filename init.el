@@ -102,7 +102,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -1545,27 +1545,27 @@ The provider is `nerd-icons'."
      ;; Make it full-frame
      (body-function . delete-other-windows))))
 
-;; Keeps track of the point position over time and allows us to navigate back
-;; and forward in history.
-(use-package gumshoe
-  :ensure (:host github :repo "Overdr0ne/gumshoe")
+;; ;; Keeps track of the point position over time and allows us to navigate back
+;; ;; and forward in history.
+;; (use-package gumshoe
+;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
 
-  :hook
-  (elpaca-after-init
-   .
-   (lambda ()
-     (global-gumshoe-mode 1)
-     (diminish 'global-gumshoe-mode)))
+;;   :hook
+;;   (elpaca-after-init
+;;    .
+;;    (lambda ()
+;;      (global-gumshoe-mode 1)
+;;      (diminish 'global-gumshoe-mode)))
 
-  :custom
-  (gumshoe-show-footprints-p nil)
-  (gumshoe-prefer-same-window t)
-  (gumshoe-idle-time 2))
+;;   :custom
+;;   (gumshoe-show-footprints-p nil)
+;;   (gumshoe-prefer-same-window t)
+;;   (gumshoe-idle-time 2))
 
-(use-package better-jumper
-  :hook (elpaca-after-init . better-jumper-mode)
+;; (use-package better-jumper
+;;   :hook (elpaca-after-init . better-jumper-mode)
 
-  :diminish better-jumper-local-mode)
+;;   :diminish better-jumper-local-mode)
 
 (use-package vundo
   :bind
