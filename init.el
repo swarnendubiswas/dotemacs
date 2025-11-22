@@ -3377,49 +3377,50 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
 
-  ;; Enable `lsp-booster'
-  (defun lsp-booster--advice-json-parse (old-fn &rest args)
-    "Try to parse bytecode instead of json."
-    (or (when (equal (following-char) ?#)
-          (let ((bytecode (read (current-buffer))))
-            (when (byte-code-function-p bytecode)
-              (funcall bytecode))))
-        (apply old-fn args)))
-  (advice-add
-   (if (progn
-         (require 'json)
-         (fboundp 'json-parse-buffer))
-       'json-parse-buffer
-     'json-read)
-   :around #'lsp-booster--advice-json-parse)
-  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-    "Prepend emacs-lsp-booster command to lsp CMD."
-    (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and
-           (not test?) ;; for check lsp-server-present?
-           ;; see lsp-resolve-final-command, it would add extra shell wrapper
-           (not (file-remote-p default-directory)) lsp-use-plists
-           (not (functionp 'json-rpc-connection)) ;; native json-rpc
-           (executable-find "emacs-lsp-booster"))
-          (progn
-            (message "Using emacs-lsp-booster for %s!" orig-result)
-            (cons "emacs-lsp-booster" orig-result))
-        orig-result)))
-  (advice-add
-   'lsp-resolve-final-command
-   :around #'lsp-booster--advice-final-command)
+  ;; ;; Enable `lsp-booster'
+  ;; (defun lsp-booster--advice-json-parse (old-fn &rest args)
+  ;;   "Try to parse bytecode instead of json."
+  ;;   (or (when (equal (following-char) ?#)
+  ;;         (let ((bytecode (read (current-buffer))))
+  ;;           (when (byte-code-function-p bytecode)
+  ;;             (funcall bytecode))))
+  ;;       (apply old-fn args)))
+  ;; (advice-add
+  ;;  (if (progn
+  ;;        (require 'json)
+  ;;        (fboundp 'json-parse-buffer))
+  ;;      'json-parse-buffer
+  ;;    'json-read)
+  ;;  :around #'lsp-booster--advice-json-parse)
+  ;; (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+  ;;   "Prepend emacs-lsp-booster command to lsp CMD."
+  ;;   (let ((orig-result (funcall old-fn cmd test?)))
+  ;;     (if (and
+  ;;          (not test?) ;; for check lsp-server-present?
+  ;;          ;; see lsp-resolve-final-command, it would add extra shell wrapper
+  ;;          (not (file-remote-p default-directory)) lsp-use-plists
+  ;;          (not (functionp 'json-rpc-connection)) ;; native json-rpc
+  ;;          (executable-find "emacs-lsp-booster"))
+  ;;         (progn
+  ;;           (message "Using emacs-lsp-booster for %s!" orig-result)
+  ;;           (cons "emacs-lsp-booster" orig-result))
+  ;;       orig-result)))
+  ;; (advice-add
+  ;;  'lsp-resolve-final-command
+  ;;  :around #'lsp-booster--advice-final-command)
 
+  ;; Prescient does not work well with certain dynamic completion tables that
+  ;; use a prefix string to produce candidates before filtering.
   (defun sb/lsp-mode-capf ()
-    ;; Prescient does not work well with certain dynamic completion tables that use a prefix string to produce candidates before filtering.
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(prescient basic)))
+          '(basic)))
   (add-hook 'lsp-completion-mode-hook #'sb/lsp-mode-capf)
 
   ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
   ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
   ;; Ensure that completion does not get interrupted by the user pressing keys
   ;; or other operations with `cape-wrap-noninterruptible'.
-  (with-eval-after-load 'lsp-mode
+  (with-eval-after-load 'corfu
     (advice-add
      #'lsp-completion-at-point
      :around
@@ -3485,7 +3486,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :when (eq sb/lsp-provider 'lsp-mode)
 
-  :init (setopt lsp-ltex-plus-version "18.5.1")
+  :init (setopt lsp-ltex-plus-version "18.6.1")
 
   :hook
   ((text-mode markdown-mode org-mode LaTeX-mode)
@@ -3495,17 +3496,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (unless (string-equal
               (file-name-nondirectory (or buffer-file-name ""))
               "COMMIT_EDITMSG")
-       (require 'lsp-ltex-plus)
        (lsp-deferred))))
 
   :custom
   ;; Recommended to set a generic language to disable spell check
-  (lsp-ltex-plus-plus-language "en")
+  (lsp-ltex-plus-language "en")
   (lsp-ltex-plus-check-frequency "save")
-
-  ;; (lsp-ltex-plus-dictionary
-  ;;  '((expand-file-name "company-dict/text-mode" user-emacs-directory)))
-
   (lsp-ltex-plus-log-level "warning")
   (lsp-ltex-plus-disabled-rules
    '(:en-US
@@ -4687,12 +4683,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :init (load-theme 'modus-vivendi t)
 
-  :custom
-  (modus-themes-mixed-fonts nil)
-  (modus-themes-completions
-   '((matches . (extrabold underline))
-     (selection . (semibold accented text-also))
-     (popup . (accented intense)))))
+  :custom (modus-themes-mixed-fonts nil)
+  ;; (modus-themes-completions
+  ;;  '((matches . (extrabold underline))
+  ;;    (selection . (semibold accented text-also))
+  ;;    (popup . (accented intense))))
+  )
 
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
@@ -5667,16 +5663,16 @@ Shows both colors when errors and warnings are present."
           (cape-capf-buster #'cape-dabbrev)))))
     (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot)))
 
-(use-package eglot-booster
-  :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
+;; (use-package eglot-booster
+;;   :ensure (:type git :host github :repo "jdtsmith/eglot-booster")
 
-  :when (executable-find "emacs-lsp-booster")
+;;   :when (executable-find "emacs-lsp-booster")
 
-  :after eglot
+;;   :after eglot
 
-  :demand t
+;;   :demand t
 
-  :config (eglot-booster-mode))
+;;   :config (eglot-booster-mode))
 
 (use-package eglot-java
   :when (eq sb/lsp-provider 'eglot)
@@ -6409,5 +6405,5 @@ DIR can be relative or absolute."
 ;; no-byte-compile: t
 ;; no-native-compile: t
 ;; no-update-autoloads: t
-;; elisp-autofmt-load-packages-local: ("use-package-core")
+;; elisp-autofmt-load-packages-local: ("use-package" "use-package-core")
 ;; End:

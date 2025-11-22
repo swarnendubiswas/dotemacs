@@ -168,7 +168,6 @@
 (when (fboundp 'tooltip-mode)
   (tooltip-mode -1))
 
-
 ;; Sets the active and inactive frame transparency to 97% for the currently
 ;; selected frame. Transparency works with GUI frames.
 (set-frame-parameter (selected-frame) 'alpha '(97 . 97))
@@ -239,8 +238,9 @@
         (set-face-attribute 'default nil
                             :font "JetBrainsMonoNerdFontMono"
                             :height 210)
-        (set-face-attribute 'mode-line nil :height 160)
-        (set-face-attribute 'mode-line-inactive nil :height 160)))
+        (set-face-attribute 'mode-line nil :height 150)
+        (set-face-attribute 'mode-line-active nil :height 150)
+        (set-face-attribute 'mode-line-inactive nil :height 150)))
 
      ((string= (system-name) "dell-7506")
       (progn

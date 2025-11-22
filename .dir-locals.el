@@ -22,7 +22,14 @@
    ;; Files
    (eval .
          (dolist (ext
-                  '("\\.tags/" ".pptx" ".xml" ".drawio" ".out" ".vect" "GPATH" ".rel"))
+                  '("\\.tags/"
+                    ".pptx"
+                    ".xml"
+                    ".drawio"
+                    ".out"
+                    ".vect"
+                    "GPATH"
+                    ".rel"))
            (add-to-list 'completion-ignored-extensions ext)))
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
@@ -86,7 +93,7 @@
            (sh-mode)))))
 
  (diff-mode . ((mode . whitespace)))
- 
+
  (dired-mode
   .
   ((dired-omit-mode . t)
@@ -96,14 +103,15 @@
  ((emacs-lisp-mode lisp-data-mode)
   .
   ((no-byte-compile . t)
+   (flycheck-disabled-checkers . (emacs-lisp-checkdoc))
    (elisp-autofmt-on-save-p . always)
-   (elisp-autofmt-load-packages-local . ("use-package-core"))
+
    ;; The special `subdirs' element is not a variable, but a special keyword
    ;; which indicates that the mode settings are only to be applied in the
-   ;; current directory, not in any subdirectories.
+   ;; current directory, not in any sub-directories.
    (subdirs . nil)))
 
- (c-mode . ((mode . c++)))
+ ;; (c-mode . ((mode . c++-mode)))
 
  ;; Some systems may not have treesitter libraries installed. Consolidated C++
  ;; (applies to both c++-mode and c++-ts-mode)
@@ -241,9 +249,12 @@
         :json-false)
        :rope_completion (:eager :json-false :enabled :json-false)
        :ruff (:enabled :json-false :formatEnabled :json-false :lineLength 80)
-       :yapf (:based_on_style "pep8"
+       :yapf
+       (:based_on_style
+        "pep8"
         :column_limit 80
-        :enabled :json-false
+        :enabled
+        :json-false
         :indent_width 4
         :split_before_logical_operator t
         :use_tabs
@@ -274,16 +285,16 @@
   .
   ((subdirs . nil)
    (eval .
-           (add-hook
+         (add-hook
           'lsp-managed-mode-hook
           (lambda () (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
 
    (eval .
          (add-hook
           'eglot-managed-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
- 
+          (lambda ()
+            (add-hook 'before-save-hook #'eglot-format-buffer nil t))))))
+
  ((yaml-mode yaml-ts-mode)
   .
   ((eglot-workspace-configuration
@@ -369,5 +380,6 @@
 
 
 ;; Local Variables:
-;; eval: (flycheck-mode -1)
+;; flycheck-mode: nil
+;; flycheck-disabled-checkers: (emacs-lisp)
 ;; End:
