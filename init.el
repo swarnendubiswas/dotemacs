@@ -3141,14 +3141,15 @@ The provider is `nerd-icons'."
 
   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
   ;; duplicates and we expect `cape-dict' to mostly suffice.
-  (add-hook
-   'text-mode-hook
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  (cape-capf-inside-string #'cape-file)
-                  #'cape-dict
-                  (cape-capf-buster #'cape-dabbrev)))))
+  (dolist (mode '(text-mode-hook fundamental-mode-hook))
+    (add-hook
+     mode
+     (lambda ()
+       (setq-local completion-at-point-functions
+                   (list
+                    (cape-capf-inside-string #'cape-file)
+                    #'cape-dict
+                    (cape-capf-buster #'cape-dabbrev))))))
 
   (dolist (hook '(markdown-mode-hook bibtex-mode-hook))
     (add-hook
@@ -5768,6 +5769,7 @@ Shows both colors when errors and warnings are present."
   "Save all modified buffers without prompting."
   (interactive)
   (save-some-buffers t))
+(bind-key "C-S-s" #'sb/save-all-buffers)
 
 (defun sb/comment-line (n)
   "Comment or uncomment current line and leave point after it.
@@ -5782,6 +5784,7 @@ If region is active, apply to active region instead."
       (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
     (forward-line 1)
     (back-to-indentation)))
+(bind-key "C-c ;" #'sb/comment-line)
 
 (defcustom sb/skippable-buffers
   '("TAGS"
@@ -5866,11 +5869,15 @@ or the major mode is not in `sb/skippable-modes'."
   "Variant of `next-buffer' that skips `sb/skippable-buffers'."
   (interactive)
   (sb/change-buffer 'next-buffer))
+(bind-keys ("C-<tab>" . sb/next-buffer) ("M-<right>" . sb/next-buffer))
+
 
 (defun sb/previous-buffer ()
   "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
   (interactive)
   (sb/change-buffer 'previous-buffer))
+(bind-keys
+ ("C-S-<iso-lefttab>" . sb/previous-buffer) ("M-<left>" . sb/previous-buffer))
 
 (defun sb/toggle-window-split ()
   "Switch between vertical and horizontal splits."
@@ -5898,6 +5905,7 @@ or the major mode is not in `sb/skippable-modes'."
           (select-window first-win)
           (if this-win-2nd
               (other-window 1))))))
+(bind-key "C-x |" #'sb/toggle-window-split)
 
 ;; Define what counts as a popup window
 (defun sb/popup-window-p (window)
@@ -5914,11 +5922,12 @@ or the major mode is not in `sb/skippable-modes'."
       (delete-window win))))
 
 (defun sb/keyboard-quit-dwim ()
-  "Quit popups if any, otherwise run `keyboard-quit`."
+  "Quit popups if any, otherwise run `keyboard-quit'."
   (interactive)
   (if (cl-some #'sb/popup-window-p (window-list))
       (sb/close-popups)
     (keyboard-quit)))
+(bind-key "C-g" #'sb/keyboard-quit-dwim)
 
 (defun sb/directory-exists-p (dir)
   "Return non-nil if DIR exists and is a directory.
@@ -5934,16 +5943,7 @@ DIR can be relative or absolute."
 ;; while pressing the subsequent key. Instead "M-something" keybindings can be
 ;; triggered by pressing ESC and the other key sequentially.
 
-(bind-keys
- ("C-c ;" . sb/comment-line)
- ("C-S-s" . sb/save-all-buffers)
- ("C-x |" . sb/toggle-window-split)
- ("M-<left>" . sb/previous-buffer)
- ("M-<right>" . sb/next-buffer)
- ("C-S-<iso-lefttab>" . sb/previous-buffer)
- ("C-<tab>" . sb/next-buffer)
- ("C-g" . sb/keyboard-quit-dwim))
-
+;; ;; Allow scaling text across all Emacs frames unlike `text-scale-mode'.
 ;; (use-package default-text-scale
 ;;   :when (display-graphic-p)
 ;;   :bind
@@ -5954,7 +5954,9 @@ DIR can be relative or absolute."
 (use-package free-keys
   :commands free-keys)
 
-;; I prefer `embark' to show help about keybindings compared to `which-key'.
+;; I prefer `embark' to show help about keybindings compared to `which-key'. For
+;; example, press "C-h b" or "C-h" after an incomplete sequence to check for
+;; possible combinations.
 
 ;; ;; Displays available keybindings following the currently entered incomplete
 ;; ;; command/prefix in a popup.
@@ -5965,6 +5967,7 @@ DIR can be relative or absolute."
 ;;   (diminish 'which-key-mode))
 
 ;; ;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
+
 ;; (which-key-add-key-based-replacements
 ;;  "<f1> 4"
 ;;  "help-other-win"
@@ -6031,14 +6034,16 @@ DIR can be relative or absolute."
 ;;  "M-s"
 ;;  "search-map")
 
-;; ;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
-;; ;; a prefix-key.  If you know of other built-in packages that have
-;; ;; this behavior, please let me know, so I can add them.
-;; (with-eval-after-load 'page-ext
-;;   (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
+;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
+;; a prefix-key.  If you know of other built-in packages that have
+;; this behavior, please let me know, so I can add them.
+(with-eval-after-load 'page-ext
+  (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
 
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
+  :unless (display-graphic-p)
+
   :hook (elpaca-after-init . global-kkp-mode)
 
   ;; :bind
