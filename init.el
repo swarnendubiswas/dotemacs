@@ -22,12 +22,14 @@
 ;; with all terminals. `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'kanagawa
-    'kanagawa)
+      'doom-solarized-dark
+    'doom-solarized-dark)
   "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "doom-nord" doom-nord)
+    (const :tag "doom-one" doom-one)
+    (const :tag "doom-solarized-dark" doom-solarized-dark)
     (const :tag "modus-vivendi" modus-vivendi)
     (const :tag "catppuccin" catppuccin)
     (const :tag "rose-pine" rose-pine)
@@ -4671,9 +4673,19 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :init (load-theme 'leuven-dark t))
 
 (use-package doom-themes
-  :when (eq sb/theme 'doom-nord)
+  :when
+  (or (eq sb/theme 'doom-one)
+      (eq sb/theme 'doom-nord)
+      (eq sb/theme 'doom-solarized-dark))
 
-  :init (load-theme 'doom-nord t)
+  :init
+  (cond
+   ((eq sb/theme 'doom-one)
+    (load-theme 'doom-one t))
+   ((eq sb/theme 'doom-nord)
+    (load-theme 'doom-nord t))
+   ((eq sb/theme 'doom-solarized-dark)
+    (load-theme 'doom-solarized-dark-high-contrast t)))
 
   :config
   ;; Corrects (and improves) org-mode's native fontification.
