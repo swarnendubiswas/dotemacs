@@ -2,7 +2,7 @@
 
 ;; Swarnendu Biswas
 
-;;; Commentary:
+;; Commentary:
 
 ;; This file is supported from Emacs 27+, and is run before package and UI
 ;; initialization.
@@ -26,6 +26,8 @@
   "Defer garbage collection during execution."
   (setopt gc-cons-threshold sb/emacs-64MB))
 
+(add-hook 'minibuffer-setup-hook #'sb/defer-gc)
+
 ;; `lsp-mode' suggests increasing the limit permanently to a reasonable value.
 ;; There will be large pause times with large `gc-cons-threshold' values
 ;; whenever GC eventually happens.
@@ -36,7 +38,6 @@
    gc-cons-percentage 0.1))
 
 (add-hook 'elpaca-after-init-hook #'sb/restore-gc)
-(add-hook 'minibuffer-setup-hook #'sb/defer-gc)
 (add-hook 'minibuffer-exit-hook #'sb/restore-gc)
 
 (defvar elpaca-installer-version 0.11)
@@ -160,8 +161,7 @@
 ;; their shortcuts but we still turn it off.
 (push '(menu-bar-lines . 0) default-frame-alist)
 
-;; (when (fboundp 'scroll-bar-mode)
-;;   (scroll-bar-mode -1))
+;; The following is faster than running "(scroll-bar-mode -1)"
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
 
@@ -256,6 +256,7 @@
                             :font "JetBrainsMonoNerdFontMono"
                             :height 210)
         (set-face-attribute 'mode-line nil :height 160)
+        (set-face-attribute 'mode-line-active nil :height 160)
         (set-face-attribute 'mode-line-inactive nil :height 160)))))
 
   (add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic))

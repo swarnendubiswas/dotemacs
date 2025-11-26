@@ -1,11 +1,12 @@
-;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp; coding: utf-8; fill-column: 80; -*-
+;;; init.el --- Emacs customization -*- lexical-binding: t; mode: emacs-lisp;
+;;; coding: utf-8; fill-column: 80; -*-
 
 ;; Swarnendu Biswas
 
-;;; Commentary: My configuration is mostly targeted toward GNU Linux. I
-;;; primarily use Company compared to Corfu for completion because it provides
-;;; for fine-grained control. I use Eglot compared to lsp-mode because it feels
-;;; lightweight and I rarely use multiple servers simultaneously.
+;; Commentary: My configuration is mostly targeted toward GNU Linux. I primarily
+;; use Company compared to Corfu for completion because it provides for
+;; fine-grained control. I use Eglot compared to lsp-mode because it feels
+;; lightweight and I rarely use multiple servers simultaneously.
 
 ;;; Code:
 
@@ -22,7 +23,7 @@
 ;; with all terminals. `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'doom-solarized-dark
+      'modus-vivendi
     'doom-solarized-dark)
   "Specify which Emacs theme to use."
   :type
@@ -565,12 +566,12 @@ The provider is `nerd-icons'."
   :custom
   (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
   (recentf-exclude
-   '("[/\\]elpa/"
-     "[/\\]\\.git/"
-     ".*\\.gz\\'"
+   '(".*\\.gz\\'"
      ".*\\.xz\\'"
      ".*\\.zip\\'"
      ".*-autoloads.el\\'"
+     "[/\\]elpa/"
+     "[/\\]\\.git/"
      "[/\\]archive-contents\\'"
      "[/\\]\\.loaddefs\\.el\\'"
      "[/\\]tmp/.*"
@@ -595,7 +596,7 @@ The provider is `nerd-icons'."
     (add-to-list 'recentf-exclude exclude))
 
   ;; `recentf-save-list' is called on Emacs exit. In addition, save the recent
-  ;; list periodically after idling.
+  ;; list periodically after idling in case Emacs becomes unresponsive.
   (run-with-idle-timer 30 t #'recentf-save-list))
 
 (progn
@@ -1123,6 +1124,8 @@ The provider is `nerd-icons'."
   :after vertico
 
   :hook (vertico-mode . vertico-timer-mode)
+
+  :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
 
   :diminish vertico-timer-mode)
 
@@ -1781,6 +1784,7 @@ The provider is `nerd-icons'."
 
   :config (transient-bind-q-to-quit))
 
+;; Use Emacsclient as the $EDITOR of child processes.
 (use-package with-editor :diminish)
 
 (use-package cond-let
@@ -3149,7 +3153,7 @@ The provider is `nerd-icons'."
      (lambda ()
        (setq-local completion-at-point-functions
                    (list
-                    (cape-capf-inside-string #'cape-file)
+                    #'cape-file
                     #'cape-dict
                     (cape-capf-buster #'cape-dabbrev))))))
 
@@ -3159,8 +3163,8 @@ The provider is `nerd-icons'."
      (lambda ()
        (setq-local completion-at-point-functions
                    (list
-                    (cape-capf-inside-string #'cape-file)
-                    #'yasnippet-capf
+                    #'cape-file
+                    (cape-capf-trigger #'yasnippet-capf ?/)
                     #'cape-dict
                     (cape-capf-buster #'cape-dabbrev))))))
 
@@ -3169,8 +3173,8 @@ The provider is `nerd-icons'."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  (cape-capf-inside-string #'cape-file)
-                  #'yasnippet-capf
+                  #'cape-file
+                  (cape-capf-trigger #'yasnippet-capf ?/)
                   #'cape-elisp-block
                   #'cape-dict
                   (cape-capf-buster #'cape-dabbrev)))))
@@ -3181,7 +3185,7 @@ The provider is `nerd-icons'."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  #'yasnippet-capf
+                  (cape-capf-trigger #'yasnippet-capf ?/)
                   (cape-capf-inside-code
                    (cape-capf-super #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
@@ -5336,6 +5340,7 @@ Shows both colors when errors and warnings are present."
 (use-package kirigami
   :ensure (:host github :repo "jamescherti/kirigami.el"))
 
+;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
 (use-package string-inflection
   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
