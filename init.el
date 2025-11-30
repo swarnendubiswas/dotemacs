@@ -23,8 +23,8 @@
 ;; with all terminals. `Catppuccin' is more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'modus-vivendi
-    'doom-solarized-dark)
+      'dracula
+    'none)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -36,13 +36,14 @@
     (const :tag "rose-pine" rose-pine)
     (const :tag "kanagawa" kanagawa)
     (const :tag "leuven-dark" leuven-dark)
+    (const :tag "dracula" dracula)
     (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Powerline looks clean and nerdy, but doom-modeline is more informative and
 ;; maintained. A plain modeline also suffices and avoids startup overhead in
 ;; `standalone' mode.
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -67,8 +68,8 @@
 
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
-      'corfu
-    'corfu)
+      'company
+    'company)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -79,7 +80,7 @@
 
 ;; Keeping icons disabled should lower overhead and help with the alignment
 ;; issue with Company and Corfu popups in the terminal.
-(defcustom sb/enable-icons t
+(defcustom sb/enable-icons nil
   "Should icons be enabled?
 The provider is `nerd-icons'."
   :type 'boolean
@@ -164,10 +165,13 @@ The provider is `nerd-icons'."
 
 (elpaca-wait) ; Wait for Elpaca to finish activating packages
 
-;; The following webpage provides a few recommendations on how to use
-;; `use-package'. Where possible, it is better to avoid :preface, :config and
+;; Where possible, it is better to avoid :preface, :config and
 ;; :init. Instead, prefer autoloading keywords such as :bind, :hook, and :mode,
 ;; as they will take care of setting up autoloads.
+;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Best-practices.html
+
+;; The following webpage provides a few recommendations on how to use
+;; `use-package'.
 ;; https://batsov.com/articles/2025/04/17/using-use-package-the-right-way/
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
@@ -176,10 +180,11 @@ The provider is `nerd-icons'."
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the
 ;; keybindings for the major and the minor modes.
 
-(use-package diminish
-  :ensure (:wait t))
+(use-package diminish)
 
 (use-package no-littering
+  :demand t
+
   :custom
   (auto-save-file-name-transforms
    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
@@ -188,8 +193,6 @@ The provider is `nerd-icons'."
   (custom-file (no-littering-expand-var-file-name "custom.el"))
 
   :config (no-littering-theme-backups))
-
-(elpaca-wait)
 
 ;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
 ;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
@@ -200,12 +203,14 @@ The provider is `nerd-icons'."
 
   :demand t
 
-  :init
-  (setopt
-   exec-path-from-shell-check-startup-files nil
-   exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LSP_USE_PLISTS")
-   exec-path-from-shell-arguments nil) ; Reduce the start up time
-  (exec-path-from-shell-initialize))
+  :custom
+  (exec-path-from-shell-check-startup-files nil)
+  (exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LSP_USE_PLISTS"))
+  (exec-path-from-shell-arguments nil) ; Reduce the start up time
+
+  :config (exec-path-from-shell-initialize))
+
+(elpaca-wait)
 
 (use-package emacs
   :ensure nil
@@ -214,9 +219,9 @@ The provider is `nerd-icons'."
   (elpaca-after-init
    .
    (lambda ()
+     (column-number-mode 1)
      (save-place-mode 1)
      ;; (size-indication-mode 1) ; No benefit in seeing the file size
-     (column-number-mode 1)
 
      ;; `auto-save-mode' saves to a separate auto-save file, while
      ;; `auto-save-visited-mode' saves directly to the visited file and runs all
@@ -252,21 +257,27 @@ The provider is `nerd-icons'."
    ("<f2>" . find-file)
    ("<f7>" . previous-error) ; "M-g p" is the default keybinding
    ("<f8>" . next-error) ; "M-g n" is the default keybinding
+
    ("C-l" . goto-line) ; "M-g l" is the default keybinding
    ("C-c z" . repeat) ; Repeat the last command
    ("C-z" . undo)
+
    ;; In a line with comments, "C-u M-;" removes the comments altogether. That
    ;; means deleting the comment, NOT UNCOMMENTING but removing all commented
    ;; text and the comment marker itself.
    ("C-c n" . comment-region)
    ("C-c m" . uncomment-region)
    ("C-c b" . comment-box)
+
    ("C-s" . save-buffer)
    ("C-x k" . kill-current-buffer)
+
    ("C-<left>" . backward-word)
    ("C-<right>" . forward-word)
+
    ("M-\\" . delete-horizontal-space)
    ("M-#" . cycle-spacing)
+
    ("C-M-b" . backward-sexp)
    ("C-M-f" . forward-sexp)
    ("C-M-k" . kill-sexp))
@@ -289,7 +300,7 @@ The provider is `nerd-icons'."
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
 
-  ;; Autofill comments in modes that define them
+  ;; ;; Autofill comments in modes that define them
   ;; (comment-auto-fill-only-comments t)
 
   ;; Show the actual symbol name in the *customize* buffer
@@ -342,8 +353,8 @@ The provider is `nerd-icons'."
   (confirm-kill-processes nil)
   ;; (confirm-kill-emacs nil)
 
-  ;; Reverting without confirmation is confusing, and hence it is better to be
-  ;; explicit
+  ;; ;; Reverting without confirmation is confusing, and hence it is better to be
+  ;; ;; explicit
   ;; (revert-without-query '("\\.*") "Revert all files without asking")
 
   (vc-handled-backends '(Git))
@@ -372,7 +383,7 @@ The provider is `nerd-icons'."
   (redisplay-skip-fontification-on-input t)
   (bidi-inhibit-bpa nil) ; Disabling BPA makes redisplay faster
 
-  ;; Show contextual lines around a match
+  ;; ;; Show contextual lines around a match
   ;; (list-matching-lines-default-context-lines 1)
 
   (imenu-auto-rescan t)
@@ -446,7 +457,7 @@ The provider is `nerd-icons'."
    bidi-display-reordering 'left-to-right
    bidi-paragraph-direction 'left-to-right)
 
-  ;; Not a library/file, so `eval-after-load' does not work
+  ;; ;; Not a library/file, so `eval-after-load' does not work
   ;; (diminish 'auto-fill-function)
   (diminish 'auto-fill-mode)
 
@@ -723,13 +734,6 @@ The provider is `nerd-icons'."
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 ;; Connect as non-root user and then use sudo: "C-x C-f /ssh:192.168.249.10|su::/some/file"
 (use-package tramp
-  :preface
-  (defun sb/cleanup-tramp ()
-    (interactive)
-    (ignore-errors
-      (tramp-cleanup-all-buffers)
-      (tramp-cleanup-all-connections)))
-
   :ensure nil
 
   :custom
@@ -742,6 +746,7 @@ The provider is `nerd-icons'."
   :config
   (when (boundp 'tramp-use-connection-share)
     (setopt tramp-use-connection-share nil))
+
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
@@ -757,11 +762,20 @@ The provider is `nerd-icons'."
   ;; back on.
   (with-eval-after-load 'compile
     (remove-hook
-     'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options)))
+     'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options))
+
+  (defun sb/cleanup-tramp ()
+    (interactive)
+    (ignore-errors
+      (tramp-cleanup-all-buffers)
+      (tramp-cleanup-all-connections))))
 
 ;; (use-package whitespace
+
 ;;   :ensure nil
+
 ;;   :custom (whitespace-line-column fill-column)
+
 ;;   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
@@ -807,7 +821,7 @@ The provider is `nerd-icons'."
      "\\*texlab.*"))
 
   :config
-  (require 'ibuf-ext)
+  ;; (require 'ibuf-ext)
   (defalias 'list-buffers 'ibuffer))
 
 ;; By default buffers are grouped by `project-current' or by
@@ -853,7 +867,6 @@ The provider is `nerd-icons'."
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
 
-;; `pixel-scroll-mode' uses line-by-line scrolling.
 (use-package pixel-scroll
   :ensure nil
 
@@ -865,6 +878,7 @@ The provider is `nerd-icons'."
   (cond
    ((fboundp 'pixel-scroll-precision-mode)
     (pixel-scroll-precision-mode 1))
+   ;; `pixel-scroll-mode' uses line-by-line scrolling.
    ((fboundp 'pixel-scroll-mode)
     (pixel-scroll-mode 1))))
 
@@ -921,24 +935,6 @@ The provider is `nerd-icons'."
 ;;     (add-to-list 'frog-jump-buffer-ignore-buffers regexp)))
 
 (use-package dired
-  :preface
-  (defun sb/dired-go-home ()
-    "Go to home directory in Dired."
-    (interactive)
-    (dired sb/user-home-directory))
-
-  (defun sb/dired-jump-to-top ()
-    "Move to the topmost file in Dired."
-    (interactive)
-    (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
-    (dired-next-line 1))
-
-  (defun sb/dired-jump-to-bottom ()
-    "Move to the last file in Dired."
-    (interactive)
-    (goto-char (point-max)) ; Faster than `(end-of-buffer)'
-    (dired-next-line -1))
-
   :ensure nil
 
   :hook
@@ -1009,7 +1005,23 @@ The provider is `nerd-icons'."
   ;; (advice-add
   ;;  'dired-omit-startup
   ;;  :after (lambda () (diminish 'dired-omit-mode)))
-  )
+
+  (defun sb/dired-go-home ()
+    "Go to home directory in Dired."
+    (interactive)
+    (dired sb/user-home-directory))
+
+  (defun sb/dired-jump-to-top ()
+    "Move to the topmost file in Dired."
+    (interactive)
+    (goto-char (point-min)) ; Faster than `(beginning-of-buffer)'
+    (dired-next-line 1))
+
+  (defun sb/dired-jump-to-bottom ()
+    "Move to the last file in Dired."
+    (interactive)
+    (goto-char (point-max)) ; Faster than `(end-of-buffer)'
+    (dired-next-line -1)))
 
 (use-package dired-narrow
   :after dired
@@ -1018,7 +1030,9 @@ The provider is `nerd-icons'."
 
 ;; (use-package dired-hist
 ;;   :ensure (:host github :repo "karthink/dired-hist")
+
 ;;   :hook (dired-mode . dired-hist-mode)
+
 ;;   :bind
 ;;   (:map
 ;;    dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
@@ -1027,18 +1041,19 @@ The provider is `nerd-icons'."
 ;; functions and variables from Lisp packages which are loaded into the current
 ;; Emacs session or are auto-loaded.
 (use-package xref
-  :after consult
-
   :bind
   (("M-." . xref-find-definitions)
    ("M-," . xref-pop-marker-stack) ("M-?" . xref-find-references)
    ;; Find all identifiers whose name matches pattern
    ("C-M-." . xref-find-apropos))
 
-  :custom
-  (xref-search-program 'ripgrep)
-  (xref-show-xrefs-function #'consult-xref)
-  (xref-show-definitions-function #'consult-xref))
+  :custom (xref-search-program 'ripgrep)
+
+  :config
+  (with-eval-after-load 'consult
+    (setopt
+     xref-show-xrefs-function #'consult-xref
+     xref-show-definitions-function #'consult-xref)))
 
 ;; Exclude project roots with `project-list-exclude'.
 (use-package project
@@ -1063,8 +1078,11 @@ The provider is `nerd-icons'."
 ;; ;; Allows identifying custom projects with a ".project" file (e.g., ~/Dropbox).
 ;; (use-package project-x
 ;;   :ensure (:host github :repo "karthink/project-x")
+
 ;;   :after project
+
 ;;   :demand t ; Required so that transient keybindings are available
+
 ;;   :config (add-hook 'project-find-functions #'project-x-try-local 90))
 
 (use-package vertico
@@ -1075,11 +1093,12 @@ The provider is `nerd-icons'."
 
   :hook
   ((elpaca-after-init . vertico-mode)
+   (minibuffer-setup . vertico-repeat-save)
+
    ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
    ;; use, say, `find-file' to go to your home '~/' or root '/' directory,
    ;; Vertico will clear the old path to keep only your current input.
-   (rfn-eshadow-update-overlay . vertico-directory-tidy)
-   (minibuffer-setup . vertico-repeat-save))
+   (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
   :bind
   (("C-c r" . vertico-repeat)
@@ -1097,8 +1116,8 @@ The provider is `nerd-icons'."
 
   :custom (vertico-cycle t)
 
-  :config
-  (vertico-indexed-mode 1)
+  :config (vertico-indexed-mode 1)
+
   (when (eq sb/theme 'catppuccin)
     (set-face-attribute 'vertico-current nil
                         :background "#676767"
@@ -1172,11 +1191,6 @@ The provider is `nerd-icons'."
   "Regexps to filter from `consult-buffer'.")
 
 (use-package consult
-  :preface
-  (defun sb/consult-line-symbol-at-point ()
-    (interactive)
-    (consult-line (or (thing-at-point 'symbol) "")))
-
   :after vertico
 
   :bind
@@ -1260,7 +1274,10 @@ The provider is `nerd-icons'."
   ;; (consult-customize
   ;;  consult-line-thing-at-point
   ;;  :initial (thing-at-point 'symbol))
-  )
+
+  (defun sb/consult-line-symbol-at-point ()
+    (interactive)
+    (consult-line (or (thing-at-point 'symbol) ""))))
 
 ;; Easily add file and directory paths into the minibuffer.
 (use-package consult-dir
@@ -1272,18 +1289,24 @@ The provider is `nerd-icons'."
 
 ;; (use-package consult-project-extra
 ;;   :after (project consult)
+
 ;;   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
+
 ;;   :custom (consult-project-function #'consult-project-extra-project-fn)
+
 ;;   :config
 ;;   ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
 ;;   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
 ;;   (setq project-switch-commands 'consult-project-extra-find))
 
 ;; (use-package consult-jump-project
-;;   :straight (:host github :repo "jdtsmith/consult-jump-project")
+;;   :ensure (:host github :repo "jdtsmith/consult-jump-project")
+
 ;;   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
-;;   :custom (consult-jump-direct-jump-modes '(dired-mode))
-;;   :bind ("C-x p j" . consult-jump-project))
+
+;;   :bind ("C-x p j" . consult-jump-project)
+
+;;   :custom (consult-jump-direct-jump-modes '(dired-mode)))
 
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
@@ -1319,9 +1342,7 @@ The provider is `nerd-icons'."
 ;; Rich annotations in the minibuffer, e.g., documentation strings or file
 ;; information.
 (use-package marginalia
-  :after vertico
-
-  :init (marginalia-mode 1)
+  :hook (vertico-mode . marginalia-mode)
 
   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
 
@@ -1348,72 +1369,72 @@ The provider is `nerd-icons'."
    'marginalia-annotators
    '(variable sb/marginalia-annotate-variable builtin none)))
 
-(use-package ispell
-  :ensure nil
+;; (use-package ispell
+;;   :ensure nil
 
-  :bind ("M-$" . ispell-word)
+;;   :bind ("M-$" . ispell-word)
 
-  :custom
-  (ispell-dictionary "en_US")
-  (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  (ispell-alternate-dictionary
-   (expand-file-name "wordlist.5" sb/extras-directory))
-  ;; Save a new word to personal dictionary without asking
-  (ispell-silently-savep t)
+;;   :custom
+;;   (ispell-dictionary "en_US")
+;;   (ispell-local-dictionary "en_US")
+;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+;;   (ispell-alternate-dictionary
+;;    (expand-file-name "wordlist.5" sb/extras-directory))
+;;   ;; Save a new word to personal dictionary without asking
+;;   (ispell-silently-savep t)
 
-  :config
-  ;; Prefer hunspell over aspell on Linux platforms
-  (cond
-   ((executable-find "hunspell")
-    (progn
-      ;; (setenv "LANG" "en_US")
-      (setenv "DICTIONARY" "en_US")
-      (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
-      (setopt
-       ispell-program-name "hunspell"
-       ispell-local-dictionary-alist
-       '(("en_US"
-          "[[:alpha:]]"
-          "[^[:alpha:]]"
-          "[']"
-          nil
-          ("-d" "en_US")
-          nil
-          utf-8))
-       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
-   ((executable-find "aspell")
-    (progn
-      (setopt
-       ispell-program-name "aspell"
-       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
+;;   :config
+;;   ;; Prefer hunspell over aspell on Linux platforms
+;;   (cond
+;;    ((executable-find "hunspell")
+;;     (progn
+;;       ;; (setenv "LANG" "en_US")
+;;       (setenv "DICTIONARY" "en_US")
+;;       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
+;;       (setopt
+;;        ispell-program-name "hunspell"
+;;        ispell-local-dictionary-alist
+;;        '(("en_US"
+;;           "[[:alpha:]]"
+;;           "[^[:alpha:]]"
+;;           "[']"
+;;           nil
+;;           ("-d" "en_US")
+;;           nil
+;;           utf-8))
+;;        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+;;        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
+;;    ((executable-find "aspell")
+;;     (progn
+;;       (setopt
+;;        ispell-program-name "aspell"
+;;        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
 
-  ;; Skip regions in `org-mode'
-  (dolist
-      (skip-pair
-       '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-         ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-         ("~" . "~")
-         ("=" . "=")
-         ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-         ;; Footnotes in org that have http links that are line breaked should not be ispelled
-         ("^http" . "\\]")
-         ("`" . "`")
-         ("cite:" . "[[:space:]]")
-         ("label:" . "[[:space:]]")
-         ("ref:" . "[[:space:]]")
-         ("\\\\begin{multline}" . "\\\\end{multline}")
-         ("\\\\begin{equation}" . "\\\\end{equation}")
-         ("\\\\begin{align}" . "\\\\end{align}")))
-    (add-to-list 'ispell-skip-region-alist skip-pair))
+;;   ;; Skip regions in `org-mode'
+;;   (dolist
+;;       (skip-pair
+;;        '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+;;          ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+;;          ("~" . "~")
+;;          ("=" . "=")
+;;          ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+;;          ;; Footnotes in org that have http links that are line breaked should not be ispelled
+;;          ("^http" . "\\]")
+;;          ("`" . "`")
+;;          ("cite:" . "[[:space:]]")
+;;          ("label:" . "[[:space:]]")
+;;          ("ref:" . "[[:space:]]")
+;;          ("\\\\begin{multline}" . "\\\\end{multline}")
+;;          ("\\\\begin{equation}" . "\\\\end{equation}")
+;;          ("\\\\begin{align}" . "\\\\end{align}")))
+;;     (add-to-list 'ispell-skip-region-alist skip-pair))
 
-  ;; Hide the "Starting new Ispell process" message
-  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+;;   ;; Hide the "Starting new Ispell process" message
+;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
-;; Silence "Starting 'look' process..." message
-(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+;; ;; Silence "Starting 'look' process..." message
+;; (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
@@ -1502,8 +1523,6 @@ The provider is `nerd-icons'."
   :hook (elpaca-after-init . whole-line-or-region-global-mode)
 
   :diminish whole-line-or-region-local-mode)
-
-;; TODO: Choose one among dogears, better-jumper, and gumshoe.
 
 (use-package dogears
   :ensure (:host github :repo "alphapapa/dogears.el")
@@ -1838,15 +1857,19 @@ The provider is `nerd-icons'."
 ;;     "Fringe is unavailable in TTY. Enable margin mode for when in TTY."
 ;;     (unless (display-graphic-p)
 ;;       (diff-hl-margin-local-mode)))
+
 ;;   :hook
 ;;   ((elpaca-after-init . global-diff-hl-mode)
 ;;    (dired-mode . diff-hl-dired-mode-unless-remote)
 ;;    (diff-hl-mode . sb/diff-hl-maybe-margin)
 ;;    (after-save-hook . diff-hl-update))
+
 ;;   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
+
 ;;   :custom
 ;;   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
 ;;   (diff-hl-update-async t)
+
 ;;   :config
 ;;   (diff-hl-flydiff-mode 1) ; For unsaved buffers
 ;;   (with-eval-after-load 'magit
@@ -1862,11 +1885,14 @@ The provider is `nerd-icons'."
 ;;     (setq-local electric-pair-pairs (append electric-pair-pairs pairs))
 ;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
 ;;   :ensure nil
+
 ;;   :hook (elpaca-after-init . electric-pair-mode)
+
 ;;   :custom
 ;;   ;; Avoid balancing parentheses since they can be both irritating and slow
 ;;   (electric-pair-preserve-balance nil)
 ;;   (electric-pair-skip-self nil)
+
 ;;   :config
 ;;   (setopt
 ;;    electric-pair-inhibit-predicate
@@ -1888,6 +1914,7 @@ The provider is `nerd-icons'."
 
 ;; (use-package mode-minder
 ;;   :ensure (:host github :repo "jdtsmith/mode-minder")
+
 ;;   :commands mode-minder)
 
 (use-package flycheck
@@ -1916,6 +1943,7 @@ The provider is `nerd-icons'."
           (seq-difference
            flycheck-checkers
            '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck)))
+
   ;; Prefer linters packaged with pylsp
   (pcase sb/python-langserver
     ('pylsp
@@ -2017,34 +2045,47 @@ The provider is `nerd-icons'."
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
   :hook (emacs-startup . global-page-break-lines-mode)
+
   :diminish)
 
 ;; (use-package sideline
 ;;   :init (setq sideline-backends-left nil)
+
 ;;   :hook ((flycheck-mode lsp-mode eglot-managed-mode) . sideline-mode)
+
 ;;   :custom
 ;;   (sideline-display-backend-name t)
 ;;   (sideline-display-backend-type 'inner)
+
 ;;   :diminish)
 
 ;; (use-package sideline-flycheck
 ;;   :after sideline
+
 ;;   :demand t
+
 ;;   :init (setq sideline-flycheck-display-mode 'line)
+
 ;;   :hook (flycheck-mode . sideline-flycheck-setup))
 
 ;; (use-package sideline-lsp
 ;;   :when (eq sb/lsp-provider 'lsp-mode)
+
 ;;   :after sideline
+
 ;;   :demand t
+
 ;;   :config
 ;;   (setq sideline-backends-right
 ;;         '((sideline-lsp . up) (sideline-flycheck . down))))
 
 ;; (use-package sideline-eglot
 ;;   :when (eq sb/lsp-provider 'eglot)
+
 ;;   :after sideline
+
 ;;   :demand t
+
 ;;   :config
 ;;   (setq sideline-backends-right
 ;;         `(((when (featurep 'eglot)
@@ -2058,6 +2099,7 @@ The provider is `nerd-icons'."
 ;;   :hook
 ;;   ((format-all-mode . format-all-ensure-formatter)
 ;;    ((markdown-mode markdown-ts-mode) . format-all-mode))
+
 ;;   :config
 ;;   (setq-default format-all-formatters
 ;;                 '(("Assembly" asmfmt)
@@ -2086,24 +2128,31 @@ The provider is `nerd-icons'."
 ;;     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
 ;;   (with-eval-after-load 'tex
 ;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
+
 ;;   :diminish)
 
 ;; ;; We now use Bash LSP for formatting with `shfmt'.
 ;; (use-package shfmt
+
 ;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
+
 ;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
+
 ;;   :diminish shfmt-on-save-mode)
 
 ;; ;; Yapfify works on the original file, so that any project settings supported
 ;; ;; by YAPF itself are used. We now use `apheleia-mode' for Python.
 ;; (use-package yapfify
 ;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
+
 ;;   :hook ((python-mode python-ts-mode) . yapf-mode)
+
 ;;   :diminish yapf-mode)
 
 ;; ;; We use `apheleia-mode' for Python.
 ;; (use-package ruff-format
 ;;   :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
+
 ;;   :diminish ruff-format-on-save-mode)
 
 ;; Basedpyright does not provide formatting feature. So, we cannot use
@@ -2273,6 +2322,7 @@ The provider is `nerd-icons'."
 ;; ;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
 ;; (use-package hotfuzz
 ;;   :demand t
+
 ;;   :custom completion-styles '(hotfuzz orderless))
 
 ;; It is recommended to load `yasnippet' before `eglot'
@@ -2752,7 +2802,7 @@ The provider is `nerd-icons'."
 ;;   :custom
 ;;   ;; Using "flx" slows down completion significantly
 ;;   (company-fuzzy-sorting-backend 'alphabetic)
-;;   ;; LATER: The right-hand side may get cut off if the annotations are
+;;   ;; The right-hand side may get cut off if the annotations are
 ;;   ;; right-aligned. Disable this after the mode is set up properly.
 ;;   (company-fuzzy-show-annotation t)
 ;;   ;; We should not need this with "flx" sorting because the "flx" sorting
@@ -3374,6 +3424,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pylsp-plugins-ruff-line-length 80)
   (lsp-pylsp-plugins-ruff-target-version "py310")
   (lsp-semgrep-metrics-enabled nil)
+  (lsp-copilot-enabled t)
 
   :config
   (cond
@@ -4764,6 +4815,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; Scrollbar foreground
      '(company-scrollbar-fg ((t (:background "#555555")))))))
 
+(use-package dracula-theme
+  :when (eq sb/theme 'dracula)
+
+  :init (load-theme 'dracula t))
+
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
 
@@ -5378,9 +5434,11 @@ Shows both colors when errors and warnings are present."
   ;;                 (eglot-shutdown server))))))))
   ;;   (project-kill-buffers))
 
-  :ensure (:source (gnu-elpa-mirror))
+  ;; :ensure (:source (gnu-elpa-mirror))
 
   :when (eq sb/lsp-provider 'eglot)
+
+  :after project
 
   :hook
   ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
