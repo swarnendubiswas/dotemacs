@@ -19,8 +19,9 @@
   :type 'string
   :group 'sb/emacs)
 
-;; `Modus-vivendi' is the most complete, has good contrast, and integrates well
-;; with all terminals. `Catppuccin' is more colorful.
+;; I now prefer dark themes. `Modus-vivendi' is the most complete, has good
+;; contrast, and integrates well with all terminals. `Catppuccin' is more
+;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
       'dracula
@@ -900,10 +901,32 @@ The provider is `nerd-icons'."
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
+  :preface
+  (defun sb/avy-goto-visual-line-column-0 ()
+    "Jump to the beginning (column 0) of each visible visual line."
+    (interactive)
+    (avy-with
+     avy-goto-line
+     (avy-process
+      (save-excursion
+        (let ((start (window-start))
+              (end (window-end nil t))
+              (positions '()))
+          (goto-char start)
+          (while (< (point) end)
+            ;; Move to beginning of visual line
+            (let ((bol
+                   (save-excursion
+                     (vertical-motion 0) ;; stay on current visual line
+                     (line-beginning-position))))
+              (push (cons bol bol) positions))
+            (vertical-motion 1)) ;; move to next visual line
+          (nreverse positions)))
+      (avy--style-fn avy-style))))
   :bind
   (("C-\\" . avy-goto-word-1)
    ("C-'" . avy-goto-char-timer)
-   ("C-/" . avy-goto-line)
+   ("C-/" . sb/avy-goto-visual-line-column-0)
    ("C-M-c" . avy-copy-line)
    ("C-M-m" . avy-move-line)
    :map isearch-mode-map
@@ -1369,72 +1392,72 @@ The provider is `nerd-icons'."
    'marginalia-annotators
    '(variable sb/marginalia-annotate-variable builtin none)))
 
-;; (use-package ispell
-;;   :ensure nil
+(use-package ispell
+  :ensure nil
 
-;;   :bind ("M-$" . ispell-word)
+  :bind ("M-$" . ispell-word)
 
-;;   :custom
-;;   (ispell-dictionary "en_US")
-;;   (ispell-local-dictionary "en_US")
-;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-;;   (ispell-alternate-dictionary
-;;    (expand-file-name "wordlist.5" sb/extras-directory))
-;;   ;; Save a new word to personal dictionary without asking
-;;   (ispell-silently-savep t)
+  :custom
+  (ispell-dictionary "en_US")
+  (ispell-local-dictionary "en_US")
+  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+  (ispell-alternate-dictionary
+   (expand-file-name "wordlist.5" sb/extras-directory))
+  ;; Save a new word to personal dictionary without asking
+  (ispell-silently-savep t)
 
-;;   :config
-;;   ;; Prefer hunspell over aspell on Linux platforms
-;;   (cond
-;;    ((executable-find "hunspell")
-;;     (progn
-;;       ;; (setenv "LANG" "en_US")
-;;       (setenv "DICTIONARY" "en_US")
-;;       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
-;;       (setopt
-;;        ispell-program-name "hunspell"
-;;        ispell-local-dictionary-alist
-;;        '(("en_US"
-;;           "[[:alpha:]]"
-;;           "[^[:alpha:]]"
-;;           "[']"
-;;           nil
-;;           ("-d" "en_US")
-;;           nil
-;;           utf-8))
-;;        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-;;        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
-;;    ((executable-find "aspell")
-;;     (progn
-;;       (setopt
-;;        ispell-program-name "aspell"
-;;        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
+  :config
+  ;; Prefer hunspell over aspell on Linux platforms
+  (cond
+   ((executable-find "hunspell")
+    (progn
+      ;; (setenv "LANG" "en_US")
+      (setenv "DICTIONARY" "en_US")
+      (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
+      (setopt
+       ispell-program-name "hunspell"
+       ispell-local-dictionary-alist
+       '(("en_US"
+          "[[:alpha:]]"
+          "[^[:alpha:]]"
+          "[']"
+          nil
+          ("-d" "en_US")
+          nil
+          utf-8))
+       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
+   ((executable-find "aspell")
+    (progn
+      (setopt
+       ispell-program-name "aspell"
+       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
 
-;;   ;; Skip regions in `org-mode'
-;;   (dolist
-;;       (skip-pair
-;;        '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-;;          ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-;;          ("~" . "~")
-;;          ("=" . "=")
-;;          ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-;;          ;; Footnotes in org that have http links that are line breaked should not be ispelled
-;;          ("^http" . "\\]")
-;;          ("`" . "`")
-;;          ("cite:" . "[[:space:]]")
-;;          ("label:" . "[[:space:]]")
-;;          ("ref:" . "[[:space:]]")
-;;          ("\\\\begin{multline}" . "\\\\end{multline}")
-;;          ("\\\\begin{equation}" . "\\\\end{equation}")
-;;          ("\\\\begin{align}" . "\\\\end{align}")))
-;;     (add-to-list 'ispell-skip-region-alist skip-pair))
+  ;; Skip regions in `org-mode'
+  (dolist
+      (skip-pair
+       '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+         ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+         ("~" . "~")
+         ("=" . "=")
+         ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+         ;; Footnotes in org that have http links that are line breaked should not be ispelled
+         ("^http" . "\\]")
+         ("`" . "`")
+         ("cite:" . "[[:space:]]")
+         ("label:" . "[[:space:]]")
+         ("ref:" . "[[:space:]]")
+         ("\\\\begin{multline}" . "\\\\end{multline}")
+         ("\\\\begin{equation}" . "\\\\end{equation}")
+         ("\\\\begin{align}" . "\\\\end{align}")))
+    (add-to-list 'ispell-skip-region-alist skip-pair))
 
-;;   ;; Hide the "Starting new Ispell process" message
-;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+  ;; Hide the "Starting new Ispell process" message
+  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
-;; ;; Silence "Starting 'look' process..." message
-;; (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+;; Silence "Starting 'look' process..." message
+(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
@@ -1794,6 +1817,7 @@ The provider is `nerd-icons'."
 
   :custom (visual-replace-display-total t))
 
+;; Magit often requries a newer version of transient.
 (use-package transient
   :commands transient-define-prefix
 
@@ -3367,6 +3391,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; projects and hence is misleading.
   (lsp-modeline-workspace-status-enable nil)
   (lsp-inlay-hint-enable nil)
+
   (lsp-enable-snippet nil)
   ;; Enable integration of custom backends other than `capf'
   (lsp-completion-provider :none)
@@ -3376,14 +3401,49 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; Show/hide completion kind, e.g., interface/class.
   (lsp-completion-show-kind t)
   (lsp-completion-default-behaviour :insert)
+
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
   ;; Sudden changes in the height of the echo area causes the cursor to lose
   ;; position, manually request via `lsp-signature-activate'.
   (lsp-signature-auto-activate nil)
   (lsp-signature-render-documentation t)
+
   ;; Client-specific configuration
-  (lsp-clangd-version "19.1.2")
+  (lsp-client-packages
+   '(lsp-asm
+     lsp-autotools
+     lsp-awk
+     lsp-bash
+     lsp-clangd
+     lsp-cmake
+     lsp-css
+     lsp-copilot
+     lsp-docker
+     lsp-dockerfile
+     lsp-emmet
+     lsp-eslint
+     lsp-java
+     lsp-javascript
+     lsp-json
+     lsp-latex
+     lsp-lisp
+     lsp-ltex-plus
+     lsp-markdown
+     lsp-marksman
+     lsp-perl
+     lsp-perlnavigator
+     lsp-php
+     lsp-pylsp
+     lsp-pyright
+     lsp-ruff
+     lsp-tex
+     lsp-tilt
+     lsp-toml
+     lsp-toml-tombi
+     lsp-xml
+     lsp-yaml))
+  (lsp-clangd-version "21.1.0")
   (lsp-clients-clangd-args
    '("-j=4"
      "--all-scopes-completion"
@@ -3402,10 +3462,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      "--enable-config"
      "--pch-storage=memory" ; Increases memory usage but can improve performance
      "--pretty"))
+
   (lsp-html-format-wrap-line-length fill-column)
   (lsp-html-format-end-with-newline t)
   (lsp-html-format-indent-inner-html t)
+
   (lsp-xml-logs-client nil)
+  (lsp-semgrep-metrics-enabled nil)
+
   (lsp-pylsp-configuration-sources ["pyproject.toml" "setup.cfg"])
   (lsp-pylsp-plugins-mccabe-enabled nil)
   (lsp-pylsp-plugins-preload-enabled nil)
@@ -3423,8 +3487,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-pylsp-plugins-ruff-format nil "Using Apheleia")
   (lsp-pylsp-plugins-ruff-line-length 80)
   (lsp-pylsp-plugins-ruff-target-version "py310")
-  (lsp-semgrep-metrics-enabled nil)
-  (lsp-copilot-enabled t)
+
+  (lsp-copilot-enabled nil)
+  (lsp-copilot-server-disabled-languages '(plaintext))
 
   :config
   (cond
@@ -3544,6 +3609,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :when (eq sb/lsp-provider 'lsp-mode)
 
+  :after lsp-mode
+
   :init (setopt lsp-ltex-plus-version "18.6.1")
 
   :hook
@@ -3554,6 +3621,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (unless (string-equal
               (file-name-nondirectory (or buffer-file-name ""))
               "COMMIT_EDITMSG")
+       (require 'lsp-ltex-plus)
        (lsp-deferred))))
 
   :custom
@@ -3565,6 +3633,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    '(:en-US
      ["EN_QUOTES"
       "OXFORD_SPELLING_Z_NOT_S"
+      "MORFOLOGIK_RULE_EN"
+      "MORFOLOGIK_RULE_EN_GB"
       "MORFOLOGIK_RULE_EN_US"
       "WANT"
       "EN_DIACRITICS_REPLACE"])))
@@ -5412,7 +5482,8 @@ Shows both colors when errors and warnings are present."
 ;; Allow fetching the latest versions via Elpaca to satisfy Eglot requirements
 (use-package flymake)
 
-(use-package jsonrpc)
+(use-package jsonrpc
+  :ensure nil)
 
 (use-package eglot
   ;; :preface
@@ -5435,6 +5506,7 @@ Shows both colors when errors and warnings are present."
   ;;   (project-kill-buffers))
 
   ;; :ensure (:source (gnu-elpa-mirror))
+  :ensure nil
 
   :when (eq sb/lsp-provider 'eglot)
 
