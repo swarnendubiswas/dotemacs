@@ -2,7 +2,7 @@
 
 ;; Swarnendu Biswas
 
-;; Commentary:
+;;; Commentary:
 
 ;; This file is supported from Emacs 27+, and is run before package and UI
 ;; initialization.

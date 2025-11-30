@@ -313,6 +313,11 @@ The provider is `nerd-icons'."
   (make-backup-files nil "Stop making backup `~' files")
   (delete-by-moving-to-trash t) ; Safe
 
+  ;; Prevents help command completion from triggering autoload.
+  (help-enable-completion-autoload nil)
+  (help-enable-autoload nil)
+  (help-enable-symbol-autoload nil)
+
   (help-window-select t "Makes it easy to close the window")
   (switch-to-buffer-preserve-window-point t)
 
@@ -479,18 +484,19 @@ The provider is `nerd-icons'."
 
   (put 'overwrite-mode 'disabled t)
 
-  ;; ;; Keep the cursor out of the read-only portions of the minibuffer
-  ;; (setopt minibuffer-prompt-properties
-  ;;         '(read-only
-  ;;           t intangible t cursor-intangible t face minibuffer-prompt))
+  ;; Keep the cursor out of the read-only portions of the minibuffer
+  (setopt minibuffer-prompt-properties
+          '(read-only
+            t intangible t cursor-intangible t face minibuffer-prompt))
 
-  ;; (add-hook
-  ;;  'minibuffer-setup-hook
-  ;;  (lambda ()
-  ;;    (cursor-intangible-mode 1)
-  ;;    ;; Allow Flycheck to show long error messages in the minibuffer
-  ;;    (setq truncate-lines nil)
-  ;;    (visual-line-mode 1)))
+  (add-hook
+   'minibuffer-setup-hook
+   (lambda ()
+     (cursor-intangible-mode 1)
+     ;; ;; Allow Flycheck to show long error messages in the minibuffer
+     ;; (setq truncate-lines nil)
+     ;; (visual-line-mode 1)
+     ))
 
   ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
   ;; Zellij.
@@ -3639,6 +3645,23 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       "WANT"
       "EN_DIACRITICS_REPLACE"])))
 
+;; (use-package lsp-harper
+;;   :ensure (:host github :repo "ju6ge/lsp-harper.el")
+
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+
+;;   :after lsp-mode
+
+;;   :hook
+;;   ((text-mode markdown-mode org-mode LaTeX-mode)
+;;    .
+
+;;    (lambda ()
+;;      (require 'lsp-harper)
+;;      (lsp-deferred)))
+
+;;   :custom (lsp-harper-active-modes '(text-mode markdown-mode org-mode LaTeX-mode)))
+
 ;; Use a per-project "pyrightconfig.json" file for configuring the language
 ;; server.
 (use-package lsp-pyright
@@ -5336,13 +5359,18 @@ Shows both colors when errors and warnings are present."
 ;; ;; Kill Emacs buffers automatically after a timeout
 ;; (use-package buffer-terminator
 ;;   :ensure (:host github :repo "jamescherti/buffer-terminator.el")
+
 ;;   :hook (find-file . buffer-terminator-mode)
+
 ;;   :custom (buffer-terminator-verbose nil)
+
 ;;   :diminish)
 
 ;; (use-package hl-line
 ;;   :ensure nil
+
 ;;   :hook (dired-mode . hl-line-mode)
+
 ;;   :custom
 ;;   ;; Restrict `hl-line-mode' highlighting to the current window
 ;;   (hl-line-sticky-flag nil))
@@ -5543,8 +5571,9 @@ Shows both colors when errors and warnings are present."
   (eglot-mode-line-format nil)
 
   :config
-  ;; Avoid overhead from logging
-  (setf (plist-get eglot-events-buffer-config :size) 0)
+  ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
+  (setopt eglot-events-buffer-config '(:size 0 :format short))
+
   (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
