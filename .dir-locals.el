@@ -104,7 +104,7 @@
   .
   ((no-byte-compile . t)
    (flycheck-disabled-checkers . (emacs-lisp-checkdoc))
-   (elisp-autofmt-on-save-p . always)
+   ;; (elisp-autofmt-on-save-p . always)
 
    ;; The special `subdirs' element is not a variable, but a special keyword
    ;; which indicates that the mode settings are only to be applied in the

@@ -25,7 +25,7 @@
 (defcustom sb/theme
   (if (display-graphic-p)
       'dracula
-    'none)
+    'dracula)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -2212,7 +2212,15 @@ The provider is `nerd-icons'."
 
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
-  :hook ((emacs-lisp-mode lisp-data-mode) . elisp-autofmt-mode)
+  :hook
+  ((emacs-lisp-mode lisp-data-mode)
+   .
+   (lambda ()
+     (when (and buffer-file-name
+                (string-equal
+                 (expand-file-name "~/.emacs.d/init.el")
+                 (expand-file-name buffer-file-name)))
+       (elisp-autofmt-mode 1))))
 
   :custom
   (elisp-autofmt-python-bin "python3")
@@ -3063,19 +3071,6 @@ The provider is `nerd-icons'."
     (setq-local
      company-backends
      '(company-files
-       ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'.
-       (company-capf
-        :separate
-        company-dabbrev-code
-        company-keywords
-        :with company-yasnippet)
-       (company-ispell company-dict :with company-yasnippet)
-       (company-dabbrev :with company-yasnippet))))
-
-  (defun sb/company-non-lsp-prog-mode-new ()
-    (setq-local
-     company-backends
-     '(company-files
        ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'. `company-yasnippet' is blocking.
        (company-capf
         :separate
@@ -3093,7 +3088,7 @@ The provider is `nerd-icons'."
                  (derived-mode-p 'bison-mode)
                  (derived-mode-p 'cmake-ts-mode))
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-non-lsp-prog-mode-new))))
+       (sb/company-non-lsp-prog-mode))))
 
   ;; `company-capf' is not complete for Elisp. For example, it will not suggest `doom-modeline' but suggests `doom-modeline-mode'. So I need to merge `company-capf' with `company-dabbrev-code'.
   (defun sb/company-elisp-mode ()
@@ -3101,22 +3096,10 @@ The provider is `nerd-icons'."
     (setq-local
      company-backends
      '(company-files
-       (:separate
-        company-capf
-        company-dabbrev-code ; Useful for local (e.g., variable) names
-        :with company-yasnippet)
-       (company-ispell company-dict :with company-yasnippet)
-       (company-dabbrev :with company-yasnippet))))
-
-  (defun sb/company-elisp-mode-new ()
-    "Add backends for `emacs-lisp-mode' completion in company mode."
-    (setq-local
-     company-backends
-     '(company-files
        ;; `company-capf' may not return all variable or type definitions, so we also use `company-dabbrev-code'. `company-yasnippet' is blocking.
        (company-capf
         :separate
-        company-dabbrev-code
+        company-dabbrev-code ; Useful for local (e.g., variable) names
         company-keywords
         :with company-yasnippet)
        (company-ispell company-dict) company-dabbrev)))
@@ -3422,7 +3405,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      lsp-awk
      lsp-bash
      lsp-clangd
-     lsp-cmake
+     ;; We register `neocmakelsp' as the preferred LSP instead of `cmake-language-server'
+     ;; lsp-cmake
      lsp-css
      lsp-copilot
      lsp-docker
@@ -3506,7 +3490,23 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (when (display-graphic-p)
     (setopt lsp-modeline-code-actions-segments '(count icon name)))
 
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection
+    (lsp-stdio-connection '("neocmakelsp" "stdio"))
+    :major-modes '(cmake-mode cmake-ts-mode)
+    :priority 2
+    :server-id 'neocmakelsp))
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection
+    (lsp-stdio-connection '("fish-lsp" "start"))
+    :activation-fn (lsp-activate-on "fish")
+    :server-id 'fish-lsp))
+
   ;; ;; Enable `lsp-booster'
+
   ;; (defun lsp-booster--advice-json-parse (old-fn &rest args)
   ;;   "Try to parse bytecode instead of json."
   ;;   (or (when (equal (following-char) ?#)
@@ -3521,6 +3521,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;;      'json-parse-buffer
   ;;    'json-read)
   ;;  :around #'lsp-booster--advice-json-parse)
+
   ;; (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
   ;;   "Prepend emacs-lsp-booster command to lsp CMD."
   ;;   (let ((orig-result (funcall old-fn cmd test?)))
@@ -3534,6 +3535,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;;           (message "Using emacs-lsp-booster for %s!" orig-result)
   ;;           (cons "emacs-lsp-booster" orig-result))
   ;;       orig-result)))
+
   ;; (advice-add
   ;;  'lsp-resolve-final-command
   ;;  :around #'lsp-booster--advice-final-command)
@@ -3953,8 +3955,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (when (eq sb/lsp-provider 'lsp-mode)
-       (setq-local lsp-disabled-clients '(ltex-ls-plus)))
+     (with-eval-after-load 'lsp-mode
+       (setq-local lsp-disabled-clients '(ltex-ls-plus cmake-language-server)))
      (sb/setup-lsp-provider))))
 
 (use-package doxymacs
@@ -4107,19 +4109,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (add-hook 'before-save-hook #'fish_indent-before-save)
-     ;; (when (eq sb/lsp-provider 'eglot)
-     ;;   (eglot-ensure))
-     ;; ;; `lsp-mode' does not support fish yet
-     ;; (when (eq sb/lsp-provider 'lsp-mode)
-     ;;   (with-eval-after-load 'lsp-mode
-     ;;     (lsp-register-client
-     ;;      (make-lsp-client
-     ;;       :new-connection
-     ;;       (lsp-stdio-connection '("fish-lsp" "start"))
-     ;;       :activation-fn (lsp-activate-on "fish")
-     ;;       :server-id 'fish-lsp))
-     ;;     (lsp-deferred)))
-     )))
+     (sb/setup-lsp-provider))))
 
 (use-package lisp-mode
   :ensure nil
@@ -4183,7 +4173,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (when (eq sb/lsp-provider 'lsp-mode)
+     (with-eval-after-load 'lsp-mode
        (setq-local lsp-disabled-clients '(ltex-ls-plus)))
      (sb/setup-lsp-provider))))
 
@@ -4319,7 +4309,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
     ;; checking.
     (jinx-mode -1)
-    (when (eq sb/lsp-provider 'lsp-mode)
+    (with-eval-after-load 'lsp-mode
       (setq-local lsp-disabled-clients '(ltex-ls-plus)))
     (sb/setup-lsp-provider))
 
@@ -4647,7 +4637,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
-;; Enabling LSP for large bibtex files incurs large overhead
 (use-package bibtex
   :ensure nil
 
@@ -4655,7 +4644,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (bibtex-mode
    .
    (lambda ()
-     (when (eq sb/lsp-provider 'lsp-mode)
+     ;; Enabling LSP for large bibtex files incurs high overhead
+     (with-eval-after-load 'lsp-mode
        (setq-local lsp-disabled-clients '(ltex-ls-plus)))))
 
   :custom
@@ -5510,8 +5500,7 @@ Shows both colors when errors and warnings are present."
 ;; Allow fetching the latest versions via Elpaca to satisfy Eglot requirements
 (use-package flymake)
 
-(use-package jsonrpc
-  :ensure nil)
+(use-package jsonrpc)
 
 (use-package eglot
   ;; :preface
@@ -5533,8 +5522,8 @@ Shows both colors when errors and warnings are present."
   ;;                 (eglot-shutdown server))))))))
   ;;   (project-kill-buffers))
 
+  ;; FIXME: Try to get MELPA version working
   ;; :ensure (:source (gnu-elpa-mirror))
-  :ensure nil
 
   :when (eq sb/lsp-provider 'eglot)
 
@@ -5619,7 +5608,9 @@ Shows both colors when errors and warnings are present."
       .
       ("vscode-json-language-server" "--stdio"))
      ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
-     ((cmake-mode cmake-ts-mode) . ("cmake-language-server"))
+     ((cmake-mode cmake-ts-mode)
+      .
+      ,(eglot-alternatives '(("neocmakelsp" "stdio") "cmake-language-server")))
      ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
      ;; Download the source from
      ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
@@ -5941,6 +5932,11 @@ Shows both colors when errors and warnings are present."
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4))
 
+(use-package mason
+  :defer 2
+
+  :hook (elpaca-after-init . mason-ensure))
+
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
   (interactive)
@@ -6210,11 +6206,11 @@ DIR can be relative or absolute."
 ;;  "M-s"
 ;;  "search-map")
 
-;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
-;; a prefix-key.  If you know of other built-in packages that have
-;; this behavior, please let me know, so I can add them.
-(with-eval-after-load 'page-ext
-  (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
+;; ;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
+;; ;; a prefix-key.  If you know of other built-in packages that have
+;; ;; this behavior, please let me know, so I can add them.
+;; (with-eval-after-load 'page-ext
+;;   (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
 
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
@@ -6552,7 +6548,7 @@ DIR can be relative or absolute."
               ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
               ("📚 Citre: jump" . citre-jump)
               ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂  Imenu (consult)" . consult-imenu)))
+              ("🗂 Imenu (consult)" . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
       (call-interactively (cdr (assoc choice options)))))
   (bind-key "M-'" #'sb/jump-choose-definition))
@@ -6566,7 +6562,7 @@ DIR can be relative or absolute."
               ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
               ("📚 Citre: jump" . citre-jump)
               ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂  Imenu: " . consult-imenu)))
+              ("🗂 Imenu: " . consult-imenu)))
            (choice (completing-read "Jump using: " (mapcar #'car options))))
       (call-interactively (cdr (assoc choice options)))))
   (bind-key "M-'" #'sb/jump-choose-definition))

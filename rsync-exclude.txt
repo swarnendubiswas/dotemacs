@@ -11,6 +11,7 @@ straight
 tree-sitter
 var
 .vscode
+mason
 
 .tags
 GPATH
