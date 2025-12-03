@@ -5436,53 +5436,53 @@ Shows both colors when errors and warnings are present."
 ;;   :hook (prog-mode . breadcrumb-mode)
 ;;   :config (breadcrumb-imenu-crumbs))
 
-;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
-;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
-;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
-;; @ C-c".
-(use-package hideshow
-  ;;   :preface
-  ;;   (defun sb/toggle-fold ()
-  ;;     (interactive)
-  ;;     (save-excursion
-  ;;       (end-of-line)
-  ;;       (hs-toggle-hiding)))
+;; ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
+;; ;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
+;; ;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
+;; ;; @ C-c".
+;; (use-package hideshow
+;;   ;;   :preface
+;;   ;;   (defun sb/toggle-fold ()
+;;   ;;     (interactive)
+;;   ;;     (save-excursion
+;;   ;;       (end-of-line)
+;;   ;;       (hs-toggle-hiding)))
 
-  :ensure nil
+;;   :ensure nil
 
-  ;;   :hook
-  ;;   ((c-mode-common
-  ;;     c-ts-mode
-  ;;     c++-mode
-  ;;     c++-ts-mode
-  ;;     cmake-mode
-  ;;     cmake-ts-mode
-  ;;     css-mode
-  ;;     css-ts-mode
-  ;;     emacs-lisp-mode
-  ;;     fish-mode
-  ;;     html-mode
-  ;;     java-mode
-  ;;     java-ts-mode
-  ;;     makefile-mode
-  ;;     perl-mode
-  ;;     python-mode
-  ;;     python-ts-mode
-  ;;     sh-mode
-  ;;     bash-ts-mode
-  ;;     json-mode
-  ;;     json-ts-mode
-  ;;     jsonc-mode
-  ;;     yaml-mode
-  ;;     yaml-ts-mode)
-  ;;    . hs-minor-mode)
+;;   ;;   :hook
+;;   ;;   ((c-mode-common
+;;   ;;     c-ts-mode
+;;   ;;     c++-mode
+;;   ;;     c++-ts-mode
+;;   ;;     cmake-mode
+;;   ;;     cmake-ts-mode
+;;   ;;     css-mode
+;;   ;;     css-ts-mode
+;;   ;;     emacs-lisp-mode
+;;   ;;     fish-mode
+;;   ;;     html-mode
+;;   ;;     java-mode
+;;   ;;     java-ts-mode
+;;   ;;     makefile-mode
+;;   ;;     perl-mode
+;;   ;;     python-mode
+;;   ;;     python-ts-mode
+;;   ;;     sh-mode
+;;   ;;     bash-ts-mode
+;;   ;;     json-mode
+;;   ;;     json-ts-mode
+;;   ;;     jsonc-mode
+;;   ;;     yaml-mode
+;;   ;;     yaml-ts-mode)
+;;   ;;    . hs-minor-mode)
 
-  :custom (hs-isearch-open t "Open all folds while searching")
+;;   :custom (hs-isearch-open t "Open all folds while searching")
 
-  :diminish hs-minor-mode)
+;;   :diminish hs-minor-mode)
 
-(use-package kirigami
-  :ensure (:host github :repo "jamescherti/kirigami.el"))
+;; (use-package kirigami
+;;   :ensure (:host github :repo "jamescherti/kirigami.el"))
 
 ;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
 (use-package string-inflection
@@ -5879,18 +5879,18 @@ Shows both colors when errors and warnings are present."
 
   (setopt eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
-(use-package eglot-hierarchy
-  :ensure (:host github :repo "dolmens/eglot-hierarchy")
+;; (use-package eglot-hierarchy
+;;   :ensure (:host github :repo "dolmens/eglot-hierarchy")
 
-  :when (eq sb/lsp-provider 'eglot)
+;;   :when (eq sb/lsp-provider 'eglot)
 
-  :after eglot
+;;   :after eglot
 
-  :commands
-  (eglot-hierarchy-call-hierarchy
-   eglot-hierarchy-incoming-calls
-   eglot-hierarchy-outgoing-calls
-   eglot-hierarchy-type-hierarchy))
+;;   :commands
+;;   (eglot-hierarchy-call-hierarchy
+;;    eglot-hierarchy-incoming-calls
+;;    eglot-hierarchy-outgoing-calls
+;;    eglot-hierarchy-type-hierarchy))
 
 (use-package consult-eglot
   :when (eq sb/lsp-provider 'eglot)
