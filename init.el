@@ -2917,26 +2917,20 @@ The provider is `nerd-icons'."
 
 (with-eval-after-load 'company
   ;; Override `company-backends' for unhandled major modes.
-  ;; (setopt company-backends
-  ;;         '(company-files
-  ;;           (company-capf
-  ;;            ;; `company-keywords' should not be required with LS support.
-  ;;            company-keywords company-dabbrev-code
-  ;;            :with company-yasnippet)
-  ;;           (company-dict company-ispell :with company-yasnippet)
-  ;;           ;; If we have `company-dabbrev' first, then other matches from later
-  ;;           ;; backends `company-ispell' or `company-dict' will be ignored.
-  ;;           (company-dabbrev :with company-yasnippet)))
-
   (setopt
    company-backends
    '(company-files
-     ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'. `company-yasnippet' is blocking.
+     ;; `company-capf' may not return all variable or type definitions, so we
+     ;; also use `company-dabbrev-code'. `company-keywords' should not be
+     ;; required ;; with LS support.
+     `company-yasnippet' is blocking.
      (company-capf
       :separate
       company-dabbrev-code
       company-keywords
       :with company-yasnippet)
+     ;; If we have `company-dabbrev' first, then other matches from later
+     ;; backends `company-ispell' or `company-dict' will be ignored.
      (company-dict company-ispell) company-dabbrev))
 
   ;; `company-capf' with Texlab does not pass to later backends even if it does
@@ -2944,27 +2938,6 @@ The provider is `nerd-icons'."
   ;; commands (e.g., words) which is the majority. By combining it in a single
   ;; group with ":separate", the following code forces all listed backends to be
   ;; queried regardless of what `company-capf' returns.
-
-  (defun sb/company-latex-backends-no-separate ()
-    (setq-local
-     company-backends
-     '(company-files ; Have files first to allow completing paths
-       (company-capf :with company-yasnippet)
-       company-reftex-citations ; will trigger inside \cite{}
-       ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-       (company-reftex-labels
-        ;; LaTeX structure
-        company-auctex-labels)
-       company-auctex-macros
-       company-auctex-environments
-       ;; company-latex-commands ; company-auctex-macros seem to be better
-       company-auctex-symbols
-       company-math-symbols-latex ; Math latex tags
-       ;; Math Unicode symbols and sub (super) scripts
-       company-math-symbols-unicode
-       company-ispell
-       company-dict
-       company-dabbrev)))
 
   ;; Always query all the following backends by using ":separate".
   (defun sb/company-latex-backends-separate ()
@@ -2985,50 +2958,26 @@ The provider is `nerd-icons'."
         company-math-symbols-unicode company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
-  (defun sb/company-latex-backends-fuzzy ()
-    "Company backends for use with `company-fuzzy-mode'."
-    (setq-local company-backends
-                '(company-files
-                  ;; References & labels
-                  company-reftex-citations
-                  company-reftex-labels
-                  company-auctex-labels
-                  ;; LaTeX macros/envs/snippets
-                  company-auctex-macros
-                  company-auctex-environments
-                  company-auctex-symbols
-                  ;; Math symbols
-                  company-math-symbols-latex
-                  company-math-symbols-unicode
-                  company-ispell
-                  company-dict
-                  company-dabbrev
-                  company-yasnippet)))
-
   (add-hook
    'LaTeX-mode-hook
    (lambda ()
      ;; Allow showing yasnippets auto-complete which often use two letters
      (setq-local company-minimum-prefix-length 2)
-     (sb/company-latex-backends-separate)
-     ;; (company-fuzzy-mode 1)
-     ))
+     (sb/company-latex-backends-separate)))
 
   (defun sb/company-text-mode ()
     "Add backends for `text-mode' completion in company mode."
     ;; Another way to make `company-backends' local.
     (set
      (make-local-variable 'company-backends)
-     '(company-files (company-dict company-ispell) company-dabbrev)))
+     '(company-files (:separate company-dict company-ispell company-dabbrev))))
 
   ;; Extends to derived modes like `markdown-mode'. We use separate hooks for `org-mode' and `LaTeX-mode'.
   (add-hook
    'text-mode-hook
    (lambda ()
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
-       (sb/company-text-mode)
-       ;; (company-fuzzy-mode 1)
-       )))
+       (sb/company-text-mode))))
 
   (defun sb/company-c-mode ()
     (setq-local
@@ -3413,6 +3362,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      lsp-dockerfile
      lsp-emmet
      lsp-eslint
+     lsp-harper
      lsp-java
      lsp-javascript
      lsp-json
@@ -3433,6 +3383,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      lsp-toml-tombi
      lsp-xml
      lsp-yaml))
+
   (lsp-clangd-version "21.1.0")
   (lsp-clients-clangd-args
    '("-j=4"
@@ -4380,7 +4331,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ("C-c C-," . org-insert-structure-template)
    ("C-c C-j" . consult-outline)
    ("C-c C-l" . org-store-link)
-   ("C-c C-k" . org-insert-link))
+   ("C-c C-k" . org-insert-link)
+   ("C-c ." . org-timestamp)
+   ("Shift-<left>" . org-timestamp-down-day)
+   ("Shift-<right>" . org-timestamp-up-day)
+   ("C-c ;" . org-toggle-comment))
 
   :custom
   (org-fontify-quote-and-verse-blocks t)
@@ -4420,6 +4375,22 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (org-imenu-depth 4)
   (org-latex-pdf-process
    '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
+
+  (org-agenda-files '("~/Dropbox/TODOs.org"))
+  (org-todo-keywords
+   '((sequence
+      "TODO(t!)" "NEXT(n!)" "PROG(p!)" "WAIT(w!)" "HOLD(h!)" "|" "DONE(d!)")))
+  (org-todo-keyword-faces
+   '(("TODO" . "IndianRed1")
+     ("PROG" . "DeepSkyBlue1")
+     ("DONE" . "MediumSeaGreen")))
+  (org-priority-highest ?A org-priority-lowest ?D org-priority-default ?B)
+  (org-priority-faces
+   '((?A . (:foreground "#bf616a" :weight bold :underline t))
+     (?B . (:foreground "#d08770" :weight bold :underline t))
+     (?C . (:foreground "#4c566a" :weight bold :underline t))
+     (?D . (:foreground "#3b4252" :weight bold :underline t))))
+  (org-use-tag-inheritance t)
 
   :config
   (require 'ox-latex)
