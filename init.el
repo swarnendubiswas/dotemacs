@@ -4326,8 +4326,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ("M-e")
    ("<tab>" . org-indent-item)
    ("<backtab>" . org-outdent-item)
+   ("C-c C-n" . org-next-visible-heading)
+   ("C-c C-p" . org-previous-visible-heading)
+   ("C-c C-f" . org-backward-heading-same-level)
+   ("C-c C-b" . outline-backward-same-level)
+   ("C-c C-u" . outline-up-heading)
    ("M-{" . org-backward-element)
    ("M-}" . org-forward-element)
+   ;; Insert empty structural blocks, such as ‘#+BEGIN_SRC’ . . . ‘#+END_SRC’,
    ("C-c C-," . org-insert-structure-template)
    ("C-c C-j" . consult-outline)
    ("C-c C-l" . org-store-link)
@@ -4335,15 +4341,31 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ("C-c ." . org-timestamp)
    ("Shift-<left>" . org-timestamp-down-day)
    ("Shift-<right>" . org-timestamp-up-day)
-   ("C-c ;" . org-toggle-comment))
+   ("C-c ;" . org-toggle-comment)
+   ("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
+   ;; Use a prefix argument to record a timestamp
+   ("C-c C-t" . org-todo)
+   ("C-c ," . org-priority)
+   ;; ("S-UP" . org-priority-up)
+   ;; ("S-DOWN" . org-priority-down)
+   ("C-c C-e" . org-export-dispatch)
+   ;; ("C-c C-e l l" . org-latex-export-to-latex)
+   ;; ("C-c C-e l p" . org-latex-export-to-pdf)
+   ;; ("C-c C-e h h" . org-html-export-to-html)
+   ("C-c C-x f" . org-footnote-action)
+   ;; Jump between definition and reference
+   ("C-c C-c" . org-ctrl-c-ctrl-c))
 
   :custom
   (org-fontify-quote-and-verse-blocks t)
   (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
   (org-hide-leading-stars-before-indent-mode nil)
+  (org-hide-leading-stars t)
   (org-src-preserve-indentation t)
   (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
   (org-src-window-setup 'current-window)
+  (org-startup-indented t)
   (org-startup-truncated nil)
   (org-startup-folded 'showeverything)
   (org-startup-with-inline-images t)
@@ -4377,9 +4399,17 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
 
   (org-agenda-files '("~/Dropbox/TODOs.org"))
+  ;; The vertical bar separates states that need work with states that do not need any work.
   (org-todo-keywords
    '((sequence
-      "TODO(t!)" "NEXT(n!)" "PROG(p!)" "WAIT(w!)" "HOLD(h!)" "|" "DONE(d!)")))
+      "TODO(t!)"
+      "NEXT(n!)"
+      "PROG(p!)"
+      "WAIT(w!)"
+      "HOLD(h!)"
+      "|"
+      "DONE(d!)"
+      "CANCELED(c)")))
   (org-todo-keyword-faces
    '(("TODO" . "IndianRed1")
      ("PROG" . "DeepSkyBlue1")
