@@ -2922,8 +2922,7 @@ The provider is `nerd-icons'."
    '(company-files
      ;; `company-capf' may not return all variable or type definitions, so we
      ;; also use `company-dabbrev-code'. `company-keywords' should not be
-     ;; required ;; with LS support.
-     `company-yasnippet' is blocking.
+     ;; required ;; with LS support. `company-yasnippet' is blocking.
      (company-capf
       :separate
       company-dabbrev-code
@@ -2931,7 +2930,7 @@ The provider is `nerd-icons'."
       :with company-yasnippet)
      ;; If we have `company-dabbrev' first, then other matches from later
      ;; backends `company-ispell' or `company-dict' will be ignored.
-     (company-dict company-ispell) company-dabbrev))
+     (:separate company-dict company-ispell company-dabbrev)))
 
   ;; `company-capf' with Texlab does not pass to later backends even if it does
   ;; not return any result. So it makes it difficult to complete non-LaTeX
@@ -2983,20 +2982,6 @@ The provider is `nerd-icons'."
     (setq-local
      company-backends
      '(company-files
-
-       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'.
-       ;; (:separate company-capf company-dabbrev-code :with company-yasnippet)
-
-       (company-capf :with company-yasnippet)
-       (company-dabbrev-code :with company-yasnippet)
-       company-c-headers
-       (company-dict company-ispell :with company-yasnippet)
-       (company-dabbrev :with company-yasnippet))))
-
-  (defun sb/company-c-mode-new ()
-    (setq-local
-     company-backends
-     '(company-files
        ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'. `company-yasnippet' is blocking.
        (company-capf
         :separate
@@ -3004,14 +2989,14 @@ The provider is `nerd-icons'."
         company-c-headers
         company-keywords
         :with company-yasnippet)
-       (company-dict company-ispell) company-dabbrev)))
+       (:separate company-dict company-ispell company-dabbrev))))
 
   (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
     (add-hook
      hook
      (lambda ()
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-c-mode-new))))
+       (sb/company-c-mode))))
 
   ;; TODO: It may be possible to merge `sb/company-non-lsp-prog-mode' and `sb/company-elisp-mode'.
 
@@ -3026,7 +3011,7 @@ The provider is `nerd-icons'."
         company-dabbrev-code
         company-keywords
         :with company-yasnippet)
-       (company-ispell company-dict) company-dabbrev)))
+       (:separate company-ispell company-dict company-dabbrev))))
 
   (add-hook
    'prog-mode-hook
@@ -3051,7 +3036,7 @@ The provider is `nerd-icons'."
         company-dabbrev-code ; Useful for local (e.g., variable) names
         company-keywords
         :with company-yasnippet)
-       (company-ispell company-dict) company-dabbrev)))
+       (:separate company-ispell company-dict company-dabbrev))))
 
   (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook

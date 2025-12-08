@@ -1170,6 +1170,7 @@
     ("reslient" "resilient" nil :count 0)
     ("resollution" "resolution" nil :count 0)
     ("resorces" "resources" nil :count 0)
+    ("resotre" "restore" nil :count 0)
     ("respomd" "respond" nil :count 0)
     ("respomse" "response" nil :count 0)
     ("responce" "response" nil :count 0)
