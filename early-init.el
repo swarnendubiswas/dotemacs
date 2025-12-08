@@ -136,7 +136,8 @@
  ;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,
  ;; fringes, or scroll bars.
  frame-inhibit-implied-resize t
- ;; frame-resize-pixelwise t
+ ;; Prevents tiling window managers from forcing weird fractional sizing. Otherwise, Emacsclient frames may not be maximized.
+ frame-resize-pixelwise t
  ;; window-resize-pixelwise t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message user-login-name
@@ -237,7 +238,7 @@
       (progn
         (set-face-attribute 'default nil
                             :font "JetBrainsMonoNerdFontMono"
-                            :height 210)
+                            :height 200)
         (set-face-attribute 'mode-line nil :height 150)
         (set-face-attribute 'mode-line-active nil :height 150)
         (set-face-attribute 'mode-line-inactive nil :height 150)))
