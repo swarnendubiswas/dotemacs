@@ -3,7 +3,9 @@
 
 ;; Swarnendu Biswas
 
-;; Commentary: My configuration is mostly targeted toward GNU Linux. I primarily
+;;; Commentary:
+
+;; My configuration is mostly targeted toward GNU Linux. I primarily
 ;; use Company compared to Corfu for completion because it provides for
 ;; fine-grained control. I use Eglot compared to lsp-mode because it feels
 ;; lightweight and I rarely use multiple servers simultaneously.
@@ -528,7 +530,7 @@ The provider is `nerd-icons'."
 
   :custom
   (auto-revert-verbose nil)
-  (auto-revert-remote-files nil) ; Avoid overhead
+  (auto-revert-remote-files t)
 
   ;; Revert `dired' buffers if the current directory contents change. Dired
   ;; buffers do not auto-revert as a result of changes in subdirectories, or in
@@ -3558,7 +3560,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :init (setopt lsp-ltex-plus-version "18.6.1")
 
   :hook
-  ((text-mode markdown-mode org-mode LaTeX-mode)
+  ;; LaTeX-mode is undefined if AUCTeX is not loaded.
+  ((text-mode markdown-mode org-mode TeX-mode LaTeX-mode)
    .
    (lambda ()
      ;; Disable LSP for git commit message buffers which are usually ephemeral
@@ -5918,10 +5921,10 @@ Shows both colors when errors and warnings are present."
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4))
 
-(use-package mason
-  :defer 2
+;; (use-package mason
+;;   :defer 2
 
-  :hook (elpaca-after-init . mason-ensure))
+;;   :hook (elpaca-after-init . mason-ensure))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
