@@ -46,7 +46,7 @@
 ;; Powerline looks clean and nerdy, but doom-modeline is more informative and
 ;; maintained. A plain modeline also suffices and avoids startup overhead in
 ;; `standalone' mode.
-(defcustom sb/modeline-theme 'none
+(defcustom sb/modeline-theme 'doom-modeline
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -743,8 +743,6 @@ The provider is `nerd-icons'."
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 ;; Connect as non-root user and then use sudo: "C-x C-f /ssh:192.168.249.10|su::/some/file"
 (use-package tramp
-  :ensure nil
-
   :custom
   ;; Remote files are not updated outside of Tramp
   (remote-file-name-inhibit-cache nil)
@@ -2779,8 +2777,7 @@ The provider is `nerd-icons'."
      (setq-local company-backends
                  '(company-files
                    (company-org-block :separate company-dabbrev-code)
-                   (company-dict company-ispell)
-                   company-dabbrev)))))
+                   (:separate company-dict company-ispell company-dabbrev))))))
 
 ;; Enables completion of C/C++ header file names
 (use-package company-c-headers
@@ -4384,7 +4381,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
   (org-latex-pdf-process
-   '("latexmk -pdflatex='-shell-escape -interaction nonstopmode -output-directory %o' -pdf -bibtex -f %f"))
+   '("latexmk -pdf -shell-escape -interaction=nonstopmode -output-directory=%o -bibtex -f %f"))
 
   (org-agenda-files '("~/Dropbox/TODOs.org"))
   ;; The vertical bar separates states that need work with states that do not need any work.
@@ -4650,6 +4647,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   (:map
 ;;    TeX-mode-map ("$" . math-delimiters-insert)
 ;;    :map LaTeX-mode-map ("$" . math-delimiters-insert)))
+
+;; TODO: Check these additional packages for useful shortcuts
+;; https://github.com/Malabarba/latex-extra
+;; https://github.com/ultronozm/tex-parens.el
 
 ;; ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 ;; (use-package bibtex-capf
@@ -6251,6 +6252,10 @@ DIR can be relative or absolute."
 ;;   (when (daemonp)
 ;;     (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
 ;;   :diminish)
+
+(use-package tramp-hlo
+  :ensure (:host github :repo "jsadusk/tramp-hlo")
+  :hook (elpaca-after-init . tramp-hlo-setup))
 
 (with-eval-after-load 'transient
   (transient-define-prefix
