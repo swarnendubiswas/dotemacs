@@ -4291,6 +4291,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; https://orgmode.org/manual/Escape-Character.html
 ;; https://orgmode.org/manual/In_002dbuffer-Settings.html
 
+;; https://alexforsale.github.io/posts/org-mode-workflow/
+;; https://github.com/james-stoup/org-mode-better-defaults
+;; https://github.com/james-stoup/emacs-org-mode-tutorial
 (use-package org
   :defer 2
 
@@ -6216,6 +6219,11 @@ DIR can be relative or absolute."
   (define-key key-translation-map (kbd "M-S-;") (kbd "M-:"))
   (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
   (define-key key-translation-map (kbd "M-S-/") (kbd "M-?")))
+
+(define-key input-decode-map "\e[127;6u" (kbd "C-S-<backspace>"))
+(define-key input-decode-map "\e[46;5u" (kbd "C-."))
+(define-key input-decode-map "\e[47;5u" (kbd "C-/"))
+(define-key input-decode-map "\e[61;5u" (kbd "C-="))
 
 ;; (use-package keyfreq
 ;;   :ensure (:host github :repo "dacap/keyfreq")
