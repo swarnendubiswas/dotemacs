@@ -109,7 +109,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -5515,6 +5515,7 @@ Shows both colors when errors and warnings are present."
   ;;                 (eglot-shutdown server))))))))
   ;;   (project-kill-buffers))
 
+  ;; :ensure nil
   ;; FIXME: Try to get MELPA version working
   ;; :ensure (:source (gnu-elpa-mirror))
 
@@ -5771,8 +5772,8 @@ Shows both colors when errors and warnings are present."
       :json-false
       :dialect "American")))
 
-  (when (fboundp 'eglot-semantic-tokens-mode)
-    (eglot-semantic-tokens-mode 1))
+  ;; (when (fboundp 'eglot-semantic-tokens-mode)
+  ;;   (eglot-semantic-tokens-mode 1))
 
   ;; (setq-default completion-category-overrides
   ;;               '((eglot (styles hotfuzz basic substring orderless))
@@ -6223,7 +6224,7 @@ DIR can be relative or absolute."
 (define-key input-decode-map "\e[127;6u" (kbd "C-S-<backspace>"))
 (define-key input-decode-map "\e[46;5u" (kbd "C-."))
 (define-key input-decode-map "\e[47;5u" (kbd "C-/"))
-(define-key input-decode-map "\e[61;5u" (kbd "C-="))
+;; (define-key input-decode-map "\e[61;5u" (kbd "C-="))
 
 ;; (use-package keyfreq
 ;;   :ensure (:host github :repo "dacap/keyfreq")

@@ -214,53 +214,122 @@
 ;; will be ignored when we use TUI Emacs, and the terminal font setting will be
 ;; used.
 
+;; TODO: Review and finalize.
+
+;; (defun sb/frame-font ()
+;;   (pcase (system-name)
+;;     ("inspiron-7572" "IosevkaTerm Nerd Font Mono:size=21")
+;;     ("office"         "IosevkaTerm Nerd Font Mono:size=20")
+;;     (_                "IosevkaTerm Nerd Font Mono:size=20")))
+
+;; (defun sb/apply-font (&optional frame)
+;;   (with-selected-frame (or frame (selected-frame))
+;;     (set-frame-font (sb/frame-font) t t)))
+
+;; ;; Apply immediately for non-daemon Emacs
+;; (sb/apply-font)
+
+;; ;; Apply for every new frame (daemon or emacsclient)
+;; (add-hook 'after-make-frame-functions #'sb/apply-font)
+
+
+;; (when (daemonp)
+;;   (cond
+;;    ((string= (system-name) "inspiron-7572")
+;;     (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-21"))
+;;     (defun sb/init-fonts-daemon (frame)
+;;       (with-selected-frame frame
+;;         (set-frame-font "JetBrainsMonoNerdFontMono-21" t t)))
+;;     (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))
+;;    ((string= (system-name) "office")
+;;     (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
+;;     (defun sb/init-fonts-daemon (frame)
+;;       (with-selected-frame frame
+;;         (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
+;;     (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))))
+
+;; ;; The following page suggests avoiding set-face-attribute for performance
+;; ;; reasons. https://github.com/D4lj337/Emacs-performance
+;; (unless (daemonp)
+;;   (defun sb/init-fonts-graphic ()
+;;     (cond
+;;      ((string= (system-name) "inspiron-7572")
+;;       (progn
+;;         (set-face-attribute 'default nil
+;;                             :font "JetBrainsMonoNerdFontMono"
+;;                             :height 200)
+;;         (set-face-attribute 'mode-line nil :height 150)
+;;         (set-face-attribute 'mode-line-active nil :height 150)
+;;         (set-face-attribute 'mode-line-inactive nil :height 150)))
+
+;;      ((string= (system-name) "dell-7506")
+;;       (progn
+;;         (set-face-attribute 'default nil
+;;                             :font "JetBrainsMonoNerdFontMono"
+;;                             :height 150)
+;;         (set-face-attribute 'mode-line nil :height 120)
+;;         (set-face-attribute 'mode-line-inactive nil :height 120)))
+
+;;      ((string= (system-name) "office")
+;;       (progn
+;;         (set-face-attribute 'default nil
+;;                             :font "JetBrainsMonoNerdFontMono"
+;;                             :height 210)
+;;         (set-face-attribute 'mode-line nil :height 160)
+;;         (set-face-attribute 'mode-line-active nil :height 160)
+;;         (set-face-attribute 'mode-line-inactive nil :height 160)))))
+
+;;   (add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic))
+
+;; Host-specific font configuration
+(defconst sb/font-config
+  '(("inspiron-7572" :font "IosevkaTerm Nerd Font Mono"
+                     :daemon-size 22
+                     :gui-height 220
+                     :mode-line 160)
+    ("dell-7506"     :font "JetBrainsMonoNerdFontMono"
+                     :gui-height 150
+                     :mode-line 120)
+    ("office"        :font "JetBrainsMonoNerdFontMono"
+                     :daemon-size 20
+                     :gui-height 210
+                     :mode-line 160)))
+
+(defun sb/font-config-for-host ()
+  (assoc (system-name) sb/font-config))
+
+;; ---------- Daemon (frames created later) ----------
+
+(defun sb/apply-font-daemon (frame)
+  (when-let* ((cfg (sb/font-config-for-host))
+              (font (plist-get (cdr cfg) :font))
+              (size (plist-get (cdr cfg) :daemon-size)))
+    (with-selected-frame frame
+      (set-frame-font (format "%s-%d" font size) t t))))
+
 (when (daemonp)
-  (cond
-   ((string= (system-name) "inspiron-7572")
-    (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-21"))
-    (defun sb/init-fonts-daemon (frame)
-      (with-selected-frame frame
-        (set-frame-font "JetBrainsMonoNerdFontMono-21" t t)))
-    (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))
-   ((string= (system-name) "office")
-    (add-to-list 'default-frame-alist '(font . "JetBrainsMonoNerdFontMono-20"))
-    (defun sb/init-fonts-daemon (frame)
-      (with-selected-frame frame
-        (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
-    (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))))
+  (when-let* ((cfg (sb/font-config-for-host))
+              (font (plist-get (cdr cfg) :font))
+              (size (plist-get (cdr cfg) :daemon-size)))
+    (add-to-list 'default-frame-alist
+                 `(font . ,(format "%s-%d" font size)))
+    (add-hook 'after-make-frame-functions #'sb/apply-font-daemon)))
 
-;; The following page suggests avoiding set-face-attribute for performance
-;; reasons. https://github.com/D4lj337/Emacs-performance
+;; ---------- Non-daemon (GUI startup) ----------
+
+(defun sb/apply-font-gui ()
+  (when-let* ((cfg (sb/font-config-for-host))
+              (font (plist-get (cdr cfg) :font))
+              (height (plist-get (cdr cfg) :gui-height))
+              (mode-line (plist-get (cdr cfg) :mode-line)))
+    (set-face-attribute 'default nil
+                        :font font
+                        :height height)
+    (dolist (face '(mode-line mode-line-active mode-line-inactive))
+      (set-face-attribute face nil :height mode-line))))
+
 (unless (daemonp)
-  (defun sb/init-fonts-graphic ()
-    (cond
-     ((string= (system-name) "inspiron-7572")
-      (progn
-        (set-face-attribute 'default nil
-                            :font "JetBrainsMonoNerdFontMono"
-                            :height 200)
-        (set-face-attribute 'mode-line nil :height 150)
-        (set-face-attribute 'mode-line-active nil :height 150)
-        (set-face-attribute 'mode-line-inactive nil :height 150)))
-
-     ((string= (system-name) "dell-7506")
-      (progn
-        (set-face-attribute 'default nil
-                            :font "JetBrainsMonoNerdFontMono"
-                            :height 150)
-        (set-face-attribute 'mode-line nil :height 120)
-        (set-face-attribute 'mode-line-inactive nil :height 120)))
-
-     ((string= (system-name) "office")
-      (progn
-        (set-face-attribute 'default nil
-                            :font "JetBrainsMonoNerdFontMono"
-                            :height 210)
-        (set-face-attribute 'mode-line nil :height 160)
-        (set-face-attribute 'mode-line-active nil :height 160)
-        (set-face-attribute 'mode-line-inactive nil :height 160)))))
-
-  (add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic))
+  (add-hook 'elpaca-after-init-hook #'sb/apply-font-gui))
 
 (provide 'early-init)
 
