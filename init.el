@@ -1567,7 +1567,6 @@ The provider is `nerd-icons'."
 
   :custom
   (dogears-message nil)
-  (dogears-idle 0.5)
   (dogears-hooks
    '(imenu-after-jump-hook
      xref-after-jump-hook
@@ -4273,6 +4272,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    (".*/vscode/settings.json\\'" . jsonc-mode)
    (".*/\\.vscode/settings.json\\'" . jsonc-mode)
    ("User/settings\\.json\\'" . jsonc-mode)
+   ("\\.jsonc\\'" . jsonc-mode)
    ("\\.htmlhintrc\\'" . json-mode)
    ("\\.json\\'" . json-ts-mode))
 
