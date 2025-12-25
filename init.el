@@ -3003,7 +3003,12 @@ The provider is `nerd-icons'."
     (setq-local
      company-backends
      '(company-files
-       ;; `company-capf' may not return all variable or type definitions, so we also use  `company-dabbrev-code'. `company-yasnippet' is blocking.
+       ;; `company-capf' may not return all variable or type definitions, so we
+       ;; also use `company-dabbrev-code' which is useful for local (e.g.,
+       ;; variable) names. For example, `company-capf' is not complete for
+       ;; Elisp. It will not suggest `doom-modeline' but suggests
+       ;; `doom-modeline-mode'. So I merge `company-capf' with
+       ;; `company-dabbrev-code'. `company-yasnippet' is blocking.
        (company-capf
         :separate
         company-dabbrev-code
@@ -3014,34 +3019,9 @@ The provider is `nerd-icons'."
   (add-hook
    'prog-mode-hook
    (lambda ()
-     (unless (or (derived-mode-p 'emacs-lisp-mode)
-                 (derived-mode-p 'lisp-data-mode)
-                 (derived-mode-p 'flex-mode)
-                 (derived-mode-p 'bison-mode)
-                 (derived-mode-p 'cmake-ts-mode))
+     (unless (or (derived-mode-p 'flex-mode) (derived-mode-p 'bison-mode))
        (setq-local company-minimum-prefix-length 2)
-       (sb/company-non-lsp-prog-mode))))
-
-  ;; `company-capf' is not complete for Elisp. For example, it will not suggest `doom-modeline' but suggests `doom-modeline-mode'. So I need to merge `company-capf' with `company-dabbrev-code'.
-  (defun sb/company-elisp-mode ()
-    "Add backends for `emacs-lisp-mode' completion in company mode."
-    (setq-local
-     company-backends
-     '(company-files
-       ;; `company-capf' may not return all variable or type definitions, so we also use `company-dabbrev-code'. `company-yasnippet' is blocking.
-       (company-capf
-        :separate
-        company-dabbrev-code ; Useful for local (e.g., variable) names
-        company-keywords
-        :with company-yasnippet)
-       (:separate company-ispell company-dict company-dabbrev))))
-
-  (dolist (hook '(emacs-lisp-mode-hook lisp-data-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (setq-local company-minimum-prefix-length 2)
-       (sb/company-elisp-mode)))))
+       (sb/company-non-lsp-prog-mode)))))
 
 ;; Corfu is not a completion framework, it is a front-end for
 ;; `completion-at-point'.
