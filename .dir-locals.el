@@ -7,41 +7,36 @@
   ((fill-column . 80)
 
    ;; Directories
-   (eval .
-         (dolist (ext
-                  '("eln-cache/"
-                    "tree-sitter/"
-                    "eglot-java-eclipse-jdt-cache/"
-                    "share/"
-                    "auto-save-list/"
-                    "\\.cache/"
-                    "\\.ctags.d/"
-                    "auto/"))
-           (add-to-list 'completion-ignored-extensions ext)))
+   (setq-local completion-ignored-extensions
+               (append
+                completion-ignored-extensions
+                '("eln-cache/"
+                  "tree-sitter/"
+                  "eglot-java-eclipse-jdt-cache/"
+                  "share/"
+                  "auto-save-list/"
+                  "\\.cache/"
+                  "\\.ctags.d/"
+                  "auto/")))
 
    ;; Files
-   (eval .
-         (dolist (ext
-                  '("\\.tags/"
-                    ".pptx"
-                    ".xml"
-                    ".drawio"
-                    ".out"
-                    ".vect"
-                    "GPATH"
-                    ".rel"))
-           (add-to-list 'completion-ignored-extensions ext)))
+   (setq-local completion-ignored-extensions
+               (append
+                completion-ignored-extensions
+                '("\\.tags/"
+                  ".pptx"
+                  ".xml"
+                  ".drawio"
+                  ".out"
+                  ".vect"
+                  "GPATH"
+                  ".rel")))
 
    (compile-command . "cmake -S . -B build; cmake --build build; ")
 
-   (eval .
-         (with-eval-after-load 'lsp-mode
-           (dolist (dir
-                    '("/\\.clangd\\'"
-                      "/\\.git$"
-                      "/\\.cache\\'"
-                      "/\\.ctags.d\\'"))
-             (add-to-list 'lsp-file-watch-ignored-directories dir))))
+   (when (boundp 'lsp-file-watch-ignored-directories)
+     (dolist (dir '("/\\.clangd\\'" "/\\.git$" "/\\.cache\\'" "/\\.ctags.d\\'"))
+       (add-to-list 'lsp-file-watch-ignored-directories dir)))
 
    (eval .
          (add-hook
@@ -366,7 +361,8 @@
       :dependencies
       ["libs/**/*.jar" "libs/*.jar"]
       :output-dir "build")
-     :jdtls (:workspaceFolder "~/java/")))
+     :jdtls (:workspaceFolder "${workspaceFolder}/.jdtls")))
+
    (eval .
          (add-hook
           'lsp-managed-mode-hook
