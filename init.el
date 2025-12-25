@@ -71,8 +71,8 @@
 
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
-      'company
-    'company)
+      'corfu
+    'corfu)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -5538,7 +5538,7 @@ Shows both colors when errors and warnings are present."
   ;; (eglot-autoshutdown t)
 
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
-  (eglot-send-changes-idle-time 3)
+  (eglot-send-changes-idle-time 1)
   (eglot-extend-to-xref t)
   (eglot-ignored-server-capabilities
    '(:codeLensProvider
@@ -5574,11 +5574,8 @@ Shows both colors when errors and warnings are present."
       .
       ("clangd"
        "-j=4"
-       "--compile-commands-dir=./."
        "--all-scopes-completion"
        "--background-index"
-       ;; Unsupported option with Clangd 14
-       "--background-index-priority=low"
        "--clang-tidy"
        "--completion-style=detailed"
        "--fallback-style=LLVM"
@@ -5742,11 +5739,11 @@ Shows both colors when errors and warnings are present."
       :validate t
       :hover t
       :completion t)
-     :vscode-json-language-server (:provideFormatter t)
+     :json (:format (:enable t))
      ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
      :harper-ls
      (:userDictPath
-      (expand-file-name ())
+      "~/.config/harper/user.dict"
       :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
       :fileDictPath ""
       :linters
@@ -5772,8 +5769,12 @@ Shows both colors when errors and warnings are present."
       :json-false
       :dialect "American")))
 
-  ;; (when (fboundp 'eglot-semantic-tokens-mode)
-  ;;   (eglot-semantic-tokens-mode 1))
+  (when (fboundp 'eglot-semantic-tokens-mode)
+    (add-hook
+     'eglot-managed-mode-hook
+     (lambda ()
+       (when (derived-mode-p 'c-mode 'c++-mode)
+         (eglot-semantic-tokens-mode 1)))))
 
   ;; (setq-default completion-category-overrides
   ;;               '((eglot (styles hotfuzz basic substring orderless))
