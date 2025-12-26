@@ -214,7 +214,7 @@
 ;; will be ignored when we use TUI Emacs, and the terminal font setting will be
 ;; used.
 
-;; TODO: Review and finalize.
+;; TODO: Review and finalize the best way to customize font preferences.
 
 ;; (defun sb/frame-font ()
 ;;   (pcase (system-name)
@@ -283,7 +283,7 @@
 
 ;; Host-specific font configuration
 (defconst sb/font-config
-  '(("inspiron-7572" :font "IosevkaTerm Nerd Font Mono"
+  '(("inspiron-7572" :font "Iosevka Nerd Font Mono"
                      :daemon-size 22
                      :gui-height 220
                      :mode-line 160)

@@ -3122,15 +3122,21 @@ The provider is `nerd-icons'."
 
   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
   ;; duplicates and we expect `cape-dict' to mostly suffice.
-  (dolist (mode '(text-mode-hook fundamental-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local completion-at-point-functions
-                   (list
-                    #'cape-file
-                    #'cape-dict
-                    (cape-capf-buster #'cape-dabbrev))))))
+  (add-hook
+   'text-mode-hook
+   (lambda ()
+     (setq-local completion-at-point-functions
+                 (list
+                  #'cape-file #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
+
+  ;; Modifying `fundamental-mode-hook' is not working
+  (defun sb/fundamental-mode-capf ()
+    "Add completion functions for fundamental-mode buffers."
+    (when (eq major-mode 'fundamental-mode)
+      (setq-local completion-at-point-functions
+                  (list
+                   #'cape-file #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
+  (add-hook 'after-change-major-mode-hook #'sb/fundamental-mode-capf)
 
   (dolist (hook '(markdown-mode-hook bibtex-mode-hook))
     (add-hook
