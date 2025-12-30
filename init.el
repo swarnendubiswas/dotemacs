@@ -71,8 +71,8 @@
 
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
-      'corfu
-    'corfu)
+      'company
+    'company)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -2678,14 +2678,6 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'company-capf
     (bind-key "C-c p" #'company-capf))
 
-  ;; (custom-set-faces
-  ;;  ;; '(company-tooltip ((t (:inherit default))))
-  ;;  ;; '(company-tooltip-selection ((t (:inherit default))))
-  ;;  ;; '(company-tooltip-common ((t (:inherit default))))
-  ;;  ;; '(company-tooltip-common-selection ((t (:inherit default))))
-  ;;  ;; '(company-preview ((t (:inherit default))))
-  ;;  '(company-preview-common ((t (:inherit default)))))
-
   :diminish)
 
 ;; Posframes do not have unaligned rendering issues with variable `:height'
@@ -3121,7 +3113,7 @@ The provider is `nerd-icons'."
   ;; https://github.com/minad/cape/discussions/130
 
   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
-  ;; duplicates and we expect `cape-dict' to mostly suffice.
+  ;; duplicates and we expect `cape-dict' to mostly suffice for `text-mode'.
   (add-hook
    'text-mode-hook
    (lambda ()
@@ -4880,7 +4872,23 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package dracula-theme
   :when (eq sb/theme 'dracula)
 
-  :init (load-theme 'dracula t))
+  :init (load-theme 'dracula t)
+
+  :config
+  ;; The default colors are difficult to distinguish
+  (with-eval-after-load 'company
+    (custom-set-faces
+     ;; Normal tooltip
+     '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
+     ;; Selected item
+     '(company-tooltip-selection
+       ((t (:background "#264f78" :foreground "#ffffff"))))
+     ;; Match highlight
+     '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
+     ;; Scrollbar background
+     '(company-scrollbar-bg ((t (:background "#333333"))))
+     ;; Scrollbar foreground
+     '(company-scrollbar-fg ((t (:background "#555555")))))))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
