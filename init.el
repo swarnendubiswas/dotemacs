@@ -4683,6 +4683,20 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
 ;;   :diminish)
 
+(use-package dumb-jump
+  :after xref
+
+  :demand t
+
+  :commands (dumb-jump-go dumb-jump-back)
+
+  :init (add-hook 'xref-backend-functions #'dumb-jump-xref-activate nil t)
+
+  :custom
+  (dumb-jump-quiet t)
+  (dumb-jump-force-searcher 'rg)
+  (dumb-jump-prefer-searcher 'rg))
+
 ;; (use-package citre
 ;;   :preface
 ;;   (defun sb/jump-citre-xref ()
