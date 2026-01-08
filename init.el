@@ -46,12 +46,14 @@
 ;; Powerline looks clean and nerdy, but doom-modeline is more informative and
 ;; maintained. A plain modeline also suffices and avoids startup overhead in
 ;; `standalone' mode.
-(defcustom sb/modeline-theme 'doom-modeline
+(defcustom sb/modeline-theme 'none
   "Specify the mode-line theme to use."
   :type
   '(radio
     (const :tag "powerline" powerline)
     (const :tag "doom-modeline" doom-modeline)
+    (const :tag "awesome-tray" awesome-tray)
+    (const :tag "mini-echo" mini-echo)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -5260,6 +5262,72 @@ Shows both colors when errors and warnings are present."
   (unless (display-graphic-p)
     ;; All other choices can lead to the modeline text overflowing
     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
+
+(use-package awesome-tray
+  :ensure (:host github :repo "manateelazycat/awesome-tray")
+
+  :defer 5
+
+  :when (eq sb/modeline-theme 'awesome-tray)
+
+  :hook (elpaca-after-init . awesome-tray-mode)
+
+  :custom
+  (awesome-tray-active-modules
+   '("file-path"
+     "buffer-name"
+     "mode-name"
+     "location"
+     "buffer-read-only"
+     "flycheck"
+     "git"
+     "word-count"
+     "anzu"
+     "hostname"))
+  (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
+  (awesome-tray-file-path-full-dirname-levels 2)
+  (awesome-tray-evil-show-mode nil)
+  (awesome-tray-meow-show-mode nil)
+  (awesome-tray-mode-line-active-color "lavender")
+
+  ;; :custom-face
+  ;; (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  ;; (awesome-tray-module-awesome-tab-face
+  ;;  ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  ;; (awesome-tray-module-buffer-name-face
+  ;;  ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  ;; (awesome-tray-module-date-face
+  ;;  ((t (:foreground "#717175" :weight bold :height 0.8))))
+  ;; (awesome-tray-module-file-path-face
+  ;;  ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  ;; (awesome-tray-module-git-face
+  ;;  ((t (:foreground "#cc2444" :weight normal :height 0.8))))
+  ;; (awesome-tray-module-last-command-face
+  ;;  ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  ;; (awesome-tray-module-location-face
+  ;;  ((t (:foreground "#cc7700" :weight normal :height 0.8))))
+  ;; (awesome-tray-module-mode-name-face
+  ;;  ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  ;; (awesome-tray-module-parent-dir-face
+  ;;  ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
+  )
+
+(use-package mini-echo
+  :when (eq sb/modeline-theme 'mini-echo)
+
+  :hook (elpaca-after-init . mini-echo-mode)
+
+  :custom
+  (mini-echo-right-padding 4)
+  (mini-echo-persistent-rule
+   '(:long
+     ("remote-host"
+      "flymake"
+      "vcs"
+      "buffer-position"
+      "major-mode"
+      "shrink-path")
+     :short ("buffer-name" "buffer-position" "flymake"))))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
