@@ -73,8 +73,8 @@
 
 (defcustom sb/in-buffer-completion
   (if (display-graphic-p)
-      'company
-    'company)
+      'corfu
+    'corfu)
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -1763,7 +1763,10 @@ The provider is `nerd-icons'."
     (setopt grep-program "rg")
     (grep-apply-setting 'grep-find-command '("rg -n -H --no-heading -e" . 27)))
 
-  (dolist (dirs '(".cache" "node_modules" "vendor" ".clangd"))
+  (dolist (file '("*.iso" "*.xmp" "*.jpg" "*.mp4"))
+    (push file grep-find-ignored-files))
+
+  (dolist (dirs '(".cache" "elpa" "node_modules" "vendor" ".clangd"))
     (add-to-list 'grep-find-ignored-directories dirs)))
 
 ;; `consult-rg' provides live search, while `deadgrep' provides a buffer with
