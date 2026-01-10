@@ -1804,6 +1804,10 @@ The provider is `nerd-icons'."
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
+(use-package consult-ripfd
+  :ensure (:host github :repo "jdtsmith/consult-ripfd")
+  :commands consult-ripfd)
+
 (use-package re-builder
   :ensure nil
 
@@ -3032,8 +3036,13 @@ The provider is `nerd-icons'."
   (corfu
    :files (:defaults "extensions/*")
    :includes
-   (corfu-info
-    corfu-history corfu-echo corfu-popupinfo corfu-indexed corfu-quick))
+   (corfu-auto
+    corfu-info
+    corfu-history
+    corfu-echo
+    corfu-popupinfo
+    corfu-indexed
+    corfu-quick))
 
   :when (eq sb/in-buffer-completion 'corfu)
 
@@ -3177,22 +3186,23 @@ The provider is `nerd-icons'."
       completion-at-point-functions
       (list
        (cape-capf-inside-string #'cape-file)
-       #'yasnippet-capf
-       #'citar-capf
+       (cape-capf-trigger #'yasnippet-capf ?/)
        (cape-capf-super
+        #'citar-capf
         (cape-company-to-capf #'company-reftex-labels)
-        (cape-company-to-capf #'company-auctex-labels))
-       (cape-capf-super
+        ;; (cape-company-to-capf #'company-auctex-labels)
         (cape-company-to-capf #'company-latex-commands)
         (cape-company-to-capf #'company-auctex-environments)
         (cape-company-to-capf #'company-auctex-macros)
         ;; Math Unicode symbols and sub(super)scripts
-        (cape-company-to-capf #'company-auctex-symbols)
+        ;; (cape-company-to-capf #'company-auctex-symbols)
+
+        ;; Math latex tags which are possibly covered by `cape-tex'
+        ;; (cape-company-to-capf #'company-math-symbols-latex)
+        ;; (cape-company-to-capf #'company-math-symbols-unicode)
+
         ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
         #'cape-tex)
-       ;; Math latex tags
-       (cape-company-to-capf #'company-math-symbols-latex)
-       (cape-company-to-capf #'company-math-symbols-unicode)
        #'cape-dict
        (cape-capf-buster #'cape-dabbrev)))))
 
@@ -5612,6 +5622,8 @@ Shows both colors when errors and warnings are present."
               "COMMIT_EDITMSG")
        (eglot-ensure))))
 
+  :bind ("M-'" . eglot-find-implementation)
+
   :custom
   ;; Disabling this helps avoid the race condition between closing a project and shutting down LSP servers.
   ;; (eglot-autoshutdown t)
@@ -6622,33 +6634,33 @@ DIR can be relative or absolute."
     ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
   (bind-key "C-c SPC" #'sb/root-transient))
 
-(when (eq sb/lsp-provider 'lsp-mode)
-  (defun sb/jump-choose-definition ()
-    "Interactive jump menu with iconified options."
-    (interactive)
-    (let* ((options
-            `(("🔍 LSP: go to definition" . lsp-find-definition)
-              ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
-              ("📚 Citre: jump" . citre-jump)
-              ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂 Imenu (consult)" . consult-imenu)))
-           (choice (completing-read "Jump using: " (mapcar #'car options))))
-      (call-interactively (cdr (assoc choice options)))))
-  (bind-key "M-'" #'sb/jump-choose-definition))
+;; (when (eq sb/lsp-provider 'lsp-mode)
+;;   (defun sb/jump-choose-definition ()
+;;     "Interactive jump menu with iconified options."
+;;     (interactive)
+;;     (let* ((options
+;;             `(("🔍 LSP: go to definition" . lsp-find-definition)
+;;               ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
+;;               ("📚 Citre: jump" . citre-jump)
+;;               ("📎 Xref: find definitions" . xref-find-definitions)
+;;               ("🗂  Imenu (consult)" . consult-imenu)))
+;;            (choice (completing-read "Jump using: " (mapcar #'car options))))
+;;       (call-interactively (cdr (assoc choice options)))))
+;;   (bind-key "M-'" #'sb/jump-choose-definition))
 
-(when (eq sb/lsp-provider 'eglot)
-  (defun sb/jump-choose-definition ()
-    "Interactive jump menu with iconified options."
-    (interactive)
-    (let* ((options
-            `(("🔍 Eglot: go to declaration" . eglot-find-declaration)
-              ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
-              ("📚 Citre: jump" . citre-jump)
-              ("📎 Xref: find definitions" . xref-find-definitions)
-              ("🗂 Imenu: " . consult-imenu)))
-           (choice (completing-read "Jump using: " (mapcar #'car options))))
-      (call-interactively (cdr (assoc choice options)))))
-  (bind-key "M-'" #'sb/jump-choose-definition))
+;; (when (eq sb/lsp-provider 'eglot)
+;;   (defun sb/jump-choose-definition ()
+;;     "Interactive jump menu with iconified options."
+;;     (interactive)
+;;     (let* ((options
+;;             `(("🔍 Eglot: go to declaration" . eglot-find-declaration)
+;;               ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
+;;               ("📚 Citre: jump" . citre-jump)
+;;               ("📎 Xref: find definitions" . xref-find-definitions)
+;;               ("🗂  Imenu: " . consult-imenu)))
+;;            (choice (completing-read "Jump using: " (mapcar #'car options))))
+;;       (call-interactively (cdr (assoc choice options)))))
+;;   (bind-key "M-'" #'sb/jump-choose-definition))
 
 (add-hook
  'elpaca-after-init-hook

@@ -290,9 +290,9 @@
     ("dell-7506"     :font "JetBrainsMonoNerdFontMono"
                      :gui-height 150
                      :mode-line 120)
-    ("office"        :font "JetBrainsMonoNerdFontMono"
+    ("office"        :font "Iosevka Nerd Font Mono"
                      :daemon-size 20
-                     :gui-height 210
+                     :gui-height 220
                      :mode-line 160)))
 
 (defun sb/font-config-for-host ()
