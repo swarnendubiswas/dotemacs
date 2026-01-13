@@ -291,7 +291,7 @@
                      :gui-height 150
                      :mode-line 120)
     ("office"        :font "Iosevka Nerd Font Mono"
-                     :daemon-size 20
+                     :daemon-size 21
                      :gui-height 220
                      :mode-line 160)))
 

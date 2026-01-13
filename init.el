@@ -717,10 +717,7 @@ The provider is `nerd-icons'."
 (use-package ediff
   :ensure nil
 
-  :hook
-  ( ;; Offer to clean up files from Ediff sessions.
-   (ediff-cleanup . (lambda () (ediff-janitor t nil)))
-   (ediff-startup . ediff-next-difference))
+  :hook (ediff-startup . ediff-next-difference)
 
   :custom
   ;; Put the control panel in the same frame as the diff windows
@@ -2354,6 +2351,10 @@ The provider is `nerd-icons'."
   ;; `describe-function'.
   (when (boundp 'completions-detailed)
     (setopt completions-detailed t))
+  ;; Emacs 31: partial-completion behaves like substring
+  (when (boundp 'completion-pcm-leading-wildcard)
+    (setopt completion-pcm-leading-wildcard t))
+
   (when (fboundp 'dabbrev-capf)
     (add-to-list 'completion-at-point-functions 'dabbrev-capf t))
 
@@ -2741,11 +2742,11 @@ The provider is `nerd-icons'."
 
   :hook (prog-mode . company-quickhelp-terminal-mode))
 
-;; ;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
-;; (use-package company-statistics
-;;   :when (eq sb/in-buffer-completion 'company)
-;;   :after company
-;;   :init (company-statistics-mode 1))
+;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
+(use-package company-statistics
+  :when (eq sb/in-buffer-completion 'company)
+  :after company
+  :init (company-statistics-mode 1))
 
 ;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
@@ -3074,7 +3075,9 @@ The provider is `nerd-icons'."
   :config
   ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
   (corfu-history-mode 1)
+  ;; Display a brief candidate documentation in the echo area.
   (corfu-echo-mode 1)
+  ;; Display candidate documentation or source in a popup next to the candidate menu
   (corfu-popupinfo-mode 1)
 
   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
@@ -3220,24 +3223,26 @@ The provider is `nerd-icons'."
                     (cape-capf-inside-comment #'cape-dict)
                     (cape-capf-buster #'cape-dabbrev)))))))
 
-;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
-;; Company has `company-statistics'. Prescient uses frecency (frequency +
-;; recency) for sorting. Recently used commands should be sorted first. Only
-;; commands that have never been used before will be sorted by length.
-(use-package prescient
-  :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+;; ;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
+;; ;; Company has `company-statistics'. Prescient uses frecency (frequency +
+;; ;; recency) for sorting. Recently used commands should be sorted first. Only
+;; ;; commands that have never been used before will be sorted by length.
+;; (use-package prescient
+;;   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
 
-  :hook (elpaca-after-init . prescient-persist-mode)
+;;   :hook (elpaca-after-init . prescient-persist-mode)
 
-  :custom (prescient-sort-full-matches-first t)
+;;   :custom (prescient-sort-full-matches-first t)
 
-  :config
-  (with-eval-after-load 'corfu
-    (corfu-prescient-mode 1))
-  (with-eval-after-load 'vertico
-    (vertico-prescient-mode 1))
-  (with-eval-after-load 'company
-    (company-prescient-mode 1)))
+;;   :config
+;;   ;; We are using `corfu-history-mode'.
+;;   ;; (with-eval-after-load 'corfu
+;;   ;;   (corfu-prescient-mode 1))
+
+;;   (with-eval-after-load 'vertico
+;;     (vertico-prescient-mode 1))
+;;   (with-eval-after-load 'company
+;;     (company-prescient-mode 1)))
 
 (defun sb/setup-lsp-provider ()
   "Set up LSP based on `sb/lsp-provider`.
