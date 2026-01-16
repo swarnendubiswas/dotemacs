@@ -46,7 +46,7 @@
 ;; Powerline looks clean and nerdy, but doom-modeline is more informative and
 ;; maintained. A plain modeline also suffices and avoids startup overhead in
 ;; `standalone' mode.
-(defcustom sb/modeline-theme 'none
+(defcustom sb/modeline-theme 'awesome-tray
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -5284,8 +5284,6 @@ Shows both colors when errors and warnings are present."
 (use-package awesome-tray
   :ensure (:host github :repo "manateelazycat/awesome-tray")
 
-  :defer 5
-
   :when (eq sb/modeline-theme 'awesome-tray)
 
   :hook (elpaca-after-init . awesome-tray-mode)
@@ -5297,38 +5295,46 @@ Shows both colors when errors and warnings are present."
      "mode-name"
      "location"
      "buffer-read-only"
-     "flycheck"
      "git"
-     "word-count"
-     "anzu"
      "hostname"))
   (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
   (awesome-tray-file-path-full-dirname-levels 2)
   (awesome-tray-evil-show-mode nil)
   (awesome-tray-meow-show-mode nil)
-  (awesome-tray-mode-line-active-color "lavender")
+  (awesome-tray-location-format "%l:%c")
 
-  ;; :custom-face
-  ;; (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  ;; (awesome-tray-module-awesome-tab-face
-  ;;  ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  ;; (awesome-tray-module-buffer-name-face
-  ;;  ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  ;; (awesome-tray-module-date-face
-  ;;  ((t (:foreground "#717175" :weight bold :height 0.8))))
-  ;; (awesome-tray-module-file-path-face
-  ;;  ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-  ;; (awesome-tray-module-git-face
-  ;;  ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-  ;; (awesome-tray-module-last-command-face
-  ;;  ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  ;; (awesome-tray-module-location-face
-  ;;  ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-  ;; (awesome-tray-module-mode-name-face
-  ;;  ((t (:foreground "#00a400" :weight bold :height 0.8))))
-  ;; (awesome-tray-module-parent-dir-face
-  ;;  ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
-  )
+  :custom-face
+  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
+  (awesome-tray-module-awesome-tab-face
+   ((t (:foreground "#b83059" :weight bold :height 0.8))))
+  (awesome-tray-module-buffer-name-face
+   ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-date-face
+   ((t (:foreground "#717175" :weight bold :height 0.8))))
+  (awesome-tray-module-file-path-face
+   ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
+  (awesome-tray-module-git-face
+   ((t (:foreground "#cc2444" :weight normal :height 0.8))))
+  (awesome-tray-module-last-command-face
+   ((t (:foreground "#0061cc" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face
+   ((t (:foreground "#cc7700" :weight normal :height 0.8))))
+  (awesome-tray-module-mode-name-face
+   ((t (:foreground "#00a400" :weight bold :height 0.8))))
+  (awesome-tray-module-parent-dir-face
+   ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
+  (awesome-tray-module-flymake-error
+   ((t (:foreground "#cc2444" :weight bold :height 0.8))))
+  (awesome-tray-module-flymake-warning
+   ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+  (awesome-tray-module-flymake-note
+   ((t (:foreground "#0061cc" :weight normal :height 0.8))))
+
+  :config
+  (defun sb/disable-mode-line ()
+    (setq-local mode-line-format nil))
+
+  (add-hook 'after-change-major-mode-hook #'sb/disable-mode-line))
 
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
@@ -5336,7 +5342,7 @@ Shows both colors when errors and warnings are present."
   :hook (elpaca-after-init . mini-echo-mode)
 
   :custom
-  (mini-echo-right-padding 4)
+  (mini-echo-right-padding 2)
   (mini-echo-persistent-rule
    '(:long
      ("remote-host"
@@ -5345,7 +5351,7 @@ Shows both colors when errors and warnings are present."
       "buffer-position"
       "major-mode"
       "shrink-path")
-     :short ("buffer-name" "buffer-position" "flymake"))))
+     :short ("shrink-path" "buffer-name" "buffer-position" "flymake"))))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
