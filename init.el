@@ -71,10 +71,7 @@
 ;; edges with terminal Emacs. The completion entries wrap around sometimes, and
 ;; messes up the completion.
 
-(defcustom sb/in-buffer-completion
-  (if (display-graphic-p)
-      'corfu
-    'corfu)
+(defcustom sb/in-buffer-completion 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -5304,31 +5301,27 @@ Shows both colors when errors and warnings are present."
   (awesome-tray-location-format "%l:%c")
 
   :custom-face
-  (awesome-tray-default-face ((t (:inherit default :height 0.8))))
-  (awesome-tray-module-awesome-tab-face
-   ((t (:foreground "#b83059" :weight bold :height 0.8))))
-  (awesome-tray-module-buffer-name-face
-   ((t (:foreground "#cc7700" :weight bold :height 0.8))))
-  (awesome-tray-module-date-face
-   ((t (:foreground "#717175" :weight bold :height 0.8))))
   (awesome-tray-module-file-path-face
-   ((t (:foreground "#5e8e2e" :weight normal :height 0.8))))
-  (awesome-tray-module-git-face
-   ((t (:foreground "#cc2444" :weight normal :height 0.8))))
-  (awesome-tray-module-last-command-face
-   ((t (:foreground "#0061cc" :weight bold :height 0.8))))
-  (awesome-tray-module-location-face
-   ((t (:foreground "#cc7700" :weight normal :height 0.8))))
-  (awesome-tray-module-mode-name-face
-   ((t (:foreground "#00a400" :weight bold :height 0.8))))
+   ((t (:foreground "#6272a4" :weight normal :height 0.8))))
   (awesome-tray-module-parent-dir-face
-   ((t (:foreground "#5e8e2e" :weight bold :height 0.8))))
+   ((t (:foreground "#50fa7b" :weight bold :height 0.8))))
+  (awesome-tray-module-buffer-name-face
+   ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
+  (awesome-tray-module-mode-name-face
+   ((t (:foreground "#ff79c6" :weight bold :height 0.8))))
+  (awesome-tray-module-location-face
+   ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
+  (awesome-tray-module-git-face
+   ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
   (awesome-tray-module-flymake-error
-   ((t (:foreground "#cc2444" :weight bold :height 0.8))))
+   ((t (:foreground "#ff5555" :weight bold :height 0.8))))
   (awesome-tray-module-flymake-warning
-   ((t (:foreground "#cc7700" :weight bold :height 0.8))))
+   ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
   (awesome-tray-module-flymake-note
-   ((t (:foreground "#0061cc" :weight normal :height 0.8))))
+   ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
+  (awesome-tray-module-date-face ((t (:foreground "#6272a4" :height 0.8))))
+  (awesome-tray-module-awesome-tab-face
+   ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
 
   :config
   (defun sb/disable-mode-line ()
