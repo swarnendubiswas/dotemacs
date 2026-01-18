@@ -108,7 +108,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -2642,7 +2642,9 @@ The provider is `nerd-icons'."
   ;; (company-require-match nil)
   ;; (company-insertion-triggers '())
 
-  (company-tooltip-align-annotations t)
+  ;; Setting this to true leads to candidates from `company-dabbrev-code' to be unaligned.
+  ;; (company-tooltip-align-annotations t)
+
   (company-tooltip-width-grow-only t) ; Avoid shrinking the company popup
 
   ;; Allow orderless-like behavior with Company, i.e., search candidates with space-separated regexp
@@ -3489,26 +3491,28 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :diminish)
 
-(use-package lsp-ui
-  :when (eq sb/lsp-provider 'lsp-mode)
+;; I do not use any features from `lsp-ui'.
 
-  :hook (lsp-mode . lsp-ui-mode)
+;; (use-package lsp-ui
+;;   :when (eq sb/lsp-provider 'lsp-mode)
 
-  :custom
-  ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-max-width 72 "150 (default) is too wide")
-  (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
-  (lsp-ui-imenu-auto-refresh 'after-save)
-  (lsp-ui-sideline-enable nil)
-  ;; Enables understanding when to invoke code actions
-  (lsp-ui-sideline-show-code-actions t)
-  (lsp-ui-sideline-show-hover nil)
-  ;; Hide diagnostics when typing because they can be intrusive, Flycheck and
-  ;; Flymake already highlight errors
-  (lsp-ui-sideline-show-diagnostics nil)
-  (lsp-ui-peek-enable nil))
+;;   :hook (lsp-mode . lsp-ui-mode)
+
+;;   :custom
+;;   ;; Disable intrusive on-hover dialogs, invoke with `lsp-ui-doc-show'
+;;   (lsp-ui-doc-enable nil)
+;;   (lsp-ui-doc-include-signature t)
+;;   (lsp-ui-doc-max-width 72 "150 (default) is too wide")
+;;   (lsp-ui-doc-delay 0.75 "0.2 (default) is too naggy")
+;;   (lsp-ui-imenu-auto-refresh 'after-save)
+;;   (lsp-ui-sideline-enable nil)
+;;   ;; Enables understanding when to invoke code actions
+;;   (lsp-ui-sideline-show-code-actions t)
+;;   (lsp-ui-sideline-show-hover nil)
+;;   ;; Hide diagnostics when typing because they can be intrusive, Flycheck and
+;;   ;; Flymake already highlight errors
+;;   (lsp-ui-sideline-show-diagnostics nil)
+;;   (lsp-ui-peek-enable nil))
 
 (use-package consult-lsp
   :after (consult lsp-mode)
@@ -5323,7 +5327,8 @@ Shows both colors when errors and warnings are present."
   (awesome-tray-module-awesome-tab-face
    ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
 
-  :config
+  :config (global-hide-mode-line-mode)
+
   (defun sb/disable-mode-line ()
     (setq-local mode-line-format nil))
 
