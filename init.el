@@ -46,7 +46,7 @@
 ;; Powerline looks clean and nerdy, but doom-modeline is more informative and
 ;; maintained. A plain modeline also suffices and avoids startup overhead in
 ;; `standalone' mode.
-(defcustom sb/modeline-theme 'awesome-tray
+(defcustom sb/modeline-theme 'mini-echo
   "Specify the mode-line theme to use."
   :type
   '(radio
@@ -2230,20 +2230,7 @@ The provider is `nerd-icons'."
 
 ;; Provides indentation guide bars with optional `tree-sitter' support
 (use-package indent-bars
-  :hook
-  ((bash-ts-mode
-    c-mode
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    java-mode
-    java-ts-mode
-    python-mode
-    python-ts-mode
-    yaml-mode
-    yaml-ts-mode
-    sh-mode)
-   . indent-bars-mode)
+  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
 
   :custom
   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
@@ -3295,10 +3282,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-enable-file-watchers nil "Avoid watcher warnings and slowdown")
   (lsp-lens-enable nil "Lenses are distracting")
+
   ;; Disable highlighting references of the symbol at point. I use
   ;; `symbol-overlay' to include languages that do not have a language server.
   (lsp-enable-symbol-highlighting nil)
-  (lsp-semantic-tokens-enable nil)
+
+  (lsp-semantic-tokens-enable t)
   ;; I do not use mouse with TUI, so showing code actions is not useful.
   (lsp-modeline-code-actions-enable nil)
   ;; We already show Flycheck status on the modeline
@@ -3318,7 +3307,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (lsp-completion-show-detail nil)
   ;; Show/hide completion kind, e.g., interface/class.
   (lsp-completion-show-kind t)
-  (lsp-completion-default-behaviour :insert)
+
+  ;; (lsp-completion-default-behaviour :insert)
 
   (lsp-imenu-sort-methods '(position) "More natural way of listing symbols")
   (lsp-eldoc-enable-hover nil "Do not show noisy hover info with mouse")
