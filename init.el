@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'dracula
-    'dracula)
+      'modus-vivendi
+    'modus-vivendi)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -5334,12 +5334,58 @@ Shows both colors when errors and warnings are present."
   (mini-echo-persistent-rule
    '(:long
      ("remote-host"
-      "flymake"
+      "flycheck"
+      "lsp-mode"
       "vcs"
       "buffer-position"
       "major-mode"
       "shrink-path")
-     :short ("shrink-path" "buffer-name" "buffer-position" "flymake"))))
+     :short ("shrink-path" "buffer-position" "flycheck")))
+  (mini-echo-temporary-rule
+   '(:both ("selection-info" "narrow" "repeat" "text-scale")))
+
+  :custom-face
+  (mini-echo-major-mode ((t (:height 0.8))))
+  (mini-echo-buffer-position ((t (:foreground "magenta" :height 0.8))))
+  (mini-echo-buffer-size ((t (:height 0.8))))
+  (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
+  (mini-echo-lsp ((t (:height 0.8))))
+  (mini-echo-remote-host ((t (:height 0.8))))
+  (mini-echo-buffer-name ((t (:height 0.8))))
+  (vc-state-base ((t (:foreground "yellow" :height 0.8))))
+
+  :config (require 'nerd-icons)
+
+  (mini-echo-define-segment
+   "vcs" "Show VCS info with icon."
+   :fetch
+   (when (and (bound-and-true-p vc-mode) buffer-file-name)
+     (let* ((branch (substring-no-properties vc-mode 5))
+            (branch (propertize branch 'face '(:height 0.9)))
+            (icon
+             (when (fboundp 'nerd-icons-octicon)
+               (nerd-icons-octicon
+                "nf-oct-git_branch"
+                :face 'mini-echo-yellow
+                :height 0.9))))
+       (concat
+        (when icon
+          (concat icon ""))
+        branch))))
+
+  (mini-echo-define-segment
+   "lsp-mode" "Show LSP status with icon."
+   :fetch
+   (when (and (bound-and-true-p lsp-mode) (lsp-workspaces))
+     (let* ((icon
+             (when (fboundp 'nerd-icons-mdicon)
+               (nerd-icons-mdicon
+                "nf-md-rocket_launch"
+                :face 'mini-echo-green
+                :height 0.9))))
+       (concat
+        (when icon
+          (concat icon "")))))))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -5642,6 +5688,7 @@ Shows both colors when errors and warnings are present."
   (eglot-report-progress nil)
   ;; Do not clutter the modeline
   (eglot-mode-line-format nil)
+  (eglot-confirm-server-edits '((eglot-rename . nil) (t . diff)))
 
   :config
   ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
