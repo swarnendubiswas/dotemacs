@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'modus-vivendi
-    'modus-vivendi)
+      'dracula
+    'dracula)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -5330,6 +5330,7 @@ Shows both colors when errors and warnings are present."
   :hook (elpaca-after-init . mini-echo-mode)
 
   :custom
+  (mini-echo-buffer-status-style 'both)
   (mini-echo-right-padding 2)
   (mini-echo-persistent-rule
    '(:long
@@ -5340,7 +5341,7 @@ Shows both colors when errors and warnings are present."
       "buffer-position"
       "major-mode"
       "shrink-path")
-     :short ("shrink-path" "buffer-position" "flycheck")))
+     :short ("remote-host" "flycheck" "vcs" "buffer-position" "shrink-path")))
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale")))
 
@@ -5357,6 +5358,56 @@ Shows both colors when errors and warnings are present."
   :config (require 'nerd-icons)
 
   (mini-echo-define-segment
+   "shrink-path"
+   "Return shrink path of current buffer in project or parent dir."
+   :update-advice '((vc-refresh-state . :after))
+   :fetch
+   (concat
+    (mini-echo-buffer-read-only)
+
+    (propertize (let* ((filepath (buffer-file-name))
+                       (project
+                        (or mini-echo--project-root
+                            (mini-echo-update-project-root)))
+                       (dir
+                        (thread-last
+                         default-directory
+                         (or (and (not (string-empty-p project)) project))
+                         (directory-file-name)
+                         (file-name-nondirectory))))
+                  (cond
+                   ((not filepath)
+                    "")
+                   ((string-empty-p project)
+                    (propertize (concat dir "/") 'face 'shadow))
+                   ((string-prefix-p project filepath)
+                    (concat
+                     (propertize dir 'face 'mini-echo-project) "/"
+                     (when-let* ((p
+                                  (butlast
+                                   (split-string (string-remove-prefix
+                                                  project filepath)
+                                                 "/" t))))
+                       (concat
+                        (propertize (mapconcat (lambda (s) (substring s 0 1)) p
+                                               "/")
+                                    'face 'shadow)
+                        "/"))))
+                   (t
+                    "")))
+                'face
+                '(:inherit
+                  mini-echo-shrink-path
+                  :foreground "orange"
+                  :height 0.8))
+
+    (propertize (mini-echo-buffer-name-with-status)
+                'face
+                '(:foreground "white")))
+
+   :update (mini-echo-update-project-root))
+
+  (mini-echo-define-segment
    "vcs" "Show VCS info with icon."
    :fetch
    (when (and (bound-and-true-p vc-mode) buffer-file-name)
@@ -5367,7 +5418,7 @@ Shows both colors when errors and warnings are present."
                (nerd-icons-octicon
                 "nf-oct-git_branch"
                 :face 'mini-echo-yellow
-                :height 0.9))))
+                :height 0.8))))
        (concat
         (when icon
           (concat icon ""))
@@ -5382,7 +5433,7 @@ Shows both colors when errors and warnings are present."
                (nerd-icons-mdicon
                 "nf-md-rocket_launch"
                 :face 'mini-echo-green
-                :height 0.9))))
+                :height 0.8))))
        (concat
         (when icon
           (concat icon "")))))))
