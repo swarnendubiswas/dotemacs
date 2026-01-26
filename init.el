@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'dracula
-    'dracula)
+      'modus-vivendi
+    'modus-vivendi)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -1697,9 +1697,23 @@ The provider is `nerd-icons'."
 
   :diminish)
 
-;; Parsing parentheses for `LaTeX-mode' is difficult.
+;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook
+  ((c-mode
+    c-ts-mode
+    c++-mode
+    c++-ts-mode
+    emacs-lisp-mode
+    java-mode
+    java-ts-mode
+    json-mode
+    json-ts-mode
+    jsonc-mode
+    lisp-data-mode
+    python-mode
+    python-ts-mode)
+   . rainbow-delimiters-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -3780,24 +3794,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;             (conf-toml-mode . toml-ts-mode)
 ;;             (yaml-mode . yaml-ts-mode))))
 
-(use-package treesit-auto
-  :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
+;; I am not very convinced with the usefulness of Treesitter for major modes where LSPs are available.
 
-  :demand t
+;; (use-package treesit-auto
+;;   :when
+;;   (and (executable-find "tree-sitter")
+;;        (fboundp 'treesit-available-p)
+;;        (treesit-available-p))
 
-  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+;;   :demand t
 
-  :custom
-  ;; Increased default font locking may hurt performance
-  (treesit-font-lock-level 4)
-  (treesit-auto-install t)
+;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
 
-  :config
-  (global-treesit-auto-mode 1)
-  (treesit-auto-add-to-auto-mode-alist 'all))
+;;   :custom
+;;   ;; Increased default font locking may hurt performance
+;;   (treesit-font-lock-level 4)
+;;   (treesit-auto-install t)
+
+;;   :config
+;;   (global-treesit-auto-mode 1)
+;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
