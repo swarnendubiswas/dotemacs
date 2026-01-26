@@ -1409,11 +1409,13 @@ The provider is `nerd-icons'."
   (ispell-silently-savep t)
 
   :config
+  (when (boundp 'ispell-save-corrections-as-abbrevs)
+    (setq ispell-save-corrections-as-abbrevs t))
+
   ;; Prefer hunspell over aspell on Linux platforms
   (cond
    ((executable-find "hunspell")
     (progn
-      ;; (setenv "LANG" "en_US")
       (setenv "DICTIONARY" "en_US")
       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
       (setopt
@@ -2350,6 +2352,14 @@ The provider is `nerd-icons'."
   ;; Do not open the *Messages* buffer when clicking in the Echo area.
   (unbind-key [mouse-1] minibuffer-inactive-mode-map))
 
+;; https://www.reddit.com/r/emacs/comments/1qlngj1/completionatpoint_overwrites_following_text/
+
+;; Insert completion without overwriting text right of cursor
+(define-advice completion--capf-wrapper (:around (orig-fun fun which) nil -1)
+  (save-restriction
+    (narrow-to-region (point-min) (point))
+    (funcall orig-fun fun which)))
+
 ;; ;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
 ;; (use-package hotfuzz
 ;;   :demand t
@@ -2681,33 +2691,34 @@ The provider is `nerd-icons'."
 ;; popup frame is may not be sufficient sometimes, and the right side may get
 ;; cut off.
 ;; https://github.com/company-mode/company-mode/issues/1010
-(use-package company-posframe
-  :when (display-graphic-p)
 
-  :hook (company-mode . company-posframe-mode)
+;; (use-package company-posframe
+;;   :when (display-graphic-p)
 
-  :custom
-  ;; Difficult to distinguish the help text from completions
-  (company-posframe-show-metadata nil)
-  ;; The backend display in the posframe modeline gets cut for complicated backend setups and looks ugly.
-  (company-posframe-show-indicator nil)
-  (company-posframe-quickhelp-delay nil "Disable showing the help frame")
+;;   :hook (company-mode . company-posframe-mode)
 
-  :config
-  (when (eq sb/theme 'leuven-dark)
-    (set-face-attribute 'company-posframe-active-backend-name nil
-                        :height 0.8
-                        :foreground "#4FC3F7" ;; light sky blue
-                        :background "#2E3440" ;; dark gray-blue
-                        :weight 'normal
-                        :box nil)
-    (set-face-attribute 'company-posframe-inactive-backend-name nil
-                        :height 0.7
-                        :foreground "#B0BEC5" ;; soft gray
-                        :background "#1C1C1C" ;; near black
-                        :box nil))
+;;   :custom
+;;   ;; Difficult to distinguish the help text from completions
+;;   (company-posframe-show-metadata nil)
+;;   ;; The backend display in the posframe modeline gets cut for complicated backend setups and looks ugly.
+;;   (company-posframe-show-indicator nil)
+;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
 
-  :diminish)
+;;   :config
+;;   (when (eq sb/theme 'leuven-dark)
+;;     (set-face-attribute 'company-posframe-active-backend-name nil
+;;                         :height 0.8
+;;                         :foreground "#4FC3F7" ;; light sky blue
+;;                         :background "#2E3440" ;; dark gray-blue
+;;                         :weight 'normal
+;;                         :box nil)
+;;     (set-face-attribute 'company-posframe-inactive-backend-name nil
+;;                         :height 0.7
+;;                         :foreground "#B0BEC5" ;; soft gray
+;;                         :background "#1C1C1C" ;; near black
+;;                         :box nil))
+
+;;   :diminish)
 
 ;; Show documentation popups
 (use-package company-quickhelp
@@ -2931,16 +2942,17 @@ The provider is `nerd-icons'."
      '(company-files ; Have files first to allow completing paths
        (:separate
         company-capf
-        company-reftex-citations ; will trigger inside \cite{}
+        ;; company-reftex-citations ; will trigger inside \cite{}
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-        company-reftex-labels
+        ;; company-reftex-labels
         ;; LaTeX structure
-        company-auctex-labels company-auctex-macros company-auctex-environments
+        ;; company-auctex-labels company-auctex-macros company-auctex-environments
         company-latex-commands ; `company-auctex-macros' seem to be better
-        company-auctex-symbols
-        company-math-symbols-latex ; Math latex tags
+        ;; company-auctex-symbols
+        ;; company-math-symbols-latex ; Math latex tags
         ;; Math Unicode symbols and sub (super) scripts
-        company-math-symbols-unicode company-dict company-ispell company-dabbrev
+        ;; company-math-symbols-unicode
+        company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
   (add-hook
@@ -4452,26 +4464,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; ;; frequent hangs while communicating with Emacs. Furthermore, this package
 ;; ;; is not required for completions with `company-mode'.
 
-;; (use-package lsp-latex
-;;   :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
-;;   :hook
-;;   ((LaTeX-mode bibtex-mode)
-;;    .
-;;    (lambda ()
-;;      (require 'lsp-latex)
-;;      (lsp-deferred)))
-;;   :custom
-;;   (lsp-latex-bibtex-formatter "latexindent")
-;;   (lsp-latex-latex-formatter "latexindent")
-;;   (lsp-latex-bibtex-formatter-line-length fill-column)
-;;   (lsp-latex-diagnostics-delay 2000)
-;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
-;;   ;; in the PDF.
-;;   (lsp-latex-forward-search-executable "okular")
-;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-;;   :config
-;;   (with-eval-after-load 'latex
-;;     (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
+(use-package lsp-latex
+  :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
+  :hook
+  ((LaTeX-mode bibtex-mode)
+   .
+   (lambda ()
+     (require 'lsp-latex)
+     (lsp-deferred)))
+  :custom
+  (lsp-latex-bibtex-formatter "latexindent")
+  (lsp-latex-latex-formatter "latexindent")
+  (lsp-latex-bibtex-formatter-line-length fill-column)
+  (lsp-latex-diagnostics-delay 2000)
+  ;; Support forward search with Okular. Perform inverse search with Shift+Click
+  ;; in the PDF.
+  (lsp-latex-forward-search-executable "okular")
+  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+  :config
+  (with-eval-after-load 'latex
+    (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
@@ -4859,8 +4871,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package rose-pine-theme
   :ensure (:host github :repo "konrad1977/pinerose-emacs")
 
-  :after autothemer
-
   :when (eq sb/theme 'rose-pine)
 
   :init (load-theme 'rose-pine t))
@@ -4913,7 +4923,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; Scrollbar background
      '(company-scrollbar-bg ((t (:background "#333333"))))
      ;; Scrollbar foreground
-     '(company-scrollbar-fg ((t (:background "#555555")))))))
+     '(company-scrollbar-fg ((t (:background "#555555"))))))
+
+  (with-eval-after-load 'compile
+    (dolist (face '(compilation-info compilation-warning compilation-error))
+      (set-face-attribute face nil :background 'unspecified))))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
@@ -5403,7 +5417,7 @@ Shows both colors when errors and warnings are present."
 
     (propertize (mini-echo-buffer-name-with-status)
                 'face
-                '(:foreground "white")))
+                '(:foreground "white" :height 0.9)))
 
    :update (mini-echo-update-project-root))
 
@@ -5789,7 +5803,8 @@ Shows both colors when errors and warnings are present."
      ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
      ((cmake-mode cmake-ts-mode)
       .
-      ,(eglot-alternatives '(("neocmakelsp" "stdio") "cmake-language-server")))
+      ,(eglot-alternatives
+        '(("neocmakelsp" "--stdio") "cmake-language-server")))
      ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
      ;; Download the source from
      ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
