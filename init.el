@@ -71,7 +71,7 @@
 ;; edges with terminal Emacs. The completion entries wrap around sometimes, and
 ;; messes up the completion.
 
-(defcustom sb/in-buffer-completion 'company
+(defcustom sb/completion-provider 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -2421,8 +2421,7 @@ The provider is `nerd-icons'."
 (use-package kind-icon
   :when
   (and (bound-and-true-p sb/enable-icons)
-       (or (eq sb/in-buffer-completion 'company)
-           (eq sb/corfu-icons 'kind-icon)))
+       (or (eq sb/completion-provider 'company) (eq sb/corfu-icons 'kind-icon)))
 
   :after nerd-icons
 
@@ -2457,7 +2456,7 @@ The provider is `nerd-icons'."
 
   ;; Company may be loaded even with Corfu for use with LaTeX. That is why we do
   ;; not use `with-eval-after-load'.
-  (when (eq sb/in-buffer-completion 'company)
+  (when (eq sb/completion-provider 'company)
     ;; Prefer smaller icons and a more compact popup
     (setopt
      kind-icon-default-style
@@ -2576,7 +2575,7 @@ The provider is `nerd-icons'."
 ;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
 (use-package company
-  :when (eq sb/in-buffer-completion 'company)
+  :when (eq sb/completion-provider 'company)
 
   :hook (elpaca-after-init . global-company-mode)
 
@@ -2736,7 +2735,7 @@ The provider is `nerd-icons'."
 
 ;; Show documentation popups
 (use-package company-quickhelp
-  :when (eq sb/in-buffer-completion 'company)
+  :when (eq sb/completion-provider 'company)
 
   :after company
 
@@ -2745,7 +2744,7 @@ The provider is `nerd-icons'."
   :hook (prog-mode . company-quickhelp-mode))
 
 (use-package company-quickhelp-terminal
-  :when (eq sb/in-buffer-completion 'company)
+  :when (eq sb/completion-provider 'company)
 
   :after company-quickhelp
 
@@ -2755,7 +2754,7 @@ The provider is `nerd-icons'."
 
 ;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
 (use-package company-statistics
-  :when (eq sb/in-buffer-completion 'company)
+  :when (eq sb/completion-provider 'company)
   :after company
   :init (company-statistics-mode 1))
 
@@ -2961,7 +2960,7 @@ The provider is `nerd-icons'."
         ;; company-reftex-labels
         ;; LaTeX structure
         ;; company-auctex-labels company-auctex-macros company-auctex-environments
-        company-latex-commands ; `company-auctex-macros' seem to be better
+        ;; company-latex-commands ; `company-auctex-macros' seem to be better
         ;; company-auctex-symbols
         ;; company-math-symbols-latex ; Math latex tags
         ;; Math Unicode symbols and sub (super) scripts
@@ -3057,7 +3056,7 @@ The provider is `nerd-icons'."
     corfu-indexed
     corfu-quick))
 
-  :when (eq sb/in-buffer-completion 'corfu)
+  :when (eq sb/completion-provider 'corfu)
 
   :hook
   ((elpaca-after-init . global-corfu-mode)
@@ -3086,7 +3085,11 @@ The provider is `nerd-icons'."
 
   :config
   ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
-  (corfu-history-mode 1)
+  (corfu-indexed-mode 1)
+
+  ;; I am using `corfu-prescient-mode'.
+  ;; (corfu-history-mode 1)
+
   ;; Display a brief candidate documentation in the echo area.
   (corfu-echo-mode 1)
   ;; Display candidate documentation or source in a popup next to the candidate menu
@@ -3101,7 +3104,7 @@ The provider is `nerd-icons'."
   :ensure (:host codeberg :repo "akib/emacs-corfu-terminal")
 
   :when
-  (and (eq sb/in-buffer-completion 'corfu)
+  (and (eq sb/completion-provider 'corfu)
        (not (display-graphic-p))
        (< emacs-major-version 31))
 
@@ -3114,7 +3117,7 @@ The provider is `nerd-icons'."
 (use-package yasnippet-capf
   :ensure (:host github :repo "elken/yasnippet-capf")
 
-  :when (eq sb/in-buffer-completion 'corfu)
+  :when (eq sb/completion-provider 'corfu)
 
   :after yasnippet
 
@@ -3235,26 +3238,25 @@ The provider is `nerd-icons'."
                     (cape-capf-inside-comment #'cape-dict)
                     (cape-capf-buster #'cape-dabbrev)))))))
 
-;; ;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
-;; ;; Company has `company-statistics'. Prescient uses frecency (frequency +
-;; ;; recency) for sorting. Recently used commands should be sorted first. Only
-;; ;; commands that have never been used before will be sorted by length.
-;; (use-package prescient
-;;   :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
+;; Company has `company-statistics'. Prescient uses frecency (frequency +
+;; recency) for sorting. Recently used commands should be sorted first. Only
+;; commands that have never been used before will be sorted by length.
+(use-package prescient
+  :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
 
-;;   :hook (elpaca-after-init . prescient-persist-mode)
+  :hook (elpaca-after-init . prescient-persist-mode)
 
-;;   :custom (prescient-sort-full-matches-first t)
+  :custom (prescient-sort-full-matches-first t)
 
-;;   :config
-;;   ;; We are using `corfu-history-mode'.
-;;   ;; (with-eval-after-load 'corfu
-;;   ;;   (corfu-prescient-mode 1))
-
-;;   (with-eval-after-load 'vertico
-;;     (vertico-prescient-mode 1))
-;;   (with-eval-after-load 'company
-;;     (company-prescient-mode 1)))
+  :config
+  ;; We are using `corfu-history-mode'.
+  (with-eval-after-load 'corfu
+    (corfu-prescient-mode 1))
+  (with-eval-after-load 'vertico
+    (vertico-prescient-mode 1))
+  (with-eval-after-load 'company
+    (company-prescient-mode 1)))
 
 (defun sb/setup-lsp-provider ()
   "Set up LSP based on `sb/lsp-provider`.
@@ -4675,12 +4677,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
 ;; (use-package bibtex-capf
 ;;   :ensure (:host github :repo "mclear-tools/bibtex-capf")
-;;   :when (eq sb/in-buffer-completion 'corfu)
+;;   :when (eq sb/completion-provider 'corfu)
 ;;   :after latex
 ;;   :commands bibtex-capf)
 
 (use-package citar
-  :when (eq sb/in-buffer-completion 'corfu)
+  :when (eq sb/completion-provider 'corfu)
 
   :after (tex cape)
 
@@ -4950,7 +4952,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :when
   (and (bound-and-true-p sb/enable-icons)
-       (eq sb/in-buffer-completion 'corfu)
+       (eq sb/completion-provider 'corfu)
        (eq sb/corfu-icons 'nerd-icons))
 
   :after corfu
@@ -6711,7 +6713,7 @@ DIR can be relative or absolute."
     (bind-key "C-c c" #'sb/citre-transient))
 
   ;; We want Cape functions to be autoloaded if not already.
-  (when (eq sb/in-buffer-completion 'corfu)
+  (when (eq sb/completion-provider 'corfu)
     (transient-define-prefix
      sb/corfu-transient () "Corfu commands"
      [["Capf"
