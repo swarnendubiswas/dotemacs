@@ -3205,22 +3205,22 @@ The provider is `nerd-icons'."
       (list
        (cape-capf-inside-string #'cape-file)
        (cape-capf-trigger #'yasnippet-capf ?/)
-       (cape-capf-super
-        #'citar-capf
-        (cape-company-to-capf #'company-reftex-labels)
-        ;; (cape-company-to-capf #'company-auctex-labels)
-        (cape-company-to-capf #'company-latex-commands)
-        (cape-company-to-capf #'company-auctex-environments)
-        (cape-company-to-capf #'company-auctex-macros)
-        ;; Math Unicode symbols and sub(super)scripts
-        ;; (cape-company-to-capf #'company-auctex-symbols)
+       ;; (cape-capf-super
+       ;;  #'citar-capf
+       ;;  (cape-company-to-capf #'company-reftex-labels)
+       ;;  ;; (cape-company-to-capf #'company-auctex-labels)
+       ;;  (cape-company-to-capf #'company-latex-commands)
+       ;;  (cape-company-to-capf #'company-auctex-environments)
+       ;;  (cape-company-to-capf #'company-auctex-macros)
+       ;;  ;; Math Unicode symbols and sub(super)scripts
+       ;;  ;; (cape-company-to-capf #'company-auctex-symbols)
 
-        ;; Math latex tags which are possibly covered by `cape-tex'
-        ;; (cape-company-to-capf #'company-math-symbols-latex)
-        ;; (cape-company-to-capf #'company-math-symbols-unicode)
+       ;;  ;; Math latex tags which are possibly covered by `cape-tex'
+       ;;  ;; (cape-company-to-capf #'company-math-symbols-latex)
+       ;;  ;; (cape-company-to-capf #'company-math-symbols-unicode)
 
-        ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-        #'cape-tex)
+       ;;  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+       ;;  #'cape-tex)
        #'cape-dict
        (cape-capf-buster #'cape-dabbrev)))))
 
