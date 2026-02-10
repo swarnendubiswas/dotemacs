@@ -214,6 +214,8 @@
 ;; will be ignored when we use TUI Emacs, and the terminal font setting will be
 ;; used.
 
+;; I prefer JetBrainsMono and Iosevka. Iosevka is slightly narrower, and so can fit more characters on a line.
+
 ;; TODO: Review and finalize the best way to customize font preferences.
 
 ;; (defun sb/frame-font ()

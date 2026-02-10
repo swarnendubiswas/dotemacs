@@ -3205,6 +3205,7 @@ The provider is `nerd-icons'."
       (list
        (cape-capf-inside-string #'cape-file)
        (cape-capf-trigger #'yasnippet-capf ?/)
+
        ;; (cape-capf-super
        ;;  #'citar-capf
        ;;  (cape-company-to-capf #'company-reftex-labels)
@@ -3221,6 +3222,7 @@ The provider is `nerd-icons'."
 
        ;;  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
        ;;  #'cape-tex)
+
        #'cape-dict
        (cape-capf-buster #'cape-dabbrev)))))
 
@@ -5427,11 +5429,7 @@ Shows both colors when errors and warnings are present."
                         "/"))))
                    (t
                     "")))
-                'face
-                '(:inherit
-                  mini-echo-shrink-path
-                  :foreground "orange"
-                  :height 0.8))
+                'face '(:foreground "orange" :height 0.8))
 
     (propertize (mini-echo-buffer-name-with-status)
                 'face
@@ -5453,7 +5451,7 @@ Shows both colors when errors and warnings are present."
                 :height 0.8))))
        (concat
         (when icon
-          (concat icon ""))
+          (concat icon " "))
         branch))))
 
   (mini-echo-define-segment
@@ -5468,7 +5466,29 @@ Shows both colors when errors and warnings are present."
                 :height 0.8))))
        (concat
         (when icon
-          (concat icon "")))))))
+          (concat " " icon))))))
+
+  (mini-echo-define-segment
+   "flycheck" "Color-coded vanilla Flycheck status."
+   :update-advice '((flycheck-after-lint . :after))
+   :fetch
+   (when (and (bound-and-true-p flycheck-mode)
+              (fboundp 'flycheck-mode-line-status-text))
+     (let* ((status (substring-no-properties (flycheck-mode-line-status-text)))
+            (counts
+             (and (boundp 'flycheck-current-errors)
+                  (flycheck-count-errors flycheck-current-errors)))
+            (face-color
+             (cond
+              ((assq 'error counts)
+               "red")
+              ((assq 'warning counts)
+               "yellow")
+              ((assq 'info counts)
+               "cyan")
+              (t
+               "green"))))
+       (propertize status 'face `(:foreground ,face-color :height 0.8))))))
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -6652,9 +6672,9 @@ DIR can be relative or absolute."
      ("b" "Backward sexp" backward-sexp)
      ("f" "Forward sexp" forward-sexp)
      ("k" "Kill sexp" kill-sexp)]
-    ["Functions"
-     ("a" "Begin" treesit-beginning-of-defun)
-     ("e" "End" treesit-end-of-defun)]
+    ;; ["Functions"
+    ;;  ("a" "Begin" treesit-beginning-of-defun)
+    ;;  ("e" "End" treesit-end-of-defun)]
     ;; ["Expressions"
     ;;  ;; ("u" "Up list" treesit-up-list)
     ;;  ;; ("d" "Down list" treesit-down-list)
