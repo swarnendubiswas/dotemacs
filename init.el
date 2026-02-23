@@ -3601,22 +3601,22 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       "WANT"
       "EN_DIACRITICS_REPLACE"])))
 
-;; (use-package lsp-harper
-;;   :ensure (:host github :repo "ju6ge/lsp-harper.el")
+(use-package lsp-harper
+  :ensure (:host github :repo "ju6ge/lsp-harper.el")
 
-;;   :when (eq sb/lsp-provider 'lsp-mode)
+  :when (eq sb/lsp-provider 'lsp-mode)
 
-;;   :after lsp-mode
+  :after lsp-mode
 
-;;   :hook
-;;   ((text-mode markdown-mode org-mode LaTeX-mode)
-;;    .
+  :hook
+  ((text-mode markdown-mode org-mode LaTeX-mode)
+   .
 
-;;    (lambda ()
-;;      (require 'lsp-harper)
-;;      (lsp-deferred)))
+   (lambda ()
+     (require 'lsp-harper)
+     (lsp-deferred)))
 
-;;   :custom (lsp-harper-active-modes '(text-mode markdown-mode org-mode LaTeX-mode)))
+  :custom (lsp-harper-active-modes '(text-mode markdown-mode org-mode LaTeX-mode)))
 
 ;; Use a per-project "pyrightconfig.json" file for configuring the language
 ;; server.

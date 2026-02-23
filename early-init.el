@@ -287,7 +287,7 @@
 (defconst sb/font-config
   '(("inspiron-7572" :font "Iosevka Nerd Font Mono"
                      :daemon-size 23
-                     :gui-height 230
+                     :gui-height 220
                      :mode-line 160)
     ("dell-7506"     :font "JetBrainsMonoNerdFontMono"
                      :gui-height 150
