@@ -71,7 +71,7 @@
 ;; edges with terminal Emacs. The completion entries wrap around sometimes, and
 ;; messes up the completion.
 
-(defcustom sb/completion-provider 'corfu
+(defcustom sb/completion-provider 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
