@@ -236,9 +236,8 @@ The provider is `nerd-icons'."
      (delete-selection-mode 1)
      ;; Use soft wraps, wrap lines without the ugly continuation marks
      (global-visual-line-mode 1)
-
-     ;; Add a prefix to continuation lines to prevent them from being indented
-     ;; too far or wrapping awkwardly
+     ;; Continuation lines are displayed with proper indentation, as if the
+     ;; text had been filled with M-q, but without modifying the buffer at all.
      (when (fboundp 'global-visual-wrap-prefix-mode)
        (global-visual-wrap-prefix-mode 1))
 
@@ -494,9 +493,6 @@ The provider is `nerd-icons'."
    'minibuffer-setup-hook
    (lambda ()
      (cursor-intangible-mode 1)
-     ;; ;; Allow Flycheck to show long error messages in the minibuffer
-     ;; (setq truncate-lines nil)
-     ;; (visual-line-mode 1)
      ))
 
   ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
@@ -4484,26 +4480,26 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; ;; frequent hangs while communicating with Emacs. Furthermore, this package
 ;; ;; is not required for completions with `company-mode'.
 
-(use-package lsp-latex
-  :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
-  :hook
-  ((LaTeX-mode bibtex-mode)
-   .
-   (lambda ()
-     (require 'lsp-latex)
-     (lsp-deferred)))
-  :custom
-  (lsp-latex-bibtex-formatter "latexindent")
-  (lsp-latex-latex-formatter "latexindent")
-  (lsp-latex-bibtex-formatter-line-length fill-column)
-  (lsp-latex-diagnostics-delay 2000)
-  ;; Support forward search with Okular. Perform inverse search with Shift+Click
-  ;; in the PDF.
-  (lsp-latex-forward-search-executable "okular")
-  (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
-  :config
-  (with-eval-after-load 'latex
-    (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
+;; (use-package lsp-latex
+;;   :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
+;;   :hook
+;;   ((LaTeX-mode bibtex-mode)
+;;    .
+;;    (lambda ()
+;;      (require 'lsp-latex)
+;;      (lsp-deferred)))
+;;   :custom
+;;   ;; (lsp-latex-bibtex-formatter "latexindent")
+;;   ;; (lsp-latex-latex-formatter "latexindent")
+;;   (lsp-latex-bibtex-formatter-line-length fill-column)
+;;   (lsp-latex-diagnostics-delay 2000)
+;;   ;; Support forward search with Okular. Perform inverse search with Shift+Click
+;;   ;; in the PDF.
+;;   (lsp-latex-forward-search-executable "okular")
+;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+;;   :config
+;;   (with-eval-after-load 'latex
+;;     (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
 
 ;; Auctex provides enhanced versions of `tex-mode' and `latex-mode', which
 ;; automatically replace the vanilla ones. Auctex provides `LaTeX-mode', which
