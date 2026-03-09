@@ -3597,6 +3597,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       "WANT"
       "EN_DIACRITICS_REPLACE"])))
 
+;; https://github.com/emacs-lsp/lsp-mode/issues/4747
 (use-package lsp-harper
   :ensure (:host github :repo "ju6ge/lsp-harper.el")
 
@@ -3610,6 +3611,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
    (lambda ()
      (require 'lsp-harper)
+     (setq-local c-basic-offset 4)
      (lsp-deferred)))
 
   :custom (lsp-harper-active-modes '(text-mode markdown-mode org-mode LaTeX-mode)))
@@ -3664,9 +3666,15 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (compile-command (format "make -k -j%s " (num-processors)))
   (compilation-always-kill t)
   (compilation-ask-about-save nil "Save all modified buffers without asking")
-  (compilation-scroll-output t)
+  ;; Use "t" to scroll the compilation buffer to follow output. We stop
+  ;; scrolling when the first error appears.
+  (compilation-scroll-output 'first-error)
   (compilation-auto-jump-to-first-error t)
   (compilation-max-output-line-length nil)
+  ;; Skip warnings and info when navigating with next-error by setting the value
+  ;; to 2. Set it to 1 to also stop at warnings but skip info. Set it to 0 to
+  ;; stop at everything.
+  (compilation-skip-threshold 2)
 
   :config
   (with-eval-after-load 'latex
