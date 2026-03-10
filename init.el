@@ -489,11 +489,7 @@ The provider is `nerd-icons'."
           '(read-only
             t intangible t cursor-intangible t face minibuffer-prompt))
 
-  (add-hook
-   'minibuffer-setup-hook
-   (lambda ()
-     (cursor-intangible-mode 1)
-     ))
+  (add-hook 'minibuffer-setup-hook (lambda () (cursor-intangible-mode 1)))
 
   ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
   ;; Zellij.
@@ -1922,6 +1918,11 @@ The provider is `nerd-icons'."
 
 ;; (use-package smerge-mode
 ;;   :ensure nil)
+
+(use-package conflict-buttons
+  :ensure (:type git :repo "https://git.andros.dev/andros/conflict-buttons.el")
+  :when (display-graphic-p)
+  :hook (smerge-mode . conflict-buttons-mode))
 
 ;; (use-package elec-pair
 ;;   :preface
