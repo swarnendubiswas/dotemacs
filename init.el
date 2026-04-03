@@ -2205,7 +2205,7 @@ The provider is `nerd-icons'."
 (use-package apheleia
   :hook
   ((markdown-mode
-    markdown-ts-mode python-mode python-ts-mode kdl-mode kdl-ts-mode)
+    markdown-ts-mode python-mode python-ts-mode)
    . apheleia-mode)
 
   :bind ("C-x f" . apheleia-format-buffer)
@@ -2217,11 +2217,11 @@ The provider is `nerd-icons'."
   (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
-  (when (executable-find "kdlfmt")
-    (setf (alist-get 'kdlfmt apheleia-formatters)
-          '("kdlfmt" "format" "--stdin"))
-    (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
-    (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
+  ;; (when (executable-find "kdlfmt")
+  ;;   (setf (alist-get 'kdlfmt apheleia-formatters)
+  ;;         '("kdlfmt" "format" "--stdin"))
+  ;;   (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
+  ;;   (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
 
   :diminish apheleia-mode)
 
@@ -3974,7 +3974,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :ensure nil
 
   :mode
-  (("SCon\\(struct\\|script\\)\\'" . python-ts-mode)
+  (("SCon\\(struct\\|script\\)\\'" . python-mode)
    ("[./]flake8\\'" . conf-mode)
    ("/Pipfile\\'" . conf-mode))
 
@@ -4122,10 +4122,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 (use-package yaml-mode
   :mode
-  (("\\.ya?ml\\'" . yaml-ts-mode)
-   ("\\.clang-format\\'" . yaml-ts-mode)
-   ("\\.clang-tidy\\'" . yaml-ts-mode)
-   ("\\.clangd\\'" . yaml-ts-mode))
+  (("\\.ya?ml\\'" . yaml-mode)
+   ("\\.clang-format\\'" . yaml-mode)
+   ("\\.clang-tidy\\'" . yaml-mode)
+   ("\\.clangd\\'" . yaml-mode))
 
   :hook
   ((yaml-mode yaml-ts-mode)
@@ -4300,7 +4300,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    ("User/settings\\.json\\'" . jsonc-mode)
    ("\\.jsonc\\'" . jsonc-mode)
    ("\\.htmlhintrc\\'" . json-mode)
-   ("\\.json\\'" . json-ts-mode))
+   ("\\.json\\'" . json-mode))
 
   :hook ((json-mode json-ts-mode jsonc-mode) . sb/json-setup))
 
