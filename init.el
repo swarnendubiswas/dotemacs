@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'modus-vivendi
-    'modus-vivendi)
+      'rose-pine
+    'rose-pine)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -2203,10 +2203,7 @@ The provider is `nerd-icons'."
 ;; Basedpyright does not provide formatting feature. So, we cannot use
 ;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
 (use-package apheleia
-  :hook
-  ((markdown-mode
-    markdown-ts-mode python-mode python-ts-mode)
-   . apheleia-mode)
+  :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
 
   :bind ("C-x f" . apheleia-format-buffer)
 
@@ -4898,7 +4895,22 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :when (eq sb/theme 'rose-pine)
 
-  :init (load-theme 'rose-pine t))
+  :init (load-theme 'rose-pine t)
+
+  :config
+  (with-eval-after-load 'company
+    (custom-set-faces
+     ;; Normal tooltip
+     '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
+     ;; Selected item
+     '(company-tooltip-selection ((t (:background "#264f78" :foreground "#ffffff" :weight bold :underline nil))))
+     '(company-tooltip-quick-access ((t (:foreground "#6e6a86"))))
+     ;; Match highlight
+     '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
+     ;; Scrollbar background
+     '(company-scrollbar-bg ((t (:background "#333333"))))
+     ;; Scrollbar foreground
+     '(company-scrollbar-fg ((t (:background "#555555")))))))
 
 ;; (use-package rose-pine-emacs
 ;;   :ensure (:host github :repo "thongpv87/rose-pine-emacs"
