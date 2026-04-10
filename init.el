@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'rose-pine
-    'rose-pine)
+      'tokyonight
+    'tokyonight)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -40,6 +40,7 @@
     (const :tag "kanagawa" kanagawa)
     (const :tag "leuven-dark" leuven-dark)
     (const :tag "dracula" dracula)
+    (const :tag "tokyonight" tokyonight)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -4965,6 +4966,11 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (with-eval-after-load 'compile
     (dolist (face '(compilation-info compilation-warning compilation-error))
       (set-face-attribute face nil :background 'unspecified))))
+
+(use-package tokyonight-themes
+  :ensure (:host github :repo "xuchengpeng/tokyonight-themes")
+  :init
+  (load-theme 'tokyonight-moon :no-confirm))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
