@@ -4967,10 +4967,21 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     (dolist (face '(compilation-info compilation-warning compilation-error))
       (set-face-attribute face nil :background 'unspecified))))
 
-(use-package tokyonight-themes
-  :ensure (:host github :repo "xuchengpeng/tokyonight-themes")
+(use-package tokyo-night
+  :ensure (:host github :repo "bbatsov/tokyo-night-emacs")
+
+  :when (eq sb/theme 'tokyonight)
+
   :init
-  (load-theme 'tokyonight-moon :no-confirm))
+  (load-theme 'tokyo-night t))
+
+;; (use-package tokyonight-themes
+;;   :ensure (:host github :repo "xuchengpeng/tokyonight-themes")
+
+;;   :when (eq sb/theme 'tokyonight)
+
+;;   :init
+;;   (load-theme 'tokyonight-moon :no-confirm))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
