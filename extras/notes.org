@@ -177,3 +177,4 @@ https://stackoverflow.com/questions/24563540/any-way-to-prevent-emacs-package-ma
 - [[https://github.com/jeremyf/dotemacs]]
 - [[https://github.com/LionyxML/LEmacs]]
 - [[https://github.com/LionyxML/emacs-kick]]
+- [[https://emacsredux.com/blog/2026/04/07/stealing-from-the-best-emacs-configs/][Stealing from the Best Emacs Configs]]

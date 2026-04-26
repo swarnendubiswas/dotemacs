@@ -121,6 +121,8 @@
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
 
+(add-to-list 'default-frame-alist '(undecorated . t))
+
 ;; The following is faster than running "(tool-bar-mode -1)"
 (push '(tool-bar-lines . 0) default-frame-alist)
 

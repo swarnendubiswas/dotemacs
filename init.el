@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'tokyonight
-    'tokyonight)
+      'matugen
+    'matugen)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -41,6 +41,7 @@
     (const :tag "leuven-dark" leuven-dark)
     (const :tag "dracula" dracula)
     (const :tag "tokyonight" tokyonight)
+    (const :tag "matugen" matugen)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -109,7 +110,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -2950,17 +2951,16 @@ The provider is `nerd-icons'."
      '(company-files ; Have files first to allow completing paths
        (:separate
         company-capf
-        ;; company-reftex-citations ; will trigger inside \cite{}
+        company-reftex-citations ; will trigger inside \cite{}
         ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-        ;; company-reftex-labels
+        company-reftex-labels
         ;; LaTeX structure
-        ;; company-auctex-labels company-auctex-macros company-auctex-environments
-        ;; company-latex-commands ; `company-auctex-macros' seem to be better
-        ;; company-auctex-symbols
-        ;; company-math-symbols-latex ; Math latex tags
+        company-auctex-labels company-auctex-macros company-auctex-environments
+        company-latex-commands ; `company-auctex-macros' seem to be better
+        company-auctex-symbols
+        company-math-symbols-latex ; Math latex tags
         ;; Math Unicode symbols and sub (super) scripts
-        ;; company-math-symbols-unicode
-        company-dict company-ispell company-dabbrev
+        company-math-symbols-unicode company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
   (add-hook
@@ -4904,7 +4904,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; Normal tooltip
      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
      ;; Selected item
-     '(company-tooltip-selection ((t (:background "#264f78" :foreground "#ffffff" :weight bold :underline nil))))
+     '(company-tooltip-selection
+       ((t
+         (:background
+          "#264f78"
+          :foreground "#ffffff"
+          :weight bold
+          :underline nil))))
      '(company-tooltip-quick-access ((t (:foreground "#6e6a86"))))
      ;; Match highlight
      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
@@ -4972,8 +4978,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :when (eq sb/theme 'tokyonight)
 
-  :init
-  (load-theme 'tokyo-night t))
+  :init (load-theme 'tokyo-night t))
 
 ;; (use-package tokyonight-themes
 ;;   :ensure (:host github :repo "xuchengpeng/tokyonight-themes")
@@ -4982,6 +4987,28 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;;   :init
 ;;   (load-theme 'tokyonight-moon :no-confirm))
+
+(use-package dank-emacs-theme
+  :ensure nil
+
+  :load-path "themes"
+
+  :when (eq sb/theme 'dank)
+
+  :init
+  (require 'dank-emacs-theme)
+  (load-theme 'dank-emacs t))
+
+(use-package matugen-theme
+  :ensure nil
+
+  :load-path "themes"
+
+  :when (eq sb/theme 'matugen)
+
+  :init
+  (require 'matugen-theme)
+  (load-theme 'matugen t))
 
 (use-package nerd-icons-corfu
   :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
