@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'matugen
-    'matugen)
+      'tokyonight
+    'tokyonight)
   "Specify which Emacs theme to use."
   :type
   '(radio
