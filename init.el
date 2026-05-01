@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'tokyonight
-    'tokyonight)
+      'modus-vivendi
+    'modus-vivendi)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -110,7 +110,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'eglot
+(defcustom sb/lsp-provider 'lsp-mode
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -3200,6 +3200,7 @@ The provider is `nerd-icons'."
       (list
        (cape-capf-inside-string #'cape-file)
        (cape-capf-trigger #'yasnippet-capf ?/)
+       #'citar-capf
 
        ;; (cape-capf-super
        ;;  #'citar-capf
@@ -3561,59 +3562,68 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
-  :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
+  :ensure (:host github :repo "alberti42/emacs-ltex-plus")
 
   :when (eq sb/lsp-provider 'lsp-mode)
 
   :after lsp-mode
 
-  :init (setopt lsp-ltex-plus-version "18.6.1")
+  :init (lsp-ltex-plus-enable-for-modes))
 
-  :hook
-  ;; LaTeX-mode is undefined if AUCTeX is not loaded.
-  ((text-mode markdown-mode org-mode TeX-mode LaTeX-mode)
-   .
-   (lambda ()
-     ;; Disable LSP for git commit message buffers which are usually ephemeral
-     (unless (string-equal
-              (file-name-nondirectory (or buffer-file-name ""))
-              "COMMIT_EDITMSG")
-       (require 'lsp-ltex-plus)
-       (lsp-deferred))))
+;; (use-package lsp-ltex-plus
+;;   :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
 
-  :custom
-  ;; Recommended to set a generic language to disable spell check
-  (lsp-ltex-plus-language "en")
-  (lsp-ltex-plus-check-frequency "save")
-  (lsp-ltex-plus-log-level "warning")
-  (lsp-ltex-plus-disabled-rules
-   '(:en-US
-     ["EN_QUOTES"
-      "OXFORD_SPELLING_Z_NOT_S"
-      "MORFOLOGIK_RULE_EN"
-      "MORFOLOGIK_RULE_EN_GB"
-      "MORFOLOGIK_RULE_EN_US"
-      "WANT"
-      "EN_DIACRITICS_REPLACE"])))
+;;   :when (eq sb/lsp-provider 'lsp-mode)
 
-;; https://github.com/emacs-lsp/lsp-mode/issues/4747
-(use-package lsp-harper
-  :ensure (:host github :repo "ju6ge/lsp-harper.el")
+;;   :after lsp-mode
 
-  :when (eq sb/lsp-provider 'lsp-mode)
+;;   :init (setopt lsp-ltex-plus-version "18.6.1")
 
-  :after lsp-mode
+;;   :hook
+;;   ;; LaTeX-mode is undefined if AUCTeX is not loaded.
+;;   ((text-mode markdown-mode org-mode TeX-mode LaTeX-mode)
+;;    .
+;;    (lambda ()
+;;      ;; Disable LSP for git commit message buffers which are usually ephemeral
+;;      (unless (string-equal
+;;               (file-name-nondirectory (or buffer-file-name ""))
+;;               "COMMIT_EDITMSG")
+;;        (require 'lsp-ltex-plus)
+;;        (lsp-deferred))))
 
-  :hook
-  ((text-mode markdown-mode org-mode LaTeX-mode)
-   .
+;;   :custom
+;;   ;; Recommended to set a generic language to disable spell check
+;;   (lsp-ltex-plus-language "en")
+;;   (lsp-ltex-plus-check-frequency "save")
+;;   (lsp-ltex-plus-log-level "warning")
+;;   (lsp-ltex-plus-disabled-rules
+;;    '(:en-US
+;;      ["EN_QUOTES"
+;;       "OXFORD_SPELLING_Z_NOT_S"
+;;       "MORFOLOGIK_RULE_EN"
+;;       "MORFOLOGIK_RULE_EN_GB"
+;;       "MORFOLOGIK_RULE_EN_US"
+;;       "WANT"
+;;       "EN_DIACRITICS_REPLACE"])))
 
-   (lambda ()
-     (require 'lsp-harper)
-     (setq-local c-basic-offset 4)
-     (lsp-deferred)))
+;; ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
+;; (use-package lsp-harper
+;;   :ensure (:host github :repo "ju6ge/lsp-harper.el")
 
-  :custom (lsp-harper-active-modes '(text-mode markdown-mode org-mode LaTeX-mode)))
+;;   :when (eq sb/lsp-provider 'lsp-mode)
+
+;;   :after lsp-mode
+
+;;   :hook
+;;   ((text-mode markdown-mode org-mode LaTeX-mode)
+;;    .
+
+;;    (lambda ()
+;;      (require 'lsp-harper)
+;;      (setq-local c-basic-offset 4)
+;;      (lsp-deferred)))
+
+;;   :custom (lsp-harper-active-modes '(text-mode markdown-mode org-mode LaTeX-mode)))
 
 ;; Use a per-project "pyrightconfig.json" file for configuring the language
 ;; server.
@@ -4319,8 +4329,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; https://github.com/james-stoup/org-mode-better-defaults
 ;; https://github.com/james-stoup/emacs-org-mode-tutorial
 (use-package org
-  :defer 2
-
   :mode ("\\.org\\'" . org-mode)
 
   :bind-keymap ("C-c o" . org-mode-map)
@@ -4689,7 +4697,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package citar
   :when (eq sb/completion-provider 'corfu)
 
-  :after (tex cape)
+  :after (org tex cape)
 
   :custom
   ;; Remove support for `org-mode' and `markdown-mode'
@@ -4987,17 +4995,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;;   :init
 ;;   (load-theme 'tokyonight-moon :no-confirm))
-
-(use-package dank-emacs-theme
-  :ensure nil
-
-  :load-path "themes"
-
-  :when (eq sb/theme 'dank)
-
-  :init
-  (require 'dank-emacs-theme)
-  (load-theme 'dank-emacs t))
 
 (use-package matugen-theme
   :ensure nil
@@ -5573,16 +5570,21 @@ Shows both colors when errors and warnings are present."
 ;;   ;; Make the headline face match `centaur-tabs-default' face
 ;;   (centaur-tabs-headline-match))
 
-;; Center the text environment
-(use-package olivetti
-  :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
+;; ;; Center the text environment
+;; (use-package olivetti
+;;   :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
 
-  :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
+;;   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
 
-  :diminish)
+;;   :diminish)
 
 (use-package kdl-mode
   :ensure (:host github :repo "taquangtrung/emacs-kdl-mode")
+
+  :when
+  (and (executable-find "tree-sitter")
+       (fboundp 'treesit-available-p)
+       (treesit-available-p))
 
   :mode ("\\.kdl\\'" . kdl-mode))
 

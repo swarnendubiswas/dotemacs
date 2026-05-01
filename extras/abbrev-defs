@@ -474,6 +474,7 @@
     ("deffered" "deferred" nil :count 1)
     ("definately" "definitely" nil :count 0)
     ("definded" "defined" nil :count 0)
+    ("deisgn" "design" nil :count 0)
     ("deparment" "department" nil :count 2)
     ("dependances" "dependencies" nil :count 0)
     ("deptartment" "department" nil :count 0)
