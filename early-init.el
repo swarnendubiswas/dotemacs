@@ -150,6 +150,9 @@
 ;; Applies to every Emacs frame
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+;; ;; Remove title bar on all future frames
+;; (add-to-list 'default-frame-alist '(undecorated . t))
+
 (setopt
  warning-minimum-level :error
  warning-suppress-types '((lexical-binding))
@@ -262,7 +265,7 @@
                      :mode-line 120)
     ("cseiitk"        :font "Iosevka Nerd Font Mono"
                      :daemon-size 21
-                     :gui-height 220
+                     :gui-height 200
                      :mode-line 160)))
 
 (defun sb/font-config-for-host ()

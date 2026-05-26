@@ -100,6 +100,185 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
+;; Links in org-mode by default are displayed as "descriptive" links, meaning
+;; they hide their target URLs. While this looks great, it makes it a bit tricky
+;; to figure out how you can edit their URL. There are two easy options: (i)
+;; press "C-c C-l" (`org-insert-link') while your point is within a link and you
+;; will be prompted to edit its URL in the minibuffer. You can use the same
+;; command to create new links (when your point is not on an existing link).
+;; (ii) You can convert the "descriptive" links to "literal" links by invoking
+;; the command "M-x org-toggle-link-display". You can also toggle between the
+;; two display modes for links. Use zero-width space "C-x 8 zero width space" to
+;; treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://orgmode.org/manual/In_002dbuffer-Settings.html
+
+;; https://alexforsale.github.io/posts/org-mode-workflow/
+;; https://github.com/james-stoup/org-mode-better-defaults
+;; https://github.com/james-stoup/emacs-org-mode-tutorial
+(use-package org
+  :mode ("\\.org\\'" . org-mode)
+
+  :bind-keymap ("C-c o" . org-mode-map)
+
+  :bind
+  (:map
+   org-mode-map
+   ("M-<left>")
+   ("M-<right>")
+   ("M-<up>")
+   ("M-<down>")
+   ("C-'")
+   ("C-c C-d")
+   ("C-c C-j")
+   ("M-e")
+   ("<tab>" . org-indent-item)
+   ("<backtab>" . org-outdent-item)
+   ("C-c C-n" . org-next-visible-heading)
+   ("C-c C-p" . org-previous-visible-heading)
+   ("C-c C-f" . org-backward-heading-same-level)
+   ("C-c C-b" . outline-backward-same-level)
+   ("C-c C-u" . outline-up-heading)
+   ("M-{" . org-backward-element)
+   ("M-}" . org-forward-element)
+   ;; Insert empty structural blocks, such as ‘#+BEGIN_SRC’ . . . ‘#+END_SRC’,
+   ("C-c C-," . org-insert-structure-template)
+   ("C-c C-j" . consult-outline)
+   ("C-c C-l" . org-store-link)
+   ("C-c C-k" . org-insert-link)
+   ("C-c ." . org-timestamp)
+   ;; ("Shift-<left>" . org-timestamp-down-day)
+   ;; ("Shift-<right>" . org-timestamp-up-day)
+   ("C-c ;" . org-toggle-comment)
+   ("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
+   ;; Use a prefix argument to record a timestamp
+   ("C-c C-t" . org-todo)
+   ("C-c ," . org-priority)
+   ;; ("S-UP" . org-priority-up)
+   ;; ("S-DOWN" . org-priority-down)
+   ("C-c C-e" . org-export-dispatch)
+   ;; ("C-c C-e l l" . org-latex-export-to-latex)
+   ;; ("C-c C-e l p" . org-latex-export-to-pdf)
+   ;; ("C-c C-e h h" . org-html-export-to-html)
+   ("C-c C-x f" . org-footnote-action)
+   ;; Jump between definition and reference
+   ("C-c C-c" . org-ctrl-c-ctrl-c))
+
+  :custom
+  (org-fontify-quote-and-verse-blocks t)
+  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
+  (org-hide-leading-stars-before-indent-mode nil)
+  (org-hide-leading-stars t)
+  (org-src-preserve-indentation t)
+  (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
+  (org-src-window-setup 'current-window)
+  (org-startup-indented t)
+  (org-startup-truncated nil)
+  (org-startup-folded 'showeverything)
+  (org-startup-with-inline-images t)
+  ;; See `org-speed-commands-default' for a list of the keys and commands
+  ;; enabled at the beginning of headlines. `org-babel-describe-bindings' will
+  ;; display a list of the code blocks commands and their related keys.
+  (org-use-speed-commands t)
+  (org-src-strip-leading-and-trailing-blank-lines t)
+  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
+  (org-pretty-entities t)
+  ;; Render subscripts and superscripts in org buffers
+  (org-pretty-entities-include-sub-superscripts t)
+  ;; Automatically sorted and renumbered whenever I insert a new one
+  (org-footnote-auto-adjust t)
+  (org-return-follows-link t)
+  (org-export-with-smart-quotes t "#+OPTIONS ':t")
+  (org-export-with-section-numbers nil "#+OPTIONS num:nil")
+  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a
+  ;; headline
+  (org-export-with-toc nil)
+  (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
+  ;; This exports broken links as [BROKEN LINK %s], so we can actually find
+  ;; them. The default value nil just aborts the export process with an error
+  ;; message "Unable to resolve link: nil". This doesn't give any hint on which
+  ;; line the broken link actually is.
+  (org-export-with-broken-links 'mark)
+  (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
+  (org-highlight-latex-and-related '(native))
+  (org-imenu-depth 4)
+  (org-latex-pdf-process
+   '("latexmk -pdf -shell-escape -interaction=nonstopmode -output-directory=%o -bibtex -f %f"))
+
+  (org-agenda-files '("~/Dropbox/TODOs.org"))
+  ;; The vertical bar separates states that need work with states that do not need any work.
+  (org-todo-keywords
+   '((sequence
+      "TODO(t!)"
+      "NEXT(n!)"
+      "PROG(p!)"
+      "WAIT(w!)"
+      "HOLD(h!)"
+      "|"
+      "DONE(d!)"
+      "CANCELED(c)")))
+  (org-todo-keyword-faces
+   '(("TODO" . "IndianRed1")
+     ("PROG" . "DeepSkyBlue1")
+     ("DONE" . "MediumSeaGreen")))
+  (org-priority-highest ?A org-priority-lowest ?D org-priority-default ?B)
+  (org-priority-faces
+   '((?A . (:foreground "#bf616a" :weight bold :underline t))
+     (?B . (:foreground "#d08770" :weight bold :underline t))
+     (?C . (:foreground "#4c566a" :weight bold :underline t))
+     (?D . (:foreground "#3b4252" :weight bold :underline t))))
+  (org-use-tag-inheritance t)
+
+  :config
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+
+  :diminish org-indent-mode)
+
+;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+
+  :custom
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities t)
+  (org-appear-autolinks t)
+  (org-appear-autoemphasis t)
+  (org-appear-autokeywords t))
+
+(use-package ox-gfm
+  :after org
+
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
+
+(use-package ox-pandoc
+  :after org
+
+  :commands
+  (org-pandoc-export-to-markdown
+   org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
+
+;; (use-package org-modern
+;;   :hook (org-mode . global-org-modern-mode))
+
+;; ;; Useful if `org-indent-mode' is enabled
+;; (use-package org-modern-indent
+;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
+
+;;   :hook (org-mode . org-modern-indent-mode))
+
+;; ;; Use "<" to trigger org block completion at point.
+;; (use-package org-block-capf
+;;   :ensure (:host github :repo "xenodium/org-block-capf")
+
+;;   :after corfu
+
+;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+
+;;   :custom (org-block-capf-edit-style 'inline))
+
 ;; It is tempting to use Eglot because it is built in to Emacs and is
 ;; lightweight. Eglot does not allow multiple servers to connect to a major
 ;; mode, does not support semantic tokens.
@@ -210,7 +389,10 @@ The provider is `nerd-icons'."
   :custom
   (exec-path-from-shell-check-startup-files nil)
   (exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LSP_USE_PLISTS"))
-  (exec-path-from-shell-arguments nil) ; Reduce the start up time
+
+  ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
+  ;; it is needed for Emacs client.
+  ;; (exec-path-from-shell-arguments nil)
 
   :config (exec-path-from-shell-initialize))
 
@@ -696,11 +878,14 @@ The provider is `nerd-icons'."
 ;; ;; Use "Shift + direction" arrows for moving around windows.
 ;; (use-package windmove
 ;;   :ensure nil
+
 ;;   :when (display-graphic-p)
+
 ;;   :init (windmove-default-keybindings))
 
 ;; (use-package winner
 ;;   :hook (elpaca-after-init . winner-mode)
+
 ;;   :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
 
 ;; Use `ediff-regions-wordwise' for small regions and `ediff-regions-linewise'
@@ -941,7 +1126,9 @@ The provider is `nerd-icons'."
 ;; ;; Jump around buffers in few keystrokes
 ;; (use-package frog-jump-buffer
 ;;   :ensure (:host github :repo "waymondo/frog-jump-buffer")
+
 ;;   :bind ("C-b" . frog-jump-buffer)
+
 ;;   :config
 ;;   (dolist
 ;;       (regexp
@@ -1166,6 +1353,13 @@ The provider is `nerd-icons'."
   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
 
   :diminish vertico-timer-mode)
+
+(use-package vertico-carousel
+  :ensure (:host github :repo "kn66/vertico-carousel")
+
+  :after vertico
+
+  :hook (vertico-mode . vertico-carousel-mode))
 
 (defconst sb/consult-buffer-filter
   '("^ "
@@ -1591,6 +1785,7 @@ The provider is `nerd-icons'."
 
 ;; ;; Keeps track of the point position over time and allows us to navigate back
 ;; ;; and forward in history.
+
 ;; (use-package gumshoe
 ;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
 
@@ -3505,6 +3700,41 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (lambda (orig-fun &rest args)
        (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args))))
 
+  (setopt c-basic-offset 2)
+
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("harper-ls" "--stdio"))
+    :add-on? 't
+    :major-modes '(markdown-mode markdown-ts-mode text-mode org-mode)
+    ;; :activation-fn (lsp-activate-on "markdown")
+    :initialization-options
+    '(:userDictPath
+      ""
+      :fileDictPath ""
+      :linters
+      (:SpellCheck
+       t
+       :SpelledNumbers
+       :json-false
+       :AnA t
+       :SentenceCapitalization t
+       :UnclosedQuotes t
+       :WrongQuotes
+       :json-false
+       :LongSentences t
+       :RepeatedWords t
+       :Spaces t
+       :Matcher t
+       :CorrectNumberSuffix t)
+      :codeActions (:ForceStable :json-false)
+      :markdown (:IgnoreLinkTitle :json-false)
+      :diagnosticSeverity "hint"
+      :isolateEnglish
+      :json-false)
+    :priority -3
+    :server-id 'harper-ls))
+
   :diminish)
 
 ;; I do not use any features from `lsp-ui'.
@@ -4312,181 +4542,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :hook ((json-mode json-ts-mode jsonc-mode) . sb/json-setup))
 
-;; Links in org-mode by default are displayed as "descriptive" links, meaning
-;; they hide their target URLs. While this looks great, it makes it a bit tricky
-;; to figure out how you can edit their URL. There are two easy options: (i)
-;; press "C-c C-l" (`org-insert-link') while your point is within a link and you
-;; will be prompted to edit its URL in the minibuffer. You can use the same
-;; command to create new links (when your point is not on an existing link).
-;; (ii) You can convert the "descriptive" links to "literal" links by invoking
-;; the command "M-x org-toggle-link-display". You can also toggle between the
-;; two display modes for links. Use zero-width space "C-x 8 zero width space" to
-;; treat Org markup as plain text.
-;; https://orgmode.org/manual/Escape-Character.html
-;; https://orgmode.org/manual/In_002dbuffer-Settings.html
-
-;; https://alexforsale.github.io/posts/org-mode-workflow/
-;; https://github.com/james-stoup/org-mode-better-defaults
-;; https://github.com/james-stoup/emacs-org-mode-tutorial
-(use-package org
-  :mode ("\\.org\\'" . org-mode)
-
-  :bind-keymap ("C-c o" . org-mode-map)
-
-  :bind
-  (:map
-   org-mode-map
-   ("M-<left>")
-   ("M-<right>")
-   ("M-<up>")
-   ("M-<down>")
-   ("C-'")
-   ("C-c C-d")
-   ("C-c C-j")
-   ("M-e")
-   ("<tab>" . org-indent-item)
-   ("<backtab>" . org-outdent-item)
-   ("C-c C-n" . org-next-visible-heading)
-   ("C-c C-p" . org-previous-visible-heading)
-   ("C-c C-f" . org-backward-heading-same-level)
-   ("C-c C-b" . outline-backward-same-level)
-   ("C-c C-u" . outline-up-heading)
-   ("M-{" . org-backward-element)
-   ("M-}" . org-forward-element)
-   ;; Insert empty structural blocks, such as ‘#+BEGIN_SRC’ . . . ‘#+END_SRC’,
-   ("C-c C-," . org-insert-structure-template)
-   ("C-c C-j" . consult-outline)
-   ("C-c C-l" . org-store-link)
-   ("C-c C-k" . org-insert-link)
-   ("C-c ." . org-timestamp)
-   ;; ("Shift-<left>" . org-timestamp-down-day)
-   ;; ("Shift-<right>" . org-timestamp-up-day)
-   ("C-c ;" . org-toggle-comment)
-   ("C-c a" . org-agenda)
-   ("C-c c" . org-capture)
-   ;; Use a prefix argument to record a timestamp
-   ("C-c C-t" . org-todo)
-   ("C-c ," . org-priority)
-   ;; ("S-UP" . org-priority-up)
-   ;; ("S-DOWN" . org-priority-down)
-   ("C-c C-e" . org-export-dispatch)
-   ;; ("C-c C-e l l" . org-latex-export-to-latex)
-   ;; ("C-c C-e l p" . org-latex-export-to-pdf)
-   ;; ("C-c C-e h h" . org-html-export-to-html)
-   ("C-c C-x f" . org-footnote-action)
-   ;; Jump between definition and reference
-   ("C-c C-c" . org-ctrl-c-ctrl-c))
-
-  :custom
-  (org-fontify-quote-and-verse-blocks t)
-  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
-  (org-hide-leading-stars-before-indent-mode nil)
-  (org-hide-leading-stars t)
-  (org-src-preserve-indentation t)
-  (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
-  (org-src-window-setup 'current-window)
-  (org-startup-indented t)
-  (org-startup-truncated nil)
-  (org-startup-folded 'showeverything)
-  (org-startup-with-inline-images t)
-  ;; See `org-speed-commands-default' for a list of the keys and commands
-  ;; enabled at the beginning of headlines. `org-babel-describe-bindings' will
-  ;; display a list of the code blocks commands and their related keys.
-  (org-use-speed-commands t)
-  (org-src-strip-leading-and-trailing-blank-lines t)
-  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
-  (org-pretty-entities t)
-  ;; Render subscripts and superscripts in org buffers
-  (org-pretty-entities-include-sub-superscripts t)
-  ;; Automatically sorted and renumbered whenever I insert a new one
-  (org-footnote-auto-adjust t)
-  (org-return-follows-link t)
-  (org-export-with-smart-quotes t "#+OPTIONS ':t")
-  (org-export-with-section-numbers nil "#+OPTIONS num:nil")
-  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a
-  ;; headline
-  (org-export-with-toc nil)
-  (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
-  ;; This exports broken links as [BROKEN LINK %s], so we can actually find
-  ;; them. The default value nil just aborts the export process with an error
-  ;; message "Unable to resolve link: nil". This doesn't give any hint on which
-  ;; line the broken link actually is.
-  (org-export-with-broken-links 'mark)
-  (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
-  (org-highlight-latex-and-related '(native))
-  (org-imenu-depth 4)
-  (org-latex-pdf-process
-   '("latexmk -pdf -shell-escape -interaction=nonstopmode -output-directory=%o -bibtex -f %f"))
-
-  (org-agenda-files '("~/Dropbox/TODOs.org"))
-  ;; The vertical bar separates states that need work with states that do not need any work.
-  (org-todo-keywords
-   '((sequence
-      "TODO(t!)"
-      "NEXT(n!)"
-      "PROG(p!)"
-      "WAIT(w!)"
-      "HOLD(h!)"
-      "|"
-      "DONE(d!)"
-      "CANCELED(c)")))
-  (org-todo-keyword-faces
-   '(("TODO" . "IndianRed1")
-     ("PROG" . "DeepSkyBlue1")
-     ("DONE" . "MediumSeaGreen")))
-  (org-priority-highest ?A org-priority-lowest ?D org-priority-default ?B)
-  (org-priority-faces
-   '((?A . (:foreground "#bf616a" :weight bold :underline t))
-     (?B . (:foreground "#d08770" :weight bold :underline t))
-     (?C . (:foreground "#4c566a" :weight bold :underline t))
-     (?D . (:foreground "#3b4252" :weight bold :underline t))))
-  (org-use-tag-inheritance t)
-
-  :config
-  (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
-
-  :diminish org-indent-mode)
-
-;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-
-  :custom
-  (org-appear-autosubmarkers t)
-  (org-appear-autoentities t)
-  (org-appear-autolinks t)
-  (org-appear-autoemphasis t)
-  (org-appear-autokeywords t))
-
-(use-package ox-gfm
-  :after org
-
-  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
-
-(use-package ox-pandoc
-  :after org
-
-  :commands
-  (org-pandoc-export-to-markdown
-   org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
-
-;; (use-package org-modern
-;;   :hook (org-mode . global-org-modern-mode))
-
-;; ;; Useful if `org-indent-mode' is enabled
-;; (use-package org-modern-indent
-;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
-;;   :hook (org-mode . org-modern-indent-mode))
-
-;; ;; Use "<" to trigger org block completion at point.
-;; (use-package org-block-capf
-;;   :ensure (:host github :repo "xenodium/org-block-capf")
-;;   :after corfu
-;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-;;   :custom (org-block-capf-edit-style 'inline))
-
 ;; Without auctex
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
@@ -4723,11 +4778,15 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; (use-package auctex-latexmk
 ;;   :after tex
+
 ;;   :when (executable-find "latexmk")
+
 ;;   :demand t
+
 ;;   :custom
 ;;   ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
 ;;   (auctex-latexmk-inherit-TeX-PDF-mode t)
+
 ;;   :config
 ;;   ;; (setq-default TeX-command-default "LaTexMk")
 ;;   (auctex-latexmk-setup))
