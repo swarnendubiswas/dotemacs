@@ -5,9 +5,9 @@
 
 ;;; Commentary:
 
-;; My configuration is mostly targeted toward GNU Linux. I primarily
-;; use Company compared to Corfu for completion because it provides for
-;; fine-grained control. I use Eglot compared to lsp-mode because it feels
+;; My configuration mostly targets GNU Linux. I tend to switch between Company
+;; and Corfu, and Eglot and Lsp-mode. Company provides finer-grained control
+;; than Corfu. I generally prefer Eglot compared to lsp-mode because it feels
 ;; lightweight and I rarely use multiple servers simultaneously.
 
 ;;; Code:
@@ -531,7 +531,9 @@ The provider is `nerd-icons'."
   (view-read-only t "Use view mode for read-only buffers")
 
   ;; (window-combination-resize t "Resize windows proportionally")
-  ;; (max-mini-window-height 0.3)
+
+  ;; Allows showing all choices during lsp import
+  (max-mini-window-height 0.3)
 
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
   ;; Disable the warning "X and Y are the same file" in case of symlinks
@@ -1354,12 +1356,13 @@ The provider is `nerd-icons'."
 
   :diminish vertico-timer-mode)
 
-(use-package vertico-carousel
-  :ensure (:host github :repo "kn66/vertico-carousel")
+;; ;; Show the currently selected candidate on the first line of the candidate list
+;; (use-package vertico-carousel
+;;   :ensure (:host github :repo "kn66/vertico-carousel")
 
-  :after vertico
+;;   :after vertico
 
-  :hook (vertico-mode . vertico-carousel-mode))
+;;   :hook (vertico-mode . vertico-carousel-mode))
 
 (defconst sb/consult-buffer-filter
   '("^ "
@@ -3798,7 +3801,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :after lsp-mode
 
-  :init (lsp-ltex-plus-enable-for-modes))
+  :init (lsp-ltex-plus-enable-for-modes)
+
+  :custom
+  (lsp-ltex-plus-check-programming-languages t)
+  (lsp-ltex-plus-disabled-rules
+   '(:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])))
 
 ;; (use-package lsp-ltex-plus
 ;;   :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
@@ -6592,6 +6600,7 @@ DIR can be relative or absolute."
 
 ;; (use-package keyfreq
 ;;   :ensure (:host github :repo "dacap/keyfreq")
+
 ;;   :hook
 ;;   (elpaca-after-init
 ;;    .
@@ -6601,11 +6610,15 @@ DIR can be relative or absolute."
 
 ;; (use-package flyover
 ;;   :ensure (:host github :repo "konrad1977/flyover")
+
 ;;   :when (display-graphic-p)
+
 ;;   :hook (flycheck-mode . flyover-mode)
+
 ;;   :custom
 ;;   (flyover-hide-checker-name nil)
 ;;   (flyover-background-lightness 40)
+
 ;;   :diminish)
 
 ;; (use-package disable-mouse
@@ -6615,296 +6628,300 @@ DIR can be relative or absolute."
 ;; ;; `inhibit-mouse' is supposed to be more efficient than `disable-mouse'
 ;; (use-package inhibit-mouse
 ;;   :hook (elpaca-after-init . inhibit-mouse-mode)
+
 ;;   :custom
 ;;   ;; Disable highlighting of clickable text such as URLs and hyperlinks when
 ;;   ;; hovered by the mouse pointer.
 ;;   (inhibit-mouse-adjust-mouse-highlight t)
 ;;   ;; Disables the use of tooltips (show-help-function) during mouse events.
 ;;   (inhibit-mouse-adjust-show-help-function t)
+
 ;;   :config
 ;;   (when (daemonp)
 ;;     (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
+
 ;;   :diminish)
 
 (use-package tramp-hlo
   :ensure (:host github :repo "jsadusk/tramp-hlo")
+
   :hook (elpaca-after-init . tramp-hlo-setup))
 
-(with-eval-after-load 'transient
-  (transient-define-prefix
-   sb/search-transient () "Search commands"
-   [["Isearch"
-     ("i" "Forward" isearch-forward)
-     ("b" "Backward" isearch-backward)
-     ("s" "Symbol at point" isearch-symbol-at-point)
-     ("w" "Forward symbol at point" isearch-forward-symbol-at-point)
-     ;; During an Isearch session, this command picks a search string from
-     ;; history and continues the search with the newly selected string. Outside
-     ;; of Isearch, the command allows you to pick a string from the history and
-     ;; starts a new Isearch.
-     ("h" "History" consult-isearch-history)]
-    ["Ripgrep" ("d" "Deadgrep" deadgrep)
-     ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
-     ("r" "Ripgrep" consult-ripgrep)]
-    ["Wgrep"
-     ("C-p" "Enable" wgrep-change-to-wgrep-mode)
-     ("C-s" "Finish edit" wgrep-finish-edit)
-     ("C-k" "Abort changes" wgrep-abort-changes)
-     ("C-q" "Exit" wgrep-exit)]
-    ["Search locations"
-     ("n" "Find" consult-find)
-     ("f" "Fd" consult-fd)
-     ("l" "Locate" consult-locate)]
-    ["Other tools"
-     ("o" "Occur" occur)
-     ("h" "Isearch occur" isearch-occur)
-     ("g" "Grep" consult-grep)
-     ("t" "Git grep" consult-git-grep)]])
-  (bind-key "C-c s" #'sb/search-transient)
+;; (with-eval-after-load 'transient
+;;   (transient-define-prefix
+;;    sb/search-transient () "Search commands"
+;;    [["Isearch"
+;;      ("i" "Forward" isearch-forward)
+;;      ("b" "Backward" isearch-backward)
+;;      ("s" "Symbol at point" isearch-symbol-at-point)
+;;      ("w" "Forward symbol at point" isearch-forward-symbol-at-point)
+;;      ;; During an Isearch session, this command picks a search string from
+;;      ;; history and continues the search with the newly selected string. Outside
+;;      ;; of Isearch, the command allows you to pick a string from the history and
+;;      ;; starts a new Isearch.
+;;      ("h" "History" consult-isearch-history)]
+;;     ["Ripgrep" ("d" "Deadgrep" deadgrep)
+;;      ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
+;;      ("r" "Ripgrep" consult-ripgrep)]
+;;     ["Wgrep"
+;;      ("C-p" "Enable" wgrep-change-to-wgrep-mode)
+;;      ("C-s" "Finish edit" wgrep-finish-edit)
+;;      ("C-k" "Abort changes" wgrep-abort-changes)
+;;      ("C-q" "Exit" wgrep-exit)]
+;;     ["Search locations"
+;;      ("n" "Find" consult-find)
+;;      ("f" "Fd" consult-fd)
+;;      ("l" "Locate" consult-locate)]
+;;     ["Other tools"
+;;      ("o" "Occur" occur)
+;;      ("h" "Isearch occur" isearch-occur)
+;;      ("g" "Grep" consult-grep)
+;;      ("t" "Git grep" consult-git-grep)]])
+;;   (bind-key "C-c s" #'sb/search-transient)
 
-  (transient-define-prefix
-   sb/dotemacs-transient () "Config-specific keybindings"
-   [["Utilities"
-     ("s" "Sudo edit" crux-sudo-edit)
-     ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
-     ("w" "Toggle whitespace" whitespace-mode)
-     ("m" "Describe major mode" discover-my-mode)]
-    ["Buffers"
-     ("c" "*scratch*" scratch-buffer)
-     ("v" "Echo-area messages" view-echo-area-messages)
-     ("l" "*Messages*"
-      (lambda ()
-        (interactive)
-        (switch-to-buffer "*Messages*")))]
-    ["Tramp" ("t" "Choose target" consult-tramp)
-     ;; We use `q' to quit transient
-     ("Q" "Cleanup connections" sb/cleanup-tramp)]
-    ["Emacs config"
-     ("e" "Edit init.el"
-      (lambda ()
-        (interactive)
-        (find-file user-init-file)))
-     ("r" "Reload init.el"
-      (lambda ()
-        (interactive)
-        (load-file user-init-file)))
-     ("d" "Open .emacs.d"
-      (lambda ()
-        (interactive)
-        (dired user-emacs-directory)))
-     ("m" "Restart" restart-emacs)
-     ("b" "keybindings" embark-bindings)
-     ("k" "Personal keybindings" describe-personal-keybindings)]])
-  (bind-key "C-c d" #'sb/dotemacs-transient)
+;;   (transient-define-prefix
+;;    sb/dotemacs-transient () "Config-specific keybindings"
+;;    [["Utilities"
+;;      ("s" "Sudo edit" crux-sudo-edit)
+;;      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
+;;      ("w" "Toggle whitespace" whitespace-mode)
+;;      ("m" "Describe major mode" discover-my-mode)]
+;;     ["Buffers"
+;;      ("c" "*scratch*" scratch-buffer)
+;;      ("v" "Echo-area messages" view-echo-area-messages)
+;;      ("l" "*Messages*"
+;;       (lambda ()
+;;         (interactive)
+;;         (switch-to-buffer "*Messages*")))]
+;;     ["Tramp" ("t" "Choose target" consult-tramp)
+;;      ;; We use `q' to quit transient
+;;      ("Q" "Cleanup connections" sb/cleanup-tramp)]
+;;     ["Emacs config"
+;;      ("e" "Edit init.el"
+;;       (lambda ()
+;;         (interactive)
+;;         (find-file user-init-file)))
+;;      ("r" "Reload init.el"
+;;       (lambda ()
+;;         (interactive)
+;;         (load-file user-init-file)))
+;;      ("d" "Open .emacs.d"
+;;       (lambda ()
+;;         (interactive)
+;;         (dired user-emacs-directory)))
+;;      ("m" "Restart" restart-emacs)
+;;      ("b" "keybindings" embark-bindings)
+;;      ("k" "Personal keybindings" describe-personal-keybindings)]])
+;;   (bind-key "C-c d" #'sb/dotemacs-transient)
 
-  (transient-define-prefix
-   sb/smerge-transient () "Smerge menu"
-   [["Navigation"
-     ("n" "Next conflict" smerge-next)
-     ("p" "Previous conflict" smerge-prev)]
-    ["Merge"
-     ("u" "Keep upper" smerge-keep-upper)
-     ("l" "Keep lower" smerge-keep-lower)
-     ("a" "Keep both" smerge-keep-all)]
-    ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
-  (bind-key "C-c ^" #'sb/smerge-transient)
+;;   (transient-define-prefix
+;;    sb/smerge-transient () "Smerge menu"
+;;    [["Navigation"
+;;      ("n" "Next conflict" smerge-next)
+;;      ("p" "Previous conflict" smerge-prev)]
+;;     ["Merge"
+;;      ("u" "Keep upper" smerge-keep-upper)
+;;      ("l" "Keep lower" smerge-keep-lower)
+;;      ("a" "Keep both" smerge-keep-all)]
+;;     ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
+;;   (bind-key "C-c ^" #'sb/smerge-transient)
 
-  (with-eval-after-load 'lsp-mode
-    (transient-define-prefix
-     sb/lsp-transient () "Lsp menu"
-     [["Lsp functionality"
-       ("l" "Start Lsp" lsp)
-       ("q" "Disconnect Lsp" lsp-disconnect)
-       ("w" "Workspace shutdown" lsp-workspace-shutdown)
-       ("R" "Workspace restart" lsp-workspace-restart)
-       ("a" "Add folder to workspace" lsp-workspace-folders-add)
-       ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
-       ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
-      ["Browsing functionality"
-       ("d" "Find declaration" lsp-find-declaration)
-       ("e" "Find definition" lsp-find-definition)
-       ("i" "Find implementation" lsp-find-implementation)
-       ("c" "Find references" lsp-find-references)
-       ("I" "Go to implementation" lsp-goto-implementation)
-       ("t" "Go to type definition" lsp-goto-type-definition)]
-      ["Code actions"
-       ("r" "Rename" lsp-rename)
-       ("f" "Format buffer" lsp-format-buffer)
-       ("x" "Execute code action" lsp-execute-code-action)]
-      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
+;;   (with-eval-after-load 'lsp-mode
+;;     (transient-define-prefix
+;;      sb/lsp-transient () "Lsp menu"
+;;      [["Lsp functionality"
+;;        ("l" "Start Lsp" lsp)
+;;        ("q" "Disconnect Lsp" lsp-disconnect)
+;;        ("w" "Workspace shutdown" lsp-workspace-shutdown)
+;;        ("R" "Workspace restart" lsp-workspace-restart)
+;;        ("a" "Add folder to workspace" lsp-workspace-folders-add)
+;;        ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
+;;        ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
+;;       ["Browsing functionality"
+;;        ("d" "Find declaration" lsp-find-declaration)
+;;        ("e" "Find definition" lsp-find-definition)
+;;        ("i" "Find implementation" lsp-find-implementation)
+;;        ("c" "Find references" lsp-find-references)
+;;        ("I" "Go to implementation" lsp-goto-implementation)
+;;        ("t" "Go to type definition" lsp-goto-type-definition)]
+;;       ["Code actions"
+;;        ("r" "Rename" lsp-rename)
+;;        ("f" "Format buffer" lsp-format-buffer)
+;;        ("x" "Execute code action" lsp-execute-code-action)]
+;;       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
 
-    (transient-define-prefix
-     sb/lsp-imenu-transient () "Imenu commands"
-     [["Imenu"
-       ("i" "Imenu" consult-imenu)
-       ("j" "Breadcrumb jump" breadcrumb-jump)]
-      ["Lsp imenu"
-       ("g" "File symbols" consult-lsp-file-symbols)
-       ("h" "Workspace symbols" consult-lsp-symbols)]
-      ["Dogears"
-       ("d" "Go" dogears-go)
-       ("r" "Remember" dogears-remember)
-       ("b" "Back" dogears-back)
-       ("f" "Forward" dogears-forward)
-       ("t" "List" dogears-list)]]))
+;;     (transient-define-prefix
+;;      sb/lsp-imenu-transient () "Imenu commands"
+;;      [["Imenu"
+;;        ("i" "Imenu" consult-imenu)
+;;        ("j" "Breadcrumb jump" breadcrumb-jump)]
+;;       ["Lsp imenu"
+;;        ("g" "File symbols" consult-lsp-file-symbols)
+;;        ("h" "Workspace symbols" consult-lsp-symbols)]
+;;       ["Dogears"
+;;        ("d" "Go" dogears-go)
+;;        ("r" "Remember" dogears-remember)
+;;        ("b" "Back" dogears-back)
+;;        ("f" "Forward" dogears-forward)
+;;        ("t" "List" dogears-list)]]))
 
-  (when (eq sb/lsp-provider 'lsp-mode)
-    (bind-key "C-c l" #'sb/lsp-transient)
-    (bind-key "C-c i" #'sb/lsp-imenu-transient))
+;;   (when (eq sb/lsp-provider 'lsp-mode)
+;;     (bind-key "C-c l" #'sb/lsp-transient)
+;;     (bind-key "C-c i" #'sb/lsp-imenu-transient))
 
-  (with-eval-after-load 'eglot
-    (transient-define-prefix
-     sb/eglot-transient () "Eglot menu"
-     [["Eglot" ("l" "Start" eglot) ("q" "Shutdown" eglot-shutdown)]
-      ["Browsing functionality"
-       ("d" "Find declaration" eglot-find-declaration)
-       ("i" "Find implementation" eglot-find-implementation)
-       ("t" "Find type definition" eglot-find-typeDefinition)]
-      ["Code actions"
-       ("r" "Rename" eglot-rename)
-       ("f" "Format buffer" eglot-format)
-       ("x" "Execute code action" eglot-code-actions)
-       ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
-       ("e" "Execution code action: extract" eglot-code-action-extract)
-       ("n" "Execution code action: inline" eglot-code-action-inline)
-       ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
-       ("o"
-        "Execution code action: organize imports"
-        eglot-code-action-organize-imports)]
-      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
+;;   (with-eval-after-load 'eglot
+;;     (transient-define-prefix
+;;      sb/eglot-transient () "Eglot menu"
+;;      [["Eglot" ("l" "Start" eglot) ("q" "Shutdown" eglot-shutdown)]
+;;       ["Browsing functionality"
+;;        ("d" "Find declaration" eglot-find-declaration)
+;;        ("i" "Find implementation" eglot-find-implementation)
+;;        ("t" "Find type definition" eglot-find-typeDefinition)]
+;;       ["Code actions"
+;;        ("r" "Rename" eglot-rename)
+;;        ("f" "Format buffer" eglot-format)
+;;        ("x" "Execute code action" eglot-code-actions)
+;;        ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
+;;        ("e" "Execution code action: extract" eglot-code-action-extract)
+;;        ("n" "Execution code action: inline" eglot-code-action-inline)
+;;        ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
+;;        ("o"
+;;         "Execution code action: organize imports"
+;;         eglot-code-action-organize-imports)]
+;;       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
 
-  (when (eq sb/lsp-provider 'eglot)
-    (bind-key "C-c l" #'sb/eglot-transient))
+;;   (when (eq sb/lsp-provider 'eglot)
+;;     (bind-key "C-c l" #'sb/eglot-transient))
 
-  (transient-define-prefix
-   sb/file-buffer-transient () "File and Buffer commands"
-   [["File"
-     ("w" "Save" write-file)
-     ("r" "Rename" rename-file)
-     ("a" "Find alternate" find-alternate-file)
-     ("o" "FFAP find other" ff-find-other-file)]
-    ["Buffer"
-     ("g" "Revert quick" revert-buffer-quick)
-     ("b" "Rename" rename-buffer)]])
-  (bind-key "C-c x" #'sb/file-buffer-transient)
+;;   (transient-define-prefix
+;;    sb/file-buffer-transient () "File and Buffer commands"
+;;    [["File"
+;;      ("w" "Save" write-file)
+;;      ("r" "Rename" rename-file)
+;;      ("a" "Find alternate" find-alternate-file)
+;;      ("o" "FFAP find other" ff-find-other-file)]
+;;     ["Buffer"
+;;      ("g" "Revert quick" revert-buffer-quick)
+;;      ("b" "Rename" rename-buffer)]])
+;;   (bind-key "C-c x" #'sb/file-buffer-transient)
 
-  (transient-define-prefix
-   sb/navigation-transient () "Jump commands"
-   [["Parentheses"
-     ("b" "Backward sexp" backward-sexp)
-     ("f" "Forward sexp" forward-sexp)
-     ("k" "Kill sexp" kill-sexp)]
-    ;; ["Functions"
-    ;;  ("a" "Begin" treesit-beginning-of-defun)
-    ;;  ("e" "End" treesit-end-of-defun)]
-    ;; ["Expressions"
-    ;;  ;; ("u" "Up list" treesit-up-list)
-    ;;  ;; ("d" "Down list" treesit-down-list)
-    ;;  ("F" "Forward sexp" treesit-forward-sexp)]
-    ["Flycheck"
-     ("n" "Next error" next-error)
-     ("p" "Previous error" previous-error)]
-    ["Imenu" ("i" "Imenu" consult-imenu)]
-    ["Eglot" ("h" "Workspace symbols" consult-eglot-symbols)]
-    ;; ["Dogears"
-    ;;  ("d" "Go" dogears-go)
-    ;;  ("r" "Remember" dogears-remember)
-    ;;  ("b" "Back" dogears-back)
-    ;;  ("f" "Forward" dogears-forward)
-    ;;  ("t" "List" dogears-list)]
-    ])
-  (bind-key "C-c n" #'sb/navigation-transient)
+;;   (transient-define-prefix
+;;    sb/navigation-transient () "Jump commands"
+;;    [["Parentheses"
+;;      ("b" "Backward sexp" backward-sexp)
+;;      ("f" "Forward sexp" forward-sexp)
+;;      ("k" "Kill sexp" kill-sexp)]
+;;     ;; ["Functions"
+;;     ;;  ("a" "Begin" treesit-beginning-of-defun)
+;;     ;;  ("e" "End" treesit-end-of-defun)]
+;;     ;; ["Expressions"
+;;     ;;  ;; ("u" "Up list" treesit-up-list)
+;;     ;;  ;; ("d" "Down list" treesit-down-list)
+;;     ;;  ("F" "Forward sexp" treesit-forward-sexp)]
+;;     ["Flycheck"
+;;      ("n" "Next error" next-error)
+;;      ("p" "Previous error" previous-error)]
+;;     ["Imenu" ("i" "Imenu" consult-imenu)]
+;;     ["Eglot" ("h" "Workspace symbols" consult-eglot-symbols)]
+;;     ;; ["Dogears"
+;;     ;;  ("d" "Go" dogears-go)
+;;     ;;  ("r" "Remember" dogears-remember)
+;;     ;;  ("b" "Back" dogears-back)
+;;     ;;  ("f" "Forward" dogears-forward)
+;;     ;;  ("t" "List" dogears-list)]
+;;     ])
+;;   (bind-key "C-c n" #'sb/navigation-transient)
 
-  (transient-define-prefix
-   sb/ediff-transient () "Launch Ediff in all it's variants"
-   ["Ediff" ["2 Way"
-     ("b" "Buffers" ediff-buffers)
-     ("f" "Files" ediff-files)
-     ("d" "Directories" ediff-directories)
-     ("c" "Buffer vs File" ediff-current-file)
-     ("~" "File vs Backup" ediff-backup)]
-    ["3 Way"
-     ("3b" "Buffers" ediff-buffers3)
-     ("3f" "Files" ediff-files3)
-     ("3d" "Directories" ediff-directories3)]
-    ["Patches"
-     ("pb" "Buffer" ediff-patch-buffer)
-     ("pf" "File" ediff-patch-file)]
-    ["Regions"
-     ("rl" "Linewise" ediff-regions-linewise)
-     ("rw" "Wordwise" ediff-regions-wordwise)]
-    ["Windows"
-     ("wl" "Linewise" ediff-windows-linewise)
-     ("ww" "Wordwise" ediff-windows-wordwise)]])
-  (bind-key "C-c e" #'sb/ediff-transient)
+;;   (transient-define-prefix
+;;    sb/ediff-transient () "Launch Ediff in all it's variants"
+;;    ["Ediff" ["2 Way"
+;;      ("b" "Buffers" ediff-buffers)
+;;      ("f" "Files" ediff-files)
+;;      ("d" "Directories" ediff-directories)
+;;      ("c" "Buffer vs File" ediff-current-file)
+;;      ("~" "File vs Backup" ediff-backup)]
+;;     ["3 Way"
+;;      ("3b" "Buffers" ediff-buffers3)
+;;      ("3f" "Files" ediff-files3)
+;;      ("3d" "Directories" ediff-directories3)]
+;;     ["Patches"
+;;      ("pb" "Buffer" ediff-patch-buffer)
+;;      ("pf" "File" ediff-patch-file)]
+;;     ["Regions"
+;;      ("rl" "Linewise" ediff-regions-linewise)
+;;      ("rw" "Wordwise" ediff-regions-wordwise)]
+;;     ["Windows"
+;;      ("wl" "Linewise" ediff-windows-linewise)
+;;      ("ww" "Wordwise" ediff-windows-wordwise)]])
+;;   (bind-key "C-c e" #'sb/ediff-transient)
 
-  (with-eval-after-load 'citre
-    (transient-define-prefix
-     sb/citre-transient () "Citre commands"
-     [["Jump"
-       ("j" "Jump" sb/jump-citre-xref)
-       ("b" "Jump back" citre-jump-back)
-       ("p" "Peek" citre-peek)
-       ("a" "Ace peek" citre-ace-peek)
-       ("r" "Reference" citre-jump-to-reference)]
-      ["Manage"
-       ("c" "Create tags" citre-create-tags-file)
-       ("u" "Update tags" citre-update-tags-file)
-       ("e" "Edit recipe" citre-edit-tags-file-recipe)
-       ("g" "Update global db" citre-global-update-database)]])
-    (bind-key "C-c c" #'sb/citre-transient))
+;;   (with-eval-after-load 'citre
+;;     (transient-define-prefix
+;;      sb/citre-transient () "Citre commands"
+;;      [["Jump"
+;;        ("j" "Jump" sb/jump-citre-xref)
+;;        ("b" "Jump back" citre-jump-back)
+;;        ("p" "Peek" citre-peek)
+;;        ("a" "Ace peek" citre-ace-peek)
+;;        ("r" "Reference" citre-jump-to-reference)]
+;;       ["Manage"
+;;        ("c" "Create tags" citre-create-tags-file)
+;;        ("u" "Update tags" citre-update-tags-file)
+;;        ("e" "Edit recipe" citre-edit-tags-file-recipe)
+;;        ("g" "Update global db" citre-global-update-database)]])
+;;     (bind-key "C-c c" #'sb/citre-transient))
 
-  ;; We want Cape functions to be autoloaded if not already.
-  (when (eq sb/completion-provider 'corfu)
-    (transient-define-prefix
-     sb/corfu-transient () "Corfu commands"
-     [["Capf"
-       ("d" "Dict" cape-dict)
-       ("v" "Dabbrev" cape-dabbrev)
-       ("h" "History" cape-history)
-       ("f" "File" cape-file)]
-      [""
-       ("t" "TeX" cape-tex)
-       ("a" "Abbrev" cape-abbrev)
-       ("k" "Keyword" cape-keyword)
-       ("e" "Elisp symbol" cape-elisp-symbol)]
-      [""
-       ("j" "Emoji" cape-emoji)
-       ("l" "Line" cape-line)
-       ("b" "Elisp block" cape-elisp-block)]
-      ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
-    (bind-key "C-c p" #'sb/corfu-transient))
+;;   ;; We want Cape functions to be autoloaded if not already.
+;;   (when (eq sb/completion-provider 'corfu)
+;;     (transient-define-prefix
+;;      sb/corfu-transient () "Corfu commands"
+;;      [["Capf"
+;;        ("d" "Dict" cape-dict)
+;;        ("v" "Dabbrev" cape-dabbrev)
+;;        ("h" "History" cape-history)
+;;        ("f" "File" cape-file)]
+;;       [""
+;;        ("t" "TeX" cape-tex)
+;;        ("a" "Abbrev" cape-abbrev)
+;;        ("k" "Keyword" cape-keyword)
+;;        ("e" "Elisp symbol" cape-elisp-symbol)]
+;;       [""
+;;        ("j" "Emoji" cape-emoji)
+;;        ("l" "Line" cape-line)
+;;        ("b" "Elisp block" cape-elisp-block)]
+;;       ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
+;;     (bind-key "C-c p" #'sb/corfu-transient))
 
-  (transient-define-prefix
-   sb/latex-transient () "LaTeX commands"
-   [[""
-     ("l" "Insert label" reftex-label)
-     ("b" "Insert block" latex-insert-block)
-     ("r" "Insert reference" consult-reftex-insert-reference)
-     ("g" "Go to label" consult-reftex-goto-label)]])
-  (bind-key "C-c j" #'sb/latex-transient)
+;;   (transient-define-prefix
+;;    sb/latex-transient () "LaTeX commands"
+;;    [[""
+;;      ("l" "Insert label" reftex-label)
+;;      ("b" "Insert block" latex-insert-block)
+;;      ("r" "Insert reference" consult-reftex-insert-reference)
+;;      ("g" "Go to label" consult-reftex-goto-label)]])
+;;   (bind-key "C-c j" #'sb/latex-transient)
 
-  (transient-define-prefix
-   sb/root-transient () "Top-level menu"
-   [["Emacs"
-     ("d" "Dotemacs" sb/dotemacs-transient)
-     ("x" "File/Buffer" sb/file-buffer-transient)
-     ("s" "Search" sb/search-transient)
-     ("^" "Smerge" sb/smerge-transient)]
-    ["Programming" ("l" "LSP/Eglot"
-      (lambda ()
-        (interactive)
-        (cond
-         ((eq sb/lsp-provider 'eglot)
-          (sb/eglot-transient))
-         ((eq sb/lsp-provider 'lsp-mode)
-          (sb/lsp-transient)))))]
-    ["Navigation"
-     ("n" "Navigation" sb/navigation-transient)
-     ("c" "Citre" sb/citre-transient)]
-    ["Completion" ("p" "Corfu" sb/corfu-transient)]
-    ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
-  (bind-key "C-c SPC" #'sb/root-transient))
+;;   (transient-define-prefix
+;;    sb/root-transient () "Top-level menu"
+;;    [["Emacs"
+;;      ("d" "Dotemacs" sb/dotemacs-transient)
+;;      ("x" "File/Buffer" sb/file-buffer-transient)
+;;      ("s" "Search" sb/search-transient)
+;;      ("^" "Smerge" sb/smerge-transient)]
+;;     ["Programming" ("l" "LSP/Eglot"
+;;       (lambda ()
+;;         (interactive)
+;;         (cond
+;;          ((eq sb/lsp-provider 'eglot)
+;;           (sb/eglot-transient))
+;;          ((eq sb/lsp-provider 'lsp-mode)
+;;           (sb/lsp-transient)))))]
+;;     ["Navigation"
+;;      ("n" "Navigation" sb/navigation-transient)
+;;      ("c" "Citre" sb/citre-transient)]
+;;     ["Completion" ("p" "Corfu" sb/corfu-transient)]
+;;     ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
+;;   (bind-key "C-c SPC" #'sb/root-transient))
 
 ;; (when (eq sb/lsp-provider 'lsp-mode)
 ;;   (defun sb/jump-choose-definition ()
