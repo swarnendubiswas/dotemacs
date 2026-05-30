@@ -100,185 +100,6 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Links in org-mode by default are displayed as "descriptive" links, meaning
-;; they hide their target URLs. While this looks great, it makes it a bit tricky
-;; to figure out how you can edit their URL. There are two easy options: (i)
-;; press "C-c C-l" (`org-insert-link') while your point is within a link and you
-;; will be prompted to edit its URL in the minibuffer. You can use the same
-;; command to create new links (when your point is not on an existing link).
-;; (ii) You can convert the "descriptive" links to "literal" links by invoking
-;; the command "M-x org-toggle-link-display". You can also toggle between the
-;; two display modes for links. Use zero-width space "C-x 8 zero width space" to
-;; treat Org markup as plain text.
-;; https://orgmode.org/manual/Escape-Character.html
-;; https://orgmode.org/manual/In_002dbuffer-Settings.html
-
-;; https://alexforsale.github.io/posts/org-mode-workflow/
-;; https://github.com/james-stoup/org-mode-better-defaults
-;; https://github.com/james-stoup/emacs-org-mode-tutorial
-(use-package org
-  :mode ("\\.org\\'" . org-mode)
-
-  :bind-keymap ("C-c o" . org-mode-map)
-
-  :bind
-  (:map
-   org-mode-map
-   ("M-<left>")
-   ("M-<right>")
-   ("M-<up>")
-   ("M-<down>")
-   ("C-'")
-   ("C-c C-d")
-   ("C-c C-j")
-   ("M-e")
-   ("<tab>" . org-indent-item)
-   ("<backtab>" . org-outdent-item)
-   ("C-c C-n" . org-next-visible-heading)
-   ("C-c C-p" . org-previous-visible-heading)
-   ("C-c C-f" . org-backward-heading-same-level)
-   ("C-c C-b" . outline-backward-same-level)
-   ("C-c C-u" . outline-up-heading)
-   ("M-{" . org-backward-element)
-   ("M-}" . org-forward-element)
-   ;; Insert empty structural blocks, such as ‘#+BEGIN_SRC’ . . . ‘#+END_SRC’,
-   ("C-c C-," . org-insert-structure-template)
-   ("C-c C-j" . consult-outline)
-   ("C-c C-l" . org-store-link)
-   ("C-c C-k" . org-insert-link)
-   ("C-c ." . org-timestamp)
-   ;; ("Shift-<left>" . org-timestamp-down-day)
-   ;; ("Shift-<right>" . org-timestamp-up-day)
-   ("C-c ;" . org-toggle-comment)
-   ("C-c a" . org-agenda)
-   ("C-c c" . org-capture)
-   ;; Use a prefix argument to record a timestamp
-   ("C-c C-t" . org-todo)
-   ("C-c ," . org-priority)
-   ;; ("S-UP" . org-priority-up)
-   ;; ("S-DOWN" . org-priority-down)
-   ("C-c C-e" . org-export-dispatch)
-   ;; ("C-c C-e l l" . org-latex-export-to-latex)
-   ;; ("C-c C-e l p" . org-latex-export-to-pdf)
-   ;; ("C-c C-e h h" . org-html-export-to-html)
-   ("C-c C-x f" . org-footnote-action)
-   ;; Jump between definition and reference
-   ("C-c C-c" . org-ctrl-c-ctrl-c))
-
-  :custom
-  (org-fontify-quote-and-verse-blocks t)
-  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
-  (org-hide-leading-stars-before-indent-mode nil)
-  (org-hide-leading-stars t)
-  (org-src-preserve-indentation t)
-  (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
-  (org-src-window-setup 'current-window)
-  (org-startup-indented t)
-  (org-startup-truncated nil)
-  (org-startup-folded 'showeverything)
-  (org-startup-with-inline-images t)
-  ;; See `org-speed-commands-default' for a list of the keys and commands
-  ;; enabled at the beginning of headlines. `org-babel-describe-bindings' will
-  ;; display a list of the code blocks commands and their related keys.
-  (org-use-speed-commands t)
-  (org-src-strip-leading-and-trailing-blank-lines t)
-  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
-  (org-pretty-entities t)
-  ;; Render subscripts and superscripts in org buffers
-  (org-pretty-entities-include-sub-superscripts t)
-  ;; Automatically sorted and renumbered whenever I insert a new one
-  (org-footnote-auto-adjust t)
-  (org-return-follows-link t)
-  (org-export-with-smart-quotes t "#+OPTIONS ':t")
-  (org-export-with-section-numbers nil "#+OPTIONS num:nil")
-  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a
-  ;; headline
-  (org-export-with-toc nil)
-  (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
-  ;; This exports broken links as [BROKEN LINK %s], so we can actually find
-  ;; them. The default value nil just aborts the export process with an error
-  ;; message "Unable to resolve link: nil". This doesn't give any hint on which
-  ;; line the broken link actually is.
-  (org-export-with-broken-links 'mark)
-  (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
-  (org-highlight-latex-and-related '(native))
-  (org-imenu-depth 4)
-  (org-latex-pdf-process
-   '("latexmk -pdf -shell-escape -interaction=nonstopmode -output-directory=%o -bibtex -f %f"))
-
-  (org-agenda-files '("~/Dropbox/TODOs.org"))
-  ;; The vertical bar separates states that need work with states that do not need any work.
-  (org-todo-keywords
-   '((sequence
-      "TODO(t!)"
-      "NEXT(n!)"
-      "PROG(p!)"
-      "WAIT(w!)"
-      "HOLD(h!)"
-      "|"
-      "DONE(d!)"
-      "CANCELED(c)")))
-  (org-todo-keyword-faces
-   '(("TODO" . "IndianRed1")
-     ("PROG" . "DeepSkyBlue1")
-     ("DONE" . "MediumSeaGreen")))
-  (org-priority-highest ?A org-priority-lowest ?D org-priority-default ?B)
-  (org-priority-faces
-   '((?A . (:foreground "#bf616a" :weight bold :underline t))
-     (?B . (:foreground "#d08770" :weight bold :underline t))
-     (?C . (:foreground "#4c566a" :weight bold :underline t))
-     (?D . (:foreground "#3b4252" :weight bold :underline t))))
-  (org-use-tag-inheritance t)
-
-  :config
-  (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "color"))
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
-
-  :diminish org-indent-mode)
-
-;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-
-  :custom
-  (org-appear-autosubmarkers t)
-  (org-appear-autoentities t)
-  (org-appear-autolinks t)
-  (org-appear-autoemphasis t)
-  (org-appear-autokeywords t))
-
-(use-package ox-gfm
-  :after org
-
-  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
-
-(use-package ox-pandoc
-  :after org
-
-  :commands
-  (org-pandoc-export-to-markdown
-   org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
-
-;; (use-package org-modern
-;;   :hook (org-mode . global-org-modern-mode))
-
-;; ;; Useful if `org-indent-mode' is enabled
-;; (use-package org-modern-indent
-;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
-
-;;   :hook (org-mode . org-modern-indent-mode))
-
-;; ;; Use "<" to trigger org block completion at point.
-;; (use-package org-block-capf
-;;   :ensure (:host github :repo "xenodium/org-block-capf")
-
-;;   :after corfu
-
-;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-
-;;   :custom (org-block-capf-edit-style 'inline))
-
 ;; It is tempting to use Eglot because it is built in to Emacs and is
 ;; lightweight. Eglot does not allow multiple servers to connect to a major
 ;; mode, does not support semantic tokens.
@@ -307,7 +128,7 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/op-mode 'daemon
+(defcustom sb/op-mode 'standalone
   "Specify the way you expect Emacs to be used."
   :type
   '(radio
@@ -319,16 +140,25 @@ The provider is `nerd-icons'."
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
-;; Install `use-package' support for Elpaca.
-(elpaca
- elpaca-use-package
- ;; Enable support for the `:ensure' keyword in `use-package' for Elpaca.
- (elpaca-use-package-mode))
+(require 'package)
+(setq package-archives
+      '(("org" . "https://orgmode.org/elpa/")
+        ("gnu" . "https://elpa.gnu.org/packages/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+        ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
 
-(eval-and-compile
-  (setopt
-   use-package-always-ensure t
-   use-package-enable-imenu-support t))
+(setq
+ package-install-upgrade-built-in t
+ package-native-compile t)
+
+(require 'use-package)
+
+(setopt
+ use-package-always-ensure t
+ use-package-enable-imenu-support t
+ use-package-verbose t
+ use-package-compute-statistics t)
 
 ;; Delay loading packages only in `standalone' mode.
 (when (eq sb/op-mode 'standalone)
@@ -345,8 +175,6 @@ The provider is `nerd-icons'."
      use-package-minimum-reported-time 0 ; Show everything
      ;; Use "M-x use-package-report" to see results
      use-package-compute-statistics t)))
-
-(elpaca-wait) ; Wait for Elpaca to finish activating packages
 
 ;; Where possible, it is better to avoid :preface, :config and
 ;; :init. Instead, prefer autoloading keywords such as :bind, :hook, and :mode,
@@ -396,13 +224,11 @@ The provider is `nerd-icons'."
 
   :config (exec-path-from-shell-initialize))
 
-(elpaca-wait)
-
 (use-package emacs
   :ensure nil
 
   :hook
-  (elpaca-after-init
+  (after-init
    .
    (lambda ()
      (column-number-mode 1)
@@ -703,7 +529,7 @@ The provider is `nerd-icons'."
 (use-package autorevert
   :ensure nil
 
-  :hook (elpaca-after-init . global-auto-revert-mode)
+  :hook (after-init . global-auto-revert-mode)
 
   :custom
   (auto-revert-verbose nil)
@@ -720,7 +546,7 @@ The provider is `nerd-icons'."
 (use-package savehist
   :ensure nil
 
-  :hook (elpaca-after-init . savehist-mode)
+  :hook (after-init . savehist-mode)
 
   :custom
   (savehist-additional-variables
@@ -740,7 +566,7 @@ The provider is `nerd-icons'."
 (use-package abbrev
   :ensure nil
 
-  :hook (elpaca-after-init . abbrev-mode)
+  :hook (after-init . abbrev-mode)
 
   :custom
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
@@ -752,7 +578,7 @@ The provider is `nerd-icons'."
   :ensure nil
 
   :hook
-  (elpaca-after-init
+  (after-init
    .
    (lambda ()
      (let ((inhibit-message t))
@@ -823,32 +649,32 @@ The provider is `nerd-icons'."
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; Allows viewing PDFs remotely through Tramp.
-(use-package doc-view
-  :ensure nil
+;; ;; Allows viewing PDFs remotely through Tramp.
+;; (use-package doc-view
+;;   :ensure nil
 
-  :hook
-  (doc-view-mode
-   .
-   (lambda ()
-     (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
-       (auto-revert-mode 1))))
+;;   :hook
+;;   (doc-view-mode
+;;    .
+;;    (lambda ()
+;;      (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
+;;        (auto-revert-mode 1))))
 
-  :bind
-  (:map
-   doc-view-mode-map
-   ("=" . doc-view-enlarge)
-   ("-" . doc-view-shrink)
-   ("n" . doc-view-next-page)
-   ("p" . doc-view-previous-page)
-   ("0" . doc-view-scale-reset)
-   ("M-<" . doc-view-first-page)
-   ("M->" . doc-view-last-page)
-   ("C-l" . doc-view-goto-page))
+;;   :bind
+;;   (:map
+;;    doc-view-mode-map
+;;    ("=" . doc-view-enlarge)
+;;    ("-" . doc-view-shrink)
+;;    ("n" . doc-view-next-page)
+;;    ("p" . doc-view-previous-page)
+;;    ("0" . doc-view-scale-reset)
+;;    ("M-<" . doc-view-first-page)
+;;    ("M->" . doc-view-last-page)
+;;    ("C-l" . doc-view-goto-page))
 
-  :custom
-  (doc-view-continuous t)
-  (doc-view-resolution 120))
+;;   :custom
+;;   (doc-view-continuous t)
+;;   (doc-view-resolution 120))
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
 ;; `find-file' unless a prefix argument is given. Then it will find file at
@@ -886,7 +712,7 @@ The provider is `nerd-icons'."
 ;;   :init (windmove-default-keybindings))
 
 ;; (use-package winner
-;;   :hook (elpaca-after-init . winner-mode)
+;;   :hook (after-init . winner-mode)
 
 ;;   :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
 
@@ -920,6 +746,8 @@ The provider is `nerd-icons'."
 ;; Sudo over ssh: "emacs -nw /ssh:user@172.16.42.1\|sudo:172.16.42.1:/etc/hosts"
 ;; Connect as non-root user and then use sudo: "C-x C-f /ssh:192.168.249.10|su::/some/file"
 (use-package tramp
+  :ensure nil
+
   :custom
   ;; Remote files are not updated outside of Tramp
   (remote-file-name-inhibit-cache nil)
@@ -1025,20 +853,20 @@ The provider is `nerd-icons'."
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-(use-package vlf
-  :commands vlf
+;; ;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+;; (use-package vlf
+;;   :commands vlf
 
-  :init (setopt vlf-application 'dont-ask)
+;;   :init (setopt vlf-application 'dont-ask)
 
-  :config (require 'vlf-setup))
+;;   :config (require 'vlf-setup))
 
 (use-package immortal-scratch
-  :hook (elpaca-after-init . immortal-scratch-mode))
+  :hook (after-init . immortal-scratch-mode))
 
 (use-package persistent-scratch
   :hook
-  (elpaca-after-init
+  (after-init
    .
    (lambda ()
      (ignore-errors
@@ -1051,24 +879,24 @@ The provider is `nerd-icons'."
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
 
-(use-package pixel-scroll
-  :ensure nil
+;; (use-package pixel-scroll
+;;   :ensure nil
 
-  :custom
-  (pixel-scroll-precision-use-momentum nil)
-  (pixel-scroll-precision-interpolate-page t)
+;;   :custom
+;;   (pixel-scroll-precision-use-momentum nil)
+;;   (pixel-scroll-precision-interpolate-page t)
 
-  :config
-  (cond
-   ((fboundp 'pixel-scroll-precision-mode)
-    (pixel-scroll-precision-mode 1))
-   ;; `pixel-scroll-mode' uses line-by-line scrolling.
-   ((fboundp 'pixel-scroll-mode)
-    (pixel-scroll-mode 1))))
+;;   :config
+;;   (cond
+;;    ((fboundp 'pixel-scroll-precision-mode)
+;;     (pixel-scroll-precision-mode 1))
+;;    ;; `pixel-scroll-mode' uses line-by-line scrolling.
+;;    ((fboundp 'pixel-scroll-mode)
+;;     (pixel-scroll-mode 1))))
 
 ;; ;; Show temporary buffers as a popup window, and close them with "C-g"
 ;; (use-package popwin
-;;   :hook (elpaca-after-init . popwin-mode)
+;;   :hook (after-init . popwin-mode)
 ;;   :config
 ;;   (push '(helpful-mode :noselect t :position bottom :height 0.5)
 ;;         popwin:special-display-config)
@@ -1294,13 +1122,14 @@ The provider is `nerd-icons'."
 ;;   :config (add-hook 'project-find-functions #'project-x-try-local 90))
 
 (use-package vertico
-  :ensure
-  (vertico
-   :files (:defaults "extensions/*")
-   :includes (vertico-directory vertico-repeat vertico-quick vertico-indexed))
+  :vc
+  (:url
+   "https://github.com/minad/vertico"
+   :lisp-dir "extensions"
+   :main-file "vertico.el")
 
   :hook
-  ((elpaca-after-init . vertico-mode)
+  ((after-init . vertico-mode)
    (minibuffer-setup . vertico-repeat-save)
 
    ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
@@ -1324,7 +1153,19 @@ The provider is `nerd-icons'."
 
   :custom (vertico-cycle t)
 
-  :config (vertico-indexed-mode 1)
+  :config
+  (let ((ext-dir
+         (expand-file-name "extensions"
+                           (file-name-directory (locate-library "vertico")))))
+    (when (file-directory-p ext-dir)
+      (add-to-list 'load-path ext-dir)))
+
+  (require 'vertico-directory)
+  (require 'vertico-repeat)
+  (require 'vertico-quick)
+  (require 'vertico-indexed)
+
+  (vertico-indexed-mode 1)
 
   (when (eq sb/theme 'catppuccin)
     (set-face-attribute 'vertico-current nil
@@ -1346,7 +1187,7 @@ The provider is `nerd-icons'."
       cand))))
 
 (use-package vertico-timer
-  :ensure (:host github :repo "ventruvian/vertico-timer")
+  :vc (:url "https://github.com/ventruvian/vertico-timer")
 
   :after vertico
 
@@ -1527,63 +1368,63 @@ The provider is `nerd-icons'."
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
 (use-package consult-tramp
-  :ensure (:host github :repo "Ladicle/consult-tramp")
+  :vc (:url "https://github.com/Ladicle/consult-tramp")
 
   :commands consult-tramp)
 
-;; Provide context-dependent actions similar to a content menu.
-(use-package embark
-  :bind
-  ( ;; "C-h b" lists all the bindings available in a buffer
-   ([remap describe-bindings] . embark-bindings)
-   ("C-`" . embark-act)
-   ("C-;" . embark-dwim)
-   :map
-   minibuffer-local-map
-   ("C-`" . embark-act)
-   ("C-c C-c" . embark-collect)
-   ("C-c C-e" . embark-export))
+;; ;; Provide context-dependent actions similar to a content menu.
+;; (use-package embark
+;;   :bind
+;;   ( ;; "C-h b" lists all the bindings available in a buffer
+;;    ([remap describe-bindings] . embark-bindings)
+;;    ("C-`" . embark-act)
+;;    ("C-;" . embark-dwim)
+;;    :map
+;;    minibuffer-local-map
+;;    ("C-`" . embark-act)
+;;    ("C-c C-c" . embark-collect)
+;;    ("C-c C-e" . embark-export))
 
-  :custom
-  ;; Replace the key help with a completing-read interface
-  (prefix-help-command #'embark-prefix-help-command))
+;;   :custom
+;;   ;; Replace the key help with a completing-read interface
+;;   (prefix-help-command #'embark-prefix-help-command))
 
-;; Supports exporting search results to a `grep-mode' buffer, on which you can
-;; use `wgrep'.
-(use-package embark-consult
-  :after (embark consult)
+;; ;; Supports exporting search results to a `grep-mode' buffer, on which you can
+;; ;; use `wgrep'.
+;; (use-package embark-consult
+;;   :after (embark consult)
 
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
+;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-;; Rich annotations in the minibuffer, e.g., documentation strings or file
-;; information.
-(use-package marginalia
-  :hook (vertico-mode . marginalia-mode)
+;; ;; Rich annotations in the minibuffer, e.g., documentation strings or file
+;; ;; information.
+;; (use-package marginalia
+;;   :hook (vertico-mode . marginalia-mode)
 
-  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+;;   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
 
-  :config
-  ;; Reduce noise by removing annotations for files otherwise columns become
-  ;; unaligned and look ugly.
-  (setopt marginalia-annotators
-          (cl-remove-if
-           (lambda (pair) (memq (car pair) '(file project-file)))
-           marginalia-annotators))
+;;   :config
+;;   ;; Reduce noise by removing annotations for files otherwise columns become
+;;   ;; unaligned and look ugly.
+;;   (setopt marginalia-annotators
+;;           (cl-remove-if
+;;            (lambda (pair) (memq (car pair) '(file project-file)))
+;;            marginalia-annotators))
 
-  (defun sb/marginalia-annotate-variable (cand)
-    "Annotate function CAND with its documentation string."
-    (when-let (sym
-               (intern-soft cand))
-      (marginalia--fields
-       ((marginalia--variable-value sym) :truncate 0.5)
-       ((documentation-property sym 'variable-documentation)
-        :truncate 1.0
-        :face 'marginalia-documentation))))
+;;   (defun sb/marginalia-annotate-variable (cand)
+;;     "Annotate function CAND with its documentation string."
+;;     (when-let (sym
+;;                (intern-soft cand))
+;;       (marginalia--fields
+;;        ((marginalia--variable-value sym) :truncate 0.5)
+;;        ((documentation-property sym 'variable-documentation)
+;;         :truncate 1.0
+;;         :face 'marginalia-documentation))))
 
-  ;; Override the annotators for the variable category.
-  (add-to-list
-   'marginalia-annotators
-   '(variable sb/marginalia-annotate-variable builtin none)))
+;;   ;; Override the annotators for the variable category.
+;;   (add-to-list
+;;    'marginalia-annotators
+;;    '(variable sb/marginalia-annotate-variable builtin none)))
 
 (use-package ispell
   :ensure nil
@@ -1707,7 +1548,7 @@ The provider is `nerd-icons'."
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
   :hook
-  ((elpaca-after-init . global-hungry-delete-mode)
+  ((after-init . global-hungry-delete-mode)
    (minibuffer-setup . (lambda () (hungry-delete-mode -1))))
 
   :diminish)
@@ -1720,30 +1561,30 @@ The provider is `nerd-icons'."
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
-;; Change the contents inside pairs like parentheses, quotes, brackets, or
-;; custom delimiters. `change-inner "' allows to kill the string contents,
-;; `change-outer "' will kill the entire string including quotes.
-(use-package change-inner
-  :commands (change-inner change-outer))
+;; ;; Change the contents inside pairs like parentheses, quotes, brackets, or
+;; ;; custom delimiters. `change-inner "' allows to kill the string contents,
+;; ;; `change-outer "' will kill the entire string including quotes.
+;; (use-package change-inner
+;;   :commands (change-inner change-outer))
 
-;; Mark current line.
-(use-package expand-line
-  :bind ("M-i" . expand-line-mark-line)
+;; ;; Mark current line.
+;; (use-package expand-line
+;;   :bind ("M-i" . expand-line-mark-line)
 
-  :diminish)
+;;   :diminish)
 
-;; Restore point to the initial location with "C-g" after marking a region
-(use-package smart-mark
-  :hook (elpaca-after-init . smart-mark-mode))
+;; ;; Restore point to the initial location with "C-g" after marking a region
+;; (use-package smart-mark
+;;   :hook (after-init . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :hook (elpaca-after-init . whole-line-or-region-global-mode)
+  :hook (after-init . whole-line-or-region-global-mode)
 
   :diminish whole-line-or-region-local-mode)
 
 (use-package dogears
-  :ensure (:host github :repo "alphapapa/dogears.el")
+  :vc (:url "https://github.com/alphapapa/dogears.el")
 
   :hook ((prog-mode text-mode) . dogears-mode)
 
@@ -1793,7 +1634,7 @@ The provider is `nerd-icons'."
 ;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
 
 ;;   :hook
-;;   (elpaca-after-init
+;;   (after-init
 ;;    .
 ;;    (lambda ()
 ;;      (global-gumshoe-mode 1)
@@ -1805,7 +1646,7 @@ The provider is `nerd-icons'."
 ;;   (gumshoe-idle-time 2))
 
 ;; (use-package better-jumper
-;;   :hook (elpaca-after-init . better-jumper-mode)
+;;   :hook (after-init . better-jumper-mode)
 
 ;;   :diminish better-jumper-local-mode)
 
@@ -1825,7 +1666,7 @@ The provider is `nerd-icons'."
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
-  :ensure (:host github :repo "victorhge/iedit")
+  :vc (:url "https://github.com/victorhge/iedit")
 
   :bind* ("C-." . iedit-mode))
 
@@ -1836,7 +1677,7 @@ The provider is `nerd-icons'."
   :init (setq bm-restore-repository-on-load t)
 
   :hook
-  ((elpaca-after-init . bm-repository-load)
+  ((after-init . bm-repository-load)
    ((find-file after-revert) . bm-buffer-restore)
    ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
    (kill-emacs
@@ -1909,15 +1750,15 @@ The provider is `nerd-icons'."
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
-  :hook (elpaca-after-init . gcmh-mode)
+  :hook (after-init . gcmh-mode)
 
   :diminish)
 
-;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
+;; ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+;; (use-package ws-butler
+;;   :hook (prog-mode . ws-butler-mode)
 
-  :diminish)
+;;   :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
@@ -2006,9 +1847,9 @@ The provider is `nerd-icons'."
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
-(use-package consult-ripfd
-  :ensure (:host github :repo "jdtsmith/consult-ripfd")
-  :commands consult-ripfd)
+;; (use-package consult-ripfd
+;;   :vc (:url "https://github.com/jdtsmith/consult-ripfd")
+;;   :commands consult-ripfd)
 
 (use-package re-builder
   :ensure nil
@@ -2047,7 +1888,7 @@ The provider is `nerd-icons'."
 (use-package with-editor :diminish)
 
 (use-package cond-let
-  :ensure (:host github :repo "tarsius/cond-let"))
+  :vc (:url "https://github.com/tarsius/cond-let"))
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package magit
@@ -2099,7 +1940,7 @@ The provider is `nerd-icons'."
 ;;       (diff-hl-margin-local-mode)))
 
 ;;   :hook
-;;   ((elpaca-after-init . global-diff-hl-mode)
+;;   ((after-init . global-diff-hl-mode)
 ;;    (dired-mode . diff-hl-dired-mode-unless-remote)
 ;;    (diff-hl-mode . sb/diff-hl-maybe-margin)
 ;;    (after-save-hook . diff-hl-update))
@@ -2119,10 +1960,10 @@ The provider is `nerd-icons'."
 ;; (use-package smerge-mode
 ;;   :ensure nil)
 
-(use-package conflict-buttons
-  :ensure (:type git :repo "https://git.andros.dev/andros/conflict-buttons.el")
-  :when (display-graphic-p)
-  :hook (smerge-mode . conflict-buttons-mode))
+;; (use-package conflict-buttons
+;;   :vc (:url "https://git.andros.dev/andros/conflict-buttons.el")
+;;   :when (display-graphic-p)
+;;   :hook (smerge-mode . conflict-buttons-mode))
 
 ;; (use-package elec-pair
 ;;   :preface
@@ -2131,7 +1972,7 @@ The provider is `nerd-icons'."
 ;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
 ;;   :ensure nil
 
-;;   :hook (elpaca-after-init . electric-pair-mode)
+;;   :hook (after-init . electric-pair-mode)
 
 ;;   :custom
 ;;   ;; Avoid balancing parentheses since they can be both irritating and slow
@@ -2258,7 +2099,7 @@ The provider is `nerd-icons'."
   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 (use-package hl-todo
-  :hook (elpaca-after-init . global-hl-todo-mode)
+  :hook (after-init . global-hl-todo-mode)
 
   ;; I use Flycheck integration (`previous-error' and `next-error') to navigate
   ;; among the highlighted lines.
@@ -2771,7 +2612,7 @@ The provider is `nerd-icons'."
 (use-package company
   :when (eq sb/completion-provider 'company)
 
-  :hook (elpaca-after-init . global-company-mode)
+  :hook (after-init . global-company-mode)
 
   :bind
   (:map
@@ -3237,22 +3078,16 @@ The provider is `nerd-icons'."
     "Use shorter prefix for Corfu in `prog-mode'."
     (setq-local corfu-auto-prefix 2))
 
-  :ensure
-  (corfu
-   :files (:defaults "extensions/*")
-   :includes
-   (corfu-auto
-    corfu-info
-    corfu-history
-    corfu-echo
-    corfu-popupinfo
-    corfu-indexed
-    corfu-quick))
+  :vc
+  (:url
+   "https://github.com/minad/corfu"
+   :lisp-dir "extensions"
+   :main-file "corfu.el")
 
   :when (eq sb/completion-provider 'corfu)
 
   :hook
-  ((elpaca-after-init . global-corfu-mode)
+  ((after-init . global-corfu-mode)
    ;; We want 2-character prefixes in LaTeX-mode for yasnippets
    ((prog-mode LaTeX-mode) . sb/corfu-prog-setup))
 
@@ -3266,7 +3101,7 @@ The provider is `nerd-icons'."
    ("M-n" . corfu-popupinfo-scroll-up)
    ("M-p" . corfu-popupinfo-scroll-down)
    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
-   ("[escape]" . corfu-quit))
+   ([escape] . corfu-quit))
 
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
@@ -3277,6 +3112,19 @@ The provider is `nerd-icons'."
   ;; (corfu-quit-at-boundary nil)
 
   :config
+  (let ((ext-dir
+         (expand-file-name "extensions"
+                           (file-name-directory (locate-library "corfu")))))
+    (when (file-directory-p ext-dir)
+      (add-to-list 'load-path ext-dir)))
+
+  (require 'corfu-info)
+  (require 'corfu-echo)
+  (require 'corfu-popupinfo)
+  (require 'corfu-indexed)
+  (require 'corfu-quick)
+  (require 'corfu-echo)
+
   ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
   (corfu-indexed-mode 1)
 
@@ -3294,7 +3142,7 @@ The provider is `nerd-icons'."
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
-  :ensure (:host codeberg :repo "akib/emacs-corfu-terminal")
+  :vc (:url "https://codeberg.org/akib/emacs-corfu-terminal")
 
   :when
   (and (eq sb/completion-provider 'corfu)
@@ -3308,7 +3156,7 @@ The provider is `nerd-icons'."
   (corfu-terminal-position-right-margin 2))
 
 (use-package yasnippet-capf
-  :ensure (:host github :repo "elken/yasnippet-capf")
+  :vc (:url "https://github.com/elken/yasnippet-capf")
 
   :when (eq sb/completion-provider 'corfu)
 
@@ -3439,20 +3287,27 @@ The provider is `nerd-icons'."
 ;; recency) for sorting. Recently used commands should be sorted first. Only
 ;; commands that have never been used before will be sorted by length.
 (use-package prescient
-  :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
+  :vc (:url "https://github.com/radian-software/prescient.el")
 
-  :hook (elpaca-after-init . prescient-persist-mode)
+  :hook (after-init . prescient-persist-mode)
 
   :custom (prescient-sort-full-matches-first t)
 
   :config
-  ;; We are using `corfu-history-mode'.
-  (with-eval-after-load 'corfu
-    (corfu-prescient-mode 1))
   (with-eval-after-load 'vertico
-    (vertico-prescient-mode 1))
+    (when (locate-library "vertico-prescient")
+      (require 'vertico-prescient)
+      (vertico-prescient-mode 1)))
+
+  (with-eval-after-load 'corfu
+    (when (locate-library "corfu-prescient")
+      (require 'corfu-prescient)
+      (corfu-prescient-mode 1)))
+
   (with-eval-after-load 'company
-    (company-prescient-mode 1)))
+    (when (locate-library "company-prescient")
+      (require 'company-prescient)
+      (company-prescient-mode 1))))
 
 (defun sb/setup-lsp-provider ()
   "Set up LSP based on `sb/lsp-provider`.
@@ -3795,7 +3650,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
-  :ensure (:host github :repo "alberti42/emacs-ltex-plus")
+  :vc (:url "https://github.com/alberti42/emacs-ltex-plus")
 
   :when (eq sb/lsp-provider 'lsp-mode)
 
@@ -4166,52 +4021,52 @@ Uses `eglot` or `lsp-mode` depending on configuration."
        (setq-local lsp-disabled-clients '(ltex-ls-plus cmake-language-server)))
      (sb/setup-lsp-provider))))
 
-(use-package doxymacs
-  :ensure (:host github :repo "pniedzielski/doxymacs")
+;; (use-package doxymacs
+;;   :vc (:url "https://github.com/pniedzielski/doxymacs")
 
-  :hook (c-mode-common-hook . doxymacs-mode)
+;;   :hook (c-mode-common-hook . doxymacs-mode)
 
-  :bind
-  (:map
-   c-mode-base-map
-   ;; Lookup documentation for the symbol at point.
-   ("C-c d ?" . doxymacs-lookup)
-   ;; Rescan your Doxygen tags file.
-   ("C-c d r" . doxymacs-rescan-tags)
-   ;; Prompt you for a Doxygen command to enter, and its
-   ;; arguments.
-   ("C-c d RET" . doxymacs-insert-command)
-   ;; Insert a Doxygen comment for the next function.
-   ("C-c d f" . doxymacs-insert-function-comment)
-   ;; Insert a Doxygen comment for the current file.
-   ("C-c d i" . doxymacs-insert-file-comment)
-   ;; Insert a Doxygen comment for the current member.
-   ("C-c d ;" . doxymacs-insert-member-comment)
-   ;; Insert a blank multi-line Doxygen comment.
-   ("C-c d m" . doxymacs-insert-blank-multiline-comment)
-   ;; Insert a blank single-line Doxygen comment.
-   ("C-c d s" . doxymacs-insert-blank-singleline-comment)
-   ;; Insert a grouping comments around the current region.
-   ("C-c d @" . doxymacs-insert-grouping-comments))
+;;   :bind
+;;   (:map
+;;    c-mode-base-map
+;;    ;; Lookup documentation for the symbol at point.
+;;    ("C-c d ?" . doxymacs-lookup)
+;;    ;; Rescan your Doxygen tags file.
+;;    ("C-c d r" . doxymacs-rescan-tags)
+;;    ;; Prompt you for a Doxygen command to enter, and its
+;;    ;; arguments.
+;;    ("C-c d RET" . doxymacs-insert-command)
+;;    ;; Insert a Doxygen comment for the next function.
+;;    ("C-c d f" . doxymacs-insert-function-comment)
+;;    ;; Insert a Doxygen comment for the current file.
+;;    ("C-c d i" . doxymacs-insert-file-comment)
+;;    ;; Insert a Doxygen comment for the current member.
+;;    ("C-c d ;" . doxymacs-insert-member-comment)
+;;    ;; Insert a blank multi-line Doxygen comment.
+;;    ("C-c d m" . doxymacs-insert-blank-multiline-comment)
+;;    ;; Insert a blank single-line Doxygen comment.
+;;    ("C-c d s" . doxymacs-insert-blank-singleline-comment)
+;;    ;; Insert a grouping comments around the current region.
+;;    ("C-c d @" . doxymacs-insert-grouping-comments))
 
-  ;; :custom
-  ;;   ;; Configure source code <-> Doxygen tag file <-> Doxygen HTML
-  ;;   ;; documentation mapping:
-  ;;   ;;   - Files in /home/me/project/foo/ have their tag file at
-  ;;   ;;     http://someplace.com/doc/foo/foo.xml, and HTML documentation
-  ;;   ;;     at http://someplace.com/doc/foo/.
-  ;;   ;;   - Files in /home/me/project/bar/ have their tag file at
-  ;;   ;;     ~/project/bar/doc/bar.xml, and HTML documentation at
-  ;;   ;;     file:///home/me/project/bar/doc/.
-  ;;   ;; This must be configured for Doxymacs to function!
-  ;;   (doxymacs-doxygen-dirs
-  ;;    '(("^/home/me/project/foo/"
-  ;;       "http://someplace.com/doc/foo/foo.xml"
-  ;;        "http://someplace.com/doc/foo/")
-  ;;      ("^/home/me/project/bar/"
-  ;;       "~/project/bar/doc/bar.xml"
-  ;;       "file:///home/me/project/bar/doc/")))
-  )
+;;   ;; :custom
+;;   ;;   ;; Configure source code <-> Doxygen tag file <-> Doxygen HTML
+;;   ;;   ;; documentation mapping:
+;;   ;;   ;;   - Files in /home/me/project/foo/ have their tag file at
+;;   ;;   ;;     http://someplace.com/doc/foo/foo.xml, and HTML documentation
+;;   ;;   ;;     at http://someplace.com/doc/foo/.
+;;   ;;   ;;   - Files in /home/me/project/bar/ have their tag file at
+;;   ;;   ;;     ~/project/bar/doc/bar.xml, and HTML documentation at
+;;   ;;   ;;     file:///home/me/project/bar/doc/.
+;;   ;;   ;; This must be configured for Doxymacs to function!
+;;   ;;   (doxymacs-doxygen-dirs
+;;   ;;    '(("^/home/me/project/foo/"
+;;   ;;       "http://someplace.com/doc/foo/foo.xml"
+;;   ;;        "http://someplace.com/doc/foo/")
+;;   ;;      ("^/home/me/project/bar/"
+;;   ;;       "~/project/bar/doc/bar.xml"
+;;   ;;       "file:///home/me/project/bar/doc/")))
+;;   )
 
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
@@ -4550,6 +4405,181 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :hook ((json-mode json-ts-mode jsonc-mode) . sb/json-setup))
 
+;; Links in org-mode by default are displayed as "descriptive" links, meaning
+;; they hide their target URLs. While this looks great, it makes it a bit tricky
+;; to figure out how you can edit their URL. There are two easy options: (i)
+;; press "C-c C-l" (`org-insert-link') while your point is within a link and you
+;; will be prompted to edit its URL in the minibuffer. You can use the same
+;; command to create new links (when your point is not on an existing link).
+;; (ii) You can convert the "descriptive" links to "literal" links by invoking
+;; the command "M-x org-toggle-link-display". You can also toggle between the
+;; two display modes for links. Use zero-width space "C-x 8 zero width space" to
+;; treat Org markup as plain text.
+;; https://orgmode.org/manual/Escape-Character.html
+;; https://orgmode.org/manual/In_002dbuffer-Settings.html
+
+;; https://alexforsale.github.io/posts/org-mode-workflow/
+;; https://github.com/james-stoup/org-mode-better-defaults
+;; https://github.com/james-stoup/emacs-org-mode-tutorial
+(use-package org
+  :mode ("\\.org\\'" . org-mode)
+
+  :bind-keymap ("C-c o" . org-mode-map)
+
+  :bind
+  (:map
+   org-mode-map
+   ("M-<left>")
+   ("M-<right>")
+   ("M-<up>")
+   ("M-<down>")
+   ("C-'")
+   ("C-c C-d")
+   ("C-c C-j")
+   ("M-e")
+   ("<tab>" . org-indent-item)
+   ("<backtab>" . org-outdent-item)
+   ("C-c C-n" . org-next-visible-heading)
+   ("C-c C-p" . org-previous-visible-heading)
+   ("C-c C-f" . org-backward-heading-same-level)
+   ("C-c C-b" . outline-backward-same-level)
+   ("C-c C-u" . outline-up-heading)
+   ("M-{" . org-backward-element)
+   ("M-}" . org-forward-element)
+   ;; Insert empty structural blocks, such as ‘#+BEGIN_SRC’ . . . ‘#+END_SRC’,
+   ("C-c C-," . org-insert-structure-template)
+   ("C-c C-j" . consult-outline)
+   ("C-c C-l" . org-store-link)
+   ("C-c C-k" . org-insert-link)
+   ("C-c ." . org-timestamp)
+   ;; ("Shift-<left>" . org-timestamp-down-day)
+   ;; ("Shift-<right>" . org-timestamp-up-day)
+   ("C-c ;" . org-toggle-comment)
+   ("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
+   ;; Use a prefix argument to record a timestamp
+   ("C-c C-t" . org-todo)
+   ("C-c ," . org-priority)
+   ;; ("S-UP" . org-priority-up)
+   ;; ("S-DOWN" . org-priority-down)
+   ("C-c C-e" . org-export-dispatch)
+   ;; ("C-c C-e l l" . org-latex-export-to-latex)
+   ;; ("C-c C-e l p" . org-latex-export-to-pdf)
+   ;; ("C-c C-e h h" . org-html-export-to-html)
+   ("C-c C-x f" . org-footnote-action)
+   ;; Jump between definition and reference
+   ("C-c C-c" . org-ctrl-c-ctrl-c))
+
+  :custom
+  (org-fontify-quote-and-verse-blocks t)
+  (org-hide-emphasis-markers t "Hide *, ~, and / in Org text unless you edit")
+  (org-hide-leading-stars-before-indent-mode nil)
+  (org-hide-leading-stars t)
+  (org-src-preserve-indentation t)
+  (org-src-tabs-acts-natively t "TAB behavior depends on the major mode")
+  (org-src-window-setup 'current-window)
+  (org-startup-indented t)
+  (org-startup-truncated nil)
+  (org-startup-folded 'showeverything)
+  (org-startup-with-inline-images t)
+  ;; See `org-speed-commands-default' for a list of the keys and commands
+  ;; enabled at the beginning of headlines. `org-babel-describe-bindings' will
+  ;; display a list of the code blocks commands and their related keys.
+  (org-use-speed-commands t)
+  (org-src-strip-leading-and-trailing-blank-lines t)
+  ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
+  (org-pretty-entities t)
+  ;; Render subscripts and superscripts in org buffers
+  (org-pretty-entities-include-sub-superscripts t)
+  ;; Automatically sorted and renumbered whenever I insert a new one
+  (org-footnote-auto-adjust t)
+  (org-return-follows-link t)
+  (org-export-with-smart-quotes t "#+OPTIONS ':t")
+  (org-export-with-section-numbers nil "#+OPTIONS num:nil")
+  ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a
+  ;; headline
+  (org-export-with-toc nil)
+  (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
+  ;; This exports broken links as [BROKEN LINK %s], so we can actually find
+  ;; them. The default value nil just aborts the export process with an error
+  ;; message "Unable to resolve link: nil". This doesn't give any hint on which
+  ;; line the broken link actually is.
+  (org-export-with-broken-links 'mark)
+  (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
+  (org-highlight-latex-and-related '(native))
+  (org-imenu-depth 4)
+  (org-latex-pdf-process
+   '("latexmk -pdf -shell-escape -interaction=nonstopmode -output-directory=%o -bibtex -f %f"))
+
+  (org-agenda-files '("~/Dropbox/TODOs.org"))
+  ;; The vertical bar separates states that need work with states that do not need any work.
+  (org-todo-keywords
+   '((sequence
+      "TODO(t!)"
+      "NEXT(n!)"
+      "PROG(p!)"
+      "WAIT(w!)"
+      "HOLD(h!)"
+      "|"
+      "DONE(d!)"
+      "CANCELED(c)")))
+  (org-todo-keyword-faces
+   '(("TODO" . "IndianRed1")
+     ("PROG" . "DeepSkyBlue1")
+     ("DONE" . "MediumSeaGreen")))
+  (org-priority-highest ?A org-priority-lowest ?D org-priority-default ?B)
+  (org-priority-faces
+   '((?A . (:foreground "#bf616a" :weight bold :underline t))
+     (?B . (:foreground "#d08770" :weight bold :underline t))
+     (?C . (:foreground "#4c566a" :weight bold :underline t))
+     (?D . (:foreground "#3b4252" :weight bold :underline t))))
+  (org-use-tag-inheritance t)
+
+  :config
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+
+  :diminish org-indent-mode)
+
+;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+
+  :custom
+  (org-appear-autosubmarkers t)
+  (org-appear-autoentities t)
+  (org-appear-autolinks t)
+  (org-appear-autoemphasis t)
+  (org-appear-autokeywords t))
+
+(use-package ox-gfm
+  :after org
+
+  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
+
+(use-package ox-pandoc
+  :after org
+
+  :commands
+  (org-pandoc-export-to-markdown
+   org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
+
+;; (use-package org-modern
+;;   :hook (org-mode . global-org-modern-mode))
+
+;; ;; Useful if `org-indent-mode' is enabled
+;; (use-package org-modern-indent
+;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
+;;   :hook (org-mode . org-modern-indent-mode))
+
+;; ;; Use "<" to trigger org block completion at point.
+;; (use-package org-block-capf
+;;   :ensure (:host github :repo "xenodium/org-block-capf")
+;;   :after corfu
+;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
+;;   :custom (org-block-capf-edit-style 'inline))
+
 ;; Without auctex
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
@@ -4584,17 +4614,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; is an alias to `latex-mode'. Auctex overrides the tex package. "P" in the
 ;; modeline highlighter "LaTeX/MPS" is due to `TeX-PDF-mode'.
 (use-package latex
-  :ensure
-  (auctex
-   :repo "https://git.savannah.gnu.org/git/auctex.git"
+  :vc
+  (:url
+   "https://git.savannah.gnu.org/git/auctex.git"
    :branch "main"
-   :pre-build (("make" "elpa"))
-   :build (:not elpaca--compile-info) ;; Make will take care of this step
-   :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
-   :version
-   (lambda (_)
-     (require 'auctex)
-     AUCTeX-version))
+   :lisp-dir "."
+   :main-file "tex.el")
 
   :init (require 'tex-site)
 
@@ -4715,7 +4740,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :diminish)
 
 (use-package consult-reftex
-  :ensure (:host github :repo "karthink/consult-reftex")
+  :vc (:url "https://github.com/karthink/consult-reftex")
 
   :after (consult reftex)
 
@@ -4967,7 +4992,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package autothemer)
 
 (use-package rose-pine-theme
-  :ensure (:host github :repo "konrad1977/pinerose-emacs")
+  :vc (:url "https://github.com/konrad1977/pinerose-emacs")
 
   :when (eq sb/theme 'rose-pine)
 
@@ -5049,7 +5074,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       (set-face-attribute face nil :background 'unspecified))))
 
 (use-package tokyo-night
-  :ensure (:host github :repo "bbatsov/tokyo-night-emacs")
+  :vc (:url "https://github.com/bbatsov/tokyo-night-emacs")
 
   :when (eq sb/theme 'tokyonight)
 
@@ -5075,7 +5100,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (load-theme 'matugen t))
 
 (use-package nerd-icons-corfu
-  :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+  :vc (:url "https://github.com/LuigiPiucco/nerd-icons-corfu")
 
   :when
   (and (bound-and-true-p sb/enable-icons)
@@ -5090,7 +5115,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; Icons in the minibuffer
 (use-package nerd-icons-completion
-  :ensure (:host github :repo "rainstormstudio/nerd-icons-completion")
+  :vc (:url "https://github.com/rainstormstudio/nerd-icons-completion")
 
   :when (bound-and-true-p sb/enable-icons)
 
@@ -5101,7 +5126,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
 (use-package nerd-icons-dired
-  :ensure (:host github :repo "rainstormstudio/nerd-icons-dired")
+  :vc (:url "https://github.com/rainstormstudio/nerd-icons-dired")
 
   :when (bound-and-true-p sb/enable-icons)
 
@@ -5277,7 +5302,7 @@ Shows both colors when errors and warnings are present."
   :when (eq sb/modeline-theme 'powerline)
 
   :hook
-  ((elpaca-after-init . sb/powerline-nano-theme)
+  ((after-init . sb/powerline-nano-theme)
    ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
 
   :custom
@@ -5411,12 +5436,12 @@ Shows both colors when errors and warnings are present."
 ;;     (sb/modeline-tty-setup))
 
 ;;   :ensure nil
-;;   :hook (elpaca-after-init . sb/enable-smart-modeline))
+;;   :hook (after-init . sb/enable-smart-modeline))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
 
-  :hook (elpaca-after-init . doom-modeline-mode)
+  :hook (-after-init . doom-modeline-mode)
 
   :custom
   (doom-modeline-buffer-encoding nil)
@@ -5432,11 +5457,11 @@ Shows both colors when errors and warnings are present."
     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
 
 (use-package awesome-tray
-  :ensure (:host github :repo "manateelazycat/awesome-tray")
+  :vc (:url "https://github.com/manateelazycat/awesome-tray")
 
   :when (eq sb/modeline-theme 'awesome-tray)
 
-  :hook (elpaca-after-init . awesome-tray-mode)
+  :hook (after-init . awesome-tray-mode)
 
   :custom
   (awesome-tray-active-modules
@@ -5486,7 +5511,7 @@ Shows both colors when errors and warnings are present."
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
 
-  :hook (elpaca-after-init . mini-echo-mode)
+  :hook (after-init . mini-echo-mode)
 
   :custom
   (mini-echo-buffer-status-style 'both)
@@ -5616,7 +5641,7 @@ Shows both colors when errors and warnings are present."
        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
 
 ;; (use-package centaur-tabs
-;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
+;;   :hook ((after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
 ;;   :bind*
 ;;   (("M-<right>" . centaur-tabs-forward-tab)
 ;;    ("C-<tab>" . centaur-tabs-forward-tab)
@@ -5646,7 +5671,7 @@ Shows both colors when errors and warnings are present."
 ;;   :diminish)
 
 (use-package kdl-mode
-  :ensure (:host github :repo "taquangtrung/emacs-kdl-mode")
+  :vc (:url "https://github.com/taquangtrung/emacs-kdl-mode")
 
   :when
   (and (executable-find "tree-sitter")
@@ -5692,7 +5717,7 @@ Shows both colors when errors and warnings are present."
 ;; transparently adjust the corresponding settings in Emacs making it more
 ;; convenient to edit the foreign files.
 (use-package dtrt-indent
-  :ensure (:host github :repo "jscheid/dtrt-indent")
+  :vc (:url "https://github.com/jscheid/dtrt-indent")
 
   :hook (find-file . dtrt-indent-mode)
 
@@ -5700,7 +5725,7 @@ Shows both colors when errors and warnings are present."
 
 ;; Navigate the xref stack with consult
 (use-package consult-xref-stack
-  :ensure (:host github :repo "brett-lempereur/consult-xref-stack")
+  :vc (:url "https://github.com/brett-lempereur/consult-xref-stack")
 
   :commands consult-xref-stack-forward
 
@@ -5728,7 +5753,7 @@ Shows both colors when errors and warnings are present."
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
 ;; (use-package clipetty
-;;   :hook (elpaca-after-init . global-clipetty-mode)
+;;   :hook (after-init . global-clipetty-mode)
 ;;   :diminish)
 
 ;; Only enable xclip in TTY under X11
@@ -5738,10 +5763,10 @@ Shows both colors when errors and warnings are present."
        (not (getenv "WAYLAND_DISPLAY")) ; avoid Wayland
        (or (executable-find "xclip") (executable-find "xsel")))
 
-  :hook (elpaca-after-init . xclip-mode))
+  :hook (after-init . xclip-mode))
 
-(use-package ztree
-  :commands (ztree-diff))
+;; (use-package ztree
+;;   :commands (ztree-diff))
 
 ;; ;; Provides pixel-precise smooth scrolling which can keep up with the very high
 ;; ;; event rates of modern trackpads and high-precision wheel mice.
@@ -5779,14 +5804,14 @@ Shows both colors when errors and warnings are present."
 ;; ;; Highlight the cursor position after the window scrolls
 ;; (use-package beacon
 ;;   :disabled
-;;   :hook (elpaca-after-init . beacon-mode)
+;;   :hook (after-init . beacon-mode)
 ;;   :diminish)
 
 ;; ;; Allows to easily identify the file path in a project. But does not support
 ;; ;; imenu.
 ;; (use-package project-headerline
 ;;   :ensure (:host github :repo "gavv/project-headerline")
-;;   :hook (elpaca-after-init . global-project-headerline-mode)
+;;   :hook (after-init . global-project-headerline-mode)
 ;;   :custom
 ;;   (project-headerline-segment-separator " > ")
 ;;   (project-headerline-path-separator " > "))
@@ -5844,12 +5869,12 @@ Shows both colors when errors and warnings are present."
 ;; (use-package kirigami
 ;;   :ensure (:host github :repo "jamescherti/kirigami.el"))
 
-;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
-(use-package string-inflection
-  :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
+;; ;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
+;; (use-package string-inflection
+;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
 (use-package kill-file-path
-  :ensure (:host github :repo "chyla/kill-file-path")
+  :vc (:url "https://github.com/chyla/kill-file-path")
 
   :commands
   (kill-file-path-basename
@@ -6301,7 +6326,7 @@ Shows both colors when errors and warnings are present."
 ;; (use-package mason
 ;;   :defer 2
 
-;;   :hook (elpaca-after-init . mason-ensure))
+;;   :hook (after-init . mason-ensure))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -6500,7 +6525,7 @@ DIR can be relative or absolute."
 ;; ;; command/prefix in a popup.
 ;; (when (< emacs-major-version 30)
 ;;   (use-package which-key))
-;; (add-hook 'elpaca-after-init-hook #'which-key-mode)
+;; (add-hook 'after-init-hook #'which-key-mode)
 ;; (with-eval-after-load 'which-key
 ;;   (diminish 'which-key-mode))
 
@@ -6582,7 +6607,7 @@ DIR can be relative or absolute."
 (use-package kkp
   :unless (display-graphic-p)
 
-  :hook (elpaca-after-init . global-kkp-mode)
+  :hook (after-init . global-kkp-mode)
 
   ;; :bind
   ;; ("M-<backspace>" . backward-kill-word) ; Should be remapped to "M-DEL"
@@ -6602,7 +6627,7 @@ DIR can be relative or absolute."
 ;;   :ensure (:host github :repo "dacap/keyfreq")
 
 ;;   :hook
-;;   (elpaca-after-init
+;;   (after-init
 ;;    .
 ;;    (lambda ()
 ;;      (keyfreq-mode 1)
@@ -6627,7 +6652,7 @@ DIR can be relative or absolute."
 
 ;; ;; `inhibit-mouse' is supposed to be more efficient than `disable-mouse'
 ;; (use-package inhibit-mouse
-;;   :hook (elpaca-after-init . inhibit-mouse-mode)
+;;   :hook (after-init . inhibit-mouse-mode)
 
 ;;   :custom
 ;;   ;; Disable highlighting of clickable text such as URLs and hyperlinks when
@@ -6643,285 +6668,285 @@ DIR can be relative or absolute."
 ;;   :diminish)
 
 (use-package tramp-hlo
-  :ensure (:host github :repo "jsadusk/tramp-hlo")
+  :vc (:url "http://github.com/jsadusk/tramp-hlo")
 
-  :hook (elpaca-after-init . tramp-hlo-setup))
+  :hook (after-init . tramp-hlo-setup))
 
-;; (with-eval-after-load 'transient
-;;   (transient-define-prefix
-;;    sb/search-transient () "Search commands"
-;;    [["Isearch"
-;;      ("i" "Forward" isearch-forward)
-;;      ("b" "Backward" isearch-backward)
-;;      ("s" "Symbol at point" isearch-symbol-at-point)
-;;      ("w" "Forward symbol at point" isearch-forward-symbol-at-point)
-;;      ;; During an Isearch session, this command picks a search string from
-;;      ;; history and continues the search with the newly selected string. Outside
-;;      ;; of Isearch, the command allows you to pick a string from the history and
-;;      ;; starts a new Isearch.
-;;      ("h" "History" consult-isearch-history)]
-;;     ["Ripgrep" ("d" "Deadgrep" deadgrep)
-;;      ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
-;;      ("r" "Ripgrep" consult-ripgrep)]
-;;     ["Wgrep"
-;;      ("C-p" "Enable" wgrep-change-to-wgrep-mode)
-;;      ("C-s" "Finish edit" wgrep-finish-edit)
-;;      ("C-k" "Abort changes" wgrep-abort-changes)
-;;      ("C-q" "Exit" wgrep-exit)]
-;;     ["Search locations"
-;;      ("n" "Find" consult-find)
-;;      ("f" "Fd" consult-fd)
-;;      ("l" "Locate" consult-locate)]
-;;     ["Other tools"
-;;      ("o" "Occur" occur)
-;;      ("h" "Isearch occur" isearch-occur)
-;;      ("g" "Grep" consult-grep)
-;;      ("t" "Git grep" consult-git-grep)]])
-;;   (bind-key "C-c s" #'sb/search-transient)
+(with-eval-after-load 'transient
+  (transient-define-prefix
+   sb/search-transient () "Search commands"
+   [["Isearch"
+     ("i" "Forward" isearch-forward)
+     ("b" "Backward" isearch-backward)
+     ("s" "Symbol at point" isearch-symbol-at-point)
+     ("w" "Forward symbol at point" isearch-forward-symbol-at-point)
+     ;; During an Isearch session, this command picks a search string from
+     ;; history and continues the search with the newly selected string. Outside
+     ;; of Isearch, the command allows you to pick a string from the history and
+     ;; starts a new Isearch.
+     ("h" "History" consult-isearch-history)]
+    ["Ripgrep" ("d" "Deadgrep" deadgrep)
+     ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
+     ("r" "Ripgrep" consult-ripgrep)]
+    ["Wgrep"
+     ("C-p" "Enable" wgrep-change-to-wgrep-mode)
+     ("C-s" "Finish edit" wgrep-finish-edit)
+     ("C-k" "Abort changes" wgrep-abort-changes)
+     ("C-q" "Exit" wgrep-exit)]
+    ["Search locations"
+     ("n" "Find" consult-find)
+     ("f" "Fd" consult-fd)
+     ("l" "Locate" consult-locate)]
+    ["Other tools"
+     ("o" "Occur" occur)
+     ("h" "Isearch occur" isearch-occur)
+     ("g" "Grep" consult-grep)
+     ("t" "Git grep" consult-git-grep)]])
+  (bind-key "C-c s" #'sb/search-transient)
 
-;;   (transient-define-prefix
-;;    sb/dotemacs-transient () "Config-specific keybindings"
-;;    [["Utilities"
-;;      ("s" "Sudo edit" crux-sudo-edit)
-;;      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
-;;      ("w" "Toggle whitespace" whitespace-mode)
-;;      ("m" "Describe major mode" discover-my-mode)]
-;;     ["Buffers"
-;;      ("c" "*scratch*" scratch-buffer)
-;;      ("v" "Echo-area messages" view-echo-area-messages)
-;;      ("l" "*Messages*"
-;;       (lambda ()
-;;         (interactive)
-;;         (switch-to-buffer "*Messages*")))]
-;;     ["Tramp" ("t" "Choose target" consult-tramp)
-;;      ;; We use `q' to quit transient
-;;      ("Q" "Cleanup connections" sb/cleanup-tramp)]
-;;     ["Emacs config"
-;;      ("e" "Edit init.el"
-;;       (lambda ()
-;;         (interactive)
-;;         (find-file user-init-file)))
-;;      ("r" "Reload init.el"
-;;       (lambda ()
-;;         (interactive)
-;;         (load-file user-init-file)))
-;;      ("d" "Open .emacs.d"
-;;       (lambda ()
-;;         (interactive)
-;;         (dired user-emacs-directory)))
-;;      ("m" "Restart" restart-emacs)
-;;      ("b" "keybindings" embark-bindings)
-;;      ("k" "Personal keybindings" describe-personal-keybindings)]])
-;;   (bind-key "C-c d" #'sb/dotemacs-transient)
+  (transient-define-prefix
+   sb/dotemacs-transient () "Config-specific keybindings"
+   [["Utilities"
+     ("s" "Sudo edit" crux-sudo-edit)
+     ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
+     ("w" "Toggle whitespace" whitespace-mode)
+     ("m" "Describe major mode" discover-my-mode)]
+    ["Buffers"
+     ("c" "*scratch*" scratch-buffer)
+     ("v" "Echo-area messages" view-echo-area-messages)
+     ("l" "*Messages*"
+      (lambda ()
+        (interactive)
+        (switch-to-buffer "*Messages*")))]
+    ["Tramp" ("t" "Choose target" consult-tramp)
+     ;; We use `q' to quit transient
+     ("Q" "Cleanup connections" sb/cleanup-tramp)]
+    ["Emacs config"
+     ("e" "Edit init.el"
+      (lambda ()
+        (interactive)
+        (find-file user-init-file)))
+     ("r" "Reload init.el"
+      (lambda ()
+        (interactive)
+        (load-file user-init-file)))
+     ("d" "Open .emacs.d"
+      (lambda ()
+        (interactive)
+        (dired user-emacs-directory)))
+     ("m" "Restart" restart-emacs)
+     ("b" "keybindings" embark-bindings)
+     ("k" "Personal keybindings" describe-personal-keybindings)]])
+  (bind-key "C-c d" #'sb/dotemacs-transient)
 
-;;   (transient-define-prefix
-;;    sb/smerge-transient () "Smerge menu"
-;;    [["Navigation"
-;;      ("n" "Next conflict" smerge-next)
-;;      ("p" "Previous conflict" smerge-prev)]
-;;     ["Merge"
-;;      ("u" "Keep upper" smerge-keep-upper)
-;;      ("l" "Keep lower" smerge-keep-lower)
-;;      ("a" "Keep both" smerge-keep-all)]
-;;     ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
-;;   (bind-key "C-c ^" #'sb/smerge-transient)
+  (transient-define-prefix
+   sb/smerge-transient () "Smerge menu"
+   [["Navigation"
+     ("n" "Next conflict" smerge-next)
+     ("p" "Previous conflict" smerge-prev)]
+    ["Merge"
+     ("u" "Keep upper" smerge-keep-upper)
+     ("l" "Keep lower" smerge-keep-lower)
+     ("a" "Keep both" smerge-keep-all)]
+    ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
+  (bind-key "C-c ^" #'sb/smerge-transient)
 
-;;   (with-eval-after-load 'lsp-mode
-;;     (transient-define-prefix
-;;      sb/lsp-transient () "Lsp menu"
-;;      [["Lsp functionality"
-;;        ("l" "Start Lsp" lsp)
-;;        ("q" "Disconnect Lsp" lsp-disconnect)
-;;        ("w" "Workspace shutdown" lsp-workspace-shutdown)
-;;        ("R" "Workspace restart" lsp-workspace-restart)
-;;        ("a" "Add folder to workspace" lsp-workspace-folders-add)
-;;        ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
-;;        ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
-;;       ["Browsing functionality"
-;;        ("d" "Find declaration" lsp-find-declaration)
-;;        ("e" "Find definition" lsp-find-definition)
-;;        ("i" "Find implementation" lsp-find-implementation)
-;;        ("c" "Find references" lsp-find-references)
-;;        ("I" "Go to implementation" lsp-goto-implementation)
-;;        ("t" "Go to type definition" lsp-goto-type-definition)]
-;;       ["Code actions"
-;;        ("r" "Rename" lsp-rename)
-;;        ("f" "Format buffer" lsp-format-buffer)
-;;        ("x" "Execute code action" lsp-execute-code-action)]
-;;       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
+  (with-eval-after-load 'lsp-mode
+    (transient-define-prefix
+     sb/lsp-transient () "Lsp menu"
+     [["Lsp functionality"
+       ("l" "Start Lsp" lsp)
+       ("q" "Disconnect Lsp" lsp-disconnect)
+       ("w" "Workspace shutdown" lsp-workspace-shutdown)
+       ("R" "Workspace restart" lsp-workspace-restart)
+       ("a" "Add folder to workspace" lsp-workspace-folders-add)
+       ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
+       ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
+      ["Browsing functionality"
+       ("d" "Find declaration" lsp-find-declaration)
+       ("e" "Find definition" lsp-find-definition)
+       ("i" "Find implementation" lsp-find-implementation)
+       ("c" "Find references" lsp-find-references)
+       ("I" "Go to implementation" lsp-goto-implementation)
+       ("t" "Go to type definition" lsp-goto-type-definition)]
+      ["Code actions"
+       ("r" "Rename" lsp-rename)
+       ("f" "Format buffer" lsp-format-buffer)
+       ("x" "Execute code action" lsp-execute-code-action)]
+      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
 
-;;     (transient-define-prefix
-;;      sb/lsp-imenu-transient () "Imenu commands"
-;;      [["Imenu"
-;;        ("i" "Imenu" consult-imenu)
-;;        ("j" "Breadcrumb jump" breadcrumb-jump)]
-;;       ["Lsp imenu"
-;;        ("g" "File symbols" consult-lsp-file-symbols)
-;;        ("h" "Workspace symbols" consult-lsp-symbols)]
-;;       ["Dogears"
-;;        ("d" "Go" dogears-go)
-;;        ("r" "Remember" dogears-remember)
-;;        ("b" "Back" dogears-back)
-;;        ("f" "Forward" dogears-forward)
-;;        ("t" "List" dogears-list)]]))
+    (transient-define-prefix
+     sb/lsp-imenu-transient () "Imenu commands"
+     [["Imenu"
+       ("i" "Imenu" consult-imenu)
+       ("j" "Breadcrumb jump" breadcrumb-jump)]
+      ["Lsp imenu"
+       ("g" "File symbols" consult-lsp-file-symbols)
+       ("h" "Workspace symbols" consult-lsp-symbols)]
+      ["Dogears"
+       ("d" "Go" dogears-go)
+       ("r" "Remember" dogears-remember)
+       ("b" "Back" dogears-back)
+       ("f" "Forward" dogears-forward)
+       ("t" "List" dogears-list)]]))
 
-;;   (when (eq sb/lsp-provider 'lsp-mode)
-;;     (bind-key "C-c l" #'sb/lsp-transient)
-;;     (bind-key "C-c i" #'sb/lsp-imenu-transient))
+  (when (eq sb/lsp-provider 'lsp-mode)
+    (bind-key "C-c l" #'sb/lsp-transient)
+    (bind-key "C-c i" #'sb/lsp-imenu-transient))
 
-;;   (with-eval-after-load 'eglot
-;;     (transient-define-prefix
-;;      sb/eglot-transient () "Eglot menu"
-;;      [["Eglot" ("l" "Start" eglot) ("q" "Shutdown" eglot-shutdown)]
-;;       ["Browsing functionality"
-;;        ("d" "Find declaration" eglot-find-declaration)
-;;        ("i" "Find implementation" eglot-find-implementation)
-;;        ("t" "Find type definition" eglot-find-typeDefinition)]
-;;       ["Code actions"
-;;        ("r" "Rename" eglot-rename)
-;;        ("f" "Format buffer" eglot-format)
-;;        ("x" "Execute code action" eglot-code-actions)
-;;        ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
-;;        ("e" "Execution code action: extract" eglot-code-action-extract)
-;;        ("n" "Execution code action: inline" eglot-code-action-inline)
-;;        ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
-;;        ("o"
-;;         "Execution code action: organize imports"
-;;         eglot-code-action-organize-imports)]
-;;       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
+  (with-eval-after-load 'eglot
+    (transient-define-prefix
+     sb/eglot-transient () "Eglot menu"
+     [["Eglot" ("l" "Start" eglot) ("q" "Shutdown" eglot-shutdown)]
+      ["Browsing functionality"
+       ("d" "Find declaration" eglot-find-declaration)
+       ("i" "Find implementation" eglot-find-implementation)
+       ("t" "Find type definition" eglot-find-typeDefinition)]
+      ["Code actions"
+       ("r" "Rename" eglot-rename)
+       ("f" "Format buffer" eglot-format)
+       ("x" "Execute code action" eglot-code-actions)
+       ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
+       ("e" "Execution code action: extract" eglot-code-action-extract)
+       ("n" "Execution code action: inline" eglot-code-action-inline)
+       ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
+       ("o"
+        "Execution code action: organize imports"
+        eglot-code-action-organize-imports)]
+      ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
 
-;;   (when (eq sb/lsp-provider 'eglot)
-;;     (bind-key "C-c l" #'sb/eglot-transient))
+  (when (eq sb/lsp-provider 'eglot)
+    (bind-key "C-c l" #'sb/eglot-transient))
 
-;;   (transient-define-prefix
-;;    sb/file-buffer-transient () "File and Buffer commands"
-;;    [["File"
-;;      ("w" "Save" write-file)
-;;      ("r" "Rename" rename-file)
-;;      ("a" "Find alternate" find-alternate-file)
-;;      ("o" "FFAP find other" ff-find-other-file)]
-;;     ["Buffer"
-;;      ("g" "Revert quick" revert-buffer-quick)
-;;      ("b" "Rename" rename-buffer)]])
-;;   (bind-key "C-c x" #'sb/file-buffer-transient)
+  (transient-define-prefix
+   sb/file-buffer-transient () "File and Buffer commands"
+   [["File"
+     ("w" "Save" write-file)
+     ("r" "Rename" rename-file)
+     ("a" "Find alternate" find-alternate-file)
+     ("o" "FFAP find other" ff-find-other-file)]
+    ["Buffer"
+     ("g" "Revert quick" revert-buffer-quick)
+     ("b" "Rename" rename-buffer)]])
+  (bind-key "C-c x" #'sb/file-buffer-transient)
 
-;;   (transient-define-prefix
-;;    sb/navigation-transient () "Jump commands"
-;;    [["Parentheses"
-;;      ("b" "Backward sexp" backward-sexp)
-;;      ("f" "Forward sexp" forward-sexp)
-;;      ("k" "Kill sexp" kill-sexp)]
-;;     ;; ["Functions"
-;;     ;;  ("a" "Begin" treesit-beginning-of-defun)
-;;     ;;  ("e" "End" treesit-end-of-defun)]
-;;     ;; ["Expressions"
-;;     ;;  ;; ("u" "Up list" treesit-up-list)
-;;     ;;  ;; ("d" "Down list" treesit-down-list)
-;;     ;;  ("F" "Forward sexp" treesit-forward-sexp)]
-;;     ["Flycheck"
-;;      ("n" "Next error" next-error)
-;;      ("p" "Previous error" previous-error)]
-;;     ["Imenu" ("i" "Imenu" consult-imenu)]
-;;     ["Eglot" ("h" "Workspace symbols" consult-eglot-symbols)]
-;;     ;; ["Dogears"
-;;     ;;  ("d" "Go" dogears-go)
-;;     ;;  ("r" "Remember" dogears-remember)
-;;     ;;  ("b" "Back" dogears-back)
-;;     ;;  ("f" "Forward" dogears-forward)
-;;     ;;  ("t" "List" dogears-list)]
-;;     ])
-;;   (bind-key "C-c n" #'sb/navigation-transient)
+  (transient-define-prefix
+   sb/navigation-transient () "Jump commands"
+   [["Parentheses"
+     ("b" "Backward sexp" backward-sexp)
+     ("f" "Forward sexp" forward-sexp)
+     ("k" "Kill sexp" kill-sexp)]
+    ;; ["Functions"
+    ;;  ("a" "Begin" treesit-beginning-of-defun)
+    ;;  ("e" "End" treesit-end-of-defun)]
+    ;; ["Expressions"
+    ;;  ;; ("u" "Up list" treesit-up-list)
+    ;;  ;; ("d" "Down list" treesit-down-list)
+    ;;  ("F" "Forward sexp" treesit-forward-sexp)]
+    ["Flycheck"
+     ("n" "Next error" next-error)
+     ("p" "Previous error" previous-error)]
+    ["Imenu" ("i" "Imenu" consult-imenu)]
+    ["Eglot" ("h" "Workspace symbols" consult-eglot-symbols)]
+    ;; ["Dogears"
+    ;;  ("d" "Go" dogears-go)
+    ;;  ("r" "Remember" dogears-remember)
+    ;;  ("b" "Back" dogears-back)
+    ;;  ("f" "Forward" dogears-forward)
+    ;;  ("t" "List" dogears-list)]
+    ])
+  (bind-key "C-c n" #'sb/navigation-transient)
 
-;;   (transient-define-prefix
-;;    sb/ediff-transient () "Launch Ediff in all it's variants"
-;;    ["Ediff" ["2 Way"
-;;      ("b" "Buffers" ediff-buffers)
-;;      ("f" "Files" ediff-files)
-;;      ("d" "Directories" ediff-directories)
-;;      ("c" "Buffer vs File" ediff-current-file)
-;;      ("~" "File vs Backup" ediff-backup)]
-;;     ["3 Way"
-;;      ("3b" "Buffers" ediff-buffers3)
-;;      ("3f" "Files" ediff-files3)
-;;      ("3d" "Directories" ediff-directories3)]
-;;     ["Patches"
-;;      ("pb" "Buffer" ediff-patch-buffer)
-;;      ("pf" "File" ediff-patch-file)]
-;;     ["Regions"
-;;      ("rl" "Linewise" ediff-regions-linewise)
-;;      ("rw" "Wordwise" ediff-regions-wordwise)]
-;;     ["Windows"
-;;      ("wl" "Linewise" ediff-windows-linewise)
-;;      ("ww" "Wordwise" ediff-windows-wordwise)]])
-;;   (bind-key "C-c e" #'sb/ediff-transient)
+  (transient-define-prefix
+   sb/ediff-transient () "Launch Ediff in all it's variants"
+   ["Ediff" ["2 Way"
+     ("b" "Buffers" ediff-buffers)
+     ("f" "Files" ediff-files)
+     ("d" "Directories" ediff-directories)
+     ("c" "Buffer vs File" ediff-current-file)
+     ("~" "File vs Backup" ediff-backup)]
+    ["3 Way"
+     ("3b" "Buffers" ediff-buffers3)
+     ("3f" "Files" ediff-files3)
+     ("3d" "Directories" ediff-directories3)]
+    ["Patches"
+     ("pb" "Buffer" ediff-patch-buffer)
+     ("pf" "File" ediff-patch-file)]
+    ["Regions"
+     ("rl" "Linewise" ediff-regions-linewise)
+     ("rw" "Wordwise" ediff-regions-wordwise)]
+    ["Windows"
+     ("wl" "Linewise" ediff-windows-linewise)
+     ("ww" "Wordwise" ediff-windows-wordwise)]])
+  (bind-key "C-c e" #'sb/ediff-transient)
 
-;;   (with-eval-after-load 'citre
-;;     (transient-define-prefix
-;;      sb/citre-transient () "Citre commands"
-;;      [["Jump"
-;;        ("j" "Jump" sb/jump-citre-xref)
-;;        ("b" "Jump back" citre-jump-back)
-;;        ("p" "Peek" citre-peek)
-;;        ("a" "Ace peek" citre-ace-peek)
-;;        ("r" "Reference" citre-jump-to-reference)]
-;;       ["Manage"
-;;        ("c" "Create tags" citre-create-tags-file)
-;;        ("u" "Update tags" citre-update-tags-file)
-;;        ("e" "Edit recipe" citre-edit-tags-file-recipe)
-;;        ("g" "Update global db" citre-global-update-database)]])
-;;     (bind-key "C-c c" #'sb/citre-transient))
+  (with-eval-after-load 'citre
+    (transient-define-prefix
+     sb/citre-transient () "Citre commands"
+     [["Jump"
+       ("j" "Jump" sb/jump-citre-xref)
+       ("b" "Jump back" citre-jump-back)
+       ("p" "Peek" citre-peek)
+       ("a" "Ace peek" citre-ace-peek)
+       ("r" "Reference" citre-jump-to-reference)]
+      ["Manage"
+       ("c" "Create tags" citre-create-tags-file)
+       ("u" "Update tags" citre-update-tags-file)
+       ("e" "Edit recipe" citre-edit-tags-file-recipe)
+       ("g" "Update global db" citre-global-update-database)]])
+    (bind-key "C-c c" #'sb/citre-transient))
 
-;;   ;; We want Cape functions to be autoloaded if not already.
-;;   (when (eq sb/completion-provider 'corfu)
-;;     (transient-define-prefix
-;;      sb/corfu-transient () "Corfu commands"
-;;      [["Capf"
-;;        ("d" "Dict" cape-dict)
-;;        ("v" "Dabbrev" cape-dabbrev)
-;;        ("h" "History" cape-history)
-;;        ("f" "File" cape-file)]
-;;       [""
-;;        ("t" "TeX" cape-tex)
-;;        ("a" "Abbrev" cape-abbrev)
-;;        ("k" "Keyword" cape-keyword)
-;;        ("e" "Elisp symbol" cape-elisp-symbol)]
-;;       [""
-;;        ("j" "Emoji" cape-emoji)
-;;        ("l" "Line" cape-line)
-;;        ("b" "Elisp block" cape-elisp-block)]
-;;       ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
-;;     (bind-key "C-c p" #'sb/corfu-transient))
+  ;; We want Cape functions to be autoloaded if not already.
+  (when (eq sb/completion-provider 'corfu)
+    (transient-define-prefix
+     sb/corfu-transient () "Corfu commands"
+     [["Capf"
+       ("d" "Dict" cape-dict)
+       ("v" "Dabbrev" cape-dabbrev)
+       ("h" "History" cape-history)
+       ("f" "File" cape-file)]
+      [""
+       ("t" "TeX" cape-tex)
+       ("a" "Abbrev" cape-abbrev)
+       ("k" "Keyword" cape-keyword)
+       ("e" "Elisp symbol" cape-elisp-symbol)]
+      [""
+       ("j" "Emoji" cape-emoji)
+       ("l" "Line" cape-line)
+       ("b" "Elisp block" cape-elisp-block)]
+      ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
+    (bind-key "C-c p" #'sb/corfu-transient))
 
-;;   (transient-define-prefix
-;;    sb/latex-transient () "LaTeX commands"
-;;    [[""
-;;      ("l" "Insert label" reftex-label)
-;;      ("b" "Insert block" latex-insert-block)
-;;      ("r" "Insert reference" consult-reftex-insert-reference)
-;;      ("g" "Go to label" consult-reftex-goto-label)]])
-;;   (bind-key "C-c j" #'sb/latex-transient)
+  (transient-define-prefix
+   sb/latex-transient () "LaTeX commands"
+   [[""
+     ("l" "Insert label" reftex-label)
+     ("b" "Insert block" latex-insert-block)
+     ("r" "Insert reference" consult-reftex-insert-reference)
+     ("g" "Go to label" consult-reftex-goto-label)]])
+  (bind-key "C-c j" #'sb/latex-transient)
 
-;;   (transient-define-prefix
-;;    sb/root-transient () "Top-level menu"
-;;    [["Emacs"
-;;      ("d" "Dotemacs" sb/dotemacs-transient)
-;;      ("x" "File/Buffer" sb/file-buffer-transient)
-;;      ("s" "Search" sb/search-transient)
-;;      ("^" "Smerge" sb/smerge-transient)]
-;;     ["Programming" ("l" "LSP/Eglot"
-;;       (lambda ()
-;;         (interactive)
-;;         (cond
-;;          ((eq sb/lsp-provider 'eglot)
-;;           (sb/eglot-transient))
-;;          ((eq sb/lsp-provider 'lsp-mode)
-;;           (sb/lsp-transient)))))]
-;;     ["Navigation"
-;;      ("n" "Navigation" sb/navigation-transient)
-;;      ("c" "Citre" sb/citre-transient)]
-;;     ["Completion" ("p" "Corfu" sb/corfu-transient)]
-;;     ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
-;;   (bind-key "C-c SPC" #'sb/root-transient))
+  (transient-define-prefix
+   sb/root-transient () "Top-level menu"
+   [["Emacs"
+     ("d" "Dotemacs" sb/dotemacs-transient)
+     ("x" "File/Buffer" sb/file-buffer-transient)
+     ("s" "Search" sb/search-transient)
+     ("^" "Smerge" sb/smerge-transient)]
+    ["Programming" ("l" "LSP/Eglot"
+      (lambda ()
+        (interactive)
+        (cond
+         ((eq sb/lsp-provider 'eglot)
+          (sb/eglot-transient))
+         ((eq sb/lsp-provider 'lsp-mode)
+          (sb/lsp-transient)))))]
+    ["Navigation"
+     ("n" "Navigation" sb/navigation-transient)
+     ("c" "Citre" sb/citre-transient)]
+    ["Completion" ("p" "Corfu" sb/corfu-transient)]
+    ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
+  (bind-key "C-c SPC" #'sb/root-transient))
 
 ;; (when (eq sb/lsp-provider 'lsp-mode)
 ;;   (defun sb/jump-choose-definition ()
@@ -6952,7 +6977,7 @@ DIR can be relative or absolute."
 ;;   (bind-key "M-'" #'sb/jump-choose-definition))
 
 (add-hook
- 'elpaca-after-init-hook
+ 'emacs-startup-hook
  (lambda ()
    (let ((gc-time (float-time gc-elapsed)))
      (message "Emacs ready (init time = %s, gc time = %.2fs, gc count = %d)."

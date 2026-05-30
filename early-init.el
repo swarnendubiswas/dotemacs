@@ -37,47 +37,8 @@
    gc-cons-threshold sb/emacs-4MB
    gc-cons-percentage 0.1))
 
-(add-hook 'elpaca-after-init-hook #'sb/restore-gc)
+(add-hook 'after-init-hook #'sb/restore-gc)
 (add-hook 'minibuffer-exit-hook #'sb/restore-gc)
-
-(defvar elpaca-installer-version 0.12)
-(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
-(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
-(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1 :inherit ignore
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca-activate)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
-  (add-to-list 'load-path (if (file-exists-p build) build repo))
-  (unless (file-exists-p repo)
-    (make-directory repo t)
-    (when (<= emacs-major-version 28) (require 'subr-x))
-    (condition-case-unless-debug err
-        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                  ,@(when-let* ((depth (plist-get order :depth)))
-                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                  ,(plist-get order :repo) ,repo))))
-                  ((zerop (call-process "git" nil buffer t "checkout"
-                                        (or (plist-get order :ref) "--"))))
-                  (emacs (concat invocation-directory invocation-name))
-                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                  ((require 'elpaca))
-                  ((elpaca-generate-autoloads "elpaca" repo)))
-            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-          (error "%s" (with-current-buffer buffer (buffer-string))))
-      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
-  (unless (require 'elpaca-autoloads nil t)
-    (require 'elpaca)
-    (elpaca-generate-autoloads "elpaca" repo)
-    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
-(add-hook 'after-init-hook #'elpaca-process-queues)
-(elpaca `(,@elpaca-order))
 
 ;; The run-time load order till Emacs 30 is: (1) early-init.el, (2) file
 ;; described by `site-run-file' if non-nil, (3) `user-init-file', and (4)
@@ -154,7 +115,7 @@
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 
 (setopt
- warning-minimum-level :error
+ ;; warning-minimum-level :error
  warning-suppress-types '((lexical-binding))
  warning-suppress-log-types '((files missing-lexbind-cookie)))
 
@@ -252,7 +213,7 @@
 ;;         (set-face-attribute 'mode-line-active nil :height 160)
 ;;         (set-face-attribute 'mode-line-inactive nil :height 160)))))
 
-;;   (add-hook 'elpaca-after-init-hook #'sb/init-fonts-graphic))
+;;   (add-hook 'after-init-hook #'sb/init-fonts-graphic))
 
 ;; Host-specific font configuration
 (defconst sb/font-config
@@ -302,7 +263,7 @@
       (set-face-attribute face nil :height mode-line))))
 
 (unless (daemonp)
-  (add-hook 'elpaca-after-init-hook #'sb/apply-font-gui))
+  (add-hook 'after-init-hook #'sb/apply-font-gui))
 
 (provide 'early-init)
 
