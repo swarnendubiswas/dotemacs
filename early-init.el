@@ -51,11 +51,21 @@
 (setq site-run-file nil)
 
 (setopt
- ;; Disable loading of `default.el' at startup
- inhibit-default-init t
+ inhibit-default-init t ; Disable loading of `default.el' at startup
  ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
  ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
- package-enable-at-startup nil)
+ package-enable-at-startup nil
+ package-quickstart t
+ package-archives
+      '(("org" . "https://orgmode.org/elpa/")
+        ("gnu" . "https://elpa.gnu.org/packages/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+        ("melpa" . "https://melpa.org/packages/"))
+ package-install-upgrade-built-in t
+ package-native-compile t)
+
+(unless package--initialized
+  (package-initialize))
 
 (setopt
  load-prefer-newer t
