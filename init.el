@@ -1406,71 +1406,71 @@ The provider is `nerd-icons'."
 ;;    'marginalia-annotators
 ;;    '(variable sb/marginalia-annotate-variable builtin none)))
 
-(use-package ispell
-  :ensure nil
+;; (use-package ispell
+;;   :ensure nil
 
-  :bind ("M-$" . ispell-word)
+;;   :bind ("M-$" . ispell-word)
 
-  :custom
-  (ispell-dictionary "en_US")
-  (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  (ispell-alternate-dictionary
-   (expand-file-name "wordlist.5" sb/extras-directory))
-  ;; Save a new word to personal dictionary without asking
-  (ispell-silently-savep t)
+;;   :custom
+;;   (ispell-dictionary "en_US")
+;;   (ispell-local-dictionary "en_US")
+;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+;;   (ispell-alternate-dictionary
+;;    (expand-file-name "wordlist.5" sb/extras-directory))
+;;   ;; Save a new word to personal dictionary without asking
+;;   (ispell-silently-savep t)
 
-  :config
-  (when (boundp 'ispell-save-corrections-as-abbrevs)
-    (setq ispell-save-corrections-as-abbrevs t))
+;;   :config
+;;   (when (boundp 'ispell-save-corrections-as-abbrevs)
+;;     (setq ispell-save-corrections-as-abbrevs t))
 
-  ;; Prefer hunspell over aspell on Linux platforms
-  (cond
-   ((executable-find "hunspell")
-    (progn
-      (setenv "DICTIONARY" "en_US")
-      (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
-      (setopt
-       ispell-program-name "hunspell"
-       ispell-local-dictionary-alist
-       '(("en_US"
-          "[[:alpha:]]"
-          "[^[:alpha:]]"
-          "[']"
-          nil
-          ("-d" "en_US")
-          nil
-          utf-8))
-       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
-   ((executable-find "aspell")
-    (progn
-      (setopt
-       ispell-program-name "aspell"
-       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
+;;   ;; Prefer hunspell over aspell on Linux platforms
+;;   (cond
+;;    ((executable-find "hunspell")
+;;     (progn
+;;       (setenv "DICTIONARY" "en_US")
+;;       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
+;;       (setopt
+;;        ispell-program-name "hunspell"
+;;        ispell-local-dictionary-alist
+;;        '(("en_US"
+;;           "[[:alpha:]]"
+;;           "[^[:alpha:]]"
+;;           "[']"
+;;           nil
+;;           ("-d" "en_US")
+;;           nil
+;;           utf-8))
+;;        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+;;        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
+;;    ((executable-find "aspell")
+;;     (progn
+;;       (setopt
+;;        ispell-program-name "aspell"
+;;        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
 
-  ;; Skip regions in `org-mode'
-  (dolist
-      (skip-pair
-       '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-         ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-         ("~" . "~")
-         ("=" . "=")
-         ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-         ;; Footnotes in org that have http links that are line breaked should not be ispelled
-         ("^http" . "\\]")
-         ("`" . "`")
-         ("cite:" . "[[:space:]]")
-         ("label:" . "[[:space:]]")
-         ("ref:" . "[[:space:]]")
-         ("\\\\begin{multline}" . "\\\\end{multline}")
-         ("\\\\begin{equation}" . "\\\\end{equation}")
-         ("\\\\begin{align}" . "\\\\end{align}")))
-    (add-to-list 'ispell-skip-region-alist skip-pair))
+;;   ;; Skip regions in `org-mode'
+;;   (dolist
+;;       (skip-pair
+;;        '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+;;          ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+;;          ("~" . "~")
+;;          ("=" . "=")
+;;          ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+;;          ;; Footnotes in org that have http links that are line breaked should not be ispelled
+;;          ("^http" . "\\]")
+;;          ("`" . "`")
+;;          ("cite:" . "[[:space:]]")
+;;          ("label:" . "[[:space:]]")
+;;          ("ref:" . "[[:space:]]")
+;;          ("\\\\begin{multline}" . "\\\\end{multline}")
+;;          ("\\\\begin{equation}" . "\\\\end{equation}")
+;;          ("\\\\begin{align}" . "\\\\end{align}")))
+;;     (add-to-list 'ispell-skip-region-alist skip-pair))
 
-  ;; Hide the "Starting new Ispell process" message
-  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+;;   ;; Hide the "Starting new Ispell process" message
+;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -3266,28 +3266,29 @@ The provider is `nerd-icons'."
 ;; Company has `company-statistics'. Prescient uses frecency (frequency +
 ;; recency) for sorting. Recently used commands should be sorted first. Only
 ;; commands that have never been used before will be sorted by length.
-(use-package prescient
-  :vc (:url "https://github.com/radian-software/prescient.el")
 
-  :hook (after-init . prescient-persist-mode)
+;; (use-package prescient
+;;   :vc (:url "https://github.com/radian-software/prescient.el")
 
-  :custom (prescient-sort-full-matches-first t)
+;;   :hook (after-init . prescient-persist-mode)
 
-  :config
-  (with-eval-after-load 'vertico
-    (when (locate-library "vertico-prescient")
-      (require 'vertico-prescient)
-      (vertico-prescient-mode 1)))
+;;   :custom (prescient-sort-full-matches-first t)
 
-  (with-eval-after-load 'corfu
-    (when (locate-library "corfu-prescient")
-      (require 'corfu-prescient)
-      (corfu-prescient-mode 1)))
+;;   :config
+;;   (with-eval-after-load 'vertico
+;;     (when (locate-library "vertico-prescient")
+;;       (require 'vertico-prescient)
+;;       (vertico-prescient-mode 1)))
 
-  (with-eval-after-load 'company
-    (when (locate-library "company-prescient")
-      (require 'company-prescient)
-      (company-prescient-mode 1))))
+;;   (with-eval-after-load 'corfu
+;;     (when (locate-library "corfu-prescient")
+;;       (require 'corfu-prescient)
+;;       (corfu-prescient-mode 1)))
+
+;;   (with-eval-after-load 'company
+;;     (when (locate-library "company-prescient")
+;;       (require 'company-prescient)
+;;       (company-prescient-mode 1))))
 
 (defun sb/setup-lsp-provider ()
   "Set up LSP based on `sb/lsp-provider`.
@@ -5054,7 +5055,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       (set-face-attribute face nil :background 'unspecified))))
 
 (use-package tokyo-night
-  :vc (:url "https://github.com/bbatsov/tokyo-night-emacs")
+  :vc (:url "https://github.com/bbatsov/tokyo-night-emacs" :rev :newest)
 
   :when (eq sb/theme 'tokyonight)
 
@@ -6646,6 +6647,16 @@ DIR can be relative or absolute."
 ;;     (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
 
 ;;   :diminish)
+
+(use-package tramp-rpc
+  :vc
+  (:url
+   "https://github.com/ArthurHeymans/emacs-tramp-rpc"
+   :rev
+   :newest
+   :lisp-dir "lisp")
+
+  :after tramp)
 
 (use-package tramp-hlo
   :vc (:url "http://github.com/jsadusk/tramp-hlo")
