@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'modus-vivendi
-    'modus-vivendi)
+      'standard-dark
+    'standard-dark)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -42,6 +42,7 @@
     (const :tag "dracula" dracula)
     (const :tag "tokyonight" tokyonight)
     (const :tag "matugen" matugen)
+    (const :tag "standard-dark" standard-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -73,7 +74,7 @@
 ;; edges with terminal Emacs. The completion entries wrap around sometimes, and
 ;; messes up the completion.
 
-(defcustom sb/completion-provider 'company
+(defcustom sb/completion-provider 'corfu
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -110,7 +111,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -139,6 +140,21 @@ The provider is `nerd-icons'."
 
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
+
+(require 'package)
+(setopt
+ package-quickstart nil
+ package-archives
+ '(("org" . "https://orgmode.org/elpa/")
+   ("gnu" . "https://elpa.gnu.org/packages/")
+   ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+   ("melpa" . "https://melpa.org/packages/"))
+ package-install-upgrade-built-in t
+ package-native-compile t)
+
+(unless package--initialized
+  (package-initialize))
+(package-initialize)
 
 (require 'use-package)
 
@@ -1102,12 +1118,6 @@ The provider is `nerd-icons'."
 ;;   :config (add-hook 'project-find-functions #'project-x-try-local 90))
 
 (use-package vertico
-  :vc
-  (:url
-   "https://github.com/minad/vertico"
-   :lisp-dir "extensions"
-   :main-file "vertico.el")
-
   :hook
   ((after-init . vertico-mode)
    (minibuffer-setup . vertico-repeat-save)
@@ -1166,16 +1176,16 @@ The provider is `nerd-icons'."
         "  ")
       cand))))
 
-(use-package vertico-timer
-  :vc (:url "https://github.com/ventruvian/vertico-timer")
+;; (use-package vertico-timer
+;;   :vc (:url "https://github.com/ventruvian/vertico-timer")
 
-  :after vertico
+;;   :after vertico
 
-  :hook (vertico-mode . vertico-timer-mode)
+;;   :hook (vertico-mode . vertico-timer-mode)
 
-  :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
+;;   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
 
-  :diminish vertico-timer-mode)
+;;   :diminish vertico-timer-mode)
 
 ;; ;; Show the currently selected candidate on the first line of the candidate list
 ;; (use-package vertico-carousel
@@ -1348,9 +1358,11 @@ The provider is `nerd-icons'."
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
 (use-package consult-tramp
-  :vc (:url "https://github.com/Ladicle/consult-tramp")
+  :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
 
-  :commands consult-tramp)
+  :after consult
+
+  :bind ("C-c d t" . consult-tramp))
 
 ;; ;; Provide context-dependent actions similar to a content menu.
 ;; (use-package embark
@@ -1564,8 +1576,6 @@ The provider is `nerd-icons'."
   :diminish whole-line-or-region-local-mode)
 
 (use-package dogears
-  :vc (:url "https://github.com/alphapapa/dogears.el")
-
   :hook ((prog-mode text-mode) . dogears-mode)
 
   :bind
@@ -1646,8 +1656,6 @@ The provider is `nerd-icons'."
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
-  :vc (:url "https://github.com/victorhge/iedit")
-
   :bind* ("C-." . iedit-mode))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
@@ -1867,9 +1875,6 @@ The provider is `nerd-icons'."
 ;; Use Emacsclient as the $EDITOR of child processes.
 (use-package with-editor :diminish)
 
-(use-package cond-let
-  :vc (:url "https://github.com/tarsius/cond-let"))
-
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package magit
   :hook
@@ -1941,8 +1946,8 @@ The provider is `nerd-icons'."
 ;;   :ensure nil)
 
 ;; (use-package conflict-buttons
-;;   :vc (:url "https://git.andros.dev/andros/conflict-buttons.el")
 ;;   :when (display-graphic-p)
+
 ;;   :hook (smerge-mode . conflict-buttons-mode))
 
 ;; (use-package elec-pair
@@ -1950,6 +1955,7 @@ The provider is `nerd-icons'."
 ;;   (defun sb/add-pairs (pairs)
 ;;     (setq-local electric-pair-pairs (append electric-pair-pairs pairs))
 ;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
+
 ;;   :ensure nil
 
 ;;   :hook (after-init . electric-pair-mode)
@@ -3058,12 +3064,6 @@ The provider is `nerd-icons'."
     "Use shorter prefix for Corfu in `prog-mode'."
     (setq-local corfu-auto-prefix 2))
 
-  :vc
-  (:url
-   "https://github.com/minad/corfu"
-   :lisp-dir "extensions"
-   :main-file "corfu.el")
-
   :when (eq sb/completion-provider 'corfu)
 
   :hook
@@ -3135,14 +3135,14 @@ The provider is `nerd-icons'."
   ;; Prevent wraparound at the right edge, although this breaks sometimes.
   (corfu-terminal-position-right-margin 2))
 
-(use-package yasnippet-capf
-  :vc (:url "https://github.com/elken/yasnippet-capf")
+;; (use-package yasnippet-capf
+;;   :vc (:url "https://github.com/elken/yasnippet-capf")
 
-  :when (eq sb/completion-provider 'corfu)
+;;   :when (eq sb/completion-provider 'corfu)
 
-  :after yasnippet
+;;   :after (cape yasnippet)
 
-  :demand t)
+;;   :demand t)
 
 (use-package cape
   :after corfu
@@ -3190,9 +3190,8 @@ The provider is `nerd-icons'."
        (setq-local completion-at-point-functions
                    (list
                     #'cape-file
-                    (cape-capf-trigger #'yasnippet-capf ?/)
-                    #'cape-dict
-                    (cape-capf-buster #'cape-dabbrev))))))
+                    ;; (cape-capf-trigger #'yasnippet-capf ?/)
+                    #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
 
   (add-hook
    'org-mode-hook
@@ -3200,7 +3199,7 @@ The provider is `nerd-icons'."
      (setq-local completion-at-point-functions
                  (list
                   #'cape-file
-                  (cape-capf-trigger #'yasnippet-capf ?/)
+                  ;; (cape-capf-trigger #'yasnippet-capf ?/)
                   #'cape-elisp-block
                   #'cape-dict
                   (cape-capf-buster #'cape-dabbrev)))))
@@ -3211,7 +3210,7 @@ The provider is `nerd-icons'."
    (lambda ()
      (setq-local completion-at-point-functions
                  (list
-                  (cape-capf-trigger #'yasnippet-capf ?/)
+                  ;; (cape-capf-trigger #'yasnippet-capf ?/)
                   (cape-capf-inside-code
                    (cape-capf-super #'cape-keyword #'cape-dabbrev))
                   (cape-capf-inside-comment #'cape-dict)
@@ -3225,7 +3224,7 @@ The provider is `nerd-icons'."
       completion-at-point-functions
       (list
        (cape-capf-inside-string #'cape-file)
-       (cape-capf-trigger #'yasnippet-capf ?/)
+       ;; (cape-capf-trigger #'yasnippet-capf ?/)
        #'citar-capf
 
        ;; (cape-capf-super
@@ -3245,8 +3244,7 @@ The provider is `nerd-icons'."
        ;;  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
        ;;  #'cape-tex)
 
-       #'cape-dict
-       (cape-capf-buster #'cape-dabbrev)))))
+       #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -3255,7 +3253,7 @@ The provider is `nerd-icons'."
        (setq-local completion-at-point-functions
                    (list
                     (cape-capf-inside-string #'cape-file)
-                    #'yasnippet-capf
+                    ;; #'yasnippet-capf
                     (cape-capf-inside-code
                      (cape-capf-nonexclusive #'elisp-completion-at-point))
                     (cape-capf-inside-code #'cape-elisp-symbol)
@@ -4003,8 +4001,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (sb/setup-lsp-provider))))
 
 ;; (use-package doxymacs
-;;   :vc (:url "https://github.com/pniedzielski/doxymacs")
-
 ;;   :hook (c-mode-common-hook . doxymacs-mode)
 
 ;;   :bind
@@ -5080,9 +5076,16 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (require 'matugen-theme)
   (load-theme 'matugen t))
 
-(use-package nerd-icons-corfu
-  :vc (:url "https://github.com/LuigiPiucco/nerd-icons-corfu")
+(use-package standard-themes
+  :when (eq sb/theme 'standard-dark)
 
+  :init (standard-themes-take-over-modus-themes-mode 1)
+
+  :custom (modus-themes-mixed-fonts nil)
+
+  :config (modus-themes-load-theme 'standard-dark))
+
+(use-package nerd-icons-corfu
   :when
   (and (bound-and-true-p sb/enable-icons)
        (eq sb/completion-provider 'corfu)
@@ -5096,8 +5099,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; Icons in the minibuffer
 (use-package nerd-icons-completion
-  :vc (:url "https://github.com/rainstormstudio/nerd-icons-completion")
-
   :when (bound-and-true-p sb/enable-icons)
 
   :after (nerd-icons marginalia)
@@ -5107,8 +5108,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
 (use-package nerd-icons-dired
-  :vc (:url "https://github.com/rainstormstudio/nerd-icons-dired")
-
   :when (bound-and-true-p sb/enable-icons)
 
   :hook (dired-mode . nerd-icons-dired-mode)
@@ -5500,6 +5499,7 @@ Shows both colors when errors and warnings are present."
   (mini-echo-persistent-rule
    '(:long
      ("remote-host"
+      "selection-info"
       "flycheck"
       "lsp-mode"
       "vcs"
@@ -5568,22 +5568,22 @@ Shows both colors when errors and warnings are present."
 
    :update (mini-echo-update-project-root))
 
-  (mini-echo-define-segment
-   "vcs" "Show VCS info with icon."
-   :fetch
-   (when (and (bound-and-true-p vc-mode) buffer-file-name)
-     (let* ((branch (substring-no-properties vc-mode 5))
-            (branch (propertize branch 'face '(:height 0.9)))
-            (icon
-             (when (fboundp 'nerd-icons-octicon)
-               (nerd-icons-octicon
-                "nf-oct-git_branch"
-                :face 'mini-echo-yellow
-                :height 0.8))))
-       (concat
-        (when icon
-          (concat icon " "))
-        branch))))
+  ;; (mini-echo-define-segment
+  ;;  "vcs" "Show VCS info with icon."
+  ;;  :fetch
+  ;;  (when (and (bound-and-true-p vc-mode) buffer-file-name)
+  ;;    (let* ((branch (substring-no-properties vc-mode 5))
+  ;;           (branch (propertize branch 'face '(:height 0.9)))
+  ;;           (icon
+  ;;            (when (fboundp 'nerd-icons-octicon)
+  ;;              (nerd-icons-octicon
+  ;;               "nf-oct-git_branch"
+  ;;               :face 'mini-echo-yellow
+  ;;               :height 0.8))))
+  ;;      (concat
+  ;;       (when icon
+  ;;         (concat icon " "))
+  ;;       branch))))
 
   (mini-echo-define-segment
    "lsp-mode" "Show LSP status with icon."
@@ -5600,26 +5600,79 @@ Shows both colors when errors and warnings are present."
           (concat " " icon))))))
 
   (mini-echo-define-segment
-   "flycheck" "Color-coded vanilla Flycheck status."
-   :update-advice '((flycheck-after-lint . :after))
+   "lsp-mode" "Show dynamic LSP status with active server count."
    :fetch
-   (when (and (bound-and-true-p flycheck-mode)
-              (fboundp 'flycheck-mode-line-status-text))
-     (let* ((status (substring-no-properties (flycheck-mode-line-status-text)))
-            (counts
-             (and (boundp 'flycheck-current-errors)
-                  (flycheck-count-errors flycheck-current-errors)))
-            (face-color
-             (cond
-              ((assq 'error counts)
-               "red")
-              ((assq 'warning counts)
-               "yellow")
-              ((assq 'info counts)
-               "cyan")
-              (t
-               "green"))))
-       (propertize status 'face `(:foreground ,face-color :height 0.8))))))
+   (when (and (bound-and-true-p lsp-mode) (fboundp 'lsp-workspaces))
+     (let*
+         ((active-servers (lsp-workspaces))
+          (server-count (length active-servers))
+          ;; Use an orange/yellow warning face if LSP is active but no servers connected
+          (icon-face
+           (if (> server-count 0)
+               'mini-echo-green
+             'mini-echo-yellow))
+          (icon
+           (when (fboundp 'nerd-icons-mdicon)
+             (nerd-icons-mdicon
+              "nf-md-rocket_launch"
+              :face icon-face
+              :height 0.8))))
+       (concat
+        (when icon
+          (concat " " icon))
+        ;; Only show the count if you have multiple servers running (like your 3-server LaTeX setup)
+        (when (> server-count 1)
+          (propertize (format "(%d)" server-count)
+                      'face
+                      `(:inherit shadow :height 0.7)))))))
+
+  ;; (mini-echo-define-segment
+  ;;  "flycheck" "Color-coded vanilla Flycheck status."
+  ;;  :update-advice '((flycheck-after-lint . :after))
+  ;;  :fetch
+  ;;  (when (and (bound-and-true-p flycheck-mode)
+  ;;             (fboundp 'flycheck-mode-line-status-text))
+  ;;    (let* ((status (substring-no-properties (flycheck-mode-line-status-text)))
+  ;;           (counts
+  ;;            (and (boundp 'flycheck-current-errors)
+  ;;                 (flycheck-count-errors flycheck-current-errors)))
+  ;;           (face-color
+  ;;            (cond
+  ;;             ((assq 'error counts)
+  ;;              "red")
+  ;;             ((assq 'warning counts)
+  ;;              "yellow")
+  ;;             ((assq 'info counts)
+  ;;              "cyan")
+  ;;             (t
+  ;;              "green"))))
+  ;;      (unless (string-empty-p status)
+  ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
+
+  ;; (mini-echo-define-segment
+  ;;  "flycheck" "Color-coded high-performance Flycheck status."
+  ;;  :update-advice '((flycheck-after-lint . :after))
+  ;;  :fetch
+  ;;  (when (and (bound-and-true-p flycheck-mode)
+  ;;             (fboundp 'flycheck-mode-line-status-text))
+  ;;    (let*
+  ;;        ((status-text (flycheck-mode-line-status-text))
+  ;;         (status (substring-no-properties (or status-text "")))
+  ;;         ;; Leverage pre-computed boolean flags instead of parsing an alist loop
+  ;;         (face-color
+  ;;          (cond
+  ;;           ((bound-and-true-p flycheck-has-current-errors)
+  ;;            "red")
+  ;;           ((bound-and-true-p flycheck-has-current-warnings)
+  ;;            "yellow")
+  ;;           ((bound-and-true-p flycheck-has-current-info)
+  ;;            "cyan")
+  ;;           (t
+  ;;            "green"))))
+  ;;      ;; Only render the status if it isn't completely blank
+  ;;      (unless (string-empty-p status)
+  ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
+  )
 
 ;; (use-package centaur-tabs
 ;;   :hook ((after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -5643,17 +5696,15 @@ Shows both colors when errors and warnings are present."
 ;;   ;; Make the headline face match `centaur-tabs-default' face
 ;;   (centaur-tabs-headline-match))
 
-;; ;; Center the text environment
-;; (use-package olivetti
-;;   :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
+;; Center the text environment
+(use-package olivetti
+  :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
 
-;;   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
+  :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
 
-;;   :diminish)
+  :diminish)
 
 (use-package kdl-mode
-  :vc (:url "https://github.com/taquangtrung/emacs-kdl-mode")
-
   :when
   (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
@@ -5694,15 +5745,14 @@ Shows both colors when errors and warnings are present."
   ;; :hook (asm-mode . sb/setup-lsp-provider)
   )
 
-;; Guess the indentation offset originally used in foreign source code files and
-;; transparently adjust the corresponding settings in Emacs making it more
-;; convenient to edit the foreign files.
-(use-package dtrt-indent
-  :vc (:url "https://github.com/jscheid/dtrt-indent")
+;; ;; Guess the indentation offset originally used in foreign source code files and
+;; ;; transparently adjust the corresponding settings in Emacs making it more
+;; ;; convenient to edit the foreign files.
 
-  :hook (find-file . dtrt-indent-mode)
+;; (use-package dtrt-indent
+;;   :hook (find-file . dtrt-indent-mode)
 
-  :diminish)
+;;   :diminish)
 
 ;; Navigate the xref stack with consult
 (use-package consult-xref-stack
@@ -5854,14 +5904,13 @@ Shows both colors when errors and warnings are present."
 ;; (use-package string-inflection
 ;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
-(use-package kill-file-path
-  :vc (:url "https://github.com/chyla/kill-file-path")
+;; (use-package kill-file-path)
 
-  :commands
-  (kill-file-path-basename
-   kill-file-path-basename-without-extension
-   kill-file-path-dirname
-   kill-file-path))
+;;   :commands
+;;   (kill-file-path-basename
+;;    kill-file-path-basename-without-extension
+;;    kill-file-path-dirname
+;;    kill-file-path))
 
 ;; Allow fetching the latest versions via Elpaca to satisfy Eglot requirements
 (use-package flymake)
@@ -6197,7 +6246,9 @@ Shows both colors when errors and warnings are present."
            (cape-capf-super
             #'eglot-completion-at-point
             ;; We do not need to merge `cape-keyword' and `cape-dabbrev' if for Eglot-managed major modes
-            #'yasnippet-capf))
+
+            ;; #'yasnippet-capf
+            ))
           (cape-capf-inside-comment #'cape-dict)
           (cape-capf-inside-string #'cape-file)
           (cape-capf-buster #'cape-dabbrev)))))
@@ -6648,20 +6699,20 @@ DIR can be relative or absolute."
 
 ;;   :diminish)
 
-(use-package tramp-rpc
-  :vc
-  (:url
-   "https://github.com/ArthurHeymans/emacs-tramp-rpc"
-   :rev
-   :newest
-   :lisp-dir "lisp")
+;; (use-package tramp-rpc
+;;   :vc
+;;   (:url
+;;    "https://github.com/ArthurHeymans/emacs-tramp-rpc"
+;;    :rev
+;;    :newest
+;;    :lisp-dir "lisp")
 
-  :after tramp)
+;;   :after tramp)
 
-(use-package tramp-hlo
-  :vc (:url "http://github.com/jsadusk/tramp-hlo")
+;; (use-package tramp-hlo
+;;   :vc (:url "http://github.com/jsadusk/tramp-hlo")
 
-  :hook (emacs-startup . tramp-hlo-setup))
+;;   :hook (emacs-startup . tramp-hlo-setup))
 
 ;; (with-eval-after-load 'transient
 ;;   (transient-define-prefix
