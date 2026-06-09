@@ -3122,7 +3122,7 @@ The provider is `nerd-icons'."
 
 ;; Emacs 31+ has in-built support for child frames in the terminal
 (use-package corfu-terminal
-  :vc (:url "https://codeberg.org/akib/emacs-corfu-terminal")
+  :vc (:url "https://codeberg.org/akib/emacs-corfu-terminal" :rev :newest)
 
   :when
   (and (eq sb/completion-provider 'corfu)
@@ -3629,8 +3629,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
-  :vc (:url "https://github.com/alberti42/emacs-ltex-plus")
-
   :when (eq sb/lsp-provider 'lsp-mode)
 
   :after lsp-mode
@@ -4717,7 +4715,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :diminish)
 
 (use-package consult-reftex
-  :vc (:url "https://github.com/karthink/consult-reftex")
+  :vc (:url "https://github.com/karthink/consult-reftex" :rev :newest)
 
   :after (consult reftex)
 
@@ -5437,7 +5435,7 @@ Shows both colors when errors and warnings are present."
     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
 
 (use-package awesome-tray
-  :vc (:url "https://github.com/manateelazycat/awesome-tray")
+  :vc (:url "https://github.com/manateelazycat/awesome-tray" :rev :newest)
 
   :when (eq sb/modeline-theme 'awesome-tray)
 
