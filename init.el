@@ -26,8 +26,8 @@
 ;; colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'modus-vivendi
-    'modus-vivendi)
+      'standard-dark
+    'standard-dark)
   "Specify which Emacs theme to use."
   :type
   '(radio
@@ -42,6 +42,7 @@
     (const :tag "dracula" dracula)
     (const :tag "tokyonight" tokyonight)
     (const :tag "matugen" matugen)
+    (const :tag "standard-dark" standard-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -289,7 +290,7 @@ The provider is `nerd-icons'."
 ;; Using a single server suffices for most programming language major modes, but
 ;; it is beneficial to use more than one LS for languages like plain text,
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'lsp-mode
+(defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
   :type
   '(radio
@@ -307,7 +308,7 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/op-mode 'daemon
+(defcustom sb/op-mode 'standalone
   "Specify the way you expect Emacs to be used."
   :type
   '(radio
@@ -381,6 +382,7 @@ The provider is `nerd-icons'."
 ;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
 ;; for defining aliases. Then, we can avoid passing shell arguments to be more
 ;; efficient.
+
 (use-package exec-path-from-shell
   :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
 
@@ -388,7 +390,8 @@ The provider is `nerd-icons'."
 
   :custom
   (exec-path-from-shell-check-startup-files nil)
-  (exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LSP_USE_PLISTS"))
+  (exec-path-from-shell-variables
+   '("PATH" "JAVA_HOME" "LSP_USE_PLISTS" "LTEX_LS_PLUS" "JDTLS_PATH"))
 
   ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
   ;; it is needed for Emacs client.
@@ -465,7 +468,9 @@ The provider is `nerd-icons'."
 
    ("C-M-b" . backward-sexp)
    ("C-M-f" . forward-sexp)
-   ("C-M-k" . kill-sexp))
+   ("C-M-k" . kill-sexp)
+
+   ("C-c d m" . restart-emacs))
 
   :bind* ("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
 
@@ -823,32 +828,32 @@ The provider is `nerd-icons'."
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; Allows viewing PDFs remotely through Tramp.
-(use-package doc-view
-  :ensure nil
+;; ;; Allows viewing PDFs remotely through Tramp.
+;; (use-package doc-view
+;;   :ensure nil
 
-  :hook
-  (doc-view-mode
-   .
-   (lambda ()
-     (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
-       (auto-revert-mode 1))))
+;;   :hook
+;;   (doc-view-mode
+;;    .
+;;    (lambda ()
+;;      (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
+;;        (auto-revert-mode 1))))
 
-  :bind
-  (:map
-   doc-view-mode-map
-   ("=" . doc-view-enlarge)
-   ("-" . doc-view-shrink)
-   ("n" . doc-view-next-page)
-   ("p" . doc-view-previous-page)
-   ("0" . doc-view-scale-reset)
-   ("M-<" . doc-view-first-page)
-   ("M->" . doc-view-last-page)
-   ("C-l" . doc-view-goto-page))
+;;   :bind
+;;   (:map
+;;    doc-view-mode-map
+;;    ("=" . doc-view-enlarge)
+;;    ("-" . doc-view-shrink)
+;;    ("n" . doc-view-next-page)
+;;    ("p" . doc-view-previous-page)
+;;    ("0" . doc-view-scale-reset)
+;;    ("M-<" . doc-view-first-page)
+;;    ("M->" . doc-view-last-page)
+;;    ("C-l" . doc-view-goto-page))
 
-  :custom
-  (doc-view-continuous t)
-  (doc-view-resolution 120))
+;;   :custom
+;;   (doc-view-continuous t)
+;;   (doc-view-resolution 120))
 
 ;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
 ;; `find-file' unless a prefix argument is given. Then it will find file at
@@ -1025,13 +1030,13 @@ The provider is `nerd-icons'."
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-(use-package vlf
-  :commands vlf
+;; ;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
+;; (use-package vlf
+;;   :commands vlf
 
-  :init (setopt vlf-application 'dont-ask)
+;;   :init (setopt vlf-application 'dont-ask)
 
-  :config (require 'vlf-setup))
+;;   :config (require 'vlf-setup))
 
 (use-package immortal-scratch
   :hook (elpaca-after-init . immortal-scratch-mode))
@@ -1051,20 +1056,20 @@ The provider is `nerd-icons'."
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
 
-(use-package pixel-scroll
-  :ensure nil
+;; (use-package pixel-scroll
+;;   :ensure nil
 
-  :custom
-  (pixel-scroll-precision-use-momentum nil)
-  (pixel-scroll-precision-interpolate-page t)
+;;   :custom
+;;   (pixel-scroll-precision-use-momentum nil)
+;;   (pixel-scroll-precision-interpolate-page t)
 
-  :config
-  (cond
-   ((fboundp 'pixel-scroll-precision-mode)
-    (pixel-scroll-precision-mode 1))
-   ;; `pixel-scroll-mode' uses line-by-line scrolling.
-   ((fboundp 'pixel-scroll-mode)
-    (pixel-scroll-mode 1))))
+;;   :config
+;;   (cond
+;;    ((fboundp 'pixel-scroll-precision-mode)
+;;     (pixel-scroll-precision-mode 1))
+;;    ;; `pixel-scroll-mode' uses line-by-line scrolling.
+;;    ((fboundp 'pixel-scroll-mode)
+;;     (pixel-scroll-mode 1))))
 
 ;; ;; Show temporary buffers as a popup window, and close them with "C-g"
 ;; (use-package popwin
@@ -1232,7 +1237,7 @@ The provider is `nerd-icons'."
     (dired-next-line -1)))
 
 (use-package dired-narrow
-  :after dired
+  :commands dired-narrow
 
   :bind (:map dired-mode-map ("/" . dired-narrow)))
 
@@ -1345,16 +1350,16 @@ The provider is `nerd-icons'."
         "  ")
       cand))))
 
-(use-package vertico-timer
-  :ensure (:host github :repo "ventruvian/vertico-timer")
+;; (use-package vertico-timer
+;;   :vc (:url "https://github.com/ventruvian/vertico-timer")
 
-  :after vertico
+;;   :after vertico
 
-  :hook (vertico-mode . vertico-timer-mode)
+;;   :hook (vertico-mode . vertico-timer-mode)
 
-  :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
+;;   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
 
-  :diminish vertico-timer-mode)
+;;   :diminish vertico-timer-mode)
 
 ;; ;; Show the currently selected candidate on the first line of the candidate list
 ;; (use-package vertico-carousel
@@ -1453,7 +1458,7 @@ The provider is `nerd-icons'."
 
   (consult-narrow-key "<")
   (consult-widen-key ">")
-  (consult-buffer-filter sb/consult-buffer-filter)
+  ;; (consult-buffer-filter sb/consult-buffer-filter)
 
   :config
   (consult-customize
@@ -1529,127 +1534,132 @@ The provider is `nerd-icons'."
 (use-package consult-tramp
   :ensure (:host github :repo "Ladicle/consult-tramp")
 
-  :commands consult-tramp)
+  :after consult
 
-;; Provide context-dependent actions similar to a content menu.
-(use-package embark
-  :bind
-  ( ;; "C-h b" lists all the bindings available in a buffer
-   ([remap describe-bindings] . embark-bindings)
-   ("C-`" . embark-act)
-   ("C-;" . embark-dwim)
-   :map
-   minibuffer-local-map
-   ("C-`" . embark-act)
-   ("C-c C-c" . embark-collect)
-   ("C-c C-e" . embark-export))
+  :bind ("C-c d t" . consult-tramp))
 
-  :custom
-  ;; Replace the key help with a completing-read interface
-  (prefix-help-command #'embark-prefix-help-command))
+;; ;; Provide context-dependent actions similar to a content menu.
 
-;; Supports exporting search results to a `grep-mode' buffer, on which you can
-;; use `wgrep'.
-(use-package embark-consult
-  :after (embark consult)
+;; (use-package embark
+;;   :bind
+;;   ( ;; "C-h b" lists all the bindings available in a buffer
+;;    ([remap describe-bindings] . embark-bindings)
+;;    ("C-`" . embark-act)
+;;    ("C-;" . embark-dwim)
+;;    :map
+;;    minibuffer-local-map
+;;    ("C-`" . embark-act)
+;;    ("C-c C-c" . embark-collect)
+;;    ("C-c C-e" . embark-export))
 
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
+;;   :custom
+;;   ;; Replace the key help with a completing-read interface
+;;   (prefix-help-command #'embark-prefix-help-command))
 
-;; Rich annotations in the minibuffer, e.g., documentation strings or file
-;; information.
-(use-package marginalia
-  :hook (vertico-mode . marginalia-mode)
+;; ;; Supports exporting search results to a `grep-mode' buffer, on which you can
+;; ;; use `wgrep'.
 
-  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+;; (use-package embark-consult
+;;   :after (embark consult)
 
-  :config
-  ;; Reduce noise by removing annotations for files otherwise columns become
-  ;; unaligned and look ugly.
-  (setopt marginalia-annotators
-          (cl-remove-if
-           (lambda (pair) (memq (car pair) '(file project-file)))
-           marginalia-annotators))
+;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-  (defun sb/marginalia-annotate-variable (cand)
-    "Annotate function CAND with its documentation string."
-    (when-let (sym
-               (intern-soft cand))
-      (marginalia--fields
-       ((marginalia--variable-value sym) :truncate 0.5)
-       ((documentation-property sym 'variable-documentation)
-        :truncate 1.0
-        :face 'marginalia-documentation))))
+;; ;; Rich annotations in the minibuffer, e.g., documentation strings or file
+;; ;; information.
 
-  ;; Override the annotators for the variable category.
-  (add-to-list
-   'marginalia-annotators
-   '(variable sb/marginalia-annotate-variable builtin none)))
+;; (use-package marginalia
+;;   :hook (vertico-mode . marginalia-mode)
 
-(use-package ispell
-  :ensure nil
+;;   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
 
-  :bind ("M-$" . ispell-word)
+;;   :config
+;;   ;; Reduce noise by removing annotations for files otherwise columns become
+;;   ;; unaligned and look ugly.
+;;   (setopt marginalia-annotators
+;;           (cl-remove-if
+;;            (lambda (pair) (memq (car pair) '(file project-file)))
+;;            marginalia-annotators))
 
-  :custom
-  (ispell-dictionary "en_US")
-  (ispell-local-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  (ispell-alternate-dictionary
-   (expand-file-name "wordlist.5" sb/extras-directory))
-  ;; Save a new word to personal dictionary without asking
-  (ispell-silently-savep t)
+;;   (defun sb/marginalia-annotate-variable (cand)
+;;     "Annotate function CAND with its documentation string."
+;;     (when-let (sym
+;;                (intern-soft cand))
+;;       (marginalia--fields
+;;        ((marginalia--variable-value sym) :truncate 0.5)
+;;        ((documentation-property sym 'variable-documentation)
+;;         :truncate 1.0
+;;         :face 'marginalia-documentation))))
 
-  :config
-  (when (boundp 'ispell-save-corrections-as-abbrevs)
-    (setq ispell-save-corrections-as-abbrevs t))
+;;   ;; Override the annotators for the variable category.
+;;   (add-to-list
+;;    'marginalia-annotators
+;;    '(variable sb/marginalia-annotate-variable builtin none)))
 
-  ;; Prefer hunspell over aspell on Linux platforms
-  (cond
-   ((executable-find "hunspell")
-    (progn
-      (setenv "DICTIONARY" "en_US")
-      (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
-      (setopt
-       ispell-program-name "hunspell"
-       ispell-local-dictionary-alist
-       '(("en_US"
-          "[[:alpha:]]"
-          "[^[:alpha:]]"
-          "[']"
-          nil
-          ("-d" "en_US")
-          nil
-          utf-8))
-       ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-       ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
-   ((executable-find "aspell")
-    (progn
-      (setopt
-       ispell-program-name "aspell"
-       ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
+;; (use-package ispell
+;;   :ensure nil
 
-  ;; Skip regions in `org-mode'
-  (dolist
-      (skip-pair
-       '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-         ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-         ("~" . "~")
-         ("=" . "=")
-         ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-         ;; Footnotes in org that have http links that are line breaked should not be ispelled
-         ("^http" . "\\]")
-         ("`" . "`")
-         ("cite:" . "[[:space:]]")
-         ("label:" . "[[:space:]]")
-         ("ref:" . "[[:space:]]")
-         ("\\\\begin{multline}" . "\\\\end{multline}")
-         ("\\\\begin{equation}" . "\\\\end{equation}")
-         ("\\\\begin{align}" . "\\\\end{align}")))
-    (add-to-list 'ispell-skip-region-alist skip-pair))
+;;   :bind ("M-$" . ispell-word)
 
-  ;; Hide the "Starting new Ispell process" message
-  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+;;   :custom
+;;   (ispell-dictionary "en_US")
+;;   (ispell-local-dictionary "en_US")
+;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+;;   (ispell-alternate-dictionary
+;;    (expand-file-name "wordlist.5" sb/extras-directory))
+;;   ;; Save a new word to personal dictionary without asking
+;;   (ispell-silently-savep t)
+
+;;   :config
+;;   (when (boundp 'ispell-save-corrections-as-abbrevs)
+;;     (setq ispell-save-corrections-as-abbrevs t))
+
+;;   ;; Prefer hunspell over aspell on Linux platforms
+;;   (cond
+;;    ((executable-find "hunspell")
+;;     (progn
+;;       (setenv "DICTIONARY" "en_US")
+;;       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
+;;       (setopt
+;;        ispell-program-name "hunspell"
+;;        ispell-local-dictionary-alist
+;;        '(("en_US"
+;;           "[[:alpha:]]"
+;;           "[^[:alpha:]]"
+;;           "[']"
+;;           nil
+;;           ("-d" "en_US")
+;;           nil
+;;           utf-8))
+;;        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
+;;        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
+;;    ((executable-find "aspell")
+;;     (progn
+;;       (setopt
+;;        ispell-program-name "aspell"
+;;        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
+
+;;   ;; Skip regions in `org-mode'
+;;   (dolist
+;;       (skip-pair
+;;        '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+;;          ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+;;          ("~" . "~")
+;;          ("=" . "=")
+;;          ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+;;          ;; Footnotes in org that have http links that are line breaked should not be ispelled
+;;          ("^http" . "\\]")
+;;          ("`" . "`")
+;;          ("cite:" . "[[:space:]]")
+;;          ("label:" . "[[:space:]]")
+;;          ("ref:" . "[[:space:]]")
+;;          ("\\\\begin{multline}" . "\\\\end{multline}")
+;;          ("\\\\begin{equation}" . "\\\\end{equation}")
+;;          ("\\\\begin{align}" . "\\\\end{align}")))
+;;     (add-to-list 'ispell-skip-region-alist skip-pair))
+
+;;   ;; Hide the "Starting new Ispell process" message
+;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -1720,21 +1730,21 @@ The provider is `nerd-icons'."
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
-;; Change the contents inside pairs like parentheses, quotes, brackets, or
-;; custom delimiters. `change-inner "' allows to kill the string contents,
-;; `change-outer "' will kill the entire string including quotes.
-(use-package change-inner
-  :commands (change-inner change-outer))
+;; ;; Change the contents inside pairs like parentheses, quotes, brackets, or
+;; ;; custom delimiters. `change-inner "' allows to kill the string contents,
+;; ;; `change-outer "' will kill the entire string including quotes.
+;; (use-package change-inner
+;;   :commands (change-inner change-outer))
 
-;; Mark current line.
-(use-package expand-line
-  :bind ("M-i" . expand-line-mark-line)
+;; ;; Mark current line.
+;; (use-package expand-line
+;;   :bind ("M-i" . expand-line-mark-line)
 
-  :diminish)
+;;   :diminish)
 
-;; Restore point to the initial location with "C-g" after marking a region
-(use-package smart-mark
-  :hook (elpaca-after-init . smart-mark-mode))
+;; ;; Restore point to the initial location with "C-g" after marking a region
+;; (use-package smart-mark
+;;   :hook (after-init . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
@@ -1743,8 +1753,6 @@ The provider is `nerd-icons'."
   :diminish whole-line-or-region-local-mode)
 
 (use-package dogears
-  :ensure (:host github :repo "alphapapa/dogears.el")
-
   :hook ((prog-mode text-mode) . dogears-mode)
 
   :bind
@@ -1825,8 +1833,6 @@ The provider is `nerd-icons'."
 
 ;; Edit multiple regions in the same way simultaneously
 (use-package iedit
-  :ensure (:host github :repo "victorhge/iedit")
-
   :bind* ("C-." . iedit-mode))
 
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
@@ -1853,7 +1859,8 @@ The provider is `nerd-icons'."
 
 (use-package crux
   :bind
-  (("C-<f9>" . crux-recentf-find-directory)
+  (("C-c d s" . crux-sudo-edit)
+   ("C-<f9>" . crux-recentf-find-directory)
    ("C-<f11>" . crux-kill-other-buffers)
    ([remap keyboard-quit] . crux-keyboard-quit-dwim)
    ("C-c d i" . crux-ispell-word-then-abbrev))
@@ -1913,11 +1920,11 @@ The provider is `nerd-icons'."
 
   :diminish)
 
-;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-(use-package ws-butler
-  :hook (prog-mode . ws-butler-mode)
+;; ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
+;; (use-package ws-butler
+;;   :hook (prog-mode . ws-butler-mode)
 
-  :diminish)
+;;   :diminish)
 
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
@@ -2006,9 +2013,9 @@ The provider is `nerd-icons'."
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
-(use-package consult-ripfd
-  :ensure (:host github :repo "jdtsmith/consult-ripfd")
-  :commands consult-ripfd)
+;; (use-package consult-ripfd
+;;   :vc (:url "https://github.com/jdtsmith/consult-ripfd")
+;;   :commands consult-ripfd)
 
 (use-package re-builder
   :ensure nil
@@ -2046,9 +2053,6 @@ The provider is `nerd-icons'."
 ;; Use Emacsclient as the $EDITOR of child processes.
 (use-package with-editor :diminish)
 
-(use-package cond-let
-  :ensure (:host github :repo "tarsius/cond-let"))
-
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package magit
   :hook
@@ -2081,6 +2085,13 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
     (setopt magit-diff-refine-hunk t)))
+
+(use-package magit-difftastic
+  :vc (:url "https://github.com/rschmukler/magit-difftastic")
+
+  :after magit
+
+  :config (difftastic-status-mode 1))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -2119,16 +2130,17 @@ The provider is `nerd-icons'."
 ;; (use-package smerge-mode
 ;;   :ensure nil)
 
-(use-package conflict-buttons
-  :ensure (:type git :repo "https://git.andros.dev/andros/conflict-buttons.el")
-  :when (display-graphic-p)
-  :hook (smerge-mode . conflict-buttons-mode))
+;; (use-package conflict-buttons
+;;   :when (display-graphic-p)
+
+;;   :hook (smerge-mode . conflict-buttons-mode))
 
 ;; (use-package elec-pair
 ;;   :preface
 ;;   (defun sb/add-pairs (pairs)
 ;;     (setq-local electric-pair-pairs (append electric-pair-pairs pairs))
 ;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
+
 ;;   :ensure nil
 
 ;;   :hook (elpaca-after-init . electric-pair-mode)
@@ -2155,6 +2167,8 @@ The provider is `nerd-icons'."
 
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
+  :ensure (:url "http://framagit.org/steckerhalter/discover-my-major")
+
   :bind ("C-h C-m" . discover-my-major))
 
 ;; (use-package mode-minder
@@ -2949,8 +2963,10 @@ The provider is `nerd-icons'."
 ;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
 (use-package company-statistics
   :when (eq sb/completion-provider 'company)
+
   :after company
-  :init (company-statistics-mode 1))
+
+  :hook (company-mode . company-statistics-mode))
 
 ;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
@@ -2959,7 +2975,7 @@ The provider is `nerd-icons'."
 (use-package company-math
   :after company
 
-  :demand t)
+  :commands (company-math-symbols-unicode company-math-symbols-latex))
 
 (use-package company-dict
   :after company
@@ -3266,7 +3282,7 @@ The provider is `nerd-icons'."
    ("M-n" . corfu-popupinfo-scroll-up)
    ("M-p" . corfu-popupinfo-scroll-down)
    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
-   ("[escape]" . corfu-quit))
+   ([escape] . corfu-quit))
 
   :custom
   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
@@ -3400,6 +3416,10 @@ The provider is `nerd-icons'."
        (cape-capf-trigger #'yasnippet-capf ?/)
        #'citar-capf
 
+       (cape-company-to-capf #'company-latex-commands)
+       (cape-company-to-capf #'company-auctex-macros)
+       (cape-company-to-capf #'company-auctex-environments)
+
        ;; (cape-capf-super
        ;;  #'citar-capf
        ;;  (cape-company-to-capf #'company-reftex-labels)
@@ -3438,9 +3458,8 @@ The provider is `nerd-icons'."
 ;; Company has `company-statistics'. Prescient uses frecency (frequency +
 ;; recency) for sorting. Recently used commands should be sorted first. Only
 ;; commands that have never been used before will be sorted by length.
-(use-package prescient
-  :ensure (:host github :repo "radian-software/prescient.el" :files (:defaults "/*.el"))
 
+(use-package prescient
   :hook (elpaca-after-init . prescient-persist-mode)
 
   :custom (prescient-sort-full-matches-first t)
@@ -3795,8 +3814,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
-  :ensure (:host github :repo "alberti42/emacs-ltex-plus")
-
   :when (eq sb/lsp-provider 'lsp-mode)
 
   :after lsp-mode
@@ -3806,7 +3823,15 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :custom
   (lsp-ltex-plus-check-programming-languages t)
   (lsp-ltex-plus-disabled-rules
-   '(:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])))
+   '(:en-US
+     ["ELLIPSIS"
+      "EN_QUOTES"
+      "MORFOLOGIK_RULE_EN_US"
+      "MORFOLOGIK_RULE_EN_GB"
+      "OXFORD_SPELLING_Z_NOT_S"
+      "MORFOLOGIK_RULE_EN"
+      "WANT"
+      "EN_DIACRITICS_REPLACE"])))
 
 ;; (use-package lsp-ltex-plus
 ;;   :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
@@ -4166,52 +4191,52 @@ Uses `eglot` or `lsp-mode` depending on configuration."
        (setq-local lsp-disabled-clients '(ltex-ls-plus cmake-language-server)))
      (sb/setup-lsp-provider))))
 
-(use-package doxymacs
-  :ensure (:host github :repo "pniedzielski/doxymacs")
+;; (use-package doxymacs
+;;   :ensure (:host github :repo "pniedzielski/doxymacs")
 
-  :hook (c-mode-common-hook . doxymacs-mode)
+;;   :hook (c-mode-common-hook . doxymacs-mode)
 
-  :bind
-  (:map
-   c-mode-base-map
-   ;; Lookup documentation for the symbol at point.
-   ("C-c d ?" . doxymacs-lookup)
-   ;; Rescan your Doxygen tags file.
-   ("C-c d r" . doxymacs-rescan-tags)
-   ;; Prompt you for a Doxygen command to enter, and its
-   ;; arguments.
-   ("C-c d RET" . doxymacs-insert-command)
-   ;; Insert a Doxygen comment for the next function.
-   ("C-c d f" . doxymacs-insert-function-comment)
-   ;; Insert a Doxygen comment for the current file.
-   ("C-c d i" . doxymacs-insert-file-comment)
-   ;; Insert a Doxygen comment for the current member.
-   ("C-c d ;" . doxymacs-insert-member-comment)
-   ;; Insert a blank multi-line Doxygen comment.
-   ("C-c d m" . doxymacs-insert-blank-multiline-comment)
-   ;; Insert a blank single-line Doxygen comment.
-   ("C-c d s" . doxymacs-insert-blank-singleline-comment)
-   ;; Insert a grouping comments around the current region.
-   ("C-c d @" . doxymacs-insert-grouping-comments))
+;;   :bind
+;;   (:map
+;;    c-mode-base-map
+;;    ;; Lookup documentation for the symbol at point.
+;;    ("C-c d ?" . doxymacs-lookup)
+;;    ;; Rescan your Doxygen tags file.
+;;    ("C-c d r" . doxymacs-rescan-tags)
+;;    ;; Prompt you for a Doxygen command to enter, and its
+;;    ;; arguments.
+;;    ("C-c d RET" . doxymacs-insert-command)
+;;    ;; Insert a Doxygen comment for the next function.
+;;    ("C-c d f" . doxymacs-insert-function-comment)
+;;    ;; Insert a Doxygen comment for the current file.
+;;    ("C-c d i" . doxymacs-insert-file-comment)
+;;    ;; Insert a Doxygen comment for the current member.
+;;    ("C-c d ;" . doxymacs-insert-member-comment)
+;;    ;; Insert a blank multi-line Doxygen comment.
+;;    ("C-c d m" . doxymacs-insert-blank-multiline-comment)
+;;    ;; Insert a blank single-line Doxygen comment.
+;;    ("C-c d s" . doxymacs-insert-blank-singleline-comment)
+;;    ;; Insert a grouping comments around the current region.
+;;    ("C-c d @" . doxymacs-insert-grouping-comments))
 
-  ;; :custom
-  ;;   ;; Configure source code <-> Doxygen tag file <-> Doxygen HTML
-  ;;   ;; documentation mapping:
-  ;;   ;;   - Files in /home/me/project/foo/ have their tag file at
-  ;;   ;;     http://someplace.com/doc/foo/foo.xml, and HTML documentation
-  ;;   ;;     at http://someplace.com/doc/foo/.
-  ;;   ;;   - Files in /home/me/project/bar/ have their tag file at
-  ;;   ;;     ~/project/bar/doc/bar.xml, and HTML documentation at
-  ;;   ;;     file:///home/me/project/bar/doc/.
-  ;;   ;; This must be configured for Doxymacs to function!
-  ;;   (doxymacs-doxygen-dirs
-  ;;    '(("^/home/me/project/foo/"
-  ;;       "http://someplace.com/doc/foo/foo.xml"
-  ;;        "http://someplace.com/doc/foo/")
-  ;;      ("^/home/me/project/bar/"
-  ;;       "~/project/bar/doc/bar.xml"
-  ;;       "file:///home/me/project/bar/doc/")))
-  )
+;;   ;; :custom
+;;   ;;   ;; Configure source code <-> Doxygen tag file <-> Doxygen HTML
+;;   ;;   ;; documentation mapping:
+;;   ;;   ;;   - Files in /home/me/project/foo/ have their tag file at
+;;   ;;   ;;     http://someplace.com/doc/foo/foo.xml, and HTML documentation
+;;   ;;   ;;     at http://someplace.com/doc/foo/.
+;;   ;;   ;;   - Files in /home/me/project/bar/ have their tag file at
+;;   ;;   ;;     ~/project/bar/doc/bar.xml, and HTML documentation at
+;;   ;;   ;;     file:///home/me/project/bar/doc/.
+;;   ;;   ;; This must be configured for Doxymacs to function!
+;;   ;;   (doxymacs-doxygen-dirs
+;;   ;;    '(("^/home/me/project/foo/"
+;;   ;;       "http://someplace.com/doc/foo/foo.xml"
+;;   ;;        "http://someplace.com/doc/foo/")
+;;   ;;      ("^/home/me/project/bar/"
+;;   ;;       "~/project/bar/doc/bar.xml"
+;;   ;;       "file:///home/me/project/bar/doc/")))
+;;   )
 
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
@@ -4777,12 +4802,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;; Only show key and title in Corfu popup
   (citar-format-reference-function 'citar-citeproc-format-reference))
 
-(use-package citar-embark
-  :after (citar embark)
+;; (use-package citar-embark
+;;   :after (citar embark)
 
-  :config (citar-embark-mode)
+;;   :config (citar-embark-mode)
 
-  :diminish)
+;;   :diminish)
 
 ;; (use-package auctex-latexmk
 ;;   :after tex
@@ -5074,9 +5099,16 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (require 'matugen-theme)
   (load-theme 'matugen t))
 
-(use-package nerd-icons-corfu
-  :ensure (:host github :repo "LuigiPiucco/nerd-icons-corfu")
+(use-package standard-themes
+  :when (eq sb/theme 'standard-dark)
 
+  :init (standard-themes-take-over-modus-themes-mode 1)
+
+  :custom (modus-themes-mixed-fonts nil)
+
+  :config (modus-themes-load-theme 'standard-dark))
+
+(use-package nerd-icons-corfu
   :when
   (and (bound-and-true-p sb/enable-icons)
        (eq sb/completion-provider 'corfu)
@@ -5090,8 +5122,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; Icons in the minibuffer
 (use-package nerd-icons-completion
-  :ensure (:host github :repo "rainstormstudio/nerd-icons-completion")
-
   :when (bound-and-true-p sb/enable-icons)
 
   :after (nerd-icons marginalia)
@@ -5101,8 +5131,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
 (use-package nerd-icons-dired
-  :ensure (:host github :repo "rainstormstudio/nerd-icons-dired")
-
   :when (bound-and-true-p sb/enable-icons)
 
   :hook (dired-mode . nerd-icons-dired-mode)
@@ -5494,6 +5522,7 @@ Shows both colors when errors and warnings are present."
   (mini-echo-persistent-rule
    '(:long
      ("remote-host"
+      "selection-info"
       "flycheck"
       "lsp-mode"
       "vcs"
@@ -5504,15 +5533,15 @@ Shows both colors when errors and warnings are present."
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale")))
 
-  :custom-face
-  (mini-echo-major-mode ((t (:height 0.8))))
-  (mini-echo-buffer-position ((t (:foreground "magenta" :height 0.8))))
-  (mini-echo-buffer-size ((t (:height 0.8))))
-  (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-  (mini-echo-lsp ((t (:height 0.8))))
-  (mini-echo-remote-host ((t (:height 0.8))))
-  (mini-echo-buffer-name ((t (:height 0.8))))
-  (vc-state-base ((t (:foreground "yellow" :height 0.8))))
+  ;; :custom-face
+  ;; (mini-echo-major-mode ((t (:height 0.8))))
+  ;; (mini-echo-buffer-position ((t (:foreground "magenta" :height 0.8))))
+  ;; (mini-echo-buffer-size ((t (:height 0.8))))
+  ;; (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
+  ;; (mini-echo-lsp ((t (:height 0.8))))
+  ;; (mini-echo-remote-host ((t (:height 0.8))))
+  ;; (mini-echo-buffer-name ((t (:height 0.8))))
+  ;; (vc-state-base ((t (:foreground "yellow" :height 0.8))))
 
   :config (require 'nerd-icons)
 
@@ -5554,11 +5583,11 @@ Shows both colors when errors and warnings are present."
                         "/"))))
                    (t
                     "")))
-                'face '(:foreground "orange" :height 0.8))
+                'face '(:foreground "orange" :height 1.0))
 
     (propertize (mini-echo-buffer-name-with-status)
                 'face
-                '(:foreground "white" :height 0.9)))
+                '(:foreground "white" :height 1.0)))
 
    :update (mini-echo-update-project-root))
 
@@ -5567,13 +5596,13 @@ Shows both colors when errors and warnings are present."
    :fetch
    (when (and (bound-and-true-p vc-mode) buffer-file-name)
      (let* ((branch (substring-no-properties vc-mode 5))
-            (branch (propertize branch 'face '(:height 0.9)))
+            (branch (propertize branch 'face '(:height 1.0)))
             (icon
              (when (fboundp 'nerd-icons-octicon)
                (nerd-icons-octicon
                 "nf-oct-git_branch"
                 :face 'mini-echo-yellow
-                :height 0.8))))
+                :height 1.0))))
        (concat
         (when icon
           (concat icon " "))
@@ -5594,26 +5623,79 @@ Shows both colors when errors and warnings are present."
           (concat " " icon))))))
 
   (mini-echo-define-segment
-   "flycheck" "Color-coded vanilla Flycheck status."
-   :update-advice '((flycheck-after-lint . :after))
+   "lsp-mode" "Show dynamic LSP status with active server count."
    :fetch
-   (when (and (bound-and-true-p flycheck-mode)
-              (fboundp 'flycheck-mode-line-status-text))
-     (let* ((status (substring-no-properties (flycheck-mode-line-status-text)))
-            (counts
-             (and (boundp 'flycheck-current-errors)
-                  (flycheck-count-errors flycheck-current-errors)))
-            (face-color
-             (cond
-              ((assq 'error counts)
-               "red")
-              ((assq 'warning counts)
-               "yellow")
-              ((assq 'info counts)
-               "cyan")
-              (t
-               "green"))))
-       (propertize status 'face `(:foreground ,face-color :height 0.8))))))
+   (when (and (bound-and-true-p lsp-mode) (fboundp 'lsp-workspaces))
+     (let*
+         ((active-servers (lsp-workspaces))
+          (server-count (length active-servers))
+          ;; Use an orange/yellow warning face if LSP is active but no servers connected
+          (icon-face
+           (if (> server-count 0)
+               'mini-echo-green
+             'mini-echo-yellow))
+          (icon
+           (when (fboundp 'nerd-icons-mdicon)
+             (nerd-icons-mdicon
+              "nf-md-rocket_launch"
+              :face icon-face
+              :height 0.8))))
+       (concat
+        (when icon
+          (concat " " icon))
+        ;; Only show the count if you have multiple servers running (like your 3-server LaTeX setup)
+        (when (> server-count 1)
+          (propertize (format "(%d)" server-count)
+                      'face
+                      `(:inherit shadow :height 0.7)))))))
+
+  ;; (mini-echo-define-segment
+  ;;  "flycheck" "Color-coded vanilla Flycheck status."
+  ;;  :update-advice '((flycheck-after-lint . :after))
+  ;;  :fetch
+  ;;  (when (and (bound-and-true-p flycheck-mode)
+  ;;             (fboundp 'flycheck-mode-line-status-text))
+  ;;    (let* ((status (substring-no-properties (flycheck-mode-line-status-text)))
+  ;;           (counts
+  ;;            (and (boundp 'flycheck-current-errors)
+  ;;                 (flycheck-count-errors flycheck-current-errors)))
+  ;;           (face-color
+  ;;            (cond
+  ;;             ((assq 'error counts)
+  ;;              "red")
+  ;;             ((assq 'warning counts)
+  ;;              "yellow")
+  ;;             ((assq 'info counts)
+  ;;              "cyan")
+  ;;             (t
+  ;;              "green"))))
+  ;;      (unless (string-empty-p status)
+  ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
+
+  ;; (mini-echo-define-segment
+  ;;  "flycheck" "Color-coded high-performance Flycheck status."
+  ;;  :update-advice '((flycheck-after-lint . :after))
+  ;;  :fetch
+  ;;  (when (and (bound-and-true-p flycheck-mode)
+  ;;             (fboundp 'flycheck-mode-line-status-text))
+  ;;    (let*
+  ;;        ((status-text (flycheck-mode-line-status-text))
+  ;;         (status (substring-no-properties (or status-text "")))
+  ;;         ;; Leverage pre-computed boolean flags instead of parsing an alist loop
+  ;;         (face-color
+  ;;          (cond
+  ;;           ((bound-and-true-p flycheck-has-current-errors)
+  ;;            "red")
+  ;;           ((bound-and-true-p flycheck-has-current-warnings)
+  ;;            "yellow")
+  ;;           ((bound-and-true-p flycheck-has-current-info)
+  ;;            "cyan")
+  ;;           (t
+  ;;            "green"))))
+  ;;      ;; Only render the status if it isn't completely blank
+  ;;      (unless (string-empty-p status)
+  ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
+  )
 
 ;; (use-package centaur-tabs
 ;;   :hook ((elpaca-after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
@@ -5637,17 +5719,15 @@ Shows both colors when errors and warnings are present."
 ;;   ;; Make the headline face match `centaur-tabs-default' face
 ;;   (centaur-tabs-headline-match))
 
-;; ;; Center the text environment
-;; (use-package olivetti
-;;   :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
+;; Center the text environment
+(use-package olivetti
+  :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
 
-;;   :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
+  :bind (:map olivetti-mode-map ("C-c {") ("C-c }") ("C-c \\"))
 
-;;   :diminish)
+  :diminish)
 
 (use-package kdl-mode
-  :ensure (:host github :repo "taquangtrung/emacs-kdl-mode")
-
   :when
   (and (executable-find "tree-sitter")
        (fboundp 'treesit-available-p)
@@ -5691,12 +5771,11 @@ Shows both colors when errors and warnings are present."
 ;; Guess the indentation offset originally used in foreign source code files and
 ;; transparently adjust the corresponding settings in Emacs making it more
 ;; convenient to edit the foreign files.
-(use-package dtrt-indent
-  :ensure (:host github :repo "jscheid/dtrt-indent")
 
-  :hook (find-file . dtrt-indent-mode)
+;; (use-package dtrt-indent
+;;   :hook (find-file . dtrt-indent-mode)
 
-  :diminish)
+;;   :diminish)
 
 ;; Navigate the xref stack with consult
 (use-package consult-xref-stack
@@ -5740,8 +5819,8 @@ Shows both colors when errors and warnings are present."
 
   :hook (elpaca-after-init . xclip-mode))
 
-(use-package ztree
-  :commands (ztree-diff))
+;; (use-package ztree
+;;   :commands (ztree-diff))
 
 ;; ;; Provides pixel-precise smooth scrolling which can keep up with the very high
 ;; ;; event rates of modern trackpads and high-precision wheel mice.
@@ -5844,18 +5923,19 @@ Shows both colors when errors and warnings are present."
 ;; (use-package kirigami
 ;;   :ensure (:host github :repo "jamescherti/kirigami.el"))
 
-;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
-(use-package string-inflection
-  :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
+;; ;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
 
-(use-package kill-file-path
-  :ensure (:host github :repo "chyla/kill-file-path")
+;; (use-package string-inflection
+;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
-  :commands
-  (kill-file-path-basename
-   kill-file-path-basename-without-extension
-   kill-file-path-dirname
-   kill-file-path))
+;; (use-package kill-file-path
+;;   :ensure (:host github :repo "chyla/kill-file-path")
+
+;;   :commands
+;;   (kill-file-path-basename
+;;    kill-file-path-basename-without-extension
+;;    kill-file-path-dirname
+;;    kill-file-path))
 
 ;; Allow fetching the latest versions via Elpaca to satisfy Eglot requirements
 (use-package flymake)
@@ -5925,15 +6005,17 @@ Shows both colors when errors and warnings are present."
 
   :config
   ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
-  (setopt eglot-events-buffer-config '(:size 0 :format short))
+  ;; (setopt eglot-events-buffer-config '(:size 0 :format short))
 
-  (fset #'jsonrpc--log-event #'ignore)
+  ;; (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' completely
-     ((text-mode org-mode markdown-mode markdown-ts-mode LaTeX-mode)
+     (text-mode . ("rass" "--" "ltex-ls-plus" "--" "harper-ls" "--stdio"))
+     (LaTeX-mode . ("rass" "--" "texlab" "--" "ltex-ls-plus"))
+     ((org-mode markdown-mode markdown-ts-mode)
       .
       ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -6101,7 +6183,13 @@ Shows both colors when errors and warnings are present."
      :ltex-ls-plus
      (:language
       "en-US"
-      :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
+      :disabledRules
+      ["ELLIPSIS"
+       "EN_QUOTES"
+       "MORFOLOGIK_RULE_EN_US"
+       "MORFOLOGIK_RULE_EN_GB"
+       "HUNSPELL_RULE"
+       "HUNSPELL_NO_SUGGEST_RULE"]
       ;; Keep grammar and style checking
       :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
      :yaml
@@ -6642,10 +6730,13 @@ DIR can be relative or absolute."
 
 ;;   :diminish)
 
-(use-package tramp-hlo
-  :ensure (:host github :repo "jsadusk/tramp-hlo")
+;; (use-package tramp-hlo
+;;   :ensure (:host github :repo "jsadusk/tramp-hlo")
 
-  :hook (elpaca-after-init . tramp-hlo-setup))
+;;   :hook (elpaca-after-init . tramp-hlo-setup))
+
+(use-package tramp-rpc
+  :ensure (:host github :repo "ArthurHeymans/emacs-tramp-rpc"))
 
 ;; (with-eval-after-load 'transient
 ;;   (transient-define-prefix
