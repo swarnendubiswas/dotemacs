@@ -75,7 +75,7 @@
 ;; edges with terminal Emacs. The completion entries wrap around sometimes, and
 ;; messes up the completion.
 
-(defcustom sb/completion-provider 'corfu
+(defcustom sb/completion-provider 'company
   "Choose the framework to use for completion at point."
   :type
   '(radio
@@ -144,7 +144,7 @@ The provider is `nerd-icons'."
 
 (require 'package)
 (setopt
- package-quickstart nil
+ package-quickstart t
  package-archives
  '(("org" . "https://orgmode.org/elpa/")
    ("gnu" . "https://elpa.gnu.org/packages/")
@@ -164,8 +164,8 @@ The provider is `nerd-icons'."
  use-package-vc-prefer-newest t
  use-package-enable-imenu-support t
  ;; Delay loading packages only in `standalone' mode.
- use-package-expand-minimally (eq sb/op-mode 'standalone)
- use-package-always-defer (eq sb/op-mode 'standalone))
+ use-package-expand-minimally nil
+ use-package-always-defer nil)
 
 (setopt
  use-package-verbose t
@@ -207,20 +207,21 @@ The provider is `nerd-icons'."
 ;; for defining aliases. Then, we can avoid passing shell arguments to be more
 ;; efficient.
 
-;; (use-package exec-path-from-shell
-;;   :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
+(use-package exec-path-from-shell
+  :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
 
-;;   :demand t
+  :demand t
 
-;;   :custom
-;;   (exec-path-from-shell-check-startup-files nil)
-;;   (exec-path-from-shell-variables '("PATH" "JAVA_HOME" "LSP_USE_PLISTS"))
+  :custom
+  (exec-path-from-shell-check-startup-files nil)
+  (exec-path-from-shell-variables
+   '("PATH" "JAVA_HOME" "LSP_USE_PLISTS" "LTEX_LS_PLUS" "JDTLS_PATH"))
 
-;;   ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
-;;   ;; it is needed for Emacs client.
-;;   ;; (exec-path-from-shell-arguments nil)
+  ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
+  ;; it is needed for Emacs client.
+  ;; (exec-path-from-shell-arguments nil)
 
-;;   :config (exec-path-from-shell-initialize))
+  :config (exec-path-from-shell-initialize))
 
 (use-package emacs
   :ensure nil
@@ -289,7 +290,9 @@ The provider is `nerd-icons'."
 
    ("C-M-b" . backward-sexp)
    ("C-M-f" . forward-sexp)
-   ("C-M-k" . kill-sexp))
+   ("C-M-k" . kill-sexp)
+
+   ("C-c d m" . restart-emacs))
 
   :bind* ("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
 
@@ -1286,7 +1289,7 @@ The provider is `nerd-icons'."
 
   (consult-narrow-key "<")
   (consult-widen-key ">")
-  (consult-buffer-filter sb/consult-buffer-filter)
+  ;; (consult-buffer-filter sb/consult-buffer-filter)
 
   :config
   (consult-customize
@@ -1684,7 +1687,8 @@ The provider is `nerd-icons'."
 
 (use-package crux
   :bind
-  (("C-<f9>" . crux-recentf-find-directory)
+  (("C-c d s" . crux-sudo-edit)
+   ("C-<f9>" . crux-recentf-find-directory)
    ("C-<f11>" . crux-kill-other-buffers)
    ([remap keyboard-quit] . crux-keyboard-quit-dwim)
    ("C-c d i" . crux-ispell-word-then-abbrev))
@@ -1909,6 +1913,13 @@ The provider is `nerd-icons'."
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
     (setopt magit-diff-refine-hunk t)))
+
+(use-package magit-difftastic
+  :vc (:url "https://github.com/rschmukler/magit-difftastic")
+
+  :after magit
+
+  :config (difftastic-status-mode 1))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -2779,7 +2790,7 @@ The provider is `nerd-icons'."
 (use-package company-statistics
   :when (eq sb/completion-provider 'company)
   :after company
-  :init (company-statistics-mode 1))
+  :hook (company-mode . company-statistics-mode))
 
 ;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
@@ -2788,12 +2799,10 @@ The provider is `nerd-icons'."
 (use-package company-math
   :after company
 
-  :demand t)
+  :commands (company-math-symbols-unicode company-math-symbols-latex))
 
 (use-package company-dict
   :after company
-
-  :demand t
 
   :custom
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
@@ -3229,6 +3238,10 @@ The provider is `nerd-icons'."
        ;; (cape-capf-trigger #'yasnippet-capf ?/)
        #'citar-capf
 
+       (cape-company-to-capf #'company-latex-commands)
+       (cape-company-to-capf #'company-auctex-macros)
+       (cape-company-to-capf #'company-auctex-environments)
+
        ;; (cape-capf-super
        ;;  #'citar-capf
        ;;  (cape-company-to-capf #'company-reftex-labels)
@@ -3246,7 +3259,8 @@ The provider is `nerd-icons'."
        ;;  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
        ;;  #'cape-tex)
 
-       #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
+       #'cape-dict
+       (cape-capf-buster #'cape-dabbrev)))))
 
   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
     (add-hook
@@ -3267,28 +3281,26 @@ The provider is `nerd-icons'."
 ;; recency) for sorting. Recently used commands should be sorted first. Only
 ;; commands that have never been used before will be sorted by length.
 
-;; (use-package prescient
-;;   :vc (:url "https://github.com/radian-software/prescient.el")
+(use-package prescient
+  :hook (after-init . prescient-persist-mode)
 
-;;   :hook (after-init . prescient-persist-mode)
+  :custom (prescient-sort-full-matches-first t)
 
-;;   :custom (prescient-sort-full-matches-first t)
+  :config
+  (with-eval-after-load 'vertico
+    (when (locate-library "vertico-prescient")
+      (require 'vertico-prescient)
+      (vertico-prescient-mode 1)))
 
-;;   :config
-;;   (with-eval-after-load 'vertico
-;;     (when (locate-library "vertico-prescient")
-;;       (require 'vertico-prescient)
-;;       (vertico-prescient-mode 1)))
+  (with-eval-after-load 'corfu
+    (when (locate-library "corfu-prescient")
+      (require 'corfu-prescient)
+      (corfu-prescient-mode 1)))
 
-;;   (with-eval-after-load 'corfu
-;;     (when (locate-library "corfu-prescient")
-;;       (require 'corfu-prescient)
-;;       (corfu-prescient-mode 1)))
-
-;;   (with-eval-after-load 'company
-;;     (when (locate-library "company-prescient")
-;;       (require 'company-prescient)
-;;       (company-prescient-mode 1))))
+  (with-eval-after-load 'company
+    (when (locate-library "company-prescient")
+      (require 'company-prescient)
+      (company-prescient-mode 1))))
 
 (defun sb/setup-lsp-provider ()
   "Set up LSP based on `sb/lsp-provider`.
@@ -3541,38 +3553,46 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   (setopt c-basic-offset 2)
 
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection '("harper-ls" "--stdio"))
-    :add-on? 't
-    :major-modes '(markdown-mode markdown-ts-mode text-mode org-mode)
-    ;; :activation-fn (lsp-activate-on "markdown")
-    :initialization-options
-    '(:userDictPath
-      ""
-      :fileDictPath ""
-      :linters
-      (:SpellCheck
-       t
-       :SpelledNumbers
-       :json-false
-       :AnA t
-       :SentenceCapitalization t
-       :UnclosedQuotes t
-       :WrongQuotes
-       :json-false
-       :LongSentences t
-       :RepeatedWords t
-       :Spaces t
-       :Matcher t
-       :CorrectNumberSuffix t)
-      :codeActions (:ForceStable :json-false)
-      :markdown (:IgnoreLinkTitle :json-false)
-      :diagnosticSeverity "hint"
-      :isolateEnglish
-      :json-false)
-    :priority -3
-    :server-id 'harper-ls))
+  ;; (lsp-register-client
+  ;;  (make-lsp-client
+  ;;   :new-connection (lsp-stdio-connection '("harper-ls" "--stdio"))
+  ;;   :add-on? 't
+  ;;   :major-modes '(markdown-mode markdown-ts-mode text-mode org-mode latex-mode)
+  ;;   ;; :activation-fn (lsp-activate-on "markdown" "org" "text" "latex")
+  ;;   :activation-fn
+  ;;   (lambda (filename mode)
+  ;;     (or (memq
+  ;;          mode '(markdown-mode markdown-ts-mode text-mode org-mode latex-mode))
+  ;;         (string-match-p "\\.\\(tex\\|txt\\|org\\|md\\)$" filename)))
+  ;;   :initialization-options
+  ;;   '(:userDictPath
+  ;;     "~/.config/harper/user.dict"
+  ;;     :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
+  ;;     :fileDictPath ""
+  ;;     :linters
+  ;;     (:SpellCheck
+  ;;      :json-false
+  ;;      :SpelledNumbers
+  ;;      :json-false
+  ;;      :AnA t
+  ;;      :UnclosedQuotes t
+  ;;      :WrongQuotes
+  ;;      :json-false
+  ;;      :LongSentences
+  ;;      :json-false
+  ;;      :RepeatedWords t
+  ;;      :Spaces t
+  ;;      :Matcher t
+  ;;      :CorrectNumberSuffix t
+  ;;      :SentenceCapitalization t)
+  ;;     :codeActions (:ForceStable :json-false)
+  ;;     :diagnosticSeverity "hint"
+  ;;     :markdown (:IgnoreLinkTitle :json-false)
+  ;;     :isolateEnglish
+  ;;     :json-false
+  ;;     :dialect "American")
+  ;;   :priority -3
+  ;;   :server-id 'harper-ls))
 
   :diminish)
 
@@ -3643,40 +3663,52 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    '(:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"])))
 
 ;; (use-package lsp-ltex-plus
-;;   :ensure (:host github :repo "emacs-languagetool/lsp-ltex-plus")
-
 ;;   :when (eq sb/lsp-provider 'lsp-mode)
 
 ;;   :after lsp-mode
 
-;;   :init (setopt lsp-ltex-plus-version "18.6.1")
-
-;;   :hook
-;;   ;; LaTeX-mode is undefined if AUCTeX is not loaded.
-;;   ((text-mode markdown-mode org-mode TeX-mode LaTeX-mode)
-;;    .
-;;    (lambda ()
-;;      ;; Disable LSP for git commit message buffers which are usually ephemeral
-;;      (unless (string-equal
-;;               (file-name-nondirectory (or buffer-file-name ""))
-;;               "COMMIT_EDITMSG")
-;;        (require 'lsp-ltex-plus)
-;;        (lsp-deferred))))
+;;   :demand t
 
 ;;   :custom
-;;   ;; Recommended to set a generic language to disable spell check
-;;   (lsp-ltex-plus-language "en")
-;;   (lsp-ltex-plus-check-frequency "save")
-;;   (lsp-ltex-plus-log-level "warning")
+;;   (lsp-ltex-plus-check-programming-languages t)
 ;;   (lsp-ltex-plus-disabled-rules
-;;    '(:en-US
-;;      ["EN_QUOTES"
-;;       "OXFORD_SPELLING_Z_NOT_S"
-;;       "MORFOLOGIK_RULE_EN"
-;;       "MORFOLOGIK_RULE_EN_GB"
-;;       "MORFOLOGIK_RULE_EN_US"
-;;       "WANT"
-;;       "EN_DIACRITICS_REPLACE"])))
+;;    '(:en-US ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]))
+
+;;   :config (lsp-ltex-plus-enable-for-modes))
+
+(use-package lsp-ltex-plus
+  :vc (:url "https://github.com/emacs-languagetool/lsp-ltex-plus")
+
+  :when (eq sb/lsp-provider 'lsp-mode)
+
+  :init (setopt lsp-ltex-plus-version "18.6.1")
+
+  :hook
+  ;; LaTeX-mode is undefined if AUCTeX is not loaded.
+  ((text-mode markdown-mode org-mode TeX-mode LaTeX-mode)
+   .
+   (lambda ()
+     ;; Disable LSP for git commit message buffers which are usually ephemeral
+     (unless (string-equal
+              (file-name-nondirectory (or buffer-file-name ""))
+              "COMMIT_EDITMSG")
+       (require 'lsp-ltex-plus)
+       (lsp-deferred))))
+
+  :custom
+  ;; Recommended to set a generic language to disable spell check
+  (lsp-ltex-plus-language "en")
+  (lsp-ltex-plus-check-frequency "save")
+  (lsp-ltex-plus-log-level "warning")
+  (lsp-ltex-plus-disabled-rules
+   '(:en-US
+     ["EN_QUOTES"
+      "OXFORD_SPELLING_Z_NOT_S"
+      "MORFOLOGIK_RULE_EN"
+      "MORFOLOGIK_RULE_EN_GB"
+      "MORFOLOGIK_RULE_EN_US"
+      "WANT"
+      "EN_DIACRITICS_REPLACE"])))
 
 ;; ;; https://github.com/emacs-lsp/lsp-mode/issues/4747
 ;; (use-package lsp-harper
@@ -5517,15 +5549,15 @@ Shows both colors when errors and warnings are present."
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale")))
 
-  :custom-face
-  (mini-echo-major-mode ((t (:height 0.8))))
-  (mini-echo-buffer-position ((t (:foreground "magenta" :height 0.8))))
-  (mini-echo-buffer-size ((t (:height 0.8))))
-  (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-  (mini-echo-lsp ((t (:height 0.8))))
-  (mini-echo-remote-host ((t (:height 0.8))))
-  (mini-echo-buffer-name ((t (:height 0.8))))
-  (vc-state-base ((t (:foreground "yellow" :height 0.8))))
+  ;; :custom-face
+  ;; (mini-echo-major-mode ((t (:height 0.8))))
+  ;; (mini-echo-buffer-position ((t (:foreground "magenta" :height 0.8))))
+  ;; (mini-echo-buffer-size ((t (:height 0.8))))
+  ;; (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
+  ;; (mini-echo-lsp ((t (:height 0.8))))
+  ;; (mini-echo-remote-host ((t (:height 0.8))))
+  ;; (mini-echo-buffer-name ((t (:height 0.8))))
+  ;; (vc-state-base ((t (:foreground "yellow" :height 0.8))))
 
   :config (require 'nerd-icons)
 
@@ -5567,30 +5599,30 @@ Shows both colors when errors and warnings are present."
                         "/"))))
                    (t
                     "")))
-                'face '(:foreground "orange" :height 0.8))
+                'face '(:foreground "orange" :height 1.0))
 
     (propertize (mini-echo-buffer-name-with-status)
                 'face
-                '(:foreground "white" :height 0.9)))
+                '(:foreground "white" :height 1.0)))
 
    :update (mini-echo-update-project-root))
 
-  ;; (mini-echo-define-segment
-  ;;  "vcs" "Show VCS info with icon."
-  ;;  :fetch
-  ;;  (when (and (bound-and-true-p vc-mode) buffer-file-name)
-  ;;    (let* ((branch (substring-no-properties vc-mode 5))
-  ;;           (branch (propertize branch 'face '(:height 0.9)))
-  ;;           (icon
-  ;;            (when (fboundp 'nerd-icons-octicon)
-  ;;              (nerd-icons-octicon
-  ;;               "nf-oct-git_branch"
-  ;;               :face 'mini-echo-yellow
-  ;;               :height 0.8))))
-  ;;      (concat
-  ;;       (when icon
-  ;;         (concat icon " "))
-  ;;       branch))))
+  (mini-echo-define-segment
+   "vcs" "Show VCS info with icon."
+   :fetch
+   (when (and (bound-and-true-p vc-mode) buffer-file-name)
+     (let* ((branch (substring-no-properties vc-mode 5))
+            (branch (propertize branch 'face '(:height 1.0)))
+            (icon
+             (when (fboundp 'nerd-icons-octicon)
+               (nerd-icons-octicon
+                "nf-oct-git_branch"
+                :face 'mini-echo-yellow
+                :height 1.0))))
+       (concat
+        (when icon
+          (concat icon " "))
+        branch))))
 
   (mini-echo-define-segment
    "lsp-mode" "Show LSP status with icon."
@@ -5987,15 +6019,17 @@ Shows both colors when errors and warnings are present."
 
   :config
   ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
-  (setopt eglot-events-buffer-config '(:size 0 :format short))
+  ;; (setopt eglot-events-buffer-config '(:size 0 :format short))
 
-  (fset #'jsonrpc--log-event #'ignore)
+  ;; (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' completely
-     ((text-mode org-mode markdown-mode markdown-ts-mode LaTeX-mode)
+     (text-mode . ("rass" "--" "ltex-ls-plus" "--" "harper-ls" "--stdio"))
+     (LaTeX-mode . ("rass" "--" "texlab" "--" "ltex-ls-plus"))
+     ((org-mode markdown-mode markdown-ts-mode)
       .
       ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
@@ -6163,7 +6197,13 @@ Shows both colors when errors and warnings are present."
      :ltex-ls-plus
      (:language
       "en-US"
-      :disabledRules ["ELLIPSIS" "EN_QUOTES" "MORFOLOGIK_RULE_EN_US"]
+      :disabledRules
+      ["ELLIPSIS"
+       "EN_QUOTES"
+       "MORFOLOGIK_RULE_EN_US"
+       "MORFOLOGIK_RULE_EN_GB"
+       "HUNSPELL_RULE"
+       "HUNSPELL_NO_SUGGEST_RULE"]
       ;; Keep grammar and style checking
       :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
      :yaml

@@ -54,18 +54,7 @@
  inhibit-default-init t ; Disable loading of `default.el' at startup
  ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
  ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
- package-enable-at-startup nil
- package-quickstart t
- package-archives
-      '(("org" . "https://orgmode.org/elpa/")
-        ("gnu" . "https://elpa.gnu.org/packages/")
-        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-        ("melpa" . "https://melpa.org/packages/"))
- package-install-upgrade-built-in t
- package-native-compile t)
-
-(unless package--initialized
-  (package-initialize))
+ package-enable-at-startup nil)
 
 (setopt
  load-prefer-newer t
@@ -236,7 +225,7 @@
                      :mode-line 120)
     ("cseiitk"        :font "Iosevka Nerd Font Mono"
                      :daemon-size 21
-                     :gui-height 200
+                     :gui-height 190
                      :mode-line 160)))
 
 (defun sb/font-config-for-host ()
