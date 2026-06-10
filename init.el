@@ -43,6 +43,7 @@
     (const :tag "tokyonight" tokyonight)
     (const :tag "matugen" matugen)
     (const :tag "standard-dark" standard-dark)
+    (const :tag "nordic-night" modus-nordic-night-theme)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -160,6 +161,7 @@ The provider is `nerd-icons'."
 
 (setopt
  use-package-always-ensure t
+ use-package-vc-prefer-newest t
  use-package-enable-imenu-support t
  ;; Delay loading packages only in `standalone' mode.
  use-package-expand-minimally (eq sb/op-mode 'standalone)
@@ -169,7 +171,7 @@ The provider is `nerd-icons'."
  use-package-verbose t
  use-package-minimum-reported-time 0 ; Show everything
  ;; Use "M-x use-package-report" to see results
- use-package-compute-statistics t)
+ use-package-compute-statistics nil)
 
 ;; Where possible, it is better to avoid :preface, :config and
 ;; :init. Instead, prefer autoloading keywords such as :bind, :hook, and :mode,
@@ -5082,6 +5084,13 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :custom (modus-themes-mixed-fonts nil)
 
   :config (modus-themes-load-theme 'standard-dark))
+
+(use-package modus-nordic-night-theme
+  :vc (:url "https://codeberg.org/ashton314/modus-nordic-night" :rev :newest)
+
+  :when (eq sb/theme 'nordic-night)
+
+  :config (load-theme 'modus-nordic-midnight t))
 
 (use-package nerd-icons-corfu
   :when
