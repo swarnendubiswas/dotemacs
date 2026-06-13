@@ -57,6 +57,16 @@
  package-enable-at-startup nil)
 
 (setopt
+ package-quickstart t
+ package-archives
+ '(("org" . "https://orgmode.org/elpa/")
+   ("gnu" . "https://elpa.gnu.org/packages/")
+   ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+   ("melpa" . "https://melpa.org/packages/"))
+ package-install-upgrade-built-in t
+ package-native-compile t)
+
+(setopt
  load-prefer-newer t
  ;; Do not resize the frame to preserve the number of columns or lines being
  ;; displayed when setting font, menu bar, tool bar, tab bar, internal borders,

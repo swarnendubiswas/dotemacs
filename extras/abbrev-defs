@@ -694,6 +694,7 @@
     ("giong" "going" nil :count 1)
     ("giveing" "giving" nil :count 0)
     ("gloabl" "global" nil :count 0)
+    ("gnerated" "generated" nil :count 0)
     ("goign" "going" nil :count 0)
     ("gonig" "going" nil :count 0)
     ("goolge" "google" nil :count 0)
