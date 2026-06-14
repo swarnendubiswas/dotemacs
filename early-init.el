@@ -90,8 +90,7 @@
 (setq site-run-file nil)
 
 (setopt
- ;; Disable loading of `default.el' at startup
- inhibit-default-init t
+ inhibit-default-init t ; Disable loading of `default.el' at startup
  ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
  ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
  package-enable-at-startup nil)
@@ -154,7 +153,7 @@
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 
 (setopt
- warning-minimum-level :error
+ ;; warning-minimum-level :error
  warning-suppress-types '((lexical-binding))
  warning-suppress-log-types '((files missing-lexbind-cookie)))
 
@@ -265,7 +264,7 @@
                      :mode-line 120)
     ("cseiitk"        :font "Iosevka Nerd Font Mono"
                      :daemon-size 21
-                     :gui-height 200
+                     :gui-height 190
                      :mode-line 160)))
 
 (defun sb/font-config-for-host ()
