@@ -187,26 +187,26 @@ The provider is `nerd-icons'."
 
   :config (no-littering-theme-backups))
 
-;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
-;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
-;; for defining aliases. Then, we can avoid passing shell arguments to be more
-;; efficient.
+;; ;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
+;; ;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
+;; ;; for defining aliases. Then, we can avoid passing shell arguments to be more
+;; ;; efficient.
 
-(use-package exec-path-from-shell
-  :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
+;; (use-package exec-path-from-shell
+;;   :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
 
-  :demand t
+;;   :demand t
 
-  :custom
-  (exec-path-from-shell-check-startup-files nil)
-  (exec-path-from-shell-variables
-   '("PATH" "JAVA_HOME" "LSP_USE_PLISTS" "LTEX_LS_PLUS" "JDTLS_PATH"))
+;;   :custom
+;;   (exec-path-from-shell-check-startup-files nil)
+;;   (exec-path-from-shell-variables
+;;    '("PATH" "JAVA_HOME" "LSP_USE_PLISTS" "LTEX_LS_PLUS" "JDTLS_PATH"))
 
-  ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
-  ;; it is needed for Emacs client.
-  ;; (exec-path-from-shell-arguments nil)
+;;   ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
+;;   ;; it is needed for Emacs client.
+;;   ;; (exec-path-from-shell-arguments nil)
 
-  :config (exec-path-from-shell-initialize))
+;;   :config (exec-path-from-shell-initialize))
 
 (use-package emacs
   :ensure nil
@@ -1565,9 +1565,9 @@ The provider is `nerd-icons'."
 
 ;;   :diminish)
 
-;; ;; Restore point to the initial location with "C-g" after marking a region
-;; (use-package smart-mark
-;;   :hook (after-init . smart-mark-mode))
+;; Restore point to the initial location with "C-g" after marking a region
+(use-package smart-mark
+  :hook (emacs-startup . smart-mark-mode))
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
@@ -1869,7 +1869,7 @@ The provider is `nerd-icons'."
 (use-package transient
   :commands transient-define-prefix
 
-  :demand t ; Required so that transient keybindings are available
+  ;; :demand t ; Required so that transient keybindings are available
 
   :custom (transient-semantic-coloring t)
 
