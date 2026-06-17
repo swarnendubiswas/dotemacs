@@ -1175,7 +1175,7 @@ The provider is `nerd-icons'."
 
   :after vertico
 
-  :init (vertico-timer-global-mode 1)
+  :hook (vertico-mode . vertico-timer-mode)
 
   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
 
@@ -1918,12 +1918,12 @@ The provider is `nerd-icons'."
 
   :config (difftastic-status-mode 1))
 
-;; (use-package git-modes
-;;   :mode ("dotgitconfig" . gitconfig-mode)
+(use-package git-modes
+  :mode ("dotgitconfig" . gitconfig-mode)
 
-;;   :mode ("/\\.gitignore\\'" . gitignore-mode)
+  :mode ("/\\.gitignore\\'" . gitignore-mode)
 
-;;   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
+  :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
 ;; ;; Diff-hl looks nicer than git-gutter, but is based on `vc' and can be
 ;; ;; expensive.
@@ -2124,11 +2124,11 @@ The provider is `nerd-icons'."
 
   :commands (consult-todo consult-todo-all))
 
-;; ;; Display ugly "^L" page breaks as tidy horizontal lines
-;; (use-package page-break-lines
-;;   :hook (emacs-startup . global-page-break-lines-mode)
+;; Display ugly "^L" page breaks as tidy horizontal lines
+(use-package page-break-lines
+  :hook (elpaca-after-init . global-page-break-lines-mode)
 
-;;   :diminish)
+  :diminish)
 
 ;; (use-package sideline
 ;;   :init (setq sideline-backends-left nil)
@@ -5461,7 +5461,7 @@ Shows both colors when errors and warnings are present."
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
 
-  :hook (-after-init . doom-modeline-mode)
+  :hook (after-init . doom-modeline-mode)
 
   :custom
   (doom-modeline-buffer-encoding nil)
@@ -6021,9 +6021,9 @@ Shows both colors when errors and warnings are present."
 
   :config
   ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
-  (setopt eglot-events-buffer-config '(:size 0 :format short))
+  ;; (setopt eglot-events-buffer-config '(:size 0 :format short))
 
-  (fset #'jsonrpc--log-event #'ignore)
+  ;; (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
