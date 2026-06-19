@@ -26,8 +26,6 @@
   "Defer garbage collection during execution."
   (setopt gc-cons-threshold sb/emacs-64MB))
 
-(add-hook 'minibuffer-setup-hook #'sb/defer-gc)
-
 ;; `lsp-mode' suggests increasing the limit permanently to a reasonable value.
 ;; There will be large pause times with large `gc-cons-threshold' values
 ;; whenever GC eventually happens.
@@ -38,7 +36,22 @@
    gc-cons-percentage 0.1))
 
 (add-hook 'after-init-hook #'sb/restore-gc)
-(add-hook 'minibuffer-exit-hook #'sb/restore-gc)
+
+;; We are using the `gcmh' package which should be enough.
+;; (add-hook 'minibuffer-setup-hook #'sb/defer-gc)
+;; (add-hook 'minibuffer-exit-hook #'sb/restore-gc)
+
+;; Defer file-name matching during startup
+(defvar sb/emacs-file-name-handler-alist-old file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+(add-hook
+ 'emacs-startup-hook
+ (lambda ()
+   ;; Restore it once startup is complete
+   (setq file-name-handler-alist
+         (append
+          sb/emacs-file-name-handler-alist-old file-name-handler-alist))))
 
 ;; The run-time load order till Emacs 30 is: (1) early-init.el, (2) file
 ;; described by `site-run-file' if non-nil, (3) `user-init-file', and (4)
@@ -47,20 +60,18 @@
 ;; `default.el'.
 
 ;; Disable site-wide run-time initialization. We cannot customize
-;; `size-run-file', hence `setopt' does not work.
+;; `site-run-file', hence `setopt' does not work.
 (setq site-run-file nil)
 
-(setopt
- inhibit-default-init t ; Disable loading of `default.el' at startup
- ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
- ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
- package-enable-at-startup nil)
+(setopt inhibit-default-init t) ; Disable loading of `default.el' at startup
 
 (setopt
+  ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
+  ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
+  package-enable-at-startup nil
  package-quickstart t
  package-archives
- '(("org" . "https://orgmode.org/elpa/")
-   ("gnu" . "https://elpa.gnu.org/packages/")
+ '(("gnu" . "https://elpa.gnu.org/packages/")
    ("nongnu" . "https://elpa.nongnu.org/nongnu/")
    ("melpa" . "https://melpa.org/packages/"))
  package-install-upgrade-built-in t
@@ -82,25 +93,42 @@
  ;; as a general-purpose buffer.
  initial-major-mode 'fundamental-mode
  ;; Also disables `use-file-dialog'
- use-dialog-box nil)
+ use-dialog-box nil
+ ;; warning-minimum-level :error
+ warning-suppress-types '((lexical-binding))
+ warning-suppress-log-types '((files missing-lexbind-cookie)))
 
-;; Suppress the vanilla startup screen completely. We have disabled it with
-;; `inhibit-startup-screen', but it would still initialize anyway.
-(advice-add #'display-startup-screen :override #'ignore)
+;; We have disabled the startup screen with `inhibit-startup-screen', but it
+;; would still initialize anyway. This was a temporary workaround to suppress the vanilla ;; startup screen completely. Hopefully, that problem is resolved.
+
+;; (advice-add #'display-startup-screen :override #'ignore)
+
+(when (and ;; (featurep 'native-compile)
+       (fboundp 'native-comp-available-p)
+       (native-comp-available-p))
+  (setopt
+   native-comp-always-compile nil
+   ;; Silence compiler warnings as they can be pretty disruptive
+   native-comp-async-report-warnings-errors nil
+   ;; Compile loaded packages asynchronously
+   native-comp-jit-compilation t
+   native-comp-async-query-on-exit t
+   native-comp-warning-on-missing-source nil)
+
+  ;; Move native compilation files to directory used by `no-littering'
+  (when (fboundp 'startup-redirect-eln-cache)
+    (startup-redirect-eln-cache
+     (convert-standard-filename
+      (expand-file-name "var/eln-cache/" user-emacs-directory)))))
 
 ;; Disable UI elements early before being initialized. Use `display-graphic-p'
 ;; since `window-system' is deprecated.
 
-(add-to-list 'default-frame-alist '(undecorated . t))
-
-;; The following is faster than running "(tool-bar-mode -1)"
+;; The following style of manipulating the parameters of `default-frame-alist' is faster than disabling the modes explicitly, i.e., running "(tool-bar-mode -1)".
 (push '(tool-bar-lines . 0) default-frame-alist)
-
 ;; The menu bar can be useful to identify different capabilities available and
 ;; their shortcuts but we still turn it off.
 (push '(menu-bar-lines . 0) default-frame-alist)
-
-;; The following is faster than running "(scroll-bar-mode -1)"
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
 
@@ -123,41 +151,18 @@
 ;; ;; Remove title bar on all future frames
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 
-(setopt
- ;; warning-minimum-level :error
- warning-suppress-types '((lexical-binding))
- warning-suppress-log-types '((files missing-lexbind-cookie)))
-
-;; Move native compilation files to directory used by `no-littering'
-(when (and (fboundp 'startup-redirect-eln-cache)
-           (fboundp 'native-comp-available-p)
-           (native-comp-available-p))
-  (startup-redirect-eln-cache
-   (convert-standard-filename
-    (expand-file-name "var/eln-cache/" user-emacs-directory))))
-
-(when (and (featurep 'native-compile)
-           (fboundp 'native-comp-available-p)
-           (native-comp-available-p))
-  (setopt
-   native-comp-always-compile t
-   ;; Silence compiler warnings as they can be pretty disruptive
-   native-comp-async-report-warnings-errors nil
-   ;; Compile loaded packages asynchronously
-   native-comp-jit-compilation t
-   native-comp-async-query-on-exit t
-   native-comp-warning-on-missing-source nil))
-
-;; Recommended by `lsp-mode' for better performance
-(setenv "LSP_USE_PLISTS" "true")
-
 ;; The value of font height is in 1/10pt, so 100 implies 10pt. Font preferences
 ;; will be ignored when we use TUI Emacs, and the terminal font setting will be
 ;; used.
 
 ;; I prefer JetBrainsMono and Iosevka. Iosevka is slightly narrower, and so can fit more characters on a line.
 
-;; TODO: Review and finalize the best way to customize font preferences.
+;; `after-init-hook' runs after the initial graphical frame has already been
+;; created with the system default font. With `set-face-attribute', Emacs is
+;; forced to re-calculate all text dimensions and resize the frame. This causes
+;; a visible flicker and adds a measurable delay to the startup time. ;; The
+;; following page suggests avoiding set-face-attribute for performance reasons.
+;; https://github.com/D4lj337/Emacs-performance
 
 ;; (defun sb/frame-font ()
 ;;   (pcase (system-name)
@@ -175,7 +180,6 @@
 ;; ;; Apply for every new frame (daemon or emacsclient)
 ;; (add-hook 'after-make-frame-functions #'sb/apply-font)
 
-
 ;; (when (daemonp)
 ;;   (cond
 ;;    ((string= (system-name) "inspiron-7572")
@@ -191,8 +195,6 @@
 ;;         (set-frame-font "JetBrainsMonoNerdFontMono-20" t t)))
 ;;     (add-hook 'after-make-frame-functions #'sb/init-fonts-daemon))))
 
-;; ;; The following page suggests avoiding set-face-attribute for performance
-;; ;; reasons. https://github.com/D4lj337/Emacs-performance
 ;; (unless (daemonp)
 ;;   (defun sb/init-fonts-graphic ()
 ;;     (cond
@@ -226,53 +228,66 @@
 
 ;; Host-specific font configuration
 (defconst sb/font-config
-  '(("inspiron-7572" :font "Iosevka Nerd Font Mono"
-                     :daemon-size 21
-                     :gui-height 200
-                     :mode-line 160)
-    ("dell-7506"     :font "JetBrainsMonoNerdFontMono"
-                     :gui-height 150
-                     :mode-line 120)
-    ("cseiitk"        :font "Iosevka Nerd Font Mono"
-                     :daemon-size 21
-                     :gui-height 190
-                     :mode-line 160)))
+  '(("inspiron-7572"
+     :font "Iosevka Nerd Font Mono"
+     :gui-height 20
+     :daemon-height 20
+     :mode-line-height 160)
+    ("dell-7506"
+     :font "JetBrainsMonoNerdFontMono"
+     :gui-height 16
+     :daemon-height 16
+     :mode-line-height 120)
+    ("cseiitk"
+     :font "Iosevka Nerd Font Mono"
+     :gui-height 20
+     :daemon-height 20
+     :mode-line-height 160)))
 
 (defun sb/font-config-for-host ()
   (assoc (system-name) sb/font-config))
 
-;; ---------- Daemon (frames created later) ----------
-
 (defun sb/apply-font-daemon (frame)
   (when-let* ((cfg (sb/font-config-for-host))
               (font (plist-get (cdr cfg) :font))
-              (size (plist-get (cdr cfg) :daemon-size)))
+              (size (plist-get (cdr cfg) :daemon-height)))
     (with-selected-frame frame
       (set-frame-font (format "%s-%d" font size) t t))))
 
 (when (daemonp)
   (when-let* ((cfg (sb/font-config-for-host))
               (font (plist-get (cdr cfg) :font))
-              (size (plist-get (cdr cfg) :daemon-size)))
-    (add-to-list 'default-frame-alist
-                 `(font . ,(format "%s-%d" font size)))
+              (size (plist-get (cdr cfg) :daemon-height)))
+    (add-to-list 'default-frame-alist `(font . ,(format "%s-%d" font size)))
     (add-hook 'after-make-frame-functions #'sb/apply-font-daemon)))
-
-;; ---------- Non-daemon (GUI startup) ----------
 
 (defun sb/apply-font-gui ()
   (when-let* ((cfg (sb/font-config-for-host))
               (font (plist-get (cdr cfg) :font))
-              (height (plist-get (cdr cfg) :gui-height))
-              (mode-line (plist-get (cdr cfg) :mode-line)))
-    (set-face-attribute 'default nil
-                        :font font
-                        :height height)
+              (size (plist-get (cdr cfg) :gui-height))
+              (font-string (format "%s-%d" font size)))
+    (add-to-list 'default-frame-alist `(font . ,font-string))
+    (add-to-list 'initial-frame-alist `(font . ,font-string))
+    ;; (set-face-attribute 'default nil
+    ;;                     :font font
+    ;;                     :height fh)
+    ))
+  
+(defun sb/apply-mode-line-height ()
+  (when-let* ((cfg (sb/font-config-for-host))
+              (mlh (plist-get (cdr cfg) :mode-line-height)))
     (dolist (face '(mode-line mode-line-active mode-line-inactive))
-      (set-face-attribute face nil :height mode-line))))
+      (set-face-attribute face nil :height mlh))))
 
-(unless (daemonp)
-  (add-hook 'after-init-hook #'sb/apply-font-gui))
+;; (unless (daemonp)
+;;   (add-hook 'after-init-hook #'sb/apply-font-gui))
+
+;; Call the function directly instead of a hook.
+(sb/apply-font-gui)
+(add-hook 'after-init-hook #'sb/apply-mode-line-height)
+
+;; Recommended by `lsp-mode' for better performance
+(setenv "LSP_USE_PLISTS" "true")
 
 (provide 'early-init)
 

@@ -21,9 +21,9 @@
   :type 'string
   :group 'sb/emacs)
 
-;; I now prefer dark themes. `Modus-vivendi' is the most complete, has good
-;; contrast, and integrates well with all terminals. `Catppuccin' is more
-;; colorful.
+;; I now prefer dark themes. Modus-vivendi is the most complete, has good
+;; contrast, and integrates well with all terminals. Catppuccin and Dracula are
+;; more colorful.
 (defcustom sb/theme
   (if (display-graphic-p)
       'standard-dark
@@ -130,6 +130,7 @@ The provider is `nerd-icons'."
     (const :tag "none" none))
   :group 'sb/emacs)
 
+;; TODO: What is the difference between server and daemon?
 (defcustom sb/op-mode 'standalone
   "Specify the way you expect Emacs to be used."
   :type
@@ -142,8 +143,6 @@ The provider is `nerd-icons'."
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
-;; (unless package--initialized
-;;   (package-initialize))
 (package-initialize)
 
 (setopt
@@ -228,8 +227,10 @@ The provider is `nerd-icons'."
 
      ;; Typing with the mark active will overwrite the marked region
      (delete-selection-mode 1)
+
      ;; Use soft wraps, wrap lines without the ugly continuation marks
      (global-visual-line-mode 1)
+
      ;; Continuation lines are displayed with proper indentation, as if the
      ;; text had been filled with M-q, but without modifying the buffer at all.
      (when (fboundp 'global-visual-wrap-prefix-mode)
@@ -344,7 +345,7 @@ The provider is `nerd-icons'."
 
   ;; (window-combination-resize t "Resize windows proportionally")
 
-  ;; Allows showing all choices during lsp import
+  ;; Allows showing all choices while importing with `lsp-mode'
   (max-mini-window-height 0.3)
 
   (x-gtk-use-system-tooltips nil "Do not use system tooltips")
@@ -482,12 +483,12 @@ The provider is `nerd-icons'."
 
   (put 'overwrite-mode 'disabled t)
 
-  ;; Keep the cursor out of the read-only portions of the minibuffer
-  (setopt minibuffer-prompt-properties
-          '(read-only
-            t intangible t cursor-intangible t face minibuffer-prompt))
+  ;; ;; Keep the cursor out of the read-only portions of the minibuffer
+  ;; (setopt minibuffer-prompt-properties
+  ;;         '(read-only
+  ;;           t intangible t cursor-intangible t face minibuffer-prompt))
 
-  (add-hook 'minibuffer-setup-hook (lambda () (cursor-intangible-mode 1)))
+  ;; (add-hook 'minibuffer-setup-hook (lambda () (cursor-intangible-mode 1)))
 
   ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
   ;; Zellij.
@@ -1281,6 +1282,8 @@ The provider is `nerd-icons'."
 
   (consult-narrow-key "<")
   (consult-widen-key ">")
+
+  ;; Do not filter buffers, they help to debug configuration errors 
   ;; (consult-buffer-filter sb/consult-buffer-filter)
 
   :config
@@ -2126,7 +2129,7 @@ The provider is `nerd-icons'."
 
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
-  :hook (elpaca-after-init . global-page-break-lines-mode)
+  :hook (emacs-startup . global-page-break-lines-mode)
 
   :diminish)
 
@@ -6310,7 +6313,7 @@ Shows both colors when errors and warnings are present."
 
   :after eglot
 
-  :config (eglot-managed-mode . eglot-booster-mode))
+  :hook (eglot-managed-mode . eglot-booster-mode))
 
 (use-package eglot-java
   :when (eq sb/lsp-provider 'eglot)

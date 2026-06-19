@@ -98,15 +98,14 @@
  ((emacs-lisp-mode lisp-data-mode)
   .
   ((no-byte-compile . t)
-   (flycheck-disabled-checkers . (emacs-lisp-checkdoc))
-   ;; (elisp-autofmt-on-save-p . always)
-
+   (elisp-autofmt-on-save-p . always)
+   (elisp-autofmt-load-packages-local . ("use-package-core"))
    ;; The special `subdirs' element is not a variable, but a special keyword
    ;; which indicates that the mode settings are only to be applied in the
-   ;; current directory, not in any sub-directories.
+   ;; current directory, not in any subdirectories.
    (subdirs . nil)))
 
- ;; (c-mode . ((mode . c++-mode)))
+ (c-mode . ((mode . c++)))
 
  ;; Some systems may not have treesitter libraries installed. Consolidated C++
  ;; (applies to both c++-mode and c++-ts-mode)
@@ -339,7 +338,7 @@
 
  (LaTeX-mode
   .
-  ( ;; (TeX-master . (expand-file-name "./paper.tex"))
+  ((TeX-master . (expand-file-name "paper.tex"))
    (eval .
          (let ((bibpath (expand-file-name "./references/references.bib")))
            (setq-local

@@ -62,3 +62,9 @@ tramp
 /mason/
 /themes/
 extras/.wordlist.5.kate-swp
+/.persistent-scratch
+/bm-repository
+/company-statistics-cache.el
+/history
+/places.eld
+/recentf.eld
