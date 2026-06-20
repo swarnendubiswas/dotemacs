@@ -246,7 +246,13 @@ The provider is `nerd-icons'."
      ;; This puts the buffer in read-only mode and disables font locking, revert
      ;; with "C-c C-c".
      (when (fboundp 'global-so-long-mode)
-       (global-so-long-mode 1))))
+       (global-so-long-mode 1))
+
+     (when (fboundp 'vc-auto-revert-mode)
+       (vc-auto-revert-mode 1))
+
+     (when (and (not (display-graphic-p)) (fboundp 'tty-tip-mode))
+       (tty-tip-mode 1))))
 
   :bind
   (("<f1>" . execute-extended-command)
@@ -366,6 +372,8 @@ The provider is `nerd-icons'."
   ;; Disable version control for remote files to improve performance
   (vc-ignore-dir-regexp
    (format "\\(%s\\)\\|\\(%s\\)" vc-ignore-dir-regexp tramp-file-name-regexp))
+  (vc-allow-rewriting-published-history t)
+  (vc-dir-auto-hide-up-to-date 'revert)
 
   ;; Accelerate scrolling operations when non-nil. Only those portions of the
   ;; buffer which are actually going to be displayed get fontified.
@@ -465,9 +473,6 @@ The provider is `nerd-icons'."
   ;; ;; Not a library/file, so `eval-after-load' does not work
   ;; (diminish 'auto-fill-function)
   (diminish 'auto-fill-mode)
-
-  (when (fboundp 'tty-tip-mode)
-    (tty-tip-mode 1))
 
   ;; (when (file-in-directory-p buffer-file-name user-emacs-directory)
   ;; (advice-add 'risky-local-variable-p :override #'ignore))
@@ -2379,6 +2384,9 @@ The provider is `nerd-icons'."
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
   (completion-category-overrides '((file (styles basic partial-completion))))
+  (completion-eager-update t)
+  (completion-eager-display 'auto)
+  (minibuffer-visible-completions 'up-down)
 
   :config
   ;; Show docstring description for completion candidates in commands like
@@ -3816,6 +3824,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :custom
   (eldoc-area-prefer-doc-buffer t "Disable popups")
   (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+  (eldoc-help-at-pt t)
 
   :config
   ;; Allow Eldoc to trigger after completions
@@ -3844,6 +3853,18 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; in `c-ts-mode'. That means `.dir-locals.el' settings and yasnippets for
 ;; `c-mode' will work for `c-ts-mode' too. However, `c-ts-mode' still does not
 ;; run c-mode's major mode hooks. Also, there's still no major mode fallback.
+
+(use-package treesit
+  :ensure nil
+
+  :when
+  (and (executable-find "tree-sitter")
+       (fboundp 'treesit-available-p)
+       (treesit-available-p))
+
+  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+
+  :custom (treesit-enabled-modes t))
 
 ;; (use-package treesit
 ;;   :ensure nil
