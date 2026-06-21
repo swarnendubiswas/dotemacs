@@ -717,6 +717,11 @@ The provider is `nerd-icons'."
 
   :hook (ediff-startup . ediff-next-difference)
 
+  :bind
+  (("C-c e f" . ediff-files)
+   ("C-c e d" . ediff-directories)
+   ("C-c e b" . ediff-buffers))
+
   :custom
   ;; Put the control panel in the same frame as the diff windows
   (ediff-window-setup-function #'ediff-setup-windows-plain)
@@ -2109,16 +2114,7 @@ The provider is `nerd-icons'."
   ;; among the highlighted lines.
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
 
-  :custom (hl-todo-highlight-punctuation ":")
-
-  :config
-  (setopt hl-todo-keyword-faces
-          (append
-           '(("LATER" . "#d0bf8f")
-             ("IMP" . "#7cb8bb")
-             ("TEST" . "tomato")
-             ("WARNING" . "#cc0000"))
-           hl-todo-keyword-faces)))
+  :custom (hl-todo-highlight-punctuation ":"))
 
 ;; Include `hl-todo' keywords in Flycheck messages.
 (use-package flycheck-hl-todo
@@ -3059,8 +3055,6 @@ The provider is `nerd-icons'."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-c-mode))))
 
-  ;; TODO: It may be possible to merge `sb/company-non-lsp-prog-mode' and `sb/company-elisp-mode'.
-
   ;; We override `company-backends' for LSP-managed major modes.
   (defun sb/company-non-lsp-prog-mode ()
     (setq-local
@@ -3854,6 +3848,8 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; `c-mode' will work for `c-ts-mode' too. However, `c-ts-mode' still does not
 ;; run c-mode's major mode hooks. Also, there's still no major mode fallback.
 
+;; I am not very convinced with the usefulness of Treesitter for major modes where LSPs are available.
+
 (use-package treesit
   :ensure nil
 
@@ -3862,87 +3858,80 @@ Uses `eglot` or `lsp-mode` depending on configuration."
        (fboundp 'treesit-available-p)
        (treesit-available-p))
 
+  ;;   :demand t
+
+  ;;   :commands (treesit-install-language-grammar)
+
   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
 
-  :custom (treesit-enabled-modes t))
+  :custom (treesit-enabled-modes t)
 
-;; (use-package treesit
-;;   :ensure nil
-;;   :when
-;;   (and (executable-find "tree-sitter")
-;;        (fboundp 'treesit-available-p)
-;;        (treesit-available-p))
-;;   :demand t
-;;   :commands (treesit-install-language-grammar)
-;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-;;   :custom
-;;   ;; Increased default font locking may hurt performance
-;;   (treesit-font-lock-level 4)
-;;   (treesit-language-source-alist
-;;    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-;;      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-;;      (c "https://github.com/tree-sitter/tree-sitter-c")
-;;      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-;;      (cmake "https://github.com/uyha/tree-sitter-cmake")
-;;      (css "https://github.com/tree-sitter/tree-sitter-css")
-;;      (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
-;;      (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-;;      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-;;      (go "https://github.com/tree-sitter/tree-sitter-go")
-;;      (html "https://github.com/tree-sitter/tree-sitter-html")
-;;      (java "https://github.com/tree-sitter/tree-sitter-java")
-;;      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-;;      (json "https://github.com/tree-sitter/tree-sitter-json")
-;;      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
-;;      (latex "https://github.com/latex-lsp/tree-sitter-latex")
-;;      (make "https://github.com/alemuller/tree-sitter-make")
-;;      (markdown
-;;       "https://github.com/ikatyang/tree-sitter-markdown"
-;;       "split_parser"
-;;       "tree-sitter-markdown/src")
-;;      (markdown-inline
-;;       "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-;;       "split_parser"
-;;       "tree-sitter-markdown-inline/src")
-;;      (org "https://github.com/milisims/tree-sitter-org")
-;;      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-;;      (php "https://github.com/tree-sitter/tree-sitter-php")
-;;      (python "https://github.com/tree-sitter/tree-sitter-python")
-;;      (toml "https://github.com/tree-sitter/tree-sitter-toml")
-;;      (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
-;;      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
-;;      (rust "https://github.com/tree-sitter/tree-sitter-rust")
-;;      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-;;   :config
-;;   (setopt treesit-language-source-alist
-;;           '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
+  ;;   ;; Increased default font locking may hurt performance
+  ;;   (treesit-font-lock-level 4)
+  ;;   (treesit-language-source-alist
+  ;;    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  ;;      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+  ;;      (c "https://github.com/tree-sitter/tree-sitter-c")
+  ;;      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+  ;;      (cmake "https://github.com/uyha/tree-sitter-cmake")
+  ;;      (css "https://github.com/tree-sitter/tree-sitter-css")
+  ;;      (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
+  ;;      (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+  ;;      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  ;;      (go "https://github.com/tree-sitter/tree-sitter-go")
+  ;;      (html "https://github.com/tree-sitter/tree-sitter-html")
+  ;;      (java "https://github.com/tree-sitter/tree-sitter-java")
+  ;;      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+  ;;      (json "https://github.com/tree-sitter/tree-sitter-json")
+  ;;      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
+  ;;      (latex "https://github.com/latex-lsp/tree-sitter-latex")
+  ;;      (make "https://github.com/alemuller/tree-sitter-make")
+  ;;      (markdown
+  ;;       "https://github.com/ikatyang/tree-sitter-markdown"
+  ;;       "split_parser"
+  ;;       "tree-sitter-markdown/src")
+  ;;      (markdown-inline
+  ;;       "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+  ;;       "split_parser"
+  ;;       "tree-sitter-markdown-inline/src")
+  ;;      (org "https://github.com/milisims/tree-sitter-org")
+  ;;      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+  ;;      (php "https://github.com/tree-sitter/tree-sitter-php")
+  ;;      (python "https://github.com/tree-sitter/tree-sitter-python")
+  ;;      (toml "https://github.com/tree-sitter/tree-sitter-toml")
+  ;;      (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
+  ;;      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+  ;;      (rust "https://github.com/tree-sitter/tree-sitter-rust")
+  ;;      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  ;;   :config
+  ;;   (setopt treesit-language-source-alist
+  ;;           '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
 
-;;   ;; Install grammars if missing
-;;   (unless (seq-every-p
-;;            #'treesit-language-available-p
-;;            (mapcar #'car treesit-language-source-alist))
-;;     (mapc
-;;      #'treesit-install-language-grammar
-;;      (mapcar #'car treesit-language-source-alist)))
+  ;;   ;; Install grammars if missing
+  ;;   (unless (seq-every-p
+  ;;            #'treesit-language-available-p
+  ;;            (mapcar #'car treesit-language-source-alist))
+  ;;     (mapc
+  ;;      #'treesit-install-language-grammar
+  ;;      (mapcar #'car treesit-language-source-alist)))
 
-;;   (setopt major-mode-remap-alist
-;;           '((sh-mode . bash-ts-mode)
-;;             (c-mode . c-ts-mode)
-;;             (c++-mode . c++-ts-mode)
-;;             (c-or-c++-mode . c-or-c++-ts-mode)
-;;             (cmake-mode . cmake-ts-mode)
-;;             (css-mode . css-ts-mode)
-;;             (dockerfile-mode . dockerfile-ts-mode)
-;;             (html-mode . html-ts-mode)
-;;             (java-mode . java-ts-mode)
-;;             (json-mode . json-ts-mode)
-;;             (kdl-mode . kdl-ts-mode)
-;;             (python-mode . python-ts-mode)
-;;             (toml-mode . toml-ts-mode)
-;;             (conf-toml-mode . toml-ts-mode)
-;;             (yaml-mode . yaml-ts-mode))))
-
-;; I am not very convinced with the usefulness of Treesitter for major modes where LSPs are available.
+  ;;   (setopt major-mode-remap-alist
+  ;;           '((sh-mode . bash-ts-mode)
+  ;;             (c-mode . c-ts-mode)
+  ;;             (c++-mode . c++-ts-mode)
+  ;;             (c-or-c++-mode . c-or-c++-ts-mode)
+  ;;             (cmake-mode . cmake-ts-mode)
+  ;;             (css-mode . css-ts-mode)
+  ;;             (dockerfile-mode . dockerfile-ts-mode)
+  ;;             (html-mode . html-ts-mode)
+  ;;             (java-mode . java-ts-mode)
+  ;;             (json-mode . json-ts-mode)
+  ;;             (kdl-mode . kdl-ts-mode)
+  ;;             (python-mode . python-ts-mode)
+  ;;             (toml-mode . toml-ts-mode)
+  ;;             (conf-toml-mode . toml-ts-mode)
+  ;;             (yaml-mode . yaml-ts-mode))))
+  )
 
 ;; (use-package treesit-auto
 ;;   :when
@@ -3976,7 +3965,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package cc-mode
   :ensure nil
 
-  :mode ("\\.h\\'" . c-or-c++-mode)
+  :mode ("\\.h\\'" . c-or-c++-ts-mode)
 
   :hook
   ((awk-mode
@@ -4027,26 +4016,16 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (if (and (executable-find "tree-sitter")
          (fboundp 'treesit-available-p)
          (treesit-available-p))
-    (use-package cuda-mode
-      :mode ("\\.cu\\'" . c++-ts-mode)
-
-      :mode ("\\.cuh\\'" . c++-ts-mode))
-  (use-package cuda-mode
-    :mode ("\\.cu\\'" . c++-mode)
-
-    :mode ("\\.cuh\\'" . c++-mode)))
+    (add-to-list 'auto-mode-alist '("\\.cu[h]?\\'" . c++-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.cu[h]?\\'" . c++-mode)))
 
 (use-package opencl-c-mode
   :mode "\\.cl\\'")
 
-;; I have disabled treesitter support for CMake because it seems unstable. For
-;; example, I get "treesit-font-lock-fontify-region: Query pattern is malformed"
-;; on search with `consult-line'.
-;; https://github.com/regen100/cmake-language-server/pull/103/files
 (use-package cmake-mode
   :when (executable-find "cmake")
 
-  :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))
+  :mode (("CMakeLists\\.txt\\'" . cmake-ts-mode) ("\\.cmake\\'" . cmake-ts-mode))
 
   :hook
   ((cmake-mode cmake-ts-mode)
@@ -4879,98 +4858,114 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg))
 
-;; (use-package citre
-;;   :preface
-;;   (defun sb/jump-citre-xref ()
-;;     "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
-;;     (interactive)
-;;     (condition-case _
-;;         (citre-jump)
-;;       (error
-;;        (let* ((xref-prompt-for-identifier nil))
-;;          (call-interactively #'xref-find-definitions)))))
+(use-package citre
+  :preface
+  (defun sb/jump-citre-xref ()
+    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
+    (interactive)
+    (condition-case _
+        (citre-jump)
+      (error
+       (let* ((xref-prompt-for-identifier nil))
+         (call-interactively #'xref-find-definitions)))))
 
-;;   (defun sb/jump-xref-citre ()
-;;     "Jump to the definition of the symbol at point using `xref-find-definitions' first. Falls back to `citre-jump' on failure."
-;;     (interactive)
-;;     (let ((ofn
-;;            (lambda ()
-;;              (let* ((xref-prompt-for-identifier nil))
-;;                (call-interactively #'xref-find-definitions)))))
-;;       (condition-case _
-;;           (citre-jump)
-;;         (error
-;;          (funcall ofn)))))
+  (defun sb/jump-xref-citre ()
+    "Jump to the definition of the symbol at point using `xref-find-definitions' first. Falls back to `citre-jump' on failure."
+    (interactive)
+    (let ((ofn
+           (lambda ()
+             (let* ((xref-prompt-for-identifier nil))
+               (call-interactively #'xref-find-definitions)))))
+      (condition-case _
+          (citre-jump)
+        (error
+         (funcall ofn)))))
 
-;;   (defun sb/jump-back-citre-xref ()
-;;     "Go back to the position before last `citre-jump'.
-;; Fallback to `xref-go-back'."
-;;     (interactive)
-;;     (condition-case _
-;;         (citre-jump-back)
-;;       (error
-;;        (if (fboundp #'xref-go-back)
-;;            (call-interactively #'xref-go-back)
-;;          (call-interactively #'xref-pop-marker-stack)))))
-;;   :hook ((prog-mode LaTeX-mode) . citre-mode)
-;;   :bind* (("M-." . sb/jump-xref-citre) ("M-," . sb/jump-back-citre-xref))
-;;   :custom (citre-default-create-tags-file-location 'in-dir)
-;;   ;; Add exclude by: --exclude=target or by --exclude=@./.ctagsignore
-;;   ;; Add dirs/files to scan here, one line per dir/file
-;;   (citre-ctags-default-options
-;;    (string-join
-;;     '("-o %TAGSFILE%"
-;;       "--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX"
-;;       "--kinds-all=*"
-;;       "--fields=*"
-;;       "--extras=*"
-;;       "--recurse")
-;;     " "))
-;;   ;; Add Elisp to the backend lists.
-;;   (citre-find-definition-backends '(elisp eglot tags global))
-;;   (citre-find-reference-backends '(elisp eglot global))
-;;   :config
-;;   (setq-default
-;;    citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
-;;    ;; Large tags file slows down completion
-;;    citre-enable-capf-integration nil)
+  (defun sb/jump-back-citre-xref ()
+    "Go back to the position before last `citre-jump'.
+Fallback to `xref-go-back'."
+    (interactive)
+    (condition-case _
+        (citre-jump-back)
+      (error
+       (if (fboundp #'xref-go-back)
+           (call-interactively #'xref-go-back)
+         (call-interactively #'xref-pop-marker-stack)))))
 
-;;   ;; Use `citre' with Emacs Lisp
-;;   (defvar citre-elisp-backend
-;;     (citre-xref-backend-to-citre-backend
-;;      ;; This is the xref backend name
-;;      'elisp
-;;      ;; A function to tell if the backend is usable
-;;      (lambda () (derived-mode-p 'emacs-lisp-mode))))
-;;   ;; Register the backend, which means to bind it with the symbol `elisp'.
-;;   (citre-register-backend 'elisp citre-elisp-backend)
+  :hook ((prog-mode LaTeX-mode) . citre-mode)
 
-;;   ;; Integrate with `lsp-mode' and `eglot'
-;;   (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-;;     (let ((fetcher (apply -fn -args))
-;;           (citre-fetcher
-;;            (let ((xref-backend-functions '(citre-xref-backend t)))
-;;              (apply -fn -args))))
-;;       (lambda ()
-;;         (or (with-demoted-errors "%s, fallback to citre"
-;;               (funcall fetcher))
-;;             (funcall citre-fetcher)))))
+  :bind*
+  (("M-." . sb/jump-xref-citre)
+   ("M-," . sb/jump-back-citre-xref)
+   ("C-c c j" . citre-jump)
+   ("C-c c b" . citre-jump-back)
+   ("C-c c p" . citre-peek)
+   ("C-c c a" . citre-ace-peek)
+   ("C-c c r" . citre-jump-to-reference)
+   ("C-c c c" . citre-create-tags-file)
+   ("C-c c u" . citre-update-tags-file)
+   ("C-c c e" . citre-edit-tags-file-recipe)
+   ("C-c c g" . citre-global-update-database))
 
-;;   (defun sb/push-point-to-xref-marker-stack (&rest r)
-;;     (xref-push-marker-stack (point-marker)))
+  :custom (citre-default-create-tags-file-location 'in-dir)
+  ;; Add exclude by: --exclude=target or by --exclude=@./.ctagsignore
+  ;; Add dirs/files to scan here, one line per dir/file
+  (citre-ctags-default-options
+   (string-join
+    '("-o %TAGSFILE%"
+      "--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX"
+      "--kinds-all=*"
+      "--fields=*"
+      "--extras=*"
+      "--recurse")
+    " "))
+  ;; Add Elisp to the backend lists.
+  (citre-find-definition-backends '(elisp eglot tags global))
+  (citre-find-reference-backends '(elisp eglot global))
 
-;;   (dolist (func
-;;            '(xref-find-definitions
-;;              xref-find-references
-;;              find-function
-;;              consult-imenu
-;;              project-grep
-;;              deadgrep
-;;              counsel-rg
-;;              consult-lsp-file-symbols
-;;              citre-jump))
-;;     (advice-add func :before 'sb/push-point-to-xref-marker-stack))
-;;   :diminish)
+  :config
+  (setq-default
+   citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
+   ;; Large tags file slows down completion
+   citre-enable-capf-integration nil)
+
+  ;; Use `citre' with Emacs Lisp
+  (defvar citre-elisp-backend
+    (citre-xref-backend-to-citre-backend
+     ;; This is the xref backend name
+     'elisp
+     ;; A function to tell if the backend is usable
+     (lambda () (derived-mode-p 'emacs-lisp-mode))))
+  ;; Register the backend, which means to bind it with the symbol `elisp'.
+  (citre-register-backend 'elisp citre-elisp-backend)
+
+  ;; Integrate with `lsp-mode' and `eglot'
+  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
+    (let ((fetcher (apply -fn -args))
+          (citre-fetcher
+           (let ((xref-backend-functions '(citre-xref-backend t)))
+             (apply -fn -args))))
+      (lambda ()
+        (or (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher)))))
+
+  (defun sb/push-point-to-xref-marker-stack (&rest r)
+    (xref-push-marker-stack (point-marker)))
+
+  (dolist (func
+           '(xref-find-definitions
+             xref-find-references
+             find-function
+             consult-imenu
+             project-grep
+             deadgrep
+             counsel-rg
+             consult-lsp-file-symbols
+             citre-jump))
+    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
+
+  :diminish)
 
 (use-package leuven-theme
   :when (eq sb/theme 'leuven-dark)
@@ -5356,131 +5351,6 @@ Shows both colors when errors and warnings are present."
   (powerline-display-mule-info nil "File encoding information is not useful")
   (powerline-gui-use-vcs-glyph t)
   (powerline-height 20))
-
-;; TODO: Merge this with `powerline' modeline theme.
-
-;; (use-package sb-modeline
-;;   :preface
-;;   (defvar sb/modeline-max-project-length 20
-;;     "Maximum length of displayed project name before truncation.")
-
-;;   (defvar sb/modeline-show-percentage t
-;;     "If non-nil, show percentage-of-file instead of total-lines.")
-
-;;   (defvar sb/modeline-min-width-for-vcs 90
-;;     "Minimum window width to show Git/VCS segment.")
-
-;;   ;; ---------------------------------------------
-;;   ;; Internal caches
-;;   ;; ---------------------------------------------
-;;   (defvar sb/modeline--project-cache (make-hash-table :test 'equal)
-;;     "Caches project root → displayed project name.")
-
-;;   (defun sb/modeline--project-name ()
-;;     "Return truncated project name, cached."
-;;     (let* ((proj
-;;             (ignore-errors
-;;               (project-current)))
-;;            (root
-;;             (when proj
-;;               (project-root proj))))
-;;       (if (not root)
-;;           ""
-;;         (or (gethash root sb/modeline--project-cache)
-;;             (let* ((name (file-name-nondirectory (directory-file-name root)))
-;;                    (trunc
-;;                     (if (> (length name) sb/modeline-max-project-length)
-;;                         (concat
-;;                          (substring name 0 sb/modeline-max-project-length) "…")
-;;                       name)))
-;;               (puthash root trunc sb/modeline--project-cache)
-;;               trunc)))))
-
-;;   (defun sb/modeline--vcs-info-visible-p ()
-;;     "Return non-nil if VCS information should be shown."
-;;     (>= (window-total-width) sb/modeline-min-width-for-vcs))
-
-;;   (defun sb/modeline--vcs-segment ()
-;;     "Return VCS segment (branch name) or empty string if hidden."
-;;     (if (sb/modeline--vcs-info-visible-p)
-;;         (let ((branch (vc-working-revision buffer-file-name)))
-;;           (if branch
-;;               (format "  %s " branch)
-;;             ""))
-;;       ""))
-
-;;   (defun sb/modeline--position ()
-;;     "Return position segment: percentage or line/total-lines."
-;;     (if sb/modeline-show-percentage
-;;         (let* ((cur (line-number-at-pos))
-;;                (max (max 1 (line-number-at-pos (point-max)))))
-;;           (format " %d%%%% " (/ (* 100 cur) max)))
-;;       (format " %d/%d " (line-number-at-pos) (line-number-at-pos (point-max)))))
-
-
-;;   ;; GUI icon wrapper (fallback to plain text in TTY)
-;;   (defun sb/modeline--icon (text)
-;;     (if (display-graphic-p)
-;;         (propertize text 'face 'shadow)
-;;       text))
-
-;;   (defun sb/modeline-format ()
-;;     `(" "
-;;       ;; Project
-;;       ,(sb/modeline--icon "📁 ") ,(sb/modeline--project-name)
-
-;;       " | "
-
-;;       ;; Buffer
-;;       ,(sb/modeline--icon "📄 ") ,mode-line-buffer-identification
-
-;;       ;; Modified indicator
-;;       ,(when (buffer-modified-p)
-;;          (propertize " ●" 'face 'error))
-
-;;       " | "
-
-;;       ;; Position
-;;       ,(sb/modeline--position)
-
-;;       ;; Major mode
-;;       " | " "(" ,mode-name ")"
-
-;;       ;; VCS (hidden on narrow windows)
-;;       ,(sb/modeline--vcs-segment)
-
-;;       " "))
-
-;;   (defun sb/modeline-tty-setup ()
-;;     "Compact modeline for terminal use."
-;;     (unless (display-graphic-p)
-;;       ;; Reduce modeline visuals
-;;       (set-face-attribute 'mode-line nil :height 0.8 :weight 'normal :box nil)
-;;       (set-face-attribute 'mode-line-inactive nil
-;;                           :height 0.8
-;;                           :weight 'normal
-;;                           :box nil)
-;;       ;; Very minimal TTY format
-;;       (setq-default mode-line-format
-;;                     '(" "
-;;                       mode-line-buffer-identification
-;;                       " "
-;;                       (:eval (sb/modeline--position))
-;;                       " ("
-;;                       mode-name
-;;                       ") "))))
-
-;;   ;; ---------------------------------------------
-;;   ;; Enable
-;;   ;; ---------------------------------------------
-;;   (defun sb/enable-smart-modeline ()
-;;     "Activate the smart, width-adaptive modeline."
-;;     (interactive)
-;;     (setq-default mode-line-format '((:eval (sb/modeline-format))))
-;;     (sb/modeline-tty-setup))
-
-;;   :ensure nil
-;;   :hook (after-init . sb/enable-smart-modeline))
 
 (use-package doom-modeline
   :when (eq sb/modeline-theme 'doom-modeline)
@@ -5977,38 +5847,12 @@ Shows both colors when errors and warnings are present."
 ;;    kill-file-path-dirname
 ;;    kill-file-path))
 
-;; Allow fetching the latest versions via Elpaca to satisfy Eglot requirements
-(use-package flymake)
-
-(use-package jsonrpc)
-
 (use-package eglot
-  ;; :preface
-  ;; ;; FIXME: It seems there is a race condition between Eglot shutting down the
-  ;; ;; servers and closing the project buffers.
-  ;; (defun sb/project-kill-buffers-disconnect-eglot ()
-  ;;   "Shutdown Eglot for the current project before killing its buffers."
-  ;;   (interactive)
-  ;;   (when-let* ((proj (project-current))
-  ;;               (root (project-root proj)))
-  ;;     (dolist (buf (project-buffers proj))
-  ;;       (with-current-buffer buf
-  ;;         (when (and eglot--managed-mode (eglot-current-server))
-  ;;           ;; Shut down once per server, not once per buffer
-  ;;           (let ((server (eglot-current-server)))
-  ;;             (when (and server
-  ;;                        (equal (project-root (eglot--project server)) root))
-  ;;               (ignore-errors
-  ;;                 (eglot-shutdown server))))))))
-  ;;   (project-kill-buffers))
-
-  ;; :ensure nil
-  ;; FIXME: Try to get MELPA version working
-  ;; :ensure (:source (gnu-elpa-mirror))
-
   :when (eq sb/lsp-provider 'eglot)
 
   :after project
+
+  :pin gnu
 
   :hook
   ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
