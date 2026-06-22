@@ -1013,23 +1013,6 @@ The provider is `nerd-icons'."
   (dired-free-space nil)
   (dired-omit-verbose nil "Do not show messages when omitting files")
 
-  ;; (dired-omit-files
-  ;;  (rx
-  ;;   (or (seq bol "." (not (any "."))) ; dotfiles
-  ;;       ".DS_Store"
-  ;;       ".project"
-  ;;       (optional "ile")
-  ;;       ".svn"
-  ;;       ".git"
-  ;;       ".cache"
-  ;;       ".ccls-cache"
-  ;;       "__pycache__"
-  ;;       "eln-cache"
-  ;;       ".ctags.d"
-  ;;       ".git"
-  ;;       (seq (optional ".js") ".meta")
-  ;;       (seq "." (or "elc" "o" "pyo" "swp" "class")))))
-
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
     (setopt dired-kill-when-opening-new-dired-buffer t))
@@ -1112,16 +1095,6 @@ The provider is `nerd-icons'."
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
-;; ;; Allows identifying custom projects with a ".project" file (e.g., ~/Dropbox).
-;; (use-package project-x
-;;   :ensure (:host github :repo "karthink/project-x")
-
-;;   :after project
-
-;;   :demand t ; Required so that transient keybindings are available
-
-;;   :config (add-hook 'project-find-functions #'project-x-try-local 90))
-
 (use-package vertico
   :hook
   ((after-init . vertico-mode)
@@ -1191,14 +1164,6 @@ The provider is `nerd-icons'."
   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
 
   :diminish vertico-timer-mode)
-
-;; ;; Show the currently selected candidate on the first line of the candidate list
-;; (use-package vertico-carousel
-;;   :ensure (:host github :repo "kn66/vertico-carousel")
-
-;;   :after vertico
-
-;;   :hook (vertico-mode . vertico-carousel-mode))
 
 (defconst sb/consult-buffer-filter
   '("^ "
@@ -1344,27 +1309,6 @@ The provider is `nerd-icons'."
 
   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
-;; (use-package consult-project-extra
-;;   :after (project consult)
-
-;;   :bind (:map project-prefix-map ("z" . consult-project-extra-find))
-
-;;   :custom (consult-project-function #'consult-project-extra-project-fn)
-
-;;   :config
-;;   ;; (add-to-list 'project-switch-commands '(consult-project-extra-find "Find file" ?f))
-;;   ;; (add-to-list 'project-switch-commands '(consult-project-buffer "Buffer"))
-;;   (setq project-switch-commands 'consult-project-extra-find))
-
-;; (use-package consult-jump-project
-;;   :ensure (:host github :repo "jdtsmith/consult-jump-project")
-
-;;   :when (and (eq sb/minibuffer-completion 'vertico) (eq sb/project-handler 'project))
-
-;;   :bind ("C-x p j" . consult-jump-project)
-
-;;   :custom (consult-jump-direct-jump-modes '(dired-mode)))
-
 ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
 ;; config, known hosts, and docker containers.
 (use-package consult-tramp
@@ -1503,6 +1447,7 @@ The provider is `nerd-icons'."
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
 ;; the word at point, even if it is not misspelled.
+
 (use-package jinx
   ;; Presence of the "enchant-2" executable does not imply that the header files
   ;; are present for compiling jinx.
@@ -1569,6 +1514,7 @@ The provider is `nerd-icons'."
 ;; ;; Change the contents inside pairs like parentheses, quotes, brackets, or
 ;; ;; custom delimiters. `change-inner "' allows to kill the string contents,
 ;; ;; `change-outer "' will kill the entire string including quotes.
+
 ;; (use-package change-inner
 ;;   :commands (change-inner change-outer))
 
@@ -1588,6 +1534,8 @@ The provider is `nerd-icons'."
 
   :diminish whole-line-or-region-local-mode)
 
+;; Keeps track of the point position over time and allows us to navigate back
+;; and forward in history.
 (use-package dogears
   :hook ((prog-mode text-mode) . dogears-mode)
 
@@ -1629,29 +1577,6 @@ The provider is `nerd-icons'."
      (window-parameters . ((no-other-window . t)))
      ;; Make it full-frame
      (body-function . delete-other-windows))))
-
-;; ;; Keeps track of the point position over time and allows us to navigate back
-;; ;; and forward in history.
-
-;; (use-package gumshoe
-;;   :ensure (:host github :repo "Overdr0ne/gumshoe")
-
-;;   :hook
-;;   (after-init
-;;    .
-;;    (lambda ()
-;;      (global-gumshoe-mode 1)
-;;      (diminish 'global-gumshoe-mode)))
-
-;;   :custom
-;;   (gumshoe-show-footprints-p nil)
-;;   (gumshoe-prefer-same-window t)
-;;   (gumshoe-idle-time 2))
-
-;; (use-package better-jumper
-;;   :hook (after-init . better-jumper-mode)
-
-;;   :diminish better-jumper-local-mode)
 
 (use-package vundo
   :bind
@@ -1851,10 +1776,6 @@ The provider is `nerd-icons'."
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
-;; (use-package consult-ripfd
-;;   :vc (:url "https://github.com/jdtsmith/consult-ripfd")
-;;   :commands consult-ripfd)
-
 (use-package re-builder
   :ensure nil
 
@@ -1967,11 +1888,6 @@ The provider is `nerd-icons'."
 
 ;; (use-package smerge-mode
 ;;   :ensure nil)
-
-;; (use-package conflict-buttons
-;;   :when (display-graphic-p)
-
-;;   :hook (smerge-mode . conflict-buttons-mode))
 
 ;; (use-package elec-pair
 ;;   :preface
@@ -2133,53 +2049,6 @@ The provider is `nerd-icons'."
   :hook (emacs-startup . global-page-break-lines-mode)
 
   :diminish)
-
-;; (use-package sideline
-;;   :init (setq sideline-backends-left nil)
-
-;;   :hook ((flycheck-mode lsp-mode eglot-managed-mode) . sideline-mode)
-
-;;   :custom
-;;   (sideline-display-backend-name t)
-;;   (sideline-display-backend-type 'inner)
-
-;;   :diminish)
-
-;; (use-package sideline-flycheck
-;;   :after sideline
-
-;;   :demand t
-
-;;   :init (setq sideline-flycheck-display-mode 'line)
-
-;;   :hook (flycheck-mode . sideline-flycheck-setup))
-
-;; (use-package sideline-lsp
-;;   :when (eq sb/lsp-provider 'lsp-mode)
-
-;;   :after sideline
-
-;;   :demand t
-
-;;   :config
-;;   (setq sideline-backends-right
-;;         '((sideline-lsp . up) (sideline-flycheck . down))))
-
-;; (use-package sideline-eglot
-;;   :when (eq sb/lsp-provider 'eglot)
-
-;;   :after sideline
-
-;;   :demand t
-
-;;   :config
-;;   (setq sideline-backends-right
-;;         `(((when (featurep 'eglot)
-;;              'sideline-eglot)
-;;            . up)
-;;           ((when (featurep 'flycheck)
-;;              'sideline-flycheck)
-;;            . down))))
 
 ;; (use-package format-all
 ;;   :hook
@@ -2347,6 +2216,7 @@ The provider is `nerd-icons'."
   :demand t
 
   ;; TODO: What is the utility of this? Is this to highlight the different parts with orderless?
+
   ;; :config
   ;; (with-eval-after-load 'company
   ;;   (defun sb/just-one-face (fn &rest args)
@@ -2411,12 +2281,6 @@ The provider is `nerd-icons'."
   (save-restriction
     (narrow-to-region (point-min) (point))
     (funcall orig-fun fun which)))
-
-;; ;; `hotfuzz' allows fuzzy matching and is faster than `flex' (built-in) for large candidate sets.
-;; (use-package hotfuzz
-;;   :demand t
-
-;;   :custom completion-styles '(hotfuzz orderless))
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
@@ -2848,10 +2712,6 @@ The provider is `nerd-icons'."
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/13"))
    ((sb/directory-exists-p "/usr/include/c++/11")
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/11"))))
-
-;; ;; Incompatible with the tags file generated by Citre, works if the tags file is generated independently with "ctags -R .".
-;; (use-package company-ctags
-;;   :after company)
 
 (use-package company-auctex
   :after tex
@@ -3831,15 +3691,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :diminish)
 
-;; (use-package eldoc-box
-;;   :when (display-graphic-p)
-;;   ;; :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
-;;   :custom (eldoc-box-clear-with-C-g t)
-;;   ;; Reduce the width to cover a lesser portion of the screen
-;;   (eldoc-box-max-pixel-height 400)
-;;   :config (eldoc-box-mouse-mode -1)
-;;   :diminish (eldoc-box-hover-mode eldoc-box-hover-at-point-mode))
-
 ;; Tree-sitter provides advanced syntax highlighting features. Run
 ;; `tree-sitter-langs-install-grammar' to install the grammar files for
 ;; languages for tree-sitter. Many treesitter modes are derived from their based
@@ -4038,51 +3889,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
        (setq-local lsp-disabled-clients '(ltex-ls-plus cmake-language-server)))
      (sb/setup-lsp-provider))))
 
-;; (use-package doxymacs
-;;   :hook (c-mode-common-hook . doxymacs-mode)
-
-;;   :bind
-;;   (:map
-;;    c-mode-base-map
-;;    ;; Lookup documentation for the symbol at point.
-;;    ("C-c d ?" . doxymacs-lookup)
-;;    ;; Rescan your Doxygen tags file.
-;;    ("C-c d r" . doxymacs-rescan-tags)
-;;    ;; Prompt you for a Doxygen command to enter, and its
-;;    ;; arguments.
-;;    ("C-c d RET" . doxymacs-insert-command)
-;;    ;; Insert a Doxygen comment for the next function.
-;;    ("C-c d f" . doxymacs-insert-function-comment)
-;;    ;; Insert a Doxygen comment for the current file.
-;;    ("C-c d i" . doxymacs-insert-file-comment)
-;;    ;; Insert a Doxygen comment for the current member.
-;;    ("C-c d ;" . doxymacs-insert-member-comment)
-;;    ;; Insert a blank multi-line Doxygen comment.
-;;    ("C-c d m" . doxymacs-insert-blank-multiline-comment)
-;;    ;; Insert a blank single-line Doxygen comment.
-;;    ("C-c d s" . doxymacs-insert-blank-singleline-comment)
-;;    ;; Insert a grouping comments around the current region.
-;;    ("C-c d @" . doxymacs-insert-grouping-comments))
-
-;;   ;; :custom
-;;   ;;   ;; Configure source code <-> Doxygen tag file <-> Doxygen HTML
-;;   ;;   ;; documentation mapping:
-;;   ;;   ;;   - Files in /home/me/project/foo/ have their tag file at
-;;   ;;   ;;     http://someplace.com/doc/foo/foo.xml, and HTML documentation
-;;   ;;   ;;     at http://someplace.com/doc/foo/.
-;;   ;;   ;;   - Files in /home/me/project/bar/ have their tag file at
-;;   ;;   ;;     ~/project/bar/doc/bar.xml, and HTML documentation at
-;;   ;;   ;;     file:///home/me/project/bar/doc/.
-;;   ;;   ;; This must be configured for Doxymacs to function!
-;;   ;;   (doxymacs-doxygen-dirs
-;;   ;;    '(("^/home/me/project/foo/"
-;;   ;;       "http://someplace.com/doc/foo/foo.xml"
-;;   ;;        "http://someplace.com/doc/foo/")
-;;   ;;      ("^/home/me/project/bar/"
-;;   ;;       "~/project/bar/doc/bar.xml"
-;;   ;;       "file:///home/me/project/bar/doc/")))
-;;   )
-
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
 
@@ -4204,10 +4010,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    (lambda ()
      (when buffer-file-name
        (add-hook 'after-save-hook #'check-parens nil t)))))
-
-;; (use-package semel
-;;   :ensure (:host github :repo "eshelyaron/semel")
-;;   :hook ((emacs-lisp-mode lisp-data-mode) . semel-mode))
 
 (use-package ini-mode
   :commands ini-mode)
@@ -4436,7 +4238,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; https://alexforsale.github.io/posts/org-mode-workflow/
 ;; https://github.com/james-stoup/org-mode-better-defaults
 ;; https://github.com/james-stoup/emacs-org-mode-tutorial
+
 (use-package org
+  :pin gnu
+
   :mode ("\\.org\\'" . org-mode)
 
   :bind-keymap ("C-c o" . org-mode-map)
@@ -4497,10 +4302,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (org-startup-truncated nil)
   (org-startup-folded 'showeverything)
   (org-startup-with-inline-images t)
+
   ;; See `org-speed-commands-default' for a list of the keys and commands
   ;; enabled at the beginning of headlines. `org-babel-describe-bindings' will
   ;; display a list of the code blocks commands and their related keys.
   (org-use-speed-commands t)
+
   (org-src-strip-leading-and-trailing-blank-lines t)
   ;; Display entities like `\tilde' and `\alpha' in UTF-8 characters
   (org-pretty-entities t)
@@ -4511,15 +4318,18 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   (org-return-follows-link t)
   (org-export-with-smart-quotes t "#+OPTIONS ':t")
   (org-export-with-section-numbers nil "#+OPTIONS num:nil")
+
   ;; #+OPTIONS toc:nil, use "#+TOC: headlines 2" or similar if you need a
   ;; headline
   (org-export-with-toc nil)
   (org-export-with-sub-superscripts nil "#+OPTIONS ^:{}")
+
   ;; This exports broken links as [BROKEN LINK %s], so we can actually find
   ;; them. The default value nil just aborts the export process with an error
   ;; message "Unable to resolve link: nil". This doesn't give any hint on which
   ;; line the broken link actually is.
   (org-export-with-broken-links 'mark)
+
   (org-latex-listings 'minted "Syntax coloring is more extensive than listings")
   (org-highlight-latex-and-related '(native))
   (org-imenu-depth 4)
@@ -4605,12 +4415,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; (use-package lsp-latex
 ;;   :when (and (eq sb/lsp-provider 'lsp-mode) (executable-find "texlab"))
+
 ;;   :hook
 ;;   ((LaTeX-mode bibtex-mode)
 ;;    .
 ;;    (lambda ()
 ;;      (require 'lsp-latex)
 ;;      (lsp-deferred)))
+
 ;;   :custom
 ;;   ;; (lsp-latex-bibtex-formatter "latexindent")
 ;;   ;; (lsp-latex-latex-formatter "latexindent")
@@ -4620,6 +4432,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   ;; in the PDF.
 ;;   (lsp-latex-forward-search-executable "okular")
 ;;   (lsp-latex-forward-search-args '("--noraise --unique" "file:%p#src:%l%f"))
+
 ;;   :config
 ;;   (with-eval-after-load 'latex
 ;;     (bind-key "C-c C-c" #'lsp-latex-build LaTeX-mode-map)))
@@ -4720,6 +4533,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
 ;; (use-package tex
 ;;   :ensure nil
+
 ;;   :config
 ;;   (when (executable-find "okular")
 ;;     (add-to-list
@@ -4840,8 +4654,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   (auctex-latexmk-setup))
 
 ;; ;; Insert an environment with "C-c {". For a full list of environment abbreviations, use `C-c ?'.
+
 ;; (use-package cdlatex
 ;;   :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
+
 ;;   :diminish)
 
 (use-package dumb-jump
@@ -4996,12 +4812,7 @@ Fallback to `xref-go-back'."
 
   :init (load-theme 'modus-vivendi t)
 
-  :custom (modus-themes-mixed-fonts nil)
-  ;; (modus-themes-completions
-  ;;  '((matches . (extrabold underline))
-  ;;    (selection . (semibold accented text-also))
-  ;;    (popup . (accented intense))))
-  )
+  :custom (modus-themes-mixed-fonts nil))
 
 (use-package catppuccin-theme
   :when (eq sb/theme 'catppuccin)
@@ -5019,8 +4830,6 @@ Fallback to `xref-go-back'."
    `(diff-hl-insert
      ((t
        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
-
-;; (use-package autothemer)
 
 (use-package rose-pine-theme
   :vc (:url "https://github.com/konrad1977/pinerose-emacs")
@@ -5049,14 +4858,6 @@ Fallback to `xref-go-back'."
      '(company-scrollbar-bg ((t (:background "#333333"))))
      ;; Scrollbar foreground
      '(company-scrollbar-fg ((t (:background "#555555")))))))
-
-;; (use-package rose-pine-emacs
-;;   :ensure (:host github :repo "thongpv87/rose-pine-emacs"
-;;                  :files ("*.el")
-;;    :includes (rose-pine-moon-theme))
-;;   :after autothemer
-;;   :when (eq sb/theme 'rose-pine)
-;;   :init (load-theme 'rose-pine-moon-theme t))
 
 (use-package kanagawa-themes
   :when (eq sb/theme 'kanagawa)
@@ -5110,14 +4911,6 @@ Fallback to `xref-go-back'."
   :when (eq sb/theme 'tokyonight)
 
   :init (load-theme 'tokyo-night t))
-
-;; (use-package tokyonight-themes
-;;   :ensure (:host github :repo "xuchengpeng/tokyonight-themes")
-
-;;   :when (eq sb/theme 'tokyonight)
-
-;;   :init
-;;   (load-theme 'tokyonight-moon :no-confirm))
 
 (use-package matugen-theme
   :ensure nil
@@ -5182,9 +4975,13 @@ Fallback to `xref-go-back'."
 
 ;; (use-package nerd-icons-grep
 ;;   :ensure (:host github :repo "hron/nerd-icons-grep")
+
 ;;   :when (bound-and-true-p sb/enable-icons)
+
 ;;   :after grep
+
 ;;   :init (nerd-icons-grep-mode)
+
 ;;   :custom (grep-use-headings t))
 
 ;; Powerline theme for Nano looks great, and takes less space on the modeline.
@@ -5444,9 +5241,9 @@ Shows both colors when errors and warnings are present."
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale")))
 
-  ;; :custom-face
-  ;; (mini-echo-major-mode ((t (:height 0.8))))
-  ;; (mini-echo-buffer-position ((t (:foreground "magenta" :height 0.8))))
+  :custom-face
+  (mini-echo-major-mode ((t (:height 0.8))))
+  (mini-echo-buffer-position ((t (:height 0.8))))
   ;; (mini-echo-buffer-size ((t (:height 0.8))))
   ;; (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
   ;; (mini-echo-lsp ((t (:height 0.8))))
@@ -5696,16 +5493,6 @@ Shows both colors when errors and warnings are present."
 
   :bind ("C-," . consult-xref-stack-backward))
 
-;; ;; Kill Emacs buffers automatically after a timeout
-;; (use-package buffer-terminator
-;;   :ensure (:host github :repo "jamescherti/buffer-terminator.el")
-
-;;   :hook (find-file . buffer-terminator-mode)
-
-;;   :custom (buffer-terminator-verbose nil)
-
-;;   :diminish)
-
 ;; (use-package hl-line
 ;;   :ensure nil
 
@@ -5732,45 +5519,6 @@ Shows both colors when errors and warnings are present."
 
 ;; (use-package ztree
 ;;   :commands (ztree-diff))
-
-;; ;; Provides pixel-precise smooth scrolling which can keep up with the very high
-;; ;; event rates of modern trackpads and high-precision wheel mice.
-;; (use-package ultra-scroll
-;;   :ensure (:host github :repo "jdtsmith/ultra-scroll")
-;;   :custom
-;;   (scroll-conservatively 101)
-;;   (scroll-margin 0)
-;;   :hook (find-file . ultra-scroll-mode))
-
-;; ;; Fold text using indentation levels
-;; (use-package outline-indent
-;;   :hook
-;;   ((python-mode python-ts-mode yaml-mode yaml-ts-mode)
-;;    .
-;;    outline-indent-minor-mode)
-;;   :custom
-;;   (outline-indent-ellipsis " ▼ ")
-;;   (outline-blank-line t)
-;;   :diminish (outline-minor-mode outline-indent-minor-mode))
-
-;; (use-package all-the-icons
-;;   :commands all-the-icons-install-fonts
-;;   :custom
-;;   ;; Small icons look nicer
-;;   (all-the-icons-scale-factor 0.9)
-;;   (all-the-icons-faicon-scale-factor 0.9)
-;;   (all-the-icons-wicon-scale-factor 0.9)
-;;   (all-the-icons-octicon-scale-factor 0.9)
-;;   (all-the-icons-fileicon-scale-factor 0.9)
-;;   (all-the-icons-material-scale-factor 0.9)
-;;   (all-the-icons-alltheicon-scale-factor 0.9)
-;;   (all-the-icons-color-icons t))
-
-;; ;; Highlight the cursor position after the window scrolls
-;; (use-package beacon
-;;   :disabled
-;;   :hook (after-init . beacon-mode)
-;;   :diminish)
 
 ;; ;; Allows to easily identify the file path in a project. But does not support
 ;; ;; imenu.
@@ -5831,15 +5579,12 @@ Shows both colors when errors and warnings are present."
 
 ;;   :diminish hs-minor-mode)
 
-;; (use-package kirigami
-;;   :ensure (:host github :repo "jamescherti/kirigami.el"))
-
 ;; ;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
 
 ;; (use-package string-inflection
 ;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
-;; (use-package kill-file-path)
+;; (use-package kill-file-path
 
 ;;   :commands
 ;;   (kill-file-path-basename
@@ -6129,11 +5874,6 @@ Shows both colors when errors and warnings are present."
                   (eglot-capf (styles basic))
                   (capf (styles basic))))
 
-  ;; ;; Try to avoid the race condition when closing a project and shutting down the LSP server.
-  ;; (with-eval-after-load 'project
-  ;;   (bind-key
-  ;;    "k" #'sb/project-kill-buffers-disconnect-eglot project-prefix-map))
-
   (add-to-list
    'display-buffer-alist
    '("\\*EGLOT workspace configuration\\*"
@@ -6267,11 +6007,6 @@ Shows both colors when errors and warnings are present."
   :custom
   (eglot-inactive-regions-style 'darken-foreground)
   (eglot-inactive-regions-opacity 0.4))
-
-;; (use-package mason
-;;   :defer 2
-
-;;   :hook (after-init . mason-ensure))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -6474,85 +6209,11 @@ DIR can be relative or absolute."
 ;; (with-eval-after-load 'which-key
 ;;   (diminish 'which-key-mode))
 
-;; ;; https://gist.github.com/mmarshall540/a12f95ab25b1941244c759b1da24296d
-
-;; (which-key-add-key-based-replacements
-;;  "<f1> 4"
-;;  "help-other-win"
-;;  "<f1>"
-;;  "help"
-;;  "<f2>"
-;;  "2-column"
-;;  "C-c"
-;;  "mode-and-user"
-;;  "C-h 4"
-;;  "help-other-win"
-;;  "C-h"
-;;  "help"
-;;  "C-x 4"
-;;  "other-window"
-;;  "C-x 5"
-;;  "other-frame"
-;;  "C-x 6"
-;;  "2-column"
-;;  "C-x 8"
-;;  "insert-special"
-;;  "C-x C-k C-q"
-;;  "kmacro-counters"
-;;  "C-x C-k C-r a"
-;;  "kmacro-add"
-;;  "C-x C-k C-r"
-;;  "kmacro-register"
-;;  "C-x C-k"
-;;  "keyboard-macros"
-;;  "C-x RET"
-;;  "encoding/input"
-;;  "C-x a i"
-;;  "abbrevs-inverse-add"
-;;  "C-x a"
-;;  "abbrevs"
-;;  "C-x n"
-;;  "narrowing"
-;;  "C-x p"
-;;  "projects"
-;;  "C-x r"
-;;  "reg/rect/bkmks"
-;;  "C-x t ^"
-;;  "tab-bar-detach"
-;;  "C-x t"
-;;  "tab-bar"
-;;  "C-x v M"
-;;  "vc-mergebase"
-;;  "C-x v b"
-;;  "vc-branch"
-;;  "C-x v"
-;;  "version-control"
-;;  "C-x w ^"
-;;  "window-detach"
-;;  "C-x w"
-;;  "window-extras"
-;;  "C-x x"
-;;  "buffer-extras"
-;;  "C-x"
-;;  "extra-commands"
-;;  "M-g"
-;;  "goto-map"
-;;  "M-s h"
-;;  "search-highlight"
-;;  "M-s"
-;;  "search-map")
-
-;; ;; Upon loading, the built-in `page-ext' package turns "C-x C-p" into
-;; ;; a prefix-key.  If you know of other built-in packages that have
-;; ;; this behavior, please let me know, so I can add them.
-;; (with-eval-after-load 'page-ext
-;;   (which-key-add-key-based-replacements "C-x C-p" "page-extras"))
-
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
   :unless (display-graphic-p)
 
-  :hook (after-init . global-kkp-mode)
+  :hook (emacs-startup . global-kkp-mode)
 
   ;; :bind
   ;; ("M-<backspace>" . backward-kill-word) ; Should be remapped to "M-DEL"
