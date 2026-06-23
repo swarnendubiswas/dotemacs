@@ -286,7 +286,9 @@ The provider is `nerd-icons'."
 
    ("C-c d m" . restart-emacs))
 
-  :bind* ("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
+  :bind*
+  (("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
+   ("<f3>" . switch-to-buffer) ("C-c C-j" . imenu))
 
   :custom
   ;; (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
@@ -401,6 +403,8 @@ The provider is `nerd-icons'."
 
   (imenu-auto-rescan t)
   (imenu-use-popup-menu nil)
+  (imenu-flatten t)
+
   (show-paren-when-point-inside-paren t)
   (whitespace-line-column fill-column)
 
@@ -525,7 +529,8 @@ The provider is `nerd-icons'."
 
   :custom
   (auto-revert-verbose nil)
-  (auto-revert-remote-files t)
+  (auto-revert-remote-files nil)
+  (auto-revert-avoid-polling t)
 
   ;; Revert `dired' buffers if the current directory contents change. Dired
   ;; buffers do not auto-revert as a result of changes in subdirectories, or in
@@ -569,6 +574,14 @@ The provider is `nerd-icons'."
   :diminish)
 
 (use-package recentf
+  :preface
+  (defun sb/icomplete-recentf ()
+    "Find a recent file using `icomplete-vertical-mode`."
+    (interactive)
+    (let ((file (completing-read "Recent files: " recentf-list nil t)))
+      (when file
+        (find-file file))))
+
   :ensure nil
 
   :hook
@@ -578,7 +591,7 @@ The provider is `nerd-icons'."
      (let ((inhibit-message t))
        (recentf-mode 1))))
 
-  :bind ("<f9>" . recentf-open-files)
+  :bind ("<f9>" . sb/icomplete-recentf)
 
   :custom
   (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
@@ -830,6 +843,7 @@ The provider is `nerd-icons'."
      "\\*yaml-ls.*"
      "\\*clangd.*"
      "\\*texlab.*"))
+  (ibuffer-human-readable-size t)
 
   :config
   ;; (require 'ibuf-ext)
@@ -879,21 +893,6 @@ The provider is `nerd-icons'."
   (advice-add
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
-
-;; (use-package pixel-scroll
-;;   :ensure nil
-
-;;   :custom
-;;   (pixel-scroll-precision-use-momentum nil)
-;;   (pixel-scroll-precision-interpolate-page t)
-
-;;   :config
-;;   (cond
-;;    ((fboundp 'pixel-scroll-precision-mode)
-;;     (pixel-scroll-precision-mode 1))
-;;    ;; `pixel-scroll-mode' uses line-by-line scrolling.
-;;    ((fboundp 'pixel-scroll-mode)
-;;     (pixel-scroll-mode 1))))
 
 ;; ;; Show temporary buffers as a popup window, and close them with "C-g"
 ;; (use-package popwin
@@ -1012,6 +1011,7 @@ The provider is `nerd-icons'."
   (dired-hide-details-hide-symlink-targets nil)
   (dired-free-space nil)
   (dired-omit-verbose nil "Do not show messages when omitting files")
+  (dired-hide-details-hide-absolute-location t)
 
   :config
   (when (boundp 'dired-kill-when-opening-new-dired-buffer)
@@ -1095,75 +1095,111 @@ The provider is `nerd-icons'."
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
-(use-package vertico
-  :hook
-  ((after-init . vertico-mode)
-   (minibuffer-setup . vertico-repeat-save)
+;; (fido-vertical-mode 1)
 
-   ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
-   ;; use, say, `find-file' to go to your home '~/' or root '/' directory,
-   ;; Vertico will clear the old path to keep only your current input.
-   (rfn-eshadow-update-overlay . vertico-directory-tidy))
-
+(use-package icomplete
   :bind
-  (("C-c r" . vertico-repeat)
-   ("M-r" . vertico-repeat-select)
-   :map vertico-map
-   ;; `vertico-exit' (RET) exits with the currently selected candidate, while
-   ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
-   ("M-<" . vertico-first)
-   ("M->" . vertico-last)
-   ("RET" . vertico-directory-enter)
-   ("DEL" . vertico-directory-delete-char)
-   ("M-DEL" . vertico-directory-delete-word)
-   ("C-q" . vertico-quick-insert)
-   ("C-'" . vertico-quick-jump))
+  (:map
+   icomplete-minibuffer-map
+   ("C-n" . icomplete-forward-completions)
+   ("C-p" . icomplete-backward-completions)
+   ("C-v" . icomplete-vertical-toggle)
+   ("RET" . icomplete-force-complete-and-exit)
+   ("C-j" . exit-minibuffer))
 
-  :custom (vertico-cycle t)
+  :hook (after-init . icomplete-vertical-mode)
+
+  :custom
+  (icomplete-delay-completions-threshold 0)
+  (icomplete-compute-delay 0)
+  (icomplete-show-matches-on-no-input t)
+  (icomplete-hide-common-prefix nil)
+  (icomplete-prospects-height 10)
+  (icomplete-separator " . ")
+  (icomplete-with-completion-tables t)
+  (icomplete-in-buffer t)
+  (icomplete-max-delay-chars 0)
+  (icomplete-scroll t)
 
   :config
-  (let ((ext-dir
-         (expand-file-name "extensions"
-                           (file-name-directory (locate-library "vertico")))))
-    (when (file-directory-p ext-dir)
-      (add-to-list 'load-path ext-dir)))
+  (when (and (>= emacs-major-version 31)
+             (boundp 'icomplete-vertical-in-buffer-adjust-list))
 
-  (require 'vertico-directory)
-  (require 'vertico-repeat)
-  (require 'vertico-quick)
-  (require 'vertico-indexed)
+    (setq icomplete-vertical-in-buffer-adjust-list t)
+    (setq icomplete-vertical-render-prefix-indicator t))
 
-  (vertico-indexed-mode 1)
+  (if icomplete-in-buffer
+      (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
 
-  (when (eq sb/theme 'catppuccin)
-    (set-face-attribute 'vertico-current nil
-                        :background "#676767"
-                        :foreground "#FFFFFF"))
+;; (use-package vertico
+;;   :hook
+;;   ((after-init . vertico-mode)
+;;    (minibuffer-setup . vertico-repeat-save)
 
-  ;; Customize the display of the current candidate in the completion list. This
-  ;; will prefix the current candidate with "» " to make it stand out.
-  ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
-  (advice-add
-   #'vertico--format-candidate
-   :around
-   (lambda (orig cand prefix suffix index _start)
-     (setq cand (funcall orig cand prefix suffix index _start))
-     (concat
-      (if (= vertico--index index)
-          (propertize "» " 'face '(:foreground "#80adf0" :weight bold))
-        "  ")
-      cand))))
+;;    ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
+;;    ;; use, say, `find-file' to go to your home '~/' or root '/' directory,
+;;    ;; Vertico will clear the old path to keep only your current input.
+;;    (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
-(use-package vertico-timer
-  :vc (:url "https://github.com/ventruvian/vertico-timer")
+;;   :bind
+;;   (("C-c r" . vertico-repeat)
+;;    ("M-r" . vertico-repeat-select)
+;;    :map vertico-map
+;;    ;; `vertico-exit' (RET) exits with the currently selected candidate, while
+;;    ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
+;;    ("M-<" . vertico-first)
+;;    ("M->" . vertico-last)
+;;    ("RET" . vertico-directory-enter)
+;;    ("DEL" . vertico-directory-delete-char)
+;;    ("M-DEL" . vertico-directory-delete-word)
+;;    ("C-q" . vertico-quick-insert)
+;;    ("C-'" . vertico-quick-jump))
 
-  :after vertico
+;;   :custom (vertico-cycle t)
 
-  :hook (vertico-mode . vertico-timer-mode)
+;;   :config
+;;   (let ((ext-dir
+;;          (expand-file-name "extensions"
+;;                            (file-name-directory (locate-library "vertico")))))
+;;     (when (file-directory-p ext-dir)
+;;       (add-to-list 'load-path ext-dir)))
 
-  :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
+;;   (require 'vertico-directory)
+;;   (require 'vertico-repeat)
+;;   (require 'vertico-quick)
+;;   (require 'vertico-indexed)
 
-  :diminish vertico-timer-mode)
+;;   (vertico-indexed-mode 1)
+
+;;   (when (eq sb/theme 'catppuccin)
+;;     (set-face-attribute 'vertico-current nil
+;;                         :background "#676767"
+;;                         :foreground "#FFFFFF"))
+
+;;   ;; Customize the display of the current candidate in the completion list. This
+;;   ;; will prefix the current candidate with "» " to make it stand out.
+;;   ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
+;;   (advice-add
+;;    #'vertico--format-candidate
+;;    :around
+;;    (lambda (orig cand prefix suffix index _start)
+;;      (setq cand (funcall orig cand prefix suffix index _start))
+;;      (concat
+;;       (if (= vertico--index index)
+;;           (propertize "» " 'face '(:foreground "#80adf0" :weight bold))
+;;         "  ")
+;;       cand))))
+
+;; (use-package vertico-timer
+;;   :vc (:url "https://github.com/ventruvian/vertico-timer")
+
+;;   :after vertico
+
+;;   :hook (vertico-mode . vertico-timer-mode)
+
+;;   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
+
+;;   :diminish vertico-timer-mode)
 
 (defconst sb/consult-buffer-filter
   '("^ "
@@ -1207,116 +1243,116 @@ The provider is `nerd-icons'."
     "\\*html-ls.*")
   "Regexps to filter from `consult-buffer'.")
 
-(use-package consult
-  :after vertico
+;; (use-package consult
+;;   :after vertico
 
-  :bind
-  ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
-   ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
-   ;; afterwards, the full candidate list will be shown again.
-   ([remap switch-to-buffer] . consult-buffer)
-   ("<f3>" . consult-buffer)
-   ([remap project-switch-to-buffer] . consult-project-buffer)
-   ([remap yank-pop] . consult-yank-from-kill-ring)
-   ([remap goto-line] . consult-goto-line)
-   ([remap bookmark-jump] . consult-bookmark)
-   ([remap list-bookmarks] . consult-bookmark)
-   ([remap bookmark-bmenu-list] . consult-bookmark)
-   ("M-g o" . consult-outline)
-   ("C-c C-m" . consult-mark)
-   ([remap imenu] . consult-imenu) ; "M-g i"
-   ("C-c C-j" . consult-imenu)
-   ([remap customize] . consult-customize)
-   ([remap load-theme] . consult-theme)
-   ([remap locate] . consult-locate)
-   ("C-c s l" . consult-locate)
-   ("C-c s f" . consult-fd)
-   ;; Prefix argument "C-u" allows to specify the directory. You can pass
-   ;; additional grep flags to `consult-grep' with the "--" separator. E.g.:
-   ;; "foo bar -- -A3" to get matches with 3 lines of 'after' context.
-   ([remap rgrep] . consult-grep)
-   ([remap vc-git-grep] . consult-git-grep)
-   ("<f4>" . consult-line)
-   ("M-g l" . sb/consult-line-symbol-at-point)
-   ("C-c s r" . consult-ripgrep)
-   ([remap recentf-open-files] . consult-recent-file)
-   ("M-g r" . consult-register)
-   :map
-   isearch-mode-map
-   ("M-s e" . consult-isearch-history))
+;;   :bind
+;;   ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
+;;    ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
+;;    ;; afterwards, the full candidate list will be shown again.
+;;    ([remap switch-to-buffer] . consult-buffer)
+;;    ("<f3>" . consult-buffer)
+;;    ([remap project-switch-to-buffer] . consult-project-buffer)
+;;    ([remap yank-pop] . consult-yank-from-kill-ring)
+;;    ([remap goto-line] . consult-goto-line)
+;;    ([remap bookmark-jump] . consult-bookmark)
+;;    ([remap list-bookmarks] . consult-bookmark)
+;;    ([remap bookmark-bmenu-list] . consult-bookmark)
+;;    ("M-g o" . consult-outline)
+;;    ("C-c C-m" . consult-mark)
+;;    ([remap imenu] . consult-imenu) ; "M-g i"
+;;    ("C-c C-j" . consult-imenu)
+;;    ([remap customize] . consult-customize)
+;;    ([remap load-theme] . consult-theme)
+;;    ([remap locate] . consult-locate)
+;;    ("C-c s l" . consult-locate)
+;;    ("C-c s f" . consult-fd)
+;;    ;; Prefix argument "C-u" allows to specify the directory. You can pass
+;;    ;; additional grep flags to `consult-grep' with the "--" separator. E.g.:
+;;    ;; "foo bar -- -A3" to get matches with 3 lines of 'after' context.
+;;    ([remap rgrep] . consult-grep)
+;;    ([remap vc-git-grep] . consult-git-grep)
+;;    ("<f4>" . consult-line)
+;;    ("M-g l" . sb/consult-line-symbol-at-point)
+;;    ("C-c s r" . consult-ripgrep)
+;;    ([remap recentf-open-files] . consult-recent-file)
+;;    ("M-g r" . consult-register)
+;;    :map
+;;    isearch-mode-map
+;;    ("M-s e" . consult-isearch-history))
 
-  :custom (consult-line-start-from-top t "Start search from the beginning")
-  ;; Disable preview by default, enable for selected commands
-  (consult-preview-key nil)
-  (completion-in-region-function #'consult-completion-in-region "Complete M-:")
+;;   :custom (consult-line-start-from-top t "Start search from the beginning")
+;;   ;; Disable preview by default, enable for selected commands
+;;   (consult-preview-key nil)
+;;   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
 
-  ;; Having multiple other sources like `recentf' may make it difficult to
-  ;; identify and switch quickly between only buffers, especially while wrapping
-  ;; around.
-  ;; (consult-buffer-sources '(consult--source-buffer))
+;;   ;; Having multiple other sources like `recentf' may make it difficult to
+;;   ;; identify and switch quickly between only buffers, especially while wrapping
+;;   ;; around.
+;;   ;; (consult-buffer-sources '(consult--source-buffer))
 
-  (consult-narrow-key "<")
-  (consult-widen-key ">")
+;;   (consult-narrow-key "<")
+;;   (consult-widen-key ">")
 
-  ;; Do not filter buffers, they help to debug configuration errors 
-  ;; (consult-buffer-filter sb/consult-buffer-filter)
+;;   ;; Do not filter buffers, they help to debug configuration errors 
+;;   ;; (consult-buffer-filter sb/consult-buffer-filter)
 
-  :config
-  (consult-customize
-   consult-line
-   consult-ripgrep
-   consult-git-grep
-   consult-grep
-   consult-bookmark
-   consult-xref
-   consult-yank-from-kill-ring
-   :preview-key
-   '(:debounce 1.5 any)
-   consult-recent-file
-   consult-theme
-   consult-buffer
-   :preview-key
-   "M-."
-   consult-find
-   :sort
-   t
-   consult-line
-   consult-ripgrep
-   consult-grep
-   ;; Initialize search string with the highlighted region
-   :initial
-   (when (use-region-p)
-     (buffer-substring-no-properties (region-beginning) (region-end))))
+;;   :config
+;;   (consult-customize
+;;    consult-line
+;;    consult-ripgrep
+;;    consult-git-grep
+;;    consult-grep
+;;    consult-bookmark
+;;    consult-xref
+;;    consult-yank-from-kill-ring
+;;    :preview-key
+;;    '(:debounce 1.5 any)
+;;    consult-recent-file
+;;    consult-theme
+;;    consult-buffer
+;;    :preview-key
+;;    "M-."
+;;    consult-find
+;;    :sort
+;;    t
+;;    consult-line
+;;    consult-ripgrep
+;;    consult-grep
+;;    ;; Initialize search string with the highlighted region
+;;    :initial
+;;    (when (use-region-p)
+;;      (buffer-substring-no-properties (region-beginning) (region-end))))
 
-  ;; ;; Use thing at point with `consult-line'
-  ;;   (consult-customize
-  ;;    consult-line
-  ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
-  ;; (defalias 'consult-line-thing-at-point 'consult-line)
-  ;; (consult-customize
-  ;;  consult-line-thing-at-point
-  ;;  :initial (thing-at-point 'symbol))
+;;   ;; ;; Use thing at point with `consult-line'
+;;   ;;   (consult-customize
+;;   ;;    consult-line
+;;   ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
+;;   ;; (defalias 'consult-line-thing-at-point 'consult-line)
+;;   ;; (consult-customize
+;;   ;;  consult-line-thing-at-point
+;;   ;;  :initial (thing-at-point 'symbol))
 
-  (defun sb/consult-line-symbol-at-point ()
-    (interactive)
-    (consult-line (or (thing-at-point 'symbol) ""))))
+;;   (defun sb/consult-line-symbol-at-point ()
+;;     (interactive)
+;;     (consult-line (or (thing-at-point 'symbol) ""))))
 
-;; Easily add file and directory paths into the minibuffer.
-(use-package consult-dir
-  :commands consult-dir-jump-file
+;; ;; Easily add file and directory paths into the minibuffer.
+;; (use-package consult-dir
+;;   :commands consult-dir-jump-file
 
-  :bind ("C-x C-d" . consult-dir)
+;;   :bind ("C-x C-d" . consult-dir)
 
-  :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
+;;   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
-;; Use `consult' to select Tramp targets. Supported completion sources are ssh
-;; config, known hosts, and docker containers.
-(use-package consult-tramp
-  :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
+;; ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
+;; ;; config, known hosts, and docker containers.
+;; (use-package consult-tramp
+;;   :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
 
-  :after consult
+;;   :after consult
 
-  :bind ("C-c d t" . consult-tramp))
+;;   :bind ("C-c d t" . consult-tramp))
 
 ;; ;; Provide context-dependent actions similar to a content menu.
 
@@ -1641,21 +1677,21 @@ The provider is `nerd-icons'."
 ;;    . rainbow-mode)
 ;;   :diminish)
 
-;; Emacs theme files also have hex codes.
-(use-package colorful-mode
-  :hook
-  ((LaTeX-mode
-    css-mode
-    css-ts-mode
-    html-mode
-    html-ts-mode
-    web-mode
-    help-mode
-    helpful-mode
-    emacs-lisp-mode)
-   . colorful-mode)
+;; ;; Emacs theme files also have hex codes.
+;; (use-package colorful-mode
+;;   :hook
+;;   ((LaTeX-mode
+;;     css-mode
+;;     css-ts-mode
+;;     html-mode
+;;     html-ts-mode
+;;     web-mode
+;;     help-mode
+;;     helpful-mode
+;;     emacs-lisp-mode)
+;;    . colorful-mode)
 
-  :diminish)
+;;   :diminish)
 
 ;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
 (use-package rainbow-delimiters
@@ -1886,8 +1922,16 @@ The provider is `nerd-icons'."
 ;;     ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
 ;;     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
-;; (use-package smerge-mode
-;;   :ensure nil)
+(use-package smerge-mode
+  :ensure nil
+
+  :bind
+  (:map
+   smerge-mode-map
+   ("C-c ^ u" . smerge-keep-upper)
+   ("C-c ^ l" . smerge-keep-lower)
+   ("C-c ^ n" . smerge-next)
+   ("C-c ^ p" . smerge-prev)))
 
 ;; (use-package elec-pair
 ;;   :preface
@@ -2018,10 +2062,10 @@ The provider is `nerd-icons'."
                           'face
                           'sb/flycheck-mode-line)))))
 
-(use-package consult-flycheck
-  :after flycheck
+;; (use-package consult-flycheck
+;;   :after flycheck
 
-  :bind (:map flycheck-command-map ("!" . consult-flycheck)))
+;;   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
 
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
@@ -2038,11 +2082,11 @@ The provider is `nerd-icons'."
 
   :init (flycheck-hl-todo-setup))
 
-;; Jump to `hl-todo' keywords in current buffer.
-(use-package consult-todo
-  :after (consult hl-todo)
+;; ;; Jump to `hl-todo' keywords in current buffer.
+;; (use-package consult-todo
+;;   :after (consult hl-todo)
 
-  :commands (consult-todo consult-todo-all))
+;;   :commands (consult-todo consult-todo-all))
 
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
@@ -2211,19 +2255,19 @@ The provider is `nerd-icons'."
      try-expand-line))
   (hippie-expand-verbose nil))
 
-;; Use "M-SPC" for space-separated completion lookups.
-(use-package orderless
-  :demand t
+;; ;; Use "M-SPC" for space-separated completion lookups.
+;; (use-package orderless
+;;   :demand t
 
-  ;; TODO: What is the utility of this? Is this to highlight the different parts with orderless?
+;;   ;; TODO: What is the utility of this? Is this to highlight the different parts with orderless?
 
-  ;; :config
-  ;; (with-eval-after-load 'company
-  ;;   (defun sb/just-one-face (fn &rest args)
-  ;;     (let ((orderless-match-faces [completions-common-part]))
-  ;;       (apply fn args)))
-  ;;   (advice-add 'company-capf--candidates :around #'sb/just-one-face))
-  )
+;;   ;; :config
+;;   ;; (with-eval-after-load 'company
+;;   ;;   (defun sb/just-one-face (fn &rest args)
+;;   ;;     (let ((orderless-match-faces [completions-common-part]))
+;;   ;;       (apply fn args)))
+;;   ;;   (advice-add 'company-capf--candidates :around #'sb/just-one-face))
+;;   )
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -2245,7 +2289,7 @@ The provider is `nerd-icons'."
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
   (read-buffer-completion-ignore-case t)
-  (completion-styles '(basic orderless))
+  ;; (completion-styles '(basic orderless))
   (completion-category-defaults nil)
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
@@ -2307,172 +2351,172 @@ The provider is `nerd-icons'."
 
   :init (yasnippet-snippets-initialize))
 
-(use-package consult-yasnippet
-  :bind ("C-M-y" . consult-yasnippet))
+;; (use-package consult-yasnippet
+;;   :bind ("C-M-y" . consult-yasnippet))
 
-(use-package nerd-icons
-  :when (bound-and-true-p sb/enable-icons)
+;; (use-package nerd-icons
+;;   :when (bound-and-true-p sb/enable-icons)
 
-  :demand t
+;;   :demand t
 
-  :custom (nerd-icons-scale-factor 0.8))
+;;   :custom (nerd-icons-scale-factor 0.8))
 
-;; `kind-icon' can be used for both Corfu and Company. I use `kind-icon' to
-;; provide Nerd icons for Company while I use `nerd-icons-corfu' to set up nerd
-;; icons for Corfu.
-(use-package kind-icon
-  :when
-  (and (bound-and-true-p sb/enable-icons)
-       (or (eq sb/completion-provider 'company) (eq sb/corfu-icons 'kind-icon)))
+;; ;; `kind-icon' can be used for both Corfu and Company. I use `kind-icon' to
+;; ;; provide Nerd icons for Company while I use `nerd-icons-corfu' to set up nerd
+;; ;; icons for Corfu.
+;; (use-package kind-icon
+;;   :when
+;;   (and (bound-and-true-p sb/enable-icons)
+;;        (or (eq sb/completion-provider 'company) (eq sb/corfu-icons 'kind-icon)))
 
-  :after nerd-icons
+;;   :after nerd-icons
 
-  :demand t ; Required to load the library because there are no other triggers
+;;   :demand t ; Required to load the library because there are no other triggers
 
-  :config
-  (add-to-list
-   'svg-lib-icon-collections
-   '("vscode-codicons"
-     .
-     "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
-  (add-to-list
-   'svg-lib-icon-collections
-   '("nerd-fonts-codicons"
-     .
-     "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
+;;   :config
+;;   (add-to-list
+;;    'svg-lib-icon-collections
+;;    '("vscode-codicons"
+;;      .
+;;      "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
+;;   (add-to-list
+;;    'svg-lib-icon-collections
+;;    '("nerd-fonts-codicons"
+;;      .
+;;      "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
 
-  (with-eval-after-load 'corfu
-    (setopt
-     kind-icon-default-face 'corfu-default
-     ;; Corfu icons are too big, prefer smaller icons and a more compact popup
-     kind-icon-default-style
-     '(:padding
-       0
-       :stroke 0
-       :margin 0
-       :radius 0
-       :height 0.5
-       :scale 0.8
-       :background nil))
-    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+;;   (with-eval-after-load 'corfu
+;;     (setopt
+;;      kind-icon-default-face 'corfu-default
+;;      ;; Corfu icons are too big, prefer smaller icons and a more compact popup
+;;      kind-icon-default-style
+;;      '(:padding
+;;        0
+;;        :stroke 0
+;;        :margin 0
+;;        :radius 0
+;;        :height 0.5
+;;        :scale 0.8
+;;        :background nil))
+;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-  ;; Company may be loaded even with Corfu for use with LaTeX. That is why we do
-  ;; not use `with-eval-after-load'.
-  (when (eq sb/completion-provider 'company)
-    ;; Prefer smaller icons and a more compact popup
-    (setopt
-     kind-icon-default-style
-     '(:padding
-       0
-       :stroke 0
-       :margin 0
-       :radius 0
-       :height 0.8
-       :scale 0.6
-       :background nil)
-     kind-icon-mapping
-     `((array
-        ,(nerd-icons-codicon "nf-cod-symbol_array")
-        :face font-lock-type-face)
-       (boolean
-        ,(nerd-icons-codicon "nf-cod-symbol_boolean")
-        :face font-lock-builtin-face)
-       (class
-        ,(nerd-icons-codicon "nf-cod-symbol_class")
-        :face font-lock-type-face)
-       (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
-       (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-       (constant
-        ,(nerd-icons-codicon "nf-cod-symbol_constant")
-        :face font-lock-constant-face)
-       (constructor
-        ,(nerd-icons-codicon "nf-cod-triangle_right")
-        :face font-lock-function-name-face)
-       (enummember
-        ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-        :face font-lock-builtin-face)
-       (enum-member
-        ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-        :face font-lock-builtin-face)
-       (enum
-        ,(nerd-icons-codicon "nf-cod-symbol_enum")
-        :face font-lock-builtin-face)
-       (event
-        ,(nerd-icons-codicon "nf-cod-symbol_event")
-        :face font-lock-warning-face)
-       (field
-        ,(nerd-icons-codicon "nf-cod-symbol_field")
-        :face font-lock-variable-name-face)
-       (file
-        ,(nerd-icons-codicon "nf-cod-symbol_file")
-        :face font-lock-string-face)
-       (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
-       (interface
-        ,(nerd-icons-codicon "nf-cod-symbol_interface")
-        :face font-lock-type-face)
-       (keyword
-        ,(nerd-icons-codicon "nf-cod-symbol_keyword")
-        :face font-lock-keyword-face)
-       (macro
-        ,(nerd-icons-codicon "nf-cod-symbol_misc")
-        :face font-lock-keyword-face)
-       (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
-       (method
-        ,(nerd-icons-codicon "nf-cod-symbol_method")
-        :face font-lock-function-name-face)
-       (function ,(nerd-icons-codicon "nf-cod-symbol_method")
-                 :face font-lock-function-name-face)
-       (module
-        ,(nerd-icons-codicon "nf-cod-file_submodule")
-        :face font-lock-preprocessor-face)
-       (numeric
-        ,(nerd-icons-codicon "nf-cod-symbol_numeric")
-        :face font-lock-builtin-face)
-       (operator
-        ,(nerd-icons-codicon "nf-cod-symbol_operator")
-        :face font-lock-comment-delimiter-face)
-       (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
-       (property
-        ,(nerd-icons-codicon "nf-cod-symbol_property")
-        :face font-lock-variable-name-face)
-       (reference
-        ,(nerd-icons-codicon "nf-cod-references")
-        :face font-lock-variable-name-face)
-       (snippet
-        ,(nerd-icons-codicon "nf-cod-symbol_snippet")
-        :face font-lock-string-face)
-       (string
-        ,(nerd-icons-codicon "nf-cod-symbol_string")
-        :face font-lock-string-face)
-       (struct
-        ,(nerd-icons-codicon "nf-cod-symbol_structure")
-        :face font-lock-variable-name-face)
-       (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
-       (typeparameter
-        ,(nerd-icons-codicon "nf-cod-list_unordered")
-        :face font-lock-type-face)
-       (type-parameter
-        ,(nerd-icons-codicon "nf-cod-list_unordered")
-        :face font-lock-type-face)
-       (unit
-        ,(nerd-icons-codicon "nf-cod-symbol_ruler")
-        :face font-lock-constant-face)
-       (value
-        ,(nerd-icons-codicon "nf-cod-symbol_field")
-        :face font-lock-builtin-face)
-       (variable
-        ,(nerd-icons-codicon "nf-cod-symbol_variable")
-        :face font-lock-variable-name-face)
-       (t
-        ,(nerd-icons-codicon "nf-cod-text_size")
-        :face font-lock-builtin-face)))
+;;   ;; Company may be loaded even with Corfu for use with LaTeX. That is why we do
+;;   ;; not use `with-eval-after-load'.
+;;   (when (eq sb/completion-provider 'company)
+;;     ;; Prefer smaller icons and a more compact popup
+;;     (setopt
+;;      kind-icon-default-style
+;;      '(:padding
+;;        0
+;;        :stroke 0
+;;        :margin 0
+;;        :radius 0
+;;        :height 0.8
+;;        :scale 0.6
+;;        :background nil)
+;;      kind-icon-mapping
+;;      `((array
+;;         ,(nerd-icons-codicon "nf-cod-symbol_array")
+;;         :face font-lock-type-face)
+;;        (boolean
+;;         ,(nerd-icons-codicon "nf-cod-symbol_boolean")
+;;         :face font-lock-builtin-face)
+;;        (class
+;;         ,(nerd-icons-codicon "nf-cod-symbol_class")
+;;         :face font-lock-type-face)
+;;        (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+;;        (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+;;        (constant
+;;         ,(nerd-icons-codicon "nf-cod-symbol_constant")
+;;         :face font-lock-constant-face)
+;;        (constructor
+;;         ,(nerd-icons-codicon "nf-cod-triangle_right")
+;;         :face font-lock-function-name-face)
+;;        (enummember
+;;         ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+;;         :face font-lock-builtin-face)
+;;        (enum-member
+;;         ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
+;;         :face font-lock-builtin-face)
+;;        (enum
+;;         ,(nerd-icons-codicon "nf-cod-symbol_enum")
+;;         :face font-lock-builtin-face)
+;;        (event
+;;         ,(nerd-icons-codicon "nf-cod-symbol_event")
+;;         :face font-lock-warning-face)
+;;        (field
+;;         ,(nerd-icons-codicon "nf-cod-symbol_field")
+;;         :face font-lock-variable-name-face)
+;;        (file
+;;         ,(nerd-icons-codicon "nf-cod-symbol_file")
+;;         :face font-lock-string-face)
+;;        (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
+;;        (interface
+;;         ,(nerd-icons-codicon "nf-cod-symbol_interface")
+;;         :face font-lock-type-face)
+;;        (keyword
+;;         ,(nerd-icons-codicon "nf-cod-symbol_keyword")
+;;         :face font-lock-keyword-face)
+;;        (macro
+;;         ,(nerd-icons-codicon "nf-cod-symbol_misc")
+;;         :face font-lock-keyword-face)
+;;        (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
+;;        (method
+;;         ,(nerd-icons-codicon "nf-cod-symbol_method")
+;;         :face font-lock-function-name-face)
+;;        (function ,(nerd-icons-codicon "nf-cod-symbol_method")
+;;                  :face font-lock-function-name-face)
+;;        (module
+;;         ,(nerd-icons-codicon "nf-cod-file_submodule")
+;;         :face font-lock-preprocessor-face)
+;;        (numeric
+;;         ,(nerd-icons-codicon "nf-cod-symbol_numeric")
+;;         :face font-lock-builtin-face)
+;;        (operator
+;;         ,(nerd-icons-codicon "nf-cod-symbol_operator")
+;;         :face font-lock-comment-delimiter-face)
+;;        (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
+;;        (property
+;;         ,(nerd-icons-codicon "nf-cod-symbol_property")
+;;         :face font-lock-variable-name-face)
+;;        (reference
+;;         ,(nerd-icons-codicon "nf-cod-references")
+;;         :face font-lock-variable-name-face)
+;;        (snippet
+;;         ,(nerd-icons-codicon "nf-cod-symbol_snippet")
+;;         :face font-lock-string-face)
+;;        (string
+;;         ,(nerd-icons-codicon "nf-cod-symbol_string")
+;;         :face font-lock-string-face)
+;;        (struct
+;;         ,(nerd-icons-codicon "nf-cod-symbol_structure")
+;;         :face font-lock-variable-name-face)
+;;        (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
+;;        (typeparameter
+;;         ,(nerd-icons-codicon "nf-cod-list_unordered")
+;;         :face font-lock-type-face)
+;;        (type-parameter
+;;         ,(nerd-icons-codicon "nf-cod-list_unordered")
+;;         :face font-lock-type-face)
+;;        (unit
+;;         ,(nerd-icons-codicon "nf-cod-symbol_ruler")
+;;         :face font-lock-constant-face)
+;;        (value
+;;         ,(nerd-icons-codicon "nf-cod-symbol_field")
+;;         :face font-lock-builtin-face)
+;;        (variable
+;;         ,(nerd-icons-codicon "nf-cod-symbol_variable")
+;;         :face font-lock-variable-name-face)
+;;        (t
+;;         ,(nerd-icons-codicon "nf-cod-text_size")
+;;         :face font-lock-builtin-face)))
 
-    (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
-           (formatter
-            (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
-      (defun sb/company-kind-icon-margin (cand _selected)
-        (funcall formatter cand))
-      (setopt company-format-margin-function #'sb/company-kind-icon-margin))))
+;;     (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
+;;            (formatter
+;;             (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
+;;       (defun sb/company-kind-icon-margin (cand _selected)
+;;         (funcall formatter cand))
+;;       (setopt company-format-margin-function #'sb/company-kind-icon-margin))))
 
 ;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
@@ -2654,13 +2698,13 @@ The provider is `nerd-icons'."
 
   :hook (prog-mode . company-quickhelp-terminal-mode))
 
-;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
-(use-package company-statistics
-  :when (eq sb/completion-provider 'company)
+;; ;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
+;; (use-package company-statistics
+;;   :when (eq sb/completion-provider 'company)
 
-  :after company
+;;   :after company
 
-  :hook (company-mode . company-statistics-mode))
+;;   :hook (company-mode . company-statistics-mode))
 
 ;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
@@ -2743,11 +2787,7 @@ The provider is `nerd-icons'."
 ;;   :commands company-bibtex)
 
 (use-package company-try-hard
-  :bind
-  (("C-j" . company-try-hard)
-   :map
-   company-active-map
-   ("C-j" . company-try-hard)))
+  :bind (:map company-active-map ("C-j" . company-try-hard)))
 
 ;; We should enable `company-fuzzy-mode' at the very end of configuring
 ;; `company'. Nice feature but slows completions.
@@ -2940,215 +2980,215 @@ The provider is `nerd-icons'."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-non-lsp-prog-mode)))))
 
-;; Corfu is not a completion framework, it is a front-end for
-;; `completion-at-point'.
-(use-package corfu
-  :preface
-  (defun sb/corfu-prog-setup ()
-    "Use shorter prefix for Corfu in `prog-mode'."
-    (setq-local corfu-auto-prefix 2))
-
-  :when (eq sb/completion-provider 'corfu)
-
-  :hook
-  ((after-init . global-corfu-mode)
-   ;; We want 2-character prefixes in LaTeX-mode for yasnippets
-   ((prog-mode LaTeX-mode) . sb/corfu-prog-setup))
-
-  :bind
-  (:map
-   corfu-map
-   ("TAB" . corfu-quick-insert)
-   ("<tab>" . corfu-quick-insert)
-   ("M-d" . corfu-info-documentation)
-   ("M-l" . corfu-info-location)
-   ("M-n" . corfu-popupinfo-scroll-up)
-   ("M-p" . corfu-popupinfo-scroll-down)
-   ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
-   ([escape] . corfu-quit))
-
-  :custom
-  (corfu-cycle t "Enable cycling for `corfu-next/previous'")
-  (corfu-auto t "Enable auto completion")
-  ;; (corfu-on-exact-match 'show)
-
-  ;; ;; Do not close popup when adjacent to other characters
-  ;; (corfu-quit-at-boundary nil)
-
-  :config
-  (let ((ext-dir
-         (expand-file-name "extensions"
-                           (file-name-directory (locate-library "corfu")))))
-    (when (file-directory-p ext-dir)
-      (add-to-list 'load-path ext-dir)))
-
-  ;; (require 'corfu-info)
-  ;; (require 'corfu-quick)
-
-  ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
-  (require 'corfu-indexed)
-  (corfu-indexed-mode 1)
-
-  ;; I am using `corfu-prescient-mode'.
-  ;; (require 'corfu-history)
-  ;; (corfu-history-mode 1)
-
-  ;; Display a brief candidate documentation in the echo area.
-  (require 'corfu-echo)
-  (corfu-echo-mode 1)
-
-  ;; Display candidate documentation or source in a popup next to the candidate menu
-  (require 'corfu-popupinfo)
-  (corfu-popupinfo-mode 1)
-
-  ;; Add space at the right edge so characters do not get cut off in the terminal interface.
-  (unless (display-graphic-p)
-    (setopt corfu-right-margin-width 1.5)))
-
-;; Emacs 31+ has in-built support for child frames in the terminal
-(use-package corfu-terminal
-  :vc (:url "https://codeberg.org/akib/emacs-corfu-terminal" :rev :newest)
-
-  :when
-  (and (eq sb/completion-provider 'corfu)
-       (not (display-graphic-p))
-       (< emacs-major-version 31))
-
-  :hook (corfu-mode . corfu-terminal-mode)
-
-  :custom
-  ;; Prevent wraparound at the right edge, although this breaks sometimes.
-  (corfu-terminal-position-right-margin 2))
-
-;; (use-package yasnippet-capf
-;;   :vc (:url "https://github.com/elken/yasnippet-capf")
+;; ;; Corfu is not a completion framework, it is a front-end for
+;; ;; `completion-at-point'.
+;; (use-package corfu
+;;   :preface
+;;   (defun sb/corfu-prog-setup ()
+;;     "Use shorter prefix for Corfu in `prog-mode'."
+;;     (setq-local corfu-auto-prefix 2))
 
 ;;   :when (eq sb/completion-provider 'corfu)
 
-;;   :after (cape yasnippet)
+;;   :hook
+;;   ((after-init . global-corfu-mode)
+;;    ;; We want 2-character prefixes in LaTeX-mode for yasnippets
+;;    ((prog-mode LaTeX-mode) . sb/corfu-prog-setup))
 
-;;   :demand t)
+;;   :bind
+;;   (:map
+;;    corfu-map
+;;    ("TAB" . corfu-quick-insert)
+;;    ("<tab>" . corfu-quick-insert)
+;;    ("M-d" . corfu-info-documentation)
+;;    ("M-l" . corfu-info-location)
+;;    ("M-n" . corfu-popupinfo-scroll-up)
+;;    ("M-p" . corfu-popupinfo-scroll-down)
+;;    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
+;;    ([escape] . corfu-quit))
 
-(use-package cape
-  :after corfu
+;;   :custom
+;;   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
+;;   (corfu-auto t "Enable auto completion")
+;;   ;; (corfu-on-exact-match 'show)
 
-  :demand t
+;;   ;; ;; Do not close popup when adjacent to other characters
+;;   ;; (corfu-quit-at-boundary nil)
 
-  :custom
-  (cape-dict-file
-   `(,(expand-file-name "wordlist.5" sb/extras-directory)
-     ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+;;   :config
+;;   (let ((ext-dir
+;;          (expand-file-name "extensions"
+;;                            (file-name-directory (locate-library "corfu")))))
+;;     (when (file-directory-p ext-dir)
+;;       (add-to-list 'load-path ext-dir)))
 
-  :config
-  ;; `cape-capf-super' works for static completion functions like
-  ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
-  ;; completions like `cape-file'. File completion with `cape-file' is available
-  ;; in comments and string literals, but not in normal code.
+;;   ;; (require 'corfu-info)
+;;   ;; (require 'corfu-quick)
 
-  ;; There is no mechanism to force deduplication if candidates from `cape-dict'
-  ;; and `cape-dabbrev' are the same (equal string and equal text
-  ;; properties) because of different metadata.
-  ;; https://github.com/minad/cape/discussions/130
+;;   ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
+;;   (require 'corfu-indexed)
+;;   (corfu-indexed-mode 1)
 
-  ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
-  ;; duplicates and we expect `cape-dict' to mostly suffice for `text-mode'.
-  (add-hook
-   'text-mode-hook
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  #'cape-file #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
+;;   ;; I am using `corfu-prescient-mode'.
+;;   ;; (require 'corfu-history)
+;;   ;; (corfu-history-mode 1)
 
-  ;; Modifying `fundamental-mode-hook' is not working
-  (defun sb/fundamental-mode-capf ()
-    "Add completion functions for fundamental-mode buffers."
-    (when (eq major-mode 'fundamental-mode)
-      (setq-local completion-at-point-functions
-                  (list
-                   #'cape-file #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
-  (add-hook 'after-change-major-mode-hook #'sb/fundamental-mode-capf)
+;;   ;; Display a brief candidate documentation in the echo area.
+;;   (require 'corfu-echo)
+;;   (corfu-echo-mode 1)
 
-  (dolist (hook '(markdown-mode-hook bibtex-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (setq-local completion-at-point-functions
-                   (list
-                    #'cape-file
-                    ;; (cape-capf-trigger #'yasnippet-capf ?/)
-                    #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
+;;   ;; Display candidate documentation or source in a popup next to the candidate menu
+;;   (require 'corfu-popupinfo)
+;;   (corfu-popupinfo-mode 1)
 
-  (add-hook
-   'org-mode-hook
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  #'cape-file
-                  ;; (cape-capf-trigger #'yasnippet-capf ?/)
-                  #'cape-elisp-block
-                  #'cape-dict
-                  (cape-capf-buster #'cape-dabbrev)))))
+;;   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
+;;   (unless (display-graphic-p)
+;;     (setopt corfu-right-margin-width 1.5)))
 
-  ;; For generic non-LSP-managed programming modes
-  (add-hook
-   'prog-mode-hook
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  ;; (cape-capf-trigger #'yasnippet-capf ?/)
-                  (cape-capf-inside-code
-                   (cape-capf-super #'cape-keyword #'cape-dabbrev))
-                  (cape-capf-inside-comment #'cape-dict)
-                  (cape-capf-inside-string #'cape-file)
-                  (cape-capf-buster #'cape-dabbrev)))))
+;; ;; Emacs 31+ has in-built support for child frames in the terminal
+;; (use-package corfu-terminal
+;;   :vc (:url "https://codeberg.org/akib/emacs-corfu-terminal" :rev :newest)
 
-  (add-hook
-   'LaTeX-mode-hook
-   (lambda ()
-     (setq-local
-      completion-at-point-functions
-      (list
-       (cape-capf-inside-string #'cape-file)
-       ;; (cape-capf-trigger #'yasnippet-capf ?/)
-       #'citar-capf
+;;   :when
+;;   (and (eq sb/completion-provider 'corfu)
+;;        (not (display-graphic-p))
+;;        (< emacs-major-version 31))
 
-       (cape-company-to-capf #'company-latex-commands)
-       (cape-company-to-capf #'company-auctex-macros)
-       (cape-company-to-capf #'company-auctex-environments)
+;;   :hook (corfu-mode . corfu-terminal-mode)
 
-       ;; (cape-capf-super
-       ;;  #'citar-capf
-       ;;  (cape-company-to-capf #'company-reftex-labels)
-       ;;  ;; (cape-company-to-capf #'company-auctex-labels)
-       ;;  (cape-company-to-capf #'company-latex-commands)
-       ;;  (cape-company-to-capf #'company-auctex-environments)
-       ;;  (cape-company-to-capf #'company-auctex-macros)
-       ;;  ;; Math Unicode symbols and sub(super)scripts
-       ;;  ;; (cape-company-to-capf #'company-auctex-symbols)
+;;   :custom
+;;   ;; Prevent wraparound at the right edge, although this breaks sometimes.
+;;   (corfu-terminal-position-right-margin 2))
 
-       ;;  ;; Math latex tags which are possibly covered by `cape-tex'
-       ;;  ;; (cape-company-to-capf #'company-math-symbols-latex)
-       ;;  ;; (cape-company-to-capf #'company-math-symbols-unicode)
+;; ;; (use-package yasnippet-capf
+;; ;;   :vc (:url "https://github.com/elken/yasnippet-capf")
 
-       ;;  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
-       ;;  #'cape-tex)
+;; ;;   :when (eq sb/completion-provider 'corfu)
 
-       #'cape-dict
-       (cape-capf-buster #'cape-dabbrev)))))
+;; ;;   :after (cape yasnippet)
 
-  (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
-    (add-hook
-     mode
-     (lambda ()
-       (setq-local completion-at-point-functions
-                   (list
-                    (cape-capf-inside-string #'cape-file)
-                    ;; #'yasnippet-capf
-                    (cape-capf-inside-code
-                     (cape-capf-nonexclusive #'elisp-completion-at-point))
-                    (cape-capf-inside-code #'cape-elisp-symbol)
-                    (cape-capf-inside-comment #'cape-dict)
-                    (cape-capf-buster #'cape-dabbrev)))))))
+;; ;;   :demand t)
+
+;; (use-package cape
+;;   :after corfu
+
+;;   :demand t
+
+;;   :custom
+;;   (cape-dict-file
+;;    `(,(expand-file-name "wordlist.5" sb/extras-directory)
+;;      ,(expand-file-name "company-dict/text-mode" user-emacs-directory)))
+
+;;   :config
+;;   ;; `cape-capf-super' works for static completion functions like
+;;   ;; `cape-dabbrev', `cape-keyword', and `cape-dict', but not for multi-step
+;;   ;; completions like `cape-file'. File completion with `cape-file' is available
+;;   ;; in comments and string literals, but not in normal code.
+
+;;   ;; There is no mechanism to force deduplication if candidates from `cape-dict'
+;;   ;; and `cape-dabbrev' are the same (equal string and equal text
+;;   ;; properties) because of different metadata.
+;;   ;; https://github.com/minad/cape/discussions/130
+
+;;   ;; We do not merge `cape-dict' and `cape-dabbrev' because there will be
+;;   ;; duplicates and we expect `cape-dict' to mostly suffice for `text-mode'.
+;;   (add-hook
+;;    'text-mode-hook
+;;    (lambda ()
+;;      (setq-local completion-at-point-functions
+;;                  (list
+;;                   #'cape-file #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
+
+;;   ;; Modifying `fundamental-mode-hook' is not working
+;;   (defun sb/fundamental-mode-capf ()
+;;     "Add completion functions for fundamental-mode buffers."
+;;     (when (eq major-mode 'fundamental-mode)
+;;       (setq-local completion-at-point-functions
+;;                   (list
+;;                    #'cape-file #'cape-dict (cape-capf-buster #'cape-dabbrev)))))
+;;   (add-hook 'after-change-major-mode-hook #'sb/fundamental-mode-capf)
+
+;;   (dolist (hook '(markdown-mode-hook bibtex-mode-hook))
+;;     (add-hook
+;;      hook
+;;      (lambda ()
+;;        (setq-local completion-at-point-functions
+;;                    (list
+;;                     #'cape-file
+;;                     ;; (cape-capf-trigger #'yasnippet-capf ?/)
+;;                     #'cape-dict (cape-capf-buster #'cape-dabbrev))))))
+
+;;   (add-hook
+;;    'org-mode-hook
+;;    (lambda ()
+;;      (setq-local completion-at-point-functions
+;;                  (list
+;;                   #'cape-file
+;;                   ;; (cape-capf-trigger #'yasnippet-capf ?/)
+;;                   #'cape-elisp-block
+;;                   #'cape-dict
+;;                   (cape-capf-buster #'cape-dabbrev)))))
+
+;;   ;; For generic non-LSP-managed programming modes
+;;   (add-hook
+;;    'prog-mode-hook
+;;    (lambda ()
+;;      (setq-local completion-at-point-functions
+;;                  (list
+;;                   ;; (cape-capf-trigger #'yasnippet-capf ?/)
+;;                   (cape-capf-inside-code
+;;                    (cape-capf-super #'cape-keyword #'cape-dabbrev))
+;;                   (cape-capf-inside-comment #'cape-dict)
+;;                   (cape-capf-inside-string #'cape-file)
+;;                   (cape-capf-buster #'cape-dabbrev)))))
+
+;;   (add-hook
+;;    'LaTeX-mode-hook
+;;    (lambda ()
+;;      (setq-local
+;;       completion-at-point-functions
+;;       (list
+;;        (cape-capf-inside-string #'cape-file)
+;;        ;; (cape-capf-trigger #'yasnippet-capf ?/)
+;;        #'citar-capf
+
+;;        (cape-company-to-capf #'company-latex-commands)
+;;        (cape-company-to-capf #'company-auctex-macros)
+;;        (cape-company-to-capf #'company-auctex-environments)
+
+;;        ;; (cape-capf-super
+;;        ;;  #'citar-capf
+;;        ;;  (cape-company-to-capf #'company-reftex-labels)
+;;        ;;  ;; (cape-company-to-capf #'company-auctex-labels)
+;;        ;;  (cape-company-to-capf #'company-latex-commands)
+;;        ;;  (cape-company-to-capf #'company-auctex-environments)
+;;        ;;  (cape-company-to-capf #'company-auctex-macros)
+;;        ;;  ;; Math Unicode symbols and sub(super)scripts
+;;        ;;  ;; (cape-company-to-capf #'company-auctex-symbols)
+
+;;        ;;  ;; Math latex tags which are possibly covered by `cape-tex'
+;;        ;;  ;; (cape-company-to-capf #'company-math-symbols-latex)
+;;        ;;  ;; (cape-company-to-capf #'company-math-symbols-unicode)
+
+;;        ;;  ;; `cape-tex' is used for Unicode symbols and not for the corresponding LaTeX names.
+;;        ;;  #'cape-tex)
+
+;;        #'cape-dict
+;;        (cape-capf-buster #'cape-dabbrev)))))
+
+;;   (dolist (mode '(emacs-lisp-mode-hook lisp-data-mode-hook))
+;;     (add-hook
+;;      mode
+;;      (lambda ()
+;;        (setq-local completion-at-point-functions
+;;                    (list
+;;                     (cape-capf-inside-string #'cape-file)
+;;                     ;; #'yasnippet-capf
+;;                     (cape-capf-inside-code
+;;                      (cape-capf-nonexclusive #'elisp-completion-at-point))
+;;                     (cape-capf-inside-code #'cape-elisp-symbol)
+;;                     (cape-capf-inside-comment #'cape-dict)
+;;                     (cape-capf-buster #'cape-dabbrev)))))))
 
 ;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
 ;; Company has `company-statistics'. Prescient uses frecency (frequency +
@@ -3160,15 +3200,15 @@ The provider is `nerd-icons'."
 
   :custom (prescient-sort-full-matches-first t))
 
-(use-package vertico-prescient
-  :after vertico
+;; (use-package vertico-prescient
+;;   :after vertico
 
-  :init (vertico-prescient-mode 1))
+;;   :init (vertico-prescient-mode 1))
 
-(use-package corfu-prescient
-  :after corfu
+;; (use-package corfu-prescient
+;;   :after corfu
 
-  :init (corfu-prescient-mode 1))
+;;   :init (corfu-prescient-mode 1))
 
 (use-package company-prescient
   :after company
@@ -3491,36 +3531,36 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   (lsp-ui-sideline-show-diagnostics nil)
 ;;   (lsp-ui-peek-enable nil))
 
-(use-package consult-lsp
-  :after (consult lsp-mode)
+;; (use-package consult-lsp
+;;   :after (consult lsp-mode)
 
-  :when (eq sb/lsp-provider 'lsp-mode)
+;;   :when (eq sb/lsp-provider 'lsp-mode)
 
-  :commands (consult-lsp-symbols consult-lsp-file-symbols consult-lsp-diagnostics))
+;;   :commands (consult-lsp-symbols consult-lsp-file-symbols consult-lsp-diagnostics))
 
-(use-package lsp-java
-  :when (eq sb/lsp-provider 'lsp-mode)
+;; (use-package lsp-java
+;;   :when (eq sb/lsp-provider 'lsp-mode)
 
-  :hook
-  ((java-mode java-ts-mode)
-   .
-   (lambda ()
-     (setq-local c-basic-offset 4)
-     (c-set-style "java")
-     (lsp-deferred)))
+;;   :hook
+;;   ((java-mode java-ts-mode)
+;;    .
+;;    (lambda ()
+;;      (setq-local c-basic-offset 4)
+;;      (c-set-style "java")
+;;      (lsp-deferred)))
 
-  :custom
-  (lsp-java-progress-reports-enabled nil)
-  (lsp-java-save-actions-organize-imports t)
-  (lsp-java-format-settings-url
-   (concat
-    "file://"
-    (file-truename (locate-user-emacs-file "servers/eclipse-formatter.xml"))))
-  ;; Provide my own installation which Eglot can also use
-  (lsp-java-server-install-dir
-   (file-truename
-    (locate-user-emacs-file
-     "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
+;;   :custom
+;;   (lsp-java-progress-reports-enabled nil)
+;;   (lsp-java-save-actions-organize-imports t)
+;;   (lsp-java-format-settings-url
+;;    (concat
+;;     "file://"
+;;     (file-truename (locate-user-emacs-file "servers/eclipse-formatter.xml"))))
+;;   ;; Provide my own installation which Eglot can also use
+;;   (lsp-java-server-install-dir
+;;    (file-truename
+;;     (locate-user-emacs-file
+;;      "servers/eclipse.jdt.ls-1.50.0/org.eclipse.jdt.ls.product/target/repository/"))))
 
 (use-package lsp-ltex-plus
   :when (eq sb/lsp-provider 'lsp-mode)
@@ -3715,7 +3755,9 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
 
-  :custom (treesit-enabled-modes t)
+  :custom
+  (treesit-enabled-modes t)
+  (treesit-auto-install-grammar 'always)
 
   ;;   ;; Increased default font locking may hurt performance
   ;;   (treesit-font-lock-level 4)
@@ -4017,19 +4059,18 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package conf-mode
   :ensure nil
 
-  :mode
-  "\\.cfg\\'"
-  "\\.conf\\'"
+  :mode ("\\.cfg\\'" "\\.conf\\'" "\\.env\\..*\\'" "\\.env\\'")
 
-  :hook
-  (conf-unix-mode
-   .
-   (lambda ()
-     (setq-local completion-at-point-functions
-                 (list
-                  (cape-capf-inside-string #'cape-file)
-                  #'cape-dict
-                  (cape-capf-buster #'cape-dabbrev))))))
+  ;; :hook
+  ;; (conf-unix-mode
+  ;;  .
+  ;;  (lambda ()
+  ;;    (setq-local completion-at-point-functions
+  ;;                (list
+  ;;                 (cape-capf-inside-string #'cape-file)
+  ;;                 #'cape-dict
+  ;;                 (cape-capf-buster #'cape-dabbrev)))))
+  )
 
 (use-package toml-ts-mode
   :ensure nil
@@ -4568,12 +4609,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :diminish)
 
-(use-package consult-reftex
-  :vc (:url "https://github.com/karthink/consult-reftex" :rev :newest)
+;; (use-package consult-reftex
+;;   :vc (:url "https://github.com/karthink/consult-reftex" :rev :newest)
 
-  :after (consult reftex)
+;;   :after (consult reftex)
 
-  :commands (consult-reftex-insert-reference consult-reftex-goto-label))
+;;   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
 
 (use-package bibtex
   :ensure nil
@@ -4783,145 +4824,145 @@ Fallback to `xref-go-back'."
 
   :diminish)
 
-(use-package leuven-theme
-  :when (eq sb/theme 'leuven-dark)
+;; (use-package leuven-theme
+;;   :when (eq sb/theme 'leuven-dark)
 
-  :init (load-theme 'leuven-dark t))
+;;   :init (load-theme 'leuven-dark t))
 
-(use-package doom-themes
-  :when
-  (or (eq sb/theme 'doom-one)
-      (eq sb/theme 'doom-nord)
-      (eq sb/theme 'doom-solarized-dark))
+;; (use-package doom-themes
+;;   :when
+;;   (or (eq sb/theme 'doom-one)
+;;       (eq sb/theme 'doom-nord)
+;;       (eq sb/theme 'doom-solarized-dark))
 
-  :init
-  (cond
-   ((eq sb/theme 'doom-one)
-    (load-theme 'doom-one t))
-   ((eq sb/theme 'doom-nord)
-    (load-theme 'doom-nord t))
-   ((eq sb/theme 'doom-solarized-dark)
-    (load-theme 'doom-solarized-dark-high-contrast t)))
+;;   :init
+;;   (cond
+;;    ((eq sb/theme 'doom-one)
+;;     (load-theme 'doom-one t))
+;;    ((eq sb/theme 'doom-nord)
+;;     (load-theme 'doom-nord t))
+;;    ((eq sb/theme 'doom-solarized-dark)
+;;     (load-theme 'doom-solarized-dark-high-contrast t)))
 
-  :config
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+;;   :config
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
 
-(use-package modus-themes
-  :when (eq sb/theme 'modus-vivendi)
+;; (use-package modus-themes
+;;   :when (eq sb/theme 'modus-vivendi)
 
-  :init (load-theme 'modus-vivendi t)
+;;   :init (load-theme 'modus-vivendi t)
 
-  :custom (modus-themes-mixed-fonts nil))
+;;   :custom (modus-themes-mixed-fonts nil))
 
-(use-package catppuccin-theme
-  :when (eq sb/theme 'catppuccin)
+;; (use-package catppuccin-theme
+;;   :when (eq sb/theme 'catppuccin)
 
-  :init (load-theme 'catppuccin t)
+;;   :init (load-theme 'catppuccin t)
 
-  :config
-  (custom-set-faces
-   `(diff-hl-change
-     ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
-  (custom-set-faces
-   `(diff-hl-delete
-     ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
-  (custom-set-faces
-   `(diff-hl-insert
-     ((t
-       (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
+;;   :config
+;;   (custom-set-faces
+;;    `(diff-hl-change
+;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
+;;   (custom-set-faces
+;;    `(diff-hl-delete
+;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
+;;   (custom-set-faces
+;;    `(diff-hl-insert
+;;      ((t
+;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
 
-(use-package rose-pine-theme
-  :vc (:url "https://github.com/konrad1977/pinerose-emacs")
+;; (use-package rose-pine-theme
+;;   :vc (:url "https://github.com/konrad1977/pinerose-emacs")
 
-  :when (eq sb/theme 'rose-pine)
+;;   :when (eq sb/theme 'rose-pine)
 
-  :init (load-theme 'rose-pine t)
+;;   :init (load-theme 'rose-pine t)
 
-  :config
-  (with-eval-after-load 'company
-    (custom-set-faces
-     ;; Normal tooltip
-     '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
-     ;; Selected item
-     '(company-tooltip-selection
-       ((t
-         (:background
-          "#264f78"
-          :foreground "#ffffff"
-          :weight bold
-          :underline nil))))
-     '(company-tooltip-quick-access ((t (:foreground "#6e6a86"))))
-     ;; Match highlight
-     '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
-     ;; Scrollbar background
-     '(company-scrollbar-bg ((t (:background "#333333"))))
-     ;; Scrollbar foreground
-     '(company-scrollbar-fg ((t (:background "#555555")))))))
+;;   :config
+;;   (with-eval-after-load 'company
+;;     (custom-set-faces
+;;      ;; Normal tooltip
+;;      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
+;;      ;; Selected item
+;;      '(company-tooltip-selection
+;;        ((t
+;;          (:background
+;;           "#264f78"
+;;           :foreground "#ffffff"
+;;           :weight bold
+;;           :underline nil))))
+;;      '(company-tooltip-quick-access ((t (:foreground "#6e6a86"))))
+;;      ;; Match highlight
+;;      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
+;;      ;; Scrollbar background
+;;      '(company-scrollbar-bg ((t (:background "#333333"))))
+;;      ;; Scrollbar foreground
+;;      '(company-scrollbar-fg ((t (:background "#555555")))))))
 
-(use-package kanagawa-themes
-  :when (eq sb/theme 'kanagawa)
+;; (use-package kanagawa-themes
+;;   :when (eq sb/theme 'kanagawa)
 
-  :init (load-theme 'kanagawa-wave t)
+;;   :init (load-theme 'kanagawa-wave t)
 
-  :config
-  ;; The default colors are difficult to distinguish
-  (with-eval-after-load 'company
-    (custom-set-faces
-     ;; Normal tooltip
-     '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
-     ;; Selected item
-     '(company-tooltip-selection
-       ((t (:background "#264f78" :foreground "#ffffff"))))
-     ;; Match highlight
-     '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
-     ;; Scrollbar background
-     '(company-scrollbar-bg ((t (:background "#333333"))))
-     ;; Scrollbar foreground
-     '(company-scrollbar-fg ((t (:background "#555555")))))))
+;;   :config
+;;   ;; The default colors are difficult to distinguish
+;;   (with-eval-after-load 'company
+;;     (custom-set-faces
+;;      ;; Normal tooltip
+;;      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
+;;      ;; Selected item
+;;      '(company-tooltip-selection
+;;        ((t (:background "#264f78" :foreground "#ffffff"))))
+;;      ;; Match highlight
+;;      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
+;;      ;; Scrollbar background
+;;      '(company-scrollbar-bg ((t (:background "#333333"))))
+;;      ;; Scrollbar foreground
+;;      '(company-scrollbar-fg ((t (:background "#555555")))))))
 
-(use-package dracula-theme
-  :when (eq sb/theme 'dracula)
+;; (use-package dracula-theme
+;;   :when (eq sb/theme 'dracula)
 
-  :init (load-theme 'dracula t)
+;;   :init (load-theme 'dracula t)
 
-  :config
-  ;; The default colors are difficult to distinguish
-  (with-eval-after-load 'company
-    (custom-set-faces
-     ;; Normal tooltip
-     '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
-     ;; Selected item
-     '(company-tooltip-selection
-       ((t (:background "#264f78" :foreground "#ffffff"))))
-     ;; Match highlight
-     '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
-     ;; Scrollbar background
-     '(company-scrollbar-bg ((t (:background "#333333"))))
-     ;; Scrollbar foreground
-     '(company-scrollbar-fg ((t (:background "#555555"))))))
+;;   :config
+;;   ;; The default colors are difficult to distinguish
+;;   (with-eval-after-load 'company
+;;     (custom-set-faces
+;;      ;; Normal tooltip
+;;      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
+;;      ;; Selected item
+;;      '(company-tooltip-selection
+;;        ((t (:background "#264f78" :foreground "#ffffff"))))
+;;      ;; Match highlight
+;;      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
+;;      ;; Scrollbar background
+;;      '(company-scrollbar-bg ((t (:background "#333333"))))
+;;      ;; Scrollbar foreground
+;;      '(company-scrollbar-fg ((t (:background "#555555"))))))
 
-  (with-eval-after-load 'compile
-    (dolist (face '(compilation-info compilation-warning compilation-error))
-      (set-face-attribute face nil :background 'unspecified))))
+;;   (with-eval-after-load 'compile
+;;     (dolist (face '(compilation-info compilation-warning compilation-error))
+;;       (set-face-attribute face nil :background 'unspecified))))
 
-(use-package tokyo-night
-  :vc (:url "https://github.com/bbatsov/tokyo-night-emacs" :rev :newest)
+;; (use-package tokyo-night
+;;   :vc (:url "https://github.com/bbatsov/tokyo-night-emacs" :rev :newest)
 
-  :when (eq sb/theme 'tokyonight)
+;;   :when (eq sb/theme 'tokyonight)
 
-  :init (load-theme 'tokyo-night t))
+;;   :init (load-theme 'tokyo-night t))
 
-(use-package matugen-theme
-  :ensure nil
+;; (use-package matugen-theme
+;;   :ensure nil
 
-  :load-path "themes"
+;;   :load-path "themes"
 
-  :when (eq sb/theme 'matugen)
+;;   :when (eq sb/theme 'matugen)
 
-  :init
-  (require 'matugen-theme)
-  (load-theme 'matugen t))
+;;   :init
+;;   (require 'matugen-theme)
+;;   (load-theme 'matugen t))
 
 (use-package standard-themes
   :when (eq sb/theme 'standard-dark)
@@ -4930,48 +4971,48 @@ Fallback to `xref-go-back'."
 
   :custom (modus-themes-mixed-fonts nil))
 
-(use-package modus-nordic-night-theme
-  :vc (:url "https://codeberg.org/ashton314/modus-nordic-night" :rev :newest)
+;; (use-package modus-nordic-night-theme
+;;   :vc (:url "https://codeberg.org/ashton314/modus-nordic-night" :rev :newest)
 
-  :when (eq sb/theme 'nordic-night)
+;;   :when (eq sb/theme 'nordic-night)
 
-  :init (load-theme 'modus-nordic-midnight t))
+;;   :init (load-theme 'modus-nordic-midnight t))
 
-(use-package nerd-icons-corfu
-  :when
-  (and (bound-and-true-p sb/enable-icons)
-       (eq sb/completion-provider 'corfu)
-       (eq sb/corfu-icons 'nerd-icons))
+;; (use-package nerd-icons-corfu
+;;   :when
+;;   (and (bound-and-true-p sb/enable-icons)
+;;        (eq sb/completion-provider 'corfu)
+;;        (eq sb/corfu-icons 'nerd-icons))
 
-  :after corfu
+;;   :after corfu
 
-  :demand t
+;;   :demand t
 
-  :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-;; Icons in the minibuffer
-(use-package nerd-icons-completion
-  :when (bound-and-true-p sb/enable-icons)
+;; ;; Icons in the minibuffer
+;; (use-package nerd-icons-completion
+;;   :when (bound-and-true-p sb/enable-icons)
 
-  :after (nerd-icons marginalia)
+;;   :after (nerd-icons marginalia)
 
-  :init (nerd-icons-completion-mode 1)
+;;   :init (nerd-icons-completion-mode 1)
 
-  :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
+;;   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
-(use-package nerd-icons-dired
-  :when (bound-and-true-p sb/enable-icons)
+;; (use-package nerd-icons-dired
+;;   :when (bound-and-true-p sb/enable-icons)
 
-  :hook (dired-mode . nerd-icons-dired-mode)
+;;   :hook (dired-mode . nerd-icons-dired-mode)
 
-  :diminish)
+;;   :diminish)
 
-(use-package nerd-icons-ibuffer
-  :when (bound-and-true-p sb/enable-icons)
+;; (use-package nerd-icons-ibuffer
+;;   :when (bound-and-true-p sb/enable-icons)
 
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
+;;   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
 
-  :custom (nerd-icons-ibuffer-icon-size 1.0))
+;;   :custom (nerd-icons-ibuffer-icon-size 1.0))
 
 ;; (use-package nerd-icons-grep
 ;;   :ensure (:host github :repo "hron/nerd-icons-grep")
@@ -4988,236 +5029,236 @@ Fallback to `xref-go-back'."
 ;; But the package is not being actively maintained. Inspired by
 ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
 
-(use-package powerline
-  :preface
-  (defun sb/powerline-raw (str &optional face pad)
-    "Render STR as mode-line data using FACE and optionally PAD import.
-PAD can be left (`l') or right (`r')."
-    (when str
-      (let* ((rendered-str (format-mode-line str))
-             (padded-str
-              (concat
-               (when (and (> (length rendered-str) 0) (eq pad 'l))
-                 "")
-               (if (listp str)
-                   rendered-str
-                 str)
-               (when (and (> (length rendered-str) 0) (eq pad 'r))
-                 ""))))
-        (if face
-            (pl/add-text-property padded-str 'face face)
-          padded-str))))
+;; (use-package powerline
+;;   :preface
+;;   (defun sb/powerline-raw (str &optional face pad)
+;;     "Render STR as mode-line data using FACE and optionally PAD import.
+;; PAD can be left (`l') or right (`r')."
+;;     (when str
+;;       (let* ((rendered-str (format-mode-line str))
+;;              (padded-str
+;;               (concat
+;;                (when (and (> (length rendered-str) 0) (eq pad 'l))
+;;                  "")
+;;                (if (listp str)
+;;                    rendered-str
+;;                  str)
+;;                (when (and (> (length rendered-str) 0) (eq pad 'r))
+;;                  ""))))
+;;         (if face
+;;             (pl/add-text-property padded-str 'face face)
+;;           padded-str))))
 
-  ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
-  (defun sb/flycheck-status ()
-    "Return Flycheck status with red for errors and yellow for warnings.
-Shows both colors when errors and warnings are present."
-    (when (bound-and-true-p flycheck-mode)
-      (let-alist
-       (flycheck-count-errors flycheck-current-errors)
-       (cond
-        ;; Both errors and warnings
-        ((and .error .warning)
-         (concat
-          (propertize (format "E:%s" .error) 'face '(:foreground "red"))
-          " "
-          (propertize (format "W:%s" .warning) 'face '(:foreground "gold"))))
-        ;; Only errors
-        (.error
-         (propertize (format "E:%s" .error) 'face '(:foreground "red")))
-        ;; Only warnings
-        (.warning
-         (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
-        ;; Clean: show nothing
-        (t
-         (propertize "✔ " 'face '(:foreground "green")))))))
+;;   ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
+;;   (defun sb/flycheck-status ()
+;;     "Return Flycheck status with red for errors and yellow for warnings.
+;; Shows both colors when errors and warnings are present."
+;;     (when (bound-and-true-p flycheck-mode)
+;;       (let-alist
+;;        (flycheck-count-errors flycheck-current-errors)
+;;        (cond
+;;         ;; Both errors and warnings
+;;         ((and .error .warning)
+;;          (concat
+;;           (propertize (format "E:%s" .error) 'face '(:foreground "red"))
+;;           " "
+;;           (propertize (format "W:%s" .warning) 'face '(:foreground "gold"))))
+;;         ;; Only errors
+;;         (.error
+;;          (propertize (format "E:%s" .error) 'face '(:foreground "red")))
+;;         ;; Only warnings
+;;         (.warning
+;;          (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
+;;         ;; Clean: show nothing
+;;         (t
+;;          (propertize "✔ " 'face '(:foreground "green")))))))
 
-  ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-  (defun sb/powerline-nano-theme ()
-    "Setup a nano-like modeline"
-    (interactive)
-    (setq-default
-     mode-line-format
-     '("%e" (:eval
-        (let*
-            ((active (powerline-selected-window-active))
-             (face0
-              (if active
-                  'powerline-active0
-                'powerline-inactive0))
-             (emacs-icon
-              (if (fboundp 'nerd-icons-devicon)
-                  (nerd-icons-devicon
-                   "nf-dev-emacs"
-                   :height 1.1
-                   :v-adjust -0.05)
-                "λ"))
+;;   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
+;;   (defun sb/powerline-nano-theme ()
+;;     "Setup a nano-like modeline"
+;;     (interactive)
+;;     (setq-default
+;;      mode-line-format
+;;      '("%e" (:eval
+;;         (let*
+;;             ((active (powerline-selected-window-active))
+;;              (face0
+;;               (if active
+;;                   'powerline-active0
+;;                 'powerline-inactive0))
+;;              (emacs-icon
+;;               (if (fboundp 'nerd-icons-devicon)
+;;                   (nerd-icons-devicon
+;;                    "nf-dev-emacs"
+;;                    :height 1.1
+;;                    :v-adjust -0.05)
+;;                 "λ"))
 
-             ;; Left-hand side (GNU Emacs version)
+;;              ;; Left-hand side (GNU Emacs version)
 
-             ;; (lhs
-             ;;  (list
-             ;;   (powerline-raw
-             ;;    (concat
-             ;;     "GNU Emacs "
-             ;;     (number-to-string emacs-major-version)
-             ;;     "."
-             ;;     (number-to-string emacs-minor-version))
-             ;;    nil 'l)))
+;;              ;; (lhs
+;;              ;;  (list
+;;              ;;   (powerline-raw
+;;              ;;    (concat
+;;              ;;     "GNU Emacs "
+;;              ;;     (number-to-string emacs-major-version)
+;;              ;;     "."
+;;              ;;     (number-to-string emacs-minor-version))
+;;              ;;    nil 'l)))
 
-             (lhs
-              (list
-               (powerline-raw
-                (format "%s GNU Emacs %d.%d"
-                        emacs-icon emacs-major-version emacs-minor-version)
-                nil 'l)))
+;;              (lhs
+;;               (list
+;;                (powerline-raw
+;;                 (format "%s GNU Emacs %d.%d"
+;;                         emacs-icon emacs-major-version emacs-minor-version)
+;;                 nil 'l)))
 
-             ;; Center (buffer name)
-             (center (list (powerline-raw "%b" nil 'r)))
+;;              ;; Center (buffer name)
+;;              (center (list (powerline-raw "%b" nil 'r)))
 
-             ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
-             (rhs
-              (list
-               (when which-function-mode
-                 (powerline-raw which-func-format nil 'l))
+;;              ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
+;;              (rhs
+;;               (list
+;;                (when which-function-mode
+;;                  (powerline-raw which-func-format nil 'l))
 
-               (when-let*
-                   ((proj (project-current))
-                    (proj-name (project-name proj))
-                    (branch
-                     (when vc-mode
-                       (let* ((backend
-                               (substring-no-properties vc-mode)))
-                         (replace-regexp-in-string
-                          "^ *[Gg]it[:-]" "" backend))))
-                    ;; Git branch icon (fallback if Nerd Icons not available)
-                    (git-icon
-                     (if (fboundp 'nerd-icons-octicon)
-                         (nerd-icons-octicon
-                          "nf-oct-git_branch"
-                          :v-adjust -0.05)
-                       "")))
-                 (powerline-raw
-                  (format " [%s  %s %s]"
-                          proj-name
-                          git-icon
-                          (or branch "—"))
-                  nil 'l))
+;;                (when-let*
+;;                    ((proj (project-current))
+;;                     (proj-name (project-name proj))
+;;                     (branch
+;;                      (when vc-mode
+;;                        (let* ((backend
+;;                                (substring-no-properties vc-mode)))
+;;                          (replace-regexp-in-string
+;;                           "^ *[Gg]it[:-]" "" backend))))
+;;                     ;; Git branch icon (fallback if Nerd Icons not available)
+;;                     (git-icon
+;;                      (if (fboundp 'nerd-icons-octicon)
+;;                          (nerd-icons-octicon
+;;                           "nf-oct-git_branch"
+;;                           :v-adjust -0.05)
+;;                        "")))
+;;                  (powerline-raw
+;;                   (format " [%s  %s %s]"
+;;                           proj-name
+;;                           git-icon
+;;                           (or branch "—"))
+;;                   nil 'l))
 
-               ;; (when-let ((proj (project-current)))
-               ;;   (powerline-raw (format "[%s" (project-name proj)) nil 'l))
+;;                ;; (when-let ((proj (project-current)))
+;;                ;;   (powerline-raw (format "[%s" (project-name proj)) nil 'l))
 
-               ;; Remove the "Git:" prefix to save space.
-               ;; (powerline-vc nil 'l)
+;;                ;; Remove the "Git:" prefix to save space.
+;;                ;; (powerline-vc nil 'l)
 
-               ;; (when vc-mode
-               ;;   (let* ((backend
-               ;;           (substring-no-properties vc-mode))
-               ;;          (branch
-               ;;           (replace-regexp-in-string "^ *[Gg]it[:-]" "" backend)))
-               ;;     (powerline-raw (format "  %s]" branch) nil 'l)))
+;;                ;; (when vc-mode
+;;                ;;   (let* ((backend
+;;                ;;           (substring-no-properties vc-mode))
+;;                ;;          (branch
+;;                ;;           (replace-regexp-in-string "^ *[Gg]it[:-]" "" backend)))
+;;                ;;     (powerline-raw (format "  %s]" branch) nil 'l)))
 
-               (powerline-raw " ")
-               (powerline-raw "%4l" nil 'l)
-               (powerline-raw ",")
-               (powerline-raw "%3c" nil 'r)
-               (if (buffer-modified-p)
-                   (powerline-raw " ⠾" nil 'r)
-                 (powerline-raw "  " nil 'r))
-               (let ((status (sb/flycheck-status)))
-                 (when status
-                   (powerline-raw (format "  %s" status) nil 'r)))
-               (powerline-raw " "))))
-          (concat
-           (powerline-render lhs)
-           (powerline-fill-center nil (/ (powerline-width center) 2.0))
-           (powerline-render center)
-           (powerline-fill nil (powerline-width rhs))
-           (powerline-render rhs)))))))
+;;                (powerline-raw " ")
+;;                (powerline-raw "%4l" nil 'l)
+;;                (powerline-raw ",")
+;;                (powerline-raw "%3c" nil 'r)
+;;                (if (buffer-modified-p)
+;;                    (powerline-raw " ⠾" nil 'r)
+;;                  (powerline-raw "  " nil 'r))
+;;                (let ((status (sb/flycheck-status)))
+;;                  (when status
+;;                    (powerline-raw (format "  %s" status) nil 'r)))
+;;                (powerline-raw " "))))
+;;           (concat
+;;            (powerline-render lhs)
+;;            (powerline-fill-center nil (/ (powerline-width center) 2.0))
+;;            (powerline-render center)
+;;            (powerline-fill nil (powerline-width rhs))
+;;            (powerline-render rhs)))))))
 
-  :when (eq sb/modeline-theme 'powerline)
+;;   :when (eq sb/modeline-theme 'powerline)
 
-  :hook
-  ((after-init . sb/powerline-nano-theme)
-   ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
+;;   :hook
+;;   ((after-init . sb/powerline-nano-theme)
+;;    ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
 
-  :custom
-  ;; Visualization of the buffer position is not useful
-  (powerline-display-hud nil)
-  (powerline-display-buffer-size nil)
-  (powerline-display-mule-info nil "File encoding information is not useful")
-  (powerline-gui-use-vcs-glyph t)
-  (powerline-height 20))
+;;   :custom
+;;   ;; Visualization of the buffer position is not useful
+;;   (powerline-display-hud nil)
+;;   (powerline-display-buffer-size nil)
+;;   (powerline-display-mule-info nil "File encoding information is not useful")
+;;   (powerline-gui-use-vcs-glyph t)
+;;   (powerline-height 20))
 
-(use-package doom-modeline
-  :when (eq sb/modeline-theme 'doom-modeline)
+;; (use-package doom-modeline
+;;   :when (eq sb/modeline-theme 'doom-modeline)
 
-  :hook (after-init . doom-modeline-mode)
+;;   :hook (after-init . doom-modeline-mode)
 
-  :custom
-  (doom-modeline-buffer-encoding nil)
-  (doom-modeline-unicode-fallback t)
-  ;; Wrong LSP state is shown for non-LSP-managed files
-  (doom-modeline-lsp nil)
-  (doom-modeline-minor-modes t)
-  (doom-modeline-icon sb/enable-icons)
+;;   :custom
+;;   (doom-modeline-buffer-encoding nil)
+;;   (doom-modeline-unicode-fallback t)
+;;   ;; Wrong LSP state is shown for non-LSP-managed files
+;;   (doom-modeline-lsp nil)
+;;   (doom-modeline-minor-modes t)
+;;   (doom-modeline-icon sb/enable-icons)
 
-  :config
-  (unless (display-graphic-p)
-    ;; All other choices can lead to the modeline text overflowing
-    (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
+;;   :config
+;;   (unless (display-graphic-p)
+;;     ;; All other choices can lead to the modeline text overflowing
+;;     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
 
-(use-package awesome-tray
-  :vc (:url "https://github.com/manateelazycat/awesome-tray" :rev :newest)
+;; (use-package awesome-tray
+;;   :vc (:url "https://github.com/manateelazycat/awesome-tray" :rev :newest)
 
-  :when (eq sb/modeline-theme 'awesome-tray)
+;;   :when (eq sb/modeline-theme 'awesome-tray)
 
-  :hook (after-init . awesome-tray-mode)
+;;   :hook (after-init . awesome-tray-mode)
 
-  :custom
-  (awesome-tray-active-modules
-   '("file-path"
-     "buffer-name"
-     "mode-name"
-     "location"
-     "buffer-read-only"
-     "git"
-     "hostname"))
-  (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
-  (awesome-tray-file-path-full-dirname-levels 2)
-  (awesome-tray-evil-show-mode nil)
-  (awesome-tray-meow-show-mode nil)
-  (awesome-tray-location-format "%l:%c")
+;;   :custom
+;;   (awesome-tray-active-modules
+;;    '("file-path"
+;;      "buffer-name"
+;;      "mode-name"
+;;      "location"
+;;      "buffer-read-only"
+;;      "git"
+;;      "hostname"))
+;;   (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
+;;   (awesome-tray-file-path-full-dirname-levels 2)
+;;   (awesome-tray-evil-show-mode nil)
+;;   (awesome-tray-meow-show-mode nil)
+;;   (awesome-tray-location-format "%l:%c")
 
-  :custom-face
-  (awesome-tray-module-file-path-face
-   ((t (:foreground "#6272a4" :weight normal :height 0.8))))
-  (awesome-tray-module-parent-dir-face
-   ((t (:foreground "#50fa7b" :weight bold :height 0.8))))
-  (awesome-tray-module-buffer-name-face
-   ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-  (awesome-tray-module-mode-name-face
-   ((t (:foreground "#ff79c6" :weight bold :height 0.8))))
-  (awesome-tray-module-location-face
-   ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
-  (awesome-tray-module-git-face
-   ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
-  (awesome-tray-module-flymake-error
-   ((t (:foreground "#ff5555" :weight bold :height 0.8))))
-  (awesome-tray-module-flymake-warning
-   ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-  (awesome-tray-module-flymake-note
-   ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
-  (awesome-tray-module-date-face ((t (:foreground "#6272a4" :height 0.8))))
-  (awesome-tray-module-awesome-tab-face
-   ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
+;;   :custom-face
+;;   (awesome-tray-module-file-path-face
+;;    ((t (:foreground "#6272a4" :weight normal :height 0.8))))
+;;   (awesome-tray-module-parent-dir-face
+;;    ((t (:foreground "#50fa7b" :weight bold :height 0.8))))
+;;   (awesome-tray-module-buffer-name-face
+;;    ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
+;;   (awesome-tray-module-mode-name-face
+;;    ((t (:foreground "#ff79c6" :weight bold :height 0.8))))
+;;   (awesome-tray-module-location-face
+;;    ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
+;;   (awesome-tray-module-git-face
+;;    ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
+;;   (awesome-tray-module-flymake-error
+;;    ((t (:foreground "#ff5555" :weight bold :height 0.8))))
+;;   (awesome-tray-module-flymake-warning
+;;    ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
+;;   (awesome-tray-module-flymake-note
+;;    ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
+;;   (awesome-tray-module-date-face ((t (:foreground "#6272a4" :height 0.8))))
+;;   (awesome-tray-module-awesome-tab-face
+;;    ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
 
-  :config (global-hide-mode-line-mode)
+;;   :config (global-hide-mode-line-mode)
 
-  (defun sb/disable-mode-line ()
-    (setq-local mode-line-format nil))
+;;   (defun sb/disable-mode-line ()
+;;     (setq-local mode-line-format nil))
 
-  (add-hook 'after-change-major-mode-hook #'sb/disable-mode-line))
+;;   (add-hook 'after-change-major-mode-hook #'sb/disable-mode-line))
 
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
@@ -5251,7 +5292,10 @@ Shows both colors when errors and warnings are present."
   ;; (mini-echo-buffer-name ((t (:height 0.8))))
   ;; (vc-state-base ((t (:foreground "yellow" :height 0.8))))
 
-  :config (require 'nerd-icons)
+  :config
+
+  (when (bound-and-true-p sb/enable-icons)
+    (require 'nerd-icons))
 
   (mini-echo-define-segment
    "shrink-path"
@@ -5485,13 +5529,13 @@ Shows both colors when errors and warnings are present."
 
 ;;   :diminish)
 
-;; Navigate the xref stack with consult
-(use-package consult-xref-stack
-  :vc (:url "https://github.com/brett-lempereur/consult-xref-stack")
+;; ;; Navigate the xref stack with consult
+;; (use-package consult-xref-stack
+;;   :vc (:url "https://github.com/brett-lempereur/consult-xref-stack")
 
-  :commands consult-xref-stack-forward
+;;   :commands consult-xref-stack-forward
 
-  :bind ("C-," . consult-xref-stack-backward))
+;;   :bind ("C-," . consult-xref-stack-backward))
 
 ;; (use-package hl-line
 ;;   :ensure nil
@@ -5592,370 +5636,370 @@ Shows both colors when errors and warnings are present."
 ;;    kill-file-path-dirname
 ;;    kill-file-path))
 
-(use-package eglot
-  :when (eq sb/lsp-provider 'eglot)
+;; (use-package eglot
+;;   :when (eq sb/lsp-provider 'eglot)
 
-  :after project
+;;   :after project
 
-  :pin gnu
+;;   :pin gnu
 
-  :hook
-  ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
-   .
-   (lambda ()
-     ;; Disable LSP for git commit message buffers which are usually ephemeral
-     (unless (string-equal
-              (file-name-nondirectory (or buffer-file-name ""))
-              "COMMIT_EDITMSG")
-       (eglot-ensure))))
+;;   :hook
+;;   ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
+;;    .
+;;    (lambda ()
+;;      ;; Disable LSP for git commit message buffers which are usually ephemeral
+;;      (unless (string-equal
+;;               (file-name-nondirectory (or buffer-file-name ""))
+;;               "COMMIT_EDITMSG")
+;;        (eglot-ensure))))
 
-  :bind ("M-'" . eglot-find-implementation)
+;;   :bind ("M-'" . eglot-find-implementation)
 
-  :custom
-  ;; Disabling this helps avoid the race condition between closing a project and shutting down LSP servers.
-  ;; (eglot-autoshutdown t)
+;;   :custom
+;;   ;; Disabling this helps avoid the race condition between closing a project and shutting down LSP servers.
+;;   ;; (eglot-autoshutdown t)
 
-  (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
-  (eglot-send-changes-idle-time 1)
-  (eglot-extend-to-xref t)
-  (eglot-ignored-server-capabilities
-   '(:codeLensProvider
-     :documentHighlightProvider
-     :documentOnTypeFormattingProvider
-     :foldingRangeProvider
-     :hoverProvider ; Automatic documentation popups can be distracting
-     :inlayHintProvider ; Inlay hints are distracting
-     :executeCommandProvider
-     :documentLinkProvider))
-  (eglot-report-progress nil)
-  ;; Do not clutter the modeline
-  (eglot-mode-line-format nil)
-  (eglot-confirm-server-edits '((eglot-rename . nil) (t . diff)))
+;;   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
+;;   (eglot-send-changes-idle-time 1)
+;;   (eglot-extend-to-xref t)
+;;   (eglot-ignored-server-capabilities
+;;    '(:codeLensProvider
+;;      :documentHighlightProvider
+;;      :documentOnTypeFormattingProvider
+;;      :foldingRangeProvider
+;;      :hoverProvider ; Automatic documentation popups can be distracting
+;;      :inlayHintProvider ; Inlay hints are distracting
+;;      :executeCommandProvider
+;;      :documentLinkProvider))
+;;   (eglot-report-progress nil)
+;;   ;; Do not clutter the modeline
+;;   (eglot-mode-line-format nil)
+;;   (eglot-confirm-server-edits '((eglot-rename . nil) (t . diff)))
 
-  :config
-  ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
-  ;; (setopt eglot-events-buffer-config '(:size 0 :format short))
+;;   :config
+;;   ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
+;;   ;; (setopt eglot-events-buffer-config '(:size 0 :format short))
 
-  ;; (fset #'jsonrpc--log-event #'ignore)
+;;   ;; (fset #'jsonrpc--log-event #'ignore)
 
-  (setopt
-   eglot-server-programs
-   `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
-     ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' completely
-     (text-mode . ("rass" "text"))
-     (LaTeX-mode . ("rass" "latex"))
-     ((markdown-mode markdown-ts-mode) . ("rass" "markdown"))
-     (org-mode
-      . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
-     ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
-      . ("autotools-language-server"))
-     (fish-mode . ("fish-lsp" "start"))
-     ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
-     ((c-mode c-ts-mode c++-mode c++-ts-mode c-or-c++-ts-mode c-or-c++-mode)
-      .
-      ("clangd"
-       "-j=4"
-       "--all-scopes-completion"
-       "--background-index"
-       "--clang-tidy"
-       "--completion-style=detailed"
-       "--fallback-style=LLVM"
-       "--header-insertion=never"
-       "--header-insertion-decorators"
-       "--log=error"
-       ;; Unsupported option with Clangd 10: malloc-trim and enable-config
-       "--malloc-trim" ; Release memory periodically
-       ;; Project config is from a .clangd file in the project directory
-       "--enable-config"
-       "--pch-storage=memory" ; Increases memory usage but can improve performance
-       "--inlay-hints=0"
-       "--pretty"))
-     (awk-mode . ("awk-language-server"))
-     ((scss-mode css-mode css-ts-mode)
-      .
-      ("vscode-css-language-server" "--stdio"))
-     ((web-mode html-mode html-ts-mode)
-      .
-      ("vscode-html-language-server" "--stdio"))
-     ((json-mode json-ts-mode jsonc-mode)
-      .
-      ("vscode-json-language-server" "--stdio"))
-     ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
-     ((cmake-mode cmake-ts-mode)
-      .
-      ,(eglot-alternatives
-        '(("neocmakelsp" "--stdio") "cmake-language-server")))
-     ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
-     ;; Download the source from
-     ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
-     ;; clean verify -U -DskipTests=true". Change the url in
-     ;; "org.eclipse.jdt.ls.target/org.eclipse.jdt.ls.tp.target" if there is a
-     ;; "No repository found" error.
-     ((java-mode java-ts-mode)
-      .
-      ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx4G"))
-     ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
-     ((perl-mode cperl-mode)
-      .
-      ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
-     ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
-     ;; Download the latest milestone from
-     ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
-     ;; verify -DskipTests=true". After successful compilation, the resulting
-     ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
-     ;; "org.eclipse.lemminx/target".
-     ((nxml-mode xml-mode)
-      .
-      ("java" "-jar"
-       ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
-                          user-emacs-directory)))))
+;;   (setopt
+;;    eglot-server-programs
+;;    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
+;;      ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' completely
+;;      (text-mode . ("rass" "text"))
+;;      (LaTeX-mode . ("rass" "latex"))
+;;      ((markdown-mode markdown-ts-mode) . ("rass" "markdown"))
+;;      (org-mode
+;;       . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
+;;      ((autoconf-mode makefile-mode makefile-automake-mode makefile-gmake-mode)
+;;       . ("autotools-language-server"))
+;;      (fish-mode . ("fish-lsp" "start"))
+;;      ((asm-mode fasm-mode masm-mode nasm-mode gas-mode) . ("asm-lsp"))
+;;      ((c-mode c-ts-mode c++-mode c++-ts-mode c-or-c++-ts-mode c-or-c++-mode)
+;;       .
+;;       ("clangd"
+;;        "-j=4"
+;;        "--all-scopes-completion"
+;;        "--background-index"
+;;        "--clang-tidy"
+;;        "--completion-style=detailed"
+;;        "--fallback-style=LLVM"
+;;        "--header-insertion=never"
+;;        "--header-insertion-decorators"
+;;        "--log=error"
+;;        ;; Unsupported option with Clangd 10: malloc-trim and enable-config
+;;        "--malloc-trim" ; Release memory periodically
+;;        ;; Project config is from a .clangd file in the project directory
+;;        "--enable-config"
+;;        "--pch-storage=memory" ; Increases memory usage but can improve performance
+;;        "--inlay-hints=0"
+;;        "--pretty"))
+;;      (awk-mode . ("awk-language-server"))
+;;      ((scss-mode css-mode css-ts-mode)
+;;       .
+;;       ("vscode-css-language-server" "--stdio"))
+;;      ((web-mode html-mode html-ts-mode)
+;;       .
+;;       ("vscode-html-language-server" "--stdio"))
+;;      ((json-mode json-ts-mode jsonc-mode)
+;;       .
+;;       ("vscode-json-language-server" "--stdio"))
+;;      ((yaml-ts-mode yaml-mode) . ("yaml-language-server" "--stdio"))
+;;      ((cmake-mode cmake-ts-mode)
+;;       .
+;;       ,(eglot-alternatives
+;;         '(("neocmakelsp" "--stdio") "cmake-language-server")))
+;;      ((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
+;;      ;; Download the source from
+;;      ;; https://github.com/eclipse-jdtls/eclipse.jdt.ls/tags. Build with "./mvnw
+;;      ;; clean verify -U -DskipTests=true". Change the url in
+;;      ;; "org.eclipse.jdt.ls.target/org.eclipse.jdt.ls.tp.target" if there is a
+;;      ;; "No repository found" error.
+;;      ((java-mode java-ts-mode)
+;;       .
+;;       ("jdtls" "--illegal-access=warn" "-Xms2G" "-Xmx4G"))
+;;      ;; (add-to-list 'eglot-server-programs '(markdown-mode . ("marksman" "server")))
+;;      ((perl-mode cperl-mode)
+;;       .
+;;       ("perl" "-MPerl::LanguageServer" "-e" "Perl::LanguageServer::run"))
+;;      ((dockerfile-mode dockerfile-ts-mode) . ("docker-langserver" "--stdio"))
+;;      ;; Download the latest milestone from
+;;      ;; https://github.com/eclipse-lemminx/lemminx and build with "./mvnw clean
+;;      ;; verify -DskipTests=true". After successful compilation, the resulting
+;;      ;; output "org.eclipse.lemminx-uber.jar" will be in the folder
+;;      ;; "org.eclipse.lemminx/target".
+;;      ((nxml-mode xml-mode)
+;;       .
+;;       ("java" "-jar"
+;;        ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
+;;                           user-emacs-directory)))))
 
-  (if (eq sb/python-langserver 'pylsp)
-      (add-to-list
-       'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
-    (add-to-list
-     'eglot-server-programs
-     '((python-mode python-ts-mode) . ("rass" "python"))))
+;;   (if (eq sb/python-langserver 'pylsp)
+;;       (add-to-list
+;;        'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
+;;     (add-to-list
+;;      'eglot-server-programs
+;;      '((python-mode python-ts-mode) . ("rass" "python"))))
 
-  ;; Eglot overwrites `company-backends' to only include `company-capf'
-  (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
+;;   ;; Eglot overwrites `company-backends' to only include `company-capf'
+;;   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
 
-  ;; `eglot-workspace-configuration' should be set as a directory-local
-  ;; variable. `:json-false' is the correct way to send false to LSP servers
-  ;; instead of nil, which would remove the key.
-  (setq-default
-   eglot-workspace-configuration
-   '(:pylsp
-     (:configurationSources
-      ["pyproject.toml" "setup.cfg"]
-      :plugins
-      (:autopep8
-       (:enabled :json-false)
-       :black (:enabled :json-false)
-       :flake8 (:enabled :json-false)
-       :jedi
-       (:auto_import_modules
-        []
-        :env_vars nil ; (:SOME_ENV_VAR "/some/path")
-        :environment nil ; "./.venv/"
-        :extra_paths [])
-       :jedi_completion
-       (:cache_for
-        []
-        :eager
-        :json-false
-        :enabled t
-        :fuzzy t
-        :include_class_objects
-        :json-false
-        :include_function_objects
-        :json-false
-        :include_params t
-        :resolve_at_most 25)
-       :jedi_definition
-       (:enabled
-        t
-        :follow_builtin_definitions t
-        :follow_builtin_imports t
-        :follow_imports t)
-       :jedi_hover (:enabled t)
-       :jedi_references (:enabled t)
-       :jedi_signature_help (:enabled t)
-       :jedi_symbols
-       (:all_scopes t :enabled t :include_import_symbols :json-false)
-       :mccabe (:enabled t :threshold 15)
-       :mypy (:enabled :json-false)
-       :preload (:enabled :json-false :modules [])
-       :pycodestyle (:enabled :json-false)
-       :pydocstyle (:enabled :json-false)
-       :pyflakes (:enabled :json-false)
-       ;; We use "basedpyright" as the primary server which provides type hints.
-       :pylint (:args [] :enabled :json-false)
-       :pylsp_black (:enabled :json-false)
-       :pylsp_isort (:enabled t)
-       :pylsp_mypy
-       (:enabled t :live_mode :json-false :report_progress :json-false)
-       ;; We use ruff from `apheleia-mode' because `basedpyright' does not support formatting.
-       :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
-       :rope_autoimport
-       (:code_actions
-        (:enabled :json-false)
-        :completions (:enabled :json-false)
-        :enabled
-        :json-false
-        :memory
-        :json-false)
-       :rope_completion (:eager :json-false :enabled :json-false)
-       :ruff
-       (:enabled :json-false :formatEnabled :json-false :lineLength 80)
-       :yapf (:enabled :json-false)
-       :rope (:extensionModules nil :ropeFolder nil)))
-     ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
-     ;; LSP configuration for basedpyright.
-     :basedpyright
-     (:checkOnlyOpenFiles
-      t
-      :reportDuplicateImport t
-      :typeCheckingMode "recommended"
-      :useLibraryCodeForTypes t
-      :analysis
-      (:diagnosticSeverityOverrides
-       (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
-       :inlayHints
-       (:callArgumentNames
-        :json-false
-        :functionReturnTypes
-        :json-false
-        :variableTypes
-        :json-false
-        :genericTypes
-        :json-false)))
-     :ltex-ls-plus
-     (:language
-      "en-US"
-      :disabledRules
-      ["ELLIPSIS"
-       "EN_QUOTES"
-       "MORFOLOGIK_RULE_EN_US"
-       "MORFOLOGIK_RULE_EN_GB"
-       "HUNSPELL_RULE"
-       "HUNSPELL_NO_SUGGEST_RULE"]
-      ;; Keep grammar and style checking
-      :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
-     :yaml
-     (:format
-      (:enable t :singleQuote nil :bracketSpacing t)
-      :validate t
-      :hover t
-      :completion t)
-     :json (:format (:enable t))
-     ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
-     :harper-ls
-     (:userDictPath
-      "~/.config/harper-ls/dictionary.txt"
-      :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
-      :fileDictPath ""
-      :linters
-      (:SpellCheck
-       :json-false
-       :SpelledNumbers
-       :json-false
-       :AnA t
-       :UnclosedQuotes t
-       :WrongApostrophe
-       :json-false
-       :LongSentences
-       :json-false
-       :RepeatedWords t
-       :Spaces t
-       :CorrectNumberSuffix t
-       :SentenceCapitalization t)
-      :codeActions (:ForceStable :json-false)
-      :diagnosticSeverity "hint"
-      :markdown (:IgnoreLinkTitle :json-false)
-      :isolateEnglish
-      :json-false
-      :dialect "American")))
+;;   ;; `eglot-workspace-configuration' should be set as a directory-local
+;;   ;; variable. `:json-false' is the correct way to send false to LSP servers
+;;   ;; instead of nil, which would remove the key.
+;;   (setq-default
+;;    eglot-workspace-configuration
+;;    '(:pylsp
+;;      (:configurationSources
+;;       ["pyproject.toml" "setup.cfg"]
+;;       :plugins
+;;       (:autopep8
+;;        (:enabled :json-false)
+;;        :black (:enabled :json-false)
+;;        :flake8 (:enabled :json-false)
+;;        :jedi
+;;        (:auto_import_modules
+;;         []
+;;         :env_vars nil ; (:SOME_ENV_VAR "/some/path")
+;;         :environment nil ; "./.venv/"
+;;         :extra_paths [])
+;;        :jedi_completion
+;;        (:cache_for
+;;         []
+;;         :eager
+;;         :json-false
+;;         :enabled t
+;;         :fuzzy t
+;;         :include_class_objects
+;;         :json-false
+;;         :include_function_objects
+;;         :json-false
+;;         :include_params t
+;;         :resolve_at_most 25)
+;;        :jedi_definition
+;;        (:enabled
+;;         t
+;;         :follow_builtin_definitions t
+;;         :follow_builtin_imports t
+;;         :follow_imports t)
+;;        :jedi_hover (:enabled t)
+;;        :jedi_references (:enabled t)
+;;        :jedi_signature_help (:enabled t)
+;;        :jedi_symbols
+;;        (:all_scopes t :enabled t :include_import_symbols :json-false)
+;;        :mccabe (:enabled t :threshold 15)
+;;        :mypy (:enabled :json-false)
+;;        :preload (:enabled :json-false :modules [])
+;;        :pycodestyle (:enabled :json-false)
+;;        :pydocstyle (:enabled :json-false)
+;;        :pyflakes (:enabled :json-false)
+;;        ;; We use "basedpyright" as the primary server which provides type hints.
+;;        :pylint (:args [] :enabled :json-false)
+;;        :pylsp_black (:enabled :json-false)
+;;        :pylsp_isort (:enabled t)
+;;        :pylsp_mypy
+;;        (:enabled t :live_mode :json-false :report_progress :json-false)
+;;        ;; We use ruff from `apheleia-mode' because `basedpyright' does not support formatting.
+;;        :pylsp_ruff (:enabled t :formatEnabled :json-false :lineLength 80)
+;;        :rope_autoimport
+;;        (:code_actions
+;;         (:enabled :json-false)
+;;         :completions (:enabled :json-false)
+;;         :enabled
+;;         :json-false
+;;         :memory
+;;         :json-false)
+;;        :rope_completion (:eager :json-false :enabled :json-false)
+;;        :ruff
+;;        (:enabled :json-false :formatEnabled :json-false :lineLength 80)
+;;        :yapf (:enabled :json-false)
+;;        :rope (:extensionModules nil :ropeFolder nil)))
+;;      ;; A pyrightconfig.json or an entry in pyproject.toml gets priority over
+;;      ;; LSP configuration for basedpyright.
+;;      :basedpyright
+;;      (:checkOnlyOpenFiles
+;;       t
+;;       :reportDuplicateImport t
+;;       :typeCheckingMode "recommended"
+;;       :useLibraryCodeForTypes t
+;;       :analysis
+;;       (:diagnosticSeverityOverrides
+;;        (:reportUnusedCallResult "none" :reportInvalidCast :json-false)
+;;        :inlayHints
+;;        (:callArgumentNames
+;;         :json-false
+;;         :functionReturnTypes
+;;         :json-false
+;;         :variableTypes
+;;         :json-false
+;;         :genericTypes
+;;         :json-false)))
+;;      :ltex-ls-plus
+;;      (:language
+;;       "en-US"
+;;       :disabledRules
+;;       ["ELLIPSIS"
+;;        "EN_QUOTES"
+;;        "MORFOLOGIK_RULE_EN_US"
+;;        "MORFOLOGIK_RULE_EN_GB"
+;;        "HUNSPELL_RULE"
+;;        "HUNSPELL_NO_SUGGEST_RULE"]
+;;       ;; Keep grammar and style checking
+;;       :additionalRules (:enablePickyRules t :motherTongue "en-IN"))
+;;      :yaml
+;;      (:format
+;;       (:enable t :singleQuote nil :bracketSpacing t)
+;;       :validate t
+;;       :hover t
+;;       :completion t)
+;;      :json (:format (:enable t))
+;;      ;; Harper uses four dictionaries: per-user, per-workspace, file-local, and a in-built static dictionary.
+;;      :harper-ls
+;;      (:userDictPath
+;;       "~/.config/harper-ls/dictionary.txt"
+;;       :workspaceDictPath "${workspaceFolder}/.harper-dictionary.txt"
+;;       :fileDictPath ""
+;;       :linters
+;;       (:SpellCheck
+;;        :json-false
+;;        :SpelledNumbers
+;;        :json-false
+;;        :AnA t
+;;        :UnclosedQuotes t
+;;        :WrongApostrophe
+;;        :json-false
+;;        :LongSentences
+;;        :json-false
+;;        :RepeatedWords t
+;;        :Spaces t
+;;        :CorrectNumberSuffix t
+;;        :SentenceCapitalization t)
+;;       :codeActions (:ForceStable :json-false)
+;;       :diagnosticSeverity "hint"
+;;       :markdown (:IgnoreLinkTitle :json-false)
+;;       :isolateEnglish
+;;       :json-false
+;;       :dialect "American")))
 
-  (when (fboundp 'eglot-semantic-tokens-mode)
-    (add-hook
-     'eglot-managed-mode-hook
-     (lambda ()
-       (when (derived-mode-p 'c-mode 'c++-mode)
-         (eglot-semantic-tokens-mode 1)))))
+;;   (when (fboundp 'eglot-semantic-tokens-mode)
+;;     (add-hook
+;;      'eglot-managed-mode-hook
+;;      (lambda ()
+;;        (when (derived-mode-p 'c-mode 'c++-mode)
+;;          (eglot-semantic-tokens-mode 1)))))
 
-  ;; (setq-default completion-category-overrides
-  ;;               '((eglot (styles hotfuzz basic substring orderless))
-  ;;                 (eglot-capf (styles hotfuzz orderless))))
+;;   ;; (setq-default completion-category-overrides
+;;   ;;               '((eglot (styles hotfuzz basic substring orderless))
+;;   ;;                 (eglot-capf (styles hotfuzz orderless))))
 
-  ;; Avoid fuzzy or orderless completion for code
-  (setq-default completion-category-overrides
-                '((eglot (styles basic))
-                  (eglot-capf (styles basic))
-                  (capf (styles basic))))
+;;   ;; Avoid fuzzy or orderless completion for code
+;;   (setq-default completion-category-overrides
+;;                 '((eglot (styles basic))
+;;                   (eglot-capf (styles basic))
+;;                   (capf (styles basic))))
 
-  (add-to-list
-   'display-buffer-alist
-   '("\\*EGLOT workspace configuration\\*"
-     (display-buffer-in-side-window)
-     (side . bottom)
-     (slot . 2)
-     (window-height . 0.5)))
+;;   (add-to-list
+;;    'display-buffer-alist
+;;    '("\\*EGLOT workspace configuration\\*"
+;;      (display-buffer-in-side-window)
+;;      (side . bottom)
+;;      (slot . 2)
+;;      (window-height . 0.5)))
 
-  ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
-  ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
-  ;; Ensure that completion does not get interrupted by the user pressing keys
-  ;; or other operations with `cape-wrap-noninterruptible'.
-  (with-eval-after-load 'cape
-    (advice-add
-     #'eglot-completion-at-point
-     :around
-     (lambda (orig-fun &rest args)
-       (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args)))
+;;   ;; Clean completion metadata with `cape-capf-buster'. Make the capf composable
+;;   ;; allowing falling back to other backends with `cape-capf-nonexclusive'.
+;;   ;; Ensure that completion does not get interrupted by the user pressing keys
+;;   ;; or other operations with `cape-wrap-noninterruptible'.
+;;   (with-eval-after-load 'cape
+;;     (advice-add
+;;      #'eglot-completion-at-point
+;;      :around
+;;      (lambda (orig-fun &rest args)
+;;        (apply (cape-capf-buster (cape-capf-nonexclusive orig-fun)) args)))
 
-    (defun sb/setup-capfs-for-eglot ()
-      "Setup custom CAPFs for programming buffers."
-      (when (derived-mode-p 'prog-mode)
-        (setq-local
-         completion-at-point-functions
-         (list
-          (cape-capf-inside-code
-           (cape-capf-super
-            #'eglot-completion-at-point
-            ;; We do not need to merge `cape-keyword' and `cape-dabbrev' if for Eglot-managed major modes
+;;     (defun sb/setup-capfs-for-eglot ()
+;;       "Setup custom CAPFs for programming buffers."
+;;       (when (derived-mode-p 'prog-mode)
+;;         (setq-local
+;;          completion-at-point-functions
+;;          (list
+;;           (cape-capf-inside-code
+;;            (cape-capf-super
+;;             #'eglot-completion-at-point
+;;             ;; We do not need to merge `cape-keyword' and `cape-dabbrev' if for Eglot-managed major modes
 
-            ;; #'yasnippet-capf
-            ))
-          (cape-capf-inside-comment #'cape-dict)
-          (cape-capf-inside-string #'cape-file)
-          (cape-capf-buster #'cape-dabbrev)))))
-    (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot)))
+;;             ;; #'yasnippet-capf
+;;             ))
+;;           (cape-capf-inside-comment #'cape-dict)
+;;           (cape-capf-inside-string #'cape-file)
+;;           (cape-capf-buster #'cape-dabbrev)))))
+;;     (add-hook 'eglot-managed-mode-hook #'sb/setup-capfs-for-eglot)))
 
-(use-package eglot-booster
-  :vc (:url "https://github.com/jdtsmith/eglot-booster")
+;; (use-package eglot-booster
+;;   :vc (:url "https://github.com/jdtsmith/eglot-booster")
 
-  :when (executable-find "emacs-lsp-booster")
+;;   :when (executable-find "emacs-lsp-booster")
 
-  :after eglot
+;;   :after eglot
 
-  :hook (eglot-managed-mode . eglot-booster-mode))
+;;   :hook (eglot-managed-mode . eglot-booster-mode))
 
-(use-package eglot-java
-  :when (eq sb/lsp-provider 'eglot)
+;; (use-package eglot-java
+;;   :when (eq sb/lsp-provider 'eglot)
 
-  :hook
-  ((java-mode . eglot-ensure)
-   (eglot-managed-mode
-    .
-    (lambda ()
-      (when (derived-mode-p 'java-mode)
-        (eglot-java-mode)))))
+;;   :hook
+;;   ((java-mode . eglot-ensure)
+;;    (eglot-managed-mode
+;;     .
+;;     (lambda ()
+;;       (when (derived-mode-p 'java-mode)
+;;         (eglot-java-mode)))))
 
-  :config
-  (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
-    "Custom options that will be merged with any default settings."
-    `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
-      :settings
-      (:java
-       (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
-       :configuration
-       (:runtimes
-        [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
-         (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
-       :completion (:guessMethodArguments t)
-       :format
-       (:enabled
-        t
-        :comments (:enabled t)
-        :onType (:enabled :json-false)
-        :tabSize 4
-        :insertSpaces t
-        :settings
-        (:url
-         "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
-       :extendedClientCapabilities (:classFileContentsSupport t))))
+;;   :config
+;;   (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
+;;     "Custom options that will be merged with any default settings."
+;;     `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
+;;       :settings
+;;       (:java
+;;        (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
+;;        :configuration
+;;        (:runtimes
+;;         [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
+;;          (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
+;;        :completion (:guessMethodArguments t)
+;;        :format
+;;        (:enabled
+;;         t
+;;         :comments (:enabled t)
+;;         :onType (:enabled :json-false)
+;;         :tabSize 4
+;;         :insertSpaces t
+;;         :settings
+;;         (:url
+;;          "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
+;;        :extendedClientCapabilities (:classFileContentsSupport t))))
 
-  (setopt eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
+;;   (setopt eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
 
 ;; (use-package eglot-hierarchy
 ;;   :ensure (:host github :repo "dolmens/eglot-hierarchy")
@@ -5970,21 +6014,21 @@ Shows both colors when errors and warnings are present."
 ;;    eglot-hierarchy-outgoing-calls
 ;;    eglot-hierarchy-type-hierarchy))
 
-(use-package consult-eglot
-  :when (eq sb/lsp-provider 'eglot)
+;; (use-package consult-eglot
+;;   :when (eq sb/lsp-provider 'eglot)
 
-  :after (consult eglot)
+;;   :after (consult eglot)
 
-  :commands consult-eglot-symbols)
+;;   :commands consult-eglot-symbols)
 
-(use-package flycheck-eglot
-  :when (eq sb/lsp-provider 'eglot)
+;; (use-package flycheck-eglot
+;;   :when (eq sb/lsp-provider 'eglot)
 
-  :after (flycheck eglot)
+;;   :after (flycheck eglot)
 
-  :hook (eglot-managed-mode . flycheck-eglot-mode)
+;;   :hook (eglot-managed-mode . flycheck-eglot-mode)
 
-  :custom (flycheck-eglot-exclusive nil))
+;;   :custom (flycheck-eglot-exclusive nil))
 
 ;; (use-package eglot-semantic-tokens
 ;;   :ensure (:host github :repo "eownerdead/eglot-semantic-tokens")
@@ -5997,16 +6041,16 @@ Shows both colors when errors and warnings are present."
 
 ;;   :custom (eglot-enable-semantic-tokens t))
 
-(use-package eglot-inactive-regions
-  :when (eq sb/lsp-provider 'eglot)
+;; (use-package eglot-inactive-regions
+;;   :when (eq sb/lsp-provider 'eglot)
 
-  :after eglot
+;;   :after eglot
 
-  :hook (eglot-managed-mode . eglot-inactive-regions-mode)
+;;   :hook (eglot-managed-mode . eglot-inactive-regions-mode)
 
-  :custom
-  (eglot-inactive-regions-style 'darken-foreground)
-  (eglot-inactive-regions-opacity 0.4))
+;;   :custom
+;;   (eglot-inactive-regions-style 'darken-foreground)
+;;   (eglot-inactive-regions-opacity 0.4))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -6281,12 +6325,21 @@ DIR can be relative or absolute."
 ;;    :newest
 ;;    :lisp-dir "lisp")
 
-;;   :after tramp)
+;;   :after tramp
+
+;;   :demand t)
 
 ;; (use-package tramp-hlo
 ;;   :vc (:url "http://github.com/jsadusk/tramp-hlo")
 
 ;;   :hook (emacs-startup . tramp-hlo-setup))
+
+;; (use-package combobulate
+;;   :vc (:url "https://github.com/mickeynp/combobulate")
+
+;;   :hook ((prog-mode . combobulate-mode))
+
+;;   :custom (combobulate-key-prefix "C-c o"))
 
 ;; (with-eval-after-load 'transient
 ;;   (transient-define-prefix

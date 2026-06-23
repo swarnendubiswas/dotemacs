@@ -86,6 +86,7 @@
  ;; Prevents tiling window managers from forcing weird fractional sizing. Otherwise, Emacsclient frames may not be maximized.
  frame-resize-pixelwise t
  ;; window-resize-pixelwise t
+ inhibit-compacting-font-caches t
  inhibit-startup-screen t ; `inhibit-splash-screen' is an alias
  inhibit-startup-echo-area-message user-login-name
  initial-scratch-message nil
@@ -113,7 +114,8 @@
    ;; Compile loaded packages asynchronously
    native-comp-jit-compilation t
    native-comp-async-query-on-exit t
-   native-comp-warning-on-missing-source nil)
+   native-comp-warning-on-missing-source nil
+   native-comp-async-on-battery-power nil)
 
   ;; Move native compilation files to directory used by `no-littering'
   (when (fboundp 'startup-redirect-eln-cache)
