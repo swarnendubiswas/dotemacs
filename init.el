@@ -2121,25 +2121,6 @@ The provider is `nerd-icons'."
 
   :diminish)
 
-;; Show documentation popups
-(use-package company-quickhelp
-  :when (eq sb/completion-provider 'company)
-
-  :after company
-
-  :when (display-graphic-p)
-
-  :hook (prog-mode . company-quickhelp-mode))
-
-(use-package company-quickhelp-terminal
-  :when (eq sb/completion-provider 'company)
-
-  :after company-quickhelp
-
-  :unless (display-graphic-p)
-
-  :hook (prog-mode . company-quickhelp-terminal-mode))
-
 ;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
 ;; `company-math-symbols-latex' is not available outside of math latex
@@ -2529,14 +2510,10 @@ Uses `eglot` or `lsp-mode` depending on configuration."
        (fboundp 'treesit-available-p)
        (treesit-available-p))
 
-  ;;   :demand t
-
-  ;;   :commands (treesit-install-language-grammar)
-
   :bind
   (("C-M-<up>" . treesit-up-list)
    ("C-M-<down>" . treesit-down-list)
-   ("C-M-f" "Forward sexp" treesit-forward-sexp)
+   ("C-M-f" . treesit-forward-sexp)
    ("C-M-a" . treesit-beginning-of-defun)
    ("C-M-e" . treesit-end-of-defun))
 
