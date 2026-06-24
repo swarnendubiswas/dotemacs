@@ -284,7 +284,22 @@ The provider is `nerd-icons'."
    ("C-M-f" . forward-sexp)
    ("C-M-k" . kill-sexp)
 
-   ("C-c d m" . restart-emacs))
+   ("C-c x w" . write-file)
+   ("C-c x r" . rename-file)
+   ("C-c x a" . find-alternate-file)
+   ("C-c x g" . revert-buffer-quick)
+   ("C-c x b" . revert-buffer)
+
+   ("C-c d m" . restart-emacs)
+   ("C-c d k" . describe-personal-keybindings)
+   ("C-c d v" . view-echo-area-messages)
+   ("C-c d l" .
+    (lambda ()
+      (interactive)
+      (switch-to-buffer "*Messages*")))
+
+
+   ("C-c s o" . occur))
 
   :bind*
   (("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
@@ -868,14 +883,6 @@ The provider is `nerd-icons'."
   ;; Remote buffers will be grouped by protocol and host
   (add-to-list 'ibuffer-project-root-functions '(file-remote-p . "Remote")))
 
-;; ;; Speed up Emacs for large files: "M-x vlf <PATH-TO-FILE>"
-;; (use-package vlf
-;;   :commands vlf
-
-;;   :init (setopt vlf-application 'dont-ask)
-
-;;   :config (require 'vlf-setup))
-
 (use-package immortal-scratch
   :hook (emacs-startup . immortal-scratch-mode))
 
@@ -893,22 +900,6 @@ The provider is `nerd-icons'."
   (advice-add
    'persistent-scratch-setup-default
    :around #'sb/inhibit-message-call-orig-fun))
-
-;; ;; Show temporary buffers as a popup window, and close them with "C-g"
-;; (use-package popwin
-;;   :hook (after-init . popwin-mode)
-;;   :config
-;;   (push '(helpful-mode :noselect t :position bottom :height 0.5)
-;;         popwin:special-display-config)
-;;   ;; (push '(deadgrep-mode :noselect nil :position bottom :height 0.75)
-;;   ;;         popwin:special-display-config)
-;;   (push '(compilation-mode :noselect t :position bottom :height 0.5)
-;;         popwin:special-display-config)
-;;   (push '("\\*EGLOT workspace configuration\\*"
-;;           :noselect nil
-;;           :position bottom
-;;           :height 0.5)
-;;         popwin:special-display-config))
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
@@ -1020,12 +1011,6 @@ The provider is `nerd-icons'."
   (unless (> emacs-major-version 27)
     (setopt dired-bind-jump t))
 
-  ;; ;; https://github.com/pdcawley/dotemacs/blob/master/initscripts/dired-setup.el
-  ;; ;; Remove 'Omit' from the modeline.
-  ;; (advice-add
-  ;;  'dired-omit-startup
-  ;;  :after (lambda () (diminish 'dired-omit-mode)))
-
   (defun sb/dired-go-home ()
     "Go to home directory in Dired."
     (interactive)
@@ -1047,15 +1032,6 @@ The provider is `nerd-icons'."
   :commands dired-narrow
 
   :bind (:map dired-mode-map ("/" . dired-narrow)))
-
-;; (use-package dired-hist
-;;   :ensure (:host github :repo "karthink/dired-hist")
-
-;;   :hook (dired-mode . dired-hist-mode)
-
-;;   :bind
-;;   (:map
-;;    dired-mode-map ("l" . dired-hist-go-back) ("r" . dired-hist-go-forward)))
 
 ;; In Emacs Lisp mode, `xref-find-definitions' will by default find only
 ;; functions and variables from Lisp packages which are loaded into the current
@@ -1095,8 +1071,6 @@ The provider is `nerd-icons'."
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
-;; (fido-vertical-mode 1)
-
 (use-package icomplete
   :bind
   (:map
@@ -1130,76 +1104,6 @@ The provider is `nerd-icons'."
 
   (if icomplete-in-buffer
       (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
-
-;; (use-package vertico
-;;   :hook
-;;   ((after-init . vertico-mode)
-;;    (minibuffer-setup . vertico-repeat-save)
-
-;;    ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
-;;    ;; use, say, `find-file' to go to your home '~/' or root '/' directory,
-;;    ;; Vertico will clear the old path to keep only your current input.
-;;    (rfn-eshadow-update-overlay . vertico-directory-tidy))
-
-;;   :bind
-;;   (("C-c r" . vertico-repeat)
-;;    ("M-r" . vertico-repeat-select)
-;;    :map vertico-map
-;;    ;; `vertico-exit' (RET) exits with the currently selected candidate, while
-;;    ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
-;;    ("M-<" . vertico-first)
-;;    ("M->" . vertico-last)
-;;    ("RET" . vertico-directory-enter)
-;;    ("DEL" . vertico-directory-delete-char)
-;;    ("M-DEL" . vertico-directory-delete-word)
-;;    ("C-q" . vertico-quick-insert)
-;;    ("C-'" . vertico-quick-jump))
-
-;;   :custom (vertico-cycle t)
-
-;;   :config
-;;   (let ((ext-dir
-;;          (expand-file-name "extensions"
-;;                            (file-name-directory (locate-library "vertico")))))
-;;     (when (file-directory-p ext-dir)
-;;       (add-to-list 'load-path ext-dir)))
-
-;;   (require 'vertico-directory)
-;;   (require 'vertico-repeat)
-;;   (require 'vertico-quick)
-;;   (require 'vertico-indexed)
-
-;;   (vertico-indexed-mode 1)
-
-;;   (when (eq sb/theme 'catppuccin)
-;;     (set-face-attribute 'vertico-current nil
-;;                         :background "#676767"
-;;                         :foreground "#FFFFFF"))
-
-;;   ;; Customize the display of the current candidate in the completion list. This
-;;   ;; will prefix the current candidate with "» " to make it stand out.
-;;   ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
-;;   (advice-add
-;;    #'vertico--format-candidate
-;;    :around
-;;    (lambda (orig cand prefix suffix index _start)
-;;      (setq cand (funcall orig cand prefix suffix index _start))
-;;      (concat
-;;       (if (= vertico--index index)
-;;           (propertize "» " 'face '(:foreground "#80adf0" :weight bold))
-;;         "  ")
-;;       cand))))
-
-;; (use-package vertico-timer
-;;   :vc (:url "https://github.com/ventruvian/vertico-timer")
-
-;;   :after vertico
-
-;;   :hook (vertico-mode . vertico-timer-mode)
-
-;;   :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
-
-;;   :diminish vertico-timer-mode)
 
 (defconst sb/consult-buffer-filter
   '("^ "
@@ -1337,16 +1241,6 @@ The provider is `nerd-icons'."
 ;;     (interactive)
 ;;     (consult-line (or (thing-at-point 'symbol) ""))))
 
-;; ;; Easily add file and directory paths into the minibuffer.
-;; (use-package consult-dir
-;;   :commands consult-dir-jump-file
-
-;;   :bind ("C-x C-d" . consult-dir)
-
-;;   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
-
-;; ;; Use `consult' to select Tramp targets. Supported completion sources are ssh
-;; ;; config, known hosts, and docker containers.
 ;; (use-package consult-tramp
 ;;   :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
 
@@ -1371,45 +1265,6 @@ The provider is `nerd-icons'."
 ;;   :custom
 ;;   ;; Replace the key help with a completing-read interface
 ;;   (prefix-help-command #'embark-prefix-help-command))
-
-;; ;; Supports exporting search results to a `grep-mode' buffer, on which you can
-;; ;; use `wgrep'.
-
-;; (use-package embark-consult
-;;   :after (embark consult)
-
-;;   :hook (embark-collect-mode . consult-preview-at-point-mode))
-
-;; ;; Rich annotations in the minibuffer, e.g., documentation strings or file
-;; ;; information.
-
-;; (use-package marginalia
-;;   :hook (vertico-mode . marginalia-mode)
-
-;;   :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
-
-;;   :config
-;;   ;; Reduce noise by removing annotations for files otherwise columns become
-;;   ;; unaligned and look ugly.
-;;   (setopt marginalia-annotators
-;;           (cl-remove-if
-;;            (lambda (pair) (memq (car pair) '(file project-file)))
-;;            marginalia-annotators))
-
-;;   (defun sb/marginalia-annotate-variable (cand)
-;;     "Annotate function CAND with its documentation string."
-;;     (when-let (sym
-;;                (intern-soft cand))
-;;       (marginalia--fields
-;;        ((marginalia--variable-value sym) :truncate 0.5)
-;;        ((documentation-property sym 'variable-documentation)
-;;         :truncate 1.0
-;;         :face 'marginalia-documentation))))
-
-;;   ;; Override the annotators for the variable category.
-;;   (add-to-list
-;;    'marginalia-annotators
-;;    '(variable sb/marginalia-annotate-variable builtin none)))
 
 ;; (use-package ispell
 ;;   :ensure nil
@@ -1547,19 +1402,6 @@ The provider is `nerd-icons'."
 (use-package expand-region
   :bind (("C-=" . er/expand-region) ("C-M-=" . er/contract-region)))
 
-;; ;; Change the contents inside pairs like parentheses, quotes, brackets, or
-;; ;; custom delimiters. `change-inner "' allows to kill the string contents,
-;; ;; `change-outer "' will kill the entire string including quotes.
-
-;; (use-package change-inner
-;;   :commands (change-inner change-outer))
-
-;; ;; Mark current line.
-;; (use-package expand-line
-;;   :bind ("M-i" . expand-line-mark-line)
-
-;;   :diminish)
-
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
@@ -1664,35 +1506,6 @@ The provider is `nerd-icons'."
 
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; (use-package rainbow-mode
-;;   :hook
-;;   ((LaTeX-mode
-;;     css-mode
-;;     css-ts-mode
-;;     html-mode
-;;     html-ts-mode
-;;     web-mode
-;;     help-mode
-;;     helpful-mode)
-;;    . rainbow-mode)
-;;   :diminish)
-
-;; ;; Emacs theme files also have hex codes.
-;; (use-package colorful-mode
-;;   :hook
-;;   ((LaTeX-mode
-;;     css-mode
-;;     css-ts-mode
-;;     html-mode
-;;     html-ts-mode
-;;     web-mode
-;;     help-mode
-;;     helpful-mode
-;;     emacs-lisp-mode)
-;;    . colorful-mode)
-
-;;   :diminish)
-
 ;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
 (use-package rainbow-delimiters
   :hook
@@ -1717,12 +1530,6 @@ The provider is `nerd-icons'."
 
   :diminish)
 
-;; ;; Unobtrusively trim extraneous white-space *ONLY* in lines edited
-;; (use-package ws-butler
-;;   :hook (prog-mode . ws-butler-mode)
-
-;;   :diminish)
-
 ;; While searching, you can jump straight into `occur' with "M-s o". `isearch'
 ;; saves mark where the search started, so you can jump back to that point later
 ;; with "C-u C-SPC". Use "M-s M-<" to go to the first match and "M-s M->" to go
@@ -1733,6 +1540,9 @@ The provider is `nerd-icons'."
   :bind
   (("C-f" . isearch-forward-regexp)
    ("C-r" . isearch-backward-regexp)
+   ("C-c s f" . isearch-forward)
+   ("C-c s b" . isearch-backward)
+   ("C-c s h" . isearch-occur)
    :map
    isearch-mode-map
    ("C-s")
@@ -1757,7 +1567,11 @@ The provider is `nerd-icons'."
    ;; Will not match substrings, so foo will not match foobar.
    isearch-forward-symbol
    isearch-forward-symbol-at-point
-   isearch-backward-symbol-at-point))
+   isearch-backward-symbol-at-point)
+
+  :bind
+  (("C-c s s" . isearch-symbol-at-point)
+   ("C-c s w" . isearch-forward-symbol-at-point)))
 
 (with-eval-after-load 'grep
   (setopt
@@ -1819,13 +1633,6 @@ The provider is `nerd-icons'."
 
   :custom (reb-re-syntax 'string))
 
-;; ;; Package `visual-regexp' provides an alternate version of `query-replace'
-;; ;; which highlights matches and replacements as you type.
-;; (use-package visual-regexp
-;;   :bind
-;;   (([remap query-replace] . vr/query-replace)
-;;    ([remap replace-regex] . vr/replace)))
-
 (use-package visual-replace
   :bind
   (([remap query-replace] . visual-replace)
@@ -1837,10 +1644,6 @@ The provider is `nerd-icons'."
 
 ;; Magit often requries a newer version of transient.
 (use-package transient
-  :commands transient-define-prefix
-
-  ;; :demand t ; Required so that transient keybindings are available
-
   :custom (transient-semantic-coloring t)
 
   :config (transient-bind-q-to-quit))
@@ -1895,33 +1698,6 @@ The provider is `nerd-icons'."
 
   :mode ("/\\.gitattributes\\'" . gitattributes-mode))
 
-;; ;; Diff-hl looks nicer than git-gutter, but is based on `vc' and can be
-;; ;; expensive.
-;; (use-package diff-hl
-;;   :preface
-;;   (defun sb/diff-hl-maybe-margin ()
-;;     "Fringe is unavailable in TTY. Enable margin mode for when in TTY."
-;;     (unless (display-graphic-p)
-;;       (diff-hl-margin-local-mode)))
-
-;;   :hook
-;;   ((after-init . global-diff-hl-mode)
-;;    (dired-mode . diff-hl-dired-mode-unless-remote)
-;;    (diff-hl-mode . sb/diff-hl-maybe-margin)
-;;    (after-save-hook . diff-hl-update))
-
-;;   :bind (("C-x v [" . diff-hl-previous-hunk) ("C-x v ]" . diff-hl-next-hunk))
-
-;;   :custom
-;;   (diff-hl-draw-borders nil "Highlight without a border looks nicer")
-;;   (diff-hl-update-async t)
-
-;;   :config
-;;   (diff-hl-flydiff-mode 1) ; For unsaved buffers
-;;   (with-eval-after-load 'magit
-;;     ;; (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-;;     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
-
 (use-package smerge-mode
   :ensure nil
 
@@ -1930,47 +1706,16 @@ The provider is `nerd-icons'."
    smerge-mode-map
    ("C-c ^ u" . smerge-keep-upper)
    ("C-c ^ l" . smerge-keep-lower)
+   ("C-c ^ a" . smerge-keep-all)
    ("C-c ^ n" . smerge-next)
    ("C-c ^ p" . smerge-prev)))
-
-;; (use-package elec-pair
-;;   :preface
-;;   (defun sb/add-pairs (pairs)
-;;     (setq-local electric-pair-pairs (append electric-pair-pairs pairs))
-;;     (setq-local electric-pair-text-pairs electric-pair-pairs))
-
-;;   :ensure nil
-
-;;   :hook (after-init . electric-pair-mode)
-
-;;   :custom
-;;   ;; Avoid balancing parentheses since they can be both irritating and slow
-;;   (electric-pair-preserve-balance nil)
-;;   (electric-pair-skip-self nil)
-
-;;   :config
-;;   (setopt
-;;    electric-pair-inhibit-predicate
-;;    (lambda (char)
-;;      (or
-;;       ;; Inhibit for $ or " if point is after or before a word/symbol constituent
-;;       (and (memq char '(?$ ?\"))
-;;            (or (looking-back "\\(?:\\sw\\|\\s_\\)+" (line-beginning-position))
-;;                (looking-at "\\(?:\\sw\\|\\s_\\)+")))
-;;       ;; Fallback to default behavior
-;;       (electric-pair-default-inhibit char)))))
 
 ;; "C-h m" or `describe-mode' shows all the active minor modes (and major mode)
 ;; and a brief description of each.
 
 ;; Discover key bindings for the current Emacs major mode
 (use-package discover-my-major
-  :bind ("C-h C-m" . discover-my-major))
-
-;; (use-package mode-minder
-;;   :ensure (:host github :repo "jdtsmith/mode-minder")
-
-;;   :commands mode-minder)
+  :bind (("C-h C-m" . discover-my-major) ("C-c d m" . discover-my-mode)))
 
 (use-package flycheck
   ;; Flycheck is disabled with `emacs-lisp-mode'
@@ -2062,11 +1807,6 @@ The provider is `nerd-icons'."
                           'face
                           'sb/flycheck-mode-line)))))
 
-;; (use-package consult-flycheck
-;;   :after flycheck
-
-;;   :bind (:map flycheck-command-map ("!" . consult-flycheck)))
-
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
 
@@ -2082,77 +1822,11 @@ The provider is `nerd-icons'."
 
   :init (flycheck-hl-todo-setup))
 
-;; ;; Jump to `hl-todo' keywords in current buffer.
-;; (use-package consult-todo
-;;   :after (consult hl-todo)
-
-;;   :commands (consult-todo consult-todo-all))
-
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
   :hook (emacs-startup . global-page-break-lines-mode)
 
   :diminish)
-
-;; (use-package format-all
-;;   :hook
-;;   ((format-all-mode . format-all-ensure-formatter)
-;;    ((markdown-mode markdown-ts-mode) . format-all-mode))
-
-;;   :config
-;;   (setq-default format-all-formatters
-;;                 '(("Assembly" asmfmt)
-;;                   ("Awk" gawk)
-;;                   ("BibTeX" latexindent)
-;;                   ("C" clang-format)
-;;                   ("C++" clang-format)
-;;                   ("CMake" cmake-format)
-;;                   ("CSS" prettier)
-;;                   ("Cuda" clang-format)
-;;                   ("Emacs Lisp" emacs-lisp)
-;;                   ("Fish" fish-indent)
-;;                   ("HTML" (prettier "--print-width" "80"))
-;;                   ("LaTeX" latexindent)
-;;                   ("Markdown" (prettier "--print-width" "80"))
-;;                   ("Perl" (perltidy
-;;                     "--quiet"
-;;                     "--standard-error-output"
-;;                     "--perl-best-practices"
-;;                     "-l=80"))
-;;                   ("Python" (yapf "--style" "file") isort)
-;;                   ("Shell" (shfmt "-i" "2" "-ci"))
-;;                   ("XML" tidy)
-;;                   ("YAML" prettier "--print-width" "80")))
-;;   (with-eval-after-load 'markdown-mode
-;;     (bind-key "C-x f" #'format-all-buffer markdown-mode-map))
-;;   (with-eval-after-load 'tex
-;;     (bind-key "C-x f" #'format-all-buffer LaTeX-mode-map))
-
-;;   :diminish)
-
-;; ;; We now use Bash LSP for formatting with `shfmt'.
-;; (use-package shfmt
-
-;;   :hook ((sh-mode bash-ts-mode) . shfmt-on-save-mode)
-
-;;   :custom (shfmt-arguments '("-i" "2" "-ci"))
-
-;;   :diminish shfmt-on-save-mode)
-
-;; ;; Yapfify works on the original file, so that any project settings supported
-;; ;; by YAPF itself are used. We now use `apheleia-mode' for Python.
-;; (use-package yapfify
-;;   :when (and (executable-find "yapf") (eq sb/python-langserver 'basedpyright))
-
-;;   :hook ((python-mode python-ts-mode) . yapf-mode)
-
-;;   :diminish yapf-mode)
-
-;; ;; We use `apheleia-mode' for Python.
-;; (use-package ruff-format
-;;   :hook ((python-mode python-ts-mode) . ruff-format-on-save-mode)
-
-;;   :diminish ruff-format-on-save-mode)
 
 ;; Basedpyright does not provide formatting feature. So, we cannot use
 ;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
@@ -2255,20 +1929,6 @@ The provider is `nerd-icons'."
      try-expand-line))
   (hippie-expand-verbose nil))
 
-;; ;; Use "M-SPC" for space-separated completion lookups.
-;; (use-package orderless
-;;   :demand t
-
-;;   ;; TODO: What is the utility of this? Is this to highlight the different parts with orderless?
-
-;;   ;; :config
-;;   ;; (with-eval-after-load 'company
-;;   ;;   (defun sb/just-one-face (fn &rest args)
-;;   ;;     (let ((orderless-match-faces [completions-common-part]))
-;;   ;;       (apply fn args)))
-;;   ;;   (advice-add 'company-capf--candidates :around #'sb/just-one-face))
-;;   )
-
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
 ;; "list-command-history". "partial-completion" style allows to use wildcards
@@ -2351,173 +2011,6 @@ The provider is `nerd-icons'."
 
   :init (yasnippet-snippets-initialize))
 
-;; (use-package consult-yasnippet
-;;   :bind ("C-M-y" . consult-yasnippet))
-
-;; (use-package nerd-icons
-;;   :when (bound-and-true-p sb/enable-icons)
-
-;;   :demand t
-
-;;   :custom (nerd-icons-scale-factor 0.8))
-
-;; ;; `kind-icon' can be used for both Corfu and Company. I use `kind-icon' to
-;; ;; provide Nerd icons for Company while I use `nerd-icons-corfu' to set up nerd
-;; ;; icons for Corfu.
-;; (use-package kind-icon
-;;   :when
-;;   (and (bound-and-true-p sb/enable-icons)
-;;        (or (eq sb/completion-provider 'company) (eq sb/corfu-icons 'kind-icon)))
-
-;;   :after nerd-icons
-
-;;   :demand t ; Required to load the library because there are no other triggers
-
-;;   :config
-;;   (add-to-list
-;;    'svg-lib-icon-collections
-;;    '("vscode-codicons"
-;;      .
-;;      "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
-;;   (add-to-list
-;;    'svg-lib-icon-collections
-;;    '("nerd-fonts-codicons"
-;;      .
-;;      "https://github.com/microsoft/vscode-codicons/raw/HEAD/src/icons/%s.svg"))
-
-;;   (with-eval-after-load 'corfu
-;;     (setopt
-;;      kind-icon-default-face 'corfu-default
-;;      ;; Corfu icons are too big, prefer smaller icons and a more compact popup
-;;      kind-icon-default-style
-;;      '(:padding
-;;        0
-;;        :stroke 0
-;;        :margin 0
-;;        :radius 0
-;;        :height 0.5
-;;        :scale 0.8
-;;        :background nil))
-;;     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-
-;;   ;; Company may be loaded even with Corfu for use with LaTeX. That is why we do
-;;   ;; not use `with-eval-after-load'.
-;;   (when (eq sb/completion-provider 'company)
-;;     ;; Prefer smaller icons and a more compact popup
-;;     (setopt
-;;      kind-icon-default-style
-;;      '(:padding
-;;        0
-;;        :stroke 0
-;;        :margin 0
-;;        :radius 0
-;;        :height 0.8
-;;        :scale 0.6
-;;        :background nil)
-;;      kind-icon-mapping
-;;      `((array
-;;         ,(nerd-icons-codicon "nf-cod-symbol_array")
-;;         :face font-lock-type-face)
-;;        (boolean
-;;         ,(nerd-icons-codicon "nf-cod-symbol_boolean")
-;;         :face font-lock-builtin-face)
-;;        (class
-;;         ,(nerd-icons-codicon "nf-cod-symbol_class")
-;;         :face font-lock-type-face)
-;;        (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
-;;        (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-;;        (constant
-;;         ,(nerd-icons-codicon "nf-cod-symbol_constant")
-;;         :face font-lock-constant-face)
-;;        (constructor
-;;         ,(nerd-icons-codicon "nf-cod-triangle_right")
-;;         :face font-lock-function-name-face)
-;;        (enummember
-;;         ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-;;         :face font-lock-builtin-face)
-;;        (enum-member
-;;         ,(nerd-icons-codicon "nf-cod-symbol_enum_member")
-;;         :face font-lock-builtin-face)
-;;        (enum
-;;         ,(nerd-icons-codicon "nf-cod-symbol_enum")
-;;         :face font-lock-builtin-face)
-;;        (event
-;;         ,(nerd-icons-codicon "nf-cod-symbol_event")
-;;         :face font-lock-warning-face)
-;;        (field
-;;         ,(nerd-icons-codicon "nf-cod-symbol_field")
-;;         :face font-lock-variable-name-face)
-;;        (file
-;;         ,(nerd-icons-codicon "nf-cod-symbol_file")
-;;         :face font-lock-string-face)
-;;        (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
-;;        (interface
-;;         ,(nerd-icons-codicon "nf-cod-symbol_interface")
-;;         :face font-lock-type-face)
-;;        (keyword
-;;         ,(nerd-icons-codicon "nf-cod-symbol_keyword")
-;;         :face font-lock-keyword-face)
-;;        (macro
-;;         ,(nerd-icons-codicon "nf-cod-symbol_misc")
-;;         :face font-lock-keyword-face)
-;;        (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
-;;        (method
-;;         ,(nerd-icons-codicon "nf-cod-symbol_method")
-;;         :face font-lock-function-name-face)
-;;        (function ,(nerd-icons-codicon "nf-cod-symbol_method")
-;;                  :face font-lock-function-name-face)
-;;        (module
-;;         ,(nerd-icons-codicon "nf-cod-file_submodule")
-;;         :face font-lock-preprocessor-face)
-;;        (numeric
-;;         ,(nerd-icons-codicon "nf-cod-symbol_numeric")
-;;         :face font-lock-builtin-face)
-;;        (operator
-;;         ,(nerd-icons-codicon "nf-cod-symbol_operator")
-;;         :face font-lock-comment-delimiter-face)
-;;        (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
-;;        (property
-;;         ,(nerd-icons-codicon "nf-cod-symbol_property")
-;;         :face font-lock-variable-name-face)
-;;        (reference
-;;         ,(nerd-icons-codicon "nf-cod-references")
-;;         :face font-lock-variable-name-face)
-;;        (snippet
-;;         ,(nerd-icons-codicon "nf-cod-symbol_snippet")
-;;         :face font-lock-string-face)
-;;        (string
-;;         ,(nerd-icons-codicon "nf-cod-symbol_string")
-;;         :face font-lock-string-face)
-;;        (struct
-;;         ,(nerd-icons-codicon "nf-cod-symbol_structure")
-;;         :face font-lock-variable-name-face)
-;;        (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
-;;        (typeparameter
-;;         ,(nerd-icons-codicon "nf-cod-list_unordered")
-;;         :face font-lock-type-face)
-;;        (type-parameter
-;;         ,(nerd-icons-codicon "nf-cod-list_unordered")
-;;         :face font-lock-type-face)
-;;        (unit
-;;         ,(nerd-icons-codicon "nf-cod-symbol_ruler")
-;;         :face font-lock-constant-face)
-;;        (value
-;;         ,(nerd-icons-codicon "nf-cod-symbol_field")
-;;         :face font-lock-builtin-face)
-;;        (variable
-;;         ,(nerd-icons-codicon "nf-cod-symbol_variable")
-;;         :face font-lock-variable-name-face)
-;;        (t
-;;         ,(nerd-icons-codicon "nf-cod-text_size")
-;;         :face font-lock-builtin-face)))
-
-;;     (let* ((kind-func (lambda (cand) (company-call-backend 'kind cand)))
-;;            (formatter
-;;             (kind-icon-margin-formatter `((company-kind . ,kind-func)))))
-;;       (defun sb/company-kind-icon-margin (cand _selected)
-;;         (funcall formatter cand))
-;;       (setopt company-format-margin-function #'sb/company-kind-icon-margin))))
-
 ;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
 (use-package company
@@ -2531,23 +2024,6 @@ The provider is `nerd-icons'."
    ("C-;" . company-other-backend) ; Invoke the next backend
    ("C-s" . company-search-candidates)
    ("C-f" . company-filter-candidates)
-
-   ;; When using graphical Emacs, you need to bind both (kbd "<tab>") and (kbd
-   ;; "TAB"). First TAB key press will complete the common part of all
-   ;; completions, and the next will switch to the next completion in a cyclic
-   ;; fashion, meaning that if you reach the end you continue from the top.
-   ;; S-TAB will go in reverse direction.
-   ;; ("<tab>" . company-complete-common-or-cycle)
-   ;; ("TAB" . company-complete-common-or-cycle)
-   ;; ("<backtab>" .
-   ;;  (lambda ()
-   ;;    (interactive)
-   ;;    (company-complete-common-or-cycle -1)))
-   ;; ("S-TAB" .
-   ;;  (lambda ()
-   ;;    (interactive)
-   ;;    (company-complete-common-or-cycle -1)))
-
    ([escape] . company-abort)
    ("M-." . company-show-location)
    ("C-h" . company-show-doc-buffer)
@@ -2645,40 +2121,6 @@ The provider is `nerd-icons'."
 
   :diminish)
 
-;; Posframes do not have unaligned rendering issues with variable `:height'
-;; unlike an overlay. However, posframes do not work with TUI. The width of the
-;; popup frame is may not be sufficient sometimes, and the right side may get
-;; cut off.
-;; https://github.com/company-mode/company-mode/issues/1010
-
-;; (use-package company-posframe
-;;   :when (display-graphic-p)
-
-;;   :hook (company-mode . company-posframe-mode)
-
-;;   :custom
-;;   ;; Difficult to distinguish the help text from completions
-;;   (company-posframe-show-metadata nil)
-;;   ;; The backend display in the posframe modeline gets cut for complicated backend setups and looks ugly.
-;;   (company-posframe-show-indicator nil)
-;;   (company-posframe-quickhelp-delay nil "Disable showing the help frame")
-
-;;   :config
-;;   (when (eq sb/theme 'leuven-dark)
-;;     (set-face-attribute 'company-posframe-active-backend-name nil
-;;                         :height 0.8
-;;                         :foreground "#4FC3F7" ;; light sky blue
-;;                         :background "#2E3440" ;; dark gray-blue
-;;                         :weight 'normal
-;;                         :box nil)
-;;     (set-face-attribute 'company-posframe-inactive-backend-name nil
-;;                         :height 0.7
-;;                         :foreground "#B0BEC5" ;; soft gray
-;;                         :background "#1C1C1C" ;; near black
-;;                         :box nil))
-
-;;   :diminish)
-
 ;; Show documentation popups
 (use-package company-quickhelp
   :when (eq sb/completion-provider 'company)
@@ -2697,14 +2139,6 @@ The provider is `nerd-icons'."
   :unless (display-graphic-p)
 
   :hook (prog-mode . company-quickhelp-terminal-mode))
-
-;; ;; I am currently using Prescient for ordering Company, Vertico, and Corfu completions.
-;; (use-package company-statistics
-;;   :when (eq sb/completion-provider 'company)
-
-;;   :after company
-
-;;   :hook (company-mode . company-statistics-mode))
 
 ;; By default, the Unicode symbols backend `company-math-symbols-unicode' is not
 ;; active in latex math environments and latex math symbols
@@ -2980,86 +2414,6 @@ The provider is `nerd-icons'."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-non-lsp-prog-mode)))))
 
-;; ;; Corfu is not a completion framework, it is a front-end for
-;; ;; `completion-at-point'.
-;; (use-package corfu
-;;   :preface
-;;   (defun sb/corfu-prog-setup ()
-;;     "Use shorter prefix for Corfu in `prog-mode'."
-;;     (setq-local corfu-auto-prefix 2))
-
-;;   :when (eq sb/completion-provider 'corfu)
-
-;;   :hook
-;;   ((after-init . global-corfu-mode)
-;;    ;; We want 2-character prefixes in LaTeX-mode for yasnippets
-;;    ((prog-mode LaTeX-mode) . sb/corfu-prog-setup))
-
-;;   :bind
-;;   (:map
-;;    corfu-map
-;;    ("TAB" . corfu-quick-insert)
-;;    ("<tab>" . corfu-quick-insert)
-;;    ("M-d" . corfu-info-documentation)
-;;    ("M-l" . corfu-info-location)
-;;    ("M-n" . corfu-popupinfo-scroll-up)
-;;    ("M-p" . corfu-popupinfo-scroll-down)
-;;    ([remap corfu-show-documentation] . corfu-popupinfo-toggle)
-;;    ([escape] . corfu-quit))
-
-;;   :custom
-;;   (corfu-cycle t "Enable cycling for `corfu-next/previous'")
-;;   (corfu-auto t "Enable auto completion")
-;;   ;; (corfu-on-exact-match 'show)
-
-;;   ;; ;; Do not close popup when adjacent to other characters
-;;   ;; (corfu-quit-at-boundary nil)
-
-;;   :config
-;;   (let ((ext-dir
-;;          (expand-file-name "extensions"
-;;                            (file-name-directory (locate-library "corfu")))))
-;;     (when (file-directory-p ext-dir)
-;;       (add-to-list 'load-path ext-dir)))
-
-;;   ;; (require 'corfu-info)
-;;   ;; (require 'corfu-quick)
-
-;;   ;; I prefer `corfu-quick' compared to `corfu-indexed-mode' because pressing TAB is easier.
-;;   (require 'corfu-indexed)
-;;   (corfu-indexed-mode 1)
-
-;;   ;; I am using `corfu-prescient-mode'.
-;;   ;; (require 'corfu-history)
-;;   ;; (corfu-history-mode 1)
-
-;;   ;; Display a brief candidate documentation in the echo area.
-;;   (require 'corfu-echo)
-;;   (corfu-echo-mode 1)
-
-;;   ;; Display candidate documentation or source in a popup next to the candidate menu
-;;   (require 'corfu-popupinfo)
-;;   (corfu-popupinfo-mode 1)
-
-;;   ;; Add space at the right edge so characters do not get cut off in the terminal interface.
-;;   (unless (display-graphic-p)
-;;     (setopt corfu-right-margin-width 1.5)))
-
-;; ;; Emacs 31+ has in-built support for child frames in the terminal
-;; (use-package corfu-terminal
-;;   :vc (:url "https://codeberg.org/akib/emacs-corfu-terminal" :rev :newest)
-
-;;   :when
-;;   (and (eq sb/completion-provider 'corfu)
-;;        (not (display-graphic-p))
-;;        (< emacs-major-version 31))
-
-;;   :hook (corfu-mode . corfu-terminal-mode)
-
-;;   :custom
-;;   ;; Prevent wraparound at the right edge, although this breaks sometimes.
-;;   (corfu-terminal-position-right-margin 2))
-
 ;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
 ;; Company has `company-statistics'. Prescient uses frecency (frequency +
 ;; recency) for sorting. Recently used commands should be sorted first. Only
@@ -3069,16 +2423,6 @@ The provider is `nerd-icons'."
   :hook (emacs-startup . prescient-persist-mode)
 
   :custom (prescient-sort-full-matches-first t))
-
-;; (use-package vertico-prescient
-;;   :after vertico
-
-;;   :init (vertico-prescient-mode 1))
-
-;; (use-package corfu-prescient
-;;   :after corfu
-
-;;   :init (corfu-prescient-mode 1))
 
 (use-package company-prescient
   :after company
@@ -3189,7 +2533,12 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   ;;   :commands (treesit-install-language-grammar)
 
-  :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
+  :bind
+  (("C-M-<up>" . treesit-up-list)
+   ("C-M-<down>" . treesit-down-list)
+   ("C-M-f" "Forward sexp" treesit-forward-sexp)
+   ("C-M-a" . treesit-beginning-of-defun)
+   ("C-M-e" . treesit-end-of-defun))
 
   :custom
   (treesit-enabled-modes t)
@@ -3261,25 +2610,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   ;;             (conf-toml-mode . toml-ts-mode)
   ;;             (yaml-mode . yaml-ts-mode))))
   )
-
-;; (use-package treesit-auto
-;;   :when
-;;   (and (executable-find "tree-sitter")
-;;        (fboundp 'treesit-available-p)
-;;        (treesit-available-p))
-
-;;   :demand t
-
-;;   :bind (("C-M-<up>" . treesit-up-list) ("C-M-<down>" . treesit-down-list))
-
-;;   :custom
-;;   ;; Increased default font locking may hurt performance
-;;   (treesit-font-lock-level 4)
-;;   (treesit-auto-install t)
-
-;;   :config
-;;   (global-treesit-auto-mode 1)
-;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
@@ -3493,18 +2823,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package conf-mode
   :ensure nil
 
-  :mode ("\\.cfg\\'" "\\.conf\\'" "\\.env\\..*\\'" "\\.env\\'")
-
-  ;; :hook
-  ;; (conf-unix-mode
-  ;;  .
-  ;;  (lambda ()
-  ;;    (setq-local completion-at-point-functions
-  ;;                (list
-  ;;                 (cape-capf-inside-string #'cape-file)
-  ;;                 #'cape-dict
-  ;;                 (cape-capf-buster #'cape-dabbrev)))))
-  )
+  :mode ("\\.cfg\\'" "\\.conf\\'" "\\.env\\..*\\'" "\\.env\\'"))
 
 (use-package toml-ts-mode
   :ensure nil
@@ -3866,13 +3185,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
 ;;   :hook (org-mode . org-modern-indent-mode))
 
-;; ;; Use "<" to trigger org block completion at point.
-;; (use-package org-block-capf
-;;   :ensure (:host github :repo "xenodium/org-block-capf")
-;;   :after corfu
-;;   :hook (org-mode . org-block-capf-add-to-completion-at-point-functions)
-;;   :custom (org-block-capf-edit-style 'inline))
-
 ;; Without auctex
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
@@ -4008,13 +3320,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :diminish)
 
-;; (use-package consult-reftex
-;;   :vc (:url "https://github.com/karthink/consult-reftex" :rev :newest)
-
-;;   :after (consult reftex)
-
-;;   :commands (consult-reftex-insert-reference consult-reftex-goto-label))
-
 (use-package bibtex
   :ensure nil
 
@@ -4036,13 +3341,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;; https://github.com/Malabarba/latex-extra
 ;; https://github.com/ultronozm/tex-parens.el
 
-;; ;; Set `bibtex-capf-bibliography' in `.dir-locals.el'.
-;; (use-package bibtex-capf
-;;   :ensure (:host github :repo "mclear-tools/bibtex-capf")
-;;   :when (eq sb/completion-provider 'corfu)
-;;   :after latex
-;;   :commands bibtex-capf)
-
 (use-package citar
   :when (eq sb/completion-provider 'corfu)
 
@@ -4062,35 +3360,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      (t . ((insert-keys . citar--insert-keys-comma-space-separated)))))
   ;; Only show key and title in Corfu popup
   (citar-format-reference-function 'citar-citeproc-format-reference))
-
-;; (use-package citar-embark
-;;   :after (citar embark)
-
-;;   :config (citar-embark-mode)
-
-;;   :diminish)
-
-;; (use-package auctex-latexmk
-;;   :after tex
-
-;;   :when (executable-find "latexmk")
-
-;;   :demand t
-
-;;   :custom
-;;   ;; Pass the '-pdf' flag when `TeX-PDF-mode' is active
-;;   (auctex-latexmk-inherit-TeX-PDF-mode t)
-
-;;   :config
-;;   ;; (setq-default TeX-command-default "LaTexMk")
-;;   (auctex-latexmk-setup))
-
-;; ;; Insert an environment with "C-c {". For a full list of environment abbreviations, use `C-c ?'.
-
-;; (use-package cdlatex
-;;   :hook ((LaTeX-mode latex-mode) . turn-on-cdlatex)
-
-;;   :diminish)
 
 (use-package dumb-jump
   :after xref
@@ -4215,441 +3484,12 @@ Fallback to `xref-go-back'."
 
   :diminish)
 
-;; (use-package leuven-theme
-;;   :when (eq sb/theme 'leuven-dark)
-
-;;   :init (load-theme 'leuven-dark t))
-
-;; (use-package doom-themes
-;;   :when
-;;   (or (eq sb/theme 'doom-one)
-;;       (eq sb/theme 'doom-nord)
-;;       (eq sb/theme 'doom-solarized-dark))
-
-;;   :init
-;;   (cond
-;;    ((eq sb/theme 'doom-one)
-;;     (load-theme 'doom-one t))
-;;    ((eq sb/theme 'doom-nord)
-;;     (load-theme 'doom-nord t))
-;;    ((eq sb/theme 'doom-solarized-dark)
-;;     (load-theme 'doom-solarized-dark-high-contrast t)))
-
-;;   :config
-;;   ;; Corrects (and improves) org-mode's native fontification.
-;;   (doom-themes-org-config))
-
-;; (use-package modus-themes
-;;   :when (eq sb/theme 'modus-vivendi)
-
-;;   :init (load-theme 'modus-vivendi t)
-
-;;   :custom (modus-themes-mixed-fonts nil))
-
-;; (use-package catppuccin-theme
-;;   :when (eq sb/theme 'catppuccin)
-
-;;   :init (load-theme 'catppuccin t)
-
-;;   :config
-;;   (custom-set-faces
-;;    `(diff-hl-change
-;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'blue))))))
-;;   (custom-set-faces
-;;    `(diff-hl-delete
-;;      ((t (:background unspecified :foreground ,(catppuccin-get-color 'red))))))
-;;   (custom-set-faces
-;;    `(diff-hl-insert
-;;      ((t
-;;        (:background unspecified :foreground ,(catppuccin-get-color 'green)))))))
-
-;; (use-package rose-pine-theme
-;;   :vc (:url "https://github.com/konrad1977/pinerose-emacs")
-
-;;   :when (eq sb/theme 'rose-pine)
-
-;;   :init (load-theme 'rose-pine t)
-
-;;   :config
-;;   (with-eval-after-load 'company
-;;     (custom-set-faces
-;;      ;; Normal tooltip
-;;      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
-;;      ;; Selected item
-;;      '(company-tooltip-selection
-;;        ((t
-;;          (:background
-;;           "#264f78"
-;;           :foreground "#ffffff"
-;;           :weight bold
-;;           :underline nil))))
-;;      '(company-tooltip-quick-access ((t (:foreground "#6e6a86"))))
-;;      ;; Match highlight
-;;      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
-;;      ;; Scrollbar background
-;;      '(company-scrollbar-bg ((t (:background "#333333"))))
-;;      ;; Scrollbar foreground
-;;      '(company-scrollbar-fg ((t (:background "#555555")))))))
-
-;; (use-package kanagawa-themes
-;;   :when (eq sb/theme 'kanagawa)
-
-;;   :init (load-theme 'kanagawa-wave t)
-
-;;   :config
-;;   ;; The default colors are difficult to distinguish
-;;   (with-eval-after-load 'company
-;;     (custom-set-faces
-;;      ;; Normal tooltip
-;;      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
-;;      ;; Selected item
-;;      '(company-tooltip-selection
-;;        ((t (:background "#264f78" :foreground "#ffffff"))))
-;;      ;; Match highlight
-;;      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
-;;      ;; Scrollbar background
-;;      '(company-scrollbar-bg ((t (:background "#333333"))))
-;;      ;; Scrollbar foreground
-;;      '(company-scrollbar-fg ((t (:background "#555555")))))))
-
-;; (use-package dracula-theme
-;;   :when (eq sb/theme 'dracula)
-
-;;   :init (load-theme 'dracula t)
-
-;;   :config
-;;   ;; The default colors are difficult to distinguish
-;;   (with-eval-after-load 'company
-;;     (custom-set-faces
-;;      ;; Normal tooltip
-;;      '(company-tooltip ((t (:background "#1e1e1e" :foreground "#dcdcdc"))))
-;;      ;; Selected item
-;;      '(company-tooltip-selection
-;;        ((t (:background "#264f78" :foreground "#ffffff"))))
-;;      ;; Match highlight
-;;      '(company-tooltip-common ((t (:foreground "#c586c0" :weight bold))))
-;;      ;; Scrollbar background
-;;      '(company-scrollbar-bg ((t (:background "#333333"))))
-;;      ;; Scrollbar foreground
-;;      '(company-scrollbar-fg ((t (:background "#555555"))))))
-
-;;   (with-eval-after-load 'compile
-;;     (dolist (face '(compilation-info compilation-warning compilation-error))
-;;       (set-face-attribute face nil :background 'unspecified))))
-
-;; (use-package tokyo-night
-;;   :vc (:url "https://github.com/bbatsov/tokyo-night-emacs" :rev :newest)
-
-;;   :when (eq sb/theme 'tokyonight)
-
-;;   :init (load-theme 'tokyo-night t))
-
-;; (use-package matugen-theme
-;;   :ensure nil
-
-;;   :load-path "themes"
-
-;;   :when (eq sb/theme 'matugen)
-
-;;   :init
-;;   (require 'matugen-theme)
-;;   (load-theme 'matugen t))
-
 (use-package standard-themes
   :when (eq sb/theme 'standard-dark)
 
   :init (load-theme 'standard-dark t)
 
   :custom (modus-themes-mixed-fonts nil))
-
-;; (use-package modus-nordic-night-theme
-;;   :vc (:url "https://codeberg.org/ashton314/modus-nordic-night" :rev :newest)
-
-;;   :when (eq sb/theme 'nordic-night)
-
-;;   :init (load-theme 'modus-nordic-midnight t))
-
-;; (use-package nerd-icons-corfu
-;;   :when
-;;   (and (bound-and-true-p sb/enable-icons)
-;;        (eq sb/completion-provider 'corfu)
-;;        (eq sb/corfu-icons 'nerd-icons))
-
-;;   :after corfu
-
-;;   :demand t
-
-;;   :config (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
-;; ;; Icons in the minibuffer
-;; (use-package nerd-icons-completion
-;;   :when (bound-and-true-p sb/enable-icons)
-
-;;   :after (nerd-icons marginalia)
-
-;;   :init (nerd-icons-completion-mode 1)
-
-;;   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
-
-;; (use-package nerd-icons-dired
-;;   :when (bound-and-true-p sb/enable-icons)
-
-;;   :hook (dired-mode . nerd-icons-dired-mode)
-
-;;   :diminish)
-
-;; (use-package nerd-icons-ibuffer
-;;   :when (bound-and-true-p sb/enable-icons)
-
-;;   :hook (ibuffer-mode . nerd-icons-ibuffer-mode)
-
-;;   :custom (nerd-icons-ibuffer-icon-size 1.0))
-
-;; (use-package nerd-icons-grep
-;;   :ensure (:host github :repo "hron/nerd-icons-grep")
-
-;;   :when (bound-and-true-p sb/enable-icons)
-
-;;   :after grep
-
-;;   :init (nerd-icons-grep-mode)
-
-;;   :custom (grep-use-headings t))
-
-;; Powerline theme for Nano looks great, and takes less space on the modeline.
-;; But the package is not being actively maintained. Inspired by
-;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-
-;; (use-package powerline
-;;   :preface
-;;   (defun sb/powerline-raw (str &optional face pad)
-;;     "Render STR as mode-line data using FACE and optionally PAD import.
-;; PAD can be left (`l') or right (`r')."
-;;     (when str
-;;       (let* ((rendered-str (format-mode-line str))
-;;              (padded-str
-;;               (concat
-;;                (when (and (> (length rendered-str) 0) (eq pad 'l))
-;;                  "")
-;;                (if (listp str)
-;;                    rendered-str
-;;                  str)
-;;                (when (and (> (length rendered-str) 0) (eq pad 'r))
-;;                  ""))))
-;;         (if face
-;;             (pl/add-text-property padded-str 'face face)
-;;           padded-str))))
-
-;;   ;; Flycheck segment with distinct colors for errors (red) and warnings (yellow)
-;;   (defun sb/flycheck-status ()
-;;     "Return Flycheck status with red for errors and yellow for warnings.
-;; Shows both colors when errors and warnings are present."
-;;     (when (bound-and-true-p flycheck-mode)
-;;       (let-alist
-;;        (flycheck-count-errors flycheck-current-errors)
-;;        (cond
-;;         ;; Both errors and warnings
-;;         ((and .error .warning)
-;;          (concat
-;;           (propertize (format "E:%s" .error) 'face '(:foreground "red"))
-;;           " "
-;;           (propertize (format "W:%s" .warning) 'face '(:foreground "gold"))))
-;;         ;; Only errors
-;;         (.error
-;;          (propertize (format "E:%s" .error) 'face '(:foreground "red")))
-;;         ;; Only warnings
-;;         (.warning
-;;          (propertize (format "W:%s" .warning) 'face '(:foreground "gold")))
-;;         ;; Clean: show nothing
-;;         (t
-;;          (propertize "✔ " 'face '(:foreground "green")))))))
-
-;;   ;; https://github.com/dgellow/config/blob/master/emacs.d/modules/01-style.el
-;;   (defun sb/powerline-nano-theme ()
-;;     "Setup a nano-like modeline"
-;;     (interactive)
-;;     (setq-default
-;;      mode-line-format
-;;      '("%e" (:eval
-;;         (let*
-;;             ((active (powerline-selected-window-active))
-;;              (face0
-;;               (if active
-;;                   'powerline-active0
-;;                 'powerline-inactive0))
-;;              (emacs-icon
-;;               (if (fboundp 'nerd-icons-devicon)
-;;                   (nerd-icons-devicon
-;;                    "nf-dev-emacs"
-;;                    :height 1.1
-;;                    :v-adjust -0.05)
-;;                 "λ"))
-
-;;              ;; Left-hand side (GNU Emacs version)
-
-;;              ;; (lhs
-;;              ;;  (list
-;;              ;;   (powerline-raw
-;;              ;;    (concat
-;;              ;;     "GNU Emacs "
-;;              ;;     (number-to-string emacs-major-version)
-;;              ;;     "."
-;;              ;;     (number-to-string emacs-minor-version))
-;;              ;;    nil 'l)))
-
-;;              (lhs
-;;               (list
-;;                (powerline-raw
-;;                 (format "%s GNU Emacs %d.%d"
-;;                         emacs-icon emacs-major-version emacs-minor-version)
-;;                 nil 'l)))
-
-;;              ;; Center (buffer name)
-;;              (center (list (powerline-raw "%b" nil 'r)))
-
-;;              ;; Right-hand side (function, VCS, Flycheck, line/col, modified flag)
-;;              (rhs
-;;               (list
-;;                (when which-function-mode
-;;                  (powerline-raw which-func-format nil 'l))
-
-;;                (when-let*
-;;                    ((proj (project-current))
-;;                     (proj-name (project-name proj))
-;;                     (branch
-;;                      (when vc-mode
-;;                        (let* ((backend
-;;                                (substring-no-properties vc-mode)))
-;;                          (replace-regexp-in-string
-;;                           "^ *[Gg]it[:-]" "" backend))))
-;;                     ;; Git branch icon (fallback if Nerd Icons not available)
-;;                     (git-icon
-;;                      (if (fboundp 'nerd-icons-octicon)
-;;                          (nerd-icons-octicon
-;;                           "nf-oct-git_branch"
-;;                           :v-adjust -0.05)
-;;                        "")))
-;;                  (powerline-raw
-;;                   (format " [%s  %s %s]"
-;;                           proj-name
-;;                           git-icon
-;;                           (or branch "—"))
-;;                   nil 'l))
-
-;;                ;; (when-let ((proj (project-current)))
-;;                ;;   (powerline-raw (format "[%s" (project-name proj)) nil 'l))
-
-;;                ;; Remove the "Git:" prefix to save space.
-;;                ;; (powerline-vc nil 'l)
-
-;;                ;; (when vc-mode
-;;                ;;   (let* ((backend
-;;                ;;           (substring-no-properties vc-mode))
-;;                ;;          (branch
-;;                ;;           (replace-regexp-in-string "^ *[Gg]it[:-]" "" backend)))
-;;                ;;     (powerline-raw (format "  %s]" branch) nil 'l)))
-
-;;                (powerline-raw " ")
-;;                (powerline-raw "%4l" nil 'l)
-;;                (powerline-raw ",")
-;;                (powerline-raw "%3c" nil 'r)
-;;                (if (buffer-modified-p)
-;;                    (powerline-raw " ⠾" nil 'r)
-;;                  (powerline-raw "  " nil 'r))
-;;                (let ((status (sb/flycheck-status)))
-;;                  (when status
-;;                    (powerline-raw (format "  %s" status) nil 'r)))
-;;                (powerline-raw " "))))
-;;           (concat
-;;            (powerline-render lhs)
-;;            (powerline-fill-center nil (/ (powerline-width center) 2.0))
-;;            (powerline-render center)
-;;            (powerline-fill nil (powerline-width rhs))
-;;            (powerline-render rhs)))))))
-
-;;   :when (eq sb/modeline-theme 'powerline)
-
-;;   :hook
-;;   ((after-init . sb/powerline-nano-theme)
-;;    ((flycheck-status-changed flycheck-mode-hook) . force-mode-line-update))
-
-;;   :custom
-;;   ;; Visualization of the buffer position is not useful
-;;   (powerline-display-hud nil)
-;;   (powerline-display-buffer-size nil)
-;;   (powerline-display-mule-info nil "File encoding information is not useful")
-;;   (powerline-gui-use-vcs-glyph t)
-;;   (powerline-height 20))
-
-;; (use-package doom-modeline
-;;   :when (eq sb/modeline-theme 'doom-modeline)
-
-;;   :hook (after-init . doom-modeline-mode)
-
-;;   :custom
-;;   (doom-modeline-buffer-encoding nil)
-;;   (doom-modeline-unicode-fallback t)
-;;   ;; Wrong LSP state is shown for non-LSP-managed files
-;;   (doom-modeline-lsp nil)
-;;   (doom-modeline-minor-modes t)
-;;   (doom-modeline-icon sb/enable-icons)
-
-;;   :config
-;;   (unless (display-graphic-p)
-;;     ;; All other choices can lead to the modeline text overflowing
-;;     (setopt doom-modeline-buffer-file-name-style 'buffer-name)))
-
-;; (use-package awesome-tray
-;;   :vc (:url "https://github.com/manateelazycat/awesome-tray" :rev :newest)
-
-;;   :when (eq sb/modeline-theme 'awesome-tray)
-
-;;   :hook (after-init . awesome-tray-mode)
-
-;;   :custom
-;;   (awesome-tray-active-modules
-;;    '("file-path"
-;;      "buffer-name"
-;;      "mode-name"
-;;      "location"
-;;      "buffer-read-only"
-;;      "git"
-;;      "hostname"))
-;;   (awesome-tray-essential-modules '("file-path" "buffer-name" "location"))
-;;   (awesome-tray-file-path-full-dirname-levels 2)
-;;   (awesome-tray-evil-show-mode nil)
-;;   (awesome-tray-meow-show-mode nil)
-;;   (awesome-tray-location-format "%l:%c")
-
-;;   :custom-face
-;;   (awesome-tray-module-file-path-face
-;;    ((t (:foreground "#6272a4" :weight normal :height 0.8))))
-;;   (awesome-tray-module-parent-dir-face
-;;    ((t (:foreground "#50fa7b" :weight bold :height 0.8))))
-;;   (awesome-tray-module-buffer-name-face
-;;    ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-;;   (awesome-tray-module-mode-name-face
-;;    ((t (:foreground "#ff79c6" :weight bold :height 0.8))))
-;;   (awesome-tray-module-location-face
-;;    ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
-;;   (awesome-tray-module-git-face
-;;    ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
-;;   (awesome-tray-module-flymake-error
-;;    ((t (:foreground "#ff5555" :weight bold :height 0.8))))
-;;   (awesome-tray-module-flymake-warning
-;;    ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-;;   (awesome-tray-module-flymake-note
-;;    ((t (:foreground "#8be9fd" :weight normal :height 0.8))))
-;;   (awesome-tray-module-date-face ((t (:foreground "#6272a4" :height 0.8))))
-;;   (awesome-tray-module-awesome-tab-face
-;;    ((t (:foreground "#bd93f9" :weight bold :height 0.8))))
-
-;;   :config (global-hide-mode-line-mode)
-
-;;   (defun sb/disable-mode-line ()
-;;     (setq-local mode-line-format nil))
-
-;;   (add-hook 'after-change-major-mode-hook #'sb/disable-mode-line))
 
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
@@ -4840,28 +3680,6 @@ Fallback to `xref-go-back'."
   ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
   )
 
-;; (use-package centaur-tabs
-;;   :hook ((after-init . centaur-tabs-mode) (dired-mode . centaur-tabs-local-mode))
-;;   :bind*
-;;   (("M-<right>" . centaur-tabs-forward-tab)
-;;    ("C-<tab>" . centaur-tabs-forward-tab)
-;;    ("M-<left>" . centaur-tabs-backward-tab)
-;;    ("C-S-<iso-lefttab>" . centaur-tabs-backward-tab)
-;;    ("M-'" . centaur-tabs-ace-jump))
-;;   :custom
-;;   (centaur-tabs-set-modified-marker t)
-;;   (centaur-tabs-modified-marker "•") ; Unicode Bullet (0x2022)
-;;   (centaur-tabs-set-close-button nil "I do not use the mouse")
-;;   (centaur-tabs-show-new-tab-button nil "I do not use the mouse")
-;;   (centaur-tabs-set-bar 'under)
-;;   :config
-;;   (when (display-graphic-p)
-;;     (setq
-;;      centaur-tabs-set-icons t
-;;      centaur-tabs-icon-type 'nerd-icons))
-;;   ;; Make the headline face match `centaur-tabs-default' face
-;;   (centaur-tabs-headline-match))
-
 ;; Center the text environment
 (use-package olivetti
   :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
@@ -4881,20 +3699,6 @@ Fallback to `xref-go-back'."
 ;; (use-package kdl-ts-mode
 ;;   :ensure (:host github :repo "dataphract/kdl-ts-mode")
 ;;   :mode ("\\.kdl\\'" . kdl-ts-mode))
-
-;; ;; I use `apheleia-mode' to sort kdl files.
-;; (use-package reformatter
-;;   :after (:any kdl-ts-mode kdl-mode)
-;;   :demand t
-;;   :config
-;;   (reformatter-define
-;;    kdlformat
-;;    :program "kdlfmt"
-;;    :args '("format" "--config" "~/private-dotfiles/kdlfmt.kdl")
-;;    :lighter " KDLFMT"
-;;    :group 'reformatter)
-;;   (add-hook 'kdl-ts-mode-hook #'kdlformat-on-save-mode)
-;;   (add-hook 'kdl-mode-hook #'kdlformat-on-save-mode))
 
 ;; ;; Fontify ssh files
 ;; (use-package ssh-config-mode
@@ -4919,14 +3723,6 @@ Fallback to `xref-go-back'."
 ;;   :hook (find-file . dtrt-indent-mode)
 
 ;;   :diminish)
-
-;; ;; Navigate the xref stack with consult
-;; (use-package consult-xref-stack
-;;   :vc (:url "https://github.com/brett-lempereur/consult-xref-stack")
-
-;;   :commands consult-xref-stack-forward
-
-;;   :bind ("C-," . consult-xref-stack-backward))
 
 ;; (use-package hl-line
 ;;   :ensure nil
@@ -4955,18 +3751,13 @@ Fallback to `xref-go-back'."
 ;; (use-package ztree
 ;;   :commands (ztree-diff))
 
-;; ;; Allows to easily identify the file path in a project. But does not support
-;; ;; imenu.
-;; (use-package project-headerline
-;;   :ensure (:host github :repo "gavv/project-headerline")
-;;   :hook (after-init . global-project-headerline-mode)
-;;   :custom
-;;   (project-headerline-segment-separator " > ")
-;;   (project-headerline-path-separator " > "))
-
 ;; (use-package breadcrumb
 ;;   :ensure (:host github :repo "joaotavora/breadcrumb")
+
 ;;   :hook (prog-mode . breadcrumb-mode)
+
+;;   :bind ("C-c i j" . breadcrumb-jump)
+
 ;;   :config (breadcrumb-imenu-crumbs))
 
 ;; ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
@@ -5044,7 +3835,16 @@ Fallback to `xref-go-back'."
               "COMMIT_EDITMSG")
        (eglot-ensure))))
 
-  :bind ("M-'" . eglot-find-implementation)
+  :bind
+  (("M-'" . eglot-find-implementation)
+   ("C-c l i" . eglot-find-implementation)
+   ("C-c l d" . eglot-find-declaration)
+   ("C-c l t" . eglot-find-typeDefinition)
+   ("C-c l r" . eglot-rename)
+   ("C-c l f" . eglot-format)
+   ("C-c l x" . eglot-code-actions)
+   ("C-c l k" . eglot-code-action-quickfix)
+   ("C-c l o" . eglot-code-action-organize-imports))
 
   :custom
   ;; Disabling this helps avoid the race condition between closing a project and shutting down LSP servers.
@@ -5502,7 +4302,6 @@ or the major mode is not in `sb/skippable-modes'."
   (sb/change-buffer 'next-buffer))
 (bind-keys ("C-<tab>" . sb/next-buffer) ("M-<right>" . sb/next-buffer))
 
-
 (defun sb/previous-buffer ()
   "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
   (interactive)
@@ -5616,389 +4415,6 @@ DIR can be relative or absolute."
 (define-key input-decode-map "\e[46;5u" (kbd "C-."))
 (define-key input-decode-map "\e[47;5u" (kbd "C-/"))
 ;; (define-key input-decode-map "\e[61;5u" (kbd "C-="))
-
-;; (use-package keyfreq
-;;   :ensure (:host github :repo "dacap/keyfreq")
-
-;;   :hook
-;;   (after-init
-;;    .
-;;    (lambda ()
-;;      (keyfreq-mode 1)
-;;      (keyfreq-autosave-mode 1))))
-
-;; (use-package flyover
-;;   :ensure (:host github :repo "konrad1977/flyover")
-
-;;   :when (display-graphic-p)
-
-;;   :hook (flycheck-mode . flyover-mode)
-
-;;   :custom
-;;   (flyover-hide-checker-name nil)
-;;   (flyover-background-lightness 40)
-
-;;   :diminish)
-
-;; (use-package disable-mouse
-;;   :hook (emacs-startup . disable-mouse-global-mode)
-;;   :diminish disable-mouse-global-mode)
-
-;; ;; `inhibit-mouse' is supposed to be more efficient than `disable-mouse'
-;; (use-package inhibit-mouse
-;;   :hook (after-init . inhibit-mouse-mode)
-
-;;   :custom
-;;   ;; Disable highlighting of clickable text such as URLs and hyperlinks when
-;;   ;; hovered by the mouse pointer.
-;;   (inhibit-mouse-adjust-mouse-highlight t)
-;;   ;; Disables the use of tooltips (show-help-function) during mouse events.
-;;   (inhibit-mouse-adjust-show-help-function t)
-
-;;   :config
-;;   (when (daemonp)
-;;     (add-hook 'server-after-make-frame-hook #'inhibit-mouse-mode))
-
-;;   :diminish)
-
-;; (use-package tramp-rpc
-;;   :vc
-;;   (:url
-;;    "https://github.com/ArthurHeymans/emacs-tramp-rpc"
-;;    :rev
-;;    :newest
-;;    :lisp-dir "lisp")
-
-;;   :after tramp
-
-;;   :demand t)
-
-;; (use-package tramp-hlo
-;;   :vc (:url "http://github.com/jsadusk/tramp-hlo")
-
-;;   :hook (emacs-startup . tramp-hlo-setup))
-
-;; (use-package combobulate
-;;   :vc (:url "https://github.com/mickeynp/combobulate")
-
-;;   :hook ((prog-mode . combobulate-mode))
-
-;;   :custom (combobulate-key-prefix "C-c o"))
-
-;; (with-eval-after-load 'transient
-;;   (transient-define-prefix
-;;    sb/search-transient () "Search commands"
-;;    [["Isearch"
-;;      ("i" "Forward" isearch-forward)
-;;      ("b" "Backward" isearch-backward)
-;;      ("s" "Symbol at point" isearch-symbol-at-point)
-;;      ("w" "Forward symbol at point" isearch-forward-symbol-at-point)
-;;      ;; During an Isearch session, this command picks a search string from
-;;      ;; history and continues the search with the newly selected string. Outside
-;;      ;; of Isearch, the command allows you to pick a string from the history and
-;;      ;; starts a new Isearch.
-;;      ("h" "History" consult-isearch-history)]
-;;     ["Ripgrep" ("d" "Deadgrep" deadgrep)
-;;      ;; Filter by file extension with `consult-ripgrep' "... -- -g *.jsx"
-;;      ("r" "Ripgrep" consult-ripgrep)]
-;;     ["Wgrep"
-;;      ("C-p" "Enable" wgrep-change-to-wgrep-mode)
-;;      ("C-s" "Finish edit" wgrep-finish-edit)
-;;      ("C-k" "Abort changes" wgrep-abort-changes)
-;;      ("C-q" "Exit" wgrep-exit)]
-;;     ["Search locations"
-;;      ("n" "Find" consult-find)
-;;      ("f" "Fd" consult-fd)
-;;      ("l" "Locate" consult-locate)]
-;;     ["Other tools"
-;;      ("o" "Occur" occur)
-;;      ("h" "Isearch occur" isearch-occur)
-;;      ("g" "Grep" consult-grep)
-;;      ("t" "Git grep" consult-git-grep)]])
-;;   (bind-key "C-c s" #'sb/search-transient)
-
-;;   (transient-define-prefix
-;;    sb/dotemacs-transient () "Config-specific keybindings"
-;;    [["Utilities"
-;;      ("s" "Sudo edit" crux-sudo-edit)
-;;      ("i" "Ispell then abbrev" crux-ispell-word-then-abbrev)
-;;      ("w" "Toggle whitespace" whitespace-mode)
-;;      ("m" "Describe major mode" discover-my-mode)]
-;;     ["Buffers"
-;;      ("c" "*scratch*" scratch-buffer)
-;;      ("v" "Echo-area messages" view-echo-area-messages)
-;;      ("l" "*Messages*"
-;;       (lambda ()
-;;         (interactive)
-;;         (switch-to-buffer "*Messages*")))]
-;;     ["Tramp" ("t" "Choose target" consult-tramp)
-;;      ;; We use `q' to quit transient
-;;      ("Q" "Cleanup connections" sb/cleanup-tramp)]
-;;     ["Emacs config"
-;;      ("e" "Edit init.el"
-;;       (lambda ()
-;;         (interactive)
-;;         (find-file user-init-file)))
-;;      ("r" "Reload init.el"
-;;       (lambda ()
-;;         (interactive)
-;;         (load-file user-init-file)))
-;;      ("d" "Open .emacs.d"
-;;       (lambda ()
-;;         (interactive)
-;;         (dired user-emacs-directory)))
-;;      ("m" "Restart" restart-emacs)
-;;      ("b" "keybindings" embark-bindings)
-;;      ("k" "Personal keybindings" describe-personal-keybindings)]])
-;;   (bind-key "C-c d" #'sb/dotemacs-transient)
-
-;;   (transient-define-prefix
-;;    sb/smerge-transient () "Smerge menu"
-;;    [["Navigation"
-;;      ("n" "Next conflict" smerge-next)
-;;      ("p" "Previous conflict" smerge-prev)]
-;;     ["Merge"
-;;      ("u" "Keep upper" smerge-keep-upper)
-;;      ("l" "Keep lower" smerge-keep-lower)
-;;      ("a" "Keep both" smerge-keep-all)]
-;;     ["Diff" ("e" "Ediff" smerge-ediff) ("r" "Resolve" smerge-resolve)]])
-;;   (bind-key "C-c ^" #'sb/smerge-transient)
-
-;;   (with-eval-after-load 'lsp-mode
-;;     (transient-define-prefix
-;;      sb/lsp-transient () "Lsp menu"
-;;      [["Lsp functionality"
-;;        ("l" "Start Lsp" lsp)
-;;        ("q" "Disconnect Lsp" lsp-disconnect)
-;;        ("w" "Workspace shutdown" lsp-workspace-shutdown)
-;;        ("R" "Workspace restart" lsp-workspace-restart)
-;;        ("a" "Add folder to workspace" lsp-workspace-folders-add)
-;;        ("v" "Remove folder from workspace" lsp-workspace-folders-remove)
-;;        ("b" "Blacklist and remove workspace" lsp-workspace-blocklist-remove)]
-;;       ["Browsing functionality"
-;;        ("d" "Find declaration" lsp-find-declaration)
-;;        ("e" "Find definition" lsp-find-definition)
-;;        ("i" "Find implementation" lsp-find-implementation)
-;;        ("c" "Find references" lsp-find-references)
-;;        ("I" "Go to implementation" lsp-goto-implementation)
-;;        ("t" "Go to type definition" lsp-goto-type-definition)]
-;;       ["Code actions"
-;;        ("r" "Rename" lsp-rename)
-;;        ("f" "Format buffer" lsp-format-buffer)
-;;        ("x" "Execute code action" lsp-execute-code-action)]
-;;       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]])
-
-;;     (transient-define-prefix
-;;      sb/lsp-imenu-transient () "Imenu commands"
-;;      [["Imenu"
-;;        ("i" "Imenu" consult-imenu)
-;;        ("j" "Breadcrumb jump" breadcrumb-jump)]
-;;       ["Lsp imenu"
-;;        ("g" "File symbols" consult-lsp-file-symbols)
-;;        ("h" "Workspace symbols" consult-lsp-symbols)]
-;;       ["Dogears"
-;;        ("d" "Go" dogears-go)
-;;        ("r" "Remember" dogears-remember)
-;;        ("b" "Back" dogears-back)
-;;        ("f" "Forward" dogears-forward)
-;;        ("t" "List" dogears-list)]]))
-
-;;   (when (eq sb/lsp-provider 'lsp-mode)
-;;     (bind-key "C-c l" #'sb/lsp-transient)
-;;     (bind-key "C-c i" #'sb/lsp-imenu-transient))
-
-;;   (with-eval-after-load 'eglot
-;;     (transient-define-prefix
-;;      sb/eglot-transient () "Eglot menu"
-;;      [["Eglot" ("l" "Start" eglot) ("q" "Shutdown" eglot-shutdown)]
-;;       ["Browsing functionality"
-;;        ("d" "Find declaration" eglot-find-declaration)
-;;        ("i" "Find implementation" eglot-find-implementation)
-;;        ("t" "Find type definition" eglot-find-typeDefinition)]
-;;       ["Code actions"
-;;        ("r" "Rename" eglot-rename)
-;;        ("f" "Format buffer" eglot-format)
-;;        ("x" "Execute code action" eglot-code-actions)
-;;        ("k" "Execution code action: quickfix" eglot-code-action-quickfix)
-;;        ("e" "Execution code action: extract" eglot-code-action-extract)
-;;        ("n" "Execution code action: inline" eglot-code-action-inline)
-;;        ("w" "Execution code action: rewrite" eglot-code-action-rewrite)
-;;        ("o"
-;;         "Execution code action: organize imports"
-;;         eglot-code-action-organize-imports)]
-;;       ["Diagnostics" ("s" "Diagnostics" consult-lsp-diagnostics)]]))
-
-;;   (when (eq sb/lsp-provider 'eglot)
-;;     (bind-key "C-c l" #'sb/eglot-transient))
-
-;;   (transient-define-prefix
-;;    sb/file-buffer-transient () "File and Buffer commands"
-;;    [["File"
-;;      ("w" "Save" write-file)
-;;      ("r" "Rename" rename-file)
-;;      ("a" "Find alternate" find-alternate-file)
-;;      ("o" "FFAP find other" ff-find-other-file)]
-;;     ["Buffer"
-;;      ("g" "Revert quick" revert-buffer-quick)
-;;      ("b" "Rename" rename-buffer)]])
-;;   (bind-key "C-c x" #'sb/file-buffer-transient)
-
-;;   (transient-define-prefix
-;;    sb/navigation-transient () "Jump commands"
-;;    [["Parentheses"
-;;      ("b" "Backward sexp" backward-sexp)
-;;      ("f" "Forward sexp" forward-sexp)
-;;      ("k" "Kill sexp" kill-sexp)]
-;;     ;; ["Functions"
-;;     ;;  ("a" "Begin" treesit-beginning-of-defun)
-;;     ;;  ("e" "End" treesit-end-of-defun)]
-;;     ;; ["Expressions"
-;;     ;;  ;; ("u" "Up list" treesit-up-list)
-;;     ;;  ;; ("d" "Down list" treesit-down-list)
-;;     ;;  ("F" "Forward sexp" treesit-forward-sexp)]
-;;     ["Flycheck"
-;;      ("n" "Next error" next-error)
-;;      ("p" "Previous error" previous-error)]
-;;     ["Imenu" ("i" "Imenu" consult-imenu)]
-;;     ["Eglot" ("h" "Workspace symbols" consult-eglot-symbols)]
-;;     ;; ["Dogears"
-;;     ;;  ("d" "Go" dogears-go)
-;;     ;;  ("r" "Remember" dogears-remember)
-;;     ;;  ("b" "Back" dogears-back)
-;;     ;;  ("f" "Forward" dogears-forward)
-;;     ;;  ("t" "List" dogears-list)]
-;;     ])
-;;   (bind-key "C-c n" #'sb/navigation-transient)
-
-;;   (transient-define-prefix
-;;    sb/ediff-transient () "Launch Ediff in all it's variants"
-;;    ["Ediff" ["2 Way"
-;;      ("b" "Buffers" ediff-buffers)
-;;      ("f" "Files" ediff-files)
-;;      ("d" "Directories" ediff-directories)
-;;      ("c" "Buffer vs File" ediff-current-file)
-;;      ("~" "File vs Backup" ediff-backup)]
-;;     ["3 Way"
-;;      ("3b" "Buffers" ediff-buffers3)
-;;      ("3f" "Files" ediff-files3)
-;;      ("3d" "Directories" ediff-directories3)]
-;;     ["Patches"
-;;      ("pb" "Buffer" ediff-patch-buffer)
-;;      ("pf" "File" ediff-patch-file)]
-;;     ["Regions"
-;;      ("rl" "Linewise" ediff-regions-linewise)
-;;      ("rw" "Wordwise" ediff-regions-wordwise)]
-;;     ["Windows"
-;;      ("wl" "Linewise" ediff-windows-linewise)
-;;      ("ww" "Wordwise" ediff-windows-wordwise)]])
-;;   (bind-key "C-c e" #'sb/ediff-transient)
-
-;;   (with-eval-after-load 'citre
-;;     (transient-define-prefix
-;;      sb/citre-transient () "Citre commands"
-;;      [["Jump"
-;;        ("j" "Jump" sb/jump-citre-xref)
-;;        ("b" "Jump back" citre-jump-back)
-;;        ("p" "Peek" citre-peek)
-;;        ("a" "Ace peek" citre-ace-peek)
-;;        ("r" "Reference" citre-jump-to-reference)]
-;;       ["Manage"
-;;        ("c" "Create tags" citre-create-tags-file)
-;;        ("u" "Update tags" citre-update-tags-file)
-;;        ("e" "Edit recipe" citre-edit-tags-file-recipe)
-;;        ("g" "Update global db" citre-global-update-database)]])
-;;     (bind-key "C-c c" #'sb/citre-transient))
-
-;;   ;; We want Cape functions to be autoloaded if not already.
-;;   (when (eq sb/completion-provider 'corfu)
-;;     (transient-define-prefix
-;;      sb/corfu-transient () "Corfu commands"
-;;      [["Capf"
-;;        ("d" "Dict" cape-dict)
-;;        ("v" "Dabbrev" cape-dabbrev)
-;;        ("h" "History" cape-history)
-;;        ("f" "File" cape-file)]
-;;       [""
-;;        ("t" "TeX" cape-tex)
-;;        ("a" "Abbrev" cape-abbrev)
-;;        ("k" "Keyword" cape-keyword)
-;;        ("e" "Elisp symbol" cape-elisp-symbol)]
-;;       [""
-;;        ("j" "Emoji" cape-emoji)
-;;        ("l" "Line" cape-line)
-;;        ("b" "Elisp block" cape-elisp-block)]
-;;       ["" ("r" "RFC 1345" cape-rfc1345) ("s" "Unicode from SGML" cape-sgml)]])
-;;     (bind-key "C-c p" #'sb/corfu-transient))
-
-;;   (transient-define-prefix
-;;    sb/latex-transient () "LaTeX commands"
-;;    [[""
-;;      ("l" "Insert label" reftex-label)
-;;      ("b" "Insert block" latex-insert-block)
-;;      ("r" "Insert reference" consult-reftex-insert-reference)
-;;      ("g" "Go to label" consult-reftex-goto-label)]])
-;;   (bind-key "C-c j" #'sb/latex-transient)
-
-;;   (transient-define-prefix
-;;    sb/root-transient () "Top-level menu"
-;;    [["Emacs"
-;;      ("d" "Dotemacs" sb/dotemacs-transient)
-;;      ("x" "File/Buffer" sb/file-buffer-transient)
-;;      ("s" "Search" sb/search-transient)
-;;      ("^" "Smerge" sb/smerge-transient)]
-;;     ["Programming" ("l" "LSP/Eglot"
-;;       (lambda ()
-;;         (interactive)
-;;         (cond
-;;          ((eq sb/lsp-provider 'eglot)
-;;           (sb/eglot-transient))
-;;          ((eq sb/lsp-provider 'lsp-mode)
-;;           (sb/lsp-transient)))))]
-;;     ["Navigation"
-;;      ("n" "Navigation" sb/navigation-transient)
-;;      ("c" "Citre" sb/citre-transient)]
-;;     ["Completion" ("p" "Corfu" sb/corfu-transient)]
-;;     ["Misc" ("e" "Ediff" sb/ediff-transient) ("j" "LaTeX" sb/latex-transient)]])
-;;   (bind-key "C-c SPC" #'sb/root-transient))
-
-;; (when (eq sb/lsp-provider 'lsp-mode)
-;;   (defun sb/jump-choose-definition ()
-;;     "Interactive jump menu with iconified options."
-;;     (interactive)
-;;     (let* ((options
-;;             `(("🔍 LSP: go to definition" . lsp-find-definition)
-;;               ("🧠 LSP: search symbol (consult)" . consult-lsp-symbols)
-;;               ("📚 Citre: jump" . citre-jump)
-;;               ("📎 Xref: find definitions" . xref-find-definitions)
-;;               ("🗂  Imenu (consult)" . consult-imenu)))
-;;            (choice (completing-read "Jump using: " (mapcar #'car options))))
-;;       (call-interactively (cdr (assoc choice options)))))
-;;   (bind-key "M-'" #'sb/jump-choose-definition))
-
-;; (when (eq sb/lsp-provider 'eglot)
-;;   (defun sb/jump-choose-definition ()
-;;     "Interactive jump menu with iconified options."
-;;     (interactive)
-;;     (let* ((options
-;;             `(("🔍 Eglot: go to declaration" . eglot-find-declaration)
-;;               ("🧠 Eglot: search symbol (consult)" . consult-eglot-symbols)
-;;               ("📚 Citre: jump" . citre-jump)
-;;               ("📎 Xref: find definitions" . xref-find-definitions)
-;;               ("🗂  Imenu: " . consult-imenu)))
-;;            (choice (completing-read "Jump using: " (mapcar #'car options))))
-;;       (call-interactively (cdr (assoc choice options)))))
-;;   (bind-key "M-'" #'sb/jump-choose-definition))
-
-;; (use-package compile-angel
-;;   :demand t
-
-;;   :custom (compile-angel-verbose t)
-
-;;   :config
-;;   (push "/init.el" compile-angel-excluded-path-suffixes)
-;;   (push "/early-init.el" compile-angel-excluded-path-suffixes)
-
-;;   (compile-angel-on-load-mode 1))
 
 (add-hook
  'emacs-startup-hook
