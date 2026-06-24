@@ -31,19 +31,9 @@
   "Specify which Emacs theme to use."
   :type
   '(radio
-    (const :tag "doom-nord" doom-nord)
-    (const :tag "doom-one" doom-one)
-    (const :tag "doom-solarized-dark" doom-solarized-dark)
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "catppuccin" catppuccin)
-    (const :tag "rose-pine" rose-pine)
-    (const :tag "kanagawa" kanagawa)
     (const :tag "leuven-dark" leuven-dark)
-    (const :tag "dracula" dracula)
-    (const :tag "tokyonight" tokyonight)
-    (const :tag "matugen" matugen)
     (const :tag "standard-dark" standard-dark)
-    (const :tag "nordic-night" modus-nordic-night-theme)
     (const :tag "none" none))
   :group 'sb/emacs)
 
@@ -52,13 +42,7 @@
 ;; `standalone' mode.
 (defcustom sb/modeline-theme 'mini-echo
   "Specify the mode-line theme to use."
-  :type
-  '(radio
-    (const :tag "powerline" powerline)
-    (const :tag "doom-modeline" doom-modeline)
-    (const :tag "awesome-tray" awesome-tray)
-    (const :tag "mini-echo" mini-echo)
-    (const :tag "none" none))
+  :type '(radio (const :tag "mini-echo" mini-echo) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Company works better with both Windows and TUI Emacs, and has more extensive
@@ -69,19 +53,9 @@
 ;; because Emacs versions till 30.x does not support child frames on the
 ;; terminal which is required by Corfu.
 
-;; Corfu integrates nicely with `orderless' and provides better completion for
-;; Elisp symbols with `cape-elisp-symbol'. But `corfu-terminal-mode' with Emacs
-;; < 31 has a rendering problem for completion popups appearing near the right
-;; edges with terminal Emacs. The completion entries wrap around sometimes, and
-;; messes up the completion.
-
 (defcustom sb/completion-provider 'company
   "Choose the framework to use for completion at point."
-  :type
-  '(radio
-    (const :tag "corfu" corfu)
-    (const :tag "company" company)
-    (const :tag "none" none))
+  :type '(radio (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
 ;; Keeping icons disabled should lower overhead and help with the alignment
@@ -114,30 +88,7 @@ The provider is `nerd-icons'."
 ;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
 (defcustom sb/lsp-provider 'eglot
   "Choose between Lsp-mode and Eglot."
-  :type
-  '(radio
-    (const :tag "lsp-mode" lsp-mode)
-    (const :tag "eglot" eglot)
-    (const :tag "none" none))
-  :group 'sb/emacs)
-
-(defcustom sb/python-langserver 'basedpyright
-  "Choose the Python Language Server implementation."
-  :type
-  '(radio
-    (const :tag "pylsp" pylsp)
-    (const :tag "basedpyright" basedpyright)
-    (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; TODO: What is the difference between server and daemon?
-(defcustom sb/op-mode 'standalone
-  "Specify the way you expect Emacs to be used."
-  :type
-  '(radio
-    (const :tag "server" server)
-    (const :tag "daemon" daemon)
-    (const :tag "standalone" standalone))
+  :type '(radio (const :tag "eglot" eglot) (const :tag "none" none))
   :group 'sb/emacs)
 
 (defconst sb/user-home-directory (getenv "HOME")
@@ -188,24 +139,7 @@ The provider is `nerd-icons'."
 
 ;; ;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
 ;; ;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
-;; ;; for defining aliases. Then, we can avoid passing shell arguments to be more
-;; ;; efficient.
-
-;; (use-package exec-path-from-shell
-;;   :when (and (eq system-type 'gnu/linux) (or (display-graphic-p) (daemonp)))
-
-;;   :demand t
-
-;;   :custom
-;;   (exec-path-from-shell-check-startup-files nil)
-;;   (exec-path-from-shell-variables
-;;    '("PATH" "JAVA_HOME" "LSP_USE_PLISTS" "LTEX_LS_PLUS" "JDTLS_PATH"))
-
-;;   ;; Disabling `exec-path-from-shell-arguments' reduces the start up time, but
-;;   ;; it is needed for Emacs client.
-;;   ;; (exec-path-from-shell-arguments nil)
-
-;;   :config (exec-path-from-shell-initialize))
+;; ;; for defining aliases.
 
 (use-package emacs
   :ensure nil
@@ -290,7 +224,7 @@ The provider is `nerd-icons'."
    ("C-c x g" . revert-buffer-quick)
    ("C-c x b" . revert-buffer)
 
-   ("C-c d m" . restart-emacs)
+   ("C-c d r" . restart-emacs)
    ("C-c d k" . describe-personal-keybindings)
    ("C-c d v" . view-echo-area-messages)
    ("C-c d l" .
@@ -493,9 +427,6 @@ The provider is `nerd-icons'."
   ;; (diminish 'auto-fill-function)
   (diminish 'auto-fill-mode)
 
-  ;; (when (file-in-directory-p buffer-file-name user-emacs-directory)
-  ;; (advice-add 'risky-local-variable-p :override #'ignore))
-
   (advice-add 'risky-local-variable-p :override #'ignore)
 
   (when (file-exists-p custom-file)
@@ -506,13 +437,6 @@ The provider is `nerd-icons'."
   (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
 
   (put 'overwrite-mode 'disabled t)
-
-  ;; ;; Keep the cursor out of the read-only portions of the minibuffer
-  ;; (setopt minibuffer-prompt-properties
-  ;;         '(read-only
-  ;;           t intangible t cursor-intangible t face minibuffer-prompt))
-
-  ;; (add-hook 'minibuffer-setup-hook (lambda () (cursor-intangible-mode 1)))
 
   ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
   ;; Zellij.
@@ -725,19 +649,6 @@ The provider is `nerd-icons'."
 
   :diminish)
 
-;; ;; Use "Shift + direction" arrows for moving around windows.
-;; (use-package windmove
-;;   :ensure nil
-
-;;   :when (display-graphic-p)
-
-;;   :init (windmove-default-keybindings))
-
-;; (use-package winner
-;;   :hook (after-init . winner-mode)
-
-;;   :bind (("C-c <left>" . winner-undo) ("C-c <right>" . winner-redo)))
-
 ;; Use `ediff-regions-wordwise' for small regions and `ediff-regions-linewise'
 ;; for larger regions.
 (use-package ediff
@@ -808,14 +719,6 @@ The provider is `nerd-icons'."
     (ignore-errors
       (tramp-cleanup-all-buffers)
       (tramp-cleanup-all-connections))))
-
-;; (use-package whitespace
-
-;;   :ensure nil
-
-;;   :custom (whitespace-line-column fill-column)
-
-;;   :diminish (global-whitespace-mode whitespace-mode whitespace-newline-mode))
 
 (use-package ibuffer
   :ensure nil
@@ -943,23 +846,6 @@ The provider is `nerd-icons'."
   :custom (aw-minibuffer-flag t)
 
   :config (ace-window-display-mode 1))
-
-;; ;; Jump around buffers in few keystrokes
-;; (use-package frog-jump-buffer
-;;   :ensure (:host github :repo "waymondo/frog-jump-buffer")
-
-;;   :bind ("C-b" . frog-jump-buffer)
-
-;;   :config
-;;   (dolist
-;;       (regexp
-;;        '("^TAGS$"
-;;          "^:" ; temp buffers
-;;          "errors\\*$" ; errors* buffer
-;;          "stderr\\*$" ; stderr* buffer
-;;          "-ls\\*$" ; -ls* buffer
-;;          "^\\*\\(?:Compile-log\\|Backtrace\\|Flymake\\|vc\\|eldoc\\|Async-native-compile-log\\)\\*?$"))
-;;     (add-to-list 'frog-jump-buffer-ignore-buffers regexp)))
 
 (use-package dired
   :ensure nil
@@ -1104,167 +990,6 @@ The provider is `nerd-icons'."
 
   (if icomplete-in-buffer
       (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
-
-(defconst sb/consult-buffer-filter
-  '("^ "
-    "\\` "
-    "^:"
-    "\\*Echo Area"
-    "\\*Minibuf"
-    "\\*Help*"
-    "\\*Disabled Command\\*"
-    "Flymake log"
-    "\\*Flycheck"
-    "Shell command output"
-    "direnv"
-    "\\*magit-"
-    "magit-.*"
-    ".+-shell*"
-    "\\*straight-"
-    "\\*Compile-Log"
-    "\\*Native-*"
-    "\\*Async-"
-    "\\*Ediff Registry\\*"
-    "TAGS"
-    "\\*vc"
-    "\\*tramp"
-    "\\*citre.*"
-    "\\*pylsp.*"
-    "\\*pyright.*"
-    "\\*ltex-ls"
-    "\\*texlab"
-    "\\*bash-ls.*"
-    "\\*json-ls.*"
-    "\\*yaml-ls.*"
-    "\\*shfmt.*"
-    "\\*clangd.*"
-    "\\*semgrep.*"
-    "\\*autotools.*"
-    "\\*lsp-harper*"
-    "\\*taplo*"
-    "\\*ruff.*"
-    "\\*marksman.*"
-    "\\*html-ls.*")
-  "Regexps to filter from `consult-buffer'.")
-
-;; (use-package consult
-;;   :after vertico
-
-;;   :bind
-;;   ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
-;;    ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
-;;    ;; afterwards, the full candidate list will be shown again.
-;;    ([remap switch-to-buffer] . consult-buffer)
-;;    ("<f3>" . consult-buffer)
-;;    ([remap project-switch-to-buffer] . consult-project-buffer)
-;;    ([remap yank-pop] . consult-yank-from-kill-ring)
-;;    ([remap goto-line] . consult-goto-line)
-;;    ([remap bookmark-jump] . consult-bookmark)
-;;    ([remap list-bookmarks] . consult-bookmark)
-;;    ([remap bookmark-bmenu-list] . consult-bookmark)
-;;    ("M-g o" . consult-outline)
-;;    ("C-c C-m" . consult-mark)
-;;    ([remap imenu] . consult-imenu) ; "M-g i"
-;;    ("C-c C-j" . consult-imenu)
-;;    ([remap customize] . consult-customize)
-;;    ([remap load-theme] . consult-theme)
-;;    ([remap locate] . consult-locate)
-;;    ("C-c s l" . consult-locate)
-;;    ("C-c s f" . consult-fd)
-;;    ;; Prefix argument "C-u" allows to specify the directory. You can pass
-;;    ;; additional grep flags to `consult-grep' with the "--" separator. E.g.:
-;;    ;; "foo bar -- -A3" to get matches with 3 lines of 'after' context.
-;;    ([remap rgrep] . consult-grep)
-;;    ([remap vc-git-grep] . consult-git-grep)
-;;    ("<f4>" . consult-line)
-;;    ("M-g l" . sb/consult-line-symbol-at-point)
-;;    ("C-c s r" . consult-ripgrep)
-;;    ([remap recentf-open-files] . consult-recent-file)
-;;    ("M-g r" . consult-register)
-;;    :map
-;;    isearch-mode-map
-;;    ("M-s e" . consult-isearch-history))
-
-;;   :custom (consult-line-start-from-top t "Start search from the beginning")
-;;   ;; Disable preview by default, enable for selected commands
-;;   (consult-preview-key nil)
-;;   (completion-in-region-function #'consult-completion-in-region "Complete M-:")
-
-;;   ;; Having multiple other sources like `recentf' may make it difficult to
-;;   ;; identify and switch quickly between only buffers, especially while wrapping
-;;   ;; around.
-;;   ;; (consult-buffer-sources '(consult--source-buffer))
-
-;;   (consult-narrow-key "<")
-;;   (consult-widen-key ">")
-
-;;   ;; Do not filter buffers, they help to debug configuration errors 
-;;   ;; (consult-buffer-filter sb/consult-buffer-filter)
-
-;;   :config
-;;   (consult-customize
-;;    consult-line
-;;    consult-ripgrep
-;;    consult-git-grep
-;;    consult-grep
-;;    consult-bookmark
-;;    consult-xref
-;;    consult-yank-from-kill-ring
-;;    :preview-key
-;;    '(:debounce 1.5 any)
-;;    consult-recent-file
-;;    consult-theme
-;;    consult-buffer
-;;    :preview-key
-;;    "M-."
-;;    consult-find
-;;    :sort
-;;    t
-;;    consult-line
-;;    consult-ripgrep
-;;    consult-grep
-;;    ;; Initialize search string with the highlighted region
-;;    :initial
-;;    (when (use-region-p)
-;;      (buffer-substring-no-properties (region-beginning) (region-end))))
-
-;;   ;; ;; Use thing at point with `consult-line'
-;;   ;;   (consult-customize
-;;   ;;    consult-line
-;;   ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
-;;   ;; (defalias 'consult-line-thing-at-point 'consult-line)
-;;   ;; (consult-customize
-;;   ;;  consult-line-thing-at-point
-;;   ;;  :initial (thing-at-point 'symbol))
-
-;;   (defun sb/consult-line-symbol-at-point ()
-;;     (interactive)
-;;     (consult-line (or (thing-at-point 'symbol) ""))))
-
-;; (use-package consult-tramp
-;;   :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
-
-;;   :after consult
-
-;;   :bind ("C-c d t" . consult-tramp))
-
-;; ;; Provide context-dependent actions similar to a content menu.
-
-;; (use-package embark
-;;   :bind
-;;   ( ;; "C-h b" lists all the bindings available in a buffer
-;;    ([remap describe-bindings] . embark-bindings)
-;;    ("C-`" . embark-act)
-;;    ("C-;" . embark-dwim)
-;;    :map
-;;    minibuffer-local-map
-;;    ("C-`" . embark-act)
-;;    ("C-c C-c" . embark-collect)
-;;    ("C-c C-e" . embark-export))
-
-;;   :custom
-;;   ;; Replace the key help with a completing-read interface
-;;   (prefix-help-command #'embark-prefix-help-command))
 
 ;; (use-package ispell
 ;;   :ensure nil
@@ -1762,10 +1487,6 @@ The provider is `nerd-icons'."
               flycheck-checkers
               '(python-flake8
                 python-pylint python-mypy python-pycompile python-pyright)))))
-
-  ;; These themes have their own styles for displaying flycheck info.
-  (when (eq sb/modeline-theme 'doom-modeline)
-    (setopt flycheck-mode-line nil))
 
   (setq-default
    flycheck-python-pylint-executable "python3"
@@ -3251,14 +2972,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     (add-to-list
      'TeX-view-program-list
      '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-    (add-to-list 'TeX-view-program-selection '(output-pdf "Okular")))
-
-  ;; (with-eval-after-load 'elec-pair
-  ;; (defvar sb/latex-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\))))
-  ;; (add-hook
-  ;;  'LaTeX-mode-hook
-  ;;  (lambda () (sb/add-pairs '((?\{ . ?\}) (?\[ . ?\]) (?\( . ?\)))))))
-  )
+    (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
 
 ;; (use-package tex
 ;;   :ensure nil
@@ -3313,10 +3027,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 ;;   (:map
 ;;    TeX-mode-map ("$" . math-delimiters-insert)
 ;;    :map LaTeX-mode-map ("$" . math-delimiters-insert)))
-
-;; TODO: Check these additional packages for useful shortcuts
-;; https://github.com/Malabarba/latex-extra
-;; https://github.com/ultronozm/tex-parens.el
 
 (use-package citar
   :when (eq sb/completion-provider 'corfu)
@@ -3490,9 +3200,9 @@ Fallback to `xref-go-back'."
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale")))
 
-  :custom-face
-  (mini-echo-major-mode ((t (:height 0.8))))
-  (mini-echo-buffer-position ((t (:height 0.8))))
+  ;; :custom-face
+  ;; (mini-echo-major-mode ((t (:height 0.8))))
+  ;; (mini-echo-buffer-position ((t (:height 0.8))))
   ;; (mini-echo-buffer-size ((t (:height 0.8))))
   ;; (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
   ;; (mini-echo-lsp ((t (:height 0.8))))
@@ -3607,55 +3317,7 @@ Fallback to `xref-go-back'."
         (when (> server-count 1)
           (propertize (format "(%d)" server-count)
                       'face
-                      `(:inherit shadow :height 0.7)))))))
-
-  ;; (mini-echo-define-segment
-  ;;  "flycheck" "Color-coded vanilla Flycheck status."
-  ;;  :update-advice '((flycheck-after-lint . :after))
-  ;;  :fetch
-  ;;  (when (and (bound-and-true-p flycheck-mode)
-  ;;             (fboundp 'flycheck-mode-line-status-text))
-  ;;    (let* ((status (substring-no-properties (flycheck-mode-line-status-text)))
-  ;;           (counts
-  ;;            (and (boundp 'flycheck-current-errors)
-  ;;                 (flycheck-count-errors flycheck-current-errors)))
-  ;;           (face-color
-  ;;            (cond
-  ;;             ((assq 'error counts)
-  ;;              "red")
-  ;;             ((assq 'warning counts)
-  ;;              "yellow")
-  ;;             ((assq 'info counts)
-  ;;              "cyan")
-  ;;             (t
-  ;;              "green"))))
-  ;;      (unless (string-empty-p status)
-  ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
-
-  ;; (mini-echo-define-segment
-  ;;  "flycheck" "Color-coded high-performance Flycheck status."
-  ;;  :update-advice '((flycheck-after-lint . :after))
-  ;;  :fetch
-  ;;  (when (and (bound-and-true-p flycheck-mode)
-  ;;             (fboundp 'flycheck-mode-line-status-text))
-  ;;    (let*
-  ;;        ((status-text (flycheck-mode-line-status-text))
-  ;;         (status (substring-no-properties (or status-text "")))
-  ;;         ;; Leverage pre-computed boolean flags instead of parsing an alist loop
-  ;;         (face-color
-  ;;          (cond
-  ;;           ((bound-and-true-p flycheck-has-current-errors)
-  ;;            "red")
-  ;;           ((bound-and-true-p flycheck-has-current-warnings)
-  ;;            "yellow")
-  ;;           ((bound-and-true-p flycheck-has-current-info)
-  ;;            "cyan")
-  ;;           (t
-  ;;            "green"))))
-  ;;      ;; Only render the status if it isn't completely blank
-  ;;      (unless (string-empty-p status)
-  ;;        (propertize status 'face `(:foreground ,face-color :height 0.8))))))
-  )
+                      `(:inherit shadow :height 0.7))))))))
 
 ;; Center the text environment
 (use-package olivetti
@@ -3724,9 +3386,6 @@ Fallback to `xref-go-back'."
        (or (executable-find "xclip") (executable-find "xsel")))
 
   :hook (after-init . xclip-mode))
-
-;; (use-package ztree
-;;   :commands (ztree-diff))
 
 ;; (use-package breadcrumb
 ;;   :ensure (:host github :repo "joaotavora/breadcrumb")
