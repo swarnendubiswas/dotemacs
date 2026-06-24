@@ -35,7 +35,7 @@
    gc-cons-threshold sb/emacs-4MB
    gc-cons-percentage 0.1))
 
-(add-hook 'after-init-hook #'sb/restore-gc)
+(add-hook 'emacs-startup-hook #'sb/restore-gc)
 
 ;; We are using the `gcmh' package which should be enough.
 ;; (add-hook 'minibuffer-setup-hook #'sb/defer-gc)
@@ -45,10 +45,10 @@
 (defvar sb/emacs-file-name-handler-alist-old file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
+;; Restore it once startup is complete
 (add-hook
  'emacs-startup-hook
  (lambda ()
-   ;; Restore it once startup is complete
    (setq file-name-handler-alist
          (append
           sb/emacs-file-name-handler-alist-old file-name-handler-alist))))
@@ -63,12 +63,12 @@
 ;; `site-run-file', hence `setopt' does not work.
 (setq site-run-file nil)
 
-(setopt inhibit-default-init t) ; Disable loading of `default.el' at startup
-
 (setopt
-  ;; Avoid loading packages twice, this is set during `(package-initialize)'. This
-  ;; is also useful if we prefer "straight.el" or "Elpaca" over "package.el".
-  package-enable-at-startup nil
+ inhibit-default-init t ; Disable loading of `default.el' at startup
+ ;; Avoid loading packages twice, this is set during `(package-initialize)'.
+ ;; This is also useful if we prefer "straight.el" or "Elpaca" over
+ ;; "package.el".
+ package-enable-at-startup nil
  package-quickstart t
  package-archives
  '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -100,13 +100,12 @@
  warning-suppress-log-types '((files missing-lexbind-cookie)))
 
 ;; We have disabled the startup screen with `inhibit-startup-screen', but it
-;; would still initialize anyway. This was a temporary workaround to suppress the vanilla ;; startup screen completely. Hopefully, that problem is resolved.
+;; would still initialize anyway. This was a temporary workaround to suppress
+;; the vanilla startup screen completely. Hopefully, that problem is resolved.
 
 ;; (advice-add #'display-startup-screen :override #'ignore)
 
-(when (and ;; (featurep 'native-compile)
-       (fboundp 'native-comp-available-p)
-       (native-comp-available-p))
+(when (and (fboundp 'native-comp-available-p) (native-comp-available-p))
   (setopt
    native-comp-always-compile nil
    ;; Silence compiler warnings as they can be pretty disruptive
@@ -128,6 +127,7 @@
 
 ;; The following style of manipulating the parameters of `default-frame-alist' is faster than disabling the modes explicitly, i.e., running "(tool-bar-mode -1)".
 (push '(tool-bar-lines . 0) default-frame-alist)
+
 ;; The menu bar can be useful to identify different capabilities available and
 ;; their shortcuts but we still turn it off.
 (push '(menu-bar-lines . 0) default-frame-alist)
@@ -235,11 +235,6 @@
      :gui-height 20
      :daemon-height 20
      :mode-line-height 160)
-    ("dell-7506"
-     :font "JetBrainsMonoNerdFontMono"
-     :gui-height 16
-     :daemon-height 16
-     :mode-line-height 120)
     ("cseiitk"
      :font "Iosevka Nerd Font Mono"
      :gui-height 20
@@ -274,18 +269,15 @@
     ;;                     :font font
     ;;                     :height fh)
     ))
-  
+
+(sb/apply-font-gui)
+
 (defun sb/apply-mode-line-height ()
   (when-let* ((cfg (sb/font-config-for-host))
               (mlh (plist-get (cdr cfg) :mode-line-height)))
     (dolist (face '(mode-line mode-line-active mode-line-inactive))
       (set-face-attribute face nil :height mlh))))
 
-;; (unless (daemonp)
-;;   (add-hook 'after-init-hook #'sb/apply-font-gui))
-
-;; Call the function directly instead of a hook.
-(sb/apply-font-gui)
 (add-hook 'after-init-hook #'sb/apply-mode-line-height)
 
 ;; Recommended by `lsp-mode' for better performance
