@@ -100,8 +100,7 @@ The provider is `nerd-icons'."
  use-package-always-ensure t
  use-package-vc-prefer-newest t
  use-package-enable-imenu-support t
- ;; ;; Delay loading packages only in `standalone' mode.
- ;; use-package-expand-minimally t
+ use-package-expand-minimally t
  ;; use-package-always-defer t
  use-package-verbose nil
  use-package-minimum-reported-time 0 ; Show everything
@@ -265,7 +264,7 @@ The provider is `nerd-icons'."
   (create-lockfiles nil)
   (backup-inhibited t "Disable backup for a per-file basis")
   (make-backup-files nil "Stop making backup `~' files")
-  (delete-by-moving-to-trash t) ; Safe
+  (delete-by-moving-to-trash t) ; Safe fallback
 
   ;; Prevents help command completion from triggering autoload.
   (help-enable-completion-autoload nil)
@@ -967,19 +966,19 @@ The provider is `nerd-icons'."
    ("RET" . icomplete-force-complete-and-exit)
    ("C-j" . exit-minibuffer))
 
-  :hook (after-init . icomplete-vertical-mode)
+  :hook (emacs-startup . icomplete-vertical-mode)
 
   :custom
-  (icomplete-delay-completions-threshold 0)
-  (icomplete-compute-delay 0)
-  (icomplete-show-matches-on-no-input t)
-  (icomplete-hide-common-prefix nil)
+  ;; (icomplete-delay-completions-threshold 0)
+  ;; (icomplete-compute-delay 0)
+  ;; (icomplete-show-matches-on-no-input t)
+  ;; (icomplete-hide-common-prefix nil)
   (icomplete-prospects-height 10)
-  (icomplete-separator " . ")
+  ;; (icomplete-separator " . ")
   (icomplete-with-completion-tables t)
-  (icomplete-in-buffer t)
+  ;; (icomplete-in-buffer t)
   (icomplete-max-delay-chars 0)
-  (icomplete-scroll t)
+  ;; (icomplete-scroll t)
 
   :config
   (when (and (>= emacs-major-version 31)
@@ -1065,21 +1064,7 @@ The provider is `nerd-icons'."
 ;; the word at point, even if it is not misspelled.
 
 (use-package jinx
-  ;; Presence of the "enchant-2" executable does not imply that the header files
-  ;; are present for compiling jinx.
-  :preface
-  (defun sb/libenchant-installed-p ()
-    "Return t if libenchant-2-dev is installed, nil otherwise."
-    (string=
-     "INSTALLED"
-     (string-trim
-      (shell-command-to-string
-       "dpkg -s libenchant-2-dev 2>/dev/null | grep -q '^Status: install' && echo INSTALLED || echo NOT-INSTALLED"))))
-
-  :when
-  (and (eq system-type 'gnu/linux)
-       (executable-find "enchant-2")
-       (sb/libenchant-installed-p))
+  :when (and (eq system-type 'gnu/linux) (executable-find "enchant-2"))
 
   :hook ((text-mode conf-mode prog-mode) . jinx-mode)
 
@@ -1414,7 +1399,7 @@ The provider is `nerd-icons'."
 
   :after magit
 
-  :config (difftastic-status-mode 1))
+  :config (magit-difftastic-mode 1))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -1469,24 +1454,11 @@ The provider is `nerd-icons'."
            flycheck-checkers
            '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck)))
 
-  ;; Prefer linters packaged with pylsp
-  (pcase sb/python-langserver
-    ('pylsp
-     (setopt flycheck-checkers
-             (seq-difference
-              flycheck-checkers
-              '(python-flake8
-                python-pylint
-                python-mypy
-                python-ruff
-                python-pycompile
-                python-pyright))))
-    ('basedpyright
-     (setopt flycheck-checkers
-             (seq-difference
-              flycheck-checkers
-              '(python-flake8
-                python-pylint python-mypy python-pycompile python-pyright)))))
+  (setopt flycheck-checkers
+          (seq-difference
+           flycheck-checkers
+           '(python-flake8
+             python-pylint python-mypy python-pycompile python-pyright)))
 
   (setq-default
    flycheck-python-pylint-executable "python3"
@@ -1494,39 +1466,7 @@ The provider is `nerd-icons'."
    flycheck-shellcheck-excluded-warnings '("SC1091"))
 
   ;; https://github.com/flycheck/flycheck/issues/1833
-  (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer))
-
-  ;; Chain checkers with `Lsp-mode', using per-project directory local
-  ;; variables.
-  ;; https://github.com/flycheck/flycheck/issues/1762
-  (defvar-local sb/flycheck-local-checkers nil)
-  (defun sb/flycheck-checker-get (fn checker property)
-    (or (alist-get property (alist-get checker sb/flycheck-local-checkers))
-        (funcall fn checker property)))
-  (advice-add 'flycheck-checker-get :around 'sb/flycheck-checker-get)
-
-  ;; Customize face for Flycheck lighter in the mode line.
-  (when (or (eq sb/theme 'none) (eq sb/theme 'leuven-dark))
-    (defface sb/flycheck-mode-line
-      '((((class color) (background light))
-         ;; Active window
-         :inherit mode-line
-         :foreground "#0474B6"
-         :weight normal
-         :height 1)
-        (((class color) (background light))
-         ;; Inactive window
-         :inherit mode-line-inactive
-         :foreground "#555555"
-         :weight normal
-         :height 1))
-      "Custom face for Flycheck lighter in the mode line.")
-
-    (setopt flycheck-mode-line
-            '(:eval
-              (propertize (flycheck-mode-line-status-text)
-                          'face
-                          'sb/flycheck-mode-line)))))
+  (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer)))
 
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
@@ -1595,9 +1535,9 @@ The provider is `nerd-icons'."
   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
 
   :config
-  (when (and (executable-find "tree-sitter")
-             (fboundp 'treesit-available-p)
-             (treesit-available-p))
+  (when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (executable-find "tree-sitter"))
     (setopt
      indent-bars-treesit-support t
      indent-bars-treesit-ignore-blank-lines-types '("module")
@@ -1913,100 +1853,8 @@ The provider is `nerd-icons'."
   ;; https://github.com/TheBB/company-reftex/pull/13
   (company-reftex-labels-parse-all nil))
 
-;; (use-package bibtex-completion
-;;   :after tex
-;;   :commands bibtex-completion-insert-citation)
-
-;; ;; I cannot get this to work correctly.
-;; (use-package company-bibtex
-;;   :after tex
-;;   :commands company-bibtex)
-
 (use-package company-try-hard
   :bind (:map company-active-map ("C-j" . company-try-hard)))
-
-;; We should enable `company-fuzzy-mode' at the very end of configuring
-;; `company'. Nice feature but slows completions.
-
-;; (use-package company-fuzzy
-;;   :after company
-;;   :custom
-;;   ;; Using "flx" slows down completion significantly
-;;   (company-fuzzy-sorting-backend 'alphabetic)
-;;   ;; The right-hand side may get cut off if the annotations are
-;;   ;; right-aligned. Disable this after the mode is set up properly.
-;;   (company-fuzzy-show-annotation t)
-;;   ;; We should not need this with "flx" sorting because the "flx" sorting
-;;   ;; accounts for the prefix. Disabling the requirement may help with
-;;   ;; performance.
-;;   (company-fuzzy-prefix-on-top t)
-;;   (company-fuzzy-trigger-symbols '("." "->" "<" "\"" "'" "@" "::" ":"))
-;;   (company-fuzzy-reset-selection t)
-;;   ;; Ignore backends that are already fuzzy
-;;   (company-fuzzy-passthrough-backends
-;;    '(company-capf
-;;      company-yasnippet
-;;      company-dabbrev
-;;      company-dabbrev-code
-;;      company-files
-;;      company-ispell))
-;;   :diminish)
-
-;; Notes on configuring `company-backends'.
-
-;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
-;; backends. `company-yasnippet' is blocking. Only a few backends are
-;; specialized on certain major modes or certain contexts (e.g., outside of
-;; strings and comments), and pass control to later backends when outside of
-;; that major mode or context.
-
-;; A few mode-agnostic backends are applicable to all modes:
-;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
-;; `company-dabbrev'.
-
-;; The ‘prefix’ bool command always returns non-nil for following backends even
-;; when their candidates list command is empty: `company-abbrev',
-;; `company-dabbrev', `company-dabbrev-code'.
-
-;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode,
-;; inside strings, or comments). That is why it is better to put
-;; `company-dabbrev' at the end.
-
-;; The keyword ":with" helps to make sure the results from major/minor mode
-;; agnostic backends (such as `company-yasnippet', `company-dabbrev-code') are
-;; returned without preventing results from context-aware backends (such as
-;; `company-capf' or `company-clang'). For this feature to work, put backends
-;; dependent on a mode at the beginning of the grouped backends list, then put a
-;; keyword ":with", and then put context-agnostic backend(s).
-
-;; Company does not support grouping of entirely arbitrary backends, they need
-;; to be compatible in what `prefix' returns. If the group contains keyword
-;; `:with', the backends listed after the keyword are ignored for the purpose of
-;; the `prefix' command. If the group contains keyword `:separate', the
-;; candidates that come from different backends are sorted separately in the
-;; combined list. That is, with `:separate', the multi-backend-adapter will stop
-;; sorting and keep the order of completions just like the backends returned
-;; them.
-
-;; Try completion backends in order until there is a non-empty completion list:
-
-;; (setopt company-backends '(company-xxx company-yyy company-zzz))
-
-;; Merge completions of all the backends:
-
-;; (setopt company-backends '((company-xxx company-yyy company-zzz)))
-
-;; Both the backends will generate completions at the same time, and their
-;; results will be merged. `company-yasnippet' will be queried even if
-;; `company-capf' returns nil. Company treats the result as coming from a single
-;; backend.
-
-;; (setopt company-backends '((company-capf :with company-yasnippet)))
-
-;; Merge completions of all the backends but keep the candidates organized in
-;; accordance with the grouped backends order.
-
-;; (setopt company-backends '((company-xxx company-yyy company-zzz :separate)))
 
 (with-eval-after-load 'company
   ;; Override `company-backends' for unhandled major modes.
@@ -2116,10 +1964,9 @@ The provider is `nerd-icons'."
        (setq-local company-minimum-prefix-length 2)
        (sb/company-non-lsp-prog-mode)))))
 
-;; Vertico does its own sorting based on recency, Corfu has `corfu-history', and
-;; Company has `company-statistics'. Prescient uses frecency (frequency +
-;; recency) for sorting. Recently used commands should be sorted first. Only
-;; commands that have never been used before will be sorted by length.
+;; Prescient uses frecency (frequency + recency) for sorting. Recently used
+;; commands should be sorted first. Only commands that have never been used
+;; before will be sorted by length.
 
 (use-package prescient
   :hook (emacs-startup . prescient-persist-mode)
@@ -2130,15 +1977,6 @@ The provider is `nerd-icons'."
   :after company
 
   :init (company-prescient-mode 1))
-
-(defun sb/setup-lsp-provider ()
-  "Set up LSP based on `sb/lsp-provider`.
-Uses `eglot` or `lsp-mode` depending on configuration."
-  (cond
-   ((eq sb/lsp-provider 'eglot)
-    (eglot-ensure))
-   ((eq sb/lsp-provider 'lsp-mode)
-    (lsp-deferred))))
 
 ;; Highlight symbols on hover
 (use-package symbol-overlay
@@ -2227,16 +2065,15 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :ensure nil
 
   :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
+  (and (fboundp 'treesit-available-p)
+       (treesit-available-p)
+       (executable-find "tree-sitter"))
 
   :bind
   (("C-M-<up>" . treesit-up-list)
    ("C-M-<down>" . treesit-down-list)
-   ("C-M-f" . treesit-forward-sexp)
-   ("C-M-a" . treesit-beginning-of-defun)
-   ("C-M-e" . treesit-end-of-defun))
+   ;; ("C-M-w" . treesit-forward-sexp)
+   ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
 
   :custom
   (treesit-enabled-modes t)
@@ -2330,21 +2167,21 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     (lambda ()
       (setq-local c-basic-offset 4)
       (c-set-style "awk")
-      (sb/setup-lsp-provider)))
+      (eglot-ensure)))
    ((c-mode c++-mode)
     .
     (lambda ()
       (setq-local c-basic-offset 2)
       (c-set-style "linux")
-      (sb/setup-lsp-provider)))))
+      (eglot-ensure)))))
 
 (use-package c-ts-mode
   :ensure nil
 
   :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
+  (and (fboundp 'treesit-available-p)
+       (treesit-available-p)
+       (executable-find "tree-sitter"))
 
   :mode (("\\.h\\'" . c-or-c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
 
@@ -2361,7 +2198,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
       c-enable-auto-newline nil
       c-syntactic-indentation nil)
      (c-ts-mode-set-style "linux")
-     (sb/setup-lsp-provider)))
+     (eglot-ensure)))
 
   :bind
   (:map
@@ -2391,7 +2228,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; `cmake-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (sb/setup-lsp-provider))))
+     (eglot-ensure))))
 
 (use-package highlight-doxygen
   :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
@@ -2409,7 +2246,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (setq-local tab-width 4)
-     (sb/setup-lsp-provider)))
+     (eglot-ensure)))
 
   :bind*
   (:map
@@ -2479,7 +2316,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    (lambda ()
      ;; Apply formatting defaults for shfmt used by bash-language-server
      (setenv "SHFMT_OPTS" "-i 2 -ci")
-     (sb/setup-lsp-provider)))
+     (eglot-ensure)))
   :bind (:map sh-mode-map ("C-c C-d"))
   :custom
   (sh-basic-offset 2)
@@ -2496,7 +2333,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (add-hook 'before-save-hook #'fish_indent-before-save)
-     (sb/setup-lsp-provider))))
+     (eglot-ensure))))
 
 (use-package lisp-mode
   :ensure nil
@@ -2528,7 +2365,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 
   :mode ("\\.toml\\'" "Cargo\\.lock\\'")
 
-  :hook (toml-ts-mode . sb/setup-lsp-provider))
+  :hook (toml-ts-mode . eglot-ensure))
 
 (use-package yaml-mode
   :mode
@@ -2544,7 +2381,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      ;; `yaml-mode' is derived from `text-mode', so disable grammar and spell
      ;; checking.
      (jinx-mode -1)
-     (sb/setup-lsp-provider))))
+     (eglot-ensure))))
 
 (use-package yaml-imenu
   :hook ((yaml-mode yaml-ts-mode) . yaml-imenu-enable))
@@ -2552,7 +2389,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package web-mode
   :mode "\\.html?\\'"
 
-  :hook (web-mode . sb/setup-lsp-provider)
+  :hook (web-mode . eglot-ensure)
 
   :bind ("C-c C-d")
 
@@ -2586,14 +2423,14 @@ Uses `eglot` or `lsp-mode` depending on configuration."
 (use-package css-mode
   :ensure nil
 
-  :hook ((css-mode css-ts-mode) . sb/setup-lsp-provider)
+  :hook ((css-mode css-ts-mode) . eglot-ensure)
 
   :custom (css-indent-offset 2))
 
 (use-package autoconf
   :ensure nil
 
-  :hook (autoconf-mode . sb/setup-lsp-provider))
+  :hook (autoconf-mode . eglot-ensure))
 
 (use-package make-mode
   :ensure nil
@@ -2608,7 +2445,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
    .
    (lambda ()
      (setq-local indent-tabs-mode t)
-     (sb/setup-lsp-provider))))
+     (eglot-ensure))))
 
 (use-package bison-mode
   :mode ("\\.flex\\'" . flex-mode)
@@ -2635,7 +2472,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     ;; Auto-pair backticks
     (with-eval-after-load 'elec-pair
       (sb/add-pairs '((?` . ?`))))
-    (sb/setup-lsp-provider))
+    (eglot-ensure))
 
   :mode ("README\\.md\\'" . gfm-mode)
 
@@ -2675,7 +2512,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
     ;; `xml-mode' is derived from `text-mode', so disable grammar and spell
     ;; checking.
     (jinx-mode -1)
-    (sb/setup-lsp-provider))
+    (eglot-ensure))
 
   :ensure nil
 
@@ -2694,7 +2531,7 @@ Uses `eglot` or `lsp-mode` depending on configuration."
   :preface
   (defun sb/json-setup ()
     (setq-local js-indent-level 2)
-    (sb/setup-lsp-provider))
+    (eglot-ensure))
 
   :mode
   (("pyrightconfig\\.json\\'" . jsonc-mode)
@@ -2973,16 +2810,6 @@ Uses `eglot` or `lsp-mode` depending on configuration."
      'TeX-view-program-list
      '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
     (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
-
-;; (use-package tex
-;;   :ensure nil
-
-;;   :config
-;;   (when (executable-find "okular")
-;;     (add-to-list
-;;      'TeX-view-program-list
-;;      '("Okular" ("okular --unique file:%o" (mode-io-correlate "#src:%n%a"))))
-;;     (add-to-list 'TeX-view-program-selection '(output-pdf "Okular"))))
 
 (use-package reftex
   :ensure nil
@@ -3329,48 +3156,16 @@ Fallback to `xref-go-back'."
 
 (use-package kdl-mode
   :when
-  (and (executable-find "tree-sitter")
-       (fboundp 'treesit-available-p)
-       (treesit-available-p))
+  (and (fboundp 'treesit-available-p)
+       (treesit-available-p)
+       (executable-find "tree-sitter"))
 
   :mode ("\\.kdl\\'" . kdl-mode))
 
-;; (use-package kdl-ts-mode
-;;   :ensure (:host github :repo "dataphract/kdl-ts-mode")
-;;   :mode ("\\.kdl\\'" . kdl-ts-mode))
+(use-package asm-mode
+  :ensure nil
 
-;; ;; Fontify ssh files
-;; (use-package ssh-config-mode
-;;   :mode ("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode)
-
-;;   :mode ("/known_hosts\\'" . ssh-known-hosts-mode)
-
-;;   :mode ("/authorized_keys\\'" . ssh-authorized-keys-mode))
-
-;; ;; The LSP is too slow to start.
-;; (use-package asm-mode
-;;   :ensure nil
-
-;;   ;; :hook (asm-mode . sb/setup-lsp-provider)
-;;   )
-
-;; ;; Guess the indentation offset originally used in foreign source code files and
-;; ;; transparently adjust the corresponding settings in Emacs making it more
-;; ;; convenient to edit the foreign files.
-
-;; (use-package dtrt-indent
-;;   :hook (find-file . dtrt-indent-mode)
-
-;;   :diminish)
-
-;; (use-package hl-line
-;;   :ensure nil
-
-;;   :hook (dired-mode . hl-line-mode)
-
-;;   :custom
-;;   ;; Restrict `hl-line-mode' highlighting to the current window
-;;   (hl-line-sticky-flag nil))
+  :hook (asm-mode . eglot-ensure))
 
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
@@ -3386,65 +3181,6 @@ Fallback to `xref-go-back'."
        (or (executable-find "xclip") (executable-find "xsel")))
 
   :hook (after-init . xclip-mode))
-
-;; (use-package breadcrumb
-;;   :ensure (:host github :repo "joaotavora/breadcrumb")
-
-;;   :hook (prog-mode . breadcrumb-mode)
-
-;;   :bind ("C-c i j" . breadcrumb-jump)
-
-;;   :config (breadcrumb-imenu-crumbs))
-
-;; ;; Hide a block with "C-c @ C-d", hide all folds with "C-c @ C-t", hide all
-;; ;; blocks below the current level with "C-c @ C-l", show a block with "C-c @
-;; ;; C-s", show all folds with "C-c @ C-a", and toggle hiding of a block with "C-c
-;; ;; @ C-c".
-;; (use-package hideshow
-;;   ;;   :preface
-;;   ;;   (defun sb/toggle-fold ()
-;;   ;;     (interactive)
-;;   ;;     (save-excursion
-;;   ;;       (end-of-line)
-;;   ;;       (hs-toggle-hiding)))
-
-;;   :ensure nil
-
-;;   ;;   :hook
-;;   ;;   ((c-mode-common
-;;   ;;     c-ts-mode
-;;   ;;     c++-mode
-;;   ;;     c++-ts-mode
-;;   ;;     cmake-mode
-;;   ;;     cmake-ts-mode
-;;   ;;     css-mode
-;;   ;;     css-ts-mode
-;;   ;;     emacs-lisp-mode
-;;   ;;     fish-mode
-;;   ;;     html-mode
-;;   ;;     java-mode
-;;   ;;     java-ts-mode
-;;   ;;     makefile-mode
-;;   ;;     perl-mode
-;;   ;;     python-mode
-;;   ;;     python-ts-mode
-;;   ;;     sh-mode
-;;   ;;     bash-ts-mode
-;;   ;;     json-mode
-;;   ;;     json-ts-mode
-;;   ;;     jsonc-mode
-;;   ;;     yaml-mode
-;;   ;;     yaml-ts-mode)
-;;   ;;    . hs-minor-mode)
-
-;;   :custom (hs-isearch-open t "Open all folds while searching")
-
-;;   :diminish hs-minor-mode)
-
-;; ;; Switch between foo_bar -> FOO_BAR -> FooBar -> fooBar -> foo-bar -> Foo_Bar -> foo_bar
-
-;; (use-package string-inflection
-;;   :bind (:map prog-mode-map ("C-c C-u" . string-inflection-all-cycle)))
 
 ;; (use-package kill-file-path
 
@@ -3579,14 +3315,8 @@ Fallback to `xref-go-back'."
       .
       ("java" "-jar"
        ,(expand-file-name "servers/org.eclipse.lemminx-uber.jar"
-                          user-emacs-directory)))))
-
-  (if (eq sb/python-langserver 'pylsp)
-      (add-to-list
-       'eglot-server-programs '((python-mode python-ts-mode) . ("pylsp")))
-    (add-to-list
-     'eglot-server-programs
-     '((python-mode python-ts-mode) . ("rass" "python"))))
+                          user-emacs-directory)))
+     ((python-mode python-ts-mode) . ("rass" "python"))))
 
   ;; Eglot overwrites `company-backends' to only include `company-capf'
   (setq eglot-stay-out-of '(flymake yasnippet company eldoc))
@@ -3762,56 +3492,6 @@ Fallback to `xref-go-back'."
 
   :hook (eglot-managed-mode . eglot-booster-mode))
 
-(use-package eglot-java
-  :when (eq sb/lsp-provider 'eglot)
-
-  :hook
-  ((java-mode . eglot-ensure)
-   (eglot-managed-mode
-    .
-    (lambda ()
-      (when (derived-mode-p 'java-mode)
-        (eglot-java-mode)))))
-
-  :config
-  (defun sb/eglot-java-init-opts (server eglot-java-eclipse-jdt)
-    "Custom options that will be merged with any default settings."
-    `( ;;:workspaceFolders: ["file:///home/swarnendu/mavenproject"]
-      :settings
-      (:java
-       (:home "/usr/lib/jvm/java-21-openjdk-amd64/")
-       :configuration
-       (:runtimes
-        [(:name "JavaSE-17" :path "/usr/lib/jvm/openjdk-17/")
-         (:name "JavaSE-21" :path "/usr/lib/jvm/openjdk-21/" :default t)])
-       :completion (:guessMethodArguments t)
-       :format
-       (:enabled
-        t
-        :comments (:enabled t)
-        :onType (:enabled :json-false)
-        :tabSize 4
-        :insertSpaces t
-        :settings
-        (:url
-         "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
-       :extendedClientCapabilities (:classFileContentsSupport t))))
-
-  (setopt eglot-java-user-init-opts-fn 'sb/eglot-java-init-opts))
-
-(use-package eglot-hierarchy
-  :vc (:url "https://github.com/dolmens/eglot-hierarchy")
-
-  :when (eq sb/lsp-provider 'eglot)
-
-  :after eglot
-
-  :commands
-  (eglot-hierarchy-call-hierarchy
-   eglot-hierarchy-incoming-calls
-   eglot-hierarchy-outgoing-calls
-   eglot-hierarchy-type-hierarchy))
-
 (use-package flycheck-eglot
   :when (eq sb/lsp-provider 'eglot)
 
@@ -3820,17 +3500,6 @@ Fallback to `xref-go-back'."
   :hook (eglot-managed-mode . flycheck-eglot-mode)
 
   :custom (flycheck-eglot-exclusive nil))
-
-(use-package eglot-inactive-regions
-  :when (eq sb/lsp-provider 'eglot)
-
-  :after eglot
-
-  :hook (eglot-managed-mode . eglot-inactive-regions-mode)
-
-  :custom
-  (eglot-inactive-regions-style 'darken-foreground)
-  (eglot-inactive-regions-opacity 0.4))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
