@@ -58,24 +58,6 @@
   :type '(radio (const :tag "company" company) (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Keeping icons disabled should lower overhead and help with the alignment
-;; issue with Company and Corfu popups in the terminal.
-(defcustom sb/enable-icons nil
-  "Should icons be enabled?
-The provider is `nerd-icons'."
-  :type 'boolean
-  :group 'sb/emacs)
-
-;; Nerd-icons are more compact and look nicer than kind-icons.
-(defcustom sb/corfu-icons 'kind-icons
-  "Choose the provider for Corfu icons."
-  :type
-  '(radio
-    (const :tag "kind-icon" kind-icon)
-    (const :tag "nerd-icons" nerd-icons)
-    (const :tag "none" none))
-  :group 'sb/emacs)
-
 ;; It is tempting to use Eglot because it is built in to Emacs and is
 ;; lightweight. Eglot does not allow multiple servers to connect to a major
 ;; mode, does not support semantic tokens.
@@ -1387,9 +1369,6 @@ The provider is `nerd-icons'."
   (magit-commit-show-diff nil)
 
   :config
-  (when (bound-and-true-p sb/enable-icons)
-    (setopt magit-format-file-function #'magit-format-file-nerd-icons))
-
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
     (setopt magit-diff-refine-hunk t)))
@@ -1745,9 +1724,6 @@ The provider is `nerd-icons'."
   (company-search-regexp-function 'company-search-words-in-any-order-regexp)
 
   :config
-  (unless (bound-and-true-p sb/enable-icons)
-    (setopt company-format-margin-function nil))
-
   (setopt
    company-transformers
    '(delete-dups
@@ -3038,9 +3014,6 @@ Fallback to `xref-go-back'."
   ;; (vc-state-base ((t (:foreground "yellow" :height 0.8))))
 
   :config
-
-  (when (bound-and-true-p sb/enable-icons)
-    (require 'nerd-icons))
 
   (mini-echo-define-segment
    "shrink-path"
