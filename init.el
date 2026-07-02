@@ -3003,18 +3003,7 @@ Fallback to `xref-go-back'."
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale")))
 
-  ;; :custom-face
-  ;; (mini-echo-major-mode ((t (:height 0.8))))
-  ;; (mini-echo-buffer-position ((t (:height 0.8))))
-  ;; (mini-echo-buffer-size ((t (:height 0.8))))
-  ;; (mini-echo-project ((t (:foreground "#ffb86c" :weight bold :height 0.8))))
-  ;; (mini-echo-lsp ((t (:height 0.8))))
-  ;; (mini-echo-remote-host ((t (:height 0.8))))
-  ;; (mini-echo-buffer-name ((t (:height 0.8))))
-  ;; (vc-state-base ((t (:foreground "yellow" :height 0.8))))
-
   :config
-
   (mini-echo-define-segment
    "shrink-path"
    "Return shrink path of current buffer in project or parent dir."
@@ -3059,65 +3048,7 @@ Fallback to `xref-go-back'."
                 'face
                 '(:foreground "white" :height 1.0)))
 
-   :update (mini-echo-update-project-root))
-
-  (mini-echo-define-segment
-   "vcs" "Show VCS info with icon."
-   :fetch
-   (when (and (bound-and-true-p vc-mode) buffer-file-name)
-     (let* ((branch (substring-no-properties vc-mode 5))
-            (branch (propertize branch 'face '(:height 1.0)))
-            (icon
-             (when (fboundp 'nerd-icons-octicon)
-               (nerd-icons-octicon
-                "nf-oct-git_branch"
-                :face 'mini-echo-yellow
-                :height 1.0))))
-       (concat
-        (when icon
-          (concat icon " "))
-        branch))))
-
-  (mini-echo-define-segment
-   "lsp-mode" "Show LSP status with icon."
-   :fetch
-   (when (and (bound-and-true-p lsp-mode) (lsp-workspaces))
-     (let* ((icon
-             (when (fboundp 'nerd-icons-mdicon)
-               (nerd-icons-mdicon
-                "nf-md-rocket_launch"
-                :face 'mini-echo-green
-                :height 0.8))))
-       (concat
-        (when icon
-          (concat " " icon))))))
-
-  (mini-echo-define-segment
-   "lsp-mode" "Show dynamic LSP status with active server count."
-   :fetch
-   (when (and (bound-and-true-p lsp-mode) (fboundp 'lsp-workspaces))
-     (let*
-         ((active-servers (lsp-workspaces))
-          (server-count (length active-servers))
-          ;; Use an orange/yellow warning face if LSP is active but no servers connected
-          (icon-face
-           (if (> server-count 0)
-               'mini-echo-green
-             'mini-echo-yellow))
-          (icon
-           (when (fboundp 'nerd-icons-mdicon)
-             (nerd-icons-mdicon
-              "nf-md-rocket_launch"
-              :face icon-face
-              :height 0.8))))
-       (concat
-        (when icon
-          (concat " " icon))
-        ;; Only show the count if you have multiple servers running (like your 3-server LaTeX setup)
-        (when (> server-count 1)
-          (propertize (format "(%d)" server-count)
-                      'face
-                      `(:inherit shadow :height 0.7))))))))
+   :update (mini-echo-update-project-root)))
 
 ;; Center the text environment
 (use-package olivetti
