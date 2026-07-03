@@ -45,34 +45,6 @@
   :type '(radio (const :tag "mini-echo" mini-echo) (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Company works better with both Windows and TUI Emacs, and has more extensive
-;; LaTeX support than Corfu. It allows finer-grained control by allowing
-;; grouping of backends. We can set up separate completion files with
-;; `company-ispell' and `company-dict'. However, `company-ispell' does not keep
-;; prefix case when used as a grouped backend. Company works well with TUI
-;; because Emacs versions till 30.x does not support child frames on the
-;; terminal which is required by Corfu.
-
-(defcustom sb/completion-provider 'company
-  "Choose the framework to use for completion at point."
-  :type '(radio (const :tag "company" company) (const :tag "none" none))
-  :group 'sb/emacs)
-
-;; It is tempting to use Eglot because it is built in to Emacs and is
-;; lightweight. Eglot does not allow multiple servers to connect to a major
-;; mode, does not support semantic tokens.
-
-;; Lsp-mode offers several advantages. It allows connecting to multiple servers
-;; simultaneously and provides helpers to install and uninstall servers.
-
-;; Using a single server suffices for most programming language major modes, but
-;; it is beneficial to use more than one LS for languages like plain text,
-;; markdown, and LaTeX. Texlab is inefficient and so Eglot suffices for me.
-(defcustom sb/lsp-provider 'eglot
-  "Choose between Lsp-mode and Eglot."
-  :type '(radio (const :tag "eglot" eglot) (const :tag "none" none))
-  :group 'sb/emacs)
-
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -939,6 +911,8 @@
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
 (use-package icomplete
+  :hook (emacs-startup . fido-vertical-mode)
+
   :bind
   (:map
    icomplete-minibuffer-map
@@ -946,9 +920,11 @@
    ("C-p" . icomplete-backward-completions)
    ("C-v" . icomplete-vertical-toggle)
    ("RET" . icomplete-force-complete-and-exit)
-   ("C-j" . exit-minibuffer))
-
-  :hook (emacs-startup . icomplete-vertical-mode)
+   ("C-j" . exit-minibuffer)
+   :map
+   icomplete-vertical-mode-minibuffer-map
+   ("M-<" . icomplete-vertical-goto-first)
+   ("M->" . icomplete-vertical-goto-last))
 
   :custom
   ;; (icomplete-delay-completions-threshold 0)
@@ -958,19 +934,26 @@
   (icomplete-prospects-height 10)
   ;; (icomplete-separator " . ")
   (icomplete-with-completion-tables t)
+
+  ;; Enable icomplete-mode for completion-at-point
   ;; (icomplete-in-buffer t)
-  (icomplete-max-delay-chars 0)
+
+  ;; (icomplete-max-delay-chars 0)
   ;; (icomplete-scroll t)
 
   :config
-  (when (and (>= emacs-major-version 31)
-             (boundp 'icomplete-vertical-in-buffer-adjust-list))
+  ;; (when (and (>= emacs-major-version 31)
+  ;;            (boundp 'icomplete-vertical-in-buffer-adjust-list))
 
-    (setq icomplete-vertical-in-buffer-adjust-list t)
-    (setq icomplete-vertical-render-prefix-indicator t))
+  ;;   (setq icomplete-vertical-in-buffer-adjust-list t)
+  ;;   (setq icomplete-vertical-render-prefix-indicator t))
 
-  (if icomplete-in-buffer
-      (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
+  ;; By default, when you press C-M-i, both Icomplete mode's in-buffer display
+  ;; of possible completions and the *Completions* buffer appear. If you are
+  ;; using icomplete-in-buffer, then you may wish to suppress this appearance of
+  ;; the *Completions* buffer.
+  (when (bound-and-true-p icomplete-in-buffer)
+    (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
 
 ;; (use-package ispell
 ;;   :ensure nil
@@ -1374,7 +1357,7 @@
     (setopt magit-diff-refine-hunk t)))
 
 (use-package magit-difftastic
-  :vc (:url "https://github.com/rschmukler/magit-difftastic")
+  :vc (:url "https://github.com/rschmukler/magit-difftastic" :rev :newest)
 
   :after magit
 
@@ -1582,14 +1565,12 @@
   (("M-p" . minibuffer-previous-completion)
    ("M-n" . minibuffer-next-completion))
 
-  :custom
-  (enable-recursive-minibuffers t "Tracking the depth can be confusing")
-  (completion-ignore-case t)
+  :custom (enable-recursive-minibuffers t "Tracking the depth can be confusing")
   ;; Ignore case when reading a file name
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
   (read-buffer-completion-ignore-case t)
-  ;; (completion-styles '(basic orderless))
+  (completion-styles '(basic flex))
   (completion-category-defaults nil)
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
@@ -1654,8 +1635,6 @@
 ;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
 (use-package company
-  :when (eq sb/completion-provider 'company)
-
   :hook (after-init . global-company-mode)
 
   :bind
@@ -1735,14 +1714,13 @@
 
   ;; Disable code candidates in comments, otherwise text completions are not offered with Eglot.
   ;; https://github.com/company-mode/company-mode/discussions/1498
-  (when (eq sb/lsp-provider 'eglot)
-    (defun sb/company-capf-around (orig-fun &rest args)
-      "Custom advice for `company-capf--prefix' to restrict completions in comments."
-      (let ((syntax-info (syntax-ppss)))
-        (if (nth 4 syntax-info)
-            nil
-          (apply orig-fun args))))
-    (advice-add 'company-capf--prefix :around #'sb/company-capf-around))
+  (defun sb/company-capf-around (orig-fun &rest args)
+    "Custom advice for `company-capf--prefix' to restrict completions in comments."
+    (let ((syntax-info (syntax-ppss)))
+      (if (nth 4 syntax-info)
+          nil
+        (apply orig-fun args))))
+  (advice-add 'company-capf--prefix :around #'sb/company-capf-around)
 
   (defun sb/company-abort-then-kill-word ()
     "If company popup is active, close it, then delete the next word."
@@ -2831,26 +2809,6 @@
 ;;    TeX-mode-map ("$" . math-delimiters-insert)
 ;;    :map LaTeX-mode-map ("$" . math-delimiters-insert)))
 
-(use-package citar
-  :when (eq sb/completion-provider 'corfu)
-
-  :after (org tex cape)
-
-  :custom
-  ;; Remove support for `org-mode' and `markdown-mode'
-  (citar-major-mode-functions
-   '((LaTeX-mode
-      .
-      ((local-bib-files . citar-latex-local-bib-files)
-       (insert-citation . citar-latex-insert-citation)
-       (insert-edit . citar-latex-insert-edit)
-       (key-at-point . citar-latex-key-at-point)
-       (citation-at-point . citar-latex-citation-at-point)
-       (list-keys . citar-latex-list-keys)))
-     (t . ((insert-keys . citar--insert-keys-comma-space-separated)))))
-  ;; Only show key and title in Corfu popup
-  (citar-format-reference-function 'citar-citeproc-format-reference))
-
 (use-package dumb-jump
   :after xref
 
@@ -2994,7 +2952,6 @@ Fallback to `xref-go-back'."
      ("remote-host"
       "selection-info"
       "flycheck"
-      "lsp-mode"
       "vcs"
       "buffer-position"
       "major-mode"
@@ -3095,8 +3052,6 @@ Fallback to `xref-go-back'."
 ;;    kill-file-path))
 
 (use-package eglot
-  :when (eq sb/lsp-provider 'eglot)
-
   :after project
 
   :pin gnu
@@ -3387,18 +3342,7 @@ Fallback to `xref-go-back'."
      (slot . 2)
      (window-height . 0.5))))
 
-(use-package eglot-booster
-  :vc (:url "https://github.com/jdtsmith/eglot-booster")
-
-  :when (executable-find "emacs-lsp-booster")
-
-  :after eglot
-
-  :hook (eglot-managed-mode . eglot-booster-mode))
-
 (use-package flycheck-eglot
-  :when (eq sb/lsp-provider 'eglot)
-
   :after (flycheck eglot)
 
   :hook (eglot-managed-mode . flycheck-eglot-mode)
