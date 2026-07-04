@@ -955,71 +955,76 @@
   (when (bound-and-true-p icomplete-in-buffer)
     (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
 
-;; (use-package ispell
-;;   :ensure nil
+(use-package ispell
+  :ensure nil
 
-;;   :bind ("M-$" . ispell-word)
+  :bind ("M-$" . ispell-word)
 
-;;   :custom
-;;   (ispell-dictionary "en_US")
-;;   (ispell-local-dictionary "en_US")
-;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-;;   (ispell-alternate-dictionary
-;;    (expand-file-name "wordlist.5" sb/extras-directory))
-;;   ;; Save a new word to personal dictionary without asking
-;;   (ispell-silently-savep t)
+  :custom
+  (ispell-dictionary "en_US")
+  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+  (ispell-alternate-dictionary
+   (expand-file-name "wordlist.5" sb/extras-directory))
+  ;; Save a new word to personal dictionary without asking
+  (ispell-silently-savep t)
 
-;;   :config
-;;   (when (boundp 'ispell-save-corrections-as-abbrevs)
-;;     (setq ispell-save-corrections-as-abbrevs t))
+  :config
+  (when (boundp 'ispell-save-corrections-as-abbrevs)
+    (setq ispell-save-corrections-as-abbrevs t))
 
-;;   ;; Prefer hunspell over aspell on Linux platforms
-;;   (cond
-;;    ((executable-find "hunspell")
-;;     (progn
-;;       (setenv "DICTIONARY" "en_US")
-;;       (setenv "DICPATH" (concat user-emacs-directory "hunspell"))
-;;       (setopt
-;;        ispell-program-name "hunspell"
-;;        ispell-local-dictionary-alist
-;;        '(("en_US"
-;;           "[[:alpha:]]"
-;;           "[^[:alpha:]]"
-;;           "[']"
-;;           nil
-;;           ("-d" "en_US")
-;;           nil
-;;           utf-8))
-;;        ispell-hunspell-dictionary-alist ispell-local-dictionary-alist
-;;        ispell-hunspell-dict-paths-alist `(("en_US" ,(concat user-emacs-directory "hunspell/en_US.dic"))))))
-;;    ((executable-find "aspell")
-;;     (progn
-;;       (setopt
-;;        ispell-program-name "aspell"
-;;        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case")))))
+  ;; Prefer hunspell over aspell on Linux platforms
+  (cond
+   ((executable-find "hunspell")
+    (setenv "DICPATH" (expand-file-name "hunspell" user-emacs-directory))
+    (let ((en-us-dict
+           '(("en_US"
+              "[[:alpha:]]"
+              "[[^:alpha:]]"
+              "[']"
+              nil
+              ("-d" "en_US")
+              nil
+              utf-8))))
+      (setopt
+       ispell-program-name "hunspell"
+       ispell-local-dictionary-alist en-us-dict)
+      (setq
+       ispell-hunspell-dictionary-alist en-us-dict
+       ispell-hunspell-dict-paths-alist
+       `(("en_US"
+          ,(expand-file-name "hunspell/en_US.dic" user-emacs-directory))))))
+   ((executable-find "aspell")
+    (setopt
+     ispell-program-name "aspell"
+     ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case"))))
 
-;;   ;; Skip regions in `org-mode'
-;;   (dolist
-;;       (skip-pair
-;;        '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-;;          ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-;;          ("~" . "~")
-;;          ("=" . "=")
-;;          ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-;;          ;; Footnotes in org that have http links that are line breaked should not be ispelled
-;;          ("^http" . "\\]")
-;;          ("`" . "`")
-;;          ("cite:" . "[[:space:]]")
-;;          ("label:" . "[[:space:]]")
-;;          ("ref:" . "[[:space:]]")
-;;          ("\\\\begin{multline}" . "\\\\end{multline}")
-;;          ("\\\\begin{equation}" . "\\\\end{equation}")
-;;          ("\\\\begin{align}" . "\\\\end{align}")))
-;;     (add-to-list 'ispell-skip-region-alist skip-pair))
+  ;; Skip regions in `org-mode'
+  (defun sb/org-ispell-setup ()
+    (setq-local ispell-skip-region-alist
+                (append
+                 '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+                   ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+                   ("~" . "~")
+                   ("=" . "=")
+                   ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+                   ;; Footnotes in org that have http links
+                   ;; that are line breaked should not be
+                   ;; ispelled
+                   ("^http" . "\\]")
+                   ("`" . "`")
+                   ("cite:" . "[[:space:]]")
+                   ("label:" . "[[:space:]]")
+                   ("ref:" . "[[:space:]]")
+                   ("\\\\begin{multline}" . "\\\\end{multline}")
+                   ("\\\\begin{equation}" . "\\\\end{equation}")
+                   ("\\\\begin{align}" . "\\\\end{align}"))
+                 ispell-skip-region-alist)))
 
-;;   ;; Hide the "Starting new Ispell process" message
-;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+  (add-hook 'org-mode-hook #'sb/org-ispell-setup)
+
+  ;; Hide the "Starting new Ispell process" message
+  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
 
 ;; Silence "Starting 'look' process..." message
 (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
@@ -1356,12 +1361,12 @@
     ;; Show fine differences for the current diff hunk only
     (setopt magit-diff-refine-hunk t)))
 
-(use-package magit-difftastic
-  :vc (:url "https://github.com/rschmukler/magit-difftastic" :rev :newest)
+;; (use-package magit-difftastic
+;;   :vc (:url "https://github.com/rschmukler/magit-difftastic" :rev :newest)
 
-  :after magit
+;;   :after magit
 
-  :config (magit-difftastic-mode 1))
+;;   :config (magit-difftastic-mode 1))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -1982,6 +1987,7 @@
 
   ;;   ;; Increased default font locking may hurt performance
   ;;   (treesit-font-lock-level 4)
+
   ;;   (treesit-language-source-alist
   ;;    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
   ;;      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
@@ -2017,6 +2023,7 @@
   ;;      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
   ;;      (rust "https://github.com/tree-sitter/tree-sitter-rust")
   ;;      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
   ;;   :config
   ;;   (setopt treesit-language-source-alist
   ;;           '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
@@ -2050,11 +2057,6 @@
 ;; (with-eval-after-load 'c++-ts-mode
 ;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
 ;;   (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map))
-
-;; (with-eval-after-load 'treesit
-;;   ;; Improves performance with large files without significantly diminishing
-;;   ;; highlight quality
-;;   (setq font-lock-maximum-decoration '((c-mode . 2) (c++-mode . 2) (t . t))))
 
 ;; Some systems may not have treesitter mode enabled.
 (use-package cc-mode
@@ -2905,7 +2907,7 @@ Fallback to `xref-go-back'."
       "shrink-path")
      :short ("remote-host" "flycheck" "vcs" "buffer-position" "shrink-path")))
   (mini-echo-temporary-rule
-   '(:both ("selection-info" "narrow" "repeat" "text-scale")))
+   '(:both ("selection-info" "narrow" "repeat" "text-scale" "wgrep")))
 
   :config
   (mini-echo-define-segment
@@ -3317,98 +3319,6 @@ If region is active, apply to active region instead."
     (back-to-indentation)))
 (bind-key "C-c ;" #'sb/comment-line)
 
-(defcustom sb/skippable-buffers
-  '("TAGS"
-    "*Messages*"
-    "*Backtrace*"
-    "*scratch*"
-    "*company-documentation*"
-    "*Help*"
-    "*Packages*"
-    "*prettier (local)*"
-    "*emacs*"
-    "*Warnings*"
-    "*Compile-Log*"
-    "*lsp-log*"
-    "*pyright*"
-    "*texlab::stderr*"
-    "*texlab*"
-    "*Paradox Report*"
-    "*perl-language-server*"
-    "*perl-language-server::stderr*"
-    "*json-ls*"
-    "*json-ls::stderr*"
-    "*xmlls*"
-    "*xmlls::stderr*"
-    "*pyright::stderr*"
-    "*yamlls*"
-    "*yamlls::stderr*"
-    "*jdtls*"
-    "*jdtls::stderr*"
-    "*clangd::stderr*"
-    "*shfmt errors*")
-  "Buffer names (not regexps) ignored by `sb/next-buffer' and `sb/previous-buffer'."
-  :type '(repeat string)
-  :group 'sb/emacs)
-
-(defcustom sb/skippable-modes
-  '(dired-mode
-    fundamental-mode
-    helpful-mode
-    special-mode
-    paradox-menu-mode
-    lsp-log-io-mode
-    help-mode
-    magit-status-mode
-    magit-process-mode
-    magit-diff-mode
-    tags-table-mode
-    compilation-mode
-    emacs-lisp-compilation-mode
-    flycheck-verify-mode
-    ibuffer-mode
-    bs-mode
-    ediff-meta-mode
-    native-comp-limple-mode)
-  "List of major modes to skip over when calling `change-buffer'."
-  :type '(repeat symbol)
-  :group 'sb/emacs)
-
-(defun sb/get-buffer-major-mode (buffer-or-string)
-  "Return the major mode associated with BUFFER-OR-STRING."
-  (with-current-buffer buffer-or-string
-    major-mode))
-
-(defun sb/change-buffer (change-buffer)
-  "Call CHANGE-BUFFER.
-Keep trying until current buffer is not in `sb/skippable-buffers'
-or the major mode is not in `sb/skippable-modes'."
-  (let ((initial (current-buffer)))
-    (funcall change-buffer)
-    (let ((first-change (current-buffer)))
-      (catch 'loop
-        (while (or (member (buffer-name) sb/skippable-buffers)
-                   (member
-                    (sb/get-buffer-major-mode (current-buffer))
-                    sb/skippable-modes))
-          (funcall change-buffer)
-          (when (eq (current-buffer) first-change)
-            (switch-to-buffer initial)
-            (throw 'loop t)))))))
-
-(defun sb/next-buffer ()
-  "Variant of `next-buffer' that skips `sb/skippable-buffers'."
-  (interactive)
-  (sb/change-buffer 'next-buffer))
-(bind-keys ("C-<tab>" . sb/next-buffer) ("M-<right>" . sb/next-buffer))
-
-(defun sb/previous-buffer ()
-  "Variant of `previous-buffer' that skips `sb/skippable-buffers'."
-  (interactive)
-  (sb/change-buffer 'previous-buffer))
-(bind-keys
- ("C-S-<iso-lefttab>" . sb/previous-buffer) ("M-<left>" . sb/previous-buffer))
-
 (defun sb/toggle-window-split ()
   "Switch between vertical and horizontal splits."
   (interactive)
@@ -3437,33 +3347,6 @@ or the major mode is not in `sb/skippable-modes'."
               (other-window 1))))))
 (bind-key "C-x |" #'sb/toggle-window-split)
 
-;; Define what counts as a popup window
-(defun sb/popup-window-p (window)
-  "Return non-nil if WINDOW is a popup (side-window or marked)."
-  (or
-   (window-parameter window 'window-side) ; side-window (display-buffer-in-side-window)
-   (window-parameter window 'popup))) ; manually marked
-
-(defun sb/close-popups ()
-  "Close all popup windows."
-  (interactive)
-  (dolist (win (window-list))
-    (when (sb/popup-window-p win)
-      (delete-window win))))
-
-(defun sb/keyboard-quit-dwim ()
-  "Quit popups if any, otherwise run `keyboard-quit'."
-  (interactive)
-  (if (cl-some #'sb/popup-window-p (window-list))
-      (sb/close-popups)
-    (keyboard-quit)))
-(bind-key "C-g" #'sb/keyboard-quit-dwim)
-
-(defun sb/directory-exists-p (dir)
-  "Return non-nil if DIR exists and is a directory.
-DIR can be relative or absolute."
-  (and (stringp dir) (file-directory-p (expand-file-name dir))))
-
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
 ;; combinations) can be written in square brackets, e.g. [tab] instead of
@@ -3483,18 +3366,6 @@ DIR can be relative or absolute."
 ;; Show free bindings in current buffer
 (use-package free-keys
   :commands free-keys)
-
-;; I prefer `embark' to show help about keybindings compared to `which-key'. For
-;; example, press "C-h b" or "C-h" after an incomplete sequence to check for
-;; possible combinations.
-
-;; ;; Displays available keybindings following the currently entered incomplete
-;; ;; command/prefix in a popup.
-;; (when (< emacs-major-version 30)
-;;   (use-package which-key))
-;; (add-hook 'after-init-hook #'which-key-mode)
-;; (with-eval-after-load 'which-key
-;;   (diminish 'which-key-mode))
 
 ;; Support the Kitty keyboard protocol in Emacs
 (use-package kkp
