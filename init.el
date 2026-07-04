@@ -910,6 +910,21 @@
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
+(use-package ido
+  :hook
+  (emacs-startup
+   .
+   (lambda ()
+     (ido-mode 1)
+     (ido-everywhere 1)))
+
+  :custom
+  (ido-enable-flex-matching t)
+  (ido-enter-matching-directory 'first)
+  (ido-use-virtual-buffers t)
+  (ido-use-filename-at-point 'guess)
+  (ido-use-url-at-point nil))
+
 (use-package icomplete
   :hook (emacs-startup . fido-vertical-mode)
 
@@ -1575,13 +1590,15 @@
   (read-file-name-completion-ignore-case t)
   ;; Ignore case when reading a buffer name
   (read-buffer-completion-ignore-case t)
-  (completion-styles '(basic flex))
+
+  (completion-styles '(basic flex initials))
   (completion-category-defaults nil)
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
   (completion-category-overrides '((file (styles basic partial-completion))))
   (completion-eager-update t)
   (completion-eager-display 'auto)
+
   (minibuffer-visible-completions 'up-down)
 
   :config
