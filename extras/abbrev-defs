@@ -1178,6 +1178,7 @@
     ("requireing" "requiring" nil :count 0)
     ("requirment" "requirement" nil :count 0)
     ("requirments" "requirements" nil :count 0)
+    ("requries" "requires" nil :count 0)
     ("reserach" "research" nil :count 0)
     ("reslient" "resilient" nil :count 0)
     ("resollution" "resolution" nil :count 0)

@@ -1317,7 +1317,7 @@
 
   :custom (visual-replace-display-total t))
 
-;; Magit often requries a newer version of transient.
+;; Magit often requires a newer version of transient.
 (use-package transient
   :custom (transient-semantic-coloring t)
 
@@ -1697,6 +1697,7 @@
   ;; (company-tooltip-align-annotations t)
 
   (company-tooltip-width-grow-only t) ; Avoid shrinking the company popup
+  (company-format-margin-function nil)
 
   ;; Allow orderless-like behavior with Company, i.e., search candidates with space-separated regexp
   ;; https://github.com/company-mode/company-mode/discussions/1211
@@ -1775,18 +1776,6 @@
 ;;                    (company-org-block :separate company-dabbrev-code)
 ;;                    (:separate company-dict company-ispell company-dabbrev))))))
 
-;; Enables completion of C/C++ header file names
-(use-package company-c-headers
-  :after (company cc-mode)
-
-  :config
-  ;; Prefer GCC 13 if it is present
-  (cond
-   ((sb/directory-exists-p "/usr/include/c++/13")
-    (add-to-list 'company-c-headers-path-system "/usr/include/c++/13"))
-   ((sb/directory-exists-p "/usr/include/c++/11")
-    (add-to-list 'company-c-headers-path-system "/usr/include/c++/11"))))
-
 (use-package company-auctex
   :after tex
 
@@ -1816,8 +1805,11 @@
    company-backends
    '(company-files
      ;; `company-capf' may not return all variable or type definitions, so we
-     ;; also use `company-dabbrev-code'. `company-keywords' should not be
-     ;; required ;; with LS support. `company-yasnippet' is blocking.
+     ;; also use `company-dabbrev-code' which is useful for local (e.g.,
+     ;; variable) names. For example, `company-capf' is not complete for Elisp.
+     ;; It will not suggest `doom-modeline' but suggests `doom-modeline-mode'.
+     ;; `company-keywords' should not be required with LS support.
+     ;; `company-yasnippet' is blocking.
      (company-capf
       :separate
       company-dabbrev-code
@@ -1871,52 +1863,7 @@
    'text-mode-hook
    (lambda ()
      (unless (or (derived-mode-p 'LaTeX-mode) (derived-mode-p 'org-mode))
-       (sb/company-text-mode))))
-
-  (defun sb/company-c-mode ()
-    (setq-local
-     company-backends
-     '(company-files
-       ;; `company-capf' may not return all variable or type definitions, so we merge `company-dabbrev-code'. `company-yasnippet' is blocking.
-       (company-capf
-        :separate
-        company-dabbrev-code
-        company-c-headers
-        company-keywords
-        :with company-yasnippet)
-       (:separate company-dict company-ispell company-dabbrev))))
-
-  (dolist (hook '(c-mode-hook c-ts-mode-hook c++-mode-hook c++-ts-mode-hook))
-    (add-hook
-     hook
-     (lambda ()
-       (setq-local company-minimum-prefix-length 2)
-       (sb/company-c-mode))))
-
-  ;; We override `company-backends' for LSP-managed major modes.
-  (defun sb/company-non-lsp-prog-mode ()
-    (setq-local
-     company-backends
-     '(company-files
-       ;; `company-capf' may not return all variable or type definitions, so we
-       ;; also use `company-dabbrev-code' which is useful for local (e.g.,
-       ;; variable) names. For example, `company-capf' is not complete for
-       ;; Elisp. It will not suggest `doom-modeline' but suggests
-       ;; `doom-modeline-mode'. So I merge `company-capf' with
-       ;; `company-dabbrev-code'. `company-yasnippet' is blocking.
-       (company-capf
-        :separate
-        company-dabbrev-code
-        company-keywords
-        :with company-yasnippet)
-       (:separate company-ispell company-dict company-dabbrev))))
-
-  (add-hook
-   'prog-mode-hook
-   (lambda ()
-     (unless (or (derived-mode-p 'flex-mode) (derived-mode-p 'bison-mode))
-       (setq-local company-minimum-prefix-length 2)
-       (sb/company-non-lsp-prog-mode)))))
+       (sb/company-text-mode)))))
 
 ;; Prescient uses frecency (frequency + recency) for sorting. Recently used
 ;; commands should be sorted first. Only commands that have never been used
