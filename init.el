@@ -37,9 +37,6 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-;; Powerline looks clean and nerdy, but doom-modeline is more informative and
-;; maintained. A plain modeline also suffices and avoids startup overhead in
-;; `standalone' mode.
 (defcustom sb/modeline-theme 'mini-echo
   "Specify the mode-line theme to use."
   :type '(radio (const :tag "mini-echo" mini-echo) (const :tag "none" none))
@@ -55,7 +52,7 @@
  use-package-vc-prefer-newest t
  use-package-enable-imenu-support t
  use-package-expand-minimally t
- ;; use-package-always-defer t
+ use-package-always-defer t
  use-package-verbose nil
  use-package-minimum-reported-time 0 ; Show everything
  ;; Use "M-x use-package-report" to see results
@@ -64,10 +61,8 @@
 ;; Where possible, it is better to avoid :preface, :config and
 ;; :init. Instead, prefer autoloading keywords such as :bind, :hook, and :mode,
 ;; as they will take care of setting up autoloads.
-;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Best-practices.html
 
-;; The following webpage provides a few recommendations on how to use
-;; `use-package'.
+;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Best-practices.html
 ;; https://batsov.com/articles/2025/04/17/using-use-package-the-right-way/
 
 ;; Check "use-package-keywords.org" for a suggested order of `use-package'
@@ -90,9 +85,9 @@
 
   :config (no-littering-theme-backups))
 
-;; ;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
-;; ;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
-;; ;; for defining aliases.
+;; Emacs launched in the terminal gets to see $PATH but the GUI app may not. Use
+;; "~/.profile" for defining exports that modify $PATH, while use "~/.bashrc"
+;; for defining aliases.
 
 (use-package emacs
   :ensure nil
@@ -107,6 +102,7 @@
      (column-number-mode 1)
      (save-place-mode 1)
      ;; (size-indication-mode 1) ; No benefit in seeing the file size
+     (abbrev-mode 1)
 
      ;; `auto-save-mode' saves to a separate auto-save file, while
      ;; `auto-save-visited-mode' saves directly to the visited file and runs all
@@ -164,8 +160,14 @@
    ("C-c m" . uncomment-region)
    ("C-c b" . comment-box)
 
+   ("<f3>" . switch-to-buffer)
    ("C-s" . save-buffer)
    ("C-x k" . kill-current-buffer)
+   ("C-c x w" . write-file)
+   ("C-c x r" . rename-file)
+   ("C-c x a" . find-alternate-file)
+   ("C-c x g" . revert-buffer-quick)
+   ("C-c x b" . revert-buffer)
 
    ("C-<left>" . backward-word)
    ("C-<right>" . forward-word)
@@ -177,12 +179,6 @@
    ("C-M-f" . forward-sexp)
    ("C-M-k" . kill-sexp)
 
-   ("C-c x w" . write-file)
-   ("C-c x r" . rename-file)
-   ("C-c x a" . find-alternate-file)
-   ("C-c x g" . revert-buffer-quick)
-   ("C-c x b" . revert-buffer)
-
    ("C-c d r" . restart-emacs)
    ("C-c d k" . describe-personal-keybindings)
    ("C-c d v" . view-echo-area-messages)
@@ -191,12 +187,11 @@
       (interactive)
       (switch-to-buffer "*Messages*")))
 
-
    ("C-c s o" . occur))
 
   :bind*
   (("C-x s" . scratch-buffer) ; Bound to `save-some-buffers'
-   ("<f3>" . switch-to-buffer) ("C-c C-j" . imenu))
+   ("C-c C-j" . imenu))
 
   :custom
   (auto-revert-verbose nil)
@@ -210,6 +205,9 @@
 
   ;; This feature is supposed to be expensive
   (auto-revert-check-vc-info nil)
+
+  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
+  (save-abbrevs 'silently)
 
   (savehist-additional-variables
    '(savehist-minibuffer-history-variables
@@ -449,17 +447,6 @@
 
   :diminish (visual-line-mode auto-revert-mode))
 
-(use-package abbrev
-  :ensure nil
-
-  :hook (emacs-startup . abbrev-mode)
-
-  :custom
-  (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
-  (save-abbrevs 'silently)
-
-  :diminish)
-
 (use-package recentf
   :preface
   (defun sb/icomplete-recentf ()
@@ -543,33 +530,6 @@
 
   (advice-add 'do-auto-save :around #'sb/auto-save-wrapper))
 
-;; ;; Allows viewing PDFs remotely through Tramp.
-;; (use-package doc-view
-;;   :ensure nil
-
-;;   :hook
-;;   (doc-view-mode
-;;    .
-;;    (lambda ()
-;;      (when (and buffer-file-name (string-suffix-p ".pdf" buffer-file-name))
-;;        (auto-revert-mode 1))))
-
-;;   :bind
-;;   (:map
-;;    doc-view-mode-map
-;;    ("=" . doc-view-enlarge)
-;;    ("-" . doc-view-shrink)
-;;    ("n" . doc-view-next-page)
-;;    ("p" . doc-view-previous-page)
-;;    ("0" . doc-view-scale-reset)
-;;    ("M-<" . doc-view-first-page)
-;;    ("M->" . doc-view-last-page)
-;;    ("C-l" . doc-view-goto-page))
-
-;;   :custom
-;;   (doc-view-continuous t)
-;;   (doc-view-resolution 120))
-
 ;; Highlight and open http links in strings and comments in buffers.
 (use-package goto-addr
   :ensure nil
@@ -639,8 +599,6 @@
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path t)
   (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
 
-  ;; (setenv "SHELL" shell-file-name) ; Recommended to connect with Bash
-
   ;; https://coredumped.dev/2025/06/18/making-tramp-go-brrrr./
   ;; Newer versions of TRAMP will use SSH connection sharing for much faster
   ;; connections. These don’t require you to reenter your password each time you
@@ -699,9 +657,7 @@
      "\\*texlab.*"))
   (ibuffer-human-readable-size t)
 
-  :config
-  ;; (require 'ibuf-ext)
-  (defalias 'list-buffers 'ibuffer))
+  :config (defalias 'list-buffers 'ibuffer))
 
 ;; By default buffers are grouped by `project-current' or by
 ;; `default-directory'.
@@ -742,32 +698,10 @@
 
 ;; Jump to visible text using a char-based decision tree
 (use-package avy
-  :preface
-  (defun sb/avy-goto-visual-line-column-0 ()
-    "Jump to the beginning (column 0) of each visible visual line."
-    (interactive)
-    (avy-with
-     avy-goto-line
-     (avy-process
-      (save-excursion
-        (let ((start (window-start))
-              (end (window-end nil t))
-              (positions '()))
-          (goto-char start)
-          (while (< (point) end)
-            ;; Move to beginning of visual line
-            (let ((bol
-                   (save-excursion
-                     (vertical-motion 0) ;; stay on current visual line
-                     (line-beginning-position))))
-              (push (cons bol bol) positions))
-            (vertical-motion 1)) ;; move to next visual line
-          (nreverse positions)))
-      (avy--style-fn avy-style))))
   :bind
   (("C-\\" . avy-goto-word-1)
    ("C-'" . avy-goto-char-timer)
-   ("C-/" . sb/avy-goto-visual-line-column-0)
+   ("C-/" . avy-goto-line)
    ("C-M-c" . avy-copy-line)
    ("C-M-m" . avy-move-line)
    :map isearch-mode-map
@@ -865,48 +799,23 @@
    ;; Find all identifiers whose name matches pattern
    ("C-M-." . xref-find-apropos))
 
-  :custom (xref-search-program 'ripgrep)
-
-  :config
-  (with-eval-after-load 'consult
-    (setopt
-     xref-show-xrefs-function #'consult-xref
-     xref-show-definitions-function #'consult-xref)))
+  :custom (xref-search-program 'ripgrep))
 
 ;; Exclude project roots with `project-list-exclude'.
 (use-package project
   :bind
   (("<f5>" . project-switch-project)
    ("<f6>" . project-find-file)
-   ;; :map
-   ;; project-prefix-map ; "C-x p"
-   ;; ("f" . project-or-external-find-file)
-   ;; ("b" . project-switch-to-buffer)
-   ;; ("c" . project-compile)
-   ;; ("k" . project-kill-buffers)
-   ;; ("s" . project-find-regexp)
-   ;; ("r" . project-query-replace-regexp)
-   )
+   ("C-x p c" . project-compile)
+   ("C-x p k" . project-kill-buffers)
+   ("C-x p f" . project-find-file)
+   ("C-x p g" . project-find-regexp)
+   ("C-x p r" . project-query-replace-regexp))
 
   :custom
   ;; Start `project-find-file' by default
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
-
-;; (use-package ido
-;;   :hook
-;;   (emacs-startup
-;;    .
-;;    (lambda ()
-;;      (ido-mode 1)
-;;      (ido-everywhere 1)))
-
-;;   :custom
-;;   (ido-enable-flex-matching t)
-;;   (ido-enter-matching-directory 'first)
-;;   (ido-use-virtual-buffers t)
-;;   (ido-use-filename-at-point 'guess)
-;;   (ido-use-url-at-point nil))
 
 (use-package icomplete
   :hook (emacs-startup . fido-vertical-mode)
@@ -970,6 +879,26 @@
   (when (boundp 'ispell-save-corrections-as-abbrevs)
     (setq ispell-save-corrections-as-abbrevs t))
 
+  (setq ispell-dictionary-alist
+        (append
+         '(("english"
+            "[[:alpha:]]"
+            "[^[:alpha:]]"
+            "[']"
+            nil
+            ("-d" "en_US")
+            nil
+            utf-8)
+           ("american"
+            "[[:alpha:]]"
+            "[^[:alpha:]]"
+            "[']"
+            nil
+            ("-d" "en_US")
+            nil
+            utf-8))
+         ispell-dictionary-alist))
+
   ;; Prefer hunspell over aspell on Linux platforms
   (cond
    ((executable-find "hunspell")
@@ -1005,9 +934,8 @@
                    ("~" . "~")
                    ("=" . "=")
                    ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-                   ;; Footnotes in org that have http links
-                   ;; that are line breaked should not be
-                   ;; ispelled
+                   ;; Footnotes in org that have http links that are line
+                   ;; breaked should not be ispelled
                    ("^http" . "\\]")
                    ("`" . "`")
                    ("cite:" . "[[:space:]]")
@@ -1159,7 +1087,7 @@
   :init (setq bm-restore-repository-on-load t)
 
   :hook
-  ((after-init . bm-repository-load)
+  ((emacs-startup . bm-repository-load)
    ((find-file after-revert) . bm-buffer-restore)
    ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
    (kill-emacs
@@ -1239,16 +1167,14 @@
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
   :commands
-  ( ;; Starts an incremental search using the symbol under point as the initial
-   ;; search string and searches forward by default unless `isearch-backward' was active.
-   isearch-symbol-at-point
-   ;; Will not match substrings, so foo will not match foobar.
+  ( ;; Will not match substrings, so foo will not match foobar.
    isearch-forward-symbol
-   isearch-forward-symbol-at-point
    isearch-backward-symbol-at-point)
 
   :bind
-  (("C-c s s" . isearch-symbol-at-point)
+  ( ;; Starts an incremental search using the symbol under point as the initial
+   ;; search string and searches forward by default unless `isearch-backward' was active.
+   ("C-c s s" . isearch-symbol-at-point)
    ("C-c s w" . isearch-forward-symbol-at-point)))
 
 (with-eval-after-load 'grep
@@ -1358,13 +1284,6 @@
   (with-eval-after-load 'magit-diff
     ;; Show fine differences for the current diff hunk only
     (setopt magit-diff-refine-hunk t)))
-
-;; (use-package magit-difftastic
-;;   :vc (:url "https://github.com/rschmukler/magit-difftastic" :rev :newest)
-
-;;   :after magit
-
-;;   :config (magit-difftastic-mode 1))
 
 (use-package git-modes
   :mode ("dotgitconfig" . gitconfig-mode)
@@ -1640,7 +1559,7 @@
 ;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
 (use-package company
-  :hook (after-init . global-company-mode)
+  :hook (emacs-startup . global-company-mode)
 
   :bind
   (:map
@@ -1661,19 +1580,19 @@
   :custom
   ;; ;; Avoid slowdown in case there are lot of buffers open
   ;; (company-dabbrev-other-buffers nil)
+  ;; (company-dabbrev-code-other-buffers nil)
 
   (company-dabbrev-downcase nil "Do not downcase returned candidates")
-
-  ;; ;; Avoid slowdown in case there are lot of buffers open
-  ;; (company-dabbrev-code-other-buffers nil)
 
   (company-dabbrev-code-ignore-case t)
   (company-dabbrev-code-completion-styles '(basic))
   (company-ispell-dictionary
    (expand-file-name "wordlist.5" sb/extras-directory))
+
   ;; Speed up selecting a completion with quick access keys. Showing the access
   ;; keys on the left makes them easily discernible.
   (company-show-quick-access 'left)
+
   (company-global-modes
    '(not dired-mode
          magit-status-mode
@@ -1695,16 +1614,15 @@
   ;; `company-echo-metadata-frontend'.
   (company-frontends '(company-pseudo-tooltip-frontend))
 
-  ;; (company-require-match nil)
-  ;; (company-insertion-triggers '())
-
-  ;; Setting this to true leads to candidates from `company-dabbrev-code' to be unaligned.
+  ;; Setting this to true leads to candidates from `company-dabbrev-code' to be
+  ;; unaligned.
   ;; (company-tooltip-align-annotations t)
 
   (company-tooltip-width-grow-only t) ; Avoid shrinking the company popup
   (company-format-margin-function nil)
 
-  ;; Allow orderless-like behavior with Company, i.e., search candidates with space-separated regexp
+  ;; Allow orderless-like behavior with Company, i.e., search candidates with
+  ;; space-separated regexp
   ;; https://github.com/company-mode/company-mode/discussions/1211
   (company-search-regexp-function 'company-search-words-in-any-order-regexp)
 
@@ -1718,8 +1636,10 @@
        (cl-remove-if
         (lambda (c) (string-match-p "\\`[0-9]+\\'" c)) candidates))))
 
-  ;; Disable code candidates in comments, otherwise text completions are not offered with Eglot.
+  ;; Disable code candidates in comments, otherwise text completions are not
+  ;; offered with Eglot.
   ;; https://github.com/company-mode/company-mode/discussions/1498
+
   (defun sb/company-capf-around (orig-fun &rest args)
     "Custom advice for `company-capf--prefix' to restrict completions in comments."
     (let ((syntax-info (syntax-ppss)))
@@ -1913,11 +1833,14 @@
   (compile-command (format "make -k -j%s " (num-processors)))
   (compilation-always-kill t)
   (compilation-ask-about-save nil "Save all modified buffers without asking")
+
   ;; Use "t" to scroll the compilation buffer to follow output. We stop
   ;; scrolling when the first error appears.
   (compilation-scroll-output 'first-error)
+
   (compilation-auto-jump-to-first-error t)
   (compilation-max-output-line-length nil)
+
   ;; Skip warnings and info when navigating with next-error by setting the value
   ;; to 2. Set it to 1 to also stop at warnings but skip info. Set it to 0 to
   ;; stop at everything.
@@ -1937,9 +1860,6 @@
 
 (use-package eldoc
   :ensure nil
-
-  ;; Frequent eldoc messages are irritating.
-  ;; :hook ((emacs-lisp-mode lisp-data-mode) . global-eldoc-mode)
 
   :custom
   (eldoc-area-prefer-doc-buffer t "Disable popups")
@@ -1970,16 +1890,13 @@
 (use-package treesit
   :ensure nil
 
-  :when
-  (and (fboundp 'treesit-available-p)
-       (treesit-available-p)
-       (executable-find "tree-sitter"))
+  :when (and (fboundp 'treesit-available-p) (treesit-available-p))
 
   :bind
   (("C-M-<up>" . treesit-up-list)
    ("C-M-<down>" . treesit-down-list)
-   ;; ("C-M-w" . treesit-forward-sexp)
-   ("C-M-a" . treesit-beginning-of-defun) ("C-M-e" . treesit-end-of-defun))
+   ("C-M-a" . treesit-beginning-of-defun)
+   ("C-M-e" . treesit-end-of-defun))
 
   :custom
   (treesit-enabled-modes t)
@@ -2110,9 +2027,7 @@
    ("C-M-e" . treesit-end-of-defun)))
 
 ;; Some systems may not have treesitter mode enabled.
-(if (and (executable-find "tree-sitter")
-         (fboundp 'treesit-available-p)
-         (treesit-available-p))
+(if (and (fboundp 'treesit-available-p) (treesit-available-p))
     (add-to-list 'auto-mode-alist '("\\.cu[h]?\\'" . c++-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.cu[h]?\\'" . c++-mode)))
 
@@ -2615,14 +2530,6 @@
   (org-pandoc-export-to-markdown
    org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
 
-;; (use-package org-modern
-;;   :hook (org-mode . global-org-modern-mode))
-
-;; ;; Useful if `org-indent-mode' is enabled
-;; (use-package org-modern-indent
-;;   :ensure (:host github :repo "jdtsmith/org-modern-indent")
-;;   :hook (org-mode . org-modern-indent-mode))
-
 ;; Without auctex
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
@@ -2648,13 +2555,6 @@
      (LaTeX-math-mode 1)
      (TeX-PDF-mode) ; Use `pdflatex'
      (turn-on-reftex)
-
-     ;; Revert buffer visiting PDF file (e.g., "PDF Tools") after TeX compilation has finished.
-     ;; (TeX-after-compilation-finished-functions . TeX-revert-document-buffer)
-
-     ;; Enable rainbow mode after applying styles to the buffer
-     ;; (TeX-update-style . rainbow-delimiters-mode)
-
      (TeX-source-correlate-mode)))
 
   :bind (:map LaTeX-mode-map ("C-c C-j" . consult-outline))
