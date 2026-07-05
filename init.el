@@ -98,9 +98,12 @@
   :ensure nil
 
   :hook
-  (after-init
+  (emacs-startup
    .
    (lambda ()
+     (global-auto-revert-mode 1)
+
+     (savehist-mode 1)
      (column-number-mode 1)
      (save-place-mode 1)
      ;; (size-indication-mode 1) ; No benefit in seeing the file size
@@ -143,7 +146,10 @@
 
   :bind
   (("<f1>" . execute-extended-command)
-   ("<f2>" . find-file)
+
+   ("<f2>" . ffap)
+   ("C-x p o" . ff-find-other-file)
+
    ("<f7>" . previous-error) ; "M-g p" is the default keybinding
    ("<f8>" . next-error) ; "M-g n" is the default keybinding
 
@@ -193,6 +199,32 @@
    ("<f3>" . switch-to-buffer) ("C-c C-j" . imenu))
 
   :custom
+  (auto-revert-verbose nil)
+  (auto-revert-remote-files nil)
+  (auto-revert-avoid-polling t)
+
+  ;; Revert `dired' buffers if the current directory contents change. Dired
+  ;; buffers do not auto-revert as a result of changes in subdirectories, or in
+  ;; the contents, size, modes, etc., of files.
+  (global-auto-revert-non-file-buffers t)
+
+  ;; This feature is supposed to be expensive
+  (auto-revert-check-vc-info nil)
+
+  (savehist-additional-variables
+   '(savehist-minibuffer-history-variables
+     bookmark-history
+     command-history
+     compile-command
+     compile-history
+     extended-command-history
+     file-name-history
+     kill-ring
+     mark-ring
+     minibuffer-history
+     search-ring
+     regexp-search-ring))
+
   ;; (ad-redefinition-action 'accept "Turn off warnings due to redefinitions")
   (auto-save-no-message t "Do not print frequent auto-save messages")
   ;; Disable auto-saving based on number of characters typed
@@ -310,6 +342,9 @@
   (show-paren-when-point-inside-paren t)
   (whitespace-line-column fill-column)
 
+  ;; Do not ping things that look like domain names
+  (ffap-machine-p-known 'reject)
+
   :config
   (dolist (exts
            '(".aux"
@@ -412,47 +447,7 @@
              (slot . 1)
              (window-height . 0.5))))
 
-  :diminish visual-line-mode)
-
-(use-package autorevert
-  :ensure nil
-
-  :hook (emacs-startup . global-auto-revert-mode)
-
-  :custom
-  (auto-revert-verbose nil)
-  (auto-revert-remote-files nil)
-  (auto-revert-avoid-polling t)
-
-  ;; Revert `dired' buffers if the current directory contents change. Dired
-  ;; buffers do not auto-revert as a result of changes in subdirectories, or in
-  ;; the contents, size, modes, etc., of files.
-  (global-auto-revert-non-file-buffers t)
-
-  ;; This feature is supposed to be expensive
-  (auto-revert-check-vc-info nil)
-
-  :diminish auto-revert-mode)
-
-(use-package savehist
-  :ensure nil
-
-  :hook (emacs-startup . savehist-mode)
-
-  :custom
-  (savehist-additional-variables
-   '(savehist-minibuffer-history-variables
-     bookmark-history
-     command-history
-     compile-command
-     compile-history
-     extended-command-history
-     file-name-history
-     kill-ring
-     mark-ring
-     minibuffer-history
-     search-ring
-     regexp-search-ring)))
+  :diminish (visual-line-mode auto-revert-mode))
 
 (use-package abbrev
   :ensure nil
@@ -574,18 +569,6 @@
 ;;   :custom
 ;;   (doc-view-continuous t)
 ;;   (doc-view-resolution 120))
-
-;; Binds "C-x C-f" to `find-file-at-point' which will continue to work like
-;; `find-file' unless a prefix argument is given. Then it will find file at
-;; point.
-(use-package ffap
-  :ensure nil
-
-  :bind (("<f2>" . ffap) ("C-x p o" . ff-find-other-file))
-
-  :custom
-  ;; Do not ping things that look like domain names
-  (ffap-machine-p-known 'reject))
 
 ;; Highlight and open http links in strings and comments in buffers.
 (use-package goto-addr
@@ -910,20 +893,20 @@
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml")))
 
-(use-package ido
-  :hook
-  (emacs-startup
-   .
-   (lambda ()
-     (ido-mode 1)
-     (ido-everywhere 1)))
+;; (use-package ido
+;;   :hook
+;;   (emacs-startup
+;;    .
+;;    (lambda ()
+;;      (ido-mode 1)
+;;      (ido-everywhere 1)))
 
-  :custom
-  (ido-enable-flex-matching t)
-  (ido-enter-matching-directory 'first)
-  (ido-use-virtual-buffers t)
-  (ido-use-filename-at-point 'guess)
-  (ido-use-url-at-point nil))
+;;   :custom
+;;   (ido-enable-flex-matching t)
+;;   (ido-enter-matching-directory 'first)
+;;   (ido-use-virtual-buffers t)
+;;   (ido-use-filename-at-point 'guess)
+;;   (ido-use-url-at-point nil))
 
 (use-package icomplete
   :hook (emacs-startup . fido-vertical-mode)
