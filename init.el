@@ -22,8 +22,7 @@
   :group 'sb/emacs)
 
 ;; I now prefer dark themes. Modus-vivendi is the most complete, has good
-;; contrast, and integrates well with all terminals. Catppuccin and Dracula are
-;; more colorful.
+;; contrast, and integrates well with all terminals.
 (defcustom sb/theme
   (if (display-graphic-p)
       'standard-dark
@@ -117,6 +116,8 @@
      ;; Use soft wraps, wrap lines without the ugly continuation marks
      (global-visual-line-mode 1)
 
+     (pixel-scroll-precision-mode 1) ; Smooth scrolling
+
      ;; Continuation lines are displayed with proper indentation, as if the
      ;; text had been filled with M-q, but without modifying the buffer at all.
      (when (fboundp 'global-visual-wrap-prefix-mode)
@@ -196,15 +197,19 @@
   :custom
   (auto-revert-verbose nil)
   (auto-revert-remote-files nil)
+  ;; Automatically reread from disk if the underlying file changes
   (auto-revert-avoid-polling t)
+  ;; This feature is supposed to be expensive
+  (auto-revert-check-vc-info nil)
 
   ;; Revert `dired' buffers if the current directory contents change. Dired
   ;; buffers do not auto-revert as a result of changes in subdirectories, or in
   ;; the contents, size, modes, etc., of files.
   (global-auto-revert-non-file-buffers t)
 
-  ;; This feature is supposed to be expensive
-  (auto-revert-check-vc-info nil)
+  ;; ;; Reverting without confirmation is confusing, and hence it is better to be
+  ;; ;; explicit
+  ;; (revert-without-query '("\\.*") "Revert all files without asking")
 
   (abbrev-file-name (expand-file-name "abbrev-defs" sb/extras-directory))
   (save-abbrevs 'silently)
@@ -257,12 +262,17 @@
 
   (help-window-select t "Makes it easy to close the window")
   (switch-to-buffer-preserve-window-point t)
+  ;; Make switching buffers more consistent
+  (switch-to-buffer-obey-display-actions t)
+  ;; (window-combination-resize t "Resize windows proportionally")
 
   (read-process-output-max (* 4 1024 1024)) ; 4 MB as recommended by `lsp-mode'
 
   (remote-file-name-inhibit-locks t)
   ;; Do not auto-save remote files using `auto-save-visited-mode'
   (remote-file-name-inhibit-auto-save-visited t)
+  (remote-file-name-inhibit-delete-by-moving-to-trash t)
+  (remote-file-name-inhibit-auto-save t)
 
   (ring-bell-function 'ignore "Disable beeping sound")
   ;; (visible-bell nil)
@@ -271,8 +281,8 @@
   (select-enable-clipboard t)
   (shift-select-mode nil)
 
-  ;; (history-delete-duplicates t)
-  ;; (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
+  (history-delete-duplicates t)
+  (kill-do-not-save-duplicates t "Do not save duplicates to kill ring")
 
   (sentence-end-double-space nil)
   (require-final-newline t "Always end a file with a newline")
@@ -282,8 +292,6 @@
 
   (standard-indent 2)
   (view-read-only t "Use view mode for read-only buffers")
-
-  ;; (window-combination-resize t "Resize windows proportionally")
 
   ;; Allows showing all choices while importing with `lsp-mode'
   (max-mini-window-height 0.3)
@@ -297,10 +305,6 @@
   ;; Prevent 'Active processes exist' when you quit Emacs
   (confirm-kill-processes nil)
   ;; (confirm-kill-emacs nil)
-
-  ;; ;; Reverting without confirmation is confusing, and hence it is better to be
-  ;; ;; explicit
-  ;; (revert-without-query '("\\.*") "Revert all files without asking")
 
   (vc-handled-backends '(Git))
   ;; Disable version control for remote files to improve performance
@@ -386,8 +390,9 @@
               ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
   (when (eq system-type 'windows-nt)
     (setopt w32-get-true-file-attributes nil))
+
   ;; In Emacs 30 and newer, disable Ispell completion to avoid annotation errors
-  ;; when no `ispell' dictionary is set.
+  ;; ;; when no `ispell' dictionary is set.
   (when (boundp 'text-mode-ispell-word-completion)
     (setopt text-mode-ispell-word-completion nil))
   ;; Hide "When done with a buffer, type C-x 5" message
@@ -432,18 +437,33 @@
 
   ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 
-  (setopt display-buffer-alist
-          '(
-            ;; Allow *Help* buffers to use the full frame
-            ("*Help*" (display-buffer-same-window))
-            ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
-             (display-buffer-no-window)
-             (allow-no-window . t))
-            ("\\*compilation\\*" ; Compilation
-             (display-buffer-in-side-window)
-             (side . bottom)
-             (slot . 1)
-             (window-height . 0.5))))
+  (setopt
+   display-buffer-alist
+   '(("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Messages\\|Bookmark List\\|Occur\\|eldoc\\)\\*"
+      (display-buffer-in-side-window)
+      (window-height . 0.5)
+      (side . bottom)
+      (slot . 0))
+     ;; Allow *Help* buffers to use the full frame
+     ("\\*\\([Hh]elp\\)\\*" (display-buffer-same-window))
+     ("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
+      (display-buffer-no-window)
+      (allow-no-window . t))
+     ("\\*compilation\\*" ; Compilation
+      (display-buffer-in-side-window)
+      (side . bottom)
+      (slot . 1)
+      (window-height . 0.5))
+     ("\\*\\(Flymake diagnostics\\)"
+      (display-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . 2))
+     ("\\*\\(grep\\|xref\\|find\\)\\*"
+      (display-buffer-in-side-window)
+      (window-height . 0.5)
+      (side . bottom)
+      (slot . 1))))
 
   :diminish (visual-line-mode auto-revert-mode))
 
@@ -565,10 +585,7 @@
   ;; Prompt and kill file variants on quitting an Ediff session
   (ediff-keep-variants nil)
 
-  :config
-  (ediff-set-diff-options 'ediff-diff-options "-w")
-  (with-eval-after-load 'winner
-    (add-hook 'ediff-cleanup-hook #'winner-undo)))
+  :config (ediff-set-diff-options 'ediff-diff-options "-w"))
 
 ;; To edit remote files, use "/method:user@host#port:filename".
 ;; The shortcut "/ssh::" will connect to default "user@host#port".
@@ -587,16 +604,18 @@
   (remote-file-name-inhibit-cache nil)
   (tramp-verbose 1 "Only errors and warnings")
   (tramp-default-method "ssh")
-  (tramp-copy-size-limit (* 1024 1024)) ; 1MB
+  (tramp-copy-size-limit (* 2 1024 1024)) ; 2MB
+  (tramp-use-scp-direct-remote-copying t)
 
   :config
   (when (boundp 'tramp-use-connection-share)
     (setopt tramp-use-connection-share nil))
 
-  ;; Disable backup
-  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path t)
+
+  ;; Disable backup
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
 
   ;; https://coredumped.dev/2025/06/18/making-tramp-go-brrrr./
@@ -612,7 +631,8 @@
     (interactive)
     (ignore-errors
       (tramp-cleanup-all-buffers)
-      (tramp-cleanup-all-connections))))
+      (tramp-cleanup-all-connections)))
+  (bind-key "C-c d q" #'sb/cleanup-tramp))
 
 (use-package ibuffer
   :ensure nil
@@ -654,7 +674,8 @@
      "\\*marksman.*"
      "\\*yaml-ls.*"
      "\\*clangd.*"
-     "\\*texlab.*"))
+     "\\*texlab.*"
+     "\\*Completions\\*"))
   (ibuffer-human-readable-size t)
 
   :config (defalias 'list-buffers 'ibuffer))
@@ -815,7 +836,7 @@
   :custom
   ;; Start `project-find-file' by default
   (project-switch-commands 'project-find-file)
-  (project-vc-extra-root-markers '(".project" "pyproject.toml")))
+  (project-vc-extra-root-markers '(".project" "pyproject.toml" "Cargo.toml")))
 
 (use-package icomplete
   :hook (emacs-startup . fido-vertical-mode)
@@ -859,8 +880,7 @@
   ;; of possible completions and the *Completions* buffer appear. If you are
   ;; using icomplete-in-buffer, then you may wish to suppress this appearance of
   ;; the *Completions* buffer.
-  (when (bound-and-true-p icomplete-in-buffer)
-    (advice-add 'completion-at-point :after #'minibuffer-hide-completions)))
+  (advice-add 'completion-at-point :after #'minibuffer-hide-completions))
 
 (use-package ispell
   :ensure nil
@@ -877,7 +897,7 @@
 
   :config
   (when (boundp 'ispell-save-corrections-as-abbrevs)
-    (setq ispell-save-corrections-as-abbrevs t))
+    (setopt ispell-save-corrections-as-abbrevs t))
 
   (setq ispell-dictionary-alist
         (append
@@ -1500,6 +1520,8 @@
   (completion-category-overrides '((file (styles basic partial-completion))))
   (completion-eager-update t)
   (completion-eager-display 'auto)
+  (completion-auto-help 'always)
+  (completions-sort 'historical)
 
   (minibuffer-visible-completions 'up-down)
 
@@ -2957,8 +2979,8 @@ Fallback to `xref-go-back'."
    eglot-server-programs
    `(((toml-mode toml-ts-mode conf-toml-mode) . ("taplo" "lsp" "stdio"))
      ;; `harper-ls' is more efficient than `ltex-ls-plus' but does not support `LaTeX-mode' completely
-     (text-mode . ("rass" "text"))
      (LaTeX-mode . ("rass" "latex"))
+     (text-mode . ("rass" "text"))
      ((markdown-mode markdown-ts-mode) . ("rass" "markdown"))
      (org-mode
       . ,(eglot-alternatives '(("harper-ls" "--stdio") "ltex-ls-plus")))
