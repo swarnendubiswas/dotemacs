@@ -238,8 +238,6 @@
   ;; ;; frequent since it runs all the save-related hooks.
   ;; (auto-save-visited-interval 10)
 
-  ;; (apropos-do-all t "Make `apropos' search more extensively")
-
   ;; Save bookmark after every bookmark edit and also when Emacs is killed
   (bookmark-save-flag 1)
 
@@ -254,6 +252,8 @@
   (backup-inhibited t "Disable backup for a per-file basis")
   (make-backup-files nil "Stop making backup `~' files")
   (delete-by-moving-to-trash t) ; Safe fallback
+
+  ;; (apropos-do-all t "Make `apropos' search more extensively")
 
   ;; Prevents help command completion from triggering autoload.
   (help-enable-completion-autoload nil)
@@ -414,29 +414,6 @@
    bidi-display-reordering 'left-to-right
    bidi-paragraph-direction 'left-to-right)
 
-  ;; ;; Not a library/file, so `eval-after-load' does not work
-  ;; (diminish 'auto-fill-function)
-  (diminish 'auto-fill-mode)
-
-  (advice-add 'risky-local-variable-p :override #'ignore)
-
-  (when (file-exists-p custom-file)
-    (load custom-file 'noerror 'nomessage))
-
-  ;; Mark safe variables
-  (put 'compilation-read-command 'safe-local-variable #'stringp)
-  (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
-
-  (put 'overwrite-mode 'disabled t)
-
-  ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
-  ;; Zellij.
-  (unbind-key "C-]")
-  (unbind-key "C-x f") ; Bound to `set-fill-column'
-  (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
-
-  ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
-
   (setopt
    display-buffer-alist
    '(("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Messages\\|Bookmark List\\|Occur\\|eldoc\\)\\*"
@@ -464,6 +441,29 @@
       (window-height . 0.5)
       (side . bottom)
       (slot . 1))))
+
+  (put 'overwrite-mode 'disabled t)
+
+  ;; ;; Not a library/file, so `eval-after-load' does not work
+  ;; (diminish 'auto-fill-function)
+  (diminish 'auto-fill-mode)
+
+  (advice-add 'risky-local-variable-p :override #'ignore)
+
+  (when (file-exists-p custom-file)
+    (load custom-file 'noerror 'nomessage))
+
+  ;; Mark safe variables
+  (put 'compilation-read-command 'safe-local-variable #'stringp)
+  (put 'reftex-default-bibliography 'safe-local-variable #'stringp)
+
+  ;; Originally bound to `abort-recursive-edit'. I use it as the prefix key for
+  ;; Zellij.
+  (unbind-key "C-]")
+  (unbind-key "C-x f") ; Bound to `set-fill-column'
+  (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
+
+  ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 
   :diminish (visual-line-mode auto-revert-mode))
 
@@ -861,7 +861,6 @@
   ;; (icomplete-hide-common-prefix nil)
   (icomplete-prospects-height 10)
   ;; (icomplete-separator " . ")
-  (icomplete-with-completion-tables t)
 
   ;; Enable icomplete-mode for completion-at-point
   ;; (icomplete-in-buffer t)
@@ -1306,11 +1305,7 @@
     (setopt magit-diff-refine-hunk t)))
 
 (use-package git-modes
-  :mode ("dotgitconfig" . gitconfig-mode)
-
-  :mode ("/\\.gitignore\\'" . gitignore-mode)
-
-  :mode ("/\\.gitattributes\\'" . gitattributes-mode))
+  :mode ("dotgitconfig\''" . gitconfig-mode))
 
 (use-package smerge-mode
   :ensure nil
@@ -1327,50 +1322,9 @@
 ;; "C-h m" or `describe-mode' shows all the active minor modes (and major mode)
 ;; and a brief description of each.
 
-;; Discover key bindings for the current Emacs major mode
+;; Discover key bindings for the current Emacs major mode.
 (use-package discover-my-major
   :bind (("C-h C-m" . discover-my-major) ("C-c d m" . discover-my-mode)))
-
-(use-package flycheck
-  ;; Flycheck is disabled with `emacs-lisp-mode'
-  :hook ((prog-mode text-mode) . flycheck-mode)
-
-  :custom
-  ;; Remove newline checks, since they would trigger an immediate check when we
-  ;; want the `flycheck-idle-change-delay' to be in effect while editing.
-  (flycheck-check-syntax-automatically '(save idle-buffer-switch idle-change))
-  ;; Eager popping of the *Flycheck error messages* buffer is irritating
-  (flycheck-auto-display-errors-after-checking nil)
-  (flycheck-checker-error-threshold nil)
-  ;; Increase the time (s) to allow for quick transitions
-  (flycheck-idle-buffer-switch-delay 2)
-  ;; Increase the time (s) to allow for transient edits
-  (flycheck-idle-change-delay 2)
-  (flycheck-emacs-lisp-load-path 'inherit)
-  (flycheck-global-modes '(not csv-mode conf-mode))
-  ;; Left fringe does not work in the terminal mode. Disable indication because it is noisy.
-  (flycheck-indication-mode nil)
-
-  :config
-  ;; Shellcheck is invoked by bash lsp
-  (setopt flycheck-checkers
-          (seq-difference
-           flycheck-checkers
-           '(proselint textlint tex-chktex emacs-lisp-checkdoc sh-shellcheck)))
-
-  (setopt flycheck-checkers
-          (seq-difference
-           flycheck-checkers
-           '(python-flake8
-             python-pylint python-mypy python-pycompile python-pyright)))
-
-  (setq-default
-   flycheck-python-pylint-executable "python3"
-   flycheck-shellcheck-follow-sources nil
-   flycheck-shellcheck-excluded-warnings '("SC1091"))
-
-  ;; https://github.com/flycheck/flycheck/issues/1833
-  (add-to-list 'flycheck-hooks-alist '(after-revert-hook . flycheck-buffer)))
 
 (use-package hl-todo
   :hook (after-init . global-hl-todo-mode)
@@ -1380,12 +1334,6 @@
   ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
 
   :custom (hl-todo-highlight-punctuation ":"))
-
-;; Include `hl-todo' keywords in Flycheck messages.
-(use-package flycheck-hl-todo
-  :after flycheck
-
-  :init (flycheck-hl-todo-setup))
 
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
@@ -3213,12 +3161,6 @@ Fallback to `xref-go-back'."
      (slot . 2)
      (window-height . 0.5))))
 
-(use-package flycheck-eglot
-  :after (flycheck eglot)
-
-  :hook (eglot-managed-mode . flycheck-eglot-mode)
-
-  :custom (flycheck-eglot-exclusive nil))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
