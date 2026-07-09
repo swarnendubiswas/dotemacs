@@ -237,7 +237,7 @@
      :mode-line-height 160)
     ("cseiitk"
      :font "Iosevka Nerd Font Mono"
-     :gui-height 20
+     :gui-height 19
      :daemon-height 20
      :mode-line-height 160)))
 

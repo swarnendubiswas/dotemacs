@@ -1257,6 +1257,8 @@
   :custom (reb-re-syntax 'string))
 
 (use-package visual-replace
+  :hook (emacs-startup . visual-replace-global-mode)
+
   :bind
   (([remap query-replace] . visual-replace)
    ([remap replace-string] . visual-replace)
@@ -1468,7 +1470,7 @@
   (completion-category-overrides '((file (styles basic partial-completion))))
   (completion-eager-update t)
   (completion-eager-display 'auto)
-  (completion-auto-help 'always)
+  (completion-auto-help nil)
   (completions-sort 'historical)
 
   (minibuffer-visible-completions 'up-down)
@@ -2018,9 +2020,6 @@
      (jinx-mode -1)
      (eglot-ensure))))
 
-(use-package highlight-doxygen
-  :hook ((c-mode c-ts-mode c++-mode c++-ts-mode cuda-mode) . highlight-doxygen-mode))
-
 (use-package python
   :ensure nil
 
@@ -2252,47 +2251,6 @@
       ;; c-electric-indent nil
       c-enable-auto-newline nil
       c-syntactic-indentation nil))))
-
-;; More shortcuts: https://jblevins.org/projects/markdown-mode/
-(use-package markdown-mode
-  :preface
-  (defun sb/markdown-setup ()
-    ;; Auto-pair backticks
-    (with-eval-after-load 'elec-pair
-      (sb/add-pairs '((?` . ?`))))
-    (eglot-ensure))
-
-  :mode ("README\\.md\\'" . gfm-mode)
-
-  :hook (markdown-mode . sb/markdown-setup)
-
-  :bind
-  (:map
-   markdown-mode-map
-   ("C-c C-d")
-   ("C-c C-j")
-   ("C-c C-c l" . markdown-live-preview-mode))
-
-  :custom
-  (markdown-command
-   "pandoc -f markdown -s --mathjax --standalone --quiet --highlight-style=pygments")
-  (markdown-enable-math t "Syntax highlight for LaTeX fragments")
-  (markdown-enable-wiki-links t)
-  (markdown-fontify-code-blocks-natively t)
-  (markdown-indent-on-enter 'indent-and-new-item)
-  (markdown-list-indent-width 2)
-  (markdown-split-window-direction 'horizontal)
-  (markdown-hide-urls t))
-
-;; Use `pandoc-convert-to-pdf' to export markdown file to pdf. Convert
-;; `markdown' to `org': "pandoc -f markdown -t org -o output-file.org
-;; input-file.md".
-(use-package pandoc-mode
-  :hook ((markdown-mode markdown-ts-mode) . pandoc-mode)
-
-  :config (pandoc-load-default-settings)
-
-  :diminish)
 
 (use-package nxml-mode
   :preface
@@ -3160,7 +3118,6 @@ Fallback to `xref-go-back'."
      (side . bottom)
      (slot . 2)
      (window-height . 0.5))))
-
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
