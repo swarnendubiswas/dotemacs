@@ -1257,8 +1257,6 @@
   :custom (reb-re-syntax 'string))
 
 (use-package visual-replace
-  :hook (emacs-startup . visual-replace-global-mode)
-
   :bind
   (([remap query-replace] . visual-replace)
    ([remap replace-string] . visual-replace)
