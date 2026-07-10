@@ -854,32 +854,10 @@
    ("M-<" . icomplete-vertical-goto-first)
    ("M->" . icomplete-vertical-goto-last))
 
-  :custom
-  ;; (icomplete-delay-completions-threshold 0)
-  ;; (icomplete-compute-delay 0)
-  ;; (icomplete-show-matches-on-no-input t)
-  ;; (icomplete-hide-common-prefix nil)
-  (icomplete-prospects-height 10)
-  ;; (icomplete-separator " . ")
-
-  ;; Enable icomplete-mode for completion-at-point
-  ;; (icomplete-in-buffer t)
-
+  :custom (icomplete-prospects-height 10)
   ;; (icomplete-max-delay-chars 0)
   ;; (icomplete-scroll t)
-
-  :config
-  ;; (when (and (>= emacs-major-version 31)
-  ;;            (boundp 'icomplete-vertical-in-buffer-adjust-list))
-
-  ;;   (setq icomplete-vertical-in-buffer-adjust-list t)
-  ;;   (setq icomplete-vertical-render-prefix-indicator t))
-
-  ;; By default, when you press C-M-i, both Icomplete mode's in-buffer display
-  ;; of possible completions and the *Completions* buffer appear. If you are
-  ;; using icomplete-in-buffer, then you may wish to suppress this appearance of
-  ;; the *Completions* buffer.
-  (advice-add 'completion-at-point :after #'minibuffer-hide-completions))
+  )
 
 (use-package ispell
   :ensure nil
@@ -1468,6 +1446,7 @@
   (completion-category-overrides '((file (styles basic partial-completion))))
   (completion-eager-update t)
   (completion-eager-display 'auto)
+  ;; Never pop up the *Completions* buffer automatically
   (completion-auto-help nil)
   (completions-sort 'historical)
 
@@ -2726,12 +2705,12 @@ Fallback to `xref-go-back'."
    '(:long
      ("remote-host"
       "selection-info"
-      "flycheck"
+      "flymake"
       "vcs"
       "buffer-position"
       "major-mode"
       "shrink-path")
-     :short ("remote-host" "flycheck" "vcs" "buffer-position" "shrink-path")))
+     :short ("remote-host" "flymake" "vcs" "buffer-position" "shrink-path")))
   (mini-echo-temporary-rule
    '(:both ("selection-info" "narrow" "repeat" "text-scale" "wgrep")))
 
@@ -3116,6 +3095,20 @@ Fallback to `xref-go-back'."
      (side . bottom)
      (slot . 2)
      (window-height . 0.5))))
+
+(use-package flymake
+  :pin gnu
+
+  :hook ((prog-mode text-mode) . flymake-mode)
+
+  :bind
+  (("C-c ! l" . flymake-show-buffer-diagnostics)
+   :map
+   flymake-mode-map
+   ("M-n" . flymake-goto-next-error)
+   ("M-p" . flymake-goto-prev-error))
+
+  :config (setq flymake-diagnostic-format-alist '((t . (origin code message)))))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
