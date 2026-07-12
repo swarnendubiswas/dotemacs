@@ -468,14 +468,6 @@
   :diminish (visual-line-mode auto-revert-mode))
 
 (use-package recentf
-  :preface
-  (defun sb/icomplete-recentf ()
-    "Find a recent file using `icomplete-vertical-mode`."
-    (interactive)
-    (let ((file (completing-read "Recent files: " recentf-list nil t)))
-      (when file
-        (find-file file))))
-
   :ensure nil
 
   :hook
@@ -485,7 +477,7 @@
      (let ((inhibit-message t))
        (recentf-mode 1))))
 
-  :bind ("<f9>" . sb/icomplete-recentf)
+  :bind ("<f9>" . recentf-open-files)
 
   :custom
   (recentf-auto-cleanup 30 "Cleanup after idling for 30s")
