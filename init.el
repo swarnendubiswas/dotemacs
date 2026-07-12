@@ -838,26 +838,228 @@
   (project-switch-commands 'project-find-file)
   (project-vc-extra-root-markers '(".project" "pyproject.toml" "Cargo.toml")))
 
-(use-package icomplete
-  :hook (emacs-startup . fido-vertical-mode)
+(use-package vertico
+  :hook
+  ((emacs-startup . vertico-mode)
+   (minibuffer-setup . vertico-repeat-save)
+
+   ;; Tidy or auto-hide shadowed file names. When you are in a sub-directory and
+   ;; use, say, `find-file' to go to your home '~/' or root '/' directory,
+   ;; Vertico will clear the old path to keep only your current input.
+   (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
   :bind
-  (:map
-   icomplete-minibuffer-map
-   ("C-n" . icomplete-forward-completions)
-   ("C-p" . icomplete-backward-completions)
-   ("C-v" . icomplete-vertical-toggle)
-   ("RET" . icomplete-force-complete-and-exit)
-   ("C-j" . exit-minibuffer)
-   :map
-   icomplete-vertical-mode-minibuffer-map
-   ("M-<" . icomplete-vertical-goto-first)
-   ("M->" . icomplete-vertical-goto-last))
+  (("C-c r" . vertico-repeat)
+   ("M-r" . vertico-repeat-select)
+   :map vertico-map
+   ;; `vertico-exit' (RET) exits with the currently selected candidate, while
+   ;; `vertico-exit-input' (M-RET) exits with the minibuffer input instead.
+   ("M-<" . vertico-first)
+   ("M->" . vertico-last)
+   ("RET" . vertico-directory-enter)
+   ("DEL" . vertico-directory-delete-char)
+   ("M-DEL" . vertico-directory-delete-word)
+   ("C-q" . vertico-quick-insert)
+   ("C-'" . vertico-quick-jump))
 
-  :custom (icomplete-prospects-height 10)
-  ;; (icomplete-max-delay-chars 0)
-  ;; (icomplete-scroll t)
-  )
+  :custom (vertico-cycle t)
+
+  :config
+  (let ((ext-dir
+         (expand-file-name "extensions"
+                           (file-name-directory (locate-library "vertico")))))
+    (when (file-directory-p ext-dir)
+      (add-to-list 'load-path ext-dir)))
+
+  (require 'vertico-directory)
+  (require 'vertico-repeat)
+  (require 'vertico-quick)
+  (require 'vertico-indexed)
+
+  (vertico-indexed-mode 1)
+
+  (when (eq sb/theme 'catppuccin)
+    (set-face-attribute 'vertico-current nil
+                        :background "#676767"
+                        :foreground "#FFFFFF"))
+
+  ;; Customize the display of the current candidate in the completion list. This
+  ;; will prefix the current candidate with "» " to make it stand out.
+  ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
+  (advice-add
+   #'vertico--format-candidate
+   :around
+   (lambda (orig cand prefix suffix index _start)
+     (setq cand (funcall orig cand prefix suffix index _start))
+     (concat
+      (if (= vertico--index index)
+          (propertize "» " 'face '(:foreground "#80adf0" :weight bold))
+        "  ")
+      cand))))
+
+(use-package vertico-timer
+  :vc (:url "https://github.com/ventruvian/vertico-timer")
+
+  :after vertico
+
+  :hook (vertico-mode . vertico-timer-mode)
+
+  :bind (:map vertico-map ("M-i" . vertico-timer-toggle-in-session))
+
+  :diminish vertico-timer-mode)
+
+(defconst sb/consult-buffer-filter
+  '("^ "
+    "\\` "
+    "^:"
+    "\\*Echo Area"
+    "\\*Minibuf"
+    "\\*Help*"
+    "\\*Disabled Command\\*"
+    "Flymake log"
+    "\\*Flycheck"
+    "Shell command output"
+    "direnv"
+    "\\*magit-"
+    "magit-.*"
+    ".+-shell*"
+    "\\*straight-"
+    "\\*Compile-Log"
+    "\\*Native-*"
+    "\\*Async-"
+    "\\*Ediff Registry\\*"
+    "TAGS"
+    "\\*vc"
+    "\\*tramp"
+    "\\*citre.*"
+    "\\*pylsp.*"
+    "\\*pyright.*"
+    "\\*ltex-ls"
+    "\\*texlab"
+    "\\*bash-ls.*"
+    "\\*json-ls.*"
+    "\\*yaml-ls.*"
+    "\\*shfmt.*"
+    "\\*clangd.*"
+    "\\*semgrep.*"
+    "\\*autotools.*"
+    "\\*lsp-harper*"
+    "\\*taplo*"
+    "\\*ruff.*"
+    "\\*marksman.*"
+    "\\*html-ls.*")
+  "Regexps to filter from `consult-buffer'.")
+
+(use-package consult
+  :after vertico
+
+  :bind
+  ( ;; Press "SPC" to show ephemeral buffers, "b SPC" to filter by buffers, "f
+   ;; SPC" to filter by files, "p SPC" to filter by projects. If you press "DEL"
+   ;; afterwards, the full candidate list will be shown again.
+   ([remap switch-to-buffer] . consult-buffer)
+   ("<f3>" . consult-buffer)
+   ([remap project-switch-to-buffer] . consult-project-buffer)
+   ([remap yank-pop] . consult-yank-from-kill-ring)
+   ([remap goto-line] . consult-goto-line)
+   ([remap bookmark-jump] . consult-bookmark)
+   ([remap list-bookmarks] . consult-bookmark)
+   ([remap bookmark-bmenu-list] . consult-bookmark)
+   ("M-g o" . consult-outline)
+   ("C-c C-m" . consult-mark)
+   ([remap imenu] . consult-imenu) ; "M-g i"
+   ("C-c C-j" . consult-imenu)
+   ([remap customize] . consult-customize)
+   ([remap load-theme] . consult-theme)
+   ([remap locate] . consult-locate)
+   ("C-c s l" . consult-locate)
+   ("C-c s f" . consult-fd)
+   ;; Prefix argument "C-u" allows to specify the directory. You can pass
+   ;; additional grep flags to `consult-grep' with the "--" separator. E.g.:
+   ;; "foo bar -- -A3" to get matches with 3 lines of 'after' context.
+   ([remap rgrep] . consult-grep)
+   ([remap vc-git-grep] . consult-git-grep)
+   ("<f4>" . consult-line)
+   ("M-g l" . sb/consult-line-symbol-at-point)
+   ("C-c s r" . consult-ripgrep)
+   ([remap recentf-open-files] . consult-recent-file)
+   ("M-g r" . consult-register)
+   :map
+   isearch-mode-map
+   ("M-s e" . consult-isearch-history))
+
+  :custom (consult-line-start-from-top t "Start search from the beginning")
+  ;; Disable preview by default, enable for selected commands
+  (consult-preview-key nil)
+  (completion-in-region-function #'consult-completion-in-region "Complete M-:")
+
+  ;; Having multiple other sources like `recentf' may make it difficult to
+  ;; identify and switch quickly between only buffers, especially while wrapping
+  ;; around.
+  ;; (consult-buffer-sources '(consult--source-buffer))
+
+  (consult-narrow-key "<")
+  (consult-widen-key ">")
+
+  ;; Do not filter buffers, they help to debug configuration errors 
+  ;; (consult-buffer-filter sb/consult-buffer-filter)
+
+  :config
+  (consult-customize
+   consult-line
+   consult-ripgrep
+   consult-git-grep
+   consult-grep
+   consult-bookmark
+   consult-xref
+   consult-yank-from-kill-ring
+   :preview-key
+   '(:debounce 1.5 any)
+   consult-recent-file
+   consult-theme
+   consult-buffer
+   :preview-key
+   "M-."
+   consult-find
+   :sort
+   t
+   consult-line
+   consult-ripgrep
+   consult-grep
+   ;; Initialize search string with the highlighted region
+   :initial
+   (when (use-region-p)
+     (buffer-substring-no-properties (region-beginning) (region-end))))
+
+  ;; ;; Use thing at point with `consult-line'
+  ;;   (consult-customize
+  ;;    consult-line
+  ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
+  ;; (defalias 'consult-line-thing-at-point 'consult-line)
+  ;; (consult-customize
+  ;;  consult-line-thing-at-point
+  ;;  :initial (thing-at-point 'symbol))
+
+  (defun sb/consult-line-symbol-at-point ()
+    (interactive)
+    (consult-line (or (thing-at-point 'symbol) ""))))
+
+;; Easily add file and directory paths into the minibuffer.
+(use-package consult-dir
+  :commands consult-dir-jump-file
+
+  :bind ("C-x C-d" . consult-dir)
+
+  :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
+
+;; Use `consult' to select Tramp targets. Supported completion sources are ssh
+;; config, known hosts, and docker containers.
+(use-package consult-tramp
+  :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
+
+  :after consult
+
+  :bind ("C-c d t" . consult-tramp))
 
 (use-package ispell
   :ensure nil
@@ -899,6 +1101,8 @@
   ;; Prefer hunspell over aspell on Linux platforms
   (cond
    ((executable-find "hunspell")
+    (setenv "DICTIONARY" "en_US")
+
     (setenv "DICPATH" (expand-file-name "hunspell" user-emacs-directory))
     (let ((en-us-dict
            '(("en_US"
@@ -1313,6 +1517,12 @@
 
   :custom (hl-todo-highlight-punctuation ":"))
 
+;; Jump to `hl-todo' keywords in current buffer.
+(use-package consult-todo
+  :after (consult hl-todo)
+
+  :commands (consult-todo consult-todo-all))
+
 ;; Display ugly "^L" page breaks as tidy horizontal lines
 (use-package page-break-lines
   :hook (emacs-startup . global-page-break-lines-mode)
@@ -1504,6 +1714,9 @@
   :after yasnippet
 
   :init (yasnippet-snippets-initialize))
+
+(use-package consult-yasnippet
+  :bind ("C-M-y" . consult-yasnippet))
 
 ;; Use "M-x company-diag" or the modeline status without diminish to see the
 ;; backend used for the last completion.
@@ -1747,6 +1960,11 @@
   :hook (emacs-startup . prescient-persist-mode)
 
   :custom (prescient-sort-full-matches-first t))
+
+(use-package vertico-prescient
+  :after vertico
+
+  :init (vertico-prescient-mode 1))
 
 (use-package company-prescient
   :after company
@@ -2546,6 +2764,13 @@
 
   :diminish)
 
+(use-package consult-reftex
+  :vc (:url "https://github.com/karthink/consult-reftex" :rev :newest)
+
+  :after (consult reftex)
+
+  :commands (consult-reftex-insert-reference consult-reftex-goto-label))
+
 (use-package bibtex
   :ensure nil
 
@@ -3095,6 +3320,11 @@ Fallback to `xref-go-back'."
      (side . bottom)
      (slot . 2)
      (window-height . 0.5))))
+
+(use-package consult-eglot
+  :after (consult eglot)
+
+  :commands consult-eglot-symbols)
 
 (use-package flymake
   :pin gnu
