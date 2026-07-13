@@ -31,7 +31,7 @@
   :type
   '(radio
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "leuven-dark" leuven-dark)
+    (const :tag "matugen" matugen)
     (const :tag "standard-dark" standard-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
@@ -1188,7 +1188,7 @@
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
   :hook
-  ((after-init . global-hungry-delete-mode)
+  ((emacs-startup . global-hungry-delete-mode)
    (minibuffer-setup . (lambda () (hungry-delete-mode -1))))
 
   :diminish)
@@ -1207,7 +1207,7 @@
 
 ;; Operate on the current line if no region is active
 (use-package whole-line-or-region
-  :hook (after-init . whole-line-or-region-global-mode)
+  :hook (emacs-startup . whole-line-or-region-global-mode)
 
   :diminish whole-line-or-region-local-mode)
 
@@ -1325,7 +1325,7 @@
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
-  :hook (after-init . gcmh-mode)
+  :hook (emacs-startup . gcmh-mode)
 
   :diminish)
 
@@ -1501,7 +1501,7 @@
   :bind (("C-h C-m" . discover-my-major) ("C-c d m" . discover-my-mode)))
 
 (use-package hl-todo
-  :hook (after-init . global-hl-todo-mode)
+  :hook (emacs-startup . global-hl-todo-mode)
 
   ;; I use Flycheck integration (`previous-error' and `next-error') to navigate
   ;; among the highlighted lines.
@@ -1567,9 +1567,7 @@
   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
 
   :config
-  (when (and (fboundp 'treesit-available-p)
-             (treesit-available-p)
-             (executable-find "tree-sitter"))
+  (when (and (fboundp 'treesit-available-p) (treesit-available-p))
     (setopt
      indent-bars-treesit-support t
      indent-bars-treesit-ignore-blank-lines-types '("module")
@@ -2157,10 +2155,7 @@
 (use-package c-ts-mode
   :ensure nil
 
-  :when
-  (and (fboundp 'treesit-available-p)
-       (treesit-available-p)
-       (executable-find "tree-sitter"))
+  :when (and (fboundp 'treesit-available-p) (treesit-available-p))
 
   :mode (("\\.h\\'" . c-or-c++-ts-mode) ("\\.c\\'" . c++-ts-mode))
 
@@ -2903,12 +2898,30 @@ Fallback to `xref-go-back'."
 
   :diminish)
 
+(use-package modus-themes
+  :when (eq sb/theme 'modus-vivendi)
+
+  :init (load-theme 'modus-vivendi t)
+
+  :custom (modus-themes-mixed-fonts nil))
+
 (use-package standard-themes
   :when (eq sb/theme 'standard-dark)
 
   :init (load-theme 'standard-dark t)
 
   :custom (modus-themes-mixed-fonts nil))
+
+(use-package matugen-theme
+  :ensure nil
+
+  :load-path "themes"
+
+  :when (eq sb/theme 'matugen)
+
+  :init
+  (require 'matugen-theme)
+  (load-theme 'matugen t))
 
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
@@ -2987,10 +3000,7 @@ Fallback to `xref-go-back'."
   :diminish)
 
 (use-package kdl-mode
-  :when
-  (and (fboundp 'treesit-available-p)
-       (treesit-available-p)
-       (executable-find "tree-sitter"))
+  :when (and (fboundp 'treesit-available-p) (treesit-available-p))
 
   :mode ("\\.kdl\\'" . kdl-mode))
 
@@ -3002,7 +3012,8 @@ Fallback to `xref-go-back'."
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
 ;; (use-package clipetty
-;;   :hook (after-init . global-clipetty-mode)
+;;   :hook (emacs-startup . global-clipetty-mode)
+
 ;;   :diminish)
 
 ;; Only enable xclip in TTY under X11
@@ -3012,15 +3023,15 @@ Fallback to `xref-go-back'."
        (not (getenv "WAYLAND_DISPLAY")) ; avoid Wayland
        (or (executable-find "xclip") (executable-find "xsel")))
 
-  :hook (after-init . xclip-mode))
+  :hook (emacs-startup . xclip-mode))
 
-;; (use-package kill-file-path
+(use-package kill-file-path
 
-;;   :commands
-;;   (kill-file-path-basename
-;;    kill-file-path-basename-without-extension
-;;    kill-file-path-dirname
-;;    kill-file-path))
+  :commands
+  (kill-file-path-basename
+   kill-file-path-basename-without-extension
+   kill-file-path-dirname
+   kill-file-path))
 
 (use-package eglot
   :after project
