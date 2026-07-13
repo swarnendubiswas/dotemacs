@@ -1620,6 +1620,10 @@
      try-expand-line))
   (hippie-expand-verbose nil))
 
+;; Use "M-SPC" for space-separated completion lookups.
+(use-package orderless
+  :demand t)
+
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
 ;; "list-command-history". "partial-completion" style allows to use wildcards
@@ -1875,6 +1879,62 @@
 
 (use-package company-try-hard
   :bind (:map company-active-map ("C-j" . company-try-hard)))
+
+;; Notes on configuring `company-backends'.
+
+;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
+;; backends. `company-yasnippet' is blocking. Only a few backends are
+;; specialized on certain major modes or certain contexts (e.g., outside of
+;; strings and comments), and pass control to later backends when outside of
+;; that major mode or context.
+
+;; A few mode-agnostic backends are applicable to all modes:
+;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
+;; `company-dabbrev'.
+
+;; The ‘prefix’ bool command always returns non-nil for following backends even
+;; when their candidates list command is empty: `company-abbrev',
+;; `company-dabbrev', `company-dabbrev-code'.
+
+;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode,
+;; inside strings, or comments). That is why it is better to put
+;; `company-dabbrev' at the end.
+
+;; The keyword ":with" helps to make sure the results from major/minor mode
+;; agnostic backends (such as `company-yasnippet', `company-dabbrev-code') are
+;; returned without preventing results from context-aware backends (such as
+;; `company-capf' or `company-clang'). For this feature to work, put backends
+;; dependent on a mode at the beginning of the grouped backends list, then put a
+;; keyword ":with", and then put context-agnostic backend(s).
+
+;; Company does not support grouping of entirely arbitrary backends, they need
+;; to be compatible in what `prefix' returns. If the group contains keyword
+;; `:with', the backends listed after the keyword are ignored for the purpose of
+;; the `prefix' command. If the group contains keyword `:separate', the
+;; candidates that come from different backends are sorted separately in the
+;; combined list. That is, with `:separate', the multi-backend-adapter will stop
+;; sorting and keep the order of completions just like the backends returned
+;; them.
+
+;; Try completion backends in order until there is a non-empty completion list:
+
+;; (setopt company-backends '(company-xxx company-yyy company-zzz))
+
+;; Merge completions of all the backends:
+
+;; (setopt company-backends '((company-xxx company-yyy company-zzz)))
+
+;; Both the backends will generate completions at the same time, and their
+;; results will be merged. `company-yasnippet' will be queried even if
+;; `company-capf' returns nil. Company treats the result as coming from a single
+;; backend.
+
+;; (setopt company-backends '((company-capf :with company-yasnippet)))
+
+;; Merge completions of all the backends but keep the candidates organized in
+;; accordance with the grouped backends order.
+
+;; (setopt company-backends '((company-xxx company-yyy company-zzz :separate)))
 
 (with-eval-after-load 'company
   ;; Override `company-backends' for unhandled major modes.
@@ -3008,6 +3068,14 @@ Fallback to `xref-go-back'."
   :ensure nil
 
   :hook (asm-mode . eglot-ensure))
+
+;; Navigate the xref stack with consult
+(use-package consult-xref-stack
+  :vc (:url "https://github.com/brett-lempereur/consult-xref-stack")
+
+  :commands consult-xref-stack-forward
+
+  :bind ("C-," . consult-xref-stack-backward))
 
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
