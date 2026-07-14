@@ -25,13 +25,12 @@
 ;; contrast, and integrates well with all terminals.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'standard-dark
-    'standard-dark)
+      'modus-vivendi
+    'modus-vivendi)
   "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "matugen" matugen)
     (const :tag "standard-dark" standard-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
@@ -2971,17 +2970,6 @@ Fallback to `xref-go-back'."
   :init (load-theme 'standard-dark t)
 
   :custom (modus-themes-mixed-fonts nil))
-
-(use-package matugen-theme
-  :ensure nil
-
-  :load-path "themes"
-
-  :when (eq sb/theme 'matugen)
-
-  :init
-  (require 'matugen-theme)
-  (load-theme 'matugen t))
 
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
