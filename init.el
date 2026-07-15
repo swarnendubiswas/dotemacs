@@ -25,13 +25,12 @@
 ;; contrast, and integrates well with all terminals.
 (defcustom sb/theme
   (if (display-graphic-p)
-      'standard-dark
-    'standard-dark)
+      'modus-vivendi
+    'modus-vivendi)
   "Specify which Emacs theme to use."
   :type
   '(radio
     (const :tag "modus-vivendi" modus-vivendi)
-    (const :tag "matugen" matugen)
     (const :tag "standard-dark" standard-dark)
     (const :tag "none" none))
   :group 'sb/emacs)
@@ -976,6 +975,7 @@
    ("C-c s r" . consult-ripgrep)
    ([remap recentf-open-files] . consult-recent-file)
    ("M-g r" . consult-register)
+   ("C-c ! !" . consult-flymake)
    :map
    isearch-mode-map
    ("M-s e" . consult-isearch-history))
@@ -2122,41 +2122,41 @@
   ;;   ;; Increased default font locking may hurt performance
   ;;   (treesit-font-lock-level 4)
 
-  ;;   (treesit-language-source-alist
-  ;;    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-  ;;      (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-  ;;      (c "https://github.com/tree-sitter/tree-sitter-c")
-  ;;      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-  ;;      (cmake "https://github.com/uyha/tree-sitter-cmake")
-  ;;      (css "https://github.com/tree-sitter/tree-sitter-css")
-  ;;      (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
-  ;;      (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-  ;;      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-  ;;      (go "https://github.com/tree-sitter/tree-sitter-go")
-  ;;      (html "https://github.com/tree-sitter/tree-sitter-html")
-  ;;      (java "https://github.com/tree-sitter/tree-sitter-java")
-  ;;      (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-  ;;      (json "https://github.com/tree-sitter/tree-sitter-json")
-  ;;      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
-  ;;      (latex "https://github.com/latex-lsp/tree-sitter-latex")
-  ;;      (make "https://github.com/alemuller/tree-sitter-make")
-  ;;      (markdown
-  ;;       "https://github.com/ikatyang/tree-sitter-markdown"
-  ;;       "split_parser"
-  ;;       "tree-sitter-markdown/src")
-  ;;      (markdown-inline
-  ;;       "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-  ;;       "split_parser"
-  ;;       "tree-sitter-markdown-inline/src")
-  ;;      (org "https://github.com/milisims/tree-sitter-org")
-  ;;      (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-  ;;      (php "https://github.com/tree-sitter/tree-sitter-php")
-  ;;      (python "https://github.com/tree-sitter/tree-sitter-python")
-  ;;      (toml "https://github.com/tree-sitter/tree-sitter-toml")
-  ;;      (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
-  ;;      (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
-  ;;      (rust "https://github.com/tree-sitter/tree-sitter-rust")
-  ;;      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+    (treesit-language-source-alist
+     '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+       (c "https://github.com/tree-sitter/tree-sitter-c")
+       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+       (cmake "https://github.com/uyha/tree-sitter-cmake")
+       (css "https://github.com/tree-sitter/tree-sitter-css")
+       (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
+       (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+       (go "https://github.com/tree-sitter/tree-sitter-go")
+       (html "https://github.com/tree-sitter/tree-sitter-html")
+       (java "https://github.com/tree-sitter/tree-sitter-java")
+       (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+       (json "https://github.com/tree-sitter/tree-sitter-json")
+       (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
+       (latex "https://github.com/latex-lsp/tree-sitter-latex")
+       (make "https://github.com/alemuller/tree-sitter-make")
+       (markdown
+        "https://github.com/ikatyang/tree-sitter-markdown"
+        "split_parser"
+        "tree-sitter-markdown/src")
+       (markdown-inline
+        "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+        "split_parser"
+        "tree-sitter-markdown-inline/src")
+       (org "https://github.com/milisims/tree-sitter-org")
+       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+       (php "https://github.com/tree-sitter/tree-sitter-php")
+       (python "https://github.com/tree-sitter/tree-sitter-python")
+       (toml "https://github.com/tree-sitter/tree-sitter-toml")
+       (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
+       (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+       (rust "https://github.com/tree-sitter/tree-sitter-rust")
+       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
   ;;   :config
   ;;   (setopt treesit-language-source-alist
@@ -2971,17 +2971,6 @@ Fallback to `xref-go-back'."
   :init (load-theme 'standard-dark t)
 
   :custom (modus-themes-mixed-fonts nil))
-
-(use-package matugen-theme
-  :ensure nil
-
-  :load-path "themes"
-
-  :when (eq sb/theme 'matugen)
-
-  :init
-  (require 'matugen-theme)
-  (load-theme 'matugen t))
 
 (use-package mini-echo
   :when (eq sb/modeline-theme 'mini-echo)
