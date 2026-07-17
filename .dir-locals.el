@@ -338,7 +338,7 @@
 
  (LaTeX-mode
   .
-  ((TeX-master . (expand-file-name "paper.tex"))
+  ((TeX-master . "paper")
    (eval .
          (let ((bibpath (expand-file-name "./references/references.bib")))
            (setq-local
