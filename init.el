@@ -35,11 +35,6 @@
     (const :tag "none" none))
   :group 'sb/emacs)
 
-(defcustom sb/modeline-theme 'mini-echo
-  "Specify the mode-line theme to use."
-  :type '(radio (const :tag "mini-echo" mini-echo) (const :tag "none" none))
-  :group 'sb/emacs)
-
 (defconst sb/user-home-directory (getenv "HOME")
   "User HOME directory.")
 
@@ -464,7 +459,8 @@
 
   ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 
-  :diminish (visual-line-mode auto-revert-mode))
+  (diminish 'auto-revert-mode)
+  (diminish 'visual-line-mode))
 
 (use-package recentf
   :ensure nil
@@ -993,7 +989,7 @@
   (consult-narrow-key "<")
   (consult-widen-key ">")
 
-  ;; Do not filter buffers, they help to debug configuration errors 
+  ;; Do not filter buffers, they help to debug configuration errors
   ;; (consult-buffer-filter sb/consult-buffer-filter)
 
   :config
@@ -1044,109 +1040,131 @@
 
   :config (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t))
 
-;; Use `consult' to select Tramp targets. Supported completion sources are ssh
-;; config, known hosts, and docker containers.
-(use-package consult-tramp
-  :vc (:url "https://github.com/Ladicle/consult-tramp" :rev :newest)
+;; Provide context-dependent actions similar to a content menu.
 
-  :after consult
-
-  :bind ("C-c d t" . consult-tramp))
-
-(use-package ispell
-  :ensure nil
-
-  :bind ("M-$" . ispell-word)
+(use-package embark
+  :bind
+  ( ;; "C-h b" lists all the bindings available in a buffer
+   ([remap describe-bindings] . embark-bindings)
+   ("C-`" . embark-act)
+   ("C-;" . embark-dwim)
+   :map
+   minibuffer-local-map
+   ("C-`" . embark-act)
+   ("C-c C-c" . embark-collect)
+   ("C-c C-e" . embark-export))
 
   :custom
-  (ispell-dictionary "en_US")
-  (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-  (ispell-alternate-dictionary
-   (expand-file-name "wordlist.5" sb/extras-directory))
-  ;; Save a new word to personal dictionary without asking
-  (ispell-silently-savep t)
+  ;; Replace the key help with a completing-read interface
+  (prefix-help-command #'embark-prefix-help-command))
 
+;; Supports exporting search results to a `grep-mode' buffer, on which you can
+;; use `wgrep'.
+
+(use-package embark-consult
+  :after (embark consult)
+
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+
+(use-package affe
   :config
-  (when (boundp 'ispell-save-corrections-as-abbrevs)
-    (setopt ispell-save-corrections-as-abbrevs t))
+  ;; Manual preview key for `affe-grep'
+  (consult-customize affe-grep :preview-key "M-."))
 
-  (setq ispell-dictionary-alist
-        (append
-         '(("english"
-            "[[:alpha:]]"
-            "[^[:alpha:]]"
-            "[']"
-            nil
-            ("-d" "en_US")
-            nil
-            utf-8)
-           ("american"
-            "[[:alpha:]]"
-            "[^[:alpha:]]"
-            "[']"
-            nil
-            ("-d" "en_US")
-            nil
-            utf-8))
-         ispell-dictionary-alist))
+;; (use-package ispell
+;;   :ensure nil
 
-  ;; Prefer hunspell over aspell on Linux platforms
-  (cond
-   ((executable-find "hunspell")
-    (setenv "DICTIONARY" "en_US")
+;;   :bind ("M-$" . ispell-word)
 
-    (setenv "DICPATH" (expand-file-name "hunspell" user-emacs-directory))
-    (let ((en-us-dict
-           '(("en_US"
-              "[[:alpha:]]"
-              "[[^:alpha:]]"
-              "[']"
-              nil
-              ("-d" "en_US")
-              nil
-              utf-8))))
-      (setopt
-       ispell-program-name "hunspell"
-       ispell-local-dictionary-alist en-us-dict)
-      (setq
-       ispell-hunspell-dictionary-alist en-us-dict
-       ispell-hunspell-dict-paths-alist
-       `(("en_US"
-          ,(expand-file-name "hunspell/en_US.dic" user-emacs-directory))))))
-   ((executable-find "aspell")
-    (setopt
-     ispell-program-name "aspell"
-     ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case"))))
+;;   :custom
+;;   (ispell-dictionary "en_US")
+;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
+;;   (ispell-alternate-dictionary
+;;    (expand-file-name "wordlist.5" sb/extras-directory))
+;;   ;; Save a new word to personal dictionary without asking
+;;   (ispell-silently-savep t)
 
-  ;; Skip regions in `org-mode'
-  (defun sb/org-ispell-setup ()
-    (setq-local ispell-skip-region-alist
-                (append
-                 '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-                   ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-                   ("~" . "~")
-                   ("=" . "=")
-                   ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-                   ;; Footnotes in org that have http links that are line
-                   ;; breaked should not be ispelled
-                   ("^http" . "\\]")
-                   ("`" . "`")
-                   ("cite:" . "[[:space:]]")
-                   ("label:" . "[[:space:]]")
-                   ("ref:" . "[[:space:]]")
-                   ("\\\\begin{multline}" . "\\\\end{multline}")
-                   ("\\\\begin{equation}" . "\\\\end{equation}")
-                   ("\\\\begin{align}" . "\\\\end{align}"))
-                 ispell-skip-region-alist)))
+;;   :config
+;;   (when (boundp 'ispell-save-corrections-as-abbrevs)
+;;     (setopt ispell-save-corrections-as-abbrevs t))
 
-  (add-hook 'org-mode-hook #'sb/org-ispell-setup)
+;;   (setq ispell-dictionary-alist
+;;         (append
+;;          '(("english"
+;;             "[[:alpha:]]"
+;;             "[^[:alpha:]]"
+;;             "[']"
+;;             nil
+;;             ("-d" "en_US")
+;;             nil
+;;             utf-8)
+;;            ("american"
+;;             "[[:alpha:]]"
+;;             "[^[:alpha:]]"
+;;             "[']"
+;;             nil
+;;             ("-d" "en_US")
+;;             nil
+;;             utf-8))
+;;          ispell-dictionary-alist))
 
-  ;; Hide the "Starting new Ispell process" message
-  (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-  (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+;;   ;; Prefer hunspell over aspell on Linux platforms
+;;   (cond
+;;    ((executable-find "hunspell")
+;;     (setenv "DICTIONARY" "en_US")
 
-;; Silence "Starting 'look' process..." message
-(advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
+;;     (setenv "DICPATH" (expand-file-name "hunspell" user-emacs-directory))
+;;     (let ((en-us-dict
+;;            '(("en_US"
+;;               "[[:alpha:]]"
+;;               "[[^:alpha:]]"
+;;               "[']"
+;;               nil
+;;               ("-d" "en_US")
+;;               nil
+;;               utf-8))))
+;;       (setopt
+;;        ispell-program-name "hunspell"
+;;        ispell-local-dictionary-alist en-us-dict)
+;;       (setq
+;;        ispell-hunspell-dictionary-alist en-us-dict
+;;        ispell-hunspell-dict-paths-alist
+;;        `(("en_US"
+;;           ,(expand-file-name "hunspell/en_US.dic" user-emacs-directory))))))
+;;    ((executable-find "aspell")
+;;     (setopt
+;;      ispell-program-name "aspell"
+;;      ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case"))))
+
+;;   ;; Skip regions in `org-mode'
+;;   (defun sb/org-ispell-setup ()
+;;     (setq-local ispell-skip-region-alist
+;;                 (append
+;;                  '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
+;;                    ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
+;;                    ("~" . "~")
+;;                    ("=" . "=")
+;;                    ("\\:PROPERTIES\\:$" . "\\:END\\:$")
+;;                    ;; Footnotes in org that have http links that are line
+;;                    ;; breaked should not be ispelled
+;;                    ("^http" . "\\]")
+;;                    ("`" . "`")
+;;                    ("cite:" . "[[:space:]]")
+;;                    ("label:" . "[[:space:]]")
+;;                    ("ref:" . "[[:space:]]")
+;;                    ("\\\\begin{multline}" . "\\\\end{multline}")
+;;                    ("\\\\begin{equation}" . "\\\\end{equation}")
+;;                    ("\\\\begin{align}" . "\\\\end{align}"))
+;;                  ispell-skip-region-alist)))
+
+;;   (add-hook 'org-mode-hook #'sb/org-ispell-setup)
+
+;;   ;; Hide the "Starting new Ispell process" message
+;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
+;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
+
+;; ;; Silence "Starting 'look' process..." message
+;; (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
@@ -1162,28 +1180,6 @@
   :custom (jinx-languages "en_US")
 
   :diminish)
-
-(use-package helpful
-  :bind
-  (([remap describe-variable] . helpful-variable) ; "C-h v"
-   ;; The built-in `describe-function' includes both functions and macros.
-   ;; `helpful-function' is only for functions, so we use `helpful-callable' as
-   ;; a replacement.
-   ([remap describe-function] . helpful-callable) ; "C-h f"
-   ([remap describe-symbol] . helpful-symbol) ; "C-h o"
-   ([remap describe-key] . helpful-key) ; "C-h k"
-   ("C-h c" . helpful-command) ("C-h p" . helpful-at-point)
-   :map helpful-mode-map ("q" . helpful-kill-buffers))
-
-  :config
-  (add-to-list
-   'display-buffer-alist
-   '("\\*helpful.*\\*"
-     (display-buffer-in-side-window)
-     (side . bottom)
-     (slot . 0)
-     (window-height . 0.5)
-     (window-parameters . ((no-delete-other-windows . t))))))
 
 ;; Erase all consecutive white space characters in a given direction
 (use-package hungry-delete
@@ -1205,55 +1201,55 @@
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
 
-;; Operate on the current line if no region is active
-(use-package whole-line-or-region
-  :hook (emacs-startup . whole-line-or-region-global-mode)
+;; ;; Operate on the current line if no region is active
+;; (use-package whole-line-or-region
+;;   :hook (emacs-startup . whole-line-or-region-global-mode)
 
-  :diminish whole-line-or-region-local-mode)
+;;   :diminish whole-line-or-region-local-mode)
 
-;; Keeps track of the point position over time and allows us to navigate back
-;; and forward in history.
-(use-package dogears
-  :hook ((prog-mode text-mode) . dogears-mode)
+;; ;; Keeps track of the point position over time and allows us to navigate back
+;; ;; and forward in history.
+;; (use-package dogears
+;;   :hook ((prog-mode text-mode) . dogears-mode)
 
-  :bind
-  (("M-g d" . dogears-go)
-   ("M-g r" . dogears-remember)
-   ("M-g b" . dogears-back)
-   ("M-g f" . dogears-forward)
-   ("M-g t" . dogears-list))
+;;   :bind
+;;   (("M-g d" . dogears-go)
+;;    ("M-g r" . dogears-remember)
+;;    ("M-g b" . dogears-back)
+;;    ("M-g f" . dogears-forward)
+;;    ("M-g t" . dogears-list))
 
-  :custom
-  (dogears-message nil)
-  (dogears-hooks
-   '(imenu-after-jump-hook
-     xref-after-jump-hook
-     xref-after-return-hook
-     consult-after-jump-hook
-     before-save-hook
-     isearch-mode-end-hook
-     bookmark-after-jump-hook))
-  (dogears-functions '(avy-goto-char-timer avy-goto-line))
+;;   :custom
+;;   (dogears-message nil)
+;;   (dogears-hooks
+;;    '(imenu-after-jump-hook
+;;      xref-after-jump-hook
+;;      xref-after-return-hook
+;;      consult-after-jump-hook
+;;      before-save-hook
+;;      isearch-mode-end-hook
+;;      bookmark-after-jump-hook))
+;;   (dogears-functions '(avy-goto-char-timer avy-goto-line))
 
-  :config
-  (dolist (mode
-           '(elpaca-log-mode
-             messages-buffer-mode helpful-mode completion-list-mode))
-    (add-to-list 'dogears-ignore-modes mode))
-  (with-eval-after-load 'git-commit
-    (add-to-list 'dogears-ignore-modes 'git-commit-mode))
-  (with-eval-after-load 'magit-status
-    (add-to-list 'dogears-ignore-modes 'magit-status-mode))
+;;   :config
+;;   (dolist (mode
+;;            '(elpaca-log-mode
+;;              messages-buffer-mode helpful-mode completion-list-mode))
+;;     (add-to-list 'dogears-ignore-modes mode))
+;;   (with-eval-after-load 'git-commit
+;;     (add-to-list 'dogears-ignore-modes 'git-commit-mode))
+;;   (with-eval-after-load 'magit-status
+;;     (add-to-list 'dogears-ignore-modes 'magit-status-mode))
 
-  (add-to-list
-   'display-buffer-alist
-   '("\\*Dogears List\\*"
-     (display-buffer-same-window) ; open in same window
-     (inhibit-same-window . nil) ; allow reuse
-     (inhibit-switch-frame . nil) ; allow switching frames
-     (window-parameters . ((no-other-window . t)))
-     ;; Make it full-frame
-     (body-function . delete-other-windows))))
+;;   (add-to-list
+;;    'display-buffer-alist
+;;    '("\\*Dogears List\\*"
+;;      (display-buffer-same-window) ; open in same window
+;;      (inhibit-same-window . nil) ; allow reuse
+;;      (inhibit-switch-frame . nil) ; allow switching frames
+;;      (window-parameters . ((no-other-window . t)))
+;;      ;; Make it full-frame
+;;      (body-function . delete-other-windows))))
 
 (use-package vundo
   :bind
@@ -1273,27 +1269,27 @@
 (use-package iedit
   :bind* ("C-." . iedit-mode))
 
-;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
-;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
-;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
-(use-package bm
-  :init (setq bm-restore-repository-on-load t)
+;; ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
+;; ;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
+;; ;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
+;; (use-package bm
+;;   :init (setq bm-restore-repository-on-load t)
 
-  :hook
-  ((emacs-startup . bm-repository-load)
-   ((find-file after-revert) . bm-buffer-restore)
-   ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
-   (kill-emacs
-    .
-    (lambda ()
-      (bm-buffer-save-all)
-      (bm-repository-save))))
+;;   :hook
+;;   ((emacs-startup . bm-repository-load)
+;;    ((find-file after-revert) . bm-buffer-restore)
+;;    ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
+;;    (kill-emacs
+;;     .
+;;     (lambda ()
+;;       (bm-buffer-save-all)
+;;       (bm-repository-save))))
 
-  :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
+;;   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
 
-  :custom (bm-verbosity-level 0)
+;;   :custom (bm-verbosity-level 0)
 
-  :config (setq-default bm-buffer-persistence t))
+;;   :config (setq-default bm-buffer-persistence t))
 
 (use-package crux
   :bind
@@ -1305,23 +1301,23 @@
 
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
-(use-package rainbow-delimiters
-  :hook
-  ((c-mode
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    emacs-lisp-mode
-    java-mode
-    java-ts-mode
-    json-mode
-    json-ts-mode
-    jsonc-mode
-    lisp-data-mode
-    python-mode
-    python-ts-mode)
-   . rainbow-delimiters-mode))
+;; ;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
+;; (use-package rainbow-delimiters
+;;   :hook
+;;   ((c-mode
+;;     c-ts-mode
+;;     c++-mode
+;;     c++-ts-mode
+;;     emacs-lisp-mode
+;;     java-mode
+;;     java-ts-mode
+;;     json-mode
+;;     json-ts-mode
+;;     jsonc-mode
+;;     lisp-data-mode
+;;     python-mode
+;;     python-ts-mode)
+;;    . rainbow-delimiters-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -1439,14 +1435,14 @@
 
   :custom (visual-replace-display-total t))
 
-;; Magit often requires a newer version of transient.
-(use-package transient
-  :custom (transient-semantic-coloring t)
+;; ;; Magit often requires a newer version of transient.
+;; (use-package transient
+;;   :custom (transient-semantic-coloring t)
 
-  :config (transient-bind-q-to-quit))
+;;   :config (transient-bind-q-to-quit))
 
-;; Use Emacsclient as the $EDITOR of child processes.
-(use-package with-editor :diminish)
+;; ;; Use Emacsclient as the $EDITOR of child processes.
+;; (use-package with-editor :diminish)
 
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package magit
@@ -1515,33 +1511,33 @@
 
   :commands (consult-todo consult-todo-all))
 
-;; Display ugly "^L" page breaks as tidy horizontal lines
-(use-package page-break-lines
-  :hook (emacs-startup . global-page-break-lines-mode)
+;; ;; Display ugly "^L" page breaks as tidy horizontal lines
+;; (use-package page-break-lines
+;;   :hook (emacs-startup . global-page-break-lines-mode)
 
-  :diminish)
+;;   :diminish)
 
-;; Basedpyright does not provide formatting feature. So, we cannot use
-;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
-(use-package apheleia
-  :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
+;; ;; Basedpyright does not provide formatting feature. So, we cannot use
+;; ;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
+;; (use-package apheleia
+;;   :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
 
-  :bind ("C-x f" . apheleia-format-buffer)
+;;   :bind ("C-x f" . apheleia-format-buffer)
 
-  :custom (apheleia-formatters-respect-fill-column t)
+;;   :custom (apheleia-formatters-respect-fill-column t)
 
-  :config
-  (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
-  (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
-  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
-  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
-  ;; (when (executable-find "kdlfmt")
-  ;;   (setf (alist-get 'kdlfmt apheleia-formatters)
-  ;;         '("kdlfmt" "format" "--stdin"))
-  ;;   (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
-  ;;   (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
+;;   :config
+;;   (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
+;;   (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
+;;   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
+;;   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
+;;   ;; (when (executable-find "kdlfmt")
+;;   ;;   (setf (alist-get 'kdlfmt apheleia-formatters)
+;;   ;;         '("kdlfmt" "format" "--stdin"))
+;;   ;;   (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
+;;   ;;   (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
 
-  :diminish apheleia-mode)
+;;   :diminish apheleia-mode)
 
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
@@ -1559,27 +1555,27 @@
   (elisp-autofmt-python-bin "python3")
   (elisp-autofmt-on-save-p 'always))
 
-;; Provides indentation guide bars with optional `tree-sitter' support
-(use-package indent-bars
-  :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+;; ;; Provides indentation guide bars with optional `tree-sitter' support
+;; (use-package indent-bars
+;;   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
 
-  :custom
-  (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
+;;   :custom
+;;   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
 
-  :config
-  (when (and (fboundp 'treesit-available-p) (treesit-available-p))
-    (setopt
-     indent-bars-treesit-support t
-     indent-bars-treesit-ignore-blank-lines-types '("module")
-     indent-bars-treesit-scope
-     '((python
-        function_definition
-        class_definition
-        for_statement
-        if_statement
-        with_statement
-        while_statement)
-       (yaml block_mapping_pair comment)))))
+;;   :config
+;;   (when (and (fboundp 'treesit-available-p) (treesit-available-p))
+;;     (setopt
+;;      indent-bars-treesit-support t
+;;      indent-bars-treesit-ignore-blank-lines-types '("module")
+;;      indent-bars-treesit-scope
+;;      '((python
+;;         function_definition
+;;         class_definition
+;;         for_statement
+;;         if_statement
+;;         with_statement
+;;         while_statement)
+;;        (yaml block_mapping_pair comment)))))
 
 ;; `dabbrev-completion' finds all expansions in the current buffer and presents
 ;; suggestions for completion.
@@ -1620,9 +1616,6 @@
      try-expand-line))
   (hippie-expand-verbose nil))
 
-;; Use "M-SPC" for space-separated completion lookups.
-(use-package orderless
-  :demand t)
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -1644,6 +1637,7 @@
   (read-buffer-completion-ignore-case t)
 
   (completion-styles '(basic flex initials))
+  ;; Disable defaults, use our settings
   (completion-category-defaults nil)
   ;; The "basic" completion style needs to be tried first for TRAMP hostname
   ;; completion to work. I also want substring matching for file names.
@@ -1653,6 +1647,7 @@
   ;; Never pop up the *Completions* buffer automatically
   (completion-auto-help nil)
   (completions-sort 'historical)
+  (completion-ignore-case t)
 
   (minibuffer-visible-completions 'up-down)
 
@@ -1675,6 +1670,14 @@
 
   ;; Do not open the *Messages* buffer when clicking in the Echo area.
   (unbind-key [mouse-1] minibuffer-inactive-mode-map))
+
+;; Use "M-SPC" for space-separated completion lookups.
+(use-package orderless
+  :after minibuffer
+
+  :demand t
+
+  :custom (completion-styles '(orderless basic)))
 
 ;; https://www.reddit.com/r/emacs/comments/1qlngj1/completionatpoint_overwrites_following_text/
 
@@ -1718,14 +1721,15 @@
   :hook (emacs-startup . global-company-mode)
 
   :bind
+  ;; `company-complete-common' is bound to "C-M-i", `company-complete-common-or-cycle' is bound to "TAB", and `company-cycle-backward' is bound to "backtab".
   (:map
    company-active-map
    ("C-;" . company-other-backend) ; Invoke the next backend
    ("C-s" . company-search-candidates)
    ("C-f" . company-filter-candidates)
    ([escape] . company-abort)
-   ("M-." . company-show-location)
-   ("C-h" . company-show-doc-buffer)
+   ("M-g" . company-show-location)
+   ("M-h" . company-show-doc-buffer)
    :map
    company-search-map
    ("C-s" . company-search-repeat-forward)
@@ -1834,8 +1838,9 @@
   (company-dict-dir (expand-file-name "company-dict" user-emacs-directory))
   (company-dict-enable-yasnippet nil))
 
-;; Use "<" to trigger company completion of org blocks.
+;; Using an `use-package' declaration is loading `org-mode'.
 (defun sb/company-org-block-setup ()
+  "Use < to trigger company completion of org blocks."
   (autoload 'company-org-block "company-org-block")
   (setq-local company-backends
               '(company-files
@@ -1843,19 +1848,6 @@
                 (:separate company-dict company-ispell company-dabbrev))))
 
 (add-hook 'org-mode-hook #'sb/company-org-block-setup)
-
-;; (use-package company-org-block
-;;   :after company
-
-;;   :hook
-;;   (org-mode
-;;    .
-;;    (lambda ()
-;;      (require 'company-org-block)
-;;      (setq-local company-backends
-;;                  '(company-files
-;;                    (company-org-block :separate company-dabbrev-code)
-;;                    (:separate company-dict company-ispell company-dabbrev))))))
 
 (use-package company-auctex
   :after tex
@@ -1879,62 +1871,6 @@
 
 (use-package company-try-hard
   :bind (:map company-active-map ("C-j" . company-try-hard)))
-
-;; Notes on configuring `company-backends'.
-
-;; Most backends (e.g., `company-yasnippet') will not pass control to subsequent
-;; backends. `company-yasnippet' is blocking. Only a few backends are
-;; specialized on certain major modes or certain contexts (e.g., outside of
-;; strings and comments), and pass control to later backends when outside of
-;; that major mode or context.
-
-;; A few mode-agnostic backends are applicable to all modes:
-;; `company-yasnippet', `company-ispell', `company-dabbrev-code', and
-;; `company-dabbrev'.
-
-;; The ‘prefix’ bool command always returns non-nil for following backends even
-;; when their candidates list command is empty: `company-abbrev',
-;; `company-dabbrev', `company-dabbrev-code'.
-
-;; `company-dabbrev' returns a non-nil prefix in almost any context (major mode,
-;; inside strings, or comments). That is why it is better to put
-;; `company-dabbrev' at the end.
-
-;; The keyword ":with" helps to make sure the results from major/minor mode
-;; agnostic backends (such as `company-yasnippet', `company-dabbrev-code') are
-;; returned without preventing results from context-aware backends (such as
-;; `company-capf' or `company-clang'). For this feature to work, put backends
-;; dependent on a mode at the beginning of the grouped backends list, then put a
-;; keyword ":with", and then put context-agnostic backend(s).
-
-;; Company does not support grouping of entirely arbitrary backends, they need
-;; to be compatible in what `prefix' returns. If the group contains keyword
-;; `:with', the backends listed after the keyword are ignored for the purpose of
-;; the `prefix' command. If the group contains keyword `:separate', the
-;; candidates that come from different backends are sorted separately in the
-;; combined list. That is, with `:separate', the multi-backend-adapter will stop
-;; sorting and keep the order of completions just like the backends returned
-;; them.
-
-;; Try completion backends in order until there is a non-empty completion list:
-
-;; (setopt company-backends '(company-xxx company-yyy company-zzz))
-
-;; Merge completions of all the backends:
-
-;; (setopt company-backends '((company-xxx company-yyy company-zzz)))
-
-;; Both the backends will generate completions at the same time, and their
-;; results will be merged. `company-yasnippet' will be queried even if
-;; `company-capf' returns nil. Company treats the result as coming from a single
-;; backend.
-
-;; (setopt company-backends '((company-capf :with company-yasnippet)))
-
-;; Merge completions of all the backends but keep the candidates organized in
-;; accordance with the grouped backends order.
-
-;; (setopt company-backends '((company-xxx company-yyy company-zzz :separate)))
 
 (with-eval-after-load 'company
   ;; Override `company-backends' for unhandled major modes.
@@ -2021,25 +1957,25 @@
 
   :init (company-prescient-mode 1))
 
-;; Highlight symbols on hover
-(use-package symbol-overlay
-  :hook ((prog-mode conf-mode) . symbol-overlay-mode)
+;; ;; Highlight symbols on hover
+;; (use-package symbol-overlay
+;;   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
 
-  :bind
-  (("M-p" . symbol-overlay-jump-prev)
-   ("M-n" . symbol-overlay-jump-next)
-   :map
-   symbol-overlay-map
-   ("<" . symbol-overlay-jump-first)
-   (">" . symbol-overlay-jump-last)
-   ("d" . symbol-overlay-jump-to-definition)
-   ("r" . symbol-overlay-rename))
+;;   :bind
+;;   (("M-p" . symbol-overlay-jump-prev)
+;;    ("M-n" . symbol-overlay-jump-next)
+;;    :map
+;;    symbol-overlay-map
+;;    ("<" . symbol-overlay-jump-first)
+;;    (">" . symbol-overlay-jump-last)
+;;    ("d" . symbol-overlay-jump-to-definition)
+;;    ("r" . symbol-overlay-rename))
 
-  :custom
-  ;; Delay highlighting to allow for transient cursor placements
-  (symbol-overlay-idle-time 2)
+;;   :custom
+;;   ;; Delay highlighting to allow for transient cursor placements
+;;   (symbol-overlay-idle-time 2)
 
-  :diminish)
+;;   :diminish)
 
 (use-package compile
   :ensure nil
@@ -2119,78 +2055,41 @@
   (treesit-enabled-modes t)
   (treesit-auto-install-grammar 'always)
 
-  ;;   ;; Increased default font locking may hurt performance
-  ;;   (treesit-font-lock-level 4)
-
-    (treesit-language-source-alist
-     '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-       (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
-       (c "https://github.com/tree-sitter/tree-sitter-c")
-       (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-       (cmake "https://github.com/uyha/tree-sitter-cmake")
-       (css "https://github.com/tree-sitter/tree-sitter-css")
-       (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
-       (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-       (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-       (go "https://github.com/tree-sitter/tree-sitter-go")
-       (html "https://github.com/tree-sitter/tree-sitter-html")
-       (java "https://github.com/tree-sitter/tree-sitter-java")
-       (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-       (json "https://github.com/tree-sitter/tree-sitter-json")
-       (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
-       (latex "https://github.com/latex-lsp/tree-sitter-latex")
-       (make "https://github.com/alemuller/tree-sitter-make")
-       (markdown
-        "https://github.com/ikatyang/tree-sitter-markdown"
-        "split_parser"
-        "tree-sitter-markdown/src")
-       (markdown-inline
-        "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
-        "split_parser"
-        "tree-sitter-markdown-inline/src")
-       (org "https://github.com/milisims/tree-sitter-org")
-       (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
-       (php "https://github.com/tree-sitter/tree-sitter-php")
-       (python "https://github.com/tree-sitter/tree-sitter-python")
-       (toml "https://github.com/tree-sitter/tree-sitter-toml")
-       (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
-       (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
-       (rust "https://github.com/tree-sitter/tree-sitter-rust")
-       (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-
-  ;;   :config
-  ;;   (setopt treesit-language-source-alist
-  ;;           '((cpp "https://github.com/tree-sitter/tree-sitter-cpp" "v0.22.0")))
-
-  ;;   ;; Install grammars if missing
-  ;;   (unless (seq-every-p
-  ;;            #'treesit-language-available-p
-  ;;            (mapcar #'car treesit-language-source-alist))
-  ;;     (mapc
-  ;;      #'treesit-install-language-grammar
-  ;;      (mapcar #'car treesit-language-source-alist)))
-
-  ;;   (setopt major-mode-remap-alist
-  ;;           '((sh-mode . bash-ts-mode)
-  ;;             (c-mode . c-ts-mode)
-  ;;             (c++-mode . c++-ts-mode)
-  ;;             (c-or-c++-mode . c-or-c++-ts-mode)
-  ;;             (cmake-mode . cmake-ts-mode)
-  ;;             (css-mode . css-ts-mode)
-  ;;             (dockerfile-mode . dockerfile-ts-mode)
-  ;;             (html-mode . html-ts-mode)
-  ;;             (java-mode . java-ts-mode)
-  ;;             (json-mode . json-ts-mode)
-  ;;             (kdl-mode . kdl-ts-mode)
-  ;;             (python-mode . python-ts-mode)
-  ;;             (toml-mode . toml-ts-mode)
-  ;;             (conf-toml-mode . toml-ts-mode)
-  ;;             (yaml-mode . yaml-ts-mode))))
-  )
-
-;; (with-eval-after-load 'c++-ts-mode
-;;   (bind-key "C-M-a" #'treesit-beginning-of-defun c++-ts-mode-map)
-;;   (bind-key "C-M-e" #'treesit-end-of-defun c++-ts-mode-map))
+  (treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (bibtex "https://github.com/latex-lsp/tree-sitter-bibtex")
+     (c "https://github.com/tree-sitter/tree-sitter-c")
+     (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     (css "https://github.com/tree-sitter/tree-sitter-css")
+     (cuda "https://github.com/tree-sitter-grammars/tree-sitter-cuda")
+     (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (java "https://github.com/tree-sitter/tree-sitter-java")
+     (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+     (json "https://github.com/tree-sitter/tree-sitter-json")
+     (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
+     (latex "https://github.com/latex-lsp/tree-sitter-latex")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown
+      "https://github.com/ikatyang/tree-sitter-markdown"
+      "split_parser"
+      "tree-sitter-markdown/src")
+     (markdown-inline
+      "https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+      "split_parser"
+      "tree-sitter-markdown-inline/src")
+     (org "https://github.com/milisims/tree-sitter-org")
+     (perl "https://github.com/tree-sitter-perl/tree-sitter-perl")
+     (php "https://github.com/tree-sitter/tree-sitter-php")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     (tsx "https://github.com/tree-sitter/tree-sitter-typescript")
+     (typescript "https://github.com/tree-sitter/tree-sitter-typescript")
+     (rust "https://github.com/tree-sitter/tree-sitter-rust")
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml"))))
 
 ;; Some systems may not have treesitter mode enabled.
 (use-package cc-mode
@@ -2595,7 +2494,6 @@
    ("C-c C-e" . org-export-dispatch)
    ;; ("C-c C-e l l" . org-latex-export-to-latex)
    ;; ("C-c C-e l p" . org-latex-export-to-pdf)
-   ;; ("C-c C-e h h" . org-html-export-to-html)
    ("C-c C-x f" . org-footnote-action)
    ;; Jump between definition and reference
    ("C-c C-c" . org-ctrl-c-ctrl-c))
@@ -2972,75 +2870,6 @@ Fallback to `xref-go-back'."
 
   :custom (modus-themes-mixed-fonts nil))
 
-(use-package mini-echo
-  :when (eq sb/modeline-theme 'mini-echo)
-
-  :hook (emacs-startup . mini-echo-mode)
-
-  :custom
-  (mini-echo-buffer-status-style 'both)
-  (mini-echo-right-padding 2)
-  (mini-echo-persistent-rule
-   '(:long
-     ("remote-host"
-      "selection-info"
-      "flymake"
-      "vcs"
-      "buffer-position"
-      "major-mode"
-      "shrink-path")
-     :short ("remote-host" "flymake" "vcs" "buffer-position" "shrink-path")))
-  (mini-echo-temporary-rule
-   '(:both ("selection-info" "narrow" "repeat" "text-scale" "wgrep")))
-
-  :config
-  (mini-echo-define-segment
-   "shrink-path"
-   "Return shrink path of current buffer in project or parent dir."
-   :update-advice '((vc-refresh-state . :after))
-   :fetch
-   (concat
-    (mini-echo-buffer-read-only)
-
-    (propertize (let* ((filepath (buffer-file-name))
-                       (project
-                        (or mini-echo--project-root
-                            (mini-echo-update-project-root)))
-                       (dir
-                        (thread-last
-                         default-directory
-                         (or (and (not (string-empty-p project)) project))
-                         (directory-file-name)
-                         (file-name-nondirectory))))
-                  (cond
-                   ((not filepath)
-                    "")
-                   ((string-empty-p project)
-                    (propertize (concat dir "/") 'face 'shadow))
-                   ((string-prefix-p project filepath)
-                    (concat
-                     (propertize dir 'face 'mini-echo-project) "/"
-                     (when-let* ((p
-                                  (butlast
-                                   (split-string (string-remove-prefix
-                                                  project filepath)
-                                                 "/" t))))
-                       (concat
-                        (propertize (mapconcat (lambda (s) (substring s 0 1)) p
-                                               "/")
-                                    'face 'shadow)
-                        "/"))))
-                   (t
-                    "")))
-                'face '(:foreground "orange" :height 1.0))
-
-    (propertize (mini-echo-buffer-name-with-status)
-                'face
-                '(:foreground "white" :height 1.0)))
-
-   :update (mini-echo-update-project-root)))
-
-;; Center the text environment
 (use-package olivetti
   :hook ((text-mode prog-mode fundamental-mode conf-mode org-mode) . olivetti-mode)
 
@@ -3082,14 +2911,6 @@ Fallback to `xref-go-back'."
 
   :hook (emacs-startup . xclip-mode))
 
-(use-package kill-file-path
-
-  :commands
-  (kill-file-path-basename
-   kill-file-path-basename-without-extension
-   kill-file-path-dirname
-   kill-file-path))
-
 (use-package eglot
   :after project
 
@@ -3117,8 +2938,6 @@ Fallback to `xref-go-back'."
    ("C-c l o" . eglot-code-action-organize-imports))
 
   :custom
-  ;; Disabling this helps avoid the race condition between closing a project and shutting down LSP servers.
-  ;; (eglot-autoshutdown t)
 
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 1)
@@ -3139,9 +2958,9 @@ Fallback to `xref-go-back'."
 
   :config
   ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
-  ;; (setopt eglot-events-buffer-config '(:size 0 :format short))
+  (setopt eglot-events-buffer-config '(:size 0 :format short))
 
-  ;; (fset #'jsonrpc--log-event #'ignore)
+  (fset #'jsonrpc--log-event #'ignore)
 
   (setopt
    eglot-server-programs
@@ -3363,10 +3182,6 @@ Fallback to `xref-go-back'."
        (when (derived-mode-p 'c-mode 'c++-mode)
          (eglot-semantic-tokens-mode 1)))))
 
-  ;; (setq-default completion-category-overrides
-  ;;               '((eglot (styles hotfuzz basic substring orderless))
-  ;;                 (eglot-capf (styles hotfuzz orderless))))
-
   ;; Avoid fuzzy or orderless completion for code
   (setq-default completion-category-overrides
                 '((eglot (styles basic))
@@ -3406,48 +3221,33 @@ Fallback to `xref-go-back'."
   (save-some-buffers t))
 (bind-key "C-S-s" #'sb/save-all-buffers)
 
-(defun sb/comment-line (n)
-  "Comment or uncomment current line and leave point after it.
-With positive prefix, apply to N lines including current one.
-With negative prefix, apply to -N lines above.
-If region is active, apply to active region instead."
-  (interactive "p")
-  (if (use-region-p)
-      (comment-or-uncomment-region (region-beginning) (region-end))
-    (let ((range
-           (list (line-beginning-position) (goto-char (line-end-position n)))))
-      (comment-or-uncomment-region (apply #'min range) (apply #'max range)))
-    (forward-line 1)
-    (back-to-indentation)))
-(bind-key "C-c ;" #'sb/comment-line)
-
-(defun sb/toggle-window-split ()
-  "Switch between vertical and horizontal splits."
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-             (next-win-buffer (window-buffer (next-window)))
-             (this-win-edges (window-edges (selected-window)))
-             (next-win-edges (window-edges (next-window)))
-             (this-win-2nd
-              (not
-               (and (<= (car this-win-edges) (car next-win-edges))
-                    (<= (cadr this-win-edges) (cadr next-win-edges)))))
-             (splitter
-              (if (= (car this-win-edges) (car (window-edges (next-window))))
-                  'split-window-horizontally
-                'split-window-vertically)))
-        (delete-other-windows)
-        (let ((first-win (selected-window)))
-          (funcall splitter)
-          (if this-win-2nd
-              (other-window 1))
-          (set-window-buffer (selected-window) this-win-buffer)
-          (set-window-buffer (next-window) next-win-buffer)
-          (select-window first-win)
-          (if this-win-2nd
-              (other-window 1))))))
-(bind-key "C-x |" #'sb/toggle-window-split)
+;; (defun sb/toggle-window-split ()
+;;   "Switch between vertical and horizontal splits."
+;;   (interactive)
+;;   (if (= (count-windows) 2)
+;;       (let* ((this-win-buffer (window-buffer))
+;;              (next-win-buffer (window-buffer (next-window)))
+;;              (this-win-edges (window-edges (selected-window)))
+;;              (next-win-edges (window-edges (next-window)))
+;;              (this-win-2nd
+;;               (not
+;;                (and (<= (car this-win-edges) (car next-win-edges))
+;;                     (<= (cadr this-win-edges) (cadr next-win-edges)))))
+;;              (splitter
+;;               (if (= (car this-win-edges) (car (window-edges (next-window))))
+;;                   'split-window-horizontally
+;;                 'split-window-vertically)))
+;;         (delete-other-windows)
+;;         (let ((first-win (selected-window)))
+;;           (funcall splitter)
+;;           (if this-win-2nd
+;;               (other-window 1))
+;;           (set-window-buffer (selected-window) this-win-buffer)
+;;           (set-window-buffer (next-window) next-win-buffer)
+;;           (select-window first-win)
+;;           (if this-win-2nd
+;;               (other-window 1))))))
+;; (bind-key "C-x |" #'sb/toggle-window-split)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
@@ -3457,13 +3257,6 @@ If region is active, apply to active region instead."
 ;; ESC serves as a substitute for META, but there is no need to hold down ESC
 ;; while pressing the subsequent key. Instead "M-something" keybindings can be
 ;; triggered by pressing ESC and the other key sequentially.
-
-;; ;; Allow scaling text across all Emacs frames unlike `text-scale-mode'.
-;; (use-package default-text-scale
-;;   :when (display-graphic-p)
-;;   :bind
-;;   (("C-M-+" . default-text-scale-increase)
-;;    ("C-M--" . default-text-scale-decrease)))
 
 ;; Show free bindings in current buffer
 (use-package free-keys
