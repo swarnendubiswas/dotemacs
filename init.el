@@ -459,7 +459,8 @@
 
   ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
 
-  (diminish 'auto-revert-mode)
+  (with-eval-after-load 'autorevert
+    (diminish 'auto-revert-mode))
   (diminish 'visual-line-mode))
 
 (use-package recentf
@@ -1207,49 +1208,49 @@
 
 ;;   :diminish whole-line-or-region-local-mode)
 
-;; ;; Keeps track of the point position over time and allows us to navigate back
-;; ;; and forward in history.
-;; (use-package dogears
-;;   :hook ((prog-mode text-mode) . dogears-mode)
+;; Keeps track of the point position over time and allows us to navigate back
+;; and forward in history.
+(use-package dogears
+  :hook ((prog-mode text-mode) . dogears-mode)
 
-;;   :bind
-;;   (("M-g d" . dogears-go)
-;;    ("M-g r" . dogears-remember)
-;;    ("M-g b" . dogears-back)
-;;    ("M-g f" . dogears-forward)
-;;    ("M-g t" . dogears-list))
+  :bind
+  (("M-g d" . dogears-go)
+   ("M-g r" . dogears-remember)
+   ("M-g b" . dogears-back)
+   ("M-g f" . dogears-forward)
+   ("M-g t" . dogears-list))
 
-;;   :custom
-;;   (dogears-message nil)
-;;   (dogears-hooks
-;;    '(imenu-after-jump-hook
-;;      xref-after-jump-hook
-;;      xref-after-return-hook
-;;      consult-after-jump-hook
-;;      before-save-hook
-;;      isearch-mode-end-hook
-;;      bookmark-after-jump-hook))
-;;   (dogears-functions '(avy-goto-char-timer avy-goto-line))
+  :custom
+  (dogears-message nil)
+  (dogears-hooks
+   '(imenu-after-jump-hook
+     xref-after-jump-hook
+     xref-after-return-hook
+     consult-after-jump-hook
+     before-save-hook
+     isearch-mode-end-hook
+     bookmark-after-jump-hook))
+  (dogears-functions '(avy-goto-char-timer avy-goto-line))
 
-;;   :config
-;;   (dolist (mode
-;;            '(elpaca-log-mode
-;;              messages-buffer-mode helpful-mode completion-list-mode))
-;;     (add-to-list 'dogears-ignore-modes mode))
-;;   (with-eval-after-load 'git-commit
-;;     (add-to-list 'dogears-ignore-modes 'git-commit-mode))
-;;   (with-eval-after-load 'magit-status
-;;     (add-to-list 'dogears-ignore-modes 'magit-status-mode))
+  :config
+  (dolist (mode
+           '(elpaca-log-mode
+             messages-buffer-mode helpful-mode completion-list-mode))
+    (add-to-list 'dogears-ignore-modes mode))
+  (with-eval-after-load 'git-commit
+    (add-to-list 'dogears-ignore-modes 'git-commit-mode))
+  (with-eval-after-load 'magit-status
+    (add-to-list 'dogears-ignore-modes 'magit-status-mode))
 
-;;   (add-to-list
-;;    'display-buffer-alist
-;;    '("\\*Dogears List\\*"
-;;      (display-buffer-same-window) ; open in same window
-;;      (inhibit-same-window . nil) ; allow reuse
-;;      (inhibit-switch-frame . nil) ; allow switching frames
-;;      (window-parameters . ((no-other-window . t)))
-;;      ;; Make it full-frame
-;;      (body-function . delete-other-windows))))
+  (add-to-list
+   'display-buffer-alist
+   '("\\*Dogears List\\*"
+     (display-buffer-same-window) ; open in same window
+     (inhibit-same-window . nil) ; allow reuse
+     (inhibit-switch-frame . nil) ; allow switching frames
+     (window-parameters . ((no-other-window . t)))
+     ;; Make it full-frame
+     (body-function . delete-other-windows))))
 
 (use-package vundo
   :bind
@@ -1269,27 +1270,27 @@
 (use-package iedit
   :bind* ("C-." . iedit-mode))
 
-;; ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
-;; ;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
-;; ;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
-;; (use-package bm
-;;   :init (setq bm-restore-repository-on-load t)
+;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
+;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
+;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
+(use-package bm
+  :init (setq bm-restore-repository-on-load t)
 
-;;   :hook
-;;   ((emacs-startup . bm-repository-load)
-;;    ((find-file after-revert) . bm-buffer-restore)
-;;    ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
-;;    (kill-emacs
-;;     .
-;;     (lambda ()
-;;       (bm-buffer-save-all)
-;;       (bm-repository-save))))
+  :hook
+  ((emacs-startup . bm-repository-load)
+   ((find-file after-revert) . bm-buffer-restore)
+   ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
+   (kill-emacs
+    .
+    (lambda ()
+      (bm-buffer-save-all)
+      (bm-repository-save))))
 
-;;   :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
+  :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
 
-;;   :custom (bm-verbosity-level 0)
+  :custom (bm-verbosity-level 0)
 
-;;   :config (setq-default bm-buffer-persistence t))
+  :config (setq-default bm-buffer-persistence t))
 
 (use-package crux
   :bind
@@ -1301,23 +1302,23 @@
 
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; ;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
-;; (use-package rainbow-delimiters
-;;   :hook
-;;   ((c-mode
-;;     c-ts-mode
-;;     c++-mode
-;;     c++-ts-mode
-;;     emacs-lisp-mode
-;;     java-mode
-;;     java-ts-mode
-;;     json-mode
-;;     json-ts-mode
-;;     jsonc-mode
-;;     lisp-data-mode
-;;     python-mode
-;;     python-ts-mode)
-;;    . rainbow-delimiters-mode))
+;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
+(use-package rainbow-delimiters
+  :hook
+  ((c-mode
+    c-ts-mode
+    c++-mode
+    c++-ts-mode
+    emacs-lisp-mode
+    java-mode
+    java-ts-mode
+    json-mode
+    json-ts-mode
+    jsonc-mode
+    lisp-data-mode
+    python-mode
+    python-ts-mode)
+   . rainbow-delimiters-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
@@ -1517,27 +1518,29 @@
 
 ;;   :diminish)
 
-;; ;; Basedpyright does not provide formatting feature. So, we cannot use
-;; ;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
-;; (use-package apheleia
-;;   :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
+;; Basedpyright does not provide formatting feature. So, we cannot use
+;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
+(use-package apheleia
+  :hook ((markdown-mode markdown-ts-mode python-mode python-ts-mode) . apheleia-mode)
 
-;;   :bind ("C-x f" . apheleia-format-buffer)
+  :bind ("C-x f" . apheleia-format-buffer)
 
-;;   :custom (apheleia-formatters-respect-fill-column t)
+  :custom (apheleia-formatters-respect-fill-column t)
 
-;;   :config
-;;   (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
-;;   (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
-;;   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
-;;   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
-;;   ;; (when (executable-find "kdlfmt")
-;;   ;;   (setf (alist-get 'kdlfmt apheleia-formatters)
-;;   ;;         '("kdlfmt" "format" "--stdin"))
-;;   ;;   (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
-;;   ;;   (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
+  :config
+  (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
 
-;;   :diminish apheleia-mode)
+  ;; (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
+
+  ;; (when (executable-find "kdlfmt")
+  ;;   (setf (alist-get 'kdlfmt apheleia-formatters)
+  ;;         '("kdlfmt" "format" "--stdin"))
+  ;;   (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
+  ;;   (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
+
+  :diminish apheleia-mode)
 
 ;; Auto-format Elisp code
 (use-package elisp-autofmt
@@ -1615,7 +1618,6 @@
      try-expand-list
      try-expand-line))
   (hippie-expand-verbose nil))
-
 
 ;; "basic" matches only the prefix, "substring" matches the whole string.
 ;; "initials" matches acronyms and initialisms, e.g., can complete "M-x lch" to
@@ -3220,34 +3222,6 @@ Fallback to `xref-go-back'."
   (interactive)
   (save-some-buffers t))
 (bind-key "C-S-s" #'sb/save-all-buffers)
-
-;; (defun sb/toggle-window-split ()
-;;   "Switch between vertical and horizontal splits."
-;;   (interactive)
-;;   (if (= (count-windows) 2)
-;;       (let* ((this-win-buffer (window-buffer))
-;;              (next-win-buffer (window-buffer (next-window)))
-;;              (this-win-edges (window-edges (selected-window)))
-;;              (next-win-edges (window-edges (next-window)))
-;;              (this-win-2nd
-;;               (not
-;;                (and (<= (car this-win-edges) (car next-win-edges))
-;;                     (<= (cadr this-win-edges) (cadr next-win-edges)))))
-;;              (splitter
-;;               (if (= (car this-win-edges) (car (window-edges (next-window))))
-;;                   'split-window-horizontally
-;;                 'split-window-vertically)))
-;;         (delete-other-windows)
-;;         (let ((first-win (selected-window)))
-;;           (funcall splitter)
-;;           (if this-win-2nd
-;;               (other-window 1))
-;;           (set-window-buffer (selected-window) this-win-buffer)
-;;           (set-window-buffer (next-window) next-win-buffer)
-;;           (select-window first-win)
-;;           (if this-win-2nd
-;;               (other-window 1))))))
-;; (bind-key "C-x |" #'sb/toggle-window-split)
 
 ;; Inside strings, special keys like tab or F1-Fn have to be written inside
 ;; angle brackets, e.g., "C-<up>". Standalone special keys (and some
