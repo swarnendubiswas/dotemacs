@@ -5,10 +5,9 @@
 
 ;;; Commentary:
 
-;; My configuration mostly targets GNU Linux. I tend to switch between Company
-;; and Corfu, and Eglot and Lsp-mode. Company provides finer-grained control
-;; than Corfu. I generally prefer Eglot compared to lsp-mode because it feels
-;; lightweight and I rarely use multiple servers simultaneously.
+;; My configuration mostly targets GNU Linux. Company provides finer-grained
+;; control than Corfu. I generally prefer Eglot compared to Lsp-mode because it
+;; feels lightweight.
 
 ;;; Code:
 
@@ -21,8 +20,8 @@
   :type 'string
   :group 'sb/emacs)
 
-;; I now prefer dark themes. Modus-vivendi is the most complete, has good
-;; contrast, and integrates well with all terminals.
+;; I prefer dark themes. Modus-vivendi is the most complete, has good contrast,
+;; and integrates well with all terminals.
 (defcustom sb/theme
   (if (display-graphic-p)
       'modus-vivendi
@@ -51,9 +50,9 @@
  ;; Use "M-x use-package-report" to see results
  use-package-compute-statistics nil)
 
-;; Where possible, it is better to avoid :preface, :config and
-;; :init. Instead, prefer autoloading keywords such as :bind, :hook, and :mode,
-;; as they will take care of setting up autoloads.
+;; Where possible, it is better to avoid :preface, :config and :init. Instead,
+;; prefer autoloading keywords such as :bind, :hook, and :mode, as they will
+;; take care of setting up autoloads.
 
 ;; https://www.gnu.org/software/emacs/manual/html_node/use-package/Best-practices.html
 ;; https://batsov.com/articles/2025/04/17/using-use-package-the-right-way/
@@ -132,6 +131,7 @@
      (when (fboundp 'vc-auto-revert-mode)
        (vc-auto-revert-mode 1))
 
+     ;; Bring tooltips (e.g., help echo, button hints) to terminal frames
      (when (and (not (display-graphic-p)) (fboundp 'tty-tip-mode))
        (tty-tip-mode 1))))
 
@@ -1071,6 +1071,9 @@
   :config
   ;; Manual preview key for `affe-grep'
   (consult-customize affe-grep :preview-key "M-."))
+
+(use-package flex-x
+  :custom (completion-styles '(flex-x basic)))
 
 ;; (use-package ispell
 ;;   :ensure nil
@@ -3215,7 +3218,7 @@ Fallback to `xref-go-back'."
    ("M-n" . flymake-goto-next-error)
    ("M-p" . flymake-goto-prev-error))
 
-  :config (setq flymake-diagnostic-format-alist '((t . (origin code message)))))
+  :config (setq flymake-show-diagnostics-at-end-of-line t))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
@@ -3242,19 +3245,17 @@ Fallback to `xref-go-back'."
 
   :hook (emacs-startup . global-kkp-mode)
 
-  ;; :bind
-  ;; ("M-<backspace>" . backward-kill-word) ; Should be remapped to "M-DEL"
+  ;; :config
+  ;; ;; These workarounds are to help with Zellij.
+  ;; (define-key key-translation-map (kbd "M-S-;") (kbd "M-:"))
+  ;; (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
+  ;; (define-key key-translation-map (kbd "M-S-/") (kbd "M-?"))
+  )
 
-  :config
-  ;; These workarounds are to help with Zellij.
-  (define-key key-translation-map (kbd "M-S-;") (kbd "M-:"))
-  (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
-  (define-key key-translation-map (kbd "M-S-/") (kbd "M-?")))
-
-(define-key input-decode-map "\e[127;6u" (kbd "C-S-<backspace>"))
-(define-key input-decode-map "\e[46;5u" (kbd "C-."))
-(define-key input-decode-map "\e[47;5u" (kbd "C-/"))
-;; (define-key input-decode-map "\e[61;5u" (kbd "C-="))
+;; (define-key input-decode-map "\e[127;6u" (kbd "C-S-<backspace>"))
+;; (define-key input-decode-map "\e[46;5u" (kbd "C-."))
+;; (define-key input-decode-map "\e[47;5u" (kbd "C-/"))
+;; ;; (define-key input-decode-map "\e[61;5u" (kbd "C-="))
 
 (add-hook
  'emacs-startup-hook
