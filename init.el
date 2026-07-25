@@ -267,6 +267,8 @@
   (remote-file-name-inhibit-auto-save-visited t)
   (remote-file-name-inhibit-delete-by-moving-to-trash t)
   (remote-file-name-inhibit-auto-save t)
+  ;; Remote files are not updated outside of Tramp
+  (remote-file-name-inhibit-cache nil)
 
   (ring-bell-function 'ignore "Disable beeping sound")
   ;; (visible-bell nil)
@@ -587,11 +589,8 @@
 (use-package tramp
   :defer t
 
-  :custom
-  ;; Remote files are not updated outside of Tramp
-  (remote-file-name-inhibit-cache nil)
-  (tramp-verbose 1 "Only errors and warnings")
-  (tramp-default-method "ssh")
+  :custom (tramp-verbose 1 "Only errors and warnings")
+  ;; (tramp-default-method "ssh")
   (tramp-copy-size-limit (* 2 1024 1024)) ; 2MB
   (tramp-use-scp-direct-remote-copying t)
 
