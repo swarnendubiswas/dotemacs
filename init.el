@@ -1019,15 +1019,6 @@
    (when (use-region-p)
      (buffer-substring-no-properties (region-beginning) (region-end))))
 
-  ;; ;; Use thing at point with `consult-line'
-  ;;   (consult-customize
-  ;;    consult-line
-  ;;  :add-history (seq-some #'thing-at-point '(region symbol)))
-  ;; (defalias 'consult-line-thing-at-point 'consult-line)
-  ;; (consult-customize
-  ;;  consult-line-thing-at-point
-  ;;  :initial (thing-at-point 'symbol))
-
   (defun sb/consult-line-symbol-at-point ()
     (interactive)
     (consult-line (or (thing-at-point 'symbol) ""))))
@@ -1074,101 +1065,6 @@
 (use-package flex-x
   :custom (completion-styles '(flex-x basic)))
 
-;; (use-package ispell
-;;   :ensure nil
-
-;;   :bind ("M-$" . ispell-word)
-
-;;   :custom
-;;   (ispell-dictionary "en_US")
-;;   (ispell-personal-dictionary (expand-file-name "spell" sb/extras-directory))
-;;   (ispell-alternate-dictionary
-;;    (expand-file-name "wordlist.5" sb/extras-directory))
-;;   ;; Save a new word to personal dictionary without asking
-;;   (ispell-silently-savep t)
-
-;;   :config
-;;   (when (boundp 'ispell-save-corrections-as-abbrevs)
-;;     (setopt ispell-save-corrections-as-abbrevs t))
-
-;;   (setq ispell-dictionary-alist
-;;         (append
-;;          '(("english"
-;;             "[[:alpha:]]"
-;;             "[^[:alpha:]]"
-;;             "[']"
-;;             nil
-;;             ("-d" "en_US")
-;;             nil
-;;             utf-8)
-;;            ("american"
-;;             "[[:alpha:]]"
-;;             "[^[:alpha:]]"
-;;             "[']"
-;;             nil
-;;             ("-d" "en_US")
-;;             nil
-;;             utf-8))
-;;          ispell-dictionary-alist))
-
-;;   ;; Prefer hunspell over aspell on Linux platforms
-;;   (cond
-;;    ((executable-find "hunspell")
-;;     (setenv "DICTIONARY" "en_US")
-
-;;     (setenv "DICPATH" (expand-file-name "hunspell" user-emacs-directory))
-;;     (let ((en-us-dict
-;;            '(("en_US"
-;;               "[[:alpha:]]"
-;;               "[[^:alpha:]]"
-;;               "[']"
-;;               nil
-;;               ("-d" "en_US")
-;;               nil
-;;               utf-8))))
-;;       (setopt
-;;        ispell-program-name "hunspell"
-;;        ispell-local-dictionary-alist en-us-dict)
-;;       (setq
-;;        ispell-hunspell-dictionary-alist en-us-dict
-;;        ispell-hunspell-dict-paths-alist
-;;        `(("en_US"
-;;           ,(expand-file-name "hunspell/en_US.dic" user-emacs-directory))))))
-;;    ((executable-find "aspell")
-;;     (setopt
-;;      ispell-program-name "aspell"
-;;      ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--camel-case"))))
-
-;;   ;; Skip regions in `org-mode'
-;;   (defun sb/org-ispell-setup ()
-;;     (setq-local ispell-skip-region-alist
-;;                 (append
-;;                  '(("^#\\+BEGIN_SRC" . "^#\\+END_SRC")
-;;                    ("^#\\+BEGIN_EXAMPLE" . "^#\\+END_EXAMPLE")
-;;                    ("~" . "~")
-;;                    ("=" . "=")
-;;                    ("\\:PROPERTIES\\:$" . "\\:END\\:$")
-;;                    ;; Footnotes in org that have http links that are line
-;;                    ;; breaked should not be ispelled
-;;                    ("^http" . "\\]")
-;;                    ("`" . "`")
-;;                    ("cite:" . "[[:space:]]")
-;;                    ("label:" . "[[:space:]]")
-;;                    ("ref:" . "[[:space:]]")
-;;                    ("\\\\begin{multline}" . "\\\\end{multline}")
-;;                    ("\\\\begin{equation}" . "\\\\end{equation}")
-;;                    ("\\\\begin{align}" . "\\\\end{align}"))
-;;                  ispell-skip-region-alist)))
-
-;;   (add-hook 'org-mode-hook #'sb/org-ispell-setup)
-
-;;   ;; Hide the "Starting new Ispell process" message
-;;   (advice-add 'ispell-init-process :around #'sb/inhibit-message-call-orig-fun)
-;;   (advice-add 'ispell-lookup-words :around #'sb/inhibit-message-call-orig-fun))
-
-;; ;; Silence "Starting 'look' process..." message
-;; (advice-add 'lookup-words :around #'sb/inhibit-message-call-orig-fun)
-
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
 ;; the word at point, even if it is not misspelled.
@@ -1203,12 +1099,6 @@
 ;; Restore point to the initial location with "C-g" after marking a region
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
-
-;; ;; Operate on the current line if no region is active
-;; (use-package whole-line-or-region
-;;   :hook (emacs-startup . whole-line-or-region-global-mode)
-
-;;   :diminish whole-line-or-region-local-mode)
 
 ;; Keeps track of the point position over time and allows us to navigate back
 ;; and forward in history.
@@ -1275,24 +1165,6 @@
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
 ;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
 ;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
-(use-package bm
-  :init (setq bm-restore-repository-on-load t)
-
-  :hook
-  ((emacs-startup . bm-repository-load)
-   ((find-file after-revert) . bm-buffer-restore)
-   ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
-   (kill-emacs
-    .
-    (lambda ()
-      (bm-buffer-save-all)
-      (bm-repository-save))))
-
-  :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
-
-  :custom (bm-verbosity-level 0)
-
-  :config (setq-default bm-buffer-persistence t))
 
 (use-package crux
   :bind
@@ -1438,15 +1310,6 @@
 
   :custom (visual-replace-display-total t))
 
-;; ;; Magit often requires a newer version of transient.
-;; (use-package transient
-;;   :custom (transient-semantic-coloring t)
-
-;;   :config (transient-bind-q-to-quit))
-
-;; ;; Use Emacsclient as the $EDITOR of child processes.
-;; (use-package with-editor :diminish)
-
 ;; Use "M-p/n" to cycle between older commit messages.
 (use-package magit
   :hook
@@ -1560,28 +1423,6 @@
   (elisp-autofmt-python-bin "python3")
   (elisp-autofmt-on-save-p 'always))
 
-;; ;; Provides indentation guide bars with optional `tree-sitter' support
-;; (use-package indent-bars
-;;   :hook ((python-mode python-ts-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-
-;;   :custom
-;;   (indent-bars-no-descend-lists t) ; no extra bars in continued func arg lists
-
-;;   :config
-;;   (when (and (fboundp 'treesit-available-p) (treesit-available-p))
-;;     (setopt
-;;      indent-bars-treesit-support t
-;;      indent-bars-treesit-ignore-blank-lines-types '("module")
-;;      indent-bars-treesit-scope
-;;      '((python
-;;         function_definition
-;;         class_definition
-;;         for_statement
-;;         if_statement
-;;         with_statement
-;;         while_statement)
-;;        (yaml block_mapping_pair comment)))))
-
 ;; `dabbrev-completion' finds all expansions in the current buffer and presents
 ;; suggestions for completion.
 (use-package dabbrev
@@ -1674,22 +1515,6 @@
 
   ;; Do not open the *Messages* buffer when clicking in the Echo area.
   (unbind-key [mouse-1] minibuffer-inactive-mode-map))
-
-;; Use "M-SPC" for space-separated completion lookups.
-(use-package orderless
-  :after minibuffer
-
-  :demand t
-
-  :custom (completion-styles '(orderless basic)))
-
-;; https://www.reddit.com/r/emacs/comments/1qlngj1/completionatpoint_overwrites_following_text/
-
-;; Insert completion without overwriting text right of cursor
-(define-advice completion--capf-wrapper (:around (orig-fun fun which) nil -1)
-  (save-restriction
-    (narrow-to-region (point-min) (point))
-    (funcall orig-fun fun which)))
 
 ;; It is recommended to load `yasnippet' before `eglot'
 (use-package yasnippet
@@ -1960,26 +1785,6 @@
   :after company
 
   :init (company-prescient-mode 1))
-
-;; ;; Highlight symbols on hover
-;; (use-package symbol-overlay
-;;   :hook ((prog-mode conf-mode) . symbol-overlay-mode)
-
-;;   :bind
-;;   (("M-p" . symbol-overlay-jump-prev)
-;;    ("M-n" . symbol-overlay-jump-next)
-;;    :map
-;;    symbol-overlay-map
-;;    ("<" . symbol-overlay-jump-first)
-;;    (">" . symbol-overlay-jump-last)
-;;    ("d" . symbol-overlay-jump-to-definition)
-;;    ("r" . symbol-overlay-rename))
-
-;;   :custom
-;;   ;; Delay highlighting to allow for transient cursor placements
-;;   (symbol-overlay-idle-time 2)
-
-;;   :diminish)
 
 (use-package compile
   :ensure nil
@@ -2346,12 +2151,6 @@
     (when (boundp 'html-ts-mode-map)
       (unbind-key "M-o" html-ts-mode-map))))
 
-;; (use-package emmet-mode
-;;   :hook ((web-mode css-mode css-ts-mode html-mode html-ts-mode) . emmet-mode)
-;;   :custom
-;;   (emmet-move-cursor-between-quote t)
-;;   (emmet-self-closing-tag-style " /"))
-
 (use-package css-mode
   :ensure nil
 
@@ -2579,29 +2378,6 @@
 
   :diminish org-indent-mode)
 
-;; An alternate package is https://github.com/lorniu/org-expose-emphasis-markers.
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-
-  :custom
-  (org-appear-autosubmarkers t)
-  (org-appear-autoentities t)
-  (org-appear-autolinks t)
-  (org-appear-autoemphasis t)
-  (org-appear-autokeywords t))
-
-(use-package ox-gfm
-  :after org
-
-  :commands (org-gfm-export-as-markdown org-gfm-export-to-markdown))
-
-(use-package ox-pandoc
-  :after org
-
-  :commands
-  (org-pandoc-export-to-markdown
-   org-pandoc-export-as-markdown org-pandoc-export-to-markdown-and-open))
-
 ;; Without auctex
 (with-eval-after-load 'tex-mode
   (setopt tex-command "pdflatex"))
@@ -2728,15 +2504,6 @@
   (bibtex-maintain-sorted-entries t)
   (bibtex-comma-after-last-field nil))
 
-;; (use-package math-delimiters
-;;   :ensure (:host github :repo "oantolin/math-delimiters")
-;;   :demand t
-;;   :commands (math-delimiters-no-dollars math-delimiters-toggle)
-;;   :bind
-;;   (:map
-;;    TeX-mode-map ("$" . math-delimiters-insert)
-;;    :map LaTeX-mode-map ("$" . math-delimiters-insert)))
-
 (use-package dumb-jump
   :after xref
 
@@ -2751,126 +2518,10 @@
   (dumb-jump-force-searcher 'rg)
   (dumb-jump-prefer-searcher 'rg))
 
-(use-package citre
-  :preface
-  (defun sb/jump-citre-xref ()
-    "Jump to the definition of the symbol at point using `citre-jump' first. Falls back to `xref-find-definitions' on failure."
-    (interactive)
-    (condition-case _
-        (citre-jump)
-      (error
-       (let* ((xref-prompt-for-identifier nil))
-         (call-interactively #'xref-find-definitions)))))
-
-  (defun sb/jump-xref-citre ()
-    "Jump to the definition of the symbol at point using `xref-find-definitions' first. Falls back to `citre-jump' on failure."
-    (interactive)
-    (let ((ofn
-           (lambda ()
-             (let* ((xref-prompt-for-identifier nil))
-               (call-interactively #'xref-find-definitions)))))
-      (condition-case _
-          (citre-jump)
-        (error
-         (funcall ofn)))))
-
-  (defun sb/jump-back-citre-xref ()
-    "Go back to the position before last `citre-jump'.
-Fallback to `xref-go-back'."
-    (interactive)
-    (condition-case _
-        (citre-jump-back)
-      (error
-       (if (fboundp #'xref-go-back)
-           (call-interactively #'xref-go-back)
-         (call-interactively #'xref-pop-marker-stack)))))
-
-  :hook ((prog-mode LaTeX-mode) . citre-mode)
-
-  :bind*
-  (("M-." . sb/jump-xref-citre)
-   ("M-," . sb/jump-back-citre-xref)
-   ("C-c c j" . citre-jump)
-   ("C-c c b" . citre-jump-back)
-   ("C-c c p" . citre-peek)
-   ("C-c c a" . citre-ace-peek)
-   ("C-c c r" . citre-jump-to-reference)
-   ("C-c c c" . citre-create-tags-file)
-   ("C-c c u" . citre-update-tags-file)
-   ("C-c c e" . citre-edit-tags-file-recipe)
-   ("C-c c g" . citre-global-update-database))
-
-  :custom (citre-default-create-tags-file-location 'in-dir)
-  ;; Add exclude by: --exclude=target or by --exclude=@./.ctagsignore
-  ;; Add dirs/files to scan here, one line per dir/file
-  (citre-ctags-default-options
-   (string-join
-    '("-o %TAGSFILE%"
-      "--languages=BibTeX,C,C++,CUDA,CMake,EmacsLisp,Java,Make,Python,Sh,TeX"
-      "--kinds-all=*"
-      "--fields=*"
-      "--extras=*"
-      "--recurse")
-    " "))
-  ;; Add Elisp to the backend lists.
-  (citre-find-definition-backends '(elisp eglot tags global))
-  (citre-find-reference-backends '(elisp eglot global))
-
-  :config
-  (setq-default
-   citre-enable-imenu-integration nil ; Conflicts with Elisp imenu entries
-   ;; Large tags file slows down completion
-   citre-enable-capf-integration nil)
-
-  ;; Use `citre' with Emacs Lisp
-  (defvar citre-elisp-backend
-    (citre-xref-backend-to-citre-backend
-     ;; This is the xref backend name
-     'elisp
-     ;; A function to tell if the backend is usable
-     (lambda () (derived-mode-p 'emacs-lisp-mode))))
-  ;; Register the backend, which means to bind it with the symbol `elisp'.
-  (citre-register-backend 'elisp citre-elisp-backend)
-
-  ;; Integrate with `lsp-mode' and `eglot'
-  (define-advice xref--create-fetcher (:around (-fn &rest -args) fallback)
-    (let ((fetcher (apply -fn -args))
-          (citre-fetcher
-           (let ((xref-backend-functions '(citre-xref-backend t)))
-             (apply -fn -args))))
-      (lambda ()
-        (or (with-demoted-errors "%s, fallback to citre"
-              (funcall fetcher))
-            (funcall citre-fetcher)))))
-
-  (defun sb/push-point-to-xref-marker-stack (&rest r)
-    (xref-push-marker-stack (point-marker)))
-
-  (dolist (func
-           '(xref-find-definitions
-             xref-find-references
-             find-function
-             consult-imenu
-             project-grep
-             deadgrep
-             counsel-rg
-             consult-lsp-file-symbols
-             citre-jump))
-    (advice-add func :before 'sb/push-point-to-xref-marker-stack))
-
-  :diminish)
-
 (use-package modus-themes
   :when (eq sb/theme 'modus-vivendi)
 
   :init (load-theme 'modus-vivendi t)
-
-  :custom (modus-themes-mixed-fonts nil))
-
-(use-package standard-themes
-  :when (eq sb/theme 'standard-dark)
-
-  :init (load-theme 'standard-dark t)
 
   :custom (modus-themes-mixed-fonts nil))
 
@@ -2886,18 +2537,7 @@ Fallback to `xref-go-back'."
 
   :mode ("\\.kdl\\'" . kdl-mode))
 
-(use-package asm-mode
-  :ensure nil
-
-  :hook (asm-mode . eglot-ensure))
-
-;; Navigate the xref stack with consult
-(use-package consult-xref-stack
-  :vc (:url "https://github.com/brett-lempereur/consult-xref-stack")
-
-  :commands consult-xref-stack-forward
-
-  :bind ("C-," . consult-xref-stack-backward))
+(add-hook 'asm-mode #'eglot-ensure)
 
 ;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
 ;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
@@ -3200,11 +2840,6 @@ Fallback to `xref-go-back'."
      (slot . 2)
      (window-height . 0.5))))
 
-(use-package consult-eglot
-  :after (consult eglot)
-
-  :commands consult-eglot-symbols)
-
 (use-package flymake
   :pin gnu
 
@@ -3242,19 +2877,7 @@ Fallback to `xref-go-back'."
 (use-package kkp
   :unless (display-graphic-p)
 
-  :hook (emacs-startup . global-kkp-mode)
-
-  ;; :config
-  ;; ;; These workarounds are to help with Zellij.
-  ;; (define-key key-translation-map (kbd "M-S-;") (kbd "M-:"))
-  ;; (define-key key-translation-map (kbd "M-S-4") (kbd "M-$"))
-  ;; (define-key key-translation-map (kbd "M-S-/") (kbd "M-?"))
-  )
-
-;; (define-key input-decode-map "\e[127;6u" (kbd "C-S-<backspace>"))
-;; (define-key input-decode-map "\e[46;5u" (kbd "C-."))
-;; (define-key input-decode-map "\e[47;5u" (kbd "C-/"))
-;; ;; (define-key input-decode-map "\e[61;5u" (kbd "C-="))
+  :hook (emacs-startup . global-kkp-mode))
 
 (add-hook
  'emacs-startup-hook
