@@ -1023,21 +1023,10 @@
   ;; Replace the key help with a completing-read interface
   (prefix-help-command #'embark-prefix-help-command))
 
-;; Supports exporting search results to a `grep-mode' buffer, on which you can
-;; use `wgrep'.
-
-(use-package embark-consult
-  :after (embark consult)
-
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
-
 (use-package affe
   :config
   ;; Manual preview key for `affe-grep'
   (consult-customize affe-grep :preview-key "M-."))
-
-(use-package flex-x
-  :custom (completion-styles '(flex-x basic)))
 
 ;; "M-$" triggers correction for the misspelled word before point, "C-u M-$"
 ;; triggers correction for the entire buffer, "C-u C-u M-$" forces correction of
@@ -1145,6 +1134,24 @@
 ;; Save a bookmark with `bookmark-set' ("C-x r m"). To revisit that bookmark,
 ;; use `bookmark-jump' ("C-x r b") or `bookmark-bmenu-list' ("C-x r l"). Rename
 ;; the bookmarked location in `bookmark-bmenu-mode' with `R'.
+(use-package bm
+  :init (setq bm-restore-repository-on-load t)
+
+  :hook
+  ((after-init . bm-repository-load)
+   ((find-file after-revert) . bm-buffer-restore)
+   ((after-save kill-buffer vc-before-checkin) . bm-buffer-save)
+   (kill-emacs
+    .
+    (lambda ()
+      (bm-buffer-save-all)
+      (bm-repository-save))))
+
+  :bind (("C-<f1>" . bm-toggle) ("C-<f3>" . bm-next) ("C-<f2>" . bm-previous))
+
+  :custom (bm-verbosity-level 0)
+
+  :config (setq-default bm-buffer-persistence t))
 
 (use-package crux
   :bind
@@ -1185,10 +1192,7 @@
   (isearch-lazy-count t "Show match count")
   (isearch-allow-scroll t "Scrolling should not cancel search")
   ;; Enable "M-<", "M->", "C-v" and "M-v" to jump among matches
-  (isearch-allow-motion t)
-  (isearch-motion-changes-direction t)
-  ;; Remove delay before `isearch' highlights matches
-  (lazy-highlight-initial-delay 0))
+  (isearch-allow-motion t))
 
 ;; Auto populate `isearch' with the symbol at point
 (use-package isearch-symbol-at-point
@@ -1256,13 +1260,6 @@
 (use-package wgrep-deadgrep
   :hook (deadgrep-finished . wgrep-deadgrep-setup))
 
-(use-package re-builder
-  :ensure nil
-
-  :commands re-builder
-
-  :custom (reb-re-syntax 'string))
-
 (use-package visual-replace
   :bind
   (([remap query-replace] . visual-replace)
@@ -1325,11 +1322,9 @@
   :bind (("C-h C-m" . discover-my-major) ("C-c d m" . discover-my-mode)))
 
 (use-package hl-todo
-  :hook (emacs-startup . global-hl-todo-mode)
+  :commands (hl-todo-previous hl-todo-next)
 
-  ;; I use Flycheck integration (`previous-error' and `next-error') to navigate
-  ;; among the highlighted lines.
-  ;; :bind (("C-c p" . hl-todo-previous) ("C-c n" . hl-todo-next))
+  :hook (emacs-startup . global-hl-todo-mode)
 
   :custom (hl-todo-highlight-punctuation ":"))
 
@@ -1338,12 +1333,6 @@
   :after (consult hl-todo)
 
   :commands (consult-todo consult-todo-all))
-
-;; ;; Display ugly "^L" page breaks as tidy horizontal lines
-;; (use-package page-break-lines
-;;   :hook (emacs-startup . global-page-break-lines-mode)
-
-;;   :diminish)
 
 ;; Basedpyright does not provide formatting feature. So, we cannot use
 ;; `lsp-format-buffer' or `eglot-format-buffer' with `basedpyright'.
@@ -1355,17 +1344,8 @@
   :custom (apheleia-formatters-respect-fill-column t)
 
   :config
-  (setf (alist-get 'prettier apheleia-formatters) '("prettier"))
   (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff))
   (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff))
-
-  ;; (setf (alist-get 'shfmt apheleia-formatters) '("shfmt" "-i" "2" "-ci"))
-
-  ;; (when (executable-find "kdlfmt")
-  ;;   (setf (alist-get 'kdlfmt apheleia-formatters)
-  ;;         '("kdlfmt" "format" "--stdin"))
-  ;;   (setf (alist-get 'kdl-mode apheleia-mode-alist) 'kdlfmt)
-  ;;   (setf (alist-get 'kdl-ts-mode apheleia-mode-alist) 'kdlfmt))
 
   :diminish apheleia-mode)
 
@@ -1432,10 +1412,6 @@
 ;; "orderless" can match search terms in any order.
 (use-package minibuffer
   :ensure nil
-
-  :bind
-  (("M-p" . minibuffer-previous-completion)
-   ("M-n" . minibuffer-next-completion))
 
   :custom (enable-recursive-minibuffers t "Tracking the depth can be confusing")
   ;; Ignore case when reading a file name
@@ -2225,14 +2201,6 @@
   :bind
   (:map
    org-mode-map
-   ("M-<left>")
-   ("M-<right>")
-   ("M-<up>")
-   ("M-<down>")
-   ("C-'")
-   ("C-c C-d")
-   ("C-c C-j")
-   ("M-e")
    ("<tab>" . org-indent-item)
    ("<backtab>" . org-outdent-item)
    ("C-c C-n" . org-next-visible-heading)
@@ -2501,38 +2469,23 @@
 
   :mode ("\\.kdl\\'" . kdl-mode))
 
-(add-hook 'asm-mode #'eglot-ensure)
-
-;; ;; Combined clipboard integration for terminal & GUI. Sends every kill from a
-;; ;; TTY frame to the system clipboard. Clipetty handles clipboard via OSC 52.
-;; (use-package clipetty
-;;   :hook (emacs-startup . global-clipetty-mode)
-
-;;   :diminish)
-
-;; Only enable xclip in TTY under X11
-(use-package xclip
-  :when
-  (and (not (display-graphic-p)) ; only in TTY
-       (not (getenv "WAYLAND_DISPLAY")) ; avoid Wayland
-       (or (executable-find "xclip") (executable-find "xsel")))
-
-  :hook (emacs-startup . xclip-mode))
-
 (use-package eglot
   :after project
 
   :pin gnu
 
   :hook
-  ((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode text-mode)
-   .
-   (lambda ()
-     ;; Disable LSP for git commit message buffers which are usually ephemeral
-     (unless (string-equal
-              (file-name-nondirectory (or buffer-file-name ""))
-              "COMMIT_EDITMSG")
-       (eglot-ensure))))
+  (((html-mode html-ts-mode LaTeX-mode markdown-mode org-mode asm-mode)
+    .
+    eglot-ensure)
+   (text-mode
+    .
+    (lambda ()
+      ;; Disable LSP for git commit message buffers which are usually ephemeral
+      (unless (string-equal
+               (file-name-nondirectory (or buffer-file-name ""))
+               "COMMIT_EDITMSG")
+        (eglot-ensure)))))
 
   :bind
   (("M-'" . eglot-find-implementation)
