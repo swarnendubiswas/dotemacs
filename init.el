@@ -384,11 +384,9 @@
               ("\\([^/]+\\)\\.cpp\\'" "\\1.h")
               ("\\([^/]+\\)\\.h\\'" "\\1.c")
               ("\\([^/]+\\)\\.hpp\\'" "\\1.cpp"))))
-  (when (eq system-type 'windows-nt)
-    (setopt w32-get-true-file-attributes nil))
 
   ;; In Emacs 30 and newer, disable Ispell completion to avoid annotation errors
-  ;; ;; when no `ispell' dictionary is set.
+  ;; when no `ispell' dictionary is set.
   (when (boundp 'text-mode-ispell-word-completion)
     (setopt text-mode-ispell-word-completion nil))
   ;; Hide "When done with a buffer, type C-x 5" message
@@ -401,7 +399,7 @@
    fill-column 80
    cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
    indent-tabs-mode nil ; Spaces instead of tabs
-   tab-width 4
+   tab-width 2
 
    ;; ;; TAB first tries to indent the current line, and if the line was already
    ;; ;; indented, then try to complete the thing at point.
@@ -1158,23 +1156,23 @@
 
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
-(use-package rainbow-delimiters
-  :hook
-  ((c-mode
-    c-ts-mode
-    c++-mode
-    c++-ts-mode
-    emacs-lisp-mode
-    java-mode
-    java-ts-mode
-    json-mode
-    json-ts-mode
-    jsonc-mode
-    lisp-data-mode
-    python-mode
-    python-ts-mode)
-   . rainbow-delimiters-mode))
+;; ;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
+;; (use-package rainbow-delimiters
+;;   :hook
+;;   ((c-mode
+;;     c-ts-mode
+;;     c++-mode
+;;     c++-ts-mode
+;;     emacs-lisp-mode
+;;     java-mode
+;;     java-ts-mode
+;;     json-mode
+;;     json-ts-mode
+;;     jsonc-mode
+;;     lisp-data-mode
+;;     python-mode
+;;     python-ts-mode)
+;;    . rainbow-delimiters-mode))
 
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
