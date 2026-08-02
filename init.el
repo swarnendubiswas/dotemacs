@@ -589,30 +589,18 @@
 (use-package tramp
   :defer t
 
-  :custom (tramp-verbose 1 "Only errors and warnings")
-  ;; (tramp-default-method "ssh")
+  :custom
+  (tramp-verbose 1 "Only errors and warnings")
   (tramp-copy-size-limit (* 2 1024 1024)) ; 2MB
   (tramp-use-scp-direct-remote-copying t)
 
   :config
-  (when (boundp 'tramp-use-connection-share)
-    (setopt tramp-use-connection-share nil))
-
   ;; Include "$HOME/.local/bin" directory in $PATH on remote
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path t)
 
   ;; Disable backup
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil))
   (setopt debug-ignored-errors (cons 'remote-file-error debug-ignored-errors))
-
-  ;; https://coredumped.dev/2025/06/18/making-tramp-go-brrrr./
-  ;; Newer versions of TRAMP will use SSH connection sharing for much faster
-  ;; connections. These don’t require you to reenter your password each time you
-  ;; connect. The compile command disables this feature, so we want to turn it
-  ;; back on.
-  (with-eval-after-load 'compile
-    (remove-hook
-     'compilation-mode-hook #'tramp-compile-disable-ssh-controlmaster-options))
 
   (defun sb/cleanup-tramp ()
     (interactive)
@@ -626,24 +614,12 @@
 
   :hook (ibuffer . ibuffer-auto-mode)
 
-  :bind (("C-x C-b" . ibuffer) :map ibuffer-mode-map ("`" . ibuffer-switch-format))
+  :bind ("C-x C-b" . ibuffer)
 
   :custom
   (ibuffer-display-summary nil)
   (ibuffer-default-sorting-mode 'alphabetic)
   (ibuffer-show-empty-filter-groups nil)
-  (ibuffer-formats
-   '((mark
-      modified
-      read-only
-      locked
-      " "
-      (name 30 30 :left :elide)
-      " "
-      (mode 16 16 :left :elide)
-      " "
-      filename-and-process)
-     (mark " " (name 30 -1) " " filename-and-process)))
   (ibuffer-never-show-predicates
    '("\\*Help\\*"
      "\\*Quick Help\\*"
@@ -1100,6 +1076,12 @@
 (use-package smart-mark
   :hook (emacs-startup . smart-mark-mode))
 
+;; Operate on the current line if no region is active
+(use-package whole-line-or-region
+  :hook (after-init . whole-line-or-region-global-mode)
+
+  :diminish whole-line-or-region-local-mode)
+
 ;; Keeps track of the point position over time and allows us to navigate back
 ;; and forward in history.
 (use-package dogears
@@ -1493,6 +1475,9 @@
   (completion-auto-help nil)
   (completions-sort 'historical)
   (completion-ignore-case t)
+  (completion-auto-select t)
+  (completion-auto-help t)
+  (completion-eager-display t)
 
   (minibuffer-visible-completions 'up-down)
 
@@ -1801,7 +1786,6 @@
   (compilation-scroll-output 'first-error)
 
   (compilation-auto-jump-to-first-error t)
-  (compilation-max-output-line-length nil)
 
   ;; Skip warnings and info when navigating with next-error by setting the value
   ;; to 2. Set it to 1 to also stop at warnings but skip info. Set it to 0 to
@@ -2852,7 +2836,9 @@
    ("M-n" . flymake-goto-next-error)
    ("M-p" . flymake-goto-prev-error))
 
-  :config (setq flymake-show-diagnostics-at-end-of-line t))
+  :config
+  (with-eval-after-load 'consult
+    (bind-key "C-c ! !" #'consult-flymake)))
 
 (defun sb/save-all-buffers ()
   "Save all modified buffers without prompting."
