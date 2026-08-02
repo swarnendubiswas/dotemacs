@@ -1156,24 +1156,6 @@
 
   :bind* ("C-c C-d" . crux-duplicate-current-line-or-region))
 
-;; ;; Parsing parentheses for `LaTeX-mode' and `sh-mode' is difficult.
-;; (use-package rainbow-delimiters
-;;   :hook
-;;   ((c-mode
-;;     c-ts-mode
-;;     c++-mode
-;;     c++-ts-mode
-;;     emacs-lisp-mode
-;;     java-mode
-;;     java-ts-mode
-;;     json-mode
-;;     json-ts-mode
-;;     jsonc-mode
-;;     lisp-data-mode
-;;     python-mode
-;;     python-ts-mode)
-;;    . rainbow-delimiters-mode))
-
 ;; Allow GC to happen after a period of idle time
 (use-package gcmh
   :hook (emacs-startup . gcmh-mode)
