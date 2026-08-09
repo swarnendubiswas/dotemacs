@@ -63,7 +63,8 @@
 ;; "C-h b" lists all the bindings available in a buffer, "C-h m" shows the
 ;; keybindings for the major and the minor modes.
 
-(use-package diminish)
+(use-package diminish
+  :demand t)
 
 (use-package no-littering
   :demand t
