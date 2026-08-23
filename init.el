@@ -64,9 +64,13 @@
 ;; keybindings for the major and the minor modes.
 
 (use-package diminish
+  :ensure t
+
   :demand t)
 
 (use-package no-littering
+  :ensure t
+
   :demand t
 
   :custom
@@ -439,10 +443,6 @@
 
   (put 'overwrite-mode 'disabled t)
 
-  ;; ;; Not a library/file, so `eval-after-load' does not work
-  ;; (diminish 'auto-fill-function)
-  (diminish 'auto-fill-mode)
-
   (advice-add 'risky-local-variable-p :override #'ignore)
 
   (when (file-exists-p custom-file)
@@ -459,6 +459,10 @@
   (unbind-key "M-'") ; Bound to `abbrev-prefix-mark'
 
   ;; (unbind-key "C-j") ; Bound to `electric-newline-and-maybe-indent'
+
+  ;; ;; Not a library/file, so `eval-after-load' does not work
+  ;; (diminish 'auto-fill-function)
+  (diminish 'auto-fill-mode)
 
   (with-eval-after-load 'autorevert
     (diminish 'auto-revert-mode))

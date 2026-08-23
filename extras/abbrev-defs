@@ -966,6 +966,7 @@
     ("numeraous" "numerous" nil :count 0)
     ("nver" "never" nil :count 0)
     ("nwe" "new" nil :count 1)
+    ("nwere" "newer" nil :count 0)
     ("nwo" "now" nil :count 0)
     ("obediant" "obedient" nil :count 0)
     ("obvous" "obvious" nil :count 0)
