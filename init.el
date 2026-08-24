@@ -114,12 +114,14 @@
      ;; Use soft wraps, wrap lines without the ugly continuation marks
      (global-visual-line-mode 1)
 
-     (pixel-scroll-precision-mode 1) ; Smooth scrolling
-
      ;; Continuation lines are displayed with proper indentation, as if the
      ;; text had been filled with M-q, but without modifying the buffer at all.
      (when (fboundp 'global-visual-wrap-prefix-mode)
        (global-visual-wrap-prefix-mode 1))
+
+     (pixel-scroll-precision-mode 1) ; Smooth scrolling
+
+     (winner-mode 1)
 
      ;; When you call `find-file', you do not need to clear the existing file
      ;; path before adding the new one. Just start typing the whole path and

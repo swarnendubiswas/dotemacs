@@ -1049,6 +1049,7 @@
     ("pciture" "picture" nil :count 0)
     ("peice" "piece" nil :count 0)
     ("peices" "pieces" nil :count 0)
+    ("penalities" "penalties" nil :count 0)
     ("peolpe" "people" nil :count 0)
     ("peopel" "people" nil :count 0)
     ("percentof" "percent of" nil :count 0)
