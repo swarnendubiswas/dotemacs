@@ -1828,6 +1828,7 @@
      (json "https://github.com/tree-sitter/tree-sitter-json")
      (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
      (latex "https://github.com/latex-lsp/tree-sitter-latex")
+     (llvm "https://github.com/benwilliamgraham/tree-sitter-llvm")
      (make "https://github.com/alemuller/tree-sitter-make")
      (markdown
       "https://github.com/ikatyang/tree-sitter-markdown"
@@ -2105,6 +2106,11 @@
 
   :custom (css-indent-offset 2))
 
+(use-package markdown-ts-mode
+  :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
+
+  :config (require 'markdown-ts-mode-x))
+
 (use-package autoconf
   :ensure nil
 
@@ -2180,6 +2186,16 @@
    ("\\.json\\'" . json-mode))
 
   :hook ((json-mode json-ts-mode jsonc-mode) . sb/json-setup))
+
+(use-package llvm-ts-mode
+  :mode "\\.ll\\'"
+
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(llvm "https://github.com/benwilliamgraham/tree-sitter-llvm"))
+  (treesit-install-language-grammar 'llvm))
+
 
 ;; Links in org-mode by default are displayed as "descriptive" links, meaning
 ;; they hide their target URLs. While this looks great, it makes it a bit tricky
@@ -2506,7 +2522,7 @@
    ("C-c l o" . eglot-code-action-organize-imports))
 
   :custom
-
+  (eglot-autoshutdown t)
   (eglot-sync-connect nil "Do not block waiting to connect to the LSP")
   (eglot-send-changes-idle-time 1)
   (eglot-extend-to-xref t)
@@ -2518,15 +2534,19 @@
      :hoverProvider ; Automatic documentation popups can be distracting
      :inlayHintProvider ; Inlay hints are distracting
      :executeCommandProvider
-     :documentLinkProvider))
+     :documentLinkProvider
+     :semanticTokensProvider))
   (eglot-report-progress nil)
   ;; Do not clutter the modeline
   (eglot-mode-line-format nil)
   (eglot-confirm-server-edits '((eglot-rename . nil) (t . diff)))
+  (eglot-max-file-watches 5000)
 
   :config
-  ;; Reduce memory usage and avoid cluttering *EGLOT events* buffer
-  (setopt eglot-events-buffer-config '(:size 0 :format short))
+  ;; Disable event logging and avoid cluttering *EGLOT events* buffer
+  (if (> emacs-major-version 29)
+      (setopt eglot-events-buffer-config '(:size 0 :format short))
+    (setopt eglot-events-buffer-size 0))
 
   (fset #'jsonrpc--log-event #'ignore)
 
@@ -2763,6 +2783,24 @@
      (side . bottom)
      (slot . 2)
      (window-height . 0.5))))
+
+(defun sb/company-set-minimum-prefix-length ()
+  (when (memq
+         major-mode
+         '(c-mode
+           c-ts-mode
+           c++-mode
+           c++-ts-mode
+           bash-ts-mode
+           sh-mode
+           python-mode
+           python-ts-mode
+           makefile-mode
+           java-mode
+           java-ts-mode))
+    (setq-local company-minimum-prefix-length 2)))
+
+(add-hook 'eglot-managed-mode-hook #'sb/company-set-minimum-prefix-length)
 
 (use-package flymake
   :pin gnu

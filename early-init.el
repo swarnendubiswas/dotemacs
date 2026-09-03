@@ -233,7 +233,7 @@
   '(("inspiron-7572"
      :font "Iosevka Nerd Font Mono"
      :gui-height 18
-     :daemon-height 20
+     :daemon-height 16
      :mode-line-height 160)
     ("cseiitk"
      :font "Iosevka Nerd Font Mono"
