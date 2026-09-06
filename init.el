@@ -44,7 +44,7 @@
  use-package-vc-prefer-newest t
  use-package-enable-imenu-support t
  use-package-expand-minimally t
- use-package-always-defer t
+ use-package-always-defer nil
  use-package-verbose nil
  use-package-minimum-reported-time 0 ; Show everything
  ;; Use "M-x use-package-report" to see results
