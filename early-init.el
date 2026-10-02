@@ -232,13 +232,13 @@
 (defconst sb/font-config
   '(("inspiron-7572"
      :font "Iosevka Nerd Font Mono"
-     :gui-height 18
+     :gui-height 17
      :daemon-height 16
      :mode-line-height 160)
     ("cseiitk"
      :font "Iosevka Nerd Font Mono"
-     :gui-height 19
-     :daemon-height 20
+     :gui-height 16
+     :daemon-height 16
      :mode-line-height 160)))
 
 (defun sb/font-config-for-host ()
