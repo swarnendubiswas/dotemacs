@@ -2493,6 +2493,7 @@
 
   :mode ("\\.kdl\\'" . kdl-mode))
 
+;; https://www.jamescherti.com/emacs-eglot-auto-format-buffer-on-save/
 (use-package eglot
   :after project
 
@@ -2763,7 +2764,11 @@
       :isolateEnglish
       :json-false
       :dialect "American")
-     :texlab (:formatting (:lineLength 80 :enable nil))))
+     :texlab
+     (:build
+      (:onSave :json-false)
+      :chktex (:onOpenAndSave :json-false)
+      :formatting (:lineLength 80 :enable :json-false))))
 
   (when (fboundp 'eglot-semantic-tokens-mode)
     (add-hook
