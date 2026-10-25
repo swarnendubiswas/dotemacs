@@ -1682,16 +1682,17 @@
      '(company-files ; Have files first to allow completing paths
        (:separate
         company-capf
-        company-reftex-citations ; will trigger inside \cite{}
-        ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
-        company-reftex-labels
-        ;; LaTeX structure
-        company-auctex-labels company-auctex-macros company-auctex-environments
-        company-latex-commands ; `company-auctex-macros' seem to be better
-        company-auctex-symbols
-        company-math-symbols-latex ; Math latex tags
-        ;; Math Unicode symbols and sub (super) scripts
-        company-math-symbols-unicode company-dict company-ispell company-dabbrev
+        ;; company-reftex-citations ; will trigger inside \cite{}
+        ;; ;; Will trigger inside forms like \ref{}, \eqref{}, \auroref{}, etc.
+        ;; company-reftex-labels
+        ;; ;; LaTeX structure
+        ;; company-auctex-labels company-auctex-macros company-auctex-environments
+        ;; company-latex-commands ; `company-auctex-macros' seem to be better
+        ;; company-auctex-symbols
+        ;; company-math-symbols-latex ; Math latex tags
+        ;; ;; Math Unicode symbols and sub (super) scripts
+        ;; company-math-symbols-unicode
+        company-dict company-ispell company-dabbrev
         :with company-yasnippet))))
 
   (add-hook
@@ -2761,7 +2762,8 @@
       :markdown (:IgnoreLinkTitle :json-false)
       :isolateEnglish
       :json-false
-      :dialect "American")))
+      :dialect "American")
+     :texlab (:formatting (:lineLength 80 :enable nil))))
 
   (when (fboundp 'eglot-semantic-tokens-mode)
     (add-hook
